@@ -1,0 +1,126 @@
+<Ui xmlns="http://www.blizzard.com/wow/ui/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.blizzard.com/wow/ui/
+..\FrameXML\UI.xsd">
+
+	<Script file="Templates.lua"/>
+
+	<Frame name="BetterWardrobeSetInfoTemplate" parentKey="SetInfo" virtual="true" setAllPoints="true" hidden="false">
+		<Anchors>
+			<Anchor point="TOPLEFT" x="2" y="-2" relativePoint="TOPLEFT"/>
+			<Anchor point="BOTTOMRIGHT" x="2" y="-2" relativePoint="BOTTOMRIGHT"/>
+		</Anchors>
+		<Layers>
+			<Layer level="OVERLAY">
+				<FontString parentKey="progress" inherits="GameFontHighlightMedium" text="">
+					<Anchors>
+						<Anchor point="TOP" y="-2"/>
+					</Anchors>
+					<Color r="0.804" g="0.725" b="0.616"/>
+				</FontString>
+			</Layer>
+		<Layer level="OVERLAY">
+				<FontString parentKey="setName" inherits="GameFontHighlightMedium" text="">
+					<Anchors>
+				<Anchor point="BOTTOMLEFT"  y="15" relativePoint="BOTTOMLEFT"/>
+			<Anchor point="BOTTOMRIGHT"  relativePoint="BOTTOMRIGHT"/>
+					</Anchors>
+					
+					<Shadow>
+					<Offset x="5" y="-5" />
+				<Color r="0.804" g="0.725" b="0.616"/>
+									</Shadow>
+				</FontString>
+			</Layer>
+		</Layers>
+	</Frame>
+
+	<Frame name="BetterWardrobeIconsTemplate" parentKey="CollectionListVisual" virtual="true" setAllPoints="true" mixin="BW_SetIconMixin" hidden="false">
+		<Anchors>
+			<Anchor point="TOPLEFT" x="2" y="-2" relativePoint="TOPLEFT"/>
+			<Anchor point="BOTTOMRIGHT" x="2" y="-2" relativePoint="BOTTOMRIGHT"/>
+		</Anchors>
+		<Layers>
+			<Layer level="OVERLAY">
+				<Texture parentKey="InvalidTexture" atlas="transmog-set-border-unusable" hidden="true" >
+					<Anchors>
+						<Anchor point="TOPLEFT" x="-11" y = "3"/>
+						<Anchor point="BOTTOMRIGHT" x = "8" y = "-2"/>
+					</Anchors>
+				</Texture>
+			</Layer>
+		</Layers>
+		<Frames>
+			<Frame parentKey="Unavailable" mixin="BW_SetIconMixin" id = "1" hidden="true">
+			<Size x="17" y="17"/>
+				<Anchors>
+					<Anchor point="TOPRIGHT" x="5" y="10"/>
+				</Anchors>
+				<Layers>
+					<Layer level="ARTWORK">
+						<Texture parentKey="Icon" atlas ="transmog-icon-remove" setAllPoints="true" >
+						</Texture>
+					</Layer>
+				</Layers>
+				<Scripts>
+					<OnEnter method="OnEnter" /> 
+					<OnLeave function="GameTooltip_Hide"/>
+				</Scripts>
+			</Frame>
+			<Frame parentKey="UnavailableItems"  mixin="BW_SetIconMixin" id = "2" hidden="true">
+			<Size x="17" y="17"/>
+				<Anchors>
+					<Anchor point="TOPRIGHT" x="5" y="10"/>
+				</Anchors>
+				<Layers>
+					<Layer level="ARTWORK">
+						<Texture parentKey="Icon" file="Interface\Minimap\Minimap_skull_normal" setAllPoints="true" >
+						</Texture>
+					</Layer>
+				</Layers>
+				<Scripts>
+					<OnEnter method="OnEnter" /> 
+					<OnLeave function="GameTooltip_Hide"/>
+				</Scripts>
+			</Frame>
+			<Frame parentKey="Hidden">
+			<Size x="20" y="20"/>
+				<Anchors>
+					<Anchor point="TOP" y="12"/>
+				</Anchors>
+				<Layers>
+					<Layer level="ARTWORK">
+						<Texture parentKey="Icon" atlas="transmog-icon-hidden" useAtlasSize="true" hidden="true">
+							<Anchors>
+								<Anchor point="CENTER"/>
+							</Anchors>
+						</Texture>
+					</Layer>
+				</Layers>
+			</Frame>
+			<Frame parentKey="Collection" hidden="false">
+				<Size x="20" y="20"/>
+				<Anchors>
+					<Anchor point="BOTTOMRIGHT" x="0" y="0" relativePoint="BOTTOMRIGHT"/>
+				</Anchors>
+				<Layers>
+					<Layer level="ARTWORK">
+						<Texture parentKey="Collection_Icon" file="Interface\Minimap\Tracking\Profession" hidden="true" >
+							<Size x="25" y="25"/>
+						</Texture>
+					</Layer>
+					<Layer level="OVERLAY">
+						<Texture parentKey="Collected_Icon" atlas="ParagonReputation_Checkmark" useAtlasSize="false" hidden="true">
+							<Size x="12" y="12"/>
+							<Anchors>
+							</Anchors>
+						</Texture>
+
+					</Layer>
+				</Layers>
+			</Frame>
+		</Frames>
+	</Frame>
+
+
+	<Frame name="BW_WardrobeSetsDetailsItemFrameTemplate" inherits ="WardrobeSetsDetailsItemFrameTemplate" mixin="BW_WardrobeSetsDetailsItemMixin" virtual="true">
+	</Frame>
+</Ui>

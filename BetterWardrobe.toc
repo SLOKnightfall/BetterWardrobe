@@ -1,0 +1,89 @@
+﻿## Interface: 100002
+## Title: BetterWardrobe (@project-version@)
+## Version: @project-version@
+## Author: SLOKnightfall
+## Notes: 
+## OptionalDeps: MogIt, CanIMogIt, LegionWardrobe, WardrobeEnhanced, Rarity, TransmogOutfits, ExtendedSets, ElvUI
+## SavedVariables: BetterWardrobe_Options, BetterWardrobe_CharacterData, BetterWardrobe_SavedSetData, BetterWardrobe_SubstituteItemData, BetterWardrobe_ListData, BetterWardrobe_Mogitdata, BetterWardrobe_Updates, BTT
+## X-Curse-Project-ID: 401253
+## X-Wago-ID: 0mKOzk6x
+
+
+#Libraries
+Libs\LibStub\LibStub.lua
+Libs\CallbackHandler-1.0\CallbackHandler-1.0.lua
+Libs\AceAddon-3.0\AceAddon-3.0.xml
+Libs\AceConsole-3.0\AceConsole-3.0.xml
+Libs\AceGUI-3.0\AceGUI-3.0.xml
+Libs\AceConfig-3.0\AceConfig-3.0.xml
+Libs\AceDB-3.0\AceDB-3.0.xml
+Libs\AceDBOptions-3.0\AceDBOptions-3.0.xml
+Libs\AceEvent-3.0\AceEvent-3.0.xml
+Libs\AceHook-3.0\AceHook-3.0.xml
+Libs\AceLocale-3.0\AceLocale-3.0.xml
+Libs\LibArmorToken-1.0\lib.xml
+Libs\LibAppropriateitems-1.0\lib.xml
+#Libs\LibDataBroker-1.1\LibDataBroker-1.1.lua
+#Libs\LibTextDump-1.0\LibTextDump-1.0.lua
+Libs\UIDropDownMenu\UIDropDownMenu.xml
+Libs\AceSerializer-3.0\AceSerializer-3.0.xml
+
+#Locale
+Locale\enUS.lua
+Locale\SetNames_enUS.lua
+Locale\deDE.lua
+Locale\zhTW.lua
+
+
+#Core files
+Data\Globals.lua
+Modules\Templates.xml
+Modules\Core.lua
+
+#Data files
+#Data\ColorData.lua
+Data\CameraData.lua
+Data\AppearanceData.lua
+Data\ArtifactData.lua
+#Data\SourceData.lua
+
+Data\DataBase.lua
+Data\CLOTH.lua
+Data\LEATHER.lua
+Data\MAIL.lua
+Data\PLATE.lua
+Data\COSMETIC.lua
+
+#Modules
+Modules\BlizzardAPI.lua
+Modules\ArtifactAppearances.lua
+Modules\SavedOutfits.xml
+Modules\DressingRoom.xml
+Modules\Wardrobe.xml
+Modules\ColorFilter.lua
+
+#Modules\PreviewWindows.lua
+
+Modules\CollectionList.xml
+Modules\Sources.lua
+
+Modules\TransmogVendor.xml
+
+Modules\ImportExport.lua
+Modules\Tooltips.lua
+#Modules\UI.lua
+Modules\SortingFunctions.lua
+
+#3rd party addon compatability
+Plugins\ElvUI.lua
+Plugins\CanIMogIt.lua
+Plugins\MogIt.lua
+Plugins\WardrobeEnhanced.lua
+Plugins\TransmogOutfits.lua
+Plugins\ExtendedTransmog.lua
+
+#@do-not-package@
+#Testing
+UnitTests\DataBase.lua
+
+#@end-do-not-package@

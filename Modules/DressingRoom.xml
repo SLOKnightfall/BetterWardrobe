@@ -1,0 +1,452 @@
+<Ui xmlns="http://www.blizzard.com/wow/ui/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.blizzard.com/wow/ui/
+..\FrameXML\UI.xsd">
+	<Script file="DressingRoom.lua"/>
+
+	<Button name="BW_DressingRoomItemButtonTemplate" virtual="true" mixin="BW_DressingRoomItemButtonMixin">
+		<Size x="32" y="32"/>
+		<Layers>
+			<Layer level="OVERLAY">
+				<Texture parentKey="IconBorder" atlas="loottoast-itemborder-gold" useAtlasSize="false" setAllPoints="true">
+				</Texture>
+			</Layer>
+
+			<Layer level="BACKGROUND">
+				<Texture name="$parentBackground" parentKey="Background" setAllPoints="true">
+					<TexCoords left="0.055" right="0.945" top="0.055" bottom="0.945"/>
+					<Color r="0.6" g="0.6" b="0.6" a="0.8"/>
+				</Texture>
+			</Layer>
+			<Layer level="ARTWORK">
+				<Texture name="$parentIcon" parentKey="Icon" setAllPoints="true">
+					<TexCoords left="0.055" right="0.945" top="0.055" bottom="0.945"/>
+				</Texture>
+			</Layer>
+		</Layers>
+		<Scripts>
+			<OnLoad method="OnLoad"/>
+			<OnEnter method="OnEnter"/>
+			<OnLeave method="OnLeave"/>
+			<OnMouseDown method="OnMouseDown"/>
+
+			<OnShow>
+				self:SetFrameLevel(self:GetParent():GetFrameLevel()+2);
+			</OnShow>
+		</Scripts>
+	</Button>
+
+	<Button name="BW_DressingRoomOutfitFrameButtonTemplate" inherits="WardrobeOutfitButtonTemplate" virtual="true" mixin="BW_DressingRoomOutfitButtonMixin"/>
+	
+
+	<Frame name="BW_DressingRoomFrameTemplate" mixin="BW_DressingRoomFrameMixin" virtual="true">
+		<Anchors>
+			<Anchor point="TOPLEFT"/>
+			<Anchor point="BOTTOMRIGHT"/>
+		</Anchors>
+		<Frames>
+			<Frame parentKey="PreviewButtonFrame" hidden="false" >
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeKey="$parent" relativePoint="LEFT" x="12" y="134"/>/>
+					<Anchor point="BOTTOMRIGHT"/>
+				</Anchors>
+				<Frames>
+					<Button parentKey="PreviewButtonHead" inherits="BW_DressingRoomItemButtonTemplate" parentArray="Slots" id="1">
+						<Anchors>
+							<Anchor point="TOPLEFT" relativeKey="$parent" relativePoint="TOPLEFT" x="0" y="0"/>
+						</Anchors>
+					</Button>
+					<Button parentKey="PreviewButtonLeftShoulder" inherits="BW_DressingRoomItemButtonTemplate" parentArray="Slots" id="3">
+						<Anchors>
+							<Anchor point="TOPLEFT" relativeKey="$parent.PreviewButtonHead" relativePoint="BOTTOMLEFT" x="0" y="0"/>
+						</Anchors>
+					</Button>
+					<Button parentKey="PreviewButtonRightShoulder" inherits="BW_DressingRoomItemButtonTemplate" parentArray="Slots" id="3">
+						<Anchors>
+							<Anchor point="TOPLEFT" relativeKey="$parent.PreviewButtonLeftShoulder" relativePoint="BOTTOMLEFT" x="0" y="0"/>
+						</Anchors>
+					</Button>
+					<Button parentKey="PreviewButtonBack" inherits="BW_DressingRoomItemButtonTemplate" parentArray="Slots" id="15">
+						<Anchors>
+							<Anchor point="TOPLEFT" relativeKey="$parent.PreviewButtonRightShoulder" relativePoint="BOTTOMLEFT" x="0" y="0"/>
+						</Anchors>
+					</Button>
+					<Button parentKey="PreviewButtonChest" inherits="BW_DressingRoomItemButtonTemplate" parentArray="Slots" id="5">
+						<Anchors>
+							<Anchor point="TOPLEFT" relativeKey="$parent.PreviewButtonBack" relativePoint="BOTTOMLEFT" x="0" y="0"/>
+						</Anchors>
+					</Button>
+					<Button parentKey="PreviewButtonShirt" inherits="BW_DressingRoomItemButtonTemplate" parentArray="Slots" id="4">
+						<Anchors>
+							<Anchor point="TOPLEFT" relativeKey="$parent.PreviewButtonChest" relativePoint="BOTTOMLEFT" x="0" y="0"/>
+						</Anchors>
+					</Button>
+					<Button parentKey="PreviewButtonTabard" inherits="BW_DressingRoomItemButtonTemplate" parentArray="Slots" id="19">
+						<Anchors>
+							<Anchor point="TOPLEFT" relativeKey="$parent.PreviewButtonShirt" relativePoint="BOTTOMLEFT" x="0" y="0"/>
+						</Anchors>
+					</Button>
+					<Button parentKey="PreviewButtonWrist" inherits="BW_DressingRoomItemButtonTemplate" parentArray="Slots" id="9">
+						<Anchors>
+							<Anchor point="TOPLEFT" relativeKey="$parent.PreviewButtonTabard" relativePoint="BOTTOMLEFT" x="0" y="0"/>
+						</Anchors>
+					</Button>
+					
+					<Button parentKey="PreviewButtonHands" inherits="BW_DressingRoomItemButtonTemplate" parentArray="Slots" id="10">
+						<Anchors>
+							<Anchor point="TOPRIGHT" relativeKey="$parent" relativePoint="TOPRIGHT" x="-12" y="0"/>
+						</Anchors>
+					</Button>
+					<Button parentKey="PreviewButtonWaist" inherits="BW_DressingRoomItemButtonTemplate" parentArray="Slots" id="6">
+						<Anchors>
+							<Anchor point="TOPRIGHT" relativeKey="$parent.PreviewButtonHands" relativePoint="BOTTOMRIGHT" x="0" y="0"/>
+						</Anchors>
+					</Button>
+					<Button parentKey="PreviewButtonLegs" inherits="BW_DressingRoomItemButtonTemplate" parentArray="Slots" id="7">
+						<Anchors>
+							<Anchor point="TOPRIGHT" relativeKey="$parent.PreviewButtonWaist" relativePoint="BOTTOMRIGHT" x="0" y="0"/>
+						</Anchors>
+					</Button>
+					<Button parentKey="PreviewButtonFeet" inherits="BW_DressingRoomItemButtonTemplate" parentArray="Slots" id="8">
+						<Anchors>
+							<Anchor point="TOPRIGHT" relativeKey="$parent.PreviewButtonLegs" relativePoint="BOTTOMRIGHT" x="0" y="0"/>
+						</Anchors>
+					</Button>
+					
+					<Button parentKey="PreviewButtonMainHand" inherits="BW_DressingRoomItemButtonTemplate" parentArray="Slots" id="16">
+						<Anchors>
+							<Anchor point="TOPRIGHT" relativeKey="$parent.PreviewButtonFeet" relativePoint="BOTTOMRIGHT" x="0" y="-38"/>
+						</Anchors>
+					</Button>
+					<Button parentKey="PreviewButtonOffHand" inherits="BW_DressingRoomItemButtonTemplate" parentArray="Slots" id="17">
+						<Anchors>
+							<Anchor point="TOPRIGHT" relativeKey="$parent.PreviewButtonMainHand" relativePoint="BOTTOMRIGHT" x="0" y="0"/>
+						</Anchors>
+					</Button>
+				</Frames>
+			</Frame>
+			<Button name ="BW_DressingRoomSettingsButton" parentKey="BW_DressingRoomSettingsButton" inherits="SquareIconButtonTemplate" mixin="BW_DressingRoomButtonMixin"> 
+				<Anchors>
+					<Anchor point="BOTTOMLEFT" relativeTo="$parent" relativePoint="BOTTOMLEFT" x="2" y="-2"/>
+				</Anchors>
+				<Layers>
+					<Layer level="ARTWORK" textureSubLevel="5">
+						<Texture parentKey="Icon" file="Interface\Buttons\UI-OptionsButton">
+							<Size x="16" y="16"/>
+							<Anchors>
+								<Anchor point="CENTER" />
+							</Anchors>
+						</Texture>
+					</Layer>
+				</Layers>
+				<Scripts>
+					<OnLoad> self.buttonID = "Settings" </OnLoad>
+					<OnMouseDown method="OnMouseDown" />
+					<OnClick method="OnEnter" />
+					<OnLeave method="OnLeave" />
+				</Scripts>
+			</Button>
+			<Button parentKey="BW_DressingRoomExportButton" inherits="SquareIconButtonTemplate" mixin="BW_DressingRoomButtonMixin">
+				<Size x="32" y="32"/>
+				<Anchors>
+					<Anchor point="LEFT" relativeKey="$parent.BW_DressingRoomSettingsButton" relativePoint="RIGHT" x="-5" y="0"/>
+				</Anchors>					
+				<Layers>
+					<Layer level="ARTWORK" textureSubLevel="5">
+						<Texture parentKey="Icon" file="Interface\Buttons\UI-GuildButton-PublicNote-Up">
+							<Size x="16" y="16"/>
+							<Anchors>
+								<Anchor point="CENTER" />
+							</Anchors>
+						</Texture>
+					</Layer>
+				</Layers>
+				<Scripts>
+					<OnLoad> self.buttonID = "Import" </OnLoad>
+					<OnMouseDown method="OnMouseDown" />
+					<OnClick method="OnEnter" />
+					<OnLeave method="OnLeave" />
+				</Scripts>
+			</Button>
+			<Button parentKey="BW_DressingRoomTargetButton" inherits="SquareIconButtonTemplate" mixin="BW_DressingRoomButtonMixin">
+				<Size x="32" y="32"/>
+				<Anchors>
+					<Anchor point="LEFT" relativeKey="$parent.BW_DressingRoomExportButton" relativePoint="RIGHT" x="-5" y="0"/>
+				</Anchors>					
+				<Layers>
+					<Layer level="ARTWORK" textureSubLevel="5">
+						<Texture parentKey="Icon" file="Interface\CURSOR\Crosshairs">
+							<Size x="16" y="16"/>
+							<Anchors>
+								<Anchor point="CENTER" />
+							</Anchors>
+						</Texture>
+					</Layer>
+				</Layers>
+				<Scripts>
+					<OnLoad> self.buttonID = "Target" </OnLoad>
+					<OnMouseDown method="OnMouseDown" />
+					<OnClick method="OnEnter" />
+					<OnLeave method="OnLeave" />
+				</Scripts>
+			</Button>
+			<Button parentKey="BW_DressingRoomPlayerButton" inherits="SquareIconButtonTemplate" mixin="BW_DressingRoomButtonMixin">
+				<Size x="32" y="32"/>
+				<Anchors>
+					<Anchor point="LEFT" relativeKey="$parent.BW_DressingRoomTargetButton" relativePoint="RIGHT" x="-5" y="0"/>
+				</Anchors>					
+				<Layers>
+					<Layer level="ARTWORK" textureSubLevel="5">
+						<Texture parentKey="Icon" file="Interface\PvPRankBadges\PvPRank12">
+							<Size x="16" y="16"/>
+							<Anchors>
+								<Anchor point="CENTER" />
+							</Anchors>
+						</Texture>
+					</Layer>
+				</Layers>
+				<Scripts>
+					<OnLoad> self.buttonID = "Player" </OnLoad>
+					<OnMouseDown method="OnMouseDown" />
+					<OnClick method="OnEnter" />
+					<OnLeave method="OnLeave" />
+				</Scripts>
+			</Button>
+			<Button parentKey="BW_DressingRoomGearButton" inherits="SquareIconButtonTemplate" mixin="BW_DressingRoomButtonMixin">
+				<Size x="32" y="32"/>
+				<Anchors>
+					<Anchor point="LEFT" relativeKey="$parent.BW_DressingRoomPlayerButton" relativePoint="RIGHT" x="-5" y="0"/>
+				</Anchors>					
+				<Layers>
+					<Layer level="ARTWORK" textureSubLevel="5">
+						<Texture parentKey="Icon" file="Interface\PvPRankBadges\PvPRank09">
+							<Size x="16" y="16"/>
+							<Anchors>
+								<Anchor point="CENTER" />
+							</Anchors>
+						</Texture>
+					</Layer>
+				</Layers>
+				<Scripts>
+					<OnLoad> self.buttonID = "Gear" </OnLoad>
+					<OnMouseDown method="OnMouseDown" />
+					<OnClick method="OnEnter" />
+					<OnLeave method="OnLeave" />
+				</Scripts>
+			</Button>
+			<Button parentKey="BW_DressingRoomUndressButton" inherits="SquareIconButtonTemplate" mixin="BW_DressingRoomButtonMixin">
+				<Size x="32" y="32"/>
+				<Anchors>
+					<Anchor point="LEFT" relativeKey="$parent.BW_DressingRoomGearButton" relativePoint="RIGHT" x="-5" y="0"/>
+				</Anchors>					
+				<Layers>
+					<Layer level="ARTWORK" textureSubLevel="5">
+						<Texture parentKey="Icon" file="Interface\RAIDFRAME\Raid-Icon-Rez">
+							<Size x="16" y="16"/>
+							<Anchors>
+								<Anchor point="CENTER" />
+							</Anchors>
+						</Texture>
+					</Layer>
+				</Layers>
+				<Scripts>
+					<OnLoad> self.buttonID = "Undress" </OnLoad>
+					<OnMouseDown method="OnMouseDown" />
+					<OnClick method="OnEnter" />
+					<OnLeave method="OnLeave" />
+				</Scripts>
+			</Button>
+			<Frame parentKey="BW_OutfitDropDown"  name="BetterWardrobeDressUpFrameDropDown" inherits="BetterWardrobeOutfitDropDownTemplate" mixin="BetterDressUpOutfitMixin" >
+				<KeyValues>
+					<KeyValue key="width" value="163" type="number"/>
+					<KeyValue key="minMenuStringWidth" value="127" type="number"/>
+					<KeyValue key="maxMenuStringWidth" value="190" type="number"/>
+				</KeyValues>
+				<Anchors>
+					<Anchor point="TOP" relativeTo="DressUpFrame" relativePoint="TOP" x="-23" y="-28"/>
+				</Anchors>
+				<Scripts>
+				</Scripts>
+			</Frame>
+		</Frames>
+		<Scripts>
+			<OnLoad method="OnLoad" />
+			<OnShow method="OnShow" />
+			<OnEvent method="OnEvent" />
+			<OnHide method="OnHide" />
+		</Scripts>
+	</Frame>
+
+	<Frame name="BW_DressingRoomFrame" parent="DressUpFrame" inherits="BW_DressingRoomFrameTemplate" >
+		<Anchors>
+			<Anchor point="TOPLEFT"/>
+			<Anchor point="BOTTOMRIGHT"/>
+		</Anchors>
+	</Frame>
+
+	<Frame name="BW_DressUpFrameTemplate" mixin="DressUpModelFrameMixin" toplevel="true" enableMouse="true" parent="UIParent" hidden="true" inherits="ButtonFrameTemplateMinimizable" virtual="true">
+		<KeyValues>
+			<KeyValue key="hasOutfitControls" value="false" type="boolean"/>
+		</KeyValues>
+		<Size x="450" y="545"/>
+		<Anchors>
+			<Anchor point="TOPLEFT" x="70" y="-104"/>
+		</Anchors>
+		<HitRectInsets>
+			<AbsInset left="0" right="30" top="0" bottom="45"/>
+		</HitRectInsets>
+		<Frames>
+			<Frame parentKey="OutfitDropDown" name="$parentOutfitDropDown" inherits="WardrobeOutfitDropDownTemplate" mixin="DressUpOutfitMixin" hidden="true">
+				<KeyValues>
+					<KeyValue key="width" value="163" type="number"/>
+					<KeyValue key="minMenuStringWidth" value="127" type="number"/>
+					<KeyValue key="maxMenuStringWidth" value="190" type="number"/>
+					<KeyValue key="replaceInvalidSources" value="true" type="boolean"/>
+				</KeyValues>
+				<Anchors>
+					<Anchor point="TOP" x="-23" y="-28"/>
+				</Anchors>
+			</Frame>
+			<Frame parentKey="MaximizeMinimizeFrame" mixin="DressUpModelFrameMaximizeMinimizeMixin" inherits="MaximizeMinimizeButtonFrameTemplate">
+				<Anchors>
+					<Anchor point="RIGHT" relativeKey="$parent.CloseButton" relativePoint="LEFT" x="10" y="0"/>
+				</Anchors>
+				<Scripts>
+					<OnLoad method="OnLoad" />
+				</Scripts>
+			</Frame>
+			<Button name="DressUpFrameCancelButton" mixin="DressUpModelFrameCancelButtonMixin" inherits="UIPanelButtonTemplate" text="CLOSE">
+				<Size x="80" y="22"/>
+				<Anchors>
+					<Anchor point="BOTTOMRIGHT" relativePoint="BOTTOMRIGHT" x="-7" y="4"/>
+				</Anchors>
+				<Scripts>
+					<OnClick method="OnClick"/>
+				</Scripts>
+			</Button>
+			<ModelScene parentKey="ModelScene" inherits="PanningModelSceneMixinTemplate">
+				<KeyValues>
+					<KeyValue key="normalIntensity" value="0.75" type="number"/>
+					<KeyValue key="highlightIntensity" value="1.2" type="number"/>
+				</KeyValues>
+				<Anchors>
+					<Anchor point="TOPLEFT" x="7" y="-63"/>
+					<Anchor point="BOTTOMRIGHT" x="-9" y="28"/>
+				</Anchors>
+				<Frames>
+					<Frame parentKey="ControlFrame" inherits="ModelSceneControlFrameTemplate" >
+						<Anchors>
+							<Anchor point="TOP" x="0" y="-10"/>
+						</Anchors>
+					</Frame>
+				</Frames>
+				<Scripts>
+					<OnDressModel>
+						self:GetParent():OnDressModel();
+					</OnDressModel>
+				</Scripts>
+			</ModelScene>
+			<Button parentKey="ToggleOutfitDetailsButton">
+				<Size x="27" y="25"/>
+				<Anchors>
+					<Anchor point="TOPRIGHT" x="-11" y="-30"/>
+				</Anchors>
+				<NormalTexture atlas="dressingroom-button-appearancelist-up"/>
+				<PushedTexture atlas="dressingroom-button-appearancelist-down"/>
+				<HighlightTexture file="Interface\Buttons\ButtonHilight-Square" alphaMode="ADD">
+					<Size x="24" y="23"/>
+					<Anchors>
+						<Anchor point="CENTER" x="0" y="0"/>
+					</Anchors>
+				</HighlightTexture>
+				<Scripts>
+					<OnClick>
+						PlaySound(SOUNDKIT.IG_MAINMENU_OPEN);
+						self:GetParent():ToggleOutfitDetails();
+					</OnClick>
+					<OnEnter>
+						GameTooltip:SetOwner(self, "ANCHOR_RIGHT", -4, -4);
+						GameTooltip_SetTitle(GameTooltip, DRESSING_ROOM_APPEARANCE_LIST);
+						GameTooltip:Show();
+					</OnEnter>
+					<OnLeave function="GameTooltip_Hide"/>
+				</Scripts>
+			</Button>
+			<Frame parentKey="OutfitDetailsPanel" mixin="DressUpOutfitDetailsPanelMixin" enableKeyboard="true">
+				<Size x="313" y="473"/>
+				<Anchors>
+					<Anchor point="TOPLEFT" relativePoint="TOPRIGHT" x="-9" y="-29"/>
+				</Anchors>
+				<Layers>
+					<Layer level="BACKGROUND">
+						<Texture parentKey="BlackBackground">
+							<Size x="301" y="445"/>
+							<Anchors>
+								<Anchor point="TOPLEFT" x="6" y="-19"/>
+							</Anchors>
+							<Color color="BLACK_FONT_COLOR"/>
+						</Texture>
+					</Layer>
+					<Layer level="BORDER">
+						<Texture parentKey="ClassBackground">
+							<Size x="301" y="445"/>
+							<Anchors>
+								<Anchor point="TOPLEFT" relativeKey="$parentKey.BlackBackground"/>
+								<Anchor point="BOTTOMRIGHT" relativeKey="$parentKey.BlackBackground"/>
+							</Anchors>
+							<TexCoords left="0.1599099099099099" right="0.8378378378378378" top="0" bottom="0.9612068965517241"/>
+						</Texture>
+					</Layer>
+					<Layer level="OVERLAY">
+						<Texture atlas="dressingroom-sideframe" setAllPoints="true"/>
+					</Layer>
+				</Layers>
+				<Scripts>
+					<OnLoad method="OnLoad"/>
+					<OnShow method="OnShow"/>
+					<OnHide method="OnHide"/>
+					<OnEvent method="OnEvent"/>
+					<OnKeyDown method="OnKeyDown"/>
+				</Scripts>
+			</Frame>
+			<Button parentKey="ResetButton" mixin="DressUpModelFrameResetButtonMixin" name="DressUpFrameResetButton" inherits="UIPanelButtonTemplate" text="RESET">
+				<Size x="80" y="22"/>
+				<Anchors>
+					<Anchor point="RIGHT" relativeTo="DressUpFrameCancelButton" relativePoint="LEFT"/>
+				</Anchors>
+				<Scripts>
+					<OnLoad method="OnLoad" />
+					<OnClick method="OnClick" />
+				</Scripts>
+			</Button>
+			<DropDownToggleButton parentKey="LinkButton" mixin="DressUpModelFrameLinkButtonMixin" inherits="UIPanelButtonTemplate" text="LINK_TRANSMOG_OUTFIT">
+				<Size x="159" y="22"/>
+				<Anchors>
+					<Anchor point="BOTTOMLEFT" relativePoint="BOTTOMLEFT" x="2" y="4"/>
+				</Anchors>
+				<Scripts>
+					<OnLoad method="OnLoad"/>
+					<OnShow method="OnShow"/>
+					<OnHide method="OnHide"/>
+					<OnClick method="OnClick"/>
+				</Scripts>
+				<Frames>
+					<Frame parentKey="DropDown" inherits="UIDropDownMenuTemplate"/>
+				</Frames>
+			</DropDownToggleButton>	
+		</Frames>
+		<Layers>
+			<Layer level="BACKGROUND">
+				<Texture parentKey="ModelBackground" atlas="dressingroom-background-warrior">
+					<Anchors>
+						<Anchor point="TOPLEFT" relativeKey="$parent.ModelScene"/>
+						<Anchor point="BOTTOMRIGHT" relativeKey="$parent.ModelScene"/>
+					</Anchors>
+				</Texture>
+			</Layer>
+		</Layers>
+		<Scripts>
+			<OnLoad method="OnLoad" />
+			<OnShow method="OnShow" />
+			<OnHide method="OnHide" />
+		</Scripts>
+	</Frame>
+</Ui>

@@ -1,0 +1,31 @@
+name: Package addon
+
+on:
+  push:
+    branches:
+      - master
+    tags:
+      - '*' # Looks like BetterWardrobe just uses semvar for its release tags. This could probably be improved to use regex so you don't accidentally publish something that shouldn't be.
+    paths-ignore:
+      - '.github/**' # Ignores any updates to this file. If you need to test actions you can disable this, or use https://github.com/nektos/act
+
+jobs:
+  build:
+    runs-on: ubuntu-latest # Sets action to run on the latest Ubuntu image that GH supplies
+
+    steps:
+      - name: Checkout addon # uses the GH checkout step to checkout the repo onto the runner
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+
+      - name: Package and Release
+        uses: BigWigsMods/packager@master # https://github.com/BigWigsMods/packager
+        env:
+          # API tokens stored in your GH repo will be stored here (https://github.com/SLOKnightfall/BetterWardrobe/settings/secrets/actions). These will do nothing if not set.
+          # Review https://github.com/BigWigsMods/packager#uploading for more info!
+          GITHUB_OAUTH: ${{ secrets.GITHUB_TOKEN }} # "GITHUB_TOKEN" is a secret always provided to the workflow. 
+          # Workflow permissions need to be set to Read/Write in https://github.com/SLOKnightfall/BetterWardrobe/settings/actions
+          CF_API_KEY: ${{ secrets.CF_API_KEY }}
+          WOWI_API_TOKEN: ${{ secrets.WOWI_API_TOKEN }}
+          WAGO_API_TOKEN: ${{ secrets.WAGO_API_TOKEN }}

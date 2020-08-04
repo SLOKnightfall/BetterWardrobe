@@ -1,0 +1,104 @@
+<Ui xmlns="http://www.blizzard.com/wow/ui/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.blizzard.com/wow/ui/
+..\FrameXML\UI.xsd">
+
+	<Script file="CollectionList.lua"/>
+
+	<Frame name = "BW_ColectionListFrameTemplate" parent = "BetterWardrobeCollectionFrame"  hidden="false" setAllPoints="true" mixin="BetterWardrobeSetsCollectionListMixin" virtual = "true">
+		<Frames>
+			<Frame name = "BW_CollectionListTitle" parentKey="CollectionListTitle" hidden="true" enableMouse="false" >
+				<Anchors>
+					<Anchor point="TOPLEFT" relativePoint="TOPLEFT" y="-35" x="4"/>
+					<Anchor point="BOTTOMRIGHT" relativePoint="BOTTOMRIGHT" x="-6" y="5"/>
+				</Anchors>
+				<Layers>
+					<Layer level="ARTWORK">
+						<FontString parentKey="Name" inherits="Fancy24Font" maxLines="1" text="--">
+							<Anchors>
+								<Anchor point="TOP" x="0" y="-37"/>
+							</Anchors>
+							<Color r="1" g="0.82" b="0"/>
+							<Shadow>
+								<Offset x="1" y="-1" />
+								<Color r="0" g="0" b="0"/>
+							</Shadow>
+						</FontString>
+					</Layer>
+				</Layers>
+			</Frame>
+			<Frame  parentKey="CollectionListHelpText" hidden="true" enableMouse="false" >
+				<Anchors>
+					<Anchor point="TOPLEFT" relativePoint="TOPLEFT"/>
+					<Anchor point="BOTTOMRIGHT" relativePoint="BOTTOMRIGHT" />
+				</Anchors>
+				<Layers>
+					<Layer level="ARTWORK">
+						<FontString parentKey="Name" inherits="Fancy24Font" maxLines="5" text="--">
+							<Anchors>
+								<Anchor point="CENTER"/>
+							</Anchors>
+							<Color r="1" g="0.82" b="0"/>
+							<Shadow>
+								<Offset x="1" y="-1" />
+								<Color r="0" g="0" b="0"/>
+							</Shadow>
+						</FontString>
+					</Layer>
+				</Layers>
+			</Frame>
+			<Frame parentKey="SlotsFrame" hidden = "true">
+				<Size x="10" y="10"/>
+				<Anchors>
+					<Anchor point="TOPLEFT" x="18" y="-100"/>
+				</Anchors>
+			</Frame>
+			<Button name = "BW_CollectionListButton" parentKey="CollectionListButton" inherits="UIMenuButtonStretchTemplate" hidden="false">
+				<Size x="50" y="50"/>
+				<Anchors>
+					<Anchor point="BOTTOMRIGHT" relativePoint="BOTTOMRIGHT" x="-25" y="25"/>
+				</Anchors>
+				<Layers>
+					<Layer level="ARTWORK">
+						<Texture parentKey="Icon" file="Interface\Icons\INV_Artifact_tome01" useAtlasSize="false">
+							<Size x="49" y="49"/>
+							<Anchors>
+								<Anchor point="LEFT" x="1"/>
+							</Anchors>
+						</Texture>
+					</Layer>
+				</Layers>
+				<HighlightTexture file="Interface\Buttons\UI-Common-MouseHilight" alphaMode="ADD">
+					<Size x="49" y="49"/>
+					</HighlightTexture>
+				<Scripts>
+					<OnEnter>
+						CollectionListTooltip_OnEnter(self)
+					</OnEnter>
+					<OnLeave function="GameTooltip_Hide"/>
+					<OnClick>
+						self.ToggleState = not self.ToggleState
+						self:GetParent():Toggle(self.ToggleState)
+					</OnClick>
+					<OnHide>
+						self.ToggleState = false
+						self:GetParent():Toggle(false)
+					</OnHide>
+					<OnLeave> 
+						GameTooltip:Show()
+					</OnLeave>
+				</Scripts>
+			</Button>
+		</Frames>
+		<Scripts>
+			<OnLoad>
+				self:SetTitle()
+				self:CreateSlotButtons()
+			</OnLoad>
+			<OnShow>
+				self.CollectionListButton:SetShown(not 	C_Transmog.IsAtTransmogNPC())
+			</OnShow>
+			<OnHide>
+				self:Toggle(false)
+			</OnHide>
+		</Scripts>
+	</Frame>
+</Ui>
