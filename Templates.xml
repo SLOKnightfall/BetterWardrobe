@@ -1,0 +1,128 @@
+<Ui	xmlns="http://www.blizzard.com/wow/ui/"	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.blizzard.com/wow/ui/
+..\FrameXML\UI.xsd">
+
+	<Frame name="BPCM_ICON_TEMPLATE" id="" virtual="true" >
+		<Size x="20" y="60"/>
+		<Layers>
+		<Layer level="BACKGROUND" setAllPoints = "true">
+		<Color r="1.0" g="0.1" b="0.1" />
+		</Layer>
+		</Layers>
+		<Frames>
+			<Frame	name="$parentNoTrade" parentKey="no_trade" inherits="UICheckButtonTemplate">
+				<Size x="20" y="20"/>
+				<Anchors>
+					<Anchor	point="TOPRIGHT" relativePoint="TOPLEFT" x="0" y="0"/>
+				</Anchors>
+				<Layers>
+					<Layer>
+						<Texture name="$parentIcon"	parentKey="icon" file="Interface/Buttons/UI-GROUPLOOT-PASS-DOWN" setAllPoints = "true">
+							<Size x="20" y="20"/>
+						</Texture>
+					</Layer>
+				</Layers>
+				<Scripts>
+					<OnLoad>
+					</OnLoad>
+					<OnEnter>
+						--self:ShowTooltip()
+					</OnEnter>
+					<OnLeave>
+						--self:HideTooltip()
+					</OnLeave>
+				</Scripts>
+			</Frame>
+			<Frame	name="$parentIcons" parentKey="icons" setAllPoints = "true">
+				<Size x="20" y="60"/>
+
+				<Frames>
+				<Frame	name="$parentGlobal" parentKey="BP_Global" inherits="UICheckButtonTemplate">
+					<Size x="20" y="20"/>
+					<Anchors>
+					<Anchor	point="TOPRIGHT" relativeTo="$parent"	relativePoint="TOPLEFT" x="0" y="0"/>
+					</Anchors>
+					<Layers>
+						<Layer>
+							<Texture name="$parentIcon"	parentKey="icon" file="Interface/ICONS/INV_Misc_Note_04">
+								<Size x="20" y="20"/>
+								<Anchors>
+									<Anchor	point="CENTER" relativePoint="CENTER" x="0" y="0"/>
+								</Anchors>
+							</Texture>
+						</Layer>
+					</Layers>
+					<Scripts>
+						<OnLoad>
+						</OnLoad>
+						<OnEnter>
+							--self:ShowTooltip()
+							BPCM:BuildToolTip(self)
+						</OnEnter>
+						<OnLeave>
+							GameTooltip:Hide()
+						</OnLeave>
+					</Scripts>
+				</Frame>
+				<Frame	name="$parentValue" parentKey="BP_Value" inherits="UICheckButtonTemplate">
+					<Size x="20" y="20"/>
+					<Anchors>
+					<Anchor	point="TOPRIGHT" relativeTo="$parentGlobal"	relativePoint="TOPLEFT" x="0" y="0"/>
+					</Anchors>
+					<Layers>
+						<Layer>
+							<Texture name="$parentIcon"	parentKey="icon" file="Interface/ICONS/INV_Misc_Coin_17">
+								<Size x="20" y="20"/>
+								<Anchors>
+									<Anchor	point="CENTER" relativePoint="CENTER" x="0" y="0"/>
+								</Anchors>
+							</Texture>
+						</Layer>
+					</Layers>
+					<Scripts>
+						<OnLoad>
+						</OnLoad>
+						<OnEnter>
+							--self:ShowTooltip()
+							BPCM:BuildToolTip(self)
+						</OnEnter>
+						<OnLeave>
+							GameTooltip:Hide()
+						</OnLeave>
+					</Scripts>
+				</Frame>
+				<Frame	name="$parentCage" parentKey="BP_Cage" inherits="UICheckButtonTemplate">
+					<Size x="20" y="20"/>
+					<Anchors>
+					<Anchor	point="TOPRIGHT" relativeTo="$parentValue"	relativePoint="TOPLEFT" x="0" y="0"/>
+					</Anchors>
+					<Layers>
+						<Layer>
+							<Texture name="$parentIcon"	parentKey="icon" file="Interface/ICONS/INV_Pet_PetTrap01">
+								<Size x="20" y="20"/>
+								<Anchors>
+									<Anchor	point="CENTER" relativePoint="CENTER" x="0" y="0"/>
+								</Anchors>
+							</Texture>
+						</Layer>
+					</Layers>
+					<Scripts>
+						<OnLoad>
+						</OnLoad>
+						<OnEnter>
+							--self:ShowTooltip()
+							BPCM:BuildToolTip(self)
+						</OnEnter>
+						<OnLeave>
+							GameTooltip:Hide()
+						</OnLeave>
+					</Scripts>
+				</Frame>
+				</Frames>
+			</Frame>
+
+
+		</Frames>
+
+	</Frame>
+
+</Ui>
