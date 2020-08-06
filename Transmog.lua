@@ -1,115 +1,10 @@
---	///////////////////////////////////////////////////////////////////////////////////////////
---
---	BattlePetCageMatch
---	Author: SLOKnightfall
-
---	BattlePetCageMatch: Scans bags and puts icons on the Pet Journal for any pet that is currently caged
---
-
---	License: You are hereby authorized to freely modify and/or distribute all files of this add-on, in whole or in part,
---		providing that this header stays intact, and that you do not claim ownership of this Add-on.
---
---		Additionally, the original owner wishes to be notified by email if you make any improvements to this add-on.
---		Any positive alterations will be added to a future release, and any contributing authors will be
---		identified in the section above.
---
---
---
-
---	///////////////////////////////////////////////////////////////////////////////////////////
-
---local BPCM = select(2, ...)
+--test
+--local addonName, addon = ...
+--_G["BPCM"] = BPCM
+--addon = LibStub("AceAddon-3.0"):NewAddon(addon, addonName, "AceEvent-3.0", "AceConsole-3.0", "AceHook-3.0")
 local addonName, addon = ...
 --_G["BPCM"] = BPCM
-addon = LibStub("AceAddon-3.0"):NewAddon(addon, addonName, "AceEvent-3.0", "AceConsole-3.0", "AceHook-3.0")
-addon.Frame = LibStub("AceGUI-3.0")
---addon.DataBroker = LibStub( "LibDataBroker-1.1" )
-addon.bagResults = {}
-
-local globalPetList = {}
-local playerInv_DB
-local Profile
-local playerNme
-local realmName
-
-local L = LibStub("AceLocale-3.0"):GetLocale(addonName)
-
-
----Ace based addon initilization
-function addon:OnInitialize()
-	addon.AddSetDetailFrames()
-end
-
-
-function addon:OnEnable()
-end
-
-
---local module = mog:GetModule("MogIt_Wardrobe") or mog:RegisterModule("MogIt_Wardrobe",{});
-local sets = {
-	Cloth = {},
-	Leather = {},
-	Mail = {},
-	Plate = {},
-};
-
-local armor = {
-	"Cloth",
-	"Leather",
-	"Mail",
-	"Plate",
-};
-
-local list = {};
-local data = {
-	name = {},
-	items = {},
-	class = {},
-	faction = {},
-};
-
-local function AddData(id,name,items,class,faction)
-	data.name[id] = name;
-	data.items[id] = items;
-	data.class[id] = class;
-	data.faction[id] = faction;
-end
-
-local function GetData(id)
-	return data.name[id],data.items[id],data.class[id],data.faction[id]
-end
-
-function addon.AddCloth(id,...)
-	tinsert(sets.Cloth,id);
-	AddData(id,...);
-end
-
-function addon.AddLeather(id,...)
-	tinsert(sets.Leather,id);
-	AddData(id,...);
-end
-
-function addon.AddMail(id,...)
-	tinsert(sets.Mail,id);
-	AddData(id,...);
-end
-
-function addon.AddPlate(id,...)
-	tinsert(sets.Plate,id);
-	AddData(id,...);
-end
-
-
-function addon.AddSet(id, table)
-local name, items, class, faction = GetData(id)
-local newSet = {["name"] = name,
-	["collected"] = true,
-	["faction"] = faction,
-	["items"] = items
-}
-
-tinsert(table, newSet)
-end
+local set = {1321,"Beaststalker Armor (Recolor)",{29520,29521,29519,31328},nil}
 
 
 local SetsDataProvider = CreateFromMixins(WardrobeSetsDataProviderMixin);
@@ -118,6 +13,44 @@ local VARIANT_SET_BUTTON_HEIGHT = 20;
 local SET_PROGRESS_BAR_MAX_WIDTH = 204;
 local IN_PROGRESS_FONT_COLOR = CreateColor(0.251, 0.753, 0.251);
 local IN_PROGRESS_FONT_COLOR_CODE = "|cff40c040";
+
+
+function SetsDataProvider:GetBaseSets()
+	if ( not self.baseSets ) then
+		self.baseSets = C_TransmogSets.GetBaseSets();
+		self:DetermineFavorites();
+		self:SortSets(self.baseSets);
+	end
+	return self.baseSets;
+end
+
+--[[
+function SetsDataProvider:GetUsableSets()
+	if ( not self.usableSets ) then
+		self.usableSets = C_TransmogSets.GetUsableSets();
+		self:SortSets(self.usableSets);
+		-- group sets by baseSetID, except for favorited sets since those are to remain bucketed to the front
+		for i, set in ipairs(self.usableSets) do
+			if ( not set.favorite ) then
+				local baseSetID = set.baseSetID or set.setID;
+				local numRelatedSets = 0;
+				for j = i + 1, #self.usableSets do
+					if ( self.usableSets[j].baseSetID == baseSetID or self.usableSets[j].setID == baseSetID ) then
+						numRelatedSets = numRelatedSets + 1;
+						-- no need to do anything if already contiguous
+						if ( j ~= i + numRelatedSets ) then
+							local relatedSet = self.usableSets[j];
+							tremove(self.usableSets, j);
+							tinsert(self.usableSets, i + numRelatedSets, relatedSet);
+						end
+					end
+				end
+			end
+		end
+	end
+	return self.usableSets;
+end
+]]
 
 function SetsDataProvider:GetUsableSets()
 	local availableSets = SetsDataProvider:GetBaseSets();
@@ -141,6 +74,125 @@ function SetsDataProvider:GetUsableSets()
 	self:SortSets(self.usableSets);
 	return self.usableSets;
 end
+
+
+function SetsDataProvider:GetVariantSets(baseSetID)
+	if ( not self.variantSets ) then
+		self.variantSets = { };
+	end
+
+	local variantSets = self.variantSets[baseSetID];
+	if ( not variantSets ) then
+		variantSets = C_TransmogSets.GetVariantSets(baseSetID);
+		self.variantSets[baseSetID] = variantSets;
+		if ( #variantSets > 0 ) then
+			-- add base to variants and sort
+			local baseSet = self:GetBaseSetByID(baseSetID);
+			if ( baseSet ) then
+				tinsert(variantSets, baseSet);
+			end
+			local reverseUIOrder = true;
+			local ignorePatchID = true;
+			self:SortSets(variantSets, reverseUIOrder, ignorePatchID);
+		end
+	end
+	return variantSets;
+end
+
+function SetsDataProvider:GetSetSourceData(setID)
+	if ( not self.sourceData ) then
+		self.sourceData = { };
+	end
+
+	local sourceData = self.sourceData[setID];
+	if ( not sourceData ) then
+		local sources = C_TransmogSets.GetSetSources(setID);
+		local numCollected = 0;
+		local numTotal = 0;
+		for sourceID, collected in pairs(sources) do
+			if ( collected ) then
+				numCollected = numCollected + 1;
+			end
+			numTotal = numTotal + 1;
+		end
+		sourceData = { numCollected = numCollected, numTotal = numTotal, sources = sources };
+		self.sourceData[setID] = sourceData;
+	end
+	return sourceData;
+end
+
+function SetsDataProvider:GetBaseSetData(setID)
+	if ( not self.baseSetsData ) then
+		self.baseSetsData = { };
+	end
+	if ( not self.baseSetsData[setID] ) then
+		local baseSetID = C_TransmogSets.GetBaseSetID(setID);
+		if ( baseSetID ~= setID ) then
+			return;
+		end
+		local topCollected, topTotal = self:GetSetSourceCounts(setID);
+		local variantSets = self:GetVariantSets(setID);
+		for i = 1, #variantSets do
+			local numCollected, numTotal = self:GetSetSourceCounts(variantSets[i].setID);
+			if ( numCollected > topCollected ) then
+				topCollected = numCollected;
+				topTotal = numTotal;
+			end
+		end
+		local setInfo = { topCollected = topCollected, topTotal = topTotal, completed = (topCollected == topTotal) };
+		self.baseSetsData[setID] = setInfo;
+	end
+	return self.baseSetsData[setID];
+end
+
+
+function SetsDataProvider:ClearSets()
+	self.baseSets = nil;
+	self.baseSetsData = nil;
+	self.variantSets = nil;
+	self.usableSets = nil;
+	self.sourceData = nil;
+end
+
+function SetsDataProvider:ClearBaseSets()
+	self.baseSets = nil;
+end
+
+function SetsDataProvider:ClearVariantSets()
+	self.variantSets = nil;
+end
+
+function SetsDataProvider:ClearUsableSets()
+	self.usableSets = nil;
+end
+
+function SetsDataProvider:DetermineFavorites()
+	-- if a variant is favorited, so is the base set
+	-- keep track of which set is favorited
+	local baseSets = self:GetBaseSets();
+	for i = 1, #baseSets do
+		local baseSet = baseSets[i];
+		baseSet.favoriteSetID = nil;
+		if ( baseSet.favorite ) then
+			baseSet.favoriteSetID = baseSet.setID;
+		else
+			local variantSets = self:GetVariantSets(baseSet.setID);
+			for j = 1, #variantSets do
+				if ( variantSets[j].favorite ) then
+					baseSet.favoriteSetID = variantSets[j].setID;
+					break;
+				end
+			end
+		end
+	end
+end
+
+function SetsDataProvider:RefreshFavorites()
+	self.baseSets = nil;
+	self.variantSets = nil;
+	self:DetermineFavorites();
+end
+
 
 local BetterWardrobeSetsTransmogMixin = CreateFromMixins(WardrobeSetsTransmogMixin);
 
@@ -177,7 +229,7 @@ function BetterWardrobeSetsTransmogMixin:UpdateSets()
 			end
 			local topSourcesCollected, topSourcesTotal = SetsDataProvider:GetSetSourceCounts(set.setID);
 			local setInfo = C_TransmogSets.GetSetInfo(set.setID)
-			model.Favorite.Icon:SetShown(set.favorite);
+			model.Favorite.Icon:SetShown(C_TransmogSets.GetIsFavorite(set.setID))
 			model.setID = set.setID
 			model.setName:SetText(setInfo["name"].."\n"..(setInfo["description"] or ""))
 			model.progress:SetText(topSourcesCollected.."/".. topSourcesTotal)

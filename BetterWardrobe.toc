@@ -22,11 +22,13 @@ Libs\AceEvent-3.0\AceEvent-3.0.xml
 Libs\AceHook-3.0\AceHook-3.0.xml
 Libs\AceLocale-3.0\AceLocale-3.0.xml
 Libs\LibDataBroker-1.1\LibDataBroker-1.1.lua
+Libs\LibTextDump-1.0\LibTextDump-1.0.lua
 
 #Locale
 Locale\enUS.lua
 
 #Core Files
+Inspect.lua
 BetterWardrobe.xml
 Transmog.lua
 

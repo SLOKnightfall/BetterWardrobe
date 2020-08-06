@@ -1,4 +1,4 @@
-package-as: BattlePetCageMatch
+package-as: BetterWardrobe
 
 manual-changelog:
     filename: CHANGELOG.md
@@ -16,7 +16,6 @@ externals:
     Libs/AceEvent-3.0: https://repos.wowace.com/wow/ace3/trunk/AceEvent-3.0
     Libs/AceHook-3.0: https://repos.wowace.com/wow/ace3/trunk/AceHook-3.0
     Libs/AceLocale-3.0: https://repos.wowace.com/wow/ace3/trunk/AceLocale-3.0
-    Libs/LibDataBroker-1.1: https://repos.wowace.com/wow/libdatabroker-1-1
 
 
 enable-nolib-creation: no
