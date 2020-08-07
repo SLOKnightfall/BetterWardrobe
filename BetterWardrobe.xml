@@ -301,15 +301,29 @@
 		</Frames>
 	</ScrollFrame>
 
+	<Frame name="BetterCollectionsJournal" inherits="PortraitFrameTemplate" toplevel="true" frameStrata="HIGH" enableMouse="true" parent="UIParent" hidden="true">
+		<Size x="703" y="606"/>
+		<Anchors>
+			<Anchor point="CENTER" x="0" y="0"/>
+		</Anchors>
+		<Frames>
+		</Frames>
+		<Scripts>
+		</Scripts>
+	</Frame>
+
+	<Frame name="WardrobeCollectionFrame" parent="BetterCollectionsJournal" setAllPoints="true" hidden="false">
+		<Frames>
 
 
-			<Frame parentKey="SetsCollectionFrame" mixin="BetterWardrobeSetsCollectionMixin" hidden="true" parent = "UIParent">
-				<Size x="703" y="606"/>
+			<Frame parentKey="SetsCollectionFrame" parentArray="ContentFrames" mixin="BetterWardrobeSetsCollectionMixin" hidden="false">
+
 				<KeyValues>
 					<KeyValue key="searchType" value="LE_TRANSMOG_SEARCH_TYPE_BASE_SETS" type="global"/>
 				</KeyValues>
-					<Anchors>
-					<Anchor point="CENTER" relativePoint="CENTER" y="-60" x="4"/>
+				<Anchors>
+					<Anchor point="TOPLEFT" relativePoint="TOPLEFT" y="-60" x="4"/>
+					<Anchor point="BOTTOMRIGHT" relativePoint="BOTTOMRIGHT" x="-6" y="5"/>
 				</Anchors>
 				<Frames>
 					<Frame parentKey="LeftInset" useParentLevel="true" inherits="InsetFrameTemplate">
@@ -319,7 +333,12 @@
 							<Anchor point="BOTTOMLEFT"/>
 						</Anchors>
 					</Frame>
-					
+					<Frame parentKey="RightInset" useParentLevel="true" inherits="CollectionsBackgroundTemplate">
+						<Anchors>
+							<Anchor point="TOPLEFT" relativeKey="$parent.LeftInset" relativePoint="TOPRIGHT" x="22" y="0"/>
+							<Anchor point="BOTTOMRIGHT"/>
+						</Anchors>
+					</Frame>
 					<ScrollFrame name="$parentScrollFrame" parentKey="ScrollFrame" inherits="HybridScrollFrameTemplate" mixin="BetterWardrobeSetsCollectionScrollFrameMixin">
 						<Size x="255" y="499"/>
 						<Anchors>
@@ -341,6 +360,76 @@
 							<OnEvent method="OnEvent"/>
 						</Scripts>
 					</ScrollFrame>
+					<DressUpModel parentKey="Model" mixin="WardrobeSetsDetailsModelMixin">
+						<Anchors>
+							<Anchor point="TOPLEFT" relativeKey="$parent.RightInset" x="3" y="-3"/>
+							<Anchor point="BOTTOMRIGHT" relativeKey="$parent.RightInset" x="-4" y="3"/>
+						</Anchors>
+						<Scripts>
+							<OnLoad method="OnLoad"/>
+							<OnUpdate method="OnUpdate"/>
+							<OnMouseDown method="OnMouseDown"/>
+							<OnMouseUp method="OnMouseUp"/>
+							<OnMouseWheel method="OnMouseWheel"/>
+							<OnModelLoaded method="OnModelLoaded"/>
+						</Scripts>
+					</DressUpModel>
+					<Frame parentKey="DetailsFrame" frameLevel="5">
+						<Anchors>
+							<Anchor point="TOPLEFT" relativeKey="$parent.RightInset" x="0" y="-3"/>
+							<Anchor point="BOTTOMRIGHT" relativeKey="$parent.RightInset" x="-3" y="2"/>
+						</Anchors>
+						<Layers>
+							<Layer level="BACKGROUND">
+								<Texture parentKey="ModelFadeTexture" atlas="transmog-set-model-cutoff-fade">
+									<Size x="0" y="178"/>
+									<Anchors>
+										<Anchor point="TOPLEFT" x="2"/>
+										<Anchor point="TOPRIGHT"/>
+									</Anchors>
+								</Texture>
+							</Layer>
+							<Layer level="BORDER">
+								<Texture parentKey="IconRowBackground" atlas="transmog-set-iconrow-background" useAtlasSize="true">
+									<Anchors>
+										<Anchor point="TOP" x="0" y="-78"/>
+									</Anchors>
+								</Texture>
+							</Layer>
+							<Layer level="ARTWORK">
+								<FontString parentKey="Name" inherits="Fancy24Font" maxLines="1" mixin="ShrinkUntilTruncateFontStringMixin">
+									<Size x="380" y="0"/>
+									<Anchors>
+										<Anchor point="TOP" x="0" y="-37"/>
+									</Anchors>
+									<Color r="1" g="0.82" b="0"/>
+									<Shadow>
+										<Offset x="1" y="-1" />
+										<Color r="0" g="0" b="0"/>
+									</Shadow>
+								</FontString>
+								<FontString parentKey="LongName" inherits="Fancy16Font" maxLines="2" hidden="true">
+									<Size x="380" y="0"/>
+									<Anchors>
+										<Anchor point="TOP" x="0" y="-30"/>
+									</Anchors>
+									<Color r="1" g="0.82" b="0"/>
+									<Shadow>
+										<Offset x="1" y="-1" />
+										<Color r="0" g="0" b="0"/>
+									</Shadow>
+								</FontString>
+								<FontString parentKey="Label" inherits="GameFontHighlight" maxLines="1">
+									<Size x="380" y="0"/>
+									<Anchors>
+										<Anchor point="TOP" x="0" y="-63"/>
+									</Anchors>
+								</FontString>
+							</Layer>
+						</Layers>
+						<Frames>
+						</Frames>
+					</Frame>
 				</Frames>
 				<Scripts>
 					<OnLoad method="OnLoad"/>
@@ -349,5 +438,6 @@
 					<OnEvent method="OnEvent"/>
 				</Scripts>
 			</Frame>
-
+		</Frames>
+	</Frame>
 </Ui>

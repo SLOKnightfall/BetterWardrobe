@@ -44,7 +44,9 @@ end
 
 
 function addon:OnEnable()
-	UIParent.SetsCollectionFrame:Show()
+	BetterCollectionsJournal:Hide()
+	BetterCollectionsJournal:Show()
+	--BetterCollectionsJournal:Show()
 end
 
 
@@ -185,6 +187,70 @@ end
 
 end
 
+function addon.GetSetsources(setID)
+	local setInfo = addon.GetSetInfo(setID)
+	local setSources = {}
+	for i, item in ipairs(setInfo.items) do
+		local _, sourceID = C_TransmogCollection.GetItemInfo(item)
+		--addon.Utilities.Debug(C_TransmogCollection.GetSourceInfo(sourceID),100)
+		--print(item)
+		--print( C_TransmogCollection.GetItemInfo(item) or "boob")
+		if sourceID then
+			local sourceInfo = C_TransmogCollection.GetSourceInfo(sourceID)
+			--setSoruceData[sourceID] = C_TransmogCollection.GetSourceInfo(sourceID)
+			setSources[sourceID] = sourceInfo.isCollected
+		end
+	end
+	return setSources
+end
+
+local SetsDataProvider = CreateFromMixins(WardrobeSetsDataProviderMixin)
+
+function SetsDataProvider:GetSetSourceData(setID)
+	if ( not self.sourceData ) then
+		self.sourceData = { };
+	end
+
+	local sourceData = self.sourceData[setID];
+	if ( not sourceData ) then
+		local sources = addon.GetSetsources(setID);
+		local numCollected = 0;
+		local numTotal = 0;
+		for sourceID, collected in pairs(sources) do
+			if ( collected ) then
+				numCollected = numCollected + 1;
+			end
+			numTotal = numTotal + 1;
+		end
+		sourceData = { numCollected = numCollected, numTotal = numTotal, sources = sources };
+		self.sourceData[setID] = sourceData;
+	end
+	return sourceData;
+end
+
+function SetsDataProvider:GetSortedSetSources(setID)
+	local returnTable = { };
+	local sourceData = self:GetSetSourceData(setID);
+
+	for sourceID, collected in pairs(sourceData.sources) do
+		local sourceInfo = C_TransmogCollection.GetSourceInfo(sourceID);
+		--if not sourceInfo then print("ERRRR.."..sourceID) end
+		if ( sourceInfo ) then
+			local sortOrder = EJ_GetInvTypeSortOrder(sourceInfo.invType);
+			tinsert(returnTable, { sourceID = sourceID, collected = collected, sortOrder = sortOrder, itemID = sourceInfo.itemID, invType = sourceInfo.invType });
+		end
+	end
+
+	local comparison = function(entry1, entry2)
+		if ( entry1.sortOrder == entry2.sortOrder ) then
+			return entry1.itemID < entry2.itemID;
+		else
+			return entry1.sortOrder < entry2.sortOrder;
+		end
+	end
+	table.sort(returnTable, comparison);
+	return returnTable;
+end
 
 
 BetterWardrobeSetsCollectionScrollFrameMixin = CreateFromMixins(WardrobeSetsCollectionScrollFrameMixin);
@@ -215,22 +281,19 @@ end
 
 local selectedSetID
 function BetterWardrobeSetsCollectionScrollFrameMixin:Update()
-	print("UD")
 	local offset = HybridScrollFrame_GetOffset(self);
 	local buttons = self.buttons;
 	local baseSets = addon.sets["Mail" ]
-	local name, items
+
 	-- show the base set as selected
 	local selectedSetID = self:GetParent():GetSelectedSetID();
-	--print(selectedSetID)
-	--local selectedBaseSetID = selectedSetID and C_TransmogSets.GetBaseSetID(selectedSetID);
+	local selectedBaseSetID = selectedSetID --and C_TransmogSets.GetBaseSetID(selectedSetID);
 
 	for i = 1, #buttons do
 		local button = buttons[i];
 		local setIndex = i + offset;
 		if ( setIndex <= #baseSets ) then
 			local baseSet = baseSets[setIndex];
-			--print(baseSet)
 			local name, items = addon.GetSetData(baseSet)
 			local  icon = addon.GetSetIcon(baseSet)
 			local count, complete = addon.GetSetCompletion(baseSet)
@@ -251,7 +314,7 @@ function BetterWardrobeSetsCollectionScrollFrameMixin:Update()
 			button.Icon:SetTexture(icon);
 			--button.Icon:SetDesaturation((topSourcesCollected == 0) and 1 or 0);
 			--button.SelectedTexture:SetShown(baseSet.setID == selectedBaseSetID);
-			--button.Favorite:SetShown(baseSet.favoriteSetID);
+			button.Favorite:Hide() --SetShown(baseSet.favoriteSetID);
 			--button.New:SetShown(SetsDataProvider:IsBaseSetNew(baseSet.setID));
 			button.setID = baseSet;
 
@@ -278,11 +341,11 @@ end
 BetterWardrobeSetsCollectionMixin = CreateFromMixins(WardrobeSetsCollectionMixin);
 
 function BetterWardrobeSetsCollectionMixin:OnLoad()
-	--self.RightInset.BGCornerTopLeft:Hide();
-	--self.RightInset.BGCornerTopRight:Hide();
+	self.RightInset.BGCornerTopLeft:Hide();
+	self.RightInset.BGCornerTopRight:Hide();
 
-	--self.DetailsFrame.Name:SetFontObjectsToTry(Fancy24Font, Fancy20Font, Fancy16Font);
-	--self.DetailsFrame.itemFramesPool = CreateFramePool("FRAME", self.DetailsFrame, "WardrobeSetsDetailsItemFrameTemplate");
+	self.DetailsFrame.Name:SetFontObjectsToTry(Fancy24Font, Fancy20Font, Fancy16Font);
+	self.DetailsFrame.itemFramesPool = CreateFramePool("FRAME", self.DetailsFrame, "WardrobeSetsDetailsItemFrameTemplate");
 
 	self.selectedVariantSets = { };
 end
@@ -293,17 +356,17 @@ function BetterWardrobeSetsCollectionMixin:OnShow()
 	self:RegisterEvent("TRANSMOG_COLLECTION_UPDATED");
 	-- select the first set if not init
 
-
-
 	local baseSets = addon.sets["Mail" ]
-	--if ( not self.init ) then
-		--self.init = true;
-		--if ( baseSets and baseSets[1] ) then
+	if ( not self.init ) then
+		self.init = true;
+		if ( baseSets and baseSets[1] ) then
 			--self:SelectSet(self:GetDefaultSetIDForBaseSet(baseSets[1].setID));
-		--end
-	--else
+			self:SelectSet(baseSets[1]);
+
+		end
+	else
 		self:Refresh();
-	--end
+	end
 
 	local latestSource = C_TransmogSets.GetLatestSource();
 	if ( latestSource ~= NO_TRANSMOG_SOURCE_ID ) then
@@ -319,7 +382,7 @@ function BetterWardrobeSetsCollectionMixin:OnShow()
 
 	--WardrobeCollectionFrame.progressBar:Show();
 	--self:UpdateProgressBar();
-	--self:RefreshCameras();
+	self:RefreshCameras();
 
 	--if (self:GetParent().SetsTabHelpBox:IsShown()) then
 		--self:GetParent().SetsTabHelpBox:Hide()
@@ -368,7 +431,6 @@ function BetterWardrobeSetsCollectionMixin:SelectSetFromButton(setID)
 	CloseDropDownMenus();
 	--self:SelectSet(self:GetDefaultSetIDForBaseSet(setID));
 	self:SelectSet(setID);
-	print(setID)
 end
 
 
@@ -385,8 +447,8 @@ function BetterWardrobeSetsCollectionMixin:SelectSet(setID)
 end
 
 
-	BetterWardrobeSetsCollectionMixin.DetailsFrame = WardrobeCollectionFrame.SetsCollectionFrame.DetailsFrame
-	BetterWardrobeSetsCollectionMixin.Model = WardrobeCollectionFrame.SetsCollectionFrame.Model
+	--BetterWardrobeSetsCollectionMixin.DetailsFrame = WardrobeCollectionFrame.SetsCollectionFrame.DetailsFrame
+	--BetterWardrobeSetsCollectionMixin.Model = WardrobeCollectionFrame.SetsCollectionFrame.Model
 
 
 local itemSourceID = {}
@@ -442,55 +504,49 @@ local name, items = addon.GetSetData(setInfo)
 	end
 
 	self.DetailsFrame.Label:Hide()
-	self.DetailsFrame.LimitedSet:Hide()
 	--local newSourceIDs = C_TransmogSets.GetSetNewSources(setID);
 
 	self.DetailsFrame.itemFramesPool:ReleaseAll();
 	self.Model:Undress();
 	local BUTTON_SPACE = 37;	-- button width + spacing between 2 buttons
-	--local sortedSources = SetsDataProvider:GetSortedSetSources(setID);
+	local sortedSources = SetsDataProvider:GetSortedSetSources(setID);
 	local xOffset = -floor((#items - 1) * BUTTON_SPACE / 2);
-	--for i = 1, #sortedSources do
-
-	for i = 1, #items do
-		local source = GetSourceFromItem(items[i])
+	for i = 1, #sortedSources do
+		--local source = GetSourceFromItem(sortedSources[i])
 		local itemFrame = self.DetailsFrame.itemFramesPool:Acquire();
-		itemFrame.sourceID = source
-		itemFrame.itemID = items[i]
-
-		local  _, _, _, category, texture  = GetItemInfoInstant(items[i])
-		--local _,_,_,texture = C_TransmogCollection.GetAppearanceSourceInfo(items[i])
-		--itemFrame.collected = sortedSources[i].collected;
-		--itemFrame.invType = sortedSources[i].invType;
-		--local texture = C_TransmogCollection.GetSourceIcon(items[i]);
+		itemFrame.sourceID = sortedSources[i].sourceID;
+		itemFrame.itemID = sortedSources[i].itemID;
+		itemFrame.collected = sortedSources[i].collected;
+		itemFrame.invType = sortedSources[i].invType;
+		local texture = C_TransmogCollection.GetSourceIcon(sortedSources[i].sourceID);
 		itemFrame.Icon:SetTexture(texture);
-		--if ( sortedSources[i].collected ) then
-		--	itemFrame.Icon:SetDesaturated(false);
-			--itemFrame.Icon:SetAlpha(1);
-			--itemFrame.IconBorder:SetDesaturation(0);
-		--	itemFrame.IconBorder:SetAlpha(1);
-
-			--local transmogSlot = C_Transmog.GetSlotForInventoryType(itemFrame.invType);
-			--if ( C_TransmogSets.SetHasNewSourcesForSlot(setID, transmogSlot) ) then
-			--	itemFrame.New:Show();
-			--	itemFrame.New.Anim:Play();
-			--else
-				--itemFrame.New:Hide();
-				--itemFrame.New.Anim:Stop();
-			--end
-		--else
-			--itemFrame.Icon:SetDesaturated(true);
-			--itemFrame.Icon:SetAlpha(0.3);
-			--itemFrame.IconBorder:SetDesaturation(1);
-			--itemFrame.IconBorder:SetAlpha(0.3);
-			--itemFrame.New:Hide();
-		--end
-		--self:SetItemFrameQuality(itemFrame);
+		print(sortedSources[i].collected)
+		if ( sortedSources[i].collected ) then
+			itemFrame.Icon:SetDesaturated(false);
+			itemFrame.Icon:SetAlpha(1);
+			itemFrame.IconBorder:SetDesaturation(0);
+			itemFrame.IconBorder:SetAlpha(1);
+			local transmogSlot = C_Transmog.GetSlotForInventoryType(itemFrame.invType);
+			if ( C_TransmogSets.SetHasNewSourcesForSlot(setID, transmogSlot) ) then
+				itemFrame.New:Show();
+				itemFrame.New.Anim:Play();
+			else
+				itemFrame.New:Hide();
+				itemFrame.New.Anim:Stop();
+			end
+		else
+			itemFrame.Icon:SetDesaturated(true);
+			itemFrame.Icon:SetAlpha(0.3);
+			itemFrame.IconBorder:SetDesaturation(1);
+			itemFrame.IconBorder:SetAlpha(0.3);
+			itemFrame.New:Hide();
+		end
+		self:SetItemFrameQuality(itemFrame);
 	
 		itemFrame:SetPoint("TOP", self.DetailsFrame, "TOP", xOffset + (i - 1) * BUTTON_SPACE, -94);
 		
 		itemFrame:Show();
-		self.Model:TryOn(source);
+		self.Model:TryOn(sortedSources[i].sourceID);
 	end
 
 	-- variant sets
@@ -506,9 +562,9 @@ end
 
 function BetterWardrobeSetsCollectionMixin:SetAppearanceTooltip(frame)
 	GameTooltip:SetOwner(frame, "ANCHOR_RIGHT");
-	self.tooltipTransmogSlot = C_Transmog.GetSlotForInventoryType(frame.invType);
-	self.tooltipPrimarySourceID = frame.sourceID;
-	self:RefreshAppearanceTooltip();
+	--self.tooltipTransmogSlot = C_Transmog.GetSlotForInventoryType(frame.invType);
+	--self.tooltipPrimarySourceID = frame.sourceID;
+	--self:RefreshAppearanceTooltip();
 end
 
 function BetterWardrobeSetsCollectionMixin:RefreshAppearanceTooltip()

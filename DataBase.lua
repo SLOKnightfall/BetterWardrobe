@@ -48,7 +48,7 @@ do
 	local function Debug(...)
 	---------
 		if not debugger then
-			debugger = TextDump:New(("%s Output"):format(FOLDER_NAME), DEBUGGER_WIDTH, DEBUGGER_HEIGHT)
+			debugger = TextDump:New(("%s Output"):format(addonName), DEBUGGER_WIDTH, DEBUGGER_HEIGHT)
 		end
 
 		local t = type(...)
@@ -201,12 +201,18 @@ local newmail = {}
 
 addon.sets = sets
 
+addon.setList = {}
+addon.baseList = {}
+
+
 local function AddData(id,name,items,class,faction)
 	data.name[id] = name;
 	data.items[id] = items;
 	data.class[id] = class;
 	data.faction[id] = faction;
 end
+
+
 
 local function GetData(id)
 	return data.name[id],data.items[id],data.class[id],data.faction[id]
@@ -241,23 +247,38 @@ end
 
 	tinsert(sets.Mail,id);
 	AddData(id,...);
+	addon.AddSet(id, ...)
 end
 
 function addon.AddPlate(id,...)
-	tinsert(sets.Plate,id);
-	AddData(id,...);
+	tinsert(sets.Plate,id)
+	AddData(id,...)
+	--addon.AddSet(id, ...)
 end
 
 
-function addon.AddSet(id, table)
-	local name, items, class, faction = GetData(id)
-	local newSet = {["name"] = name,
-		["collected"] = true,
-		["faction"] = faction,
-		["items"] = items
-	}
+function addon.AddSet(id,name,items,class,faction)
+	local setInfo = {}
+	setInfo.classMask = class;
+	setInfo.collected = false; 	
+	setInfo.description = "";
+	setInfo.expansionID	= "";
+	setInfo.favorite = "";
+	setInfo.hiddenUtilCollected	= false;
+	setInfo.label = "";
+	setInfo.limitedTimeSet = false;
+	setInfo.name = name;
+	setInfo.patchID = "";
+	setInfo.requiredFaction = faction;
+	setInfo.setID = id;
+	setInfo.uiOrder = "";
+	setInfo.items = items;
+tinsert(addon.baseList, setInfo)
+	addon.setList[id] = setInfo
+end
 
-	tinsert(table, newSet)
+function addon.GetSetInfo(setID)
+	return addon.setList[setID]
 end
 
 function addon.GetSets( setType )
@@ -317,7 +338,7 @@ function addon.GetSetCompletion(setID)
 	end
 
 
-]]
+
 
 --print(setID)
 local collectedCount = 0
@@ -350,16 +371,19 @@ local collectedCount = 0
 
   return collectedCount, #items
 	--return complete, count
-		
+	]]
+	return 0,0
+
 end
 
 
 function bob()
 --print(string.format tostring(sets))
 --Utilities.Debug(sets.Mail,100)
---Utilities.Debug(#sets.Mail,100)
+Utilities.Debug(C_TransmogSets.GetSetSources(1907),100)
+
 
 
 	end
 
----	Utilities.GetDebugger()
+Utilities.GetDebugger()
