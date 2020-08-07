@@ -273,7 +273,7 @@ function addon.AddSet(id,name,items,class,faction)
 	setInfo.setID = id;
 	setInfo.uiOrder = "";
 	setInfo.items = items;
-tinsert(addon.baseList, setInfo)
+	tinsert(addon.baseList, setInfo)
 	addon.setList[id] = setInfo
 end
 

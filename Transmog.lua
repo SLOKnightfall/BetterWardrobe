@@ -285,11 +285,11 @@ end
 
 Mixin(WardrobeCollectionFrame.SetsTransmogFrame,BetterWardrobeSetsTransmogMixin)
 
-local function InitFrames(button, name, height)
-		local frame = CreateFrame("Frame", nil, WardrobeCollectionFrame.SetsTransmogFrame[button] )
+local function InitFrames(frame, button, name, height)
+		local frame = CreateFrame("Frame", nil, frame[button] )
         frame:SetHeight(height)
         frame:SetWidth(120)
-        frame.text = frame:CreateFontString(button..name, "OVERLAY", "GameFontHighlightMedium")
+        frame.text = frame:CreateFontString(nil, "OVERLAY", "GameFontHighlightMedium")
         frame.text:SetWidth(frame:GetWidth())
         frame.text:SetHeight(frame:GetHeight())
         frame.text:SetPoint("TOP", frame, "TOP", 0, 0)        
@@ -302,17 +302,19 @@ end
 
 local buttons = {"ModelR1C1","ModelR1C2","ModelR1C3","ModelR1C4","ModelR2C1","ModelR2C2","ModelR2C3","ModelR2C4"}
 
-function addon.AddSetDetailFrames()
+function addon.AddSetDetailFrames(frame)
 	local frame1, frame2
 	for i, button in ipairs(buttons) do
 
-		frame1 = InitFrames(button,"progress", 20)
-        frame1:SetPoint("TOP", WardrobeCollectionFrame.SetsTransmogFrame[button], "TOP", 0, 0)  
-		WardrobeCollectionFrame.SetsTransmogFrame[button].progress = frame1.text
+		frame1 = InitFrames(frame, button,"progress", 20)
+        frame1:SetPoint("TOP", frame[button], "TOP", 0, 0)  
+		frame[button].progress = frame1.text
 
-		frame2 = InitFrames(button,"setName", 90)
-        frame2:SetPoint("BOTTOM", WardrobeCollectionFrame.SetsTransmogFrame[button], "BOTTOM", 0, 0)  
-		WardrobeCollectionFrame.SetsTransmogFrame[button].setName = frame2.text
+		frame2 = InitFrames(frame, button,"setName", 90)
+        frame2:SetPoint("BOTTOM", frame[button], "BOTTOM", 0, 0)  
+		frame[button].setName = frame2.text
     end
 
+
 end
+
