@@ -305,8 +305,8 @@ function addon.GetSetIcon(setID)
 	return setIcon
 end
 
-function addon.GetSetCompletion(setID)
-	
+function addon.GetSetCsompletion(setID)
+	SetsDataProvider:GetSetSourceData(setID)
 
 	--local sLink = select(2, GetItemInfo(appearances[i].itemID))
 	--local itemID, itemType, itemSubType, itemEquipLoc, icon, itemClassID, itemSubClassID  = GetItemInfoInstant(itemID)
@@ -380,10 +380,18 @@ end
 function bob()
 --print(string.format tostring(sets))
 --Utilities.Debug(sets.Mail,100)
-Utilities.Debug(C_TransmogSets.GetSetSources(1907),100)
-
-
-
+--Utilities.Debug(C_TransmogSets.GetSetSources(1907),100)
+print("	Basb")
+local app, _ = C_TransmogCollection.GetItemInfo(6591)
+print(C_TransmogCollection.GetItemInfo(6591))
+print(C_TransmogCollection.GetItemInfo(24869))
+Utilities.GetDebugger()
+Utilities.Debug("te")
+Utilities.Debug(C_TransmogCollection.GetItemInfo(6591))
+Utilities.Debug(C_TransmogCollection.GetAllAppearanceSources(2179))
+local all = C_TransmogCollection.GetAllAppearanceSources(2179)
+for i, set in ipairs(all) do
+	print(set)
+end
 	end
 
-Utilities.GetDebugger()
