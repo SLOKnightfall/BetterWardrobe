@@ -724,4 +724,38 @@
 			<OnMouseWheel method="OnMouseWheel"/>
 		</Scripts>
 	</Frame>
+
+	<Button name="$parentTab3" parent="WardrobeCollectionFrame" parentKey="ExtraSetsTab" inherits="TabButtonTemplate" text="Extra Sets" id="3" frameLevel="4" parentArray="Tabs">
+		<KeyValues>
+			<KeyValue key="minWidth" value="57" type="number"/>
+		</KeyValues>
+		<Anchors>
+			<Anchor point="LEFT" relativeTo="$parentTab2" relativePoint="RIGHT" x="0" y="0"/>
+		</Anchors>
+		<Frames>
+			<Frame parentKey="FlashFrame" hidden="true">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeKey="$parent.ExtraSetsTab" relativePoint="TOPLEFT" x="0" y="-10"/>
+					<Anchor point="BOTTOMRIGHT" relativeKey="$parent.ExtraSetsTab" relativePoint="BOTTOMRIGHT" x="0" y="-5"/>
+				</Anchors>
+				<Layers>
+					<Layer level="ARTWORK">
+						<Texture file="Interface\PaperDollInfoFrame\UI-Character-Tab-Highlight-yellow" setAllPoints="true" alphaMode="ADD"/>
+					</Layer>
+				</Layers>
+				<Scripts>
+					<OnUpdate>
+						if ( self:IsMouseOver() ) then
+							self:SetAlpha(0);
+						else
+							self:SetAlpha(abs(mod(GetTime(), 2) - 1));
+						end
+					</OnUpdate>
+				</Scripts>
+			</Frame>
+		</Frames>
+		<Scripts>
+			<OnClick function="WardrobeCollectionFrame_ClickTab"/>
+		</Scripts>
+	</Button>
 </Ui>

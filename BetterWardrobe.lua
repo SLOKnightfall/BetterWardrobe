@@ -39,6 +39,9 @@ end
 function addon:OnEnable()
 	addon.AddSetDetailFrames(WardrobeCollectionFrame.SetsTransmogFrame)
 	addon.AddSetDetailFrames(bwSetsTransmogFrame)
+
+	addon.WardrobeCollectionFrame_OnLoad(WardrobeCollectionFrame)
+	self:Hook("WardrobeCollectionFrame_SetTab", true)
 end
 
 
@@ -49,7 +52,8 @@ local IN_PROGRESS_FONT_COLOR = CreateColor(0.251, 0.753, 0.251)
 local IN_PROGRESS_FONT_COLOR_CODE = "|cff40c040"
 local COLLECTION_LIST_WIDTH = 260
 
---
+--[[
+
 local showframe = false
 
 local b = CreateFrame("Button", "MyButton", WardrobeCollectionFrame, "UIPanelButtonTemplate")
@@ -74,7 +78,7 @@ b:SetScript("OnClick", function()
 	    collectionFrame:SetShown( showframe)
 	    baseFrame:SetShown(not showframe)
 end)
-
+]]
 
 function addon.GetSetsources(setID)
 	local setInfo = addon.GetSetInfo(setID)
@@ -783,4 +787,85 @@ function BetterWardrobeSetsTransmogMixin:ResetPage()
 
 	self.PagingFrame:SetCurrentPage(page)
 	self:UpdateSets()
+end
+
+
+--- Functionality to add 3rd tab to windows
+local TAB_ITEMS = 1;
+local TAB_SETS = 2;
+local TAB_EXTRASETS = 3;
+local TABS_MAX_WIDTH = 185;
+
+function addon:WardrobeCollectionFrame_SetTab(tabID)
+	PanelTemplates_SetTab(WardrobeCollectionFrame, tabID);
+	local atTransmogrifier = WardrobeFrame_IsAtTransmogrifier();
+	if ( atTransmogrifier ) then
+		WardrobeCollectionFrame.selectedTransmogTab = tabID;
+	else
+		WardrobeCollectionFrame.selectedCollectionTab = tabID;
+	end
+	if ( tabID == TAB_ITEMS ) then
+		WardrobeCollectionFrame.activeFrame = WardrobeCollectionFrame.ItemsCollectionFrame;
+		WardrobeCollectionFrame.ItemsCollectionFrame:Show();
+		WardrobeCollectionFrame.SetsCollectionFrame:Hide();
+		WardrobeCollectionFrame.SetsTransmogFrame:Hide();
+		WardrobeCollectionFrame.bwSetsTransmogFrame:Hide();
+		WardrobeCollectionFrame.BWetsCollectionFrame:Hide();
+		WardrobeCollectionFrame.searchBox:ClearAllPoints();
+		WardrobeCollectionFrame.searchBox:SetPoint("TOPRIGHT", -107, -35);
+		WardrobeCollectionFrame.searchBox:SetWidth(115);
+		WardrobeCollectionFrame.searchBox:SetEnabled(WardrobeCollectionFrame.ItemsCollectionFrame.transmogType == LE_TRANSMOG_TYPE_APPEARANCE);
+		WardrobeCollectionFrame.FilterButton:Show();
+		WardrobeCollectionFrame.FilterButton:SetEnabled(WardrobeCollectionFrame.ItemsCollectionFrame.transmogType == LE_TRANSMOG_TYPE_APPEARANCE);
+	elseif ( tabID == TAB_SETS ) then
+		WardrobeCollectionFrame.ItemsCollectionFrame:Hide();
+		WardrobeCollectionFrame.bwSetsTransmogFrame:Hide();
+		WardrobeCollectionFrame.BWetsCollectionFrame:Hide();
+		WardrobeCollectionFrame.searchBox:ClearAllPoints();
+		if ( atTransmogrifier )  then
+			WardrobeCollectionFrame.activeFrame = WardrobeCollectionFrame.SetsTransmogFrame;
+			WardrobeCollectionFrame.searchBox:SetPoint("TOPRIGHT", -107, -35);
+			WardrobeCollectionFrame.searchBox:SetWidth(115);
+			WardrobeCollectionFrame.FilterButton:Hide();
+		else
+			WardrobeCollectionFrame.activeFrame = WardrobeCollectionFrame.SetsCollectionFrame;
+			WardrobeCollectionFrame.searchBox:SetPoint("TOPLEFT", 19, -69);
+			WardrobeCollectionFrame.searchBox:SetWidth(145);
+			WardrobeCollectionFrame.FilterButton:Show();
+			WardrobeCollectionFrame.FilterButton:SetEnabled(true);
+		end
+		WardrobeCollectionFrame.searchBox:SetEnabled(true);
+		WardrobeCollectionFrame.SetsCollectionFrame:SetShown(not atTransmogrifier);
+		WardrobeCollectionFrame.SetsTransmogFrame:SetShown(atTransmogrifier);
+	elseif ( tabID == TAB_EXTRASETS ) then
+		WardrobeCollectionFrame.ItemsCollectionFrame:Hide();
+		WardrobeCollectionFrame.SetsCollectionFrame:Hide();
+		WardrobeCollectionFrame.SetsTransmogFrame:Hide();
+		WardrobeCollectionFrame.searchBox:ClearAllPoints();
+		if ( atTransmogrifier )  then
+			WardrobeCollectionFrame.activeFrame = WardrobeCollectionFrame.bwSetsTransmogFrame;
+			WardrobeCollectionFrame.searchBox:SetPoint("TOPRIGHT", -107, -35);
+			WardrobeCollectionFrame.searchBox:SetWidth(115);
+			WardrobeCollectionFrame.FilterButton:Hide();
+		else
+			WardrobeCollectionFrame.activeFrame = WardrobeCollectionFrame.BWetsCollectionFrame;
+			WardrobeCollectionFrame.searchBox:SetPoint("TOPLEFT", 19, -69);
+			WardrobeCollectionFrame.searchBox:SetWidth(145);
+			WardrobeCollectionFrame.FilterButton:Show();
+			WardrobeCollectionFrame.FilterButton:SetEnabled(true);
+		end
+		WardrobeCollectionFrame.searchBox:SetEnabled(true);
+		WardrobeCollectionFrame.BWetsCollectionFrame:SetShown(not atTransmogrifier);
+		WardrobeCollectionFrame.bwSetsTransmogFrame:SetShown(atTransmogrifier);
+	end
+end
+
+
+--Reloads WardrobeCollectionFrame to include new tab
+function addon.WardrobeCollectionFrame_OnLoad(self)
+	PanelTemplates_SetNumTabs(self, 3);
+	PanelTemplates_SetTab(self, TAB_ITEMS);
+	PanelTemplates_ResizeTabsToFit(self, TABS_MAX_WIDTH);
+	self.selectedCollectionTab = TAB_ITEMS;
+	self.selectedTransmogTab = TAB_ITEMS;
 end
