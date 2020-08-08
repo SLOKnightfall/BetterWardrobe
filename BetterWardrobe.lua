@@ -18,9 +18,7 @@
 
 --	///////////////////////////////////////////////////////////////////////////////////////////
 
---local BPCM = select(2, ...)
 local addonName, addon = ...
---_G["BPCM"] = BPCM
 --addon = LibStub("AceAddon-3.0"):NewAddon(addon, addonName, "AceEvent-3.0", "AceConsole-3.0", "AceHook-3.0")
 addon = LibStub("AceAddon-3.0"):GetAddon(addonName)
 addon.Frame = LibStub("AceGUI-3.0")
@@ -34,6 +32,7 @@ local L = LibStub("AceLocale-3.0"):GetLocale(addonName)
 
 ---Ace based addon initilization
 function addon:OnInitialize()
+	addon.buildDB()
 end
 
 
@@ -61,19 +60,19 @@ b:SetScript("OnClick", function()
 	local baseFrame
 	local atTransmogrifier = WardrobeFrame_IsAtTransmogrifier()
 
-if ( atTransmogrifier ) then
-	baseFrame = WardrobeCollectionFrame.SetsTransmogFrame
-	collectionFrame = bwSetsTransmogFrame
-	BWetsCollectionFrame:Hide()
-else
-	baseFrame = WardrobeCollectionFrame.SetsCollectionFrame
-	collectionFrame = BWetsCollectionFrame
-	bwSetsTransmogFrame:Hide()
-end
+	if ( atTransmogrifier ) then
+		baseFrame = WardrobeCollectionFrame.SetsTransmogFrame
+		collectionFrame = bwSetsTransmogFrame
+		BWetsCollectionFrame:Hide()
+	else
+		baseFrame = WardrobeCollectionFrame.SetsCollectionFrame
+		collectionFrame = BWetsCollectionFrame
+		bwSetsTransmogFrame:Hide()
+	end
 
-    showframe = not showframe
-    collectionFrame:SetShown( showframe)
-    baseFrame:SetShown(not showframe)
+	    showframe = not showframe
+	    collectionFrame:SetShown( showframe)
+	    baseFrame:SetShown(not showframe)
 end)
 
 
@@ -98,7 +97,7 @@ local SetsDataProvider = CreateFromMixins(WardrobeSetsDataProviderMixin)
 function SetsDataProvider:GetUsableSets()
 	--[[
 	if ( not self.usableSets ) then
-		self.usableSets = addon.baseList --C_TransmogSets.GetUsableSets()
+		self.usableSets = addon.GetBaseList() --C_TransmogSets.GetUsableSets()
 		self:SortSets(self.usableSets)
 		-- group sets by baseSetID, except for favorited sets since those are to remain bucketed to the front
 		for i, set in ipairs(self.usableSets) do
@@ -122,7 +121,7 @@ function SetsDataProvider:GetUsableSets()
 	return self.usableSets
 	]]
 --if ( not self.usableSets ) then
-	local availableSets = addon.baseList
+	local availableSets = addon.GetBaseList()
 	local usableSets = {} --SetsDataProvider:GetUsableSets()
 
 		for i, set in ipairs(availableSets) do
@@ -247,7 +246,7 @@ local selectedSetID
 function BetterWardrobeSetsCollectionScrollFrameMixin:Update()
 	local offset = HybridScrollFrame_GetOffset(self)
 	local buttons = self.buttons
-	local baseSets =  addon.baseList
+	local baseSets =  addon.GetBaseList()
 
 	-- show the base set as selected
 	local selectedSetID = self:GetParent():GetSelectedSetID()
@@ -319,13 +318,13 @@ function BetterWardrobeSetsCollectionMixin:OnShow()
 	self:RegisterEvent("TRANSMOG_COLLECTION_UPDATED")
 	-- select the first set if not init
 
-	local baseSets = addon.sets["Mail" ]
+	local baseSets = addon.GetBaseList()--addon.sets["Mail" ]
 	if ( not self.init ) then
 		self.init = true
 
 		if ( baseSets and baseSets[1] ) then
 			--self:SelectSet(self:GetDefaultSetIDForBaseSet(baseSets[1].setID))
-			self:SelectSet(baseSets[1])
+			self:SelectSet(baseSets[1].setID)
 
 		end
 
@@ -361,7 +360,7 @@ function BetterWardrobeSetsCollectionMixin:OnHide()
 	self:UnregisterEvent("GET_ITEM_INFO_RECEIVED")
 	self:UnregisterEvent("TRANSMOG_COLLECTION_ITEM_UPDATE")
 	self:UnregisterEvent("TRANSMOG_COLLECTION_UPDATED")
-	--SetsDataProvider:ClearSets()
+	SetsDataProvider:ClearSets()
 	--WardrobeCollectionFrame_ClearSearch(LE_TRANSMOG_SEARCH_TYPE_BASE_SETS)
 end
 
@@ -454,13 +453,13 @@ function BetterWardrobeSetsCollectionMixin:DisplaySet(setID)
 		self.Model:Show()
 	end
 
-	local name, items = addon.GetSetData(setInfo)
+	local setInfo = addon.GetSetInfo(setID)
 
-	self.DetailsFrame.Name:SetText(name)
+	self.DetailsFrame.Name:SetText(setInfo.name)
 
 	if ( self.DetailsFrame.Name:IsTruncated() ) then
 		self.DetailsFrame.Name:Hide()
-		self.DetailsFrame.LongName:SetText(name)
+		self.DetailsFrame.LongName:SetText(setInfo.name)
 		self.DetailsFrame.LongName:Show()
 	else
 		self.DetailsFrame.Name:Show()
@@ -474,7 +473,7 @@ function BetterWardrobeSetsCollectionMixin:DisplaySet(setID)
 	self.Model:Undress()
 	local BUTTON_SPACE = 37	-- button width + spacing between 2 buttons
 	local sortedSources = SetsDataProvider:GetSortedSetSources(setID)
-	local xOffset = -floor((#items - 1) * BUTTON_SPACE / 2)
+	local xOffset = -floor((#setInfo.items - 1) * BUTTON_SPACE / 2)
 
 	for i = 1, #sortedSources do
 		--local source = GetSourceFromItem(sortedSources[i])
@@ -725,7 +724,7 @@ function BetterWardrobeSetsTransmogMixin:UpdateSets()
 			end
 
 			local topSourcesCollected, topSourcesTotal = SetsDataProvider:GetSetSourceCounts(set.setID)
-			local setInfo = addon.setList[set.setID]
+			local setInfo = addon.GetSetInfo(set.setID)
 
 			model.Favorite.Icon:SetShown(set.favorite)
 			model.setID = set.setID

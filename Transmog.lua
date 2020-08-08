@@ -314,7 +314,4 @@ function addon.AddSetDetailFrames(frame)
         frame2:SetPoint("BOTTOM", frame[button], "BOTTOM", 0, 0)  
 		frame[button].setName = frame2.text
     end
-
-
 end
-
