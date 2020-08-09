@@ -119,7 +119,6 @@ do
 	Utilities.GetDebugger =  GetDebugger
 	Utilities.ClearDebug = ClearDebugger
 
-
 end
 
 local Debug = Utilities.Debug
@@ -156,7 +155,26 @@ local ClassArmor = {
 	WARRIOR = "PLATE",
 }
 
+local EmptyArmor = {
+		[1] = 134110,
+		--[2] = 134112,
+		[3] = 134112,
+		--[4] = 168659,
+		[5] = 168659,
+		[6] = 143539,
+		--[7] = 158329,
+		[8] = 168664,
+		[9] = 168665,  --wrist
+		[10] = 158329, --handr
+}
 
+local hiddenSet ={
+		["setID"] =  0 ,
+		["name"] =  "Hidden" ,
+		["items"] = { 134110, 134112, 168659, 168665, 158329, 143539, 168664 },
+	}
+
+--cloak 134111
 
 local function GetFactionID(faction)
 	if faction == "Horde" then
@@ -164,29 +182,41 @@ local function GetFactionID(faction)
 	elseif faction == "Alliance" then
 		return --4
 	end
+end
 
+local function OpposingFaction(faction)
+	if faction == "Horde" then
+		return "Alliance", "Kul Tiras"
+	elseif faction == "Alliance" then
+		return "Horde", "Zandalar"
+	end
 end
 
 
 do
 	local baseList = {}
+	local setInfo = {}
 
 	function addon.buildDB()
 	--local faction = GetFactionID(UnitFactionGroup("player"))
 		local armorSet = addon.ArmorSets[ClassArmor[playerClass]]
 
-		for i, setData in ipairs(armorSet) do
-			local id = setData[1]
-			local class = setData[4]
-			local faction = setData[5]
+		for id, setData in pairs(armorSet) do
+			--local id = i
+			local class = setData.classMask
+			--local faction = setData[5]
+			local opposingFaction , BFAFaction = OpposingFaction(faction)
+			local factionLocked = string.find(setData.name, opposingFaction) or string.find(setData.name, BFAFaction)
 
-			if  class and class == classBits[playerClass] or not class then
+			if  (class and class == classBits[playerClass] or not class) and not factionLocked 	 then
 			--if faction then  TODO: Add Faction Check
-				addon.AddSet(setData)
+				setInfo[id] = setData
+				tinsert(baseList, setInfo[id])
 			end
-
 		end
-
+		--Add Hidden Set
+		setInfo[0] = hiddenSet
+		tinsert(baseList, setInfo[0])
 		wipe(addon.ArmorSets)
 	end
 
@@ -195,7 +225,7 @@ do
 		return baseList
 	end
 
-	local setInfo = {}
+	
 
 	function addon.AddSet(setData)
 	--function addon.AddSet(id,name,items,class,faction)

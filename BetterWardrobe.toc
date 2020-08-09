@@ -32,9 +32,8 @@ Inspect.lua
 BetterWardrobe.xml
 Transmog.lua
 
-Mail.lua
-Cloth.lua
-Plate.lua
-Leather.lua
-
-
+#Data files
+Data\CLOTH.lua
+Data\LEATHER.lua
+Data\MAIL.lua
+Data\PLATE.lua

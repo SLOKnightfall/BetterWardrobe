@@ -32,7 +32,7 @@ local L = LibStub("AceLocale-3.0"):GetLocale(addonName)
 
 ---Ace based addon initilization
 function addon:OnInitialize()
-	addon.buildDB()
+	
 end
 
 
@@ -40,8 +40,11 @@ function addon:OnEnable()
 	addon.AddSetDetailFrames(WardrobeCollectionFrame.SetsTransmogFrame)
 	addon.AddSetDetailFrames(bwSetsTransmogFrame)
 
+	addon.buildDB()
+
 	addon.WardrobeCollectionFrame_OnLoad(WardrobeCollectionFrame)
 	self:Hook("WardrobeCollectionFrame_SetTab", true)
+	--self:Hook("WardrobeCollectionFrameSearchBox_OnUpdate", true)	
 end
 
 
@@ -97,6 +100,15 @@ function addon.GetSetsources(setID)
 end
 
 local SetsDataProvider = CreateFromMixins(WardrobeSetsDataProviderMixin)
+
+function SetsDataProvider:GetBaseSets()
+	if ( not self.baseSets ) then
+		self.baseSets = addon.GetBaseList() --C_TransmogSets.GetBaseSets();
+		--self:DetermineFavorites();
+		self:SortSets(self.baseSets);
+	end
+	return self.baseSets;
+end
 
 function SetsDataProvider:GetUsableSets()
 	--[[
@@ -250,7 +262,7 @@ local selectedSetID
 function BetterWardrobeSetsCollectionScrollFrameMixin:Update()
 	local offset = HybridScrollFrame_GetOffset(self)
 	local buttons = self.buttons
-	local baseSets =  addon.GetBaseList()
+	local baseSets =  SetsDataProvider:GetBaseSets() --addon.GetBaseList()
 
 	-- show the base set as selected
 	local selectedSetID = self:GetParent():GetSelectedSetID()
@@ -322,7 +334,7 @@ function BetterWardrobeSetsCollectionMixin:OnShow()
 	self:RegisterEvent("TRANSMOG_COLLECTION_UPDATED")
 	-- select the first set if not init
 
-	local baseSets = addon.GetBaseList()--addon.sets["Mail" ]
+	local baseSets = SetsDataProvider:GetBaseSets() --addon.GetBaseList()--addon.sets["Mail" ]
 	if ( not self.init ) then
 		self.init = true
 
@@ -584,20 +596,20 @@ function BWWardrobeSetsTransmogModelMixin:RefreshTooltip()
 				waitingOnQuality = true
 			end
 		end
-	end
+	end]]
 	if ( waitingOnQuality ) then
 		GameTooltip:SetText(RETRIEVING_ITEM_INFO, RED_FONT_COLOR.r, RED_FONT_COLOR.g, RED_FONT_COLOR.b)
 	else
 		local setQuality = (numTotalSlots > 0 and totalQuality > 0) and Round(totalQuality / numTotalSlots) or LE_ITEM_QUALITY_COMMON
 		local color = ITEM_QUALITY_COLORS[setQuality]
-		local setInfo = C_TransmogSets.GetSetInfo(self.setID)
+		local setInfo = addon.GetSetInfo(self.setID)
 		GameTooltip:SetText(setInfo.name, color.r, color.g, color.b)
 		if ( setInfo.label ) then
 			GameTooltip:AddLine(setInfo.label)
 			GameTooltip:Show()
 		end
 	end
-	]]
+
 end
 
 
@@ -655,11 +667,54 @@ function BetterWardrobeSetsTransmogMixin:OnShow()
 	--end
 end
 
+function BetterWardrobeSetsTransmogMixin:SelectSet(setID)
+	self.selectedSetID = setID;
+	self:LoadSet(setID);
+	self:ResetPage();
+end
+
+do
+	local EmptyArmor = {
+		[1] = 134110,
+		--[2] = 134112, neck
+		[3] = 134112,
+		--[4] = 168659, shirt
+		[5] = 168659,
+		[6] = 143539,
+		--[7] = 158329, pants
+		[8] = 168664,
+		[9] = 168665,  --wrist
+		[10] = 158329, --handr
+}
+
+	 function GetEmptySlots()
+	 	local setInfo = {}
+
+	 	for i,x in pairs(EmptyArmor) do
+	 		setInfo[i]=x
+	 	end
+
+		return setInfo
+	end
+
+end
+
+function EmptySlots(transmogSources)
+	local EmptySet= GetEmptySlots()
+
+	for i, x in pairs(transmogSources) do
+			EmptySet[i] = nil
+	end
+
+	return EmptySet
+end
+
 
 function BetterWardrobeSetsTransmogMixin:LoadSet(setID)
 	local waitingOnData = false
 	local transmogSources = { }
 	local sources = addon.GetSetsources(setID)
+
 	for sourceID in pairs(sources) do
 		local sourceInfo = C_TransmogCollection.GetSourceInfo(sourceID)
 		local slot = C_Transmog.GetSlotForInventoryType(sourceInfo.invType)
@@ -674,8 +729,10 @@ function BetterWardrobeSetsTransmogMixin:LoadSet(setID)
 			end
 		end
 	end
+
 	if ( waitingOnData ) then
 		self.loadingSetID = setID
+		
 	else
 		self.loadingSetID = nil
 		-- if we don't ignore the event, clearing will momentarily set the page to the one with the set the user currently has transmogged
@@ -684,6 +741,21 @@ function BetterWardrobeSetsTransmogMixin:LoadSet(setID)
 		C_Transmog.ClearPending()
 		self.ignoreTransmogrifyUpdateEvent = false
 		C_Transmog.LoadSources(transmogSources, -1, -1)
+
+		local clearSlots = EmptySlots(transmogSources)
+		for i, x in pairs(clearSlots) do
+			local _,  source =C_TransmogCollection.GetItemInfo(x)
+			C_Transmog.SetPending(i, LE_TRANSMOG_TYPE_APPEARANCE,source)
+		end
+
+		local emptySlotData = GetEmptySlots()
+		for i, x in pairs(transmogSources) do
+			if not C_TransmogCollection.PlayerHasTransmogItemModifiedAppearance(x) and i ~= 7 then
+				local _,  source = C_TransmogCollection.GetItemInfo(emptySlotData[i])
+				C_Transmog.SetPending(i, LE_TRANSMOG_TYPE_APPEARANCE, source)
+			end
+		end
+	
 	end
 end
 
@@ -868,4 +940,8 @@ function addon.WardrobeCollectionFrame_OnLoad(self)
 	PanelTemplates_ResizeTabsToFit(self, TABS_MAX_WIDTH);
 	self.selectedCollectionTab = TAB_ITEMS;
 	self.selectedTransmogTab = TAB_ITEMS;
+end
+
+function addon:WardrobeCollectionFrameSearchBox_OnUpdate()
+	print("hook")
 end
