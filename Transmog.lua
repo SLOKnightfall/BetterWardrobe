@@ -233,6 +233,7 @@ function BetterWardrobeSetsTransmogMixin:UpdateSets()
 			model.setID = set.setID
 			model.setName:SetText(setInfo["name"].."\n"..(setInfo["description"] or ""))
 			model.progress:SetText(topSourcesCollected.."/".. topSourcesTotal)
+		print(setInfo.label)
 			
 		else
 			model:Hide();

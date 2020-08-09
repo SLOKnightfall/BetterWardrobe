@@ -30,9 +30,82 @@ local realmName
 
 local L = LibStub("AceLocale-3.0"):GetLocale(addonName)
 
+--LoadAddOn("Blizzard_Collections")
+
+--ACE3 Options Constuctor
+local options = {
+	name = addonName,
+	handler = addon,
+	type = 'group',
+	childGroups = "tab",
+	inline = true,
+	args = {
+		settings={
+			name = "Options",
+			type = "group",
+			--inline = true,
+			order = 0,
+			args={
+				Options_Header = {
+					order = 0,
+					name = "Header",
+					type = "header",
+					width = "full",
+				},
+				ShowPartial = {
+					order = 1,
+					name = L["SHOWPARTIAL"] ,
+					desc = "",
+					type = "toggle",
+					set = function(info,val) ShowPartial = val end,
+					get = function(info) return ShowPartial end,
+					width = "full",
+				},
+				Linebreak_4 = {
+					order = 5.4,
+					name = "",
+					desc = nil,
+					type = "description",
+					width = "normal",
+
+				},
+
+				Linebreak_1 = {
+					order = 6.1,
+					name = "",
+					desc = nil,
+					type = "description",
+					width = "double",
+
+				},
+			},
+		},
+
+	},
+}
+
+--ACE Profile Saved Variables Defaults
+local defaults = {
+	profile ={
+		ShowPartial = true,
+		PartialLimit = 4,
+		HideMissing = true,
+
+		
+	}
+}
+
 ---Ace based addon initilization
 function addon:OnInitialize()
-	
+	self.db = LibStub("AceDB-3.0"):New("BetterWardrobe_Options", defaults, true)
+	options.args.profiles  = LibStub("AceDBOptions-3.0"):GetOptionsTable(self.db)
+	LibStub("AceConfigRegistry-3.0"):ValidateOptionsTable(options, addonName)
+	LibStub("AceConfig-3.0"):RegisterOptionsTable(addonName, options)
+
+	self.optionsFrame = LibStub("AceConfigDialog-3.0"):AddToBlizOptions(addonName, addonName)
+	--self.db.RegisterCallback(BPCM, "OnProfileChanged", "RefreshConfig")
+	--self.db.RegisterCallback(BPCM, "OnProfileCopied", "RefreshConfig")
+	--self.db.RegisterCallback(BPCM, "OnProfileReset", "RefreshConfig")	
 end
 
 
@@ -54,6 +127,9 @@ local SET_PROGRESS_BAR_MAX_WIDTH = 204
 local IN_PROGRESS_FONT_COLOR = CreateColor(0.251, 0.753, 0.251)
 local IN_PROGRESS_FONT_COLOR_CODE = "|cff40c040"
 local COLLECTION_LIST_WIDTH = 260
+
+
+
 
 --[[
 
@@ -99,7 +175,56 @@ function addon.GetSetsources(setID)
 	return setSources
 end
 
+
 local SetsDataProvider = CreateFromMixins(WardrobeSetsDataProviderMixin)
+
+local function mysort(set1, set2)
+		if ( set1.expansionID ~= set2.expansionID ) then
+			return set1.expansionID > set2.expansionID;
+		end
+
+        return set1.name < set2.name;
+    end
+
+
+function SetsDataProvider:SortSets(sets, reverseUIOrder, ignorePatchID)
+	local comparison = function(set1, set2)
+		local groupFavorite1 = set1.favoriteSetID and true;
+		local groupFavorite2 = set2.favoriteSetID and true;
+		if ( groupFavorite1 ~= groupFavorite2 ) then
+			return groupFavorite1;
+		end
+		if ( set1.favorite ~= set2.favorite ) then
+			return set1.favorite;
+		end
+
+		if ( set1.expansionID ~= set2.expansionID ) then
+			return set1.expansionID > set2.expansionID;
+		end
+		if not ignorePatchID then
+			if ( set1.patchID ~= set2.patchID ) then
+				return set1.patchID > set2.patchID;
+			end
+		end
+		if ( set1.uiOrder ~= set2.uiOrder ) then
+			if ( reverseUIOrder ) then
+				return set1.uiOrder < set2.uiOrder;
+			else
+				return set1.uiOrder > set2.uiOrder;
+			end
+		end
+		if reverseUIOrder then
+			return set1.setID < set2.setID;
+		else
+			return set1.setID > set2.setID;
+		end
+
+		return set1.name > set2.name;
+	end
+
+	table.sort(sets, comparison)
+	table.sort(sets, mysort)
+end
 
 function SetsDataProvider:GetBaseSets()
 	if ( not self.baseSets ) then
@@ -149,7 +274,7 @@ function SetsDataProvider:GetUsableSets()
 		end
 
 	self.usableSets = usableSets
-	--self:SortSets(self.usableSets)
+	self:SortSets(self.usableSets)
 --end
 	return self.usableSets
 end
@@ -289,7 +414,7 @@ function BetterWardrobeSetsCollectionScrollFrameMixin:Update()
 			end
 
 			button.Name:SetTextColor(color.r, color.g, color.b)
-			--button.Label:SetText(baseSet.label)
+			button.Label:SetText((L["NOTE_"..(baseSet.label or 0)] and L["NOTE_"..(baseSet.label or 0) ]) or "")--((L["NOTE_"..baseSet.label] or "X"))
 			button.Icon:SetTexture(SetsDataProvider:GetIconForSet(baseSet.setID))
 			button.Icon:SetDesaturation((topSourcesCollected == 0) and 1 or 0)
 			button.SelectedTexture:SetShown(baseSet.setID == selectedBaseSetID)
@@ -605,7 +730,8 @@ function BWWardrobeSetsTransmogModelMixin:RefreshTooltip()
 		local setInfo = addon.GetSetInfo(self.setID)
 		GameTooltip:SetText(setInfo.name, color.r, color.g, color.b)
 		if ( setInfo.label ) then
-			GameTooltip:AddLine(setInfo.label)
+			GameTooltip:AddLine(L["NOTE_"..(setInfo.label or 0)])--((L["NOTE_"..baseSet.label] or "X"))
+
 			GameTooltip:Show()
 		end
 	end
@@ -732,7 +858,7 @@ function BetterWardrobeSetsTransmogMixin:LoadSet(setID)
 
 	if ( waitingOnData ) then
 		self.loadingSetID = setID
-		
+
 	else
 		self.loadingSetID = nil
 		-- if we don't ignore the event, clearing will momentarily set the page to the one with the set the user currently has transmogged

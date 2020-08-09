@@ -2,6 +2,8 @@ local addonName, addon = ...
 
 local TextDump = LibStub("LibTextDump-1.0")
 addon = LibStub("AceAddon-3.0"):NewAddon(addon, addonName, "AceEvent-3.0", "AceConsole-3.0", "AceHook-3.0")
+local L = LibStub("AceLocale-3.0"):GetLocale(addonName)
+
 local Utilities = {}
 addon.Utilities = Utilities
 
@@ -157,12 +159,12 @@ local ClassArmor = {
 
 local EmptyArmor = {
 		[1] = 134110,
-		--[2] = 134112,
+		--[2] = 134112, neck
 		[3] = 134112,
-		--[4] = 168659,
+		--[4] = 168659, shirt
 		[5] = 168659,
 		[6] = 143539,
-		--[7] = 158329,
+		--[7] = 158329, pants
 		[8] = 168664,
 		[9] = 168665,  --wrist
 		[10] = 158329, --handr
@@ -172,6 +174,7 @@ local hiddenSet ={
 		["setID"] =  0 ,
 		["name"] =  "Hidden" ,
 		["items"] = { 134110, 134112, 168659, 168665, 158329, 143539, 168664 },
+		["expansionID"] =  39999 ,
 	}
 
 --cloak 134111
@@ -192,28 +195,38 @@ local function OpposingFaction(faction)
 	end
 end
 
-
 do
 	local baseList = {}
 	local setInfo = {}
-
-	function addon.buildDB()
-	--local faction = GetFactionID(UnitFactionGroup("player"))
-		local armorSet = addon.ArmorSets[ClassArmor[playerClass]]
-
+	Utilities.GetDebugger()
+	local function addArmor(armorSet)
+		
 		for id, setData in pairs(armorSet) do
 			--local id = i
 			local class = setData.classMask
 			--local faction = setData[5]
 			local opposingFaction , BFAFaction = OpposingFaction(faction)
-			local factionLocked = string.find(setData.name, opposingFaction) or string.find(setData.name, BFAFaction)
-
-			if  (class and class == classBits[playerClass] or not class) and not factionLocked 	 then
+			local factionLocked = string.find(setData.name, opposingFaction) 
+				or string.find(setData.name, BFAFaction)
+			local heritageArmor = string.find(setData.name, "Heritage")
+			if  (class and class == classBits[playerClass] or not class) 
+				and not factionLocked 
+				and not heritageArmor then
 			--if faction then  TODO: Add Faction Check
+				setData["name"] = L[setData["name"]]
 				setInfo[id] = setData
-				tinsert(baseList, setInfo[id])
+				tinsert(baseList, setInfo[id])	
 			end
 		end
+	end
+
+	function addon.buildDB()
+	--local faction = GetFactionID(UnitFactionGroup("player"))
+		local armorSet = addon.ArmorSets[ClassArmor[playerClass]]
+
+		addArmor(armorSet)
+		addArmor(addon.ArmorSets["COSMETIC"])
+
 		--Add Hidden Set
 		setInfo[0] = hiddenSet
 		tinsert(baseList, setInfo[0])
@@ -238,7 +251,7 @@ do
 		info.description = ""
 		info.expansionID	= ""
 		info.favorite = ""
-		info.hiddenUtilCollected	= false
+		info.hiddenUtilCollected = false
 		info.label = ""
 		info.limitedTimeSet = false
 		info.name = setData[2]--name

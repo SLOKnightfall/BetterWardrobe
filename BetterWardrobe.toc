@@ -7,7 +7,7 @@
 ## LoadOnDemand: 1
 ## LoadWith: Blizzard_Collections
 ## RequiredDep:
-## SavedVariables:
+## SavedVariables: BetterWardrobe_Options, BetterWardrobe_Options
 
 #Libraries
 Libs\LibStub\LibStub.lua
@@ -37,3 +37,4 @@ Data\CLOTH.lua
 Data\LEATHER.lua
 Data\MAIL.lua
 Data\PLATE.lua
+Data\COSMETIC.lua
