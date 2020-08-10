@@ -4,10 +4,7 @@
 ## Game Version: 8
 ## Author: SLOKnightfall
 ## Notes: 
-## LoadOnDemand: 1
-## LoadWith: Blizzard_Collections
-## RequiredDep:
-## SavedVariables: BetterWardrobe_Options, BetterWardrobe_Options
+## SavedVariables: BetterWardrobe_Options,
 
 #Libraries
 Libs\LibStub\LibStub.lua
@@ -30,7 +27,6 @@ Locale\enUS.lua
 #Core Files
 Inspect.lua
 BetterWardrobe.xml
-Transmog.lua
 
 #Data files
 Data\CLOTH.lua

@@ -127,24 +127,9 @@ local Debug = Utilities.Debug
 
 ---------
 
-local classBits = {
-	DEATHKNIGHT = 32,
-	DRUID = 1024,
-	HUNTER = 4,
-	MAGE = 128,
-	PALADIN = 2,
-	PRIEST = 16,
-	ROGUE = 8,
-	SHAMAN = 64,
-	WARLOCK = 256,
-	WARRIOR = 1,
-	MONK = 512,
-	DEMONHUNTER = 2048,
-}
-
 local ClassArmor = {
-	DEATHKNIGHT ="PLATE",
-	DEMONHUNTER="LEATHER",
+	DEATHKNIGHT = "PLATE",
+	DEMONHUNTER = "LEATHER",
 	DRUID = "LEATHER",
 	HUNTER = "MAIL",
 	MAGE = "CLOTH",
@@ -174,7 +159,7 @@ local hiddenSet ={
 		["setID"] =  0 ,
 		["name"] =  "Hidden" ,
 		["items"] = { 134110, 134112, 168659, 168665, 158329, 143539, 168664 },
-		["expansionID"] =  39999 ,
+		["expansionID"] =  9999 ,
 	}
 
 --cloak 134111
@@ -209,11 +194,14 @@ do
 			local factionLocked = string.find(setData.name, opposingFaction) 
 				or string.find(setData.name, BFAFaction)
 			local heritageArmor = string.find(setData.name, "Heritage")
-			if  (class and class == classBits[playerClass] or not class) 
+
+			if  (class and class == classID or not class) 
 				and not factionLocked 
 				and not heritageArmor then
-			--if faction then  TODO: Add Faction Check
 				setData["name"] = L[setData["name"]]
+				local note = "NOTE_"..(setData.label or 0)
+				setData.label =(L[note] and L[note]) or ""
+
 				setInfo[id] = setData
 				tinsert(baseList, setInfo[id])	
 			end
