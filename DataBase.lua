@@ -174,9 +174,9 @@ end
 
 local function OpposingFaction(faction)
 	if faction == "Horde" then
-		return "Alliance", "Kul Tiras"
+		return "Alliance", "Kul Tiras", "Stormwind"
 	elseif faction == "Alliance" then
-		return "Horde", "Zandalar"
+		return "Horde", "Zandalar", "Orgrimmar"
 	end
 end
 
@@ -223,7 +223,11 @@ do
 
 
 	function addon.GetBaseList()
-		return baseList
+		local list = {}
+		for i, data in ipairs(baseList) do 
+			tinsert(list, data)
+		end
+		return list
 	end
 
 	

@@ -3,7 +3,7 @@
 	<Script file="DataBase.lua"/>
 	<Script file="BetterWardrobe.lua"/>
 	
-	<DressUpModel name="BWWardrobeSetsTransmogModelTemplate" mixin="BWWardrobeSetsTransmogModelMixin" virtual="true">
+	<DressUpModel name="BWWardrobeSetsTransmogModelTemplate" mixin="BetterWardrobeSetsTransmogModelMixin" virtual="true">
 		<Size x="129" y="186"/>
 		<Layers>
 			<Layer level="BACKGROUND">
