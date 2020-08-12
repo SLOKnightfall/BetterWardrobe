@@ -4,11 +4,12 @@ local L = _G.LibStub("AceLocale-3.0"):NewLocale("BetterWardrobe", "enUS", true, 
 if not L then return end
 
 
-L["SHOWPARTIAL"] = "Show Partial Sets at Transmog Vendor"
-L["Show Incomplete Sets at Transmog Vendor"] = true
 L["Transmog Window"] = true
+L["Show Incomplete Sets"] = true
 L["Show Set Names"] = true
 L["Required pieces"] = true
+L["Show Collected Count"] = true
+ L["Hide Missing Set Pieces"] = true
 
 --PvP Set
 L["NOTE_17"] = "Arena Season 1 Set"

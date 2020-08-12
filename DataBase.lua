@@ -1,132 +1,14 @@
 local addonName, addon = ...
 
-local TextDump = LibStub("LibTextDump-1.0")
+--local TextDump = LibStub("LibTextDump-1.0")
 addon = LibStub("AceAddon-3.0"):NewAddon(addon, addonName, "AceEvent-3.0", "AceConsole-3.0", "AceHook-3.0")
 local L = LibStub("AceLocale-3.0"):GetLocale(addonName)
-
-local Utilities = {}
-addon.Utilities = Utilities
 
 local _, playerClass, classID = UnitClass("player")
 --local armorType = DB.GetClassArmorType(class)		  
 local faction = UnitFactionGroup("player")
 --local role = GetFilteredRole()
 addon.ArmorSets = addon.ArmorSets or {}
-
-
---
-local debugPriority = 100
-
-function SetDebug(value)
-debugPriority = value
-end
--- ----------------------------------------------------------------------------
--- Debugger.
--- ----------------------------------------------------------------------------
-local DebugPour, GetDebugger
-do
-	--local TextDump = LibStub("LibTextDump-1.0")
-
-	local DEBUGGER_WIDTH = 750
-	local DEBUGGER_HEIGHT = 800
-
-	local debugger
-
-	---
-	local function ProcessTable(table)
-
-
-
-		for k,v in pairs(table) do
-		print(k, v)
-		end
-	end
-
-	---------
-	local function Debug(...)
-	---------
-		if not debugger then
-			debugger = TextDump:New(("%s Output"):format(addonName), DEBUGGER_WIDTH, DEBUGGER_HEIGHT)
-		end
-
-		local t = type(...)
-		if t == "string" then
-			local message = string.format(...)
-			debugger:AddLine(message, "%X")
-		elseif t == "number" then
-			local message = string.format tostring((...))
-			debugger:AddLine(message, "%X")
-		elseif t == "boolean" then
-			local message = string.format tostring((...))
-			debugger:AddLine(message, "%X")
-		elseif t == "table" then
-			debugger:AddLine(addon.inspect(...), "%X")
-
-			--pour(textOrAddon, ...)
-		else
-			--error("Invalid argument 2 to :Pour, must be either a string or a table.")
-		end
-
-		return message
-	end
-
-	---------
-	function GetDebugger()
-	---------
-		if debugPriority <=0 then return end
-		if not debugger then
-			debugger = TextDump:New(("%s Output"):format(addonName), DEBUGGER_WIDTH, DEBUGGER_HEIGHT)
-		end
-		if debugger:Lines() == 0 then
-			debugger:AddLine("Nothing to report.")
-			debugger:Display()
-			debugger:Clear()
-			return
-		end
-		debugger:Display()
-		debugger:Clear()
-
-		return debugger
-	end
-
-	---------
-	function ClearDebugger()
-	---------
-		if not debugger then
-			debugger = TextDump:New(("%s Output"):format(addonName), DEBUGGER_WIDTH, DEBUGGER_HEIGHT)
-		end
-
-		debugger:Clear()
-	end
-
-	--------
-	function Export(...)
-	---------
-		if not debugger then
-			debugger = TextDump:New(("%s Export"):format(FOLDER_NAME), DEBUGGER_WIDTH, DEBUGGER_HEIGHT)
-		end
-
-		debugger:Clear()
-			local message = string.format(...)
-			debugger:AddLine(message)
-
-		 debugger:Display()
-		 return debugger
-
-	end
-
-	Utilities.Debug = Debug
-	Utilities.DebugPour = DebugPour
-	Utilities.Export = Export
-	Utilities.GetDebugger =  GetDebugger
-	Utilities.ClearDebug = ClearDebugger
-
-end
-
-local Debug = Utilities.Debug
-
----------
-
 
 local CLASS_INFO = {
 	DEATHKNIGHT = {6,32,"PLATE"},
@@ -199,7 +81,7 @@ end
 do
 	local baseList = {}
 	local setsInfo = {}
-	--Utilities.GetDebugger()
+	
 	local function addArmor(armorSet)
 		
 		for id, setData in pairs(armorSet) do
