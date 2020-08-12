@@ -1,8 +1,7 @@
-search does not work in transmog view
-favoriting set does not update right away
-some itmes doet return info
+
 
 
 To Do
-fix search to be udable for alt lists
-better selection ui flow
+menus 
+favorite extra sets
+filter extra asts

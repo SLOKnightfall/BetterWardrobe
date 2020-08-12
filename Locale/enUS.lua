@@ -1,10 +1,14 @@
 local addonName, addon = ...
-local L = _G.LibStub("AceLocale-3.0"):NewLocale("BetterWardrobe", "enUS", true)
+local L = _G.LibStub("AceLocale-3.0"):NewLocale("BetterWardrobe", "enUS", true, true)
 
 if not L then return end
 
 
 L["SHOWPARTIAL"] = "Show Partial Sets at Transmog Vendor"
+L["Show Incomplete Sets at Transmog Vendor"] = true
+L["Transmog Window"] = true
+L["Show Set Names"] = true
+L["Required pieces"] = true
 
 --PvP Set
 L["NOTE_17"] = "Arena Season 1 Set"

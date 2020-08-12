@@ -127,19 +127,35 @@ local Debug = Utilities.Debug
 
 ---------
 
-local ClassArmor = {
-	DEATHKNIGHT = "PLATE",
-	DEMONHUNTER = "LEATHER",
-	DRUID = "LEATHER",
-	HUNTER = "MAIL",
-	MAGE = "CLOTH",
-	MONK = "LEATHER",
-	PALADIN = "PLATE",
-	PRIEST = "CLOTH",
-	ROGUE = "LEATHER",
-	SHAMAN = "MAIL",
-	WARLOCK = "CLOTH",
-	WARRIOR = "PLATE",
+
+local CLASS_INFO = {
+	DEATHKNIGHT = {6,32,"PLATE"},
+	DEMONHUNTER = {12, 2048, "LEATHER"},
+	DRUID = {11, 1024,"LEATHER"},
+	HUNTER = {3, 4, "MAIL"},
+	MAGE = {8,128,"CLOTH"},
+	MONK = {10, 512, "LEATHER"},
+	PALADIN = {2, 2,"PLATE"},
+	PRIEST = {5, 16, "CLOTH"},
+	ROGUE = {4, 8, "LEATHER"},
+	SHAMAN = {7, 64, "MAIL"},
+	WARLOCK = {9, 256, "CLOTH"},
+	WARRIOR = {1,1,"PLATE"},
+}
+
+local classMask = {
+	DEATHKNIGHT = 32,
+	DRUID = 1024,
+	HUNTER = 4,
+	MAGE = 128,
+	PALADIN = 2,
+	PRIEST = 16,
+	ROGUE = 8,
+	SHAMAN = 64,
+	WARLOCK = 256,
+	WARRIOR = 1,
+	MONK = 512,
+	DEMONHUNTER = 2048,
 }
 
 local EmptyArmor = {
@@ -182,42 +198,55 @@ end
 
 do
 	local baseList = {}
-	local setInfo = {}
-	Utilities.GetDebugger()
+	local setsInfo = {}
+	--Utilities.GetDebugger()
 	local function addArmor(armorSet)
 		
 		for id, setData in pairs(armorSet) do
-			--local id = i
-			local class = setData.classMask
+			
+			local setInfo = C_TransmogSets.GetSetInfo(id)
+			local classInfo = CLASS_INFO[playerClass]
+			--if not setInfo then
+			local class = (setInfo and setInfo.classMask == classInfo[2]) or (setData.classMask and setData.classMask == classInfo[1]) or not setData.classMask
 			--local faction = setData[5]
-			local opposingFaction , BFAFaction = OpposingFaction(faction)
-			local factionLocked = string.find(setData.name, opposingFaction) 
+			local opposingFaction , BFAFaction, City = OpposingFaction(faction)
+			
+			local factionLocked =  string.find(setData.name, opposingFaction) 
 				or string.find(setData.name, BFAFaction)
+				or string.find(setData.name, City)
 			local heritageArmor = string.find(setData.name, "Heritage")
 
-			if  (class and class == classID or not class) 
+					for i, item in ipairs( setData["items"]) do
+					--print(item)
+					local _, _ = addon.GetItemSource(item)
+				end
+
+			if  (class) 
 				and not factionLocked 
 				and not heritageArmor then
 				setData["name"] = L[setData["name"]]
 				local note = "NOTE_"..(setData.label or 0)
 				setData.label =(L[note] and L[note]) or ""
 
-				setInfo[id] = setData
-				tinsert(baseList, setInfo[id])	
+		
+
+
+				setsInfo[id] = setData
+				tinsert(baseList, setsInfo[id])	
 			end
 		end
 	end
 
 	function addon.buildDB()
 	--local faction = GetFactionID(UnitFactionGroup("player"))
-		local armorSet = addon.ArmorSets[ClassArmor[playerClass]]
+		local armorSet = addon.ArmorSets[CLASS_INFO[playerClass][3]]
 
 		addArmor(armorSet)
 		addArmor(addon.ArmorSets["COSMETIC"])
 
 		--Add Hidden Set
-		setInfo[0] = hiddenSet
-		tinsert(baseList, setInfo[0])
+		setsInfo[0] = hiddenSet
+		tinsert(baseList, setsInfo[0])
 		wipe(addon.ArmorSets)
 	end
 
@@ -259,7 +288,7 @@ do
 
 
 	function addon.GetSetInfo(setID)
-		return setInfo[setID]
+		return setsInfo[setID]
 	end
 
 end

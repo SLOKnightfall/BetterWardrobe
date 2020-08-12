@@ -1,18 +1,9 @@
 --	///////////////////////////////////////////////////////////////////////////////////////////
 --
---	BattlePetCageMatch
+--	Better Wardrobe and Collection
 --	Author: SLOKnightfall
 
---	BattlePetCageMatch: Scans bags and puts icons on the Pet Journal for any pet that is currently caged
---
-
---	License: You are hereby authorized to freely modify and/or distribute all files of this add-on, in whole or in part,
---		providing that this header stays intact, and that you do not claim ownership of this Add-on.
---
---		Additionally, the original owner wishes to be notified by email if you make any improvements to this add-on.
---		Any positive alterations will be added to a future release, and any contributing authors will be
---		identified in the section above.
---
+--	Wardrobe and Collection: Adds additional functionality and sets to the transmog and collection areas
 --
 --
 
@@ -28,7 +19,11 @@ local Profile
 local playerNme
 local realmName
 
+addon.itemSourceID = {}
+
+
 local L = LibStub("AceLocale-3.0"):GetLocale(addonName)
+
 
 --ACE3 Options Constuctor
 local options = {
@@ -46,27 +41,57 @@ local options = {
 			args={
 				Options_Header = {
 					order = 0,
-					name = "Header",
+					name = L["Transmog Vendor Window"],
 					type = "header",
 					width = "full",
 				},
 
-				Linebreak_4 = {
-					order = 5.4,
-					name = "",
-					desc = nil,
-					type = "description",
-					width = "normal",
-
+				ShowIncomplete = {
+					order = 1,
+					name = L["Show Incomplete Sets"],
+					type = "toggle",
+					set = function(info,val) Profile.ShowIncomplete = val end,
+					get = function(info) return Profile.ShowIncomplete end,
+					width = "full",
+				},
+				PartialLimit = {
+					order = 7,
+					name = L["Required pieces"],
+					type = "select",
+					type = "range",
+					set = function(info,val) Profile.PartialLimit = val end,
+					get = function(info) return Profile.PartialLimit end,
+					width = "double",
+					min = 1,
+					max = 7,
+					step = 1,
 				},
 
-				Linebreak_1 = {
-					order = 6.1,
-					name = "",
-					desc = nil,
-					type = "description",
-					width = "double",
+				ShowNames = {
+					order = 1,
+					name = L["Show Set Names"],
+					type = "toggle",
+					set = function(info,val) Profile.ShowNames = val end,
+					get = function(info) return Profile.ShowNames end,
+					width = "full",
+				},
 
+				ShowSetCount = {
+					order = 1,
+					name = L["Show Collected Count"],
+					type = "toggle",
+					set = function(info,val) Profile.ShowSetCount = val end,
+					get = function(info) return Profile.ShowSetCount end,
+					width = "full",
+				},
+
+				HideMissing = {
+					order = 1,
+					name = L["Hide Missing Set Pieces"],
+					type = "toggle",
+					set = function(info,val) Profile.HideMissing = val end,
+					get = function(info) return Profile.HideMissing end,
+					width = "full",
 				},
 			},
 		},
@@ -80,9 +105,8 @@ MIN_SET_COLLECTED = 1
 --ACE Profile Saved Variables Defaults
 local defaults = {
 	profile ={
-		ShowPartial = true,
+		['*'] = true,
 		PartialLimit = 4,
-		HideMissing = true,	
 	}
 }
 
@@ -95,6 +119,14 @@ end
 
 ---Ace based addon initilization
 function addon:OnInitialize()
+
+end
+
+
+
+
+
+function addon:OnEnable()
 	self.db = LibStub("AceDB-3.0"):New("BetterWardrobe_Options", defaults, true)
 	options.args.profiles  = LibStub("AceDBOptions-3.0"):GetOptionsTable(self.db)
 	LibStub("AceConfigRegistry-3.0"):ValidateOptionsTable(options, addonName)
@@ -103,12 +135,10 @@ function addon:OnInitialize()
 	self.db.RegisterCallback(addon, "OnProfileChanged", "RefreshConfig")
 	self.db.RegisterCallback(addon, "OnProfileCopied", "RefreshConfig")
 	self.db.RegisterCallback(addon, "OnProfileReset", "RefreshConfig")	
-	WardrobeTransmogFrameSpecDropDown_Initialize()
-end
+	--WardrobeTransmogFrameSpecDropDown_Initialize()
 
-
-function addon:OnEnable()
-	
+	addon.Profile = self.db.profile
+	Profile = addon.Profile
 	addon.AddSetDetailFrames(WardrobeCollectionFrame.SetsTransmogFrame)
 	addon.AddSetDetailFrames(bwSetsTransmogFrame)
 
@@ -118,8 +148,6 @@ function addon:OnEnable()
 	self:Hook("WardrobeCollectionFrame_SetTab", true)
 	--self:Hook("WardrobeCollectionFrameSearchBox_OnUpdate", true)	
 end
-
-
 
 --[[
 local showframe = false
@@ -148,31 +176,6 @@ b:SetScript("OnClick", function()
 end)
 ]]
 
-
-local BASE_SET_BUTTON_HEIGHT = 46
-local VARIANT_SET_BUTTON_HEIGHT = 20
-local SET_PROGRESS_BAR_MAX_WIDTH = 204
-local IN_PROGRESS_FONT_COLOR = CreateColor(0.251, 0.753, 0.251)
-local IN_PROGRESS_FONT_COLOR_CODE = "|cff40c040"
-local COLLECTION_LIST_WIDTH = 260
-
-function addon.GetSetsources(setID)
-	local setInfo = addon.GetSetInfo(setID)
-	local setSources = {}
-
-	for i, item in ipairs(setInfo.items) do
-		local _, sourceID = C_TransmogCollection.GetItemInfo(item)
-		if sourceID then
-			local sourceInfo = C_TransmogCollection.GetSourceInfo(sourceID)
-			--setSoruceData[sourceID] = C_TransmogCollection.GetSourceInfo(sourceID)
-			setSources[sourceID] = sourceInfo.isCollected
-		end
-	end
-
-	return setSources
-end
-
-
 --hack way to load collections frame with out generation errors 
 function addon:GetSpecializationInfo()
 	return 1 ,"test"
@@ -182,28 +185,140 @@ addon:RawHook("GetSpecializationInfo", true)
 LoadAddOn("Blizzard_Collections")
 addon:Unhook("GetSpecializationInfo")
 
+local BASE_SET_BUTTON_HEIGHT = 46
+local VARIANT_SET_BUTTON_HEIGHT = 20
+local SET_PROGRESS_BAR_MAX_WIDTH = 204
+local IN_PROGRESS_FONT_COLOR = CreateColor(0.251, 0.753, 0.251)
+local IN_PROGRESS_FONT_COLOR_CODE = "|cff40c040"
+local COLLECTION_LIST_WIDTH = 260
+
+
+local f = CreateFrame("Frame",nil,UIParent);
+f:SetHeight(1)
+f:SetWidth(1)
+f:SetPoint("TOPLEFT", UIParent, "TOPRIGHT")
+f.model = CreateFrame("DressUpModel",nil), UIParent;
+f.model:SetPoint("CENTER", UIParent, "CENTER")
+f.model:SetHeight(1)
+f.model:SetWidth(1)
+f.model:SetModelScale(1);
+f.model:SetAutoDress(false)
+f.model:SetUnit("PLAYER");
+
+
+function addon.GetItemSource(item)
+	if not addon.itemSourceID[item] then
+		local visualID, sourceID = C_TransmogCollection.GetItemInfo(item)
+		addon.itemSourceID[item] = sourceID
+		if not sourceID then --and item == 123910 then
+			local itemlink = "item:"..item..":0"
+			f.model:Show()
+			f.model:Undress()
+			f.model:TryOn( itemlink)
+			for i = 1, 19 do
+				local source = f.model:GetSlotTransmogSources(i)
+				if source ~= 0 then
+					addon.itemSourceID[item] =  source
+					break
+				end
+			end
+		end
+	end
+
+	f.model:Hide()
+	return "",addon.itemSourceID[item]
+end
+
+
+function GetSetCount(setID)
+	local setinfo = addon.GetSetInfo(setID)
+	return #setinfo["items"]
+end
+
+
+function addon.GetSetsources(setID)
+	local setInfo = addon.GetSetInfo(setID)
+	local setSources = {}
+
+	for i, item in ipairs(setInfo.items) do
+		local _, sourceID = addon.GetItemSource(item) --C_TransmogCollection.GetItemInfo(item)
+
+		if sourceID then
+			local sourceInfo = C_TransmogCollection.GetSourceInfo(sourceID)
+			--setSoruceData[sourceID] = C_TransmogCollection.GetSourceInfo(sourceID)
+			setSources[sourceID] = sourceInfo.isCollected
+		end
+	end
+	return setSources
+end
+
+local EmptyArmor = {
+	[1] = 134110,
+	--[2] = 134112, neck
+	[3] = 134112,
+	--[4] = 168659, shirt
+	[5] = 168659,
+	[6] = 143539,
+	--[7] = 158329, pants
+	[8] = 168664,
+	[9] = 168665,  --wrist
+	[10] = 158329, --handr
+}
+
+
+local function GetEmptySlots()
+	local setInfo = {}
+
+	for i,x in pairs(EmptyArmor) do
+	 	setInfo[i]=x
+	end
+
+	return setInfo
+end
+
+local function EmptySlots(transmogSources)
+	local EmptySet = GetEmptySlots()
+
+	for i, x in pairs(transmogSources) do
+			EmptySet[i] = nil
+	end
+
+	return EmptySet
+end
 
 local SetsDataProvider = CreateFromMixins(WardrobeSetsDataProviderMixin);
 
+function SetsDataProvider:GetBaseSets()
+	if ( not self.baseSets ) then
+		self.baseSets = C_TransmogSets.GetBaseSets();
+		self:DetermineFavorites();
+		self:SortSets(self.baseSets);
+	end
+	return self.baseSets;
+end
+
+--[[
 function SetsDataProvider:GetUsableSets(incVariants)
 	if ( not self.usableSets ) then
 		local availableSets = self:GetBaseSets();
+		self.usableSets = C_TransmogSets.GetUsableSets();
+
 
 		--Generates Useable Set
 		self.usableSets = {} --SetsDataProvider:GetUsableSets();
 		for i, set in ipairs(availableSets) do
 			local topSourcesCollected, topSourcesTotal = SetsDataProvider:GetSetSourceCounts(set.setID);
 
-			if topSourcesCollected >= MIN_SET_COLLECTED  then --and not C_TransmogSets.IsSetUsable(set.setID) then
+			--if topSourcesCollected >= Profile.PartialLimit  then --and not C_TransmogSets.IsSetUsable(set.setID) then
 				tinsert(self.usableSets, set)
-			end
+			--end
 
 			if incVariants then 
 				local variantSets = C_TransmogSets.GetVariantSets(set.setID);
 				for i, set in ipairs(variantSets) do
 					local topSourcesCollected, topSourcesTotal = SetsDataProvider:GetSetSourceCounts(set.setID);
 					if topSourcesCollected == topSourcesTotal then set.collected = true end
-					if topSourcesCollected >= MIN_SET_COLLECTED  then --and not C_TransmogSets.IsSetUsable(set.setID) then
+					if topSourcesCollected >= Profile.PartialLimit  then --and not C_TransmogSets.IsSetUsable(set.setID) then
 						tinsert(self.usableSets, set)
 					end
 				end
@@ -215,9 +330,75 @@ function SetsDataProvider:GetUsableSets(incVariants)
 
 	return self.usableSets;
 end
+]]--
+
+
+function SetsDataProvider:GetUsableSets(incVariants)
+	if ( not self.usableSets ) then
+		self.usableSets = C_TransmogSets.GetUsableSets();
+
+		local setIDS = {}
+
+
+		self:SortSets(self.usableSets);
+		-- group sets by baseSetID, except for favorited sets since those are to remain bucketed to the front
+		for i, set in ipairs(self.usableSets) do
+			setIDS[set.baseSetID or set.setID] = true
+			if ( not set.favorite ) then
+				local baseSetID = set.baseSetID or set.setID;
+				local numRelatedSets = 0;
+				for j = i + 1, #self.usableSets do
+					if ( self.usableSets[j].baseSetID == baseSetID or self.usableSets[j].setID == baseSetID ) then
+						numRelatedSets = numRelatedSets + 1;
+						-- no need to do anything if already contiguous
+						if ( j ~= i + numRelatedSets ) then
+							local relatedSet = self.usableSets[j];
+							tremove(self.usableSets, j);
+							tinsert(self.usableSets, i + numRelatedSets, relatedSet);
+						end
+					end
+				end
+			end
+		end
+
+		if Profile.ShowIncomplete then 
+			local availableSets = self:GetBaseSets();
+			for i, set in ipairs(availableSets) do
+				if not setIDS[set.setID or set.baseSetID ] then 
+					local topSourcesCollected, topSourcesTotal = SetsDataProvider:GetSetSourceCounts(set.setID);
+
+					if topSourcesCollected >= Profile.PartialLimit  then --and not C_TransmogSets.IsSetUsable(set.setID) then
+						
+						tinsert(self.usableSets, set)
+					end
+				end
+
+				if incVariants then 
+					local variantSets = C_TransmogSets.GetVariantSets(set.setID);
+					for i, set in ipairs(variantSets) do
+						if not setIDS[set.setID or set.baseSetID ] then 
+							local topSourcesCollected, topSourcesTotal = SetsDataProvider:GetSetSourceCounts(set.setID);
+							if topSourcesCollected == topSourcesTotal then set.collected = true end
+							if topSourcesCollected >= Profile.PartialLimit  then --and not C_TransmogSets.IsSetUsable(set.setID) then
+								tinsert(self.usableSets, set)
+							end
+						end
+						
+					end
+				end
+
+			end
+			self:SortSets(self.usableSets);	
+		end
+
+	end
+	return self.usableSets;
+end
+
+
 
 function SetsDataProvider:FilterSearch()
-	local baseSets = self:GetUsableSets();
+	local baseSets = self:GetUsableSets(true);
 	local filteredSets = {}
 	local searchString = string.lower(WardrobeCollectionFrameSearchBox:GetText())
 
@@ -288,8 +469,9 @@ function WardrobeCollectionFrame.SetsTransmogFrame:UpdateSets()
 
 			model.Favorite.Icon:SetShown(C_TransmogSets.GetIsFavorite(set.setID))
 			model.setID = set.setID
-			model.setName:SetText(setInfo["name"].."\n"..(setInfo["description"] or ""))
-			model.progress:SetText(topSourcesCollected.."/".. topSourcesTotal)
+
+			model.setName:SetText((Profile.ShowNames and setInfo["name"].."\n"..(setInfo["description"] or "")) or "")
+			model.progress:SetText( (Profile.ShowSetCount and topSourcesCollected.."/".. topSourcesTotal) or "")
 
 		else
 			model:Hide();
@@ -318,6 +500,54 @@ function WardrobeCollectionFrame.SetsTransmogFrame:UpdateSets()
 	end
 
 	self.NoValidSetsLabel:SetShown(not C_TransmogSets.HasUsableSets());
+end
+
+function WardrobeCollectionFrame.SetsTransmogFrame:LoadSet(setID)
+	local waitingOnData = false;
+	local transmogSources = { };
+	local sources = C_TransmogSets.GetSetSources(setID);
+	for sourceID in pairs(sources) do
+		local sourceInfo = C_TransmogCollection.GetSourceInfo(sourceID);
+		local slot = C_Transmog.GetSlotForInventoryType(sourceInfo.invType);
+		local slotSources = C_TransmogSets.GetSourcesForSlot(setID, slot);
+		WardrobeCollectionFrame_SortSources(slotSources, sourceInfo.visualID);
+		local index = WardrobeCollectionFrame_GetDefaultSourceIndex(slotSources, sourceID);
+		transmogSources[slot] = slotSources[index].sourceID;
+
+		for i, slotSourceInfo in ipairs(slotSources) do
+			if ( not slotSourceInfo.name ) then
+				waitingOnData = true;
+			end
+		end
+	end
+	if ( waitingOnData ) then
+		self.loadingSetID = setID;
+	else
+		self.loadingSetID = nil;
+		-- if we don't ignore the event, clearing will momentarily set the page to the one with the set the user currently has transmogged
+		-- if that's a different page from the current one then the models will flicker as we swap the gear to different sets and back
+		self.ignoreTransmogrifyUpdateEvent = true;
+		C_Transmog.ClearPending();
+		self.ignoreTransmogrifyUpdateEvent = false;
+		C_Transmog.LoadSources(transmogSources, -1, -1);
+
+		if Profile.HideMissing then 
+
+			local clearSlots = EmptySlots(transmogSources)
+			for i, x in pairs(clearSlots) do
+				local _,  source = addon.GetItemSource(emptySlotData[x]) --C_TransmogCollection.GetItemInfo(x)
+				C_Transmog.SetPending(i, LE_TRANSMOG_TYPE_APPEARANCE,source)
+			end
+
+			local emptySlotData = GetEmptySlots()
+			for i, x in pairs(transmogSources) do
+				if not C_TransmogCollection.PlayerHasTransmogItemModifiedAppearance(x) and i ~= 7  and emptySlotData[i] then
+					local _,  source = addon.GetItemSource(emptySlotData[i]) -- C_TransmogCollection.GetItemInfo(emptySlotData[i])
+					C_Transmog.SetPending(i, LE_TRANSMOG_TYPE_APPEARANCE, source)
+				end
+			end
+		end
+	end
 end
 
 
@@ -531,7 +761,7 @@ function SetsDataProvider:GetUsableSets(incVariants)
 		for i, set in ipairs(availableSets) do
 			local topSourcesCollected, topSourcesTotal = SetsDataProvider:GetSetSourceCounts(set.setID);
 
-			if topSourcesCollected >= MIN_SET_COLLECTED  then --and not C_TransmogSets.IsSetUsable(set.setID) then
+			if topSourcesCollected >= Profile.PartialLimit  then --and not C_TransmogSets.IsSetUsable(set.setID) then
 				tinsert(self.usableSets, set)
 			end
 
@@ -540,7 +770,7 @@ function SetsDataProvider:GetUsableSets(incVariants)
 				for i, set in ipairs(variantSets) do
 					local topSourcesCollected, topSourcesTotal = SetsDataProvider:GetSetSourceCounts(set.setID);
 					if topSourcesCollected == topSourcesTotal then set.collected = true end
-					if topSourcesCollected >= MIN_SET_COLLECTED  then --and not C_TransmogSets.IsSetUsable(set.setID) then
+					if topSourcesCollected >= Profile.PartialLimit  then --and not C_TransmogSets.IsSetUsable(set.setID) then
 						tinsert(self.usableSets, set)
 					end
 				end
@@ -556,13 +786,13 @@ end
 
 
 function SetsDataProvider:GetSetSourceData(setID)
-	if ( not self.sourceData ) then
-		self.sourceData = { }
-	end
+	--if ( not self.sourceData ) then
+		local sourceData = { }
+	--end
 
-	local sourceData = self.sourceData[setID]
+	--local sourceData = self.sourceData[setID]
 
-	if ( not sourceData ) then
+	--if ( not sourceData ) then
 		local sources = addon.GetSetsources(setID)
 		local numCollected = 0
 		local numTotal = 0
@@ -576,8 +806,8 @@ function SetsDataProvider:GetSetSourceData(setID)
 		end
 
 		sourceData = { numCollected = numCollected, numTotal = numTotal, collected = numCollected == numTotal, sources = sources }
-		self.sourceData[setID] = sourceData
-	end
+		sourceData[setID] = sourceData
+	--end
 
 	return sourceData
 end
@@ -775,7 +1005,7 @@ end
 
 
 function BetterWardrobeSetsCollectionMixin:OnEvent(event, ...)
-	--[[
+
 	if ( event == "GET_ITEM_INFO_RECEIVED" ) then
 		local itemID = ...
 		for itemFrame in self.DetailsFrame.itemFramesPool:EnumerateActive() do
@@ -794,7 +1024,7 @@ function BetterWardrobeSetsCollectionMixin:OnEvent(event, ...)
 		self:UpdateProgressBar()
 		self:ClearLatestSource()
 	end
-	]]
+
 end
 
 function BetterWardrobeSetsCollectionMixin:Refresh()
@@ -1013,88 +1243,60 @@ end
 BetterWardrobeSetsTransmogMixin = CreateFromMixins(WardrobeSetsTransmogMixin)
 
 --do 
-	local EmptyArmor = {
-		[1] = 134110,
-		--[2] = 134112, neck
-		[3] = 134112,
-		--[4] = 168659, shirt
-		[5] = 168659,
-		[6] = 143539,
-		--[7] = 158329, pants
-		[8] = 168664,
-		[9] = 168665,  --wrist
-		[10] = 158329, --handr
-	}
 
 
-	local function GetEmptySlots()
-		local setInfo = {}
+function BetterWardrobeSetsTransmogMixin:LoadSet(setID)
+	local waitingOnData = false
+	local transmogSources = { }
+	local sources = addon.GetSetsources(setID)
 
-		for i,x in pairs(EmptyArmor) do
-		 	setInfo[i]=x
-		end
+	for sourceID in pairs(sources) do
+		local sourceInfo = C_TransmogCollection.GetSourceInfo(sourceID)
+		local slot = C_Transmog.GetSlotForInventoryType(sourceInfo.invType)
+		--local slotSources = C_TransmogSets.GetSourcesForSlot(setID, slot)
+		--WardrobeCollectionFrame_SortSources(slotSources, sourceInfo.visualID)
+		--local index = WardrobeCollectionFrame_GetDefaultSourceIndex(slotSources, sourceID)
+		transmogSources[slot] = sourceInfo.sourceID
 
-		return setInfo
-	end
-
-	local function EmptySlots(transmogSources)
-		local EmptySet = GetEmptySlots()
-
-		for i, x in pairs(transmogSources) do
-				EmptySet[i] = nil
-		end
-
-		return EmptySet
-	end
-
-	function BetterWardrobeSetsTransmogMixin:LoadSet(setID)
-		local waitingOnData = false
-		local transmogSources = { }
-		local sources = addon.GetSetsources(setID)
-
-		for sourceID in pairs(sources) do
-			local sourceInfo = C_TransmogCollection.GetSourceInfo(sourceID)
-			local slot = C_Transmog.GetSlotForInventoryType(sourceInfo.invType)
-			--local slotSources = C_TransmogSets.GetSourcesForSlot(setID, slot)
-			--WardrobeCollectionFrame_SortSources(slotSources, sourceInfo.visualID)
-			--local index = WardrobeCollectionFrame_GetDefaultSourceIndex(slotSources, sourceID)
-			transmogSources[slot] = sourceInfo.sourceID
-
-			for i, slotSourceInfo in ipairs(sourceInfo) do
-				if ( not slotSourceInfo.name ) then
-					waitingOnData = true
-				end
+		for i, slotSourceInfo in ipairs(sourceInfo) do
+			if ( not slotSourceInfo.name ) then
+				waitingOnData = true
 			end
 		end
+	end
 
-		if ( waitingOnData ) then
-			self.loadingSetID = setID
+	if ( waitingOnData ) then
+		self.loadingSetID = setID
 
-		else
-			self.loadingSetID = nil
-			-- if we don't ignore the event, clearing will momentarily set the page to the one with the set the user currently has transmogged
-			-- if that's a different page from the current one then the models will flicker as we swap the gear to different sets and back
-			self.ignoreTransmogrifyUpdateEvent = true
-			C_Transmog.ClearPending()
-			self.ignoreTransmogrifyUpdateEvent = false
-			C_Transmog.LoadSources(transmogSources, -1, -1)
+	else
+		self.loadingSetID = nil
+		-- if we don't ignore the event, clearing will momentarily set the page to the one with the set the user currently has transmogged
+		-- if that's a different page from the current one then the models will flicker as we swap the gear to different sets and back
+		self.ignoreTransmogrifyUpdateEvent = true
+		C_Transmog.ClearPending()
+		self.ignoreTransmogrifyUpdateEvent = false
+		C_Transmog.LoadSources(transmogSources, -1, -1)
+
+		if Profile.HideMissing then 
 
 			local clearSlots = EmptySlots(transmogSources)
 			for i, x in pairs(clearSlots) do
-				local _,  source =C_TransmogCollection.GetItemInfo(x)
+				local _,  source = addon.GetItemSource(x) --C_TransmogCollection.GetItemInfo(x)
 				C_Transmog.SetPending(i, LE_TRANSMOG_TYPE_APPEARANCE,source)
 			end
+
 
 			local emptySlotData = GetEmptySlots()
 			for i, x in pairs(transmogSources) do
 				if not C_TransmogCollection.PlayerHasTransmogItemModifiedAppearance(x) and i ~= 7  and emptySlotData[i] then
-					local _,  source = C_TransmogCollection.GetItemInfo(emptySlotData[i])
+					local _,  source = addon.GetItemSource(emptySlotData[i]) --C_TransmogCollection.GetItemInfo(emptySlotData[i])
 					C_Transmog.SetPending(i, LE_TRANSMOG_TYPE_APPEARANCE, source)
 				end
 			end
-		
 		end
+	
 	end
+end
 --end
 
 function BetterWardrobeSetsTransmogMixin:OnShow()
@@ -1314,6 +1516,13 @@ function addon:WardrobeCollectionFrame_SetTab(tabID)
 end
 
 
+function WardrobeCollectionFrame_ClickTab(tab)
+	WardrobeCollectionFrame_SetTab(tab:GetID());
+	PanelTemplates_ResizeTabsToFit(WardrobeCollectionFrame, TABS_MAX_WIDTH);
+	PlaySound(SOUNDKIT.IG_MAINMENU_OPTION_CHECKBOX_ON);
+end
+
+
 --Reloads WardrobeCollectionFrame to include new tab
 function addon.WardrobeCollectionFrame_OnLoad(self)
 	PanelTemplates_SetNumTabs(self, 3);
@@ -1321,6 +1530,10 @@ function addon.WardrobeCollectionFrame_OnLoad(self)
 	PanelTemplates_ResizeTabsToFit(self, TABS_MAX_WIDTH);
 	self.selectedCollectionTab = TAB_ITEMS;
 	self.selectedTransmogTab = TAB_ITEMS;
+end
+
+function addon:WardrobeCollectionFrameSearchBox_OnUpdate()
+	print("hook")
 end
 
 
