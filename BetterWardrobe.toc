@@ -27,8 +27,11 @@ Locale\enUS.lua
 #Core Files
 Inspect.lua
 BetterWardrobe.xml
+UI.lua
+SortingFunctions.lua
 
 #Data files
+Data\AppearanceData.lua
 Data\CLOTH.lua
 Data\LEATHER.lua
 Data\MAIL.lua

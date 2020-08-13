@@ -65,7 +65,7 @@
 		</Scripts>
 	</DressUpModel>
 	
-	<Frame name ="BWetsCollectionFrame" parentKey="BWetsCollectionFrame" parent="WardrobeCollectionFrame"  parentArray="ContentFrames" mixin="BetterWardrobeSetsCollectionMixin" hidden="true">
+	<Frame name ="BW_SetsCollectionFrame" parentKey="BW_SetsCollectionFrame" parent="WardrobeCollectionFrame"  parentArray="ContentFrames" mixin="BetterWardrobeSetsCollectionMixin" hidden="true">
 
 		<KeyValues>
 			<KeyValue key="searchType" value="LE_TRANSMOG_SEARCH_TYPE_BASE_SETS" type="global"/>
@@ -188,7 +188,7 @@
 		</Scripts>
 	</Frame>
 	
-	<Frame name="bwSetsTransmogFrame" parent="WardrobeCollectionFrame" parentKey="bwSetsTransmogFrame" parentArray="ContentFrames" inherits="CollectionsBackgroundTemplate" mixin="BetterWardrobeSetsTransmogMixin" hidden="true">
+	<Frame name="BW_SetsTransmogFrame" parent="WardrobeCollectionFrame" parentKey="BW_SetsTransmogFrame" parentArray="ContentFrames" inherits="CollectionsBackgroundTemplate" mixin="BetterWardrobeSetsTransmogMixin" hidden="true">
 		<KeyValues>
 			<KeyValue key="searchType" value="LE_TRANSMOG_SEARCH_TYPE_USABLE_SETS" type="global"/>
 		</KeyValues>

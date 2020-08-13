@@ -119,7 +119,8 @@ do
 		end
 	end
 
-	function addon.buildDB()
+	function addon.BuildDB()
+		print("BDB")
 	--local faction = GetFactionID(UnitFactionGroup("player"))
 		local armorSet = addon.ArmorSets[CLASS_INFO[playerClass][3]]
 
@@ -127,8 +128,8 @@ do
 		addArmor(addon.ArmorSets["COSMETIC"])
 
 		--Add Hidden Set
-		setsInfo[0] = hiddenSet
-		tinsert(baseList, setsInfo[0])
+		--setsInfo[0] = hiddenSet
+		--ztinsert(baseList, setsInfo[0])
 		wipe(addon.ArmorSets)
 	end
 
