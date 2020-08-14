@@ -122,10 +122,6 @@ function addon:OnInitialize()
 
 end
 
-
-
-
-
 function addon:OnEnable()
 	self.db = LibStub("AceDB-3.0"):New("BetterWardrobe_Options", defaults, true)
 	options.args.profiles  = LibStub("AceDBOptions-3.0"):GetOptionsTable(self.db)
@@ -139,85 +135,17 @@ function addon:OnEnable()
 
 	addon.Profile = self.db.profile
 	Profile = addon.Profile
-	addon.AddSetDetailFrames(WardrobeCollectionFrame.SetsTransmogFrame)
-	addon.AddSetDetailFrames(BW_SetsTransmogFrame)
 
 	addon.BuildDB()
+	addon.BuildUI()
 
-	addon.WardrobeCollectionFrame_OnLoad(WardrobeCollectionFrame)
 	self:Hook("WardrobeCollectionFrame_SetTab", true)
-	--self:Hook("WardrobeCollectionFrameSearchBox_OnUpdate", true)	
-	ExtTransmog_RebuildFrame();
-	addon.CreateDropdown()
 end
-
-
-
-
-
-function ExtTransmog_RebuildFrame()
-
-    WardrobeFrame:SetWidth(1200);
-    WardrobeTransmogFrame:SetWidth(535);
-    WardrobeTransmogFrame.ModelScene:ClearAllPoints();
-    WardrobeTransmogFrame.ModelScene:SetPoint("TOP", WardrobeTransmogFrame, "TOP", 0, -4);
-    WardrobeTransmogFrame.ModelScene:SetWidth(420);
-    WardrobeTransmogFrame.ModelScene:SetHeight(420);
-    WardrobeTransmogFrame.Inset.BG:SetWidth(529);
-
-    WardrobeTransmogFrame.ModelScene.HeadButton:ClearAllPoints();
-    WardrobeTransmogFrame.ModelScene.HeadButton:SetPoint("TOP", WardrobeTransmogFrame.ModelScene, "TOP", -238, -41);
-    WardrobeTransmogFrame.ModelScene.HandsButton:ClearAllPoints();
-    WardrobeTransmogFrame.ModelScene.HandsButton:SetPoint("TOP", WardrobeTransmogFrame.ModelScene, "TOP", 235, -118);
-
-    WardrobeTransmogFrame.ModelScene.MainHandButton:ClearAllPoints();
-    WardrobeTransmogFrame.ModelScene.MainHandButton:SetPoint("TOP", WardrobeTransmogFrame.ModelScene, "BOTTOM", -26, -5);
-    WardrobeTransmogFrame.ModelScene.SecondaryHandButton:ClearAllPoints();
-    WardrobeTransmogFrame.ModelScene.SecondaryHandButton:SetPoint("TOP", WardrobeTransmogFrame.ModelScene, "BOTTOM", 27, -5);
-    WardrobeTransmogFrame.ModelScene.MainHandEnchantButton:ClearAllPoints();
-    WardrobeTransmogFrame.ModelScene.MainHandEnchantButton:SetPoint("BOTTOM", WardrobeTransmogFrame.ModelScene.MainHandButton, "BOTTOM", 0, -20);
-    WardrobeTransmogFrame.ModelScene.SecondaryHandEnchantButton:ClearAllPoints();
-    WardrobeTransmogFrame.ModelScene.SecondaryHandEnchantButton:SetPoint("BOTTOM", WardrobeTransmogFrame.ModelScene.SecondaryHandButton, "BOTTOM", 0, -20);
-    
-    UIPanelWindows["WardrobeFrame"].width = 1200;
-    
-end
-
---[[
-local showframe = false
-
-local b = CreateFrame("Button", "MyButton", WardrobeCollectionFrame, "UIPanelButtonTemplate")
-b:SetSize(80 ,22) -- width, height
-b:SetText("Button!")
-b:SetPoint("LEFT", WardrobeCollectionFrame.progressBar, "RIGHT")
-b:SetScript("OnClick", function()
-	local baseFrame
-	local atTransmogrifier = WardrobeFrame_IsAtTransmogrifier()
-
-	if ( atTransmogrifier ) then
-		baseFrame = WardrobeCollectionFrame.SetsTransmogFrame
-		collectionFrame = BW_SetsTransmogFrame
-		BW_SetsCollectionFrame:Hide()
-	else
-		baseFrame = WardrobeCollectionFrame.SetsCollectionFrame
-		collectionFrame = BW_SetsCollectionFrame
-		BW_SetsTransmogFrame:Hide()
-	end
-
-	    showframe = not showframe
-	    collectionFrame:SetShown( showframe)
-	    baseFrame:SetShown(not showframe)
-end)
-]]
-
-
-
 
 --hack way to load collections frame with out generation errors 
 function addon:GetSpecializationInfo()
 	return 1 ,"test"
 end
-
 addon:RawHook("GetSpecializationInfo", true)	
 LoadAddOn("Blizzard_Collections")
 addon:Unhook("GetSpecializationInfo")
@@ -241,44 +169,6 @@ f.model:SetWidth(1)
 f.model:SetModelScale(1);
 f.model:SetAutoDress(false)
 f.model:SetUnit("PLAYER");
-
-local VisualMode = false
-
-local b = CreateFrame("Button", "BW_WardrobeToggle", WardrobeCollectionFrame, "EyeTemplate")
-b:SetSize(30 ,30) -- width, height
-b:Hide()
-b.texture:SetTexCoord(0.125, 0.25, 0.25, 0.5);
-b:SetPoint("CENTER")
-b:SetPoint("LEFT", WardrobeCollectionFrame.progressBar, "RIGHT")
-b:SetScript("OnClick", function()
-	local baseFrame
-
-	local atTransmogrifier = WardrobeFrame_IsAtTransmogrifier()
-	local tab = WardrobeCollectionFrame.selectedCollectionTab
-
-	if ( not atTransmogrifier ) then
-		VisualMode = true
-		if tab == 2 then 
-			if WardrobeCollectionFrame.SetsCollectionFrame:IsShown() then
-				WardrobeCollectionFrame.SetsTransmogFrame:Show()
-				WardrobeCollectionFrame.SetsCollectionFrame:Hide()
-			else
-				WardrobeCollectionFrame.SetsTransmogFrame:Hide()
-				WardrobeCollectionFrame.SetsCollectionFrame:Show()
-			end
-		elseif tab == 3 then 
-			if WardrobeCollectionFrame.BW_SetsCollectionFrame:IsShown() then
-				WardrobeCollectionFrame.BW_SetsTransmogFrame:Show()
-				WardrobeCollectionFrame.BW_SetsCollectionFrame:Hide()
-			else
-				WardrobeCollectionFrame.BW_SetsTransmogFrame:Hide()
-				WardrobeCollectionFrame.BW_SetsCollectionFrame:Show()
-			end
-		end
-
-	end
-end)
-
 
 function addon.GetItemSource(item)
 	if not addon.itemSourceID[item] then
@@ -442,13 +332,13 @@ function SetsDataProvider:GetUsableSets(incVariants)
 			end
 		end
 
-		if Profile.ShowIncomplete or VisualMode then 
+		if Profile.ShowIncomplete or BW_WardrobeToggle.VisualMode then 
 			local availableSets = self:GetBaseSets();
 			for i, set in ipairs(availableSets) do
 				if not setIDS[set.setID or set.baseSetID ] then 
 					local topSourcesCollected, topSourcesTotal = SetsDataProvider:GetSetSourceCounts(set.setID);
 
-					if VisualMode or topSourcesCollected >= Profile.PartialLimit  then --and not C_TransmogSets.IsSetUsable(set.setID) then
+					if BW_WardrobeToggle.VisualMode or topSourcesCollected >= Profile.PartialLimit  then --and not C_TransmogSets.IsSetUsable(set.setID) then
 						
 						tinsert(self.usableSets, set)
 					end
@@ -460,7 +350,7 @@ function SetsDataProvider:GetUsableSets(incVariants)
 						if not setIDS[set.setID or set.baseSetID ] then 
 							local topSourcesCollected, topSourcesTotal = SetsDataProvider:GetSetSourceCounts(set.setID);
 							if topSourcesCollected == topSourcesTotal then set.collected = true end
-							if VisualMode or topSourcesCollected >= Profile.PartialLimit  then --and not C_TransmogSets.IsSetUsable(set.setID) then
+							if BW_WardrobeToggle.VisualMode or topSourcesCollected >= Profile.PartialLimit  then --and not C_TransmogSets.IsSetUsable(set.setID) then
 								tinsert(self.usableSets, set)
 							end
 						end
@@ -498,6 +388,108 @@ function SetsDataProvider:FilterSearch()
 	end
 
 end
+
+
+function WardrobeCollectionFrame.SetsCollectionFrame:OnSearchUpdate()
+	if ( self.init ) then
+		SetsDataProvider:ClearBaseSets();
+		SetsDataProvider:ClearVariantSets();
+		SetsDataProvider:ClearUsableSets();
+		self:Refresh();
+	end
+end
+
+
+function WardrobeCollectionFrame.SetsCollectionFrame:OnShow()
+	self:RegisterEvent("GET_ITEM_INFO_RECEIVED");
+	self:RegisterEvent("TRANSMOG_COLLECTION_ITEM_UPDATE");
+	self:RegisterEvent("TRANSMOG_COLLECTION_UPDATED");
+	-- select the first set if not init
+	local baseSets = SetsDataProvider:GetBaseSets();
+	if ( not self.init ) then
+		self.init = true;
+		if ( baseSets and baseSets[1] ) then
+			self:SelectSet(self:GetDefaultSetIDForBaseSet(baseSets[1].setID));
+		end
+	else
+		self:Refresh();
+	end
+
+	local latestSource = C_TransmogSets.GetLatestSource();
+	if ( latestSource ~= NO_TRANSMOG_SOURCE_ID ) then
+		local sets = C_TransmogSets.GetSetsContainingSourceID(latestSource);
+		local setID = sets and sets[1];
+		if ( setID ) then
+			self:SelectSet(setID);
+			local baseSetID = C_TransmogSets.GetBaseSetID(setID);
+			self:ScrollToSet(baseSetID);
+		end
+		self:ClearLatestSource();
+	end
+
+	WardrobeCollectionFrame.progressBar:Show();
+	self:UpdateProgressBar();
+	self:RefreshCameras();
+
+	if (self:GetParent().SetsTabHelpBox:IsShown()) then
+		self:GetParent().SetsTabHelpBox:Hide()
+		SetCVarBitfield("closedInfoFrames", LE_FRAME_TUTORIAL_TRANSMOG_SETS_TAB, true);
+	end
+end
+
+
+function WardrobeCollectionFrameScrollFrame:Update()
+	local offset = HybridScrollFrame_GetOffset(self);
+	local buttons = self.buttons;
+	local baseSets = SetsDataProvider:GetBaseSets();
+
+	-- show the base set as selected
+	local selectedSetID = self:GetParent():GetSelectedSetID();
+	local selectedBaseSetID = selectedSetID and C_TransmogSets.GetBaseSetID(selectedSetID);
+
+	for i = 1, #buttons do
+		local button = buttons[i];
+		local setIndex = i + offset;
+		if ( setIndex <= #baseSets ) then
+			local baseSet = baseSets[setIndex];
+			button:Show();
+			button.Name:SetText(baseSet.name);
+			local topSourcesCollected, topSourcesTotal = SetsDataProvider:GetSetSourceTopCounts(baseSet.setID);
+			local setCollected = C_TransmogSets.IsBaseSetCollected(baseSet.setID);
+			local color = IN_PROGRESS_FONT_COLOR;
+			if ( setCollected ) then
+				color = NORMAL_FONT_COLOR;
+			elseif ( topSourcesCollected == 0 ) then
+				color = GRAY_FONT_COLOR;
+			end
+			button.Name:SetTextColor(color.r, color.g, color.b);
+			button.Label:SetText(baseSet.label);
+			button.Icon:SetTexture(SetsDataProvider:GetIconForSet(baseSet.setID));
+			button.Icon:SetDesaturation((topSourcesCollected == 0) and 1 or 0);
+			button.SelectedTexture:SetShown(baseSet.setID == selectedBaseSetID);
+			button.Favorite:SetShown(baseSet.favoriteSetID);
+			button.New:SetShown(SetsDataProvider:IsBaseSetNew(baseSet.setID));
+			button.setID = baseSet.setID;
+
+			if ( topSourcesCollected == 0 or setCollected ) then
+				button.ProgressBar:Hide();
+			else
+				button.ProgressBar:Show();
+				button.ProgressBar:SetWidth(SET_PROGRESS_BAR_MAX_WIDTH * topSourcesCollected / topSourcesTotal);
+			end
+			button.IconCover:SetShown(not setCollected);
+		else
+			button:Hide();
+		end
+	end
+
+	local extraHeight = (self.largeButtonHeight and self.largeButtonHeight - BASE_SET_BUTTON_HEIGHT) or 0;
+	local totalHeight = #baseSets * BASE_SET_BUTTON_HEIGHT + extraHeight;
+	HybridScrollFrame_Update(self, totalHeight, self:GetHeight());
+end
+
+
+WardrobeCollectionFrame.SetsCollectionFrame:SetScript("OnShow", WardrobeCollectionFrame.SetsCollectionFrame.OnShow)
 
 
 function WardrobeCollectionFrame.SetsTransmogFrame:OnSearchUpdate()
@@ -685,7 +677,7 @@ function WardrobeCollectionFrame.SetsTransmogFrame:OnHide()
 	SetsDataProvider:ClearSets();
 	WardrobeCollectionFrame_ClearSearch(LE_TRANSMOG_SEARCH_TYPE_USABLE_SETS);
 	self.sourceQualityTable = nil;
-	VisualMode = false
+	BW_WardrobeToggle.VisualMode = false
 end
 
 
@@ -727,9 +719,6 @@ WardrobeCollectionFrame.SetsTransmogFrame:SetScript("OnEvent",  WardrobeCollecti
 
 --
 local SetsDataProvider = CreateFromMixins(WardrobeSetsDataProviderMixin)
-
-
-
 
 function SetsDataProvider:SortSets(sets, reverseUIOrder, ignorePatchID)
 	addon.SortSet(sets, reverseUIOrder, ignorePatchID)
@@ -798,7 +787,7 @@ function SetsDataProvider:GetUsableSets(incVariants)
 		for i, set in ipairs(availableSets) do
 			local topSourcesCollected, topSourcesTotal = SetsDataProvider:GetSetSourceCounts(set.setID);
 
-			if VisualMode or topSourcesCollected >= Profile.PartialLimit  then --and not C_TransmogSets.IsSetUsable(set.setID) then
+			if BW_WardrobeToggle.VisualMode or topSourcesCollected >= Profile.PartialLimit  then --and not C_TransmogSets.IsSetUsable(set.setID) then
 				tinsert(self.usableSets, set)
 			end
 
@@ -807,7 +796,7 @@ function SetsDataProvider:GetUsableSets(incVariants)
 				for i, set in ipairs(variantSets) do
 					local topSourcesCollected, topSourcesTotal = SetsDataProvider:GetSetSourceCounts(set.setID);
 					if topSourcesCollected == topSourcesTotal then set.collected = true end
-					if VisualMode or topSourcesCollected >= Profile.PartialLimit  then --and not C_TransmogSets.IsSetUsable(set.setID) then
+					if BW_WardrobeToggle.VisualMode or topSourcesCollected >= Profile.PartialLimit  then --and not C_TransmogSets.IsSetUsable(set.setID) then
 						tinsert(self.usableSets, set)
 					end
 				end
@@ -1279,9 +1268,6 @@ end
 
 BetterWardrobeSetsTransmogMixin = CreateFromMixins(WardrobeSetsTransmogMixin)
 
---do 
-
-
 function BetterWardrobeSetsTransmogMixin:LoadSet(setID)
 	local waitingOnData = false
 	local transmogSources = { }
@@ -1349,7 +1335,6 @@ function BetterWardrobeSetsTransmogMixin:OnShow()
 	WardrobeCollectionFrame.progressBar:Show()
 	self:UpdateProgressBar()
 	self.sourceQualityTable = { }
-
 
 	--if (self:GetParent().SetsTabHelpBox:IsShown()) then
 		--self:GetParent().SetsTabHelpBox:Hide()
@@ -1479,161 +1464,5 @@ function BetterWardrobeSetsTransmogMixin:ResetPage()
 	self.PagingFrame:SetCurrentPage(page)
 	self:UpdateSets()
 end
---===
 
 
-	-- sort and update
-	hooksecurefunc(WardrobeCollectionFrame.ItemsCollectionFrame, "SortVisuals", function()
-		-- exclude enchants/illusions by checking for category
-		if WardrobeCollectionFrame.ItemsCollectionFrame:GetActiveCategory() then
-			addon.SortCollection(WardrobeCollectionFrame.ItemsCollectionFrame)
-			
-			UIDropDownMenu_EnableDropDown(BW_SortDropDown)
-		else
-			UIDropDownMenu_DisableDropDown(BW_SortDropDown)
-		end
-	end)
-
-
---- Functionality to add 3rd tab to windows
-local TAB_ITEMS = 1;
-local TAB_SETS = 2;
-local TAB_EXTRASETS = 3;
-local TABS_MAX_WIDTH = 185;
-
-function addon:WardrobeCollectionFrame_SetTab(tabID)
-	PanelTemplates_SetTab(WardrobeCollectionFrame, tabID);
-	local atTransmogrifier = WardrobeFrame_IsAtTransmogrifier();
-	if ( atTransmogrifier ) then
-		WardrobeCollectionFrame.selectedTransmogTab = tabID;
-	else
-		WardrobeCollectionFrame.selectedCollectionTab = tabID;
-	end
-	--addon.setDropdown(1)
-	if ( tabID == TAB_ITEMS ) then
-
-		WardrobeCollectionFrame.activeFrame = WardrobeCollectionFrame.ItemsCollectionFrame;
-		WardrobeCollectionFrame.ItemsCollectionFrame:Show();
-		WardrobeCollectionFrame.SetsCollectionFrame:Hide();
-		WardrobeCollectionFrame.SetsTransmogFrame:Hide();
-		WardrobeCollectionFrame.BW_SetsTransmogFrame:Hide();
-		WardrobeCollectionFrame.BW_SetsCollectionFrame:Hide();
-		WardrobeCollectionFrame.searchBox:ClearAllPoints();
-		WardrobeCollectionFrame.searchBox:SetPoint("TOPRIGHT", -107, -35);
-		WardrobeCollectionFrame.searchBox:SetWidth(115);
-		WardrobeCollectionFrame.searchBox:SetEnabled(WardrobeCollectionFrame.ItemsCollectionFrame.transmogType == LE_TRANSMOG_TYPE_APPEARANCE);
-		WardrobeCollectionFrame.FilterButton:Show();
-		WardrobeCollectionFrame.FilterButton:SetEnabled(WardrobeCollectionFrame.ItemsCollectionFrame.transmogType == LE_TRANSMOG_TYPE_APPEARANCE);
-		BW_WardrobeToggle:Hide()
-
-		if WardrobeFrame_IsAtTransmogrifier() then
-			local _, isWeapon = C_TransmogCollection.GetCategoryInfo(WardrobeCollectionFrame.ItemsCollectionFrame:GetActiveCategory() or -1)
-			BW_SortDropDown:SetPoint("TOPLEFT", WardrobeCollectionFrame.ItemsCollectionFrame.WeaponDropDown, "BOTTOMLEFT", 0, isWeapon and 55 or 32)
-		else
-			BW_SortDropDown:SetPoint("TOPLEFT", WardrobeCollectionFrame.ItemsCollectionFrame.WeaponDropDown, "BOTTOMLEFT", 0, LegionWardrobeY)
-		end
-
-	elseif ( tabID == TAB_SETS ) then
-		WardrobeCollectionFrame.ItemsCollectionFrame:Hide();
-		WardrobeCollectionFrame.BW_SetsTransmogFrame:Hide();
-		WardrobeCollectionFrame.BW_SetsCollectionFrame:Hide();
-		WardrobeCollectionFrame.searchBox:ClearAllPoints();
-		if ( atTransmogrifier )  then
-			WardrobeCollectionFrame.activeFrame = WardrobeCollectionFrame.SetsTransmogFrame;
-			WardrobeCollectionFrame.searchBox:SetPoint("TOPRIGHT", -107, -35);
-			WardrobeCollectionFrame.searchBox:SetWidth(115);
-			WardrobeCollectionFrame.FilterButton:Hide();
-		else
-			WardrobeCollectionFrame.activeFrame = WardrobeCollectionFrame.SetsCollectionFrame;
-			WardrobeCollectionFrame.searchBox:SetPoint("TOPLEFT", 19, -69);
-			WardrobeCollectionFrame.searchBox:SetWidth(145);
-			WardrobeCollectionFrame.FilterButton:Show();
-			WardrobeCollectionFrame.FilterButton:SetEnabled(true);
-			BW_WardrobeToggle:Show()
-		end
-		WardrobeCollectionFrame.searchBox:SetEnabled(true);
-		WardrobeCollectionFrame.SetsCollectionFrame:SetShown(not atTransmogrifier);
-		WardrobeCollectionFrame.SetsTransmogFrame:SetShown(atTransmogrifier);
-		BW_SortDropDown:SetPoint("TOPLEFT", BW_WardrobeToggle, "TOPRIGHT")
-	elseif ( tabID == TAB_EXTRASETS ) then
-		WardrobeCollectionFrame.ItemsCollectionFrame:Hide();
-		WardrobeCollectionFrame.SetsCollectionFrame:Hide();
-		WardrobeCollectionFrame.SetsTransmogFrame:Hide();
-		WardrobeCollectionFrame.searchBox:ClearAllPoints();
-
-		if ( atTransmogrifier )  then
-			WardrobeCollectionFrame.activeFrame = WardrobeCollectionFrame.BW_SetsTransmogFrame;
-			WardrobeCollectionFrame.searchBox:SetPoint("TOPRIGHT", -107, -35);
-			WardrobeCollectionFrame.searchBox:SetWidth(115);
-			WardrobeCollectionFrame.FilterButton:Hide();
-		else
-			WardrobeCollectionFrame.activeFrame = WardrobeCollectionFrame.BW_SetsCollectionFrame;
-			WardrobeCollectionFrame.searchBox:SetPoint("TOPLEFT", 19, -69);
-			WardrobeCollectionFrame.searchBox:SetWidth(145);
-			WardrobeCollectionFrame.FilterButton:Show();
-			WardrobeCollectionFrame.FilterButton:SetEnabled(true);
-			BW_WardrobeToggle:Show()
-		end
-		WardrobeCollectionFrame.searchBox:SetEnabled(true);
-		WardrobeCollectionFrame.BW_SetsCollectionFrame:SetShown(not atTransmogrifier);
-		WardrobeCollectionFrame.BW_SetsTransmogFrame:SetShown(atTransmogrifier);
-		BW_SortDropDown:SetPoint("TOPLEFT", BW_WardrobeToggle, "TOPRIGHT")
-	end
-
-end
-
-
-function WardrobeCollectionFrame_ClickTab(tab)
-	WardrobeCollectionFrame_SetTab(tab:GetID());
-	PanelTemplates_ResizeTabsToFit(WardrobeCollectionFrame, TABS_MAX_WIDTH);
-	PlaySound(SOUNDKIT.IG_MAINMENU_OPTION_CHECKBOX_ON);
-end
-
-
---Reloads WardrobeCollectionFrame to include new tab
-function addon.WardrobeCollectionFrame_OnLoad(self)
-	PanelTemplates_SetNumTabs(self, 3);
-	PanelTemplates_SetTab(self, TAB_ITEMS);
-	PanelTemplates_ResizeTabsToFit(self, TABS_MAX_WIDTH);
-	self.selectedCollectionTab = TAB_ITEMS;
-	self.selectedTransmogTab = TAB_ITEMS;
-end
-
-function addon:WardrobeCollectionFrameSearchBox_OnUpdate()
-	print("hook")
-end
-
-
--- Base Transmog Sets Window Upates
-
-local function InitFrames(frame, button, name, height)
-		local frame = CreateFrame("Frame", nil, frame[button] )
-        frame:SetHeight(height)
-        frame:SetWidth(120)
-        frame.text = frame:CreateFontString(nil, "OVERLAY", "GameFontHighlightMedium")
-        frame.text:SetWidth(frame:GetWidth())
-        frame.text:SetHeight(frame:GetHeight())
-        frame.text:SetPoint("TOP", frame, "TOP", 0, 0)        
-        frame.text:SetSize(frame:GetWidth(), frame:GetHeight())
-        frame.text:SetJustifyV("CENTER")
-        frame.text:SetJustifyH("CENTER")
-        frame.text:SetText("--")
-		return frame
-end
-
-
-local buttons = {"ModelR1C1","ModelR1C2","ModelR1C3","ModelR1C4","ModelR2C1","ModelR2C2","ModelR2C3","ModelR2C4"}
-
-function addon.AddSetDetailFrames(frame)
-	local frame1, frame2
-	for i, button in ipairs(buttons) do
-
-		frame1 = InitFrames(frame, button,"progress", 20)
-        frame1:SetPoint("TOP", frame[button], "TOP", 0, 0)  
-		frame[button].progress = frame1.text
-
-		frame2 = InitFrames(frame, button,"setName", 90)
-        frame2:SetPoint("BOTTOM", frame[button], "BOTTOM", 0, 0)  
-		frame[button].setName = frame2.text
-    end
-end

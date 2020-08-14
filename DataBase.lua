@@ -120,7 +120,6 @@ do
 	end
 
 	function addon.BuildDB()
-		print("BDB")
 	--local faction = GetFactionID(UnitFactionGroup("player"))
 		local armorSet = addon.ArmorSets[CLASS_INFO[playerClass][3]]
 
