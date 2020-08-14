@@ -146,9 +146,9 @@ end
 function addon:GetSpecializationInfo()
 	return 1 ,"test"
 end
-addon:RawHook("GetSpecializationInfo", true)	
-LoadAddOn("Blizzard_Collections")
-addon:Unhook("GetSpecializationInfo")
+--addon:RawHook("GetSpecializationInfo", true)	
+--LoadAddOn("Blizzard_Collections")
+--addon:Unhook("GetSpecializationInfo")
 
 local BASE_SET_BUTTON_HEIGHT = 46
 local VARIANT_SET_BUTTON_HEIGHT = 20
@@ -211,7 +211,7 @@ function addon.GetSetsources(setID)
 		if sourceID then
 			local sourceInfo = C_TransmogCollection.GetSourceInfo(sourceID)
 			--setSoruceData[sourceID] = C_TransmogCollection.GetSourceInfo(sourceID)
-			setSources[sourceID] = sourceInfo.isCollected
+			setSources[sourceID] = sourceInfo and sourceInfo.isCollected
 		end
 	end
 	return setSources

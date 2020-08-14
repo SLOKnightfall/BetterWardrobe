@@ -551,9 +551,9 @@ end
 				--sortFunc[db.sortDropdown](self)
 				addon.Sort[1][addon.sortDB.sortDropdown](self)
 				self:UpdateItems()
-				UIDropDownMenu_EnableDropDown(BW_SortDropDown)
+				--UIDropDownMenu_EnableDropDown(BW_SortDropDown)
 			else
-				UIDropDownMenu_DisableDropDown(BW_SortDropDown)
+				--UIDropDownMenu_DisableDropDown(BW_SortDropDown)
 			end
 		else 
 

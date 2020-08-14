@@ -6,7 +6,7 @@ local L = LibStub("AceLocale-3.0"):GetLocale(addonName)
 
 local _, playerClass, classID = UnitClass("player")
 --local armorType = DB.GetClassArmorType(class)		  
-local faction = UnitFactionGroup("player")
+
 --local role = GetFilteredRole()
 addon.ArmorSets = addon.ArmorSets or {}
 
@@ -83,7 +83,7 @@ do
 	local setsInfo = {}
 	
 	local function addArmor(armorSet)
-		
+		local faction = UnitFactionGroup("player")
 		for id, setData in pairs(armorSet) do
 			
 			local setInfo = C_TransmogSets.GetSetInfo(id)

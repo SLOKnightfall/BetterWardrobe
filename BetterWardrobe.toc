@@ -4,6 +4,8 @@
 ## Game Version: 8.3
 ## Author: SLOKnightfall
 ## Notes: 
+## LoadOnDemand: 1
+## LoadWith: Blizzard_Collections
 ## SavedVariables: BetterWardrobe_Options,
 
 #Libraries
