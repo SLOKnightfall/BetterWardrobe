@@ -605,12 +605,6 @@ function WardrobeCollectionFrame.SetsTransmogFrame:LoadSet(setID)
 
 		if Profile.HideMissing then 
 
-			local clearSlots = EmptySlots(transmogSources)
-			for i, x in pairs(clearSlots) do
-				local _,  source = addon.GetItemSource(emptySlotData[x]) --C_TransmogCollection.GetItemInfo(x)
-				C_Transmog.SetPending(i, LE_TRANSMOG_TYPE_APPEARANCE,source)
-			end
-
 			local emptySlotData = GetEmptySlots()
 			for i, x in pairs(transmogSources) do
 				if not C_TransmogCollection.PlayerHasTransmogItemModifiedAppearance(x) and i ~= 7  and emptySlotData[i] then
