@@ -26,11 +26,12 @@ Libs\AceLocale-3.0\AceLocale-3.0.xml
 #Locale
 Locale\enUS.lua
 
-#Core Files
+#Core files
 Inspect.lua
 BetterWardrobe.xml
-UI.lua
 SortingFunctions.lua
+
+Plugins\ElvUI.lua
 
 #Data files
 Data\AppearanceData.lua

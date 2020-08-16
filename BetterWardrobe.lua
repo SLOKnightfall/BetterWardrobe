@@ -139,7 +139,7 @@ function addon:OnEnable()
 	addon.BuildDB()
 	addon.BuildUI()
 
-	self:Hook("WardrobeCollectionFrame_SetTab", true)
+	--self:Hook("WardrobeCollectionFrame_SetTab", true)
 end
 
 --hack way to load collections frame with out generation errors 
@@ -365,6 +365,7 @@ function SetsDataProvider:GetUsableSets(incVariants)
 	end
 	return self.usableSets;
 end
+
 
 
 function SetsDataProvider:FilterSearch()
@@ -803,7 +804,6 @@ function SetsDataProvider:GetUsableSets(incVariants)
 
 	return self.usableSets;
 end
-
 
 function SetsDataProvider:GetSetSourceData(setID)
 	--if ( not self.sourceData ) then
