@@ -154,6 +154,45 @@
 				<Scripts>
 				</Scripts>
 			</Frame>
+
+			<DropDownToggleButton parentKey="FilterButton" inherits="UIMenuButtonStretchTemplate" text="FILTER" hidden="true">
+				<Size x="93" y="22"/>
+				<Anchors>
+					<Anchor point="TOPLEFT" x="2" y="-1"/>
+				</Anchors>
+				<Layers>
+					<Layer level="ARTWORK">
+						<Texture parentKey="Icon" file="Interface\ChatFrame\ChatFrameExpandArrow">
+							<Size x="10" y="12"/>
+							<Anchors>
+								<Anchor point="RIGHT" relativeKey="$parent.Right" relativePoint="RIGHT" x="-5"/>
+							</Anchors>
+						</Texture>
+					</Layer>
+				</Layers>
+				<Scripts>
+					<OnMouseDown>
+						UIMenuButtonStretchMixin.OnMouseDown(self, button);
+						if self:IsEnabled() then
+							PlaySound(SOUNDKIT.IG_MAINMENU_OPTION_CHECKBOX_ON);
+							ToggleDropDownMenu(1, nil, BW_WardrobeFilterDropDown, self, 74, 15);
+						end
+					</OnMouseDown>
+					<OnEnable>
+						self.Icon:SetDesaturated(false);
+					</OnEnable>
+					<OnDisable>
+						self.Icon:SetDesaturated(true);
+					</OnDisable>
+				</Scripts>
+			</DropDownToggleButton>
+			<Frame name="BW_WardrobeFilterDropDown" parentKey="FilterDropDown" inherits="UIDropDownMenuTemplate">
+				<Scripts>
+					<OnLoad function="BW_WardrobeFilterDropDown_OnLoad"/>
+				</Scripts>
+			</Frame>
+
+
 			<Frame name ="BW_SetsCollectionFrame" parentKey="BW_SetsCollectionFrame"  parentArray="ContentFrames" mixin="BetterWardrobeSetsCollectionMixin" hidden="true">
 
 				<KeyValues>

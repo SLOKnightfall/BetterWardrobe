@@ -50,6 +50,13 @@ local function GetTab()
 end
 
 
+local function UpdateMouseFocus()
+	local focus = GetMouseFocus()
+	if focus and focus:GetObjectType() == "DressUpModel" and focus:GetParent() == Wardrobe then
+		focus:GetScript("OnEnter")(focus)
+	end
+end
+
 local function OnItemUpdate()
 	-- sort again when we are sure all items are cached. not the most efficient way to do this
 	-- this event does not seem to fire for weapons or only when mouseovering a weapon appearance (?)
@@ -62,7 +69,7 @@ local function OnItemUpdate()
 	
 	if GameTooltip:IsShown() then
 		-- when mouse scrolling the tooltip waits for uncached item info and gets refreshed
-		--C_Timer.After(.01, UpdateMouseFocus)
+		C_Timer.After(.01, UpdateMouseFocus)
 	end
 end
 
@@ -222,6 +229,7 @@ function BW_WardrobeCollectionFrame_SetTab(tabID)
 		WardrobeCollectionFrame.searchBox:SetEnabled(WardrobeCollectionFrame.ItemsCollectionFrame.transmogType == LE_TRANSMOG_TYPE_APPEARANCE)
 		WardrobeCollectionFrame.FilterButton:Show()
 		WardrobeCollectionFrame.FilterButton:SetEnabled(WardrobeCollectionFrame.ItemsCollectionFrame.transmogType == LE_TRANSMOG_TYPE_APPEARANCE)
+		BW_WardrobeCollectionFrame.FilterButton:Hide()
 		BW_WardrobeToggle:Hide()
 		BW_SortDropDown:ClearAllPoints()
 
@@ -239,6 +247,7 @@ function BW_WardrobeCollectionFrame_SetTab(tabID)
 		BW_WardrobeCollectionFrame.BW_SetsCollectionFrame:Hide()
 		WardrobeCollectionFrame.searchBox:ClearAllPoints()
 		WardrobeCollectionFrame.FilterButton:Show()
+		BW_WardrobeCollectionFrame.FilterButton:Hide()
 		BW_SortDropDown:ClearAllPoints()
 
 		if ( atTransmogrifier )  then
@@ -254,6 +263,8 @@ function BW_WardrobeCollectionFrame_SetTab(tabID)
 			WardrobeCollectionFrame.searchBox:SetWidth(145)
 			WardrobeCollectionFrame.FilterButton:Show()
 			WardrobeCollectionFrame.FilterButton:SetEnabled(true)
+			BW_WardrobeCollectionFrame.FilterButton:Hide()
+
 			BW_WardrobeToggle:Show()
 			BW_SortDropDown:SetPoint("TOPLEFT", BW_WardrobeToggle, "TOPRIGHT")
 		end
@@ -268,6 +279,7 @@ function BW_WardrobeCollectionFrame_SetTab(tabID)
 		WardrobeCollectionFrame.SetsTransmogFrame:Hide()
 		WardrobeCollectionFrame.searchBox:ClearAllPoints()
 		WardrobeCollectionFrame.FilterButton:Hide()
+		BW_WardrobeCollectionFrame.FilterButton:Show()
 		BW_SortDropDown:ClearAllPoints()
 
 
@@ -288,6 +300,7 @@ function BW_WardrobeCollectionFrame_SetTab(tabID)
 			BW_SortDropDown:SetPoint("TOPLEFT", BW_WardrobeToggle, "TOPRIGHT")
 
 		end
+		WardrobeCollectionFrame.searchBox:Show()
 		WardrobeCollectionFrame.searchBox:SetEnabled(true)
 		BW_WardrobeCollectionFrame.BW_SetsCollectionFrame:SetShown(not atTransmogrifier)
 		BW_WardrobeCollectionFrame.BW_SetsTransmogFrame:SetShown(atTransmogrifier)
@@ -350,6 +363,155 @@ function addon.BuildUI()
 	InitSortDropdown()
 	CreateVisualViewButton()
 	ExtendTransmogView()
+--BW_WardrobeCollectionFrame:GetFrameLevel()
+	WardrobeCollectionFrame.searchBox:SetFrameLevel(BW_WardrobeCollectionFrame:GetFrameLevel()+10)
+	BW_WardrobeCollectionFrame.FilterButton:SetFrameLevel(BW_WardrobeCollectionFrame:GetFrameLevel()+10)
+	BW_WardrobeCollectionFrame.FilterButton:SetPoint("TOPLEFT", WardrobeCollectionFrame.FilterButton, "TOPLEFT")
+		
+
 
 	hooksecurefunc(Wardrobe, "UpdateWeaponDropDown", PositionDropDown )
+end
+
+
+
+
+-- ***** FILTER
+
+function BW_WardrobeFilterDropDown_OnLoad(self)
+	UIDropDownMenu_Initialize(self, BW_WardrobeFilterDropDown_Initialize, "MENU");
+end
+
+function BW_WardrobeFilterDropDown_Initialize(self, level)
+	if ( not WardrobeCollectionFrame.activeFrame ) then
+		return;
+	end
+
+BW_WardrobeFilterDropDown_InitializeItems(self, level)
+end
+
+
+local FILTER_SOURCES = {"Classic Set","Quest Set","Dunegon Set","Raid Recolor","Raid Lookalike","Garrison","Island Expidetion"}
+local EXPANSIONS = {"Classic", "Burning Crusade", "Wrath of the Litch Kink", "Cataclysm", "Mists", "WOD", "Legion", "BFA" }
+local filterSelection = {} 
+local xpacSelection = {}
+
+
+--local SetFilter()
+
+
+local svalue = 4
+function BW_WardrobeFilterDropDown_InitializeItems(self, level)
+	local info = UIDropDownMenu_CreateInfo();
+	info.keepShownOnClick = true;
+	local atTransmogrifier = WardrobeFrame_IsAtTransmogrifier();
+
+	if level == 1 then
+		info.text = COLLECTED
+		info.func = function(_, _, _, value)
+						filterSelection[1] = value
+					end
+		info.checked = 	function() return filterSelection[1] end
+
+		info.isNotRadio = true;
+		tinsert(filterSelection,true)
+		UIDropDownMenu_AddButton(info, level)
+
+		info.text = NOT_COLLECTED
+		info.func = function(_, _, _, value)
+						filterSelection[2] =  value
+					end
+		info.checked = 	function() return filterSelection[2] end
+		info.isNotRadio = true;
+		tinsert(filterSelection,true)
+		UIDropDownMenu_AddButton(info, level)
+
+		info.checked = 	nil;
+		info.isNotRadio = nil;
+		info.func =  nil;
+		info.hasArrow = true;
+		info.notCheckable = true;
+
+		info.text = SOURCES
+			info.value = 1
+		UIDropDownMenu_AddButton(info, level)
+
+		info.text = "Xpac";
+		info.value = 2
+		UIDropDownMenu_AddButton(info, level)
+
+		info.text = "cutoff- "..svalue
+		info.value = 3
+		UIDropDownMenu_AddButton(info, level)
+
+	elseif level == 2  and UIDROPDOWNMENU_MENU_VALUE == 1 then
+			local refreshLevel = 2;
+			info.hasArrow = false;
+			info.isNotRadio = true;
+			info.notCheckable = true;
+			tinsert(filterSelection,true)
+			info.text = CHECK_ALL
+			info.func = function()
+							for i = 1, #filterSelection do
+									filterSelection[i+2] = true
+							end
+							--C_TransmogCollection.SetAllSourceTypeFilters(true);
+							UIDropDownMenu_Refresh(BW_WardrobeFilterDropDown, 1, refreshLevel);
+						end
+			info.value = {
+         ["Level1_Key"] = 1;
+         ["Sublevel_Key"] = 1;
+       };
+			UIDropDownMenu_AddButton(info, level)
+
+			local refreshLevel = 2;
+			info.hasArrow = false;
+			info.isNotRadio = true;
+			info.notCheckable = true;
+			tinsert(filterSelection,true)
+
+			info.text = UNCHECK_ALL
+			info.func = function()
+							for i = 1, #filterSelection do
+									filterSelection[i+2] = false
+							end
+							UIDropDownMenu_Refresh(BW_WardrobeFilterDropDown, 1, refreshLevel);
+						end
+			UIDropDownMenu_AddButton(info, level)
+			info.notCheckable = false;
+
+
+			local numSources = #FILTER_SOURCES --C_TransmogCollection.GetNumTransmogSources();
+			for i = 1, numSources do
+				tinsert(filterSelection,true)
+				info.text = FILTER_SOURCES[i];
+					info.func = function(_, _, _, value)
+						filterSelection[i+2] = value
+						info.checked = 	filterSelection[i+2]
+					end
+					info.checked = 	function() return filterSelection[i+2] end; 
+				UIDropDownMenu_AddButton(info, level);
+			end
+
+	elseif level == 2  and UIDROPDOWNMENU_MENU_VALUE == 3 then
+			local refreshLevel = 2;
+			info.notCheckable = false;
+			info.keepShownOnClick = false
+			for i = 1, 7 do
+				local info = UIDropDownMenu_CreateInfo();
+				--tinsert(xpacSelection,true)
+				info.text = i
+				info.value = i
+				print(info.value)
+					info.func = function(a, b, c, value)
+						addon.Profile.PartialLimit = info.value
+						print(info.value)
+						UIDropDownMenu_Refresh(BW_WardrobeFilterDropDown, 1, 1);
+					end
+				info.checked = 	function() return info.value == addon.Profile.PartialLimit end;
+				UIDropDownMenu_AddButton(info, level);
+			end
+	end
+	--end
+
 end

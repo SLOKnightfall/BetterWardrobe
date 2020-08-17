@@ -486,34 +486,6 @@ addon.Sort = {
 }
 
 
-function addon.SetSortOrder()
-	SortOrder = addon.sortDB.reverse and SortReverse or SortNormal
-end
-
-
-local function UpdateMouseFocus()
-	local focus = GetMouseFocus()
-	if focus and focus:GetObjectType() == "DressUpModel" and focus:GetParent() == Wardrobe then
-		focus:GetScript("OnEnter")(focus)
-	end
-end
-
-local function OnItemUpdate()
-	-- sort again when we are sure all items are cached. not the most efficient way to do this
-	-- this event does not seem to fire for weapons or only when mouseovering a weapon appearance (?)
-	if Wardrobe:IsVisible() and (addon.sortDB.sortDropdown == LE_ITEM_SOURCE) then
-		--addon.Sort[db.sortDropdown](Wardrobe)
-		addon.Sort[getTab()][addon.sortDB.sortDropdown](Wardrobe)
-
-		Wardrobe:UpdateItems()
-	end
-	
-	if GameTooltip:IsShown() then
-		-- when mouse scrolling the tooltip waits for uncached item info and gets refreshed
-		C_Timer.After(.01, UpdateMouseFocus)
-	end
-end
-
 
 function addon.SortCollection(frame)
 if getTab() == 1 then 

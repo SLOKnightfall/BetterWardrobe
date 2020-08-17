@@ -71,41 +71,87 @@ local function GetFactionID(faction)
 end
 
 local function OpposingFaction(faction)
+	local faction = UnitFactionGroup("player")
 	if faction == "Horde" then
-		return "Alliance", "Kul Tiras", "Stormwind"
+		return "Alliance", "Stormwind" -- "Kul Tiras",
 	elseif faction == "Alliance" then
-		return "Horde", "Zandalar", "Orgrimmar"
+		return "Horde", "Orgrimmar" -- "Zandalar",
 	end
 end
 
 do
 	local baseList = {}
 	local setsInfo = {}
+	local defaultSets = {}
+
+
+	local function BuildDefaultList()
+		local baseSets = C_TransmogSets.GetAllSets()
+		print(#baseSets)
+		for id, setData in ipairs(baseSets) do
+					defaultSets[id] = setData
+		end
+	end
+
+
+local coreSetList = {}
+
+local function GetCoreSets(incVariants)
+		local sets = C_TransmogSets.GetBaseSets()
+ 	local fullSetList = {}
+		--Generates Useable Set
+		for i, set in ipairs(sets) do
+			if string.find(set.name, "Brawl") then print (set.setID)end
+			--tinsert(self.usableSets, set)
+			coreSetList[set.setID] = true
+			if incVariants then 
+				local variantSets = C_TransmogSets.GetVariantSets(set.setID);
+				for i, set in ipairs(variantSets) do
+					coreSetList[set.setID] = true
+
+				end
+			end
+
+		end
+end
+
+
 	
 	local function addArmor(armorSet)
-		local faction = UnitFactionGroup("player")
+		--local baseSets = C_TransmogSets.GetAllSets()
+
+		--BuildDefaultList()
+		GetCoreSets(true)
+	--local addon:GetUsableSets(incVariants)
+		
 		for id, setData in pairs(armorSet) do
+			-- if not  defaultSets[id] then
 			
 			local setInfo = C_TransmogSets.GetSetInfo(id)
 			local classInfo = CLASS_INFO[playerClass]
 			--if not setInfo then
-			local class = (setInfo and setInfo.classMask == classInfo[2]) or (setData.classMask and setData.classMask == classInfo[1]) or not setData.classMask
+			--local class = (setInfo and setInfo.classMask == classInfo[2]) or (setData.classMask and setData.classMask == classInfo[1]) or not setData.classMask
+			local class = (setData.classMask and setData.classMask == classInfo[1]) or not setData.classMask
+
 			--local faction = setData[5]
-			local opposingFaction , BFAFaction, City = OpposingFaction(faction)
+			local opposingFaction , City = OpposingFaction(faction) -- BFAFaction,
 			
 			local factionLocked =  string.find(setData.name, opposingFaction) 
-				or string.find(setData.name, BFAFaction)
+				--or string.find(setData.name, BFAFaction)
 				or string.find(setData.name, City)
 			local heritageArmor = string.find(setData.name, "Heritage")
 
-					for i, item in ipairs( setData["items"]) do
+				for i, item in ipairs( setData["items"]) do
 					--print(item)
 					local _, _ = addon.GetItemSource(item)
 				end
 
+--print(coreSetList[2953])
+if not  setInfo  or not coreSetList[id] then 
 			if  (class) 
 				and not factionLocked 
-				and not heritageArmor then
+				and not heritageArmor  then
+
 				setData["name"] = L[setData["name"]]
 				local note = "NOTE_"..(setData.label or 0)
 				setData.label =(L[note] and L[note]) or ""
@@ -115,6 +161,8 @@ do
 
 				setsInfo[id] = setData
 				tinsert(baseList, setsInfo[id])	
+			end
+		else --print(setInfo)
 			end
 		end
 	end
