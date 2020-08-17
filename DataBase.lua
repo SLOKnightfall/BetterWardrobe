@@ -87,7 +87,7 @@ do
 
 	local function BuildDefaultList()
 		local baseSets = C_TransmogSets.GetAllSets()
-		print(#baseSets)
+
 		for id, setData in ipairs(baseSets) do
 					defaultSets[id] = setData
 		end
@@ -101,7 +101,7 @@ local function GetCoreSets(incVariants)
  	local fullSetList = {}
 		--Generates Useable Set
 		for i, set in ipairs(sets) do
-			if string.find(set.name, "Brawl") then print (set.setID)end
+			--if string.find(set.name, "Brawl") then print (set.setID)end
 			--tinsert(self.usableSets, set)
 			coreSetList[set.setID] = true
 			if incVariants then 
@@ -116,12 +116,11 @@ local function GetCoreSets(incVariants)
 end
 
 
-	
 	local function addArmor(armorSet)
 		--local baseSets = C_TransmogSets.GetAllSets()
 
 		--BuildDefaultList()
-		GetCoreSets(true)
+		--GetCoreSets(true)
 	--local addon:GetUsableSets(incVariants)
 		
 		for id, setData in pairs(armorSet) do
@@ -147,25 +146,29 @@ end
 				end
 
 --print(coreSetList[2953])
-if not  setInfo  or not coreSetList[id] then 
-			if  (class) 
-				and not factionLocked 
-				and not heritageArmor  then
+				if not  setInfo  or not coreSetList[id] then 
+					if  (class) 
+						and not factionLocked 
+						and not heritageArmor  then
 
-				setData["name"] = L[setData["name"]]
-				local note = "NOTE_"..(setData.label or 0)
-				setData.label =(L[note] and L[note]) or ""
+						--setsByExpansion[setData.expansionID] = setByExpansion[setData.expansionID] or {}
+						--setsByExpansion[setData.expansionID][id] = true
 
-		
+						--setsByFilter[setData.label] = setsByFilter[setData.label] or {}
+						--setsByFilter[setData.label][id] = true
 
+						setData["name"] = L[setData["name"]]
+						local note = "NOTE_"..(setData.label or 0)
+						setData.label =(L[note] and L[note]) or ""
 
-				setsInfo[id] = setData
-				tinsert(baseList, setsInfo[id])	
-			end
-		else --print(setInfo)
+						setsInfo[id] = setData
+						tinsert(baseList, setsInfo[id])	
+					end
+				else --print(setInfo)
 			end
 		end
 	end
+
 
 	function addon.BuildDB()
 	--local faction = GetFactionID(UnitFactionGroup("player"))
@@ -183,9 +186,13 @@ if not  setInfo  or not coreSetList[id] then
 
 	function addon.GetBaseList()
 		local list = {}
+
 		for i, data in ipairs(baseList) do 
-			tinsert(list, data)
+
+					tinsert(list, data)
+			--end
 		end
+
 		return list
 	end
 

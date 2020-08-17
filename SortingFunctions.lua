@@ -485,6 +485,9 @@ addon.Sort = {
 	},
 }
 
+function addon.SetSortOrder()
+	SortOrder = addon.sortDB.reverse and SortReverse or SortNormal
+end
 
 
 function addon.SortCollection(frame)
@@ -531,3 +534,6 @@ end
 
 		end
 	end)
+
+
+

@@ -729,8 +729,11 @@ function SetsDataProvider:ClearSets()
 end
 
 
+local setsByExpansion = {}
+local setsByFilter = {}
+	
+local baseSets
 function SetsDataProvider:FilterSearch(useBaseSet)
-	local baseSets
 	if useBaseSet then 
 		baseSets = SetsDataProvider:GetBaseSets();
 	else 
@@ -738,26 +741,25 @@ function SetsDataProvider:FilterSearch(useBaseSet)
 	end
 
 	local filteredSets = {}
-	local searchString = string.lower(WardrobeCollectionFrameSearchBox:GetText())
+		local searchString = string.lower(WardrobeCollectionFrameSearchBox:GetText())
 
-	if searchString then 
-		for i = 1, #baseSets do
-			local baseSet = baseSets[i];
-			local match = string.find(string.lower(baseSet.name), searchString) -- or string.find(baseSet.label, searchString) or string.find(baseSet.description, searchString)
-			
-			if match then 
-				tinsert(filteredSets, baseSet)
-			end
+		for i, data in ipairs(baseSets) do
+		
+						--if (addon.filterCollected[1] and data.collected) or (addon.filterCollected[2] and not data.collected) and
+		if 	addon.xpacSelection[data.expansionID] and 
+			addon.filterSelection[data.filter]  
+			and (searchString and string.find(string.lower(data.name), searchString) ) then -- or string.find(baseSet.label, searchString) or string.find(baseSet.description, searchString)then
+				tinsert(filteredSets, data)
 		end
 
 		if useBaseSet then 
-			self.baseSets = filteredSets 
+				self.baseSets = filteredSets 
 		else 
-			self.usableSets = filteredSets 
+				self.usableSets = filteredSets 
 		end
 	
-	else 
-		self.baseSets = baseSets 
+	--else 
+		--self.baseSets = baseSets 
 	end
 end
 
