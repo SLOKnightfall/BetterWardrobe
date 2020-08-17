@@ -30,8 +30,6 @@ Locale\enUS.lua
 Inspect.lua
 BetterWardrobe.xml
 SortingFunctions.lua
-FilteringFunctions.lua
-
 
 Plugins\ElvUI.lua
 

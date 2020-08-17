@@ -171,9 +171,10 @@ f.model:SetAutoDress(false)
 f.model:SetUnit("PLAYER");
 
 function addon.GetItemSource(item)
-	if not addon.itemSourceID[item] then
+	--if not addon.itemSourceID[item] then
+		local itemSource
 		local visualID, sourceID = C_TransmogCollection.GetItemInfo(item)
-		addon.itemSourceID[item] = sourceID
+		--addon.itemSourceID[item] = sourceID
 		if not sourceID then
 			local itemlink = "item:"..item..":0"
 			f.model:Show()
@@ -182,16 +183,17 @@ function addon.GetItemSource(item)
 			for i = 1, 19 do
 				local source = f.model:GetSlotTransmogSources(i)
 				if source ~= 0 then
-					addon.itemSourceID[item] =  source
+					--addon.itemSourceID[item] =  source
+					sourceID =  source
 					break
 				end
 			end
 			
 		end
-	end
+	--end
 
 	f.model:Hide()
-	return "",addon.itemSourceID[item]
+	return visualID ,sourceID
 end
 
 
@@ -206,14 +208,23 @@ function addon.GetSetsources(setID)
 	local setSources = {}
 
 	for i, item in ipairs(setInfo.items) do
-		local _, sourceID = addon.GetItemSource(item) --C_TransmogCollection.GetItemInfo(item)
-
+		local visualID, sourceID = addon.GetItemSource(item) --C_TransmogCollection.GetItemInfo(item)
+		--local sources = C_TransmogCollection.GetAppearanceSources(sourceInfo.visualID)
 		if sourceID then
 			local sourceInfo = C_TransmogCollection.GetSourceInfo(sourceID)
-			--setSoruceData[sourceID] = C_TransmogCollection.GetSourceInfo(sourceID)
-			setSources[sourceID] = sourceInfo and sourceInfo.isCollected
+			local sources = C_TransmogCollection.GetAppearanceSources(sourceInfo.visualID)
+			if sources then 
+				if #sources > 1 then 
+					WardrobeCollectionFrame_SortSources(sources)
+				end
+
+				setSources[sourceID] = sources[1].isCollected--and sourceInfo.isCollected
+			else
+				setSources[sourceID] = false
+			end
 		end
 	end
+			--setSources[sourceID] = sourceInfo and sourceInfo.isCollected
 	return setSources
 end
 
@@ -746,7 +757,7 @@ function SetsDataProvider:FilterSearch(useBaseSet)
 		for i, data in ipairs(baseSets) do
 		
 						--if (addon.filterCollected[1] and data.collected) or (addon.filterCollected[2] and not data.collected) and
-		if 	addon.xpacSelection[data.expansionID] and 
+		if  addon.xpacSelection[data.expansionID] and 
 			addon.filterSelection[data.filter]  
 			and (searchString and string.find(string.lower(data.name), searchString) ) then -- or string.find(baseSet.label, searchString) or string.find(baseSet.description, searchString)then
 				tinsert(filteredSets, data)
@@ -775,6 +786,11 @@ function SetsDataProvider:GetBaseSets()
 end
 
 
+function SetsDataProvider:GetSetSourceCounts(setID)
+	local sourceData = self:GetSetSourceData(setID);
+	return sourceData.numCollected, sourceData.numTotal;
+end
+
 function SetsDataProvider:GetUsableSets(incVariants)
 	if ( not self.usableSets ) then
 		local availableSets = SetsDataProvider:GetBaseSets();
@@ -782,8 +798,8 @@ function SetsDataProvider:GetUsableSets(incVariants)
 		--Generates Useable Set
 		self.usableSets = {} --SetsDataProvider:GetUsableSets();
 		for i, set in ipairs(availableSets) do
-			local topSourcesCollected, topSourcesTotal = SetsDataProvider:GetSetSourceCounts(set.setID);
 
+			local topSourcesCollected, topSourcesTotal = SetsDataProvider:GetSetSourceCounts(set.setID);
 			if BW_WardrobeToggle.VisualMode or topSourcesCollected >= Profile.PartialLimit  then --and not C_TransmogSets.IsSetUsable(set.setID) then
 				tinsert(self.usableSets, set)
 			end
@@ -800,7 +816,6 @@ function SetsDataProvider:GetUsableSets(incVariants)
 			end
 
 		end
-
 		self:SortSets(self.usableSets);	
 	end
 
@@ -808,29 +823,29 @@ function SetsDataProvider:GetUsableSets(incVariants)
 end
 
 function SetsDataProvider:GetSetSourceData(setID)
-	--if ( not self.sourceData ) then
-		local sourceData = { }
-	--end
+	if ( not self.sourceData ) then
+		self.sourceData = { };
+	end
 
-	--local sourceData = self.sourceData[setID]
-
-	--if ( not sourceData ) then
+	local sourceData = self.sourceData[setID];
+	if ( not sourceData ) then
+		--print("BS")
+		--print(setID)
 		local sources = addon.GetSetsources(setID)
 		local numCollected = 0
 		local numTotal = 0
-
-		for sourceID, collected in pairs(sources) do
-
-			if ( collected ) then
-				numCollected = numCollected + 1
+		if sources then 
+			for sourceID, collected in pairs(sources) do
+				if ( collected ) then
+					numCollected = numCollected + 1
+				end
+				numTotal = numTotal + 1
 			end
-			numTotal = numTotal + 1
+
+			sourceData = { numCollected = numCollected, numTotal = numTotal, sources = sources }
+			self.sourceData[setID] = sourceData;
 		end
-
-		sourceData = { numCollected = numCollected, numTotal = numTotal, collected = numCollected == numTotal, sources = sources }
-		sourceData[setID] = sourceData
-	--end
-
+	end
 	return sourceData
 end
 
@@ -925,6 +940,7 @@ function BetterWardrobeSetsTransmogModelMixin:RefreshTooltip()
 	local sourceQualityTable = self:GetParent().sourceQualityTable
 
 	--local sources = C_TransmogSets.GetSetSources(self.setID)
+	--print(self.setID)
 	local sources = addon.GetSetsources(self.setID)
 	for sourceID in pairs(sources) do
 		numTotalSlots = numTotalSlots + 1
@@ -1275,7 +1291,22 @@ function BetterWardrobeSetsTransmogMixin:LoadSet(setID)
 		--local slotSources = C_TransmogSets.GetSourcesForSlot(setID, slot)
 		--WardrobeCollectionFrame_SortSources(slotSources, sourceInfo.visualID)
 		--local index = WardrobeCollectionFrame_GetDefaultSourceIndex(slotSources, sourceID)
-		transmogSources[slot] = sourceInfo.sourceID
+		--transmogSources[slot] = sourceInfo.sourceID
+
+
+
+
+
+		local slotSources = C_TransmogCollection.GetAppearanceSources(sourceInfo.visualID)
+
+		--local slotSources = C_TransmogSets.GetSourcesForSlot(setID, slot)
+		if slotSources then 
+		WardrobeCollectionFrame_SortSources(slotSources, sourceInfo.visualID)
+
+		local index = WardrobeCollectionFrame_GetDefaultSourceIndex(slotSources, sourceID)
+		--transmogSources[slot] = sourceInfo.sourceID
+		transmogSources[slot] = slotSources[index].sourceID;
+	end
 
 		for i, slotSourceInfo in ipairs(sourceInfo) do
 			if ( not slotSourceInfo.name ) then
@@ -1363,7 +1394,7 @@ function BetterWardrobeSetsTransmogMixin:UpdateSets()
 		local model = self.Models[i]
 		local index = i + indexOffset
 		local set = usableSets[index]
-
+--print(set)
 		if ( set ) then
 			model:Show()
 

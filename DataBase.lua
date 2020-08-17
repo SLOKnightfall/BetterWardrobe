@@ -160,6 +160,7 @@ end
 						setData["name"] = L[setData["name"]]
 						local note = "NOTE_"..(setData.label or 0)
 						setData.label =(L[note] and L[note]) or ""
+						setData.uiOrder = id*100
 
 						setsInfo[id] = setData
 						tinsert(baseList, setsInfo[id])	

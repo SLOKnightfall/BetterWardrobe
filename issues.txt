@@ -1,10 +1,5 @@
 
-
-
 To Do
-menus 
 favorite extra sets
-filter extra asts
+combine sets
 hide items  https://www.curseforge.com/wow/addons/hideappearance
-
-extend view window  --https://www.curseforge.com/wow/addons/extended-transmog-ui

@@ -340,13 +340,21 @@ local function CreateVisualViewButton()
 					BW_WardrobeCollectionFrame.BW_SetsTransmogFrame:Hide()
 					BW_WardrobeCollectionFrame.BW_SetsCollectionFrame:Show()
 				end
-						--BW_SetsCollectionFrame:OnSearchUpdate()
+						--rBW_SetsCollectionFrame:OnSearchUpdate()
 						BW_SetsTransmogFrame:OnSearchUpdate()
 			end
 
 		end
-
 	end)
+	b:SetScript("OnEnter", function(self)
+			GameTooltip:SetOwner(self, "ANCHOR_RIGHT");
+			GameTooltip:SetText("Visual View")
+			GameTooltip:Show()
+		end)
+		b:SetScript("OnLeave", function(self)
+			GameTooltip:Hide()
+		end)
+
 end
 
 

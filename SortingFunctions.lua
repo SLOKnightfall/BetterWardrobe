@@ -416,11 +416,13 @@ addon.Sort = {
 		end,
 
 		[LE_APPEARANCE] = function(self, sets, reverseUIOrder, ignorePatchID)
-				for i, data in ipairs(sets) do
+			for i, data in ipairs(sets) do
 				local baseItem = data.items[1]
 				local _, sourceID = addon.GetItemSource(baseItem)
+				if sourceID then 
 				local sourceInfo = C_TransmogCollection.GetSourceInfo(sourceID)
 				data.visualID = sourceInfo.visualID
+				end
 			end
 
 		sort(sets, function(source1, source2)
@@ -437,8 +439,9 @@ addon.Sort = {
 			for i, data in ipairs(sets) do
 				local baseItem = data.items[1]
 				local _, sourceID = addon.GetItemSource(baseItem)
-				local sourceInfo = C_TransmogCollection.GetSourceInfo(sourceID)
-				data.visualID = sourceInfo.visualID
+				local sourceInfo = sourceID and C_TransmogCollection.GetSourceInfo(sourceID)
+				print(sourceInfo)
+				data.visualID = sourceInfo and sourceInfo.visualID
 			end
 
 		sort(sets, SortColor)

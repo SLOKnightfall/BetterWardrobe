@@ -21,10 +21,14 @@ function MyPlugin:Initialize()
 	S:HandleTab(BW_WardrobeCollectionFrame.SetsTab)
 	S:HandleTab(BW_WardrobeCollectionFrame.ExtraSetsTab)
 
-	S:HandleDropDownBox(BW_SortDropDown)
 	UIDropDownMenu_SetWidth(BW_SortDropDown, 100)
+	S:HandleDropDownBox(BW_SortDropDown)
+	
 
 	--BW_SetsTransmogFrame
+
+	S:HandleButton(BW_WardrobeCollectionFrame.FilterButton)
+
 	BW_SetsTransmogFrame:StripTextures()
 	BW_SetsTransmogFrame:SetTemplate("Transparent")
 	S:HandleNextPrevButton(BW_SetsTransmogFrame.PagingFrame.NextPageButton)
