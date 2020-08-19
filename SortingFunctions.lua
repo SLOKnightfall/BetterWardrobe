@@ -274,10 +274,39 @@ addon.Sort = {
 	},
 	[TAB_SETS] = {
 		[LE_DEFAULT] = function(self, sets, reverseUIOrder, ignorePatchID)
-			sort(sets, function(set1, set2)
+	local comparison = function(set1, set2)
+		local groupFavorite1 = set1.favoriteSetID and true;
+		local groupFavorite2 = set2.favoriteSetID and true;
+		if ( groupFavorite1 ~= groupFavorite2 ) then
+			return groupFavorite1;
+		end
+		if ( set1.favorite ~= set2.favorite ) then
+			return set1.favorite;
+		end
+		if ( set1.expansionID ~= set2.expansionID ) then
+			return set1.expansionID > set2.expansionID;
+		end
+		if not ignorePatchID then
+			if ( set1.patchID ~= set2.patchID ) then
+				return set1.patchID > set2.patchID;
+			end
+		end
+		if ( set1.uiOrder ~= set2.uiOrder ) then
+			if ( reverseUIOrder ) then
+				return set1.uiOrder < set2.uiOrder;
+			else
+				return set1.uiOrder > set2.uiOrder;
+			end
+		end
+		if reverseUIOrder then
+			return set1.setID < set2.setID;
+		else
+			return set1.setID > set2.setID;
+		end
+	end
 
-				return set1.name > set2.name;
-				end)
+	table.sort(sets, comparison);
+	
 		end,
 
 		[LE_ALPHABETIC] = function(self, sets, reverseUIOrder, ignorePatchID)
@@ -440,7 +469,6 @@ addon.Sort = {
 				local baseItem = data.items[1]
 				local _, sourceID = addon.GetItemSource(baseItem)
 				local sourceInfo = sourceID and C_TransmogCollection.GetSourceInfo(sourceID)
-				print(sourceInfo)
 				data.visualID = sourceInfo and sourceInfo.visualID
 			end
 

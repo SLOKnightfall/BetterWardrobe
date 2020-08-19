@@ -1323,7 +1323,7 @@ addon.ArmorSets["MAIL"] ={
 		["filter"] =  5 ,
 		["recolor"] =  false ,
 		["minLevel"] =  100 ,
-		["name"] =  "Rylakstalkeru2019s Battlegear (Normal Lookalike)" ,
+		["name"] =  "Rylakstalker\'s Battlegear (Normal Lookalike)" ,
 		["items"] = { 113943,113902,113888,113593,113608,113875,113867,113955, },
 	},
 	[1108]={
@@ -1349,7 +1349,7 @@ addon.ArmorSets["MAIL"] ={
 		["filter"] =  5 ,
 		["recolor"] =  false ,
 		["minLevel"] =  100 ,
-		["name"] =  "Rylakstalkeru2019s Battlegear (Heroic Lookalike)" ,
+		["name"] =  "Rylakstalker\'s Battlegear (Heroic Lookalike)" ,
 		["items"] = { 113943,113902,113888,113593,113608,113875,113867,113955, },
 	},
 	[1620]={
@@ -1375,7 +1375,7 @@ addon.ArmorSets["MAIL"] ={
 		["filter"] =  5 ,
 		["recolor"] =  false ,
 		["minLevel"] =  100 ,
-		["name"] =  "Rylakstalkeru2019s Battlegear (Mythic Lookalike)" ,
+		["name"] =  "Rylakstalker\'s Battlegear (Mythic Lookalike)" ,
 		["items"] = { 113943,113902,113888,113593,113608,113875,113867,113955, },
 	},
 	[1622]={
@@ -1427,7 +1427,7 @@ addon.ArmorSets["MAIL"] ={
 		["filter"] =  5 ,
 		["recolor"] =  false ,
 		["minLevel"] =  100 ,
-		["name"] =  "Windspeakeru2019s Regalia (Normal Lookalike)" ,
+		["name"] =  "Windspeaker\'s Regalia (Normal Lookalike)" ,
 		["items"] = { 113968,113982,113954,114568,114572,114576,114580,113930, },
 	},
 	[1881]={
@@ -1440,7 +1440,7 @@ addon.ArmorSets["MAIL"] ={
 		["filter"] =  5 ,
 		["recolor"] =  false ,
 		["minLevel"] =  100 ,
-		["name"] =  "Windspeakeru2019s Regalia (Heroic Lookalike)" ,
+		["name"] =  "Windspeaker\'s Regalia (Heroic Lookalike)" ,
 		["items"] = { 113968,113982,113954,113915,114572,113944,113899,113930, },
 	},
 	[1626]={
@@ -3232,7 +3232,7 @@ addon.ArmorSets["MAIL"] ={
 		["filter"] =  5 ,
 		["recolor"] =  false ,
 		["minLevel"] =  100 ,
-		["name"] =  "Windspeakeru2019s Regalia (Mythic Lookalike)" ,
+		["name"] =  "Windspeaker\'s Regalia (Mythic Lookalike)" ,
 		["items"] = { 113968,113982,113954,113915,113891,113944,113899,113930, },
 	},
 	[1015]={

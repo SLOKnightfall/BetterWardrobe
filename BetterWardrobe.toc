@@ -6,7 +6,7 @@
 ## Notes: 
 ## LoadOnDemand: 1
 ## LoadWith: Blizzard_Collections
-## SavedVariables: BetterWardrobe_Options,
+## SavedVariables: BetterWardrobe_Options, BW_ModList
 
 #Libraries
 Libs\LibStub\LibStub.lua
@@ -35,6 +35,7 @@ Plugins\ElvUI.lua
 
 #Data files
 Data\AppearanceData.lua
+Data\SourceData.lua
 Data\CLOTH.lua
 Data\LEATHER.lua
 Data\MAIL.lua

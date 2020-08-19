@@ -1463,7 +1463,7 @@ addon.ArmorSets["LEATHER"] ={
 		["filter"] =  5 ,
 		["recolor"] =  false ,
 		["minLevel"] =  100 ,
-		["name"] =  "Poisoneru2019s Battlegear (Normal Lookalike)" ,
+		["name"] =  "Poisoner\'s Battlegear (Normal Lookalike)" ,
 		["items"] = { 113951,113974,113602,113880,113661,113964, },
 	},
 	[1869]={
@@ -1476,7 +1476,7 @@ addon.ArmorSets["LEATHER"] ={
 		["filter"] =  5 ,
 		["recolor"] =  false ,
 		["minLevel"] =  100 ,
-		["name"] =  "Poisoneru2019s Battlegear (Heroic Lookalike)" ,
+		["name"] =  "Poisoner\'s Battlegear (Heroic Lookalike)" ,
 		["items"] = { 113951,113974,113602,113880,113661,113964, },
 	},
 	[1614]={
@@ -1503,7 +1503,7 @@ addon.ArmorSets["LEATHER"] ={
 		["filter"] =  5 ,
 		["recolor"] =  false ,
 		["minLevel"] =  100 ,
-		["name"] =  "Poisoneru2019s Battlegear (Mythic Lookalike)" ,
+		["name"] =  "Poisoner\'s Battlegear (Mythic Lookalike)" ,
 		["items"] = { 113951,113974,113602,113880,113661,113964, },
 	},
 	[2204]={

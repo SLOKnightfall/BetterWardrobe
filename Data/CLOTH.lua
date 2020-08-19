@@ -1668,7 +1668,7 @@ addon.ArmorSets["CLOTH"] ={
 		["filter"] =  5 ,
 		["recolor"] =  false ,
 		["minLevel"] =  100 ,
-		["name"] =  "Soul Priestu2019s Raiment (Normal Lookalike)" ,
+		["name"] =  "Soul Priest\'s Raiment (Normal Lookalike)" ,
 		["items"] = { 113887,113958,113864,114566,113596,113828,114578,113656, },
 	},
 	[2664]={
@@ -1707,7 +1707,7 @@ addon.ArmorSets["CLOTH"] ={
 		["filter"] =  5 ,
 		["recolor"] =  false ,
 		["minLevel"] =  100 ,
-		["name"] =  "Soul Priestu2019s Raiment (Mythic Lookalike)" ,
+		["name"] =  "Soul Priest\'s Raiment (Mythic Lookalike)" ,
 		["items"] = { 113887,113958,113864,113876,113596,113828,113903,113656, },
 	},
 	[2667]={
@@ -1759,7 +1759,7 @@ addon.ArmorSets["CLOTH"] ={
 		["filter"] =  5 ,
 		["recolor"] =  false ,
 		["minLevel"] =  100 ,
-		["name"] =  "Shadow Councilu2019s Garb (Normal Lookalike)" ,
+		["name"] =  "Shadow Council\'s Garb (Normal Lookalike)" ,
 		["items"] = { 113956,113655,119342,113610,113981,113970,113928,113941, },
 	},
 	[1851]={
@@ -1772,7 +1772,7 @@ addon.ArmorSets["CLOTH"] ={
 		["filter"] =  5 ,
 		["recolor"] =  false ,
 		["minLevel"] =  100 ,
-		["name"] =  "Shadow Councilu2019s Garb (Heroic Lookalike)" ,
+		["name"] =  "Shadow Council\'s Garb (Heroic Lookalike)" ,
 		["items"] = { 113956,113655,119342,113610,113981,113970,113928,113941, },
 	},
 	[1596]={
@@ -1798,7 +1798,7 @@ addon.ArmorSets["CLOTH"] ={
 		["filter"] =  5 ,
 		["recolor"] =  false ,
 		["minLevel"] =  100 ,
-		["name"] =  "Shadow Councilu2019s Garb (Mythic Lookalike)" ,
+		["name"] =  "Shadow Council\'s Garb (Mythic Lookalike)" ,
 		["items"] = { 113956,113655,119342,113610,113981,113970,113928,113941, },
 	},
 	[1598]={
@@ -3891,6 +3891,7 @@ addon.ArmorSets["CLOTH"] ={
 		["minLevel"] =  100 ,
 		["name"] =  "Attire of Piety (Heroic Lookalike)" ,
 		["items"] = { 124185,124180,124149,124175,124170,124153, },
+		["mod"] = true,
 	},
 	[2748]={
 		["armorType"] =  1 ,
@@ -4311,7 +4312,7 @@ addon.ArmorSets["CLOTH"] ={
 		["filter"] =  5 ,
 		["recolor"] =  false ,
 		["minLevel"] =  100 ,
-		["name"] =  "Soul Priestu2019s Raiment (Heroic Lookalike)" ,
+		["name"] =  "Soul Priest\'s Raiment (Heroic Lookalike)" ,
 		["items"] = { 113887,113958,113864,113876,113596,113828,113903,113656, },
 	},
 	[2649]={

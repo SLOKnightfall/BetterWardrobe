@@ -60,6 +60,9 @@ local hiddenSet ={
 		["expansionID"] =  9999 ,
 	}
 
+
+
+
 --cloak 134111
 
 local function GetFactionID(faction)
@@ -116,6 +119,43 @@ local function GetCoreSets(incVariants)
 end
 
 
+
+local function getMod(data)
+
+local name = data.name
+
+local normal  = string.find(string.lower(name), string.lower("normal")) and 1 or nil
+local heroic = string.find(string.lower(name), string.lower("heroic")) and 2 or nil
+local mythic = string.find(string.lower(name), string.lower("Mythic")) and 3 or nil
+local raidfinder = string.find(string.lower(name), string.lower("Raid Finder")) and 4 or nil
+
+data.mod = normal or heroic or mythic or raidfinder or nil
+
+
+end
+local f = CreateFrame("Frame")
+ missing= {}
+
+ local function CacheHeaders()
+
+			local count = 0
+	for item, mod  in pairs(missing) do
+		-- oh my god so much wasted tables
+		local _, source = addon.GetItemSource(item, mod or nil )
+		if source then
+			
+			missing[item] = nil
+		end
+		count = count +1
+	end
+	print("Count:"..count)
+	if not next(missing) then
+		--catCompleted[Wardrobe:GetActiveCategory()] = true
+		f:SetScript("OnUpdate", nil)
+		--SortAlphabetic()
+	end
+end
+
 	local function addArmor(armorSet)
 		--local baseSets = C_TransmogSets.GetAllSets()
 
@@ -139,11 +179,16 @@ end
 				--or string.find(setData.name, BFAFaction)
 				or string.find(setData.name, City)
 			local heritageArmor = string.find(setData.name, "Heritage")
-
+				getMod(setData)
+		
 				for i, item in ipairs( setData["items"]) do
 					--print(item)
-					local _, _ = addon.GetItemSource(item)
+					local _, source = addon.GetItemSource(item, setData.mod or nil )
+					if not source then missing[item] = setData.mod or 0 end
+					--f:SetScript("OnUpdate", CacheHeaders)
 				end
+		
+
 
 --print(coreSetList[2953])
 				if not  setInfo  or not coreSetList[id] then 
@@ -161,6 +206,7 @@ end
 						local note = "NOTE_"..(setData.label or 0)
 						setData.label =(L[note] and L[note]) or ""
 						setData.uiOrder = id*100
+
 
 						setsInfo[id] = setData
 						tinsert(baseList, setsInfo[id])	
@@ -230,3 +276,5 @@ end
 	end
 
 end
+
+

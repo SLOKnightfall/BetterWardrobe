@@ -1875,7 +1875,7 @@ addon.ArmorSets["PLATE"] ={
 		["filter"] =  5 ,
 		["recolor"] =  false ,
 		["minLevel"] =  100 ,
-		["name"] =  "Blackhandu2019s Battlegear (Normal Lookalike)" ,
+		["name"] =  "Blackhand\'s Battlegear (Normal Lookalike)" ,
 		["items"] = { 113977,113961,113925,113894,113921,113884,113659, },
 	},
 	[2260]={
@@ -1902,7 +1902,7 @@ addon.ArmorSets["PLATE"] ={
 		["filter"] =  5 ,
 		["recolor"] =  false ,
 		["minLevel"] =  100 ,
-		["name"] =  "Blackhandu2019s Battlegear (Heroic Lookalike)" ,
+		["name"] =  "Blackhand\'s Battlegear (Heroic Lookalike)" ,
 		["items"] = { 113977,113961,113925,113894,113921,113884,113659, },
 	},
 	[1644]={
@@ -3864,7 +3864,7 @@ addon.ArmorSets["PLATE"] ={
 		["filter"] =  5 ,
 		["recolor"] =  false ,
 		["minLevel"] =  100 ,
-		["name"] =  "Blackhandu2019s Battlegear (Mythic Lookalike)" ,
+		["name"] =  "Blackhand\'s Battlegear (Mythic Lookalike)" ,
 		["items"] = { 113977,113961,113925,113894,113921,113884,113659, },
 	},
 	[1096]={

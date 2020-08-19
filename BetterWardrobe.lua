@@ -170,10 +170,41 @@ f.model:SetModelScale(1);
 f.model:SetAutoDress(false)
 f.model:SetUnit("PLAYER");
 
-function addon.GetItemSource(item)
+
+
+
+local altList = {}
+function addon.GetItemSource(item, itemMod)
+	if addon.modArmor[item] and addon.modArmor[item][itemMod] then return nil,addon.modArmor[item][itemMod] end
 	--if not addon.itemSourceID[item] then
+--BW_ModList = BW_ModList or {}
+--if addon.armorModSets[item] then return addon.armorModSets[item] end
 		local itemSource
-		local visualID, sourceID = C_TransmogCollection.GetItemInfo(item)
+		local visualID, sourceID
+	if itemMod then 
+		print(item)
+	end-- and not BW_ModList[item] then 
+		--visualID, sourceID = C_TransmogCollection.GetItemInfo(item, itemMod)
+		--if sourceID then altList[item] = altList[item] or {}  ; local list = altList[item]; list[itemMod] = sourceID end
+	--elseif itemMod and  BW_ModList[item] then
+		--f.model:Hide()
+	--	return visualID ,sourceID
+
+	--else
+		visualID, sourceID = C_TransmogCollection.GetItemInfo(item) --, (mod or 0
+	--end
+
+
+--for i=1, 4000 do
+	--if itemMod then -- and not BW_ModList[item] then 
+		--visualID, sourceID = C_TransmogCollection.GetItemInfo(item, itemMod)
+		--if sourceID then altList[item] = altList[item] or {}  ; local list = altList[item]; list[itemMod] = sourceID end
+	--elseif itemMod and  BW_ModList[item] then
+		--f.model:Hide()
+	--	return visualID ,sourceID
+--end
+--end
+
 		--addon.itemSourceID[item] = sourceID
 		if not sourceID then
 			local itemlink = "item:"..item..":0"
@@ -208,8 +239,13 @@ function addon.GetSetsources(setID)
 	local setSources = {}
 
 	for i, item in ipairs(setInfo.items) do
-		local visualID, sourceID = addon.GetItemSource(item) --C_TransmogCollection.GetItemInfo(item)
+
+		
+		local visualID, sourceID = addon.GetItemSource(item, setInfo.mod) --C_TransmogCollection.GetItemInfo(item)
+		-- visualID, sourceID = addon.GetItemSource(item,setInfo.mod)
 		--local sources = C_TransmogCollection.GetAppearanceSources(sourceInfo.visualID)
+
+	
 		if sourceID then
 			local sourceInfo = C_TransmogCollection.GetSourceInfo(sourceID)
 			local sources = C_TransmogCollection.GetAppearanceSources(sourceInfo.visualID)
