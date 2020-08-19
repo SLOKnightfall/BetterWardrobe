@@ -140,8 +140,22 @@ function addon:OnEnable()
 	addon.BuildDB()
 	addon.BuildUI()
 	addon.SetSortOrder(false)
+	WardrobeFilterDropDown_OnLoad(WardrobeCollectionFrame.FilterDropDown)
 
 	--self:Hook("WardrobeCollectionFrame_SetTab", true)
+end
+
+
+function WardrobeFilterDropDown_Initialize(self, level)
+	if ( not WardrobeCollectionFrame.activeFrame ) then
+		return;
+	end
+print(WardrobeCollectionFrame.activeFrame.searchType)
+	if ( WardrobeCollectionFrame.activeFrame.searchType == LE_TRANSMOG_SEARCH_TYPE_ITEMS ) then
+		WardrobeFilterDropDown_InitializeItems(self, level);
+	elseif ( WardrobeCollectionFrame.activeFrame.searchType == LE_TRANSMOG_SEARCH_TYPE_BASE_SETS ) then
+		WardrobeFilterDropDown_InitializeBaseSets(self, level);
+	end
 end
 
 --hack way to load collections frame with out generation errors 
