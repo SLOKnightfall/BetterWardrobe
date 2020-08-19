@@ -139,6 +139,7 @@ function addon:OnEnable()
 
 	addon.BuildDB()
 	addon.BuildUI()
+	addon.SetSortOrder(false)
 
 	--self:Hook("WardrobeCollectionFrame_SetTab", true)
 end
@@ -486,10 +487,47 @@ function WardrobeCollectionFrame.SetsCollectionFrame:OnShow()
 end
 
 
-local function WardrobeFilterDropDown_OnLoad(self)
-	
+
+function WardrobeCollectionFrame.SetsCollectionFrame:HandleKey(key)
+	if ( not self:GetSelectedSetID() ) then
+		return false;
+	end
+	local selectedSetID = C_TransmogSets.GetBaseSetID(self:GetSelectedSetID());
+	local _, index = SetsDataProvider:GetBaseSetByID(selectedSetID);
+	if ( not index ) then
+		return;
+	end
+	if ( key == WARDROBE_DOWN_VISUAL_KEY ) then
+		index = index + 1;
+	elseif ( key == WARDROBE_UP_VISUAL_KEY ) then
+		index = index - 1;
+	end
+	local sets = SetsDataProvider:GetBaseSets();
+	index = Clamp(index, 1, #sets);
+	self:SelectSet(self:GetDefaultSetIDForBaseSet(sets[index].setID));
+	self:ScrollToSet(sets[index].setID);
 end
-WardrobeCollectionFrame.FilterButton:SetScript("OnLoad", WardrobeFilterDropDown_OnLoad)
+
+function WardrobeCollectionFrame.SetsCollectionFrame:ScrollToSet(setID)
+	local totalHeight = 0;
+	local scrollFrameHeight = self.ScrollFrame:GetHeight();
+	local buttonHeight = self.ScrollFrame.buttonHeight;
+	for i, set in ipairs(SetsDataProvider:GetBaseSets()) do
+		if ( set.setID == setID ) then
+			local offset = self.ScrollFrame.scrollBar:GetValue();
+			if ( totalHeight + buttonHeight > offset + scrollFrameHeight ) then
+				offset = totalHeight + buttonHeight - scrollFrameHeight;
+			elseif ( totalHeight < offset ) then
+				offset = totalHeight;
+			end
+			self.ScrollFrame.scrollBar:SetValue(offset, true);
+			break;
+		end
+		totalHeight = totalHeight + buttonHeight;
+	end
+end
+
+
 
 function WardrobeCollectionFrameScrollFrame:Update()
 	local offset = HybridScrollFrame_GetOffset(self);
@@ -1650,21 +1688,43 @@ function BW_WardrobeCollectionFrame_OnHide(self)
 	end
 end
 
-function WardrobeItemsCollectionMixin:HandleKey(key)
-	local _, _, _, selectedVisualID = self:GetActiveSlotInfo();
-	local visualIndex;
-	local visualsList = self:GetFilteredVisualsList();
-	for i = 1, #visualsList do
-		if ( visualsList[i].visualID == selectedVisualID ) then
-			visualIndex = i;
+
+function BetterWardrobeSetsCollectionMixin:HandleKey(key)
+	if ( not self:GetSelectedSetID() ) then
+		return false;
+	end
+	local selectedSetID = self:GetSelectedSetID()
+	local _, index = SetsDataProvider:GetBaseSetByID(selectedSetID);
+	if ( not index ) then
+		return;
+	end
+	if ( key == WARDROBE_DOWN_VISUAL_KEY ) then
+		index = index + 1;
+	elseif ( key == WARDROBE_UP_VISUAL_KEY ) then
+		index = index - 1;
+	end
+	local sets = SetsDataProvider:GetBaseSets();
+	index = Clamp(index, 1, #sets);
+	self:SelectSet(sets[index].setID)
+	self:ScrollToSet(sets[index].setID);
+end
+
+function BetterWardrobeSetsCollectionMixin:ScrollToSet(setID)
+	local totalHeight = 0;
+	local scrollFrameHeight = self.ScrollFrame:GetHeight();
+	local buttonHeight = self.ScrollFrame.buttonHeight;
+	for i, set in ipairs(SetsDataProvider:GetBaseSets()) do
+		if ( set.setID == setID ) then
+			local offset = self.ScrollFrame.scrollBar:GetValue();
+			if ( totalHeight + buttonHeight > offset + scrollFrameHeight ) then
+				offset = totalHeight + buttonHeight - scrollFrameHeight;
+			elseif ( totalHeight < offset ) then
+				offset = totalHeight;
+			end
+			self.ScrollFrame.scrollBar:SetValue(offset, true);
 			break;
 		end
-	end
-	if ( visualIndex ) then
-		visualIndex = WardrobeUtils_GetAdjustedDisplayIndexFromKeyPress(self, visualIndex, #visualsList, key);
-		self:SelectVisual(visualsList[visualIndex].visualID);
-		self.jumpToVisualID = visualsList[visualIndex].visualID;
-		self:ResetPage();
+		totalHeight = totalHeight + buttonHeight;
 	end
 end
 

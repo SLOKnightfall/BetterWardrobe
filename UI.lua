@@ -111,16 +111,19 @@ local function InitSortDropdown()
 			end
 		end
 		
+		local tabID = GetTab()
 		for _, id in pairs(dropdownOrder) do
-			info.value, info.text = id, L[id]
-			info.checked = (id == selectedValue)
-			UIDropDownMenu_AddButton(info)
+			if id == LE_ITEM_SOURCE and (tabID == 2 or tabID == 3) then
+			else
+				info.value, info.text = id, L[id]
+				info.checked = (id == selectedValue)
+				UIDropDownMenu_AddButton(info)
+			end
 		end
 	end)
 
 	UIDropDownMenu_SetSelectedValue(BW_SortDropDown, db.sortDropdown)
 	UIDropDownMenu_SetText(BW_SortDropDown, COMPACT_UNIT_FRAME_PROFILE_SORTBY.." "..L[db.sortDropdown])
-
 end
 
 

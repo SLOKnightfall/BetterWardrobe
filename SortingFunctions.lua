@@ -88,10 +88,10 @@ end
 
 local function mysort(set1, set2)
 		if ( set1.expansionID ~= set2.expansionID ) then
-			return set1.expansionID > set2.expansionID;
+			return SortOrder(set1.expansionID, set2.expansionID)
 		end
 
-        return set1.name < set2.name;
+        return SortOrder(set1.name, Set2.name)
     end
 
 
@@ -146,9 +146,40 @@ local function SortColor(source1, source2)
 		else
 			return SortOrder(index1, index2)
 		end
+
 	else
 		return SortOrder(source1.uiOrder, source2.uiOrder)
 	end
+end
+
+
+local function SortDefault(set1, set2)
+	local groupFavorite1 = set1.favoriteSetID and true;
+	local groupFavorite2 = set2.favoriteSetID and true;
+	if ( groupFavorite1 ~= groupFavorite2 ) then
+		return groupFavorite1;
+	end
+
+	if ( set1.favorite ~= set2.favorite ) then
+		return set1.favorite;
+	end
+
+	if ( set1.expansionID ~= set2.expansionID ) then
+		return SortOrder(set1.expansionID, set2.expansionID)
+	end
+
+	if not ignorePatchID then
+		if ( set1.patchID ~= set2.patchID ) then
+			return SortOrder(set1.patchID, set2.patchID)
+		end
+	end
+
+	if ( set1.uiOrder ~= set2.uiOrder ) then
+		return SortOrder(set1.uiOrder, set2.uiOrder)
+	end
+
+	return SortOrder(set1.setID, set2.setID)
+
 end
 
 
@@ -187,7 +218,11 @@ end
 
 addon.Sort = {
 	[TAB_ITEMS] = {
-		[LE_DEFAULT] = function() end,
+		[LE_DEFAULT] = function(self, sets, reverseUIOrder, ignorePatchID) 
+		 			if not sets then return end
+
+				WardrobeSetsDataProviderMixin:SortSets(sets, reverseUIOrder, ignorePatchID)
+			end,
 		
 		[LE_APPEARANCE] = function(self)
 			sort(self:GetFilteredVisualsList(), function(source1, source2)
@@ -274,42 +309,14 @@ addon.Sort = {
 	},
 	[TAB_SETS] = {
 		[LE_DEFAULT] = function(self, sets, reverseUIOrder, ignorePatchID)
-	local comparison = function(set1, set2)
-		local groupFavorite1 = set1.favoriteSetID and true;
-		local groupFavorite2 = set2.favoriteSetID and true;
-		if ( groupFavorite1 ~= groupFavorite2 ) then
-			return groupFavorite1;
-		end
-		if ( set1.favorite ~= set2.favorite ) then
-			return set1.favorite;
-		end
-		if ( set1.expansionID ~= set2.expansionID ) then
-			return set1.expansionID > set2.expansionID;
-		end
-		if not ignorePatchID then
-			if ( set1.patchID ~= set2.patchID ) then
-				return set1.patchID > set2.patchID;
-			end
-		end
-		if ( set1.uiOrder ~= set2.uiOrder ) then
-			if ( reverseUIOrder ) then
-				return set1.uiOrder < set2.uiOrder;
-			else
-				return set1.uiOrder > set2.uiOrder;
-			end
-		end
-		if reverseUIOrder then
-			return set1.setID < set2.setID;
-		else
-			return set1.setID > set2.setID;
-		end
-	end
-
-	table.sort(sets, comparison);
-	
+			WardrobeSetsDataProviderMixin:SortSets(sets, reverseUIOrder, ignorePatchID)
 		end,
 
 		[LE_ALPHABETIC] = function(self, sets, reverseUIOrder, ignorePatchID)
+			local comparison = function(set1, set2)
+				return SortOrder(set1.name, set2.name)
+			end
+			table.sort(sets, comparison)
 		end,
 
 		[LE_APPEARANCE] = function(self, sets, reverseUIOrder, ignorePatchID)
@@ -359,35 +366,30 @@ addon.Sort = {
 		end,
 		
 		[LE_EXPANSION] = function(self, sets, reverseUIOrder, ignorePatchID)
-		local comparison = function(set1, set2)
-			local groupFavorite1 = set1.favoriteSetID and true;
-			local groupFavorite2 = set2.favoriteSetID and true;
-	
-			if ( set1.expansionID ~= set2.expansionID ) then
-				return set1.expansionID > set2.expansionID;
-			end
-
-			if not ignorePatchID then
-				if ( set1.patchID ~= set2.patchID ) then
-					return set1.patchID > set2.patchID;
+			local comparison = function(set1, set2)
+				local groupFavorite1 = set1.favoriteSetID and true;
+				local groupFavorite2 = set2.favoriteSetID and true;
+		
+				if ( set1.expansionID ~= set2.expansionID ) then
+					return SortOrder(set1.expansionID, set2.expansionID)
 				end
-			end
 
-			if ( set1.uiOrder ~= set2.uiOrder ) then
-				if ( reverseUIOrder ) then
-					return set1.uiOrder < set2.uiOrder;
-				else
-					return set1.uiOrder > set2.uiOrder;
+				if not ignorePatchID then
+					if ( set1.patchID ~= set2.patchID ) then
+						return SortOrder(set1.patchID, set2.patchID)
+					end
 				end
-			end
 
-			if reverseUIOrder then
-				return set1.setID < set2.setID;
-			else
-				return set1.setID > set2.setID;
-			end
+				if ( set1.uiOrder ~= set2.uiOrder ) then
+						return SortOrder(set1.uiOrder, set2.uiOrder)
+				end
 
-			return set1.name > set2.name;
+				if ( set1.setID ~= set2.setID ) then
+					return SortOrder(set1.setID, set2.setID)
+
+				end
+				
+				return SortOrder(set1.name, set2.name)
 			end
 
 			table.sort(sets, comparison)
@@ -397,51 +399,15 @@ addon.Sort = {
 
 	[TAB_EXTRASETS] = {
 		[LE_DEFAULT]  = function(self, sets, reverseUIOrder, ignorePatchID)
-			local comparison = function(set1, set2)
-			local groupFavorite1 = set1.favoriteSetID and true;
-			local groupFavorite2 = set2.favoriteSetID and true;
-			if ( groupFavorite1 ~= groupFavorite2 ) then
-				return groupFavorite1;
-			end
-
-			if ( set1.favorite ~= set2.favorite ) then
-				return set1.favorite;
-			end
-
-			if ( set1.expansionID ~= set2.expansionID ) then
-				return set1.expansionID > set2.expansionID;
-			end
-
-			if not ignorePatchID then
-				if ( set1.patchID ~= set2.patchID ) then
-					return set1.patchID > set2.patchID;
-				end
-			end
-
-			if ( set1.uiOrder ~= set2.uiOrder ) then
-				if ( reverseUIOrder ) then
-					return set1.uiOrder < set2.uiOrder;
-				else
-					return set1.uiOrder > set2.uiOrder;
-				end
-			end
-
-			if reverseUIOrder then
-				return set1.setID < set2.setID;
-			else
-				return set1.setID > set2.setID;
-			end
-
-			return set1.name > set2.name;
-			end
-
-
-
-			table.sort(sets, comparison)
-			table.sort(sets, mysort)
+			WardrobeSetsDataProviderMixin:SortSets(sets, reverseUIOrder, ignorePatchID)
+			--table.sort(sets, mysort)
 		end,
 
 		[LE_ALPHABETIC] = function(self, sets, reverseUIOrder, ignorePatchID)
+			local comparison = function(set1, set2)
+				return SortOrder(set1.name, set2.name)
+			end
+			table.sort(sets, comparison)
 		end,
 
 		[LE_APPEARANCE] = function(self, sets, reverseUIOrder, ignorePatchID)
@@ -530,7 +496,7 @@ end
 
 
 function addon.SortSet(sets, reverseUIOrder, ignorePatchID)
- 
+ 			if not sets then return end
 	addon.Sort[getTab()][addon.sortDB.sortDropdown](self, sets, reverseUIOrder, ignorePatchID)
 
 end
