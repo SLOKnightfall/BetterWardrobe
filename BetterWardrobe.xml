@@ -559,7 +559,10 @@
 		</Frames>
 		<Scripts>
 			<OnLoad function="BW_WardrobeCollectionFrame_OnLoad"/>
-			
+			<OnEvent function="BW_WardrobeCollectionFrame_OnEvent"/>
+			<OnShow function="BW_WardrobeCollectionFrame_OnShow"/>
+			<OnHide function="BW_WardrobeCollectionFrame_OnHide"/>
+			<OnKeyDown function="BW_WardrobeCollectionFrame_OnKeyDown"/>
 		</Scripts>
 	</Frame>
 </Ui>

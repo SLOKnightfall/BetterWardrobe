@@ -5,6 +5,7 @@
 
 --	Wardrobe and Collection: Adds additional functionality and sets to the transmog and collection areas
 --
+
 --
 
 --	///////////////////////////////////////////////////////////////////////////////////////////
@@ -182,7 +183,6 @@ function addon.GetItemSource(item, itemMod)
 		local itemSource
 		local visualID, sourceID
 	if itemMod then 
-		print(item)
 	end-- and not BW_ModList[item] then 
 		--visualID, sourceID = C_TransmogCollection.GetItemInfo(item, itemMod)
 		--if sourceID then altList[item] = altList[item] or {}  ; local list = altList[item]; list[itemMod] = sourceID end
@@ -486,6 +486,11 @@ function WardrobeCollectionFrame.SetsCollectionFrame:OnShow()
 end
 
 
+local function WardrobeFilterDropDown_OnLoad(self)
+	
+end
+WardrobeCollectionFrame.FilterButton:SetScript("OnLoad", WardrobeFilterDropDown_OnLoad)
+
 function WardrobeCollectionFrameScrollFrame:Update()
 	local offset = HybridScrollFrame_GetOffset(self);
 	local buttons = self.buttons;
@@ -756,6 +761,60 @@ end
 WardrobeCollectionFrame.SetsTransmogFrame:SetScript("OnShow", WardrobeCollectionFrame.SetsTransmogFrame.OnShow)
 WardrobeCollectionFrame.SetsTransmogFrame:SetScript("OnHide", WardrobeCollectionFrame.SetsTransmogFrame.OnHide)
 WardrobeCollectionFrame.SetsTransmogFrame:SetScript("OnEvent",  WardrobeCollectionFrame.SetsTransmogFrame.OnEvent)
+
+
+function WardrobeCollectionFrame.SetsCollectionFrame.ScrollFrame:Update()
+	local offset = HybridScrollFrame_GetOffset(self);
+	local buttons = self.buttons;
+	local baseSets = SetsDataProvider:GetBaseSets();
+
+	-- show the base set as selected
+	local selectedSetID = self:GetParent():GetSelectedSetID();
+	local selectedBaseSetID = selectedSetID and C_TransmogSets.GetBaseSetID(selectedSetID);
+
+	for i = 1, #buttons do
+		local button = buttons[i];
+		local setIndex = i + offset;
+		if ( setIndex <= #baseSets ) then
+			local baseSet = baseSets[setIndex];
+			button:Show();
+			button.Name:SetText(baseSet.name);
+			local topSourcesCollected, topSourcesTotal = SetsDataProvider:GetSetSourceTopCounts(baseSet.setID);
+			local setCollected = C_TransmogSets.IsBaseSetCollected(baseSet.setID);
+			local color = IN_PROGRESS_FONT_COLOR;
+			if ( setCollected ) then
+				color = NORMAL_FONT_COLOR;
+			elseif ( topSourcesCollected == 0 ) then
+				color = GRAY_FONT_COLOR;
+			end
+			button.Name:SetTextColor(color.r, color.g, color.b);
+			button.Label:SetText(baseSet.label);
+			button.Icon:SetTexture(SetsDataProvider:GetIconForSet(baseSet.setID));
+			button.Icon:SetDesaturation((topSourcesCollected == 0) and 1 or 0);
+			button.SelectedTexture:SetShown(baseSet.setID == selectedBaseSetID);
+			button.Favorite:SetShown(baseSet.favoriteSetID);
+			button.New:SetShown(SetsDataProvider:IsBaseSetNew(baseSet.setID));
+			button.setID = baseSet.setID;
+
+			if ( topSourcesCollected == 0 or setCollected ) then
+				button.ProgressBar:Hide();
+			else
+				button.ProgressBar:Show();
+				button.ProgressBar:SetWidth(SET_PROGRESS_BAR_MAX_WIDTH * topSourcesCollected / topSourcesTotal);
+			end
+			button.IconCover:SetShown(not setCollected);
+		else
+			button:Hide();
+		end
+	end
+
+	local extraHeight = (self.largeButtonHeight and self.largeButtonHeight - BASE_SET_BUTTON_HEIGHT) or 0;
+	local totalHeight = #baseSets * BASE_SET_BUTTON_HEIGHT + extraHeight;
+	HybridScrollFrame_Update(self, totalHeight, self:GetHeight());
+end
+--This bit sets "update" which is set via on load and triggers when scrolling.  Its what caused sorting issues
+WardrobeCollectionFrame.SetsCollectionFrame.ScrollFrame.update = WardrobeCollectionFrame.SetsCollectionFrame.ScrollFrame.Update
+
 --=======
 
 
@@ -1256,6 +1315,7 @@ end
 
 --local selectedSetID
 function BetterWardrobeSetsCollectionScrollFrameMixin:Update()
+
 	local offset = HybridScrollFrame_GetOffset(self)
 	local buttons = self.buttons
 	local baseSets =  SetsDataProvider:GetBaseSets() --addon.GetBaseList()
@@ -1529,3 +1589,102 @@ function BetterWardrobeSetsTransmogMixin:ResetPage()
 end
 
 
+local TAB_ITEMS = 1
+local TAB_SETS = 2
+local TAB_EXTRASETS = 3
+local TABS_MAX_WIDTH = 185
+
+function BW_WardrobeCollectionFrame_OnLoad(self)
+	WardrobeCollectionFrameTab1:Hide()
+	WardrobeCollectionFrameTab2:Hide()
+	PanelTemplates_SetNumTabs(self, 3);
+	PanelTemplates_SetTab(self, TAB_ITEMS);
+	PanelTemplates_ResizeTabsToFit(self, TABS_MAX_WIDTH);
+	self.selectedCollectionTab = TAB_ITEMS;
+	self.selectedTransmogTab = TAB_ITEMS;
+end
+
+
+function BW_WardrobeCollectionFrame_OnEvent(self, event, ...)
+	if ( event == "UNIT_MODEL_CHANGED" ) then
+		local hasAlternateForm, inAlternateForm = HasAlternateForm();
+		if ( (self.inAlternateForm ~= inAlternateForm or self.updateOnModelChanged) ) then
+			if ( self.activeFrame:OnUnitModelChangedEvent() ) then
+				self.inAlternateForm = inAlternateForm;
+				self.updateOnModelChanged = nil;
+			end
+		end
+	elseif ( event == "TRANSMOG_SEARCH_UPDATED" ) then
+		local searchType, arg1 = ...;
+		--if ( searchType == self.activeFrame.searchType ) then
+			--self.activeFrame:OnSearchUpdate(arg1);
+		--end
+	end
+end
+
+function BW_WardrobeCollectionFrame_OnShow(self)
+	CollectionsJournal:SetPortraitToAsset("Interface\\Icons\\inv_chest_cloth_17");
+
+	self:RegisterUnitEvent("UNIT_MODEL_CHANGED", "player");
+	self:RegisterEvent("TRANSMOG_SEARCH_UPDATED");
+
+	local hasAlternateForm, inAlternateForm = HasAlternateForm();
+	self.inAlternateForm = inAlternateForm;
+
+	if ( WardrobeFrame_IsAtTransmogrifier() ) then
+		BW_WardrobeCollectionFrame_SetTab(TAB_ITEMS);
+	else
+		BW_WardrobeCollectionFrame_SetTab(TAB_ITEMS);
+	end
+	--WardrobeCollectionFrame_UpdateTabButtons();
+end
+
+function BW_WardrobeCollectionFrame_OnHide(self)
+	self:UnregisterEvent("UNIT_MODEL_CHANGED");
+	self:UnregisterEvent("TRANSMOG_SEARCH_UPDATED");
+
+	--C_TransmogCollection.EndSearch();
+	self.jumpToVisualID = nil;
+	for i, frame in ipairs(BW_WardrobeCollectionFrame.ContentFrames) do
+		frame:Hide();
+	end
+end
+
+function WardrobeItemsCollectionMixin:HandleKey(key)
+	local _, _, _, selectedVisualID = self:GetActiveSlotInfo();
+	local visualIndex;
+	local visualsList = self:GetFilteredVisualsList();
+	for i = 1, #visualsList do
+		if ( visualsList[i].visualID == selectedVisualID ) then
+			visualIndex = i;
+			break;
+		end
+	end
+	if ( visualIndex ) then
+		visualIndex = WardrobeUtils_GetAdjustedDisplayIndexFromKeyPress(self, visualIndex, #visualsList, key);
+		self:SelectVisual(visualsList[visualIndex].visualID);
+		self.jumpToVisualID = visualsList[visualIndex].visualID;
+		self:ResetPage();
+	end
+end
+
+function BW_WardrobeCollectionFrame_OnKeyDown(self, key)
+	if ( self.tooltipCycle and key == WARDROBE_CYCLE_KEY ) then
+		self:SetPropagateKeyboardInput(false);
+		if ( IsShiftKeyDown() ) then
+			self.tooltipSourceIndex = self.tooltipSourceIndex - 1;
+		else
+			self.tooltipSourceIndex = self.tooltipSourceIndex + 1;
+		end
+		self.tooltipContentFrame:RefreshAppearanceTooltip();
+	elseif ( key == WARDROBE_PREV_VISUAL_KEY or key == WARDROBE_NEXT_VISUAL_KEY or key == WARDROBE_UP_VISUAL_KEY or key == WARDROBE_DOWN_VISUAL_KEY ) then
+		if ( self.activeFrame:CanHandleKey(key) ) then
+			self:SetPropagateKeyboardInput(false);
+			self.activeFrame:HandleKey(key);
+		else
+			self:SetPropagateKeyboardInput(true);
+		end
+	else
+		self:SetPropagateKeyboardInput(true);
+	end
+end
