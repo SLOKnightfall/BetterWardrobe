@@ -145,27 +145,6 @@ function addon:OnEnable()
 	--self:Hook("WardrobeCollectionFrame_SetTab", true)
 end
 
-
-function WardrobeFilterDropDown_Initialize(self, level)
-	if ( not WardrobeCollectionFrame.activeFrame ) then
-		return;
-	end
-print(WardrobeCollectionFrame.activeFrame.searchType)
-	if ( WardrobeCollectionFrame.activeFrame.searchType == LE_TRANSMOG_SEARCH_TYPE_ITEMS ) then
-		WardrobeFilterDropDown_InitializeItems(self, level);
-	elseif ( WardrobeCollectionFrame.activeFrame.searchType == LE_TRANSMOG_SEARCH_TYPE_BASE_SETS ) then
-		WardrobeFilterDropDown_InitializeBaseSets(self, level);
-	end
-end
-
---hack way to load collections frame with out generation errors 
-function addon:GetSpecializationInfo()
-	return 1 ,"test"
-end
---addon:RawHook("GetSpecializationInfo", true)	
---LoadAddOn("Blizzard_Collections")
---addon:Unhook("GetSpecializationInfo")
-
 local BASE_SET_BUTTON_HEIGHT = 46
 local VARIANT_SET_BUTTON_HEIGHT = 20
 local SET_PROGRESS_BAR_MAX_WIDTH = 204
@@ -185,42 +164,18 @@ f.model:SetWidth(1)
 f.model:SetModelScale(1);
 f.model:SetAutoDress(false)
 f.model:SetUnit("PLAYER");
+addon.frame = f
 
 
-
-
-local altList = {}
 function addon.GetItemSource(item, itemMod)
-	if addon.modArmor[item] and addon.modArmor[item][itemMod] then return nil,addon.modArmor[item][itemMod] end
-	--if not addon.itemSourceID[item] then
---BW_ModList = BW_ModList or {}
---if addon.armorModSets[item] then return addon.armorModSets[item] end
+
+	if addon.modArmor[item] and addon.modArmor[item][itemMod] then return nil, addon.modArmor[item][itemMod] end
+
 		local itemSource
 		local visualID, sourceID
-	if itemMod then 
-	end-- and not BW_ModList[item] then 
-		--visualID, sourceID = C_TransmogCollection.GetItemInfo(item, itemMod)
-		--if sourceID then altList[item] = altList[item] or {}  ; local list = altList[item]; list[itemMod] = sourceID end
-	--elseif itemMod and  BW_ModList[item] then
-		--f.model:Hide()
-	--	return visualID ,sourceID
 
-	--else
 		visualID, sourceID = C_TransmogCollection.GetItemInfo(item) --, (mod or 0
-	--end
 
-
---for i=1, 4000 do
-	--if itemMod then -- and not BW_ModList[item] then 
-		--visualID, sourceID = C_TransmogCollection.GetItemInfo(item, itemMod)
-		--if sourceID then altList[item] = altList[item] or {}  ; local list = altList[item]; list[itemMod] = sourceID end
-	--elseif itemMod and  BW_ModList[item] then
-		--f.model:Hide()
-	--	return visualID ,sourceID
---end
---end
-
-		--addon.itemSourceID[item] = sourceID
 		if not sourceID then
 			local itemlink = "item:"..item..":0"
 			f.model:Show()
@@ -236,7 +191,6 @@ function addon.GetItemSource(item, itemMod)
 			end
 			
 		end
-	--end
 
 	f.model:Hide()
 	return visualID ,sourceID
@@ -451,7 +405,6 @@ function SetsDataProvider:FilterSearch()
 	end
 
 end
-
 
 function WardrobeCollectionFrame.SetsCollectionFrame:OnSearchUpdate()
 	if ( self.init ) then
@@ -937,6 +890,12 @@ function SetsDataProvider:GetSetSourceCounts(setID)
 	local sourceData = self:GetSetSourceData(setID);
 	return sourceData.numCollected, sourceData.numTotal;
 end
+
+--Lets CanIMogIt plugin get extra sets count
+ function addon.GetSetSourceCounts(setID)
+	return SetsDataProvider:GetSetSourceCounts(setID)
+end
+
 
 function SetsDataProvider:GetUsableSets(incVariants)
 	if ( not self.usableSets ) then

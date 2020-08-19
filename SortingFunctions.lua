@@ -4,7 +4,7 @@ local addonName, addon = ...
 --addon = LibStub("AceAddon-3.0"):NewAddon(addon, addonName, "AceEvent-3.0", "AceConsole-3.0", "AceHook-3.0")
 addon = LibStub("AceAddon-3.0"):GetAddon(addonName)
 
-local f = CreateFrame("Frame")
+local f = addon.frame
 local Wardrobe = WardrobeCollectionFrame.ItemsCollectionFrame
 
 local db, active

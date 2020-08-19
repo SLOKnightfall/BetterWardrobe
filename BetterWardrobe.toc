@@ -32,6 +32,7 @@ BetterWardrobe.xml
 SortingFunctions.lua
 
 Plugins\ElvUI.lua
+Plugins\CanIMogIt.lua
 
 #Data files
 Data\AppearanceData.lua
