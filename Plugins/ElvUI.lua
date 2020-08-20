@@ -21,10 +21,10 @@ function MyPlugin:Initialize()
 	S:HandleTab(BW_WardrobeCollectionFrame.SetsTab)
 	S:HandleTab(BW_WardrobeCollectionFrame.ExtraSetsTab)
 
-	UIDropDownMenu_SetWidth(BW_SortDropDown, 100)
+	UIDropDownMenu_SetWidth(BW_SortDropDown, 110)
 	S:HandleDropDownBox(BW_SortDropDown)
 	
-
+	BW_SortDropDown:SetScript("OnShow", function() UIDropDownMenu_SetWidth(BW_SortDropDown, 110) end)
 	--BW_SetsTransmogFrame
 
 	S:HandleButton(BW_WardrobeCollectionFrame.FilterButton)
