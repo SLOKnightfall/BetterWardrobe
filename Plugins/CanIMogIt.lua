@@ -39,7 +39,7 @@ local function BW_WardrobeCollectionFrame_CIMIOnValueChanged()
     -- For each button, update the text value
     for i=1,CanIMogIt.NUM_WARDROBE_COLLECTION_BUTTONS do
         local frame = _G["BW_SetsCollectionFrameScrollFrameButton"..i]
-        if frame and frame.CanIMogItOverlay then
+        if frame and frame.CanIMogItOverlay and frame.setID then
             frame.CanIMogItOverlay:UpdateText()
         end
     end
