@@ -45,8 +45,6 @@ local function BW_WardrobeCollectionFrame_CIMIOnValueChanged()
     end
 end
 
-
-
     for i=1,CanIMogIt.NUM_WARDROBE_COLLECTION_BUTTONS do
         local frame = _G["BW_SetsCollectionFrameScrollFrameButton"..i]
         if frame then

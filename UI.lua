@@ -247,6 +247,8 @@ function BW_WardrobeCollectionFrame_SetTab(tabID)
 		WardrobeCollectionFrame.FilterButton:Show()
 		BW_WardrobeCollectionFrame.FilterButton:Hide()
 		BW_SortDropDown:ClearAllPoints()
+		BW_WardrobeToggle.VisualMode = false
+		BW_WardrobeToggle:Show()
 
 
 		if ( atTransmogrifier )  then
@@ -265,7 +267,7 @@ function BW_WardrobeCollectionFrame_SetTab(tabID)
 			WardrobeCollectionFrame.FilterButton:Show()
 			WardrobeCollectionFrame.FilterButton:SetEnabled(true)
 			BW_WardrobeCollectionFrame.FilterButton:Hide()
-			BW_WardrobeToggle:Show()
+			
 			BW_SortDropDown:SetPoint("TOPLEFT", BW_WardrobeToggle, "TOPRIGHT")
 		end
 
@@ -282,6 +284,8 @@ function BW_WardrobeCollectionFrame_SetTab(tabID)
 		BW_WardrobeCollectionFrame.FilterButton:Show()
 		BW_SortDropDown:ClearAllPoints()
 		UIDropDownMenu_EnableDropDown(BW_SortDropDown)
+		BW_WardrobeToggle.VisualMode = flase
+		BW_WardrobeToggle:Show()
 					
 		if ( atTransmogrifier )  then
 			WardrobeCollectionFrame.activeFrame = BW_WardrobeCollectionFrame.BW_SetsTransmogFrame
@@ -296,7 +300,7 @@ function BW_WardrobeCollectionFrame_SetTab(tabID)
 			BW_WardrobeCollectionFrame.activeFrame = BW_WardrobeCollectionFrame.BW_SetsCollectionFrame
 			WardrobeCollectionFrame.searchBox:SetPoint("TOPLEFT", 19, -69)
 			WardrobeCollectionFrame.searchBox:SetWidth(145)
-			BW_WardrobeToggle:Show()
+			--BW_WardrobeToggle:Show()
 			BW_SortDropDown:SetPoint("TOPLEFT", BW_WardrobeToggle, "TOPRIGHT")
 
 		end
@@ -318,14 +322,26 @@ local function CreateVisualViewButton()
 	b:SetPoint("LEFT", WardrobeCollectionFrame.progressBar, "RIGHT")
 	b:SetScript("OnClick", function(self)
 		local baseFrame
+		self.viewAll = false
 
 		local atTransmogrifier = WardrobeFrame_IsAtTransmogrifier()
-		local tab = WardrobeCollectionFrame.selectedCollectionTab
+		
+		--self.VisualMode = not self.VisualMode
+		if ( atTransmogrifier ) then
+			local tab = WardrobeCollectionFrame.selectedTransmogTab
+			if tab == 2  or tab == 3 then
+				self.VisualMode = not self.VisualMode
+				WardrobeCollectionFrame.SetsTransmogFrame:OnSearchUpdate()
+				BW_SetsTransmogFrame:OnSearchUpdate()
+			end
 
-		if ( not atTransmogrifier ) then
-			self.VisualMode = true
+		else
+			local tab = WardrobeCollectionFrame.selectedCollectionTab
+			
 			if tab == 2 then 
 				if WardrobeCollectionFrame.SetsCollectionFrame:IsShown() then
+					self.VisualMode = true
+					self.viewAll = true
 					WardrobeCollectionFrame.SetsTransmogFrame:Show()
 					WardrobeCollectionFrame.SetsCollectionFrame:Hide()
 					WardrobeCollectionFrame.activeFrame = WardrobeCollectionFrame.SetsTransmogFrame
@@ -334,10 +350,11 @@ local function CreateVisualViewButton()
 					WardrobeCollectionFrame.FilterButton:Hide()
 
 				else
+					self.VisualMode = false
+					self.viewAll = false
 					WardrobeCollectionFrame.SetsTransmogFrame:Hide()
 					WardrobeCollectionFrame.SetsCollectionFrame:Show()
 					WardrobeCollectionFrame.FilterButton:Show()
-
 					WardrobeCollectionFrame.activeFrame = WardrobeCollectionFrame.SetsCollectionFrame
 					BW_WardrobeCollectionFrame.activeFrame = WardrobeCollectionFrame.SetsCollectionFrame
 
@@ -345,25 +362,31 @@ local function CreateVisualViewButton()
 
 			elseif tab == 3 then 
 				if BW_WardrobeCollectionFrame.BW_SetsCollectionFrame:IsShown() then
+					self.VisualMode = true
+					self.viewAll = true
 					BW_WardrobeCollectionFrame.BW_SetsTransmogFrame:Show()
 					BW_WardrobeCollectionFrame.BW_SetsCollectionFrame:Hide()
 					WardrobeCollectionFrame.activeFrame = BW_WardrobeCollectionFrame.BW_SetsTransmogFrame
 					BW_WardrobeCollectionFrame.activeFrame = BW_WardrobeCollectionFrame.BW_SetsTransmogFrame
 					BW_SetsTransmogFrame:OnSearchUpdate()
 				else
+					self.VisualMode = false
+					self.viewAll = false
 					BW_WardrobeCollectionFrame.BW_SetsTransmogFrame:Hide()
 					BW_WardrobeCollectionFrame.BW_SetsCollectionFrame:Show()
 					WardrobeCollectionFrame.activeFrame = BW_WardrobeCollectionFrame.BW_SetsCollectionFrame
 					BW_WardrobeCollectionFrame.activeFrame = BW_WardrobeCollectionFrame.BW_SetsCollectionFrame
+
 				end
 
 			end
 
 		end
 	end)
+	
 	b:SetScript("OnHide", function(self) 
 			BW_WardrobeCollectionFrame.BW_SetsTransmogFrame:Hide()
-			self.VisualMode = true
+			self.VisualMode = false
 		end)
 	b:SetScript("OnEnter", function(self)
 			GameTooltip:SetOwner(self, "ANCHOR_RIGHT")

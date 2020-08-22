@@ -46,7 +46,6 @@ local options = {
 					type = "header",
 					width = "full",
 				},
-
 				ShowIncomplete = {
 					order = 1,
 					name = L["Show Incomplete Sets"],
@@ -55,8 +54,24 @@ local options = {
 					get = function(info) return Profile.ShowIncomplete end,
 					width = "full",
 				},
+				HideMissing = {
+					order = 2,
+					name = L["Hide Missing Set Pieces at Transmog Vendor"],
+					type = "toggle",
+					set = function(info,val) Profile.HideMissing = val end,
+					get = function(info) return Profile.HideMissing end,
+					width = "full",
+				},
+				HiddenMog = {
+					order = 2.5,
+					name = L["Use Hidden Transmog for Missing Set Pieces"],
+					type = "toggle",
+					set = function(info,val) Profile.HiddenMog = val end,
+					get = function(info) return Profile.HiddenMog end,
+					width = "full",
+				},
 				PartialLimit = {
-					order = 7,
+					order = 3,
 					name = L["Required pieces"],
 					type = "select",
 					type = "range",
@@ -69,7 +84,7 @@ local options = {
 				},
 
 				ShowNames = {
-					order = 1,
+					order = 4,
 					name = L["Show Set Names"],
 					type = "toggle",
 					set = function(info,val) Profile.ShowNames = val end,
@@ -78,7 +93,7 @@ local options = {
 				},
 
 				ShowSetCount = {
-					order = 1,
+					order = 5,
 					name = L["Show Collected Count"],
 					type = "toggle",
 					set = function(info,val) Profile.ShowSetCount = val end,
@@ -86,14 +101,7 @@ local options = {
 					width = "full",
 				},
 
-				HideMissing = {
-					order = 1,
-					name = L["Hide Missing Set Pieces"],
-					type = "toggle",
-					set = function(info,val) Profile.HideMissing = val end,
-					get = function(info) return Profile.HideMissing end,
-					width = "full",
-				},
+
 			},
 		},
 
@@ -212,9 +220,7 @@ function addon.GetSetsources(setID)
 		
 		local visualID, sourceID = addon.GetItemSource(item, setInfo.mod) --C_TransmogCollection.GetItemInfo(item)
 		-- visualID, sourceID = addon.GetItemSource(item,setInfo.mod)
-		--local sources = C_TransmogCollection.GetAppearanceSources(sourceInfo.visualID)
-
-	
+		--local sources = C_TransmogCollection.GetAppearanceSources(sourceInfo.visualID)	
 		if sourceID then
 			local sourceInfo = C_TransmogCollection.GetSourceInfo(sourceID)
 			local sources = C_TransmogCollection.GetAppearanceSources(sourceInfo.visualID)
@@ -266,6 +272,25 @@ local function EmptySlots(transmogSources)
 
 	return EmptySet
 end
+
+
+local function isMogKnown(sourceID)
+
+	local sourceInfo = C_TransmogCollection.GetSourceInfo(sourceID)
+	local slotSources = C_TransmogCollection.GetAppearanceSources(sourceInfo.visualID)
+
+	local slotColected 
+	--local slotSources = C_TransmogSets.GetSourcesForSlot(setID, slot)
+	if slotSources then 
+		WardrobeCollectionFrame_SortSources(slotSources, sourceInfo.visualID)
+		for i,d in ipairs(slotSources) do
+			if d.isCollected then slotColected = d.sourceID end
+		end
+	end
+
+	return slotColected
+end
+
 
 local SetsDataProvider = CreateFromMixins(WardrobeSetsDataProviderMixin);
 
@@ -323,6 +348,7 @@ end
 function SetsDataProvider:GetUsableSets(incVariants)
 	if ( not self.usableSets ) then
 		self.usableSets = C_TransmogSets.GetUsableSets();
+		local atTransmogrifier = WardrobeFrame_IsAtTransmogrifier()
 
 		local setIDS = {}
 
@@ -354,7 +380,7 @@ function SetsDataProvider:GetUsableSets(incVariants)
 				if not setIDS[set.setID or set.baseSetID ] then 
 					local topSourcesCollected, topSourcesTotal = SetsDataProvider:GetSetSourceCounts(set.setID);
 
-					if BW_WardrobeToggle.VisualMode or topSourcesCollected >= Profile.PartialLimit  then --and not C_TransmogSets.IsSetUsable(set.setID) then
+					if (not atTransmogrifier and BW_WardrobeToggle.VisualMode) or topSourcesCollected >= Profile.PartialLimit  then --and not C_TransmogSets.IsSetUsable(set.setID) then
 						
 						tinsert(self.usableSets, set)
 					end
@@ -366,7 +392,7 @@ function SetsDataProvider:GetUsableSets(incVariants)
 						if not setIDS[set.setID or set.baseSetID ] then 
 							local topSourcesCollected, topSourcesTotal = SetsDataProvider:GetSetSourceCounts(set.setID);
 							if topSourcesCollected == topSourcesTotal then set.collected = true end
-							if BW_WardrobeToggle.VisualMode or topSourcesCollected >= Profile.PartialLimit  then --and not C_TransmogSets.IsSetUsable(set.setID) then
+							if (not atTransmogrifier and BW_WardrobeToggle.VisualMode) or topSourcesCollected >= Profile.PartialLimit  then --and not C_TransmogSets.IsSetUsable(set.setID) then
 								tinsert(self.usableSets, set)
 							end
 						end
@@ -403,6 +429,7 @@ function SetsDataProvider:FilterSearch()
 	else 
 		self.usableSets = baseSets 
 	end
+	self:SortSets(self.usableSets);
 
 end
 
@@ -552,71 +579,10 @@ WardrobeCollectionFrame.SetsCollectionFrame:SetScript("OnShow", WardrobeCollecti
 function WardrobeCollectionFrame.SetsTransmogFrame:OnSearchUpdate()
 	SetsDataProvider:ClearUsableSets();
 	SetsDataProvider:FilterSearch()
-	self:UpdateSets();
+	WardrobeCollectionFrame.SetsTransmogFrame:UpdateSets();
 end
 
-function WardrobeCollectionFrame.SetsTransmogFrame:UpdateSets()
-	local usableSets = SetsDataProvider:GetUsableSets();
-	self.PagingFrame:SetMaxPages(ceil(#usableSets / self.PAGE_SIZE));
-	local pendingTransmogModelFrame = nil;
-	local indexOffset = (self.PagingFrame:GetCurrentPage() - 1) * self.PAGE_SIZE;
-	for i = 1, self.PAGE_SIZE do
-		local model = self.Models[i];
-		local index = i + indexOffset;
-		local set = usableSets[index];
-		if ( set ) then
-			model:Show();
-			if ( model.setID ~= set.setID ) then
-				model:Undress();
-				local sourceData = SetsDataProvider:GetSetSourceData(set.setID);
-				for sourceID  in pairs(sourceData.sources) do
-					model:TryOn(sourceID);
-				end
-			end
-			local transmogStateAtlas;
-			if ( set.setID == self.appliedSetID and set.setID == self.selectedSetID ) then
-				transmogStateAtlas = "transmog-set-border-current-transmogged";
-			elseif ( set.setID == self.selectedSetID ) then
-				transmogStateAtlas = "transmog-set-border-selected";
-				pendingTransmogModelFrame = model;
-			end
-			if ( transmogStateAtlas ) then
-				model.TransmogStateTexture:SetAtlas(transmogStateAtlas, true);
-				model.TransmogStateTexture:Show();
-			else
-				model.TransmogStateTexture:Hide();
-			end
-			model.Favorite.Icon:SetShown(set.favorite);
-			model.setID = set.setID;
-			
-		else
-			model:Hide();
-		end
-	end
 
-	if ( pendingTransmogModelFrame ) then
-		self.PendingTransmogFrame:SetParent(pendingTransmogModelFrame);
-		self.PendingTransmogFrame:SetPoint("CENTER");
-		self.PendingTransmogFrame:Show();
-		if ( self.PendingTransmogFrame.setID ~= pendingTransmogModelFrame.setID ) then
-			self.PendingTransmogFrame.TransmogSelectedAnim:Stop();
-			self.PendingTransmogFrame.TransmogSelectedAnim:Play();
-			self.PendingTransmogFrame.TransmogSelectedAnim2:Stop();
-			self.PendingTransmogFrame.TransmogSelectedAnim2:Play();
-			self.PendingTransmogFrame.TransmogSelectedAnim3:Stop();
-			self.PendingTransmogFrame.TransmogSelectedAnim3:Play();
-			self.PendingTransmogFrame.TransmogSelectedAnim4:Stop();
-			self.PendingTransmogFrame.TransmogSelectedAnim4:Play();
-			self.PendingTransmogFrame.TransmogSelectedAnim5:Stop();
-			self.PendingTransmogFrame.TransmogSelectedAnim5:Play();
-		end
-		self.PendingTransmogFrame.setID = pendingTransmogModelFrame.setID;
-	else
-		self.PendingTransmogFrame:Hide();
-	end
-
-	self.NoValidSetsLabel:SetShown(not C_TransmogSets.HasUsableSets());
-end
 --local BetterWardrobeSetsTransmogMixin = CreateFromMixins(WardrobeSetsTransmogMixin);
 
 function WardrobeCollectionFrame.SetsTransmogFrame:UpdateSets()
@@ -632,13 +598,18 @@ function WardrobeCollectionFrame.SetsTransmogFrame:UpdateSets()
 		if ( set ) then
 			model:Show();
 
-			if ( model.setID ~= set.setID ) then
-				model:Undress();
-				local sourceData = SetsDataProvider:GetSetSourceData(set.setID);
+			--if ( model.setID ~= set.setID ) then
+				model:Undress()
+				local sourceData = SetsDataProvider:GetSetSourceData(set.setID)
+
 				for sourceID  in pairs(sourceData.sources) do
-					model:TryOn(sourceID);
+					--if (not Profile.HideMissing and not BW_WardrobeToggle.VisualMode) or (Profile.HideMissing and BW_WardrobeToggle.VisualMode ) or (Profile.HideMissing and isMogKnown(sourceID)) then 
+					if (not Profile.HideMissing and (not BW_WardrobeToggle.VisualMode or (isMogKnown(sourceID) and BW_WardrobeToggle.VisualMode))) or 
+						(Profile.HideMissing and (BW_WardrobeToggle.VisualMode or isMogKnown(sourceID))) then 
+						model:TryOn(sourceID)
+					end
 				end
-			end
+			--end
 
 			local transmogStateAtlas;
 			if ( set.setID == self.appliedSetID and set.setID == self.selectedSetID ) then
@@ -708,6 +679,8 @@ function WardrobeCollectionFrame.SetsTransmogFrame:LoadSet(setID)
 	if slotSources then 
 			WardrobeCollectionFrame_SortSources(slotSources, sourceInfo.visualID);
 			local index = WardrobeCollectionFrame_GetDefaultSourceIndex(slotSources, sourceID);
+			local knownID = isMogKnown(sourceID)
+			if knownID then transmogSources[slot] = knownID end
 
 			if combineSources then 
 				local _, hasPending  = C_Transmog.GetSlotInfo(slot, LE_TRANSMOG_TYPE_APPEARANCE)
@@ -750,7 +723,7 @@ function WardrobeCollectionFrame.SetsTransmogFrame:LoadSet(setID)
 		self.ignoreTransmogrifyUpdateEvent = false;
 		C_Transmog.LoadSources(transmogSources, -1, -1);
 
-		if Profile.HideMissing then 				
+		if Profile.HiddenMog then				
 			local emptySlotData = GetEmptySlots()
 			for i, x in pairs(transmogSources) do
 				if not C_TransmogCollection.PlayerHasTransmogItemModifiedAppearance(x) and i ~= 7  and emptySlotData[i] then
@@ -988,22 +961,23 @@ end
 function SetsDataProvider:GetUsableSets(incVariants)
 	if ( not self.usableSets ) then
 		local availableSets = SetsDataProvider:GetBaseSets();
+		local atTransmogrifier = WardrobeFrame_IsAtTransmogrifier()
 
 		--Generates Useable Set
 		self.usableSets = {} --SetsDataProvider:GetUsableSets();
 		for i, set in ipairs(availableSets) do
 
 			local topSourcesCollected, topSourcesTotal = SetsDataProvider:GetSetSourceCounts(set.setID);
-			if BW_WardrobeToggle.VisualMode or topSourcesCollected >= Profile.PartialLimit  then --and not C_TransmogSets.IsSetUsable(set.setID) then
+			if (BW_WardrobeToggle.viewAll and BW_WardrobeToggle.VisualMode) or (not atTransmogrifier and BW_WardrobeToggle.VisualMode) or topSourcesCollected >= Profile.PartialLimit  then --and not C_TransmogSets.IsSetUsable(set.setID) then
 				tinsert(self.usableSets, set)
 			end
-
+ 
 			if incVariants then 
 				local variantSets = C_TransmogSets.GetVariantSets(set.setID);
 				for i, set in ipairs(variantSets) do
 					local topSourcesCollected, topSourcesTotal = SetsDataProvider:GetSetSourceCounts(set.setID);
 					if topSourcesCollected == topSourcesTotal then set.collected = true end
-					if BW_WardrobeToggle.VisualMode or topSourcesCollected >= Profile.PartialLimit  then --and not C_TransmogSets.IsSetUsable(set.setID) then
+					if (BW_WardrobeToggle.viewAll and BW_WardrobeToggle.VisualMode) or (not atTransmogrifier and BW_WardrobeToggle.VisualMode) or topSourcesCollected >= Profile.PartialLimit  then --and not C_TransmogSets.IsSetUsable(set.setID) then
 						tinsert(self.usableSets, set)
 					end
 				end
@@ -1023,8 +997,6 @@ function SetsDataProvider:GetSetSourceData(setID)
 
 	local sourceData = self.sourceData[setID];
 	if ( not sourceData ) then
-		--print("BS")
-		--print(setID)
 		local sources = addon.GetSetsources(setID)
 		local numCollected = 0
 		local numTotal = 0
@@ -1132,9 +1104,6 @@ function BetterWardrobeSetsTransmogModelMixin:RefreshTooltip()
 	local numTotalSlots = 0
 	local waitingOnQuality = false
 	local sourceQualityTable = self:GetParent().sourceQualityTable
-
-	--local sources = C_TransmogSets.GetSetSources(self.setID)
-	--print(self.setID)
 	local sources = addon.GetSetsources(self.setID)
 	for sourceID in pairs(sources) do
 		numTotalSlots = numTotalSlots + 1
@@ -1482,44 +1451,44 @@ function BetterWardrobeSetsTransmogMixin:LoadSet(setID)
 	local sources = addon.GetSetsources(setID)
 	local combineSources = IsShiftKeyDown()
 	local selectedItems = {}
+	local SourceList = {}
 
 	for sourceID in pairs(sources) do
 		local sourceInfo = C_TransmogCollection.GetSourceInfo(sourceID)
 		local slot = C_Transmog.GetSlotForInventoryType(sourceInfo.invType)
-		--local slotSources = C_TransmogSets.GetSourcesForSlot(setID, slot)
-		--WardrobeCollectionFrame_SortSources(slotSources, sourceInfo.visualID)
-		
-		--transmogSources[slot] = sourceInfo.sourceID
 
 		local slotSources = C_TransmogCollection.GetAppearanceSources(sourceInfo.visualID)
 
-		--local slotSources = C_TransmogSets.GetSourcesForSlot(setID, slot)
+
 		if slotSources then 
-		local index = WardrobeCollectionFrame_GetDefaultSourceIndex(slotSources, sourceID)
-		WardrobeCollectionFrame_SortSources(slotSources, sourceInfo.visualID)
+			WardrobeCollectionFrame_SortSources(slotSources, sourceInfo.visualID)
+			local knownID = isMogKnown(sourceID)
+			if knownID then transmogSources[slot] = knownID end
 
-		if combineSources then 
-			local _, hasPending  = C_Transmog.GetSlotInfo(slot, LE_TRANSMOG_TYPE_APPEARANCE)
-			if  hasPending then 
-				local _,_,_,_,sourceID, appearanceID = C_Transmog.GetSlotVisualInfo(slot, LE_TRANSMOG_TYPE_APPEARANCE)
-				local emptyappearanceID, emptySourceID = EmptyArmor[slot] and C_TransmogCollection.GetItemInfo(EmptyArmor[slot])
+			local index = WardrobeCollectionFrame_GetDefaultSourceIndex(slotSources, sourceID)
+			--WardrobeCollectionFrame_SortSources(slotSources, sourceInfo.visualID)
 
-				if appearanceID == emptyappearanceID then
-					C_Transmog.ClearPending(slot, LE_TRANSMOG_TYPE_APPEARANCE)
-					transmogSources[slot] = slotSources[index].sourceID;
-				else				
-					transmogSources[slot] = sourceID;
+			if combineSources then 
+				local _, hasPending  = C_Transmog.GetSlotInfo(slot, LE_TRANSMOG_TYPE_APPEARANCE)
+				if  hasPending then 
+					local _,_,_,_,sourceID, appearanceID = C_Transmog.GetSlotVisualInfo(slot, LE_TRANSMOG_TYPE_APPEARANCE)
+					local emptyappearanceID, emptySourceID = EmptyArmor[slot] and C_TransmogCollection.GetItemInfo(EmptyArmor[slot])
+
+					if appearanceID == emptyappearanceID then
+						C_Transmog.ClearPending(slot, LE_TRANSMOG_TYPE_APPEARANCE)
+						transmogSources[slot] = slotSources[index].sourceID;
+					else				
+						transmogSources[slot] = sourceID;
+					end
+					--transmogSources[slot] = slotSources[index].sourceID;
 				end
+			--else
 
-			else
-				transmogSources[slot] = slotSources[index].sourceID;
+			--transmogSources[slot] = slotColected
+				--transmogSources[slot] = sourceInfo.sourceID
+				--transmogSources[slot] = slotSources[index].sourceID;
 			end
-		else
-
-			--transmogSources[slot] = sourceInfo.sourceID
-			transmogSources[slot] = slotSources[index].sourceID;
 		end
-	end
 
 		for i, slotSourceInfo in ipairs(sourceInfo) do
 			if ( not slotSourceInfo.name ) then
@@ -1540,7 +1509,7 @@ function BetterWardrobeSetsTransmogMixin:LoadSet(setID)
 		self.ignoreTransmogrifyUpdateEvent = false
 		C_Transmog.LoadSources(transmogSources, -1, -1)
 
-		if Profile.HideMissing then 			
+		if Profile.HiddenMog then	
 			local clearSlots = EmptySlots(transmogSources)
 			for i, x in pairs(clearSlots) do
 				local _,  source = addon.GetItemSource(x) --C_TransmogCollection.GetItemInfo(x)
@@ -1594,6 +1563,8 @@ function BetterWardrobeSetsTransmogMixin:OnHide()
 end
 
 
+
+
 function BetterWardrobeSetsTransmogMixin:UpdateSets()
 	local usableSets = SetsDataProvider:GetUsableSets()
 	self.PagingFrame:SetMaxPages(ceil(#usableSets / self.PAGE_SIZE))
@@ -1604,18 +1575,21 @@ function BetterWardrobeSetsTransmogMixin:UpdateSets()
 		local model = self.Models[i]
 		local index = i + indexOffset
 		local set = usableSets[index]
---print(set)
+
 		if ( set ) then
 			model:Show()
 
-			if ( model.setID ~= set.setID ) then
+			--if ( model.setID ~= set.setID ) then
 				model:Undress()
 				local sourceData = SetsDataProvider:GetSetSourceData(set.setID)
 
 				for sourceID  in pairs(sourceData.sources) do
-					model:TryOn(sourceID)
+					if (not Profile.HideMissing and (not BW_WardrobeToggle.VisualMode or (isMogKnown(sourceID) and BW_WardrobeToggle.VisualMode))) or 
+						(Profile.HideMissing and (BW_WardrobeToggle.VisualMode or isMogKnown(sourceID))) then 
+						model:TryOn(sourceID)
+					end
 				end
-			end
+			--end
 
 			local transmogStateAtlas
 

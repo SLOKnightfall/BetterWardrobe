@@ -9,7 +9,8 @@ L["Show Incomplete Sets"] = true
 L["Show Set Names"] = true
 L["Required pieces"] = true
 L["Show Collected Count"] = true
- L["Hide Missing Set Pieces"] = true
+L["Hide Missing Set Pieces at Transmog Vendor"] = true
+L["Use Hidden Transmog for Missing Set Pieces"] = true
 
 --PvP Set
 L["NOTE_17"] = "Arena Season 1 Set"
