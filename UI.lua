@@ -1,6 +1,8 @@
 local addonName, addon = ...
 addon = LibStub("AceAddon-3.0"):GetAddon(addonName)
 
+local UI = {}
+
 local LE_DEFAULT = 1
 local LE_APPEARANCE = 2
 local LE_ALPHABETIC = 3
@@ -422,7 +424,7 @@ function addon.BuildUI()
 	BW_WardrobeCollectionFrame.FilterButton:SetFrameLevel(BW_WardrobeCollectionFrame:GetFrameLevel()+10)
 	BW_WardrobeCollectionFrame.FilterButton:SetPoint("TOPLEFT", WardrobeCollectionFrame.FilterButton, "TOPLEFT")
 		
-
+	UI.HideButton_Initialize()
 
 	hooksecurefunc(Wardrobe, "UpdateWeaponDropDown", PositionDropDown )
 end
@@ -619,5 +621,121 @@ function BW_WardrobeFilterDropDown_InitializeItems(self, level)
 			end
 	end
 	--end
+end
+
+
+
+function addon.ToggleHidden(model, isHidden)
+	local tabID = GetTab()
+	if tabID == 1 then 
+		local visualID = model.visualInfo.visualID
+		local source = WardrobeCollectionFrame_GetSortedAppearanceSources(visualID)[1]
+		local name, link = GetItemInfo(source.itemID)
+		addon.chardb.profile.item[visualID] = not isHidden and name
+		--self:UpdateWardrobe()
+		print(format("%s "..link.." from the Appearances Tab", isHidden and "Unhiding" or "Hiding"))
+		WardrobeCollectionFrame.ItemsCollectionFrame:RefreshVisualsList()
+		WardrobeCollectionFrame.ItemsCollectionFrame:UpdateItems()
+
+	elseif tabID == 2 then 
+		local setInfo = C_TransmogSets.GetSetInfo(model.setID)
+		local name = setInfo["name"]
+
+		addon.chardb.profile.set[model.setID] = not isHidden and name
+		--self:UpdateWardrobe()
+		print(format("%s "..name, isHidden and "Unhiding" or "Hiding"))
+
+	else
+		local setInfo = addon.GetSetInfo(model.setID)
+		local name = setInfo["name"]
+		addon.chardb.profile.extraset[model.setID] = not isHidden and name
+		print(format("%s "..name, isHidden and "Unhiding" or "Hiding"))
+											BW_SetsCollectionFrame:OnSearchUpdate()
+						BW_SetsTransmogFrame:OnSearchUpdate()
+
+	end
+			--self:UpdateWardrobe()
+end
+
+
+
+local tabType = {"item", "set", "extraset"}
+---==== Hide Buttons
+
+local function AddHideButton(model, button)
+	if button == "RightButton" then
+		if not DropDownList1:IsShown() then -- force show dropdown
+			WardrobeModelRightClickDropDown.activeFrame = model
+			ToggleDropDownMenu(1, nil, WardrobeModelRightClickDropDown, model, -6, -3)
+		end
+		UIDropDownMenu_AddSeparator()
+		local setID = (model.visualInfo and model.visualInfo.visualID ) or model.setID
+		local type = tabType[GetTab()]
+
+		local isHidden = addon.chardb.profile[type][setID] 
+		UIDropDownMenu_AddButton({
+			notCheckable = true,
+			text = isHidden and SHOW or HIDE,
+			func = function() addon.ToggleHidden(model, isHidden) end,
+		})
+	end
+end
+
+
+
+
+
+function UI.HideButton_Initialize()
+		local Wardrobe = {WardrobeCollectionFrame.ItemsCollectionFrame, WardrobeCollectionFrame.SetsTransmogFrame, BW_SetsTransmogFrame}
+
+		-- hook all models
+		for _, frame in ipairs(Wardrobe) do
+			for _, model in pairs(frame.Models) do
+				model:HookScript("OnMouseDown", AddHideButton)
+			end
+		end
+
+
+		local buttons = WardrobeCollectionFrameScrollFrame.buttons
+		for i = 1, #buttons do
+			local button = buttons[i];
+			button:HookScript("OnMouseUp", function() 
+
+		UIDropDownMenu_AddSeparator()
+		local setID = button.setID
+		local isHidden = addon.chardb.profile.set[setID] 
+		UIDropDownMenu_AddButton({
+			notCheckable = true,
+			text = isHidden and SHOW or HIDE,
+			func = function() 
+			local setInfo = C_TransmogSets.GetSetInfo(setID)
+			local name = setInfo["name"]
+				addon.chardb.profile.set[setID] = not isHidden and name
+				print(format("%s "..name, isHidden and "Unhiding" or "Hiding"))
+				WardrobeCollectionFrame.SetsCollectionFrame:Refresh()
+				WardrobeCollectionFrame.SetsCollectionFrame:OnSearchUpdate()
+			 end,
+		})
+		end)
+
+		end
+		   -- for i=1,CanIMogIt.NUM_WARDROBE_COLLECTION_BUTTONS do
+       -- local frame = _G["BW_SetsCollectionFrameScrollFrameButton"..i]
+      --  if frame and frame.CanIMogItOverlay and frame.setID then
+          --  frame.CanIMogItOverlay:UpdateText()
+       --end
+   -- end
+--end
+		-- toggle for showing only hidden Appearances
+		--local cb = CreateFrame("CheckButton", nil, Wardrobe, "UICheckButtonTemplate")
+		--cb:SetPoint("TOPLEFT", Wardrobe.WeaponDropDown, "BOTTOMLEFT", 14, 5)
+		--cb.text:SetText("Show hidden")
+		--cb:SetScript("OnClick", function(btn)
+			--showHidden = btn:GetChecked()
+			--f:UpdateWardrobe()
+		--end)
 
 end
+
+
+

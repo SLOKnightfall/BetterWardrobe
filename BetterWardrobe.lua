@@ -102,6 +102,15 @@ local options = {
 					width = "full",
 				},
 
+				ShowHidden = {
+					order = 6,
+					name = L["Show Items set to Hidden"],
+					type = "toggle",
+					set = function(info,val) Profile.ShowHidden = val end,
+					get = function(info) return Profile.ShowHidden end,
+					width = "full",
+				},
+
 
 			},
 		},
@@ -117,6 +126,15 @@ local defaults = {
 	profile ={
 		['*'] = true,
 		PartialLimit = 4,
+		ShowHidden = false,
+	}
+}
+
+local char_defaults = {
+	profile  = {
+		item = {},
+		set = {},
+		extraset = {},
 	}
 }
 
@@ -126,17 +144,30 @@ function addon:RefreshConfig()
 	Profile = addon.Profile
 end
 
+---Updates Profile after changes
+function addon:RefreshCharConfig()
+	--addon.Profile = self.db.profile
+	--Profile = addon.Profile
+end
+
 
 ---Ace based addon initilization
 function addon:OnInitialize()
 
 end
 
+
 function addon:OnEnable()
 	self.db = LibStub("AceDB-3.0"):New("BetterWardrobe_Options", defaults, true)
 	options.args.profiles  = LibStub("AceDBOptions-3.0"):GetOptionsTable(self.db)
+
+	self.chardb = LibStub("AceDB-3.0"):New("BetterWardrobe_CharacterData", char_defaults)
+	options.args.charprofiles  = LibStub("AceDBOptions-3.0"):GetOptionsTable(self.chardb)
+	options.args.charprofiles.name = L["Hidden Set Profiles"]
+
 	LibStub("AceConfigRegistry-3.0"):ValidateOptionsTable(options, addonName)
 	LibStub("AceConfig-3.0"):RegisterOptionsTable(addonName, options)
+
 	self.optionsFrame = LibStub("AceConfigDialog-3.0"):AddToBlizOptions("BetterWardrobe", "BetterWardrobe")
 	self.db.RegisterCallback(addon, "OnProfileChanged", "RefreshConfig")
 	self.db.RegisterCallback(addon, "OnProfileCopied", "RefreshConfig")
@@ -158,7 +189,7 @@ end
 function addon:SetActiveSlot()
 	if BW_WardrobeCollectionFrame.activeFrame ~= WardrobeCollectionFrame.ItemsCollectionFrame  then
 		BW_WardrobeCollectionFrame_SetTab(1)
-		PanelTemplates_ResizeTabsToFit(WardrobeCollectionFrame, TABS_MAX_WIDTH)
+		--PanelTemplates_ResizeTabsToFit(WardrobeCollectionFrame, TABS_MAX_WIDTH)
 	end
 end
 
@@ -212,6 +243,24 @@ function addon.GetItemSource(itemID, itemMod)
 	return visualID ,sourceID
 end
 
+
+
+function ClearHidden(setList, type)
+	if Profile.ShowHidden then return setList end
+	local newSet = {}
+	for i, setInfo in ipairs(setList) do 
+		local itemID = setInfo.setID or setInfo.visualID
+
+		if not addon.chardb.profile[type][itemID]  then
+			tinsert(newSet, setInfo)
+		else
+			--print("setInfo.name")
+		end
+	end
+	return newSet
+end
+
+			--self:UpdateWardrobe()
 
 function GetSetCount(setID)
 	local setinfo = addon.GetSetInfo(setID)
@@ -299,6 +348,32 @@ local function isMogKnown(sourceID)
 end
 
 
+--===WardrobeCollectionFrame.ItemsCollectionFrame overwrites
+
+function WardrobeCollectionFrame.ItemsCollectionFrame:FilterVisuals()
+	local isAtTransmogrifier = WardrobeFrame_IsAtTransmogrifier();
+	local visualsList = self.visualsList;
+	local filteredVisualsList = { };
+	for i = 1, #visualsList do
+		if ( isAtTransmogrifier ) then
+			if ( (visualsList[i].isUsable and visualsList[i].isCollected) or visualsList[i].alwaysShowItem ) then
+				tinsert(filteredVisualsList, visualsList[i]);
+			end
+		else
+			if ( not visualsList[i].isHideVisual ) then
+				tinsert(filteredVisualsList, visualsList[i]);
+			end
+		end
+	end
+
+	self.filteredVisualsList = ClearHidden(filteredVisualsList, "item");
+end
+
+
+
+
+
+
 local SetsDataProvider = CreateFromMixins(WardrobeSetsDataProviderMixin);
 
 function SetsDataProvider:SortSets(sets, reverseUIOrder, ignorePatchID)
@@ -309,7 +384,8 @@ end
 
 function SetsDataProvider:GetBaseSets()
 	if ( not self.baseSets ) then
-		self.baseSets = C_TransmogSets.GetBaseSets();
+		self.baseSets = ClearHidden(C_TransmogSets.GetBaseSets(), "set")
+
 		self:DetermineFavorites();
 		self:SortSets(self.baseSets);
 	end
@@ -354,7 +430,7 @@ end
 
 function SetsDataProvider:GetUsableSets(incVariants)
 	if ( not self.usableSets ) then
-		self.usableSets = C_TransmogSets.GetUsableSets();
+		self.usableSets = ClearHidden(C_TransmogSets.GetUsableSets(), "set")
 		local atTransmogrifier = WardrobeFrame_IsAtTransmogrifier()
 
 		local setIDS = {}
@@ -945,7 +1021,7 @@ end
 
 function SetsDataProvider:GetBaseSets()
 	if ( not self.baseSets ) then
-		self.baseSets = addon.GetBaseList() --C_TransmogSets.GetBaseSets();
+		self.baseSets = ClearHidden(addon.GetBaseList(), "extraset") --C_TransmogSets.GetBaseSets();
 		--self:DetermineFavorites();
 		self:SortSets(self.baseSets);
 	end
@@ -1378,13 +1454,62 @@ end
 
 BetterWardrobeSetsCollectionScrollFrameMixin = CreateFromMixins(WardrobeSetsCollectionScrollFrameMixin)
 
+local function BW_WardrobeSetsCollectionScrollFrame_FavoriteDropDownInit(self)
+	if ( not self.baseSetID ) then
+		return;
+	end
+
+	local baseSet = SetsDataProvider:GetBaseSetByID(self.baseSetID);
+	--local variantSets = SetsDataProvider:GetVariantSets(self.baseSetID);
+	local useDescription = false;
+
+	local info = UIDropDownMenu_CreateInfo();
+	info.notCheckable = true;
+	info.disabled = nil;
+
+	if ( baseSet.favoriteSetID ) then
+		info.text = BATTLE_PET_UNFAVORITE;
+		info.func = function()
+			--C_TransmogSets.SetIsFavorite(baseSet.favoriteSetID, false);
+		end
+	else
+		--local targetSetID = WardrobeCollectionFrame.SetsCollectionFrame:GetDefaultSetIDForBaseSet(self.baseSetID);
+		info.text = BATTLE_PET_FAVORITE;
+		info.func = function()
+			--C_TransmogSets.SetIsFavorite(targetSetID, true);
+		end
+	end
+
+	UIDropDownMenu_AddButton(info, level);
+	info.disabled = nil;
+
+	info.text = CANCEL;
+	info.func = nil;
+	UIDropDownMenu_AddButton(info, level);
+
+	UIDropDownMenu_AddSeparator()
+	local isHidden = addon.chardb.profile.extraset[self.baseSetID] 
+	UIDropDownMenu_AddButton({
+		notCheckable = true,
+		text = isHidden and SHOW or HIDE,
+		func = function()  
+			local setInfo = addon.GetSetInfo(self.baseSetID)
+			local name = setInfo["name"]
+			addon.chardb.profile.extraset[self.baseSetID] = not isHidden and name
+			print(format("%s "..name, isHidden and "Unhiding" or "Hiding"))
+			BW_SetsCollectionFrame:Refresh()
+			BW_SetsCollectionFrame:OnSearchUpdate()
+		end,
+	})
+end
+
 function BetterWardrobeSetsCollectionScrollFrameMixin:OnLoad()
 	self.scrollBar.trackBG:Show()
 	self.scrollBar.trackBG:SetVertexColor(0, 0, 0, 0.75)
 	self.scrollBar.doNotHide = true
 	self.update = self.Update
 	HybridScrollFrame_CreateButtons(self, "WardrobeSetsScrollFrameButtonTemplate", 44, 0)
-	--UIDropDownMenu_Initialize(self.FavoriteDropDown, WardrobeSetsCollectionScrollFrame_FavoriteDropDownInit, "MENU")
+	UIDropDownMenu_Initialize(self.FavoriteDropDown, BW_WardrobeSetsCollectionScrollFrame_FavoriteDropDownInit, "MENU")
 end
 
 

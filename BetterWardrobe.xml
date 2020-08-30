@@ -228,7 +228,7 @@
 									<Anchor point="BOTTOMLEFT" relativePoint="BOTTOMRIGHT" x="4" y="8"/>
 								</Anchors>
 							</Slider>
-							<Frame name="WardrobeSetsFavoriteDropDown" parentKey="FavoriteDropDown" inherits="UIDropDownMenuTemplate" enableMouse="true"/>
+							<Frame name="BW_WardrobeSetsFavoriteDropDown" parentKey="FavoriteDropDown" inherits="UIDropDownMenuTemplate" enableMouse="true"/>
 						</Frames>
 						<Scripts>
 							<OnLoad method="OnLoad"/>
@@ -332,7 +332,7 @@
 				<Frames>
 					<Frame name="WardrobeSetsTransmogModelRightClickDropDown" parentKey="RightClickDropDown" inherits="UIDropDownMenuTemplate" hidden="false">
 						<Scripts>
-
+							<OnLoad function="WardrobeSetsTransmogModelRightClickDropDown_OnLoad"/>
 						</Scripts>
 					</Frame>
 					<Frame parentKey="PagingFrame" inherits="CollectionsPagingFrameTemplate">
