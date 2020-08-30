@@ -6,9 +6,10 @@ local L = LibStub("AceLocale-3.0"):GetLocale(addonName)
 
 local _, playerClass, classID = UnitClass("player")
 --local armorType = DB.GetClassArmorType(class)		  
-
 --local role = GetFilteredRole()
 addon.ArmorSets = addon.ArmorSets or {}
+addon.ArmorSetMods = addon.ArmorSetMods or {}
+addon.modArmor = addon.modArmor or {}
 
 local CLASS_INFO = {
 	DEATHKNIGHT = {6,32,"PLATE"},
@@ -220,6 +221,8 @@ end
 	function addon.BuildDB()
 	--local faction = GetFactionID(UnitFactionGroup("player"))
 		local armorSet = addon.ArmorSets[CLASS_INFO[playerClass][3]]
+		addon.modArmor = addon.ArmorSetMods[CLASS_INFO[playerClass][3]]
+		--addon.ArmorSetMods["CLOTH"]
 
 		addArmor(armorSet)
 		addArmor(addon.ArmorSets["COSMETIC"])

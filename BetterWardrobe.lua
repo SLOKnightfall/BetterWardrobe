@@ -23,6 +23,7 @@ local realmName
 addon.itemSourceID = {}
 
 
+
 local L = LibStub("AceLocale-3.0"):GetLocale(addonName)
 
 
@@ -144,7 +145,6 @@ function addon:OnEnable()
 
 	addon.Profile = self.db.profile
 	Profile = addon.Profile
-
 	addon.BuildDB()
 	addon.BuildUI()
 	addon.SetSortOrder(false)
@@ -184,24 +184,23 @@ f.model:SetUnit("PLAYER");
 addon.frame = f
 
 
-function addon.GetItemSource(item, itemMod)
-
-	if addon.modArmor[item] and addon.modArmor[item][itemMod] then return nil, addon.modArmor[item][itemMod] end
+function addon.GetItemSource(itemID, itemMod)
+	if addon.modArmor[itemID] and addon.modArmor[itemID][itemMod] then return nil, addon.modArmor[itemID][itemMod] end
 
 		local itemSource
 		local visualID, sourceID
 
-		visualID, sourceID = C_TransmogCollection.GetItemInfo(item) --, (mod or 0
+		visualID, sourceID = C_TransmogCollection.GetItemInfo(itemID)--, itemMod or 0)
 
 		if not sourceID then
-			local itemlink = "item:"..item..":0"
+			local itemlink = "item:"..itemID..":0"
 			f.model:Show()
 			f.model:Undress()
 			f.model:TryOn( itemlink)
 			for i = 1, 19 do
 				local source = f.model:GetSlotTransmogSources(i)
 				if source ~= 0 then
-					--addon.itemSourceID[item] =  source
+					--addon.itemSourceID[itemID] =  source
 					sourceID =  source
 					break
 				end
@@ -224,11 +223,9 @@ function addon.GetSetsources(setID)
 	local setInfo = addon.GetSetInfo(setID)
 	local setSources = {}
 
-	for i, item in ipairs(setInfo.items) do
-
-		
-		local visualID, sourceID = addon.GetItemSource(item, setInfo.mod) --C_TransmogCollection.GetItemInfo(item)
-		-- visualID, sourceID = addon.GetItemSource(item,setInfo.mod)
+	for i, itemID in ipairs(setInfo.items) do
+		local visualID, sourceID = addon.GetItemSource(itemID, setInfo.mod) --C_TransmogCollection.GetItemInfo(itemID)
+		-- visualID, sourceID = addon.GetItemSource(itemID,setInfo.mod)
 		--local sources = C_TransmogCollection.GetAppearanceSources(sourceInfo.visualID)	
 		if sourceID then
 			local sourceInfo = C_TransmogCollection.GetSourceInfo(sourceID)
@@ -247,6 +244,7 @@ function addon.GetSetsources(setID)
 			--setSources[sourceID] = sourceInfo and sourceInfo.isCollected
 	return setSources
 end
+
 
 local EmptyArmor = {
 	[1] = 134110,
@@ -272,6 +270,7 @@ local function GetEmptySlots()
 	return setInfo
 end
 
+
 local function EmptySlots(transmogSources)
 	local EmptySet = GetEmptySlots()
 
@@ -284,7 +283,6 @@ end
 
 
 local function isMogKnown(sourceID)
-
 	local sourceInfo = C_TransmogCollection.GetSourceInfo(sourceID)
 	local slotSources = C_TransmogCollection.GetAppearanceSources(sourceInfo.visualID)
 
