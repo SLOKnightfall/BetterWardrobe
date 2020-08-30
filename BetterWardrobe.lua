@@ -149,8 +149,17 @@ function addon:OnEnable()
 	addon.BuildUI()
 	addon.SetSortOrder(false)
 	WardrobeFilterDropDown_OnLoad(WardrobeCollectionFrame.FilterDropDown)
+	--WardrobeCollectionFrame.ItemsCollectionFrame:SetActiveSlot
 
-	--self:Hook("WardrobeCollectionFrame_SetTab", true)
+	self:SecureHook(WardrobeCollectionFrame.ItemsCollectionFrame,"SetActiveSlot")
+end
+
+
+function addon:SetActiveSlot()
+	if BW_WardrobeCollectionFrame.activeFrame ~= WardrobeCollectionFrame.ItemsCollectionFrame  then
+		BW_WardrobeCollectionFrame_SetTab(1)
+		PanelTemplates_ResizeTabsToFit(WardrobeCollectionFrame, TABS_MAX_WIDTH)
+	end
 end
 
 local BASE_SET_BUTTON_HEIGHT = 46
