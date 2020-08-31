@@ -184,6 +184,7 @@ function addon:OnEnable()
 	--WardrobeCollectionFrame.ItemsCollectionFrame:SetActiveSlot
 
 	self:SecureHook(WardrobeCollectionFrame.ItemsCollectionFrame,"SetActiveSlot")
+	self:SecureHook(WardrobeCollectionFrame.ItemsCollectionFrame,"UpdateItems")
 end
 
 
@@ -191,6 +192,15 @@ function addon:SetActiveSlot()
 	if BW_WardrobeCollectionFrame.activeFrame ~= WardrobeCollectionFrame.ItemsCollectionFrame  then
 		BW_WardrobeCollectionFrame_SetTab(1)
 		--PanelTemplates_ResizeTabsToFit(WardrobeCollectionFrame, TABS_MAX_WIDTH)
+	end
+end
+
+function addon:UpdateItems(self)
+	for i = 1, self.PAGE_SIZE do
+		local model = self.Models[i];
+		local setID = (model.visualInfo and model.visualInfo.visualID ) or model.setID
+		local isHidden = addon.chardb.profile.item[setID]
+		model.HideItemVisual.Icon:SetShown(isHidden);
 	end
 end
 
@@ -636,6 +646,10 @@ function WardrobeCollectionFrameScrollFrame:Update()
 			button.Icon:SetDesaturation((topSourcesCollected == 0) and 1 or 0);
 			button.SelectedTexture:SetShown(baseSet.setID == selectedBaseSetID);
 			button.Favorite:SetShown(baseSet.favoriteSetID);
+
+			local isHidden = addon.chardb.profile.set[baseSet.setID]
+			button.HideItemVisual:SetShown(isHidden)
+
 			button.New:SetShown(SetsDataProvider:IsBaseSetNew(baseSet.setID));
 			button.setID = baseSet.setID;
 
@@ -645,7 +659,7 @@ function WardrobeCollectionFrameScrollFrame:Update()
 				button.ProgressBar:Show();
 				button.ProgressBar:SetWidth(SET_PROGRESS_BAR_MAX_WIDTH * topSourcesCollected / topSourcesTotal);
 			end
-			button.IconCover:SetShown(not setCollected);
+			button.IconCover:SetShown(not setCollected)
 		else
 			button:Hide();
 		end
@@ -715,6 +729,9 @@ function WardrobeCollectionFrame.SetsTransmogFrame:UpdateSets()
 
 			model.Favorite.Icon:SetShown(C_TransmogSets.GetIsFavorite(set.setID))
 			model.setID = set.setID
+
+			local isHidden = addon.chardb.profile.set[set.setID]
+			model.HideItemVisual.Icon:SetShown(isHidden)
 
 			model.setName:SetText((Profile.ShowNames and setInfo["name"].."\n"..(setInfo["description"] or "")) or "")
 			model.progress:SetText( (Profile.ShowSetCount and topSourcesCollected.."/".. topSourcesTotal) or "")
@@ -943,6 +960,9 @@ function WardrobeCollectionFrame.SetsCollectionFrame.ScrollFrame:Update()
 			button.Icon:SetDesaturation((topSourcesCollected == 0) and 1 or 0);
 			button.SelectedTexture:SetShown(baseSet.setID == selectedBaseSetID);
 			button.Favorite:SetShown(baseSet.favoriteSetID);
+			local isHidden = addon.chardb.profile.set[baseSet.setID]
+			button.HideItemVisual:SetShown(isHidden)
+
 			button.New:SetShown(SetsDataProvider:IsBaseSetNew(baseSet.setID));
 			button.setID = baseSet.setID;
 
@@ -1541,6 +1561,8 @@ function BetterWardrobeSetsCollectionScrollFrameMixin:Update()
 		if ( setIndex <= #baseSets ) then
 			local baseSet = baseSets[setIndex]
 			local isFavorite = addon.chardb.profile.favorite[baseSet.setID]
+			local isHidden = addon.chardb.profile.extraset[baseSet.setID]
+
 			--local count, complete = addon.GetSetCompletion(baseSet)
 			button:Show()
 			button.Name:SetText(baseSet.name)
@@ -1561,6 +1583,9 @@ function BetterWardrobeSetsCollectionScrollFrameMixin:Update()
 			button.Icon:SetDesaturation((topSourcesCollected == 0) and 1 or 0)
 			button.SelectedTexture:SetShown(baseSet.setID == selectedBaseSetID)
 			button.Favorite:SetShown(isFavorite)
+			button.HideItemVisual:SetShown(isHidden)
+
+
 			--button.New:SetShown(SetsDataProvider:IsBaseSetNew(baseSet.setID))
 			button.setID = baseSet.setID
 
@@ -1753,8 +1778,11 @@ function BetterWardrobeSetsTransmogMixin:UpdateSets()
 			local topSourcesCollected, topSourcesTotal = SetsDataProvider:GetSetSourceCounts(set.setID)
 			local setInfo = addon.GetSetInfo(set.setID)
 			local isFavorite = addon.chardb.profile.favorite[set.setID]
+			local isHidden = addon.chardb.profile.extraset[set.setID]
 
 			model.Favorite.Icon:SetShown(isFavorite)
+			model.HideItemVisual.Icon:SetShown(isHidden)
+
 			model.setID = set.setID
 			model.setName:SetText(setInfo["name"].."\n"..(setInfo["description"] or ""))
 			model.progress:SetText(topSourcesCollected.."/".. topSourcesTotal)
@@ -1822,6 +1850,7 @@ end
 
 
 function BetterWardrobeSetsTransmogMixin:OpenRightClickDropDown()
+
 	if ( not self.RightClickDropDown.activeFrame ) then
 		return;
 	end
@@ -1851,6 +1880,33 @@ function BetterWardrobeSetsTransmogMixin:OpenRightClickDropDown()
 	info.notCheckable = true;
 	info.text = CANCEL;
 	UIDropDownMenu_AddButton(info);
+
+
+	UIDropDownMenu_AddSeparator()
+	local isHidden = addon.chardb.profile.extraset[setID] 
+	UIDropDownMenu_AddButton({
+		notCheckable = true,
+		text = isHidden and SHOW or HIDE,
+		func = function() 
+			local setInfo = addon.GetSetInfo(setID)
+			local name = setInfo["name"]
+			addon.chardb.profile.extraset[setID] = not isHidden and name
+			print(format("%s "..name, isHidden and "Unhiding" or "Hiding"))
+			SetsDataProvider:ClearSets()
+			BW_SetsTransmogFrame:Refresh()
+			BW_SetsTransmogFrame:OnSearchUpdate()
+		end,
+	})
+end
+
+
+do
+	local function OpenRightClickDropDown(self)
+		self:GetParent():OpenRightClickDropDown();
+	end
+	function BW_WardrobeSetsTransmogModelRightClickDropDown_OnLoad(self)
+		UIDropDownMenu_Initialize(self, OpenRightClickDropDown, "MENU");
+	end
 end
 
 

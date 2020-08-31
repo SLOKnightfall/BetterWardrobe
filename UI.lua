@@ -686,12 +686,18 @@ end
 
 
 function UI.HideButton_Initialize()
-		local Wardrobe = {WardrobeCollectionFrame.ItemsCollectionFrame, WardrobeCollectionFrame.SetsTransmogFrame, BW_SetsTransmogFrame}
+		local Wardrobe = {WardrobeCollectionFrame.ItemsCollectionFrame, WardrobeCollectionFrame.SetsTransmogFrame}
 
 		-- hook all models
 		for _, frame in ipairs(Wardrobe) do
 			for _, model in pairs(frame.Models) do
 				model:HookScript("OnMouseDown", AddHideButton)
+				local f = CreateFrame("frame", nil, model, "HideVisualTemplate")
+				--f:Show()
+				--f.Icon:SetPoint("CENTER")
+
+				
+
 			end
 		end
 
@@ -699,24 +705,36 @@ function UI.HideButton_Initialize()
 		local buttons = WardrobeCollectionFrameScrollFrame.buttons
 		for i = 1, #buttons do
 			local button = buttons[i];
+			local f = CreateFrame("frame", nil, button, "HideVisualTemplate")
+			f.Icon:ClearAllPoints()
+			f.Icon:SetPoint("TOPRIGHT", button, "TOPRIGHT", -2, -4)
 			button:HookScript("OnMouseUp", function() 
 
-		UIDropDownMenu_AddSeparator()
-		local setID = button.setID
-		local isHidden = addon.chardb.profile.set[setID] 
-		UIDropDownMenu_AddButton({
-			notCheckable = true,
-			text = isHidden and SHOW or HIDE,
-			func = function() 
-			local setInfo = C_TransmogSets.GetSetInfo(setID)
-			local name = setInfo["name"]
-				addon.chardb.profile.set[setID] = not isHidden and name
-				print(format("%s "..name, isHidden and "Unhiding" or "Hiding"))
-				WardrobeCollectionFrame.SetsCollectionFrame:Refresh()
-				WardrobeCollectionFrame.SetsCollectionFrame:OnSearchUpdate()
-			 end,
-		})
+			UIDropDownMenu_AddSeparator()
+			local setID = button.setID
+			local isHidden = addon.chardb.profile.set[setID] 
+			UIDropDownMenu_AddButton({
+				notCheckable = true,
+				text = isHidden and SHOW or HIDE,
+				func = function() 
+				local setInfo = C_TransmogSets.GetSetInfo(setID)
+				local name = setInfo["name"]
+					addon.chardb.profile.set[setID] = not isHidden and name
+					print(format("%s "..name, isHidden and "Unhiding" or "Hiding"))
+					WardrobeCollectionFrame.SetsCollectionFrame:Refresh()
+					WardrobeCollectionFrame.SetsCollectionFrame:OnSearchUpdate()
+				 end,
+			})
 		end)
+
+		end
+
+		local buttons = BW_SetsCollectionFrameScrollFrame.buttons
+		for i = 1, #buttons do
+			local button = buttons[i];
+			local f = CreateFrame("frame", nil, button, "HideVisualTemplate")
+			f.Icon:ClearAllPoints()
+			f.Icon:SetPoint("TOPRIGHT", button, "TOPRIGHT", -2, -4)
 
 		end
 		   -- for i=1,CanIMogIt.NUM_WARDROBE_COLLECTION_BUTTONS do

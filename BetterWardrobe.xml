@@ -4,6 +4,17 @@
 	<Script file="BetterWardrobe.lua"/>
 	<Script file="UI.lua"/>
 
+	<Frame name="HideVisualTemplate" parentKey="HideItemVisual" virtual="true" setAllPoints="true">
+				<Layers>
+					<Layer level="ARTWORK">
+						<Texture parentKey="Icon" atlas="transmog-icon-hidden" useAtlasSize="true" hidden="false">
+							<Anchors>
+								<Anchor point="TOPRIGHT" x="-2" y="13" relativePoint="TOPRIGHT"/>
+							</Anchors>
+						</Texture>
+					</Layer>
+				</Layers>
+			</Frame>
 	
 	<DressUpModel name="BWWardrobeSetsTransmogModelTemplate" mixin="BetterWardrobeSetsTransmogModelMixin" virtual="true">
 		<Size x="129" y="186"/>
@@ -39,7 +50,7 @@
 			<Frame parentKey="Favorite" setAllPoints="true">
 				<Layers>
 					<Layer level="ARTWORK">
-						<Texture parentKey="Icon" atlas="collections-icon-favorites" useAtlasSize="true" hidden="true">
+						<Texture parentKey="Icon" atlas="collections-icon-favorites" useAtlasSize="true" hidden="false">
 							<Anchors>
 								<Anchor point="TOPLEFT" x="-12" y="13" relativePoint="TOPLEFT"/>
 							</Anchors>
@@ -47,7 +58,19 @@
 					</Layer>
 				</Layers>
 			</Frame>
-		</Frames>
+	
+				<Frame parentKey="HideItemVisual" setAllPoints="true">
+				<Layers>
+					<Layer level="ARTWORK">
+						<Texture parentKey="Icon" atlas="transmog-icon-hidden" useAtlasSize="true" hidden="false">
+							<Anchors>
+								<Anchor point="TOPRIGHT" x="-2" y="13" relativePoint="TOPRIGHT"/>
+							</Anchors>
+						</Texture>
+					</Layer>
+				</Layers>
+			</Frame>
+				</Frames>
 		<Layer level="OVERLAY">
 			<FontString parentKey="progress" inherits="GameFontNormalMed2" text="+++">
 				<Anchors>
@@ -332,7 +355,7 @@
 				<Frames>
 					<Frame name="WardrobeSetsTransmogModelRightClickDropDown" parentKey="RightClickDropDown" inherits="UIDropDownMenuTemplate" hidden="false">
 						<Scripts>
-							<OnLoad function="WardrobeSetsTransmogModelRightClickDropDown_OnLoad"/>
+							<OnLoad function="BW_WardrobeSetsTransmogModelRightClickDropDown_OnLoad"/>
 						</Scripts>
 					</Frame>
 					<Frame parentKey="PagingFrame" inherits="CollectionsPagingFrameTemplate">
