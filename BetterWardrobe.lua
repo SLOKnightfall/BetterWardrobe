@@ -135,6 +135,7 @@ local char_defaults = {
 		item = {},
 		set = {},
 		extraset = {},
+		favorite = {},
 	}
 }
 
@@ -1454,6 +1455,10 @@ end
 
 BetterWardrobeSetsCollectionScrollFrameMixin = CreateFromMixins(WardrobeSetsCollectionScrollFrameMixin)
 
+local function SetFavorite(setid, value)
+
+	end
+
 local function BW_WardrobeSetsCollectionScrollFrame_FavoriteDropDownInit(self)
 	if ( not self.baseSetID ) then
 		return;
@@ -1466,17 +1471,22 @@ local function BW_WardrobeSetsCollectionScrollFrame_FavoriteDropDownInit(self)
 	local info = UIDropDownMenu_CreateInfo();
 	info.notCheckable = true;
 	info.disabled = nil;
+	local isFavorite = addon.chardb.profile.favorite[self.baseSetID]
 
-	if ( baseSet.favoriteSetID ) then
+	if (isFavorite) then
 		info.text = BATTLE_PET_UNFAVORITE;
 		info.func = function()
-			--C_TransmogSets.SetIsFavorite(baseSet.favoriteSetID, false);
+			addon.chardb.profile.favorite[self.baseSetID] = nil
+			BW_SetsCollectionFrame:Refresh()
+			BW_SetsCollectionFrame:OnSearchUpdate()
 		end
 	else
 		--local targetSetID = WardrobeCollectionFrame.SetsCollectionFrame:GetDefaultSetIDForBaseSet(self.baseSetID);
 		info.text = BATTLE_PET_FAVORITE;
 		info.func = function()
-			--C_TransmogSets.SetIsFavorite(targetSetID, true);
+			addon.chardb.profile.favorite[self.baseSetID] = true
+			BW_SetsCollectionFrame:Refresh()
+			BW_SetsCollectionFrame:OnSearchUpdate()
 		end
 	end
 
@@ -1530,6 +1540,7 @@ function BetterWardrobeSetsCollectionScrollFrameMixin:Update()
 
 		if ( setIndex <= #baseSets ) then
 			local baseSet = baseSets[setIndex]
+			local isFavorite = addon.chardb.profile.favorite[baseSet.setID]
 			--local count, complete = addon.GetSetCompletion(baseSet)
 			button:Show()
 			button.Name:SetText(baseSet.name)
@@ -1549,7 +1560,7 @@ function BetterWardrobeSetsCollectionScrollFrameMixin:Update()
 			button.Icon:SetTexture(SetsDataProvider:GetIconForSet(baseSet.setID))
 			button.Icon:SetDesaturation((topSourcesCollected == 0) and 1 or 0)
 			button.SelectedTexture:SetShown(baseSet.setID == selectedBaseSetID)
-			button.Favorite:Hide() --SetShown(baseSet.favoriteSetID)
+			button.Favorite:SetShown(isFavorite)
 			--button.New:SetShown(SetsDataProvider:IsBaseSetNew(baseSet.setID))
 			button.setID = baseSet.setID
 
@@ -1741,8 +1752,9 @@ function BetterWardrobeSetsTransmogMixin:UpdateSets()
 
 			local topSourcesCollected, topSourcesTotal = SetsDataProvider:GetSetSourceCounts(set.setID)
 			local setInfo = addon.GetSetInfo(set.setID)
+			local isFavorite = addon.chardb.profile.favorite[set.setID]
 
-			model.Favorite.Icon:SetShown(set.favorite)
+			model.Favorite.Icon:SetShown(isFavorite)
 			model.setID = set.setID
 			model.setName:SetText(setInfo["name"].."\n"..(setInfo["description"] or ""))
 			model.progress:SetText(topSourcesCollected.."/".. topSourcesTotal)
@@ -1806,6 +1818,39 @@ function BetterWardrobeSetsTransmogMixin:ResetPage()
 
 	self.PagingFrame:SetCurrentPage(page)
 	self:UpdateSets()
+end
+
+
+function BetterWardrobeSetsTransmogMixin:OpenRightClickDropDown()
+	if ( not self.RightClickDropDown.activeFrame ) then
+		return;
+	end
+	local setID = self.RightClickDropDown.activeFrame.setID;
+	local info = UIDropDownMenu_CreateInfo();
+	local isFavorite = addon.chardb.profile.favorite[setID]
+
+	if ( isFavorite ) then
+		info.text = BATTLE_PET_UNFAVORITE;
+		info.func = function() 
+			addon.chardb.profile.favorite[setID] = nil
+			BW_SetsTransmogFrame:Refresh()
+			BW_SetsTransmogFrame:OnSearchUpdate()
+		 end
+	else
+		info.text = BATTLE_PET_FAVORITE;
+		info.func = function() 
+			addon.chardb.profile.favorite[setID] = true
+			BW_SetsTransmogFrame:Refresh()
+			BW_SetsTransmogFrame:OnSearchUpdate()
+		end
+	end
+	info.notCheckable = true;
+	UIDropDownMenu_AddButton(info);
+	-- Cancel
+	info = UIDropDownMenu_CreateInfo();
+	info.notCheckable = true;
+	info.text = CANCEL;
+	UIDropDownMenu_AddButton(info);
 end
 
 
