@@ -616,60 +616,6 @@ function WardrobeCollectionFrame.SetsCollectionFrame:ScrollToSet(setID)
 	end
 end
 
-function WardrobeCollectionFrameScrollFrame:Update()
-	local offset = HybridScrollFrame_GetOffset(self);
-	local buttons = self.buttons;
-	local baseSets = SetsDataProvider:GetBaseSets();
-
-	-- show the base set as selected
-	local selectedSetID = self:GetParent():GetSelectedSetID();
-	local selectedBaseSetID = selectedSetID and C_TransmogSets.GetBaseSetID(selectedSetID);
-
-	for i = 1, #buttons do
-		local button = buttons[i];
-		local setIndex = i + offset;
-		if ( setIndex <= #baseSets ) then
-			local baseSet = baseSets[setIndex];
-			button:Show();
-			button.Name:SetText(baseSet.name);
-			local topSourcesCollected, topSourcesTotal = SetsDataProvider:GetSetSourceTopCounts(baseSet.setID);
-			local setCollected = C_TransmogSets.IsBaseSetCollected(baseSet.setID);
-			local color = IN_PROGRESS_FONT_COLOR;
-			if ( setCollected ) then
-				color = NORMAL_FONT_COLOR;
-			elseif ( topSourcesCollected == 0 ) then
-				color = GRAY_FONT_COLOR;
-			end
-			button.Name:SetTextColor(color.r, color.g, color.b);
-			button.Label:SetText(baseSet.label);
-			button.Icon:SetTexture(SetsDataProvider:GetIconForSet(baseSet.setID));
-			button.Icon:SetDesaturation((topSourcesCollected == 0) and 1 or 0);
-			button.SelectedTexture:SetShown(baseSet.setID == selectedBaseSetID);
-			button.Favorite:SetShown(baseSet.favoriteSetID);
-
-			local isHidden = addon.chardb.profile.set[baseSet.setID]
-			button.HideItemVisual:SetShown(isHidden)
-
-			button.New:SetShown(SetsDataProvider:IsBaseSetNew(baseSet.setID));
-			button.setID = baseSet.setID;
-
-			if ( topSourcesCollected == 0 or setCollected ) then
-				button.ProgressBar:Hide();
-			else
-				button.ProgressBar:Show();
-				button.ProgressBar:SetWidth(SET_PROGRESS_BAR_MAX_WIDTH * topSourcesCollected / topSourcesTotal);
-			end
-			button.IconCover:SetShown(not setCollected)
-		else
-			button:Hide();
-		end
-	end
-
-	local extraHeight = (self.largeButtonHeight and self.largeButtonHeight - BASE_SET_BUTTON_HEIGHT) or 0;
-	local totalHeight = #baseSets * BASE_SET_BUTTON_HEIGHT + extraHeight;
-	HybridScrollFrame_Update(self, totalHeight, self:GetHeight());
-end
-
 
 WardrobeCollectionFrame.SetsCollectionFrame:SetScript("OnShow", WardrobeCollectionFrame.SetsCollectionFrame.OnShow)
 
