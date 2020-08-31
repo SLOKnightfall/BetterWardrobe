@@ -34,6 +34,12 @@ function MyPlugin:Initialize()
 	S:HandleNextPrevButton(BW_SetsTransmogFrame.PagingFrame.NextPageButton)
 	S:HandleNextPrevButton(BW_SetsTransmogFrame.PagingFrame.PrevPageButton)
 
+
+	S:HandleButton(BW_LoadQueueButton)
+	BW_LoadQueueButton:ClearAllPoints()
+	BW_LoadQueueButton:Point("TOPLEFT",WardrobeOutfitDropDown, "TOPRIGHT", 90, -2)
+
+
 	for _, Frame in ipairs(BW_WardrobeCollectionFrame.ContentFrames) do
 		if Frame.Models then
 			for _, Model in pairs(Frame.Models) do
@@ -78,9 +84,8 @@ function MyPlugin:Initialize()
 				S:HandleNextPrevButton(Frame.PagingFrame.NextPageButton, nil, nil, true)
 		end
 	end
-end
 
-	--Sets
+		--Sets
 	local SetsCollectionFrame = BW_WardrobeCollectionFrame.BW_SetsCollectionFrame
 	SetsCollectionFrame.RightInset:StripTextures()
 	SetsCollectionFrame:SetTemplate("Transparent")
@@ -94,6 +99,10 @@ end
 		bu.Favorite:SetAtlas("PetJournal-FavoritesIcon", true)
 		bu.Favorite:Point("TOPLEFT", bu.Icon, "TOPLEFT", -8, 8)
 		bu.SelectedTexture:SetColorTexture(1, 1, 1, 0.1)
+		--bu.HideItemVisual.Icon:Point("TOPRIGHT", bu, "TOPRIGHT", -8, -8)
 	end
+end
+
+
 
 E:RegisterModule(MyPlugin:GetName()) --Register the module with ElvUI. ElvUI will now call MyPlugin:Initialize() when ElvUI is ready to load our plugin.

@@ -1,6 +1,8 @@
 local addonName, addon = ...
 addon = LibStub("AceAddon-3.0"):GetAddon(addonName)
 
+local L = LibStub("AceLocale-3.0"):GetLocale(addonName)
+
 local UI = {}
 
 local LE_DEFAULT = 1
@@ -12,15 +14,6 @@ local LE_COLOR = 4
 local TAB_ITEMS = 1
 local TAB_SETS = 2
 local TAB_EXTRASETS = 3
-
-local L = {
-	[LE_DEFAULT] = DEFAULT,
-	[LE_APPEARANCE] = APPEARANCE_LABEL,
-	[LE_ALPHABETIC] = COMPACT_UNIT_FRAME_PROFILE_SORTBY_ALPHABETICAL,
-	[LE_ITEM_SOURCE] = SOURCE:gsub("[:：]", ""),
-	[LE_COLOR] = COLOR,
-	[LE_EXPANSION] = "Expansion.."
-}
 
 local Wardrobe = WardrobeCollectionFrame.ItemsCollectionFrame
 
@@ -412,6 +405,29 @@ local function PositionDropDown()
 end
 
 
+local function BuildLoadQueueButton()
+	BW_LoadQueueButton:SetScript("OnClick", function(self)
+		local setType = addon.QueueList[1]
+		local setID = addon.QueueList[2]
+		if setType == "set" then
+			WardrobeCollectionFrame.SetsTransmogFrame:LoadSet(setID)
+		elseif setType == "extraset" then 
+		BW_SetsTransmogFrame:LoadSet(setID)
+		end
+	end)
+
+	BW_LoadQueueButton:SetScript("OnEnter", function(self)	
+		local name  = addon.QueueList[3]
+		GameTooltip:SetOwner(self, "ANCHOR_RIGHT");
+		if name then 	
+			GameTooltip:SetText(L["Load Set: %s"]:format(name))
+		else
+			GameTooltip:SetText(L["Load Set: %s"]:format(L["None Selected"]))
+		end
+	end)
+end
+
+
 function addon.BuildUI()
 	AddSetDetailFrames(WardrobeCollectionFrame.SetsTransmogFrame)
 	AddSetDetailFrames(BW_SetsTransmogFrame)
@@ -423,13 +439,12 @@ function addon.BuildUI()
 	WardrobeCollectionFrame.FilterButton:SetFrameLevel(BW_WardrobeCollectionFrame:GetFrameLevel()+10)
 	BW_WardrobeCollectionFrame.FilterButton:SetFrameLevel(BW_WardrobeCollectionFrame:GetFrameLevel()+10)
 	BW_WardrobeCollectionFrame.FilterButton:SetPoint("TOPLEFT", WardrobeCollectionFrame.FilterButton, "TOPLEFT")
-		
+
+ 	BuildLoadQueueButton()
 	UI.HideButton_Initialize()
 
 	hooksecurefunc(Wardrobe, "UpdateWeaponDropDown", PositionDropDown )
 end
-
-
 
 
 -- ***** FILTER
@@ -650,8 +665,8 @@ function addon.ToggleHidden(model, isHidden)
 		local name = setInfo["name"]
 		addon.chardb.profile.extraset[model.setID] = not isHidden and name
 		print(format("%s "..name, isHidden and "Unhiding" or "Hiding"))
-											BW_SetsCollectionFrame:OnSearchUpdate()
-						BW_SetsTransmogFrame:OnSearchUpdate()
+		BW_SetsCollectionFrame:OnSearchUpdate()
+		BW_SetsTransmogFrame:OnSearchUpdate()
 
 	end
 			--self:UpdateWardrobe()
@@ -668,10 +683,22 @@ local function AddHideButton(model, button)
 			WardrobeModelRightClickDropDown.activeFrame = model
 			ToggleDropDownMenu(1, nil, WardrobeModelRightClickDropDown, model, -6, -3)
 		end
-		UIDropDownMenu_AddSeparator()
+
 		local setID = (model.visualInfo and model.visualInfo.visualID ) or model.setID
 		local type = tabType[GetTab()]
-
+		if type == "set" then 
+		UIDropDownMenu_AddSeparator()
+		UIDropDownMenu_AddButton({
+				notCheckable = true,
+				text = L["Queue Transmog"],
+				func = function() 
+					local setInfo = C_TransmogSets.GetSetInfo(setID)
+					local name = setInfo["name"]
+					addon.QueueForTransmog(type, setID, name)
+				 end,
+			})
+end
+		UIDropDownMenu_AddSeparator()
 		local isHidden = addon.chardb.profile[type][setID] 
 		UIDropDownMenu_AddButton({
 			notCheckable = true,
@@ -680,9 +707,6 @@ local function AddHideButton(model, button)
 		})
 	end
 end
-
-
-
 
 
 function UI.HideButton_Initialize()
@@ -707,11 +731,22 @@ function UI.HideButton_Initialize()
 			local button = buttons[i];
 			local f = CreateFrame("frame", nil, button, "HideVisualTemplate")
 			f.Icon:ClearAllPoints()
-			f.Icon:SetPoint("TOPRIGHT", button, "TOPRIGHT", -2, -4)
+			f.Icon:SetPoint("BOTTOMRIGHT", button, "BOTTOMRIGHT", 2, -2)
 			button:HookScript("OnMouseUp", function() 
 
-			UIDropDownMenu_AddSeparator()
 			local setID = button.setID
+			UIDropDownMenu_AddSeparator()
+			UIDropDownMenu_AddButton({
+				notCheckable = true,
+				text = L["Queue Transmog"],
+				func = function() 
+					local setInfo = C_TransmogSets.GetSetInfo(setID)
+					local name = setInfo["name"]
+					addon.QueueForTransmog("set", setID, name)
+				 end,
+			})
+
+			UIDropDownMenu_AddSeparator()
 			local isHidden = addon.chardb.profile.set[setID] 
 			UIDropDownMenu_AddButton({
 				notCheckable = true,
@@ -734,7 +769,7 @@ function UI.HideButton_Initialize()
 			local button = buttons[i];
 			local f = CreateFrame("frame", nil, button, "HideVisualTemplate")
 			f.Icon:ClearAllPoints()
-			f.Icon:SetPoint("TOPRIGHT", button, "TOPRIGHT", -2, -4)
+			f.Icon:SetPoint("BOTTOMRIGHT", button, "BOTTOMRIGHT", 2, -2)
 
 		end
 		   -- for i=1,CanIMogIt.NUM_WARDROBE_COLLECTION_BUTTONS do

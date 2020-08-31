@@ -3,6 +3,15 @@ local L = _G.LibStub("AceLocale-3.0"):NewLocale("BetterWardrobe", "enUS", true, 
 
 if not L then return end
 
+local LE_DEFAULT = 1
+local LE_APPEARANCE = 2
+local LE_ALPHABETIC = 3
+local LE_ITEM_SOURCE = 6
+local LE_EXPANSION = 5
+local LE_COLOR = 4
+local TAB_ITEMS = 1
+local TAB_SETS = 2
+local TAB_EXTRASETS = 3
 
 L["Transmog Window"] = true
 L["Show Incomplete Sets"] = true
@@ -12,6 +21,16 @@ L["Show Collected Count"] = true
 L["Hide Missing Set Pieces at Transmog Vendor"] = true
 L["Use Hidden Transmog for Missing Set Pieces"] = true
 L["Hidden Set Profiles"] = true
+L["Queue Transmog"] = true
+L["Load Set: %s"] = true
+L["None Selected"] = true
+
+	L[LE_DEFAULT] = DEFAULT
+	L[LE_APPEARANCE] = APPEARANCE_LABEL
+	L[LE_ALPHABETIC] = COMPACT_UNIT_FRAME_PROFILE_SORTBY_ALPHABETICAL
+	L[LE_ITEM_SOURCE] = SOURCE:gsub("[:：]", "")
+	L[LE_COLOR] = COLOR
+	L[LE_EXPANSION] = "Expansion.."
 
 --PvP Set
 L["NOTE_17"] = "Arena Season 1 Set"

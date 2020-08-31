@@ -1,5 +1,9 @@
+issues
 
 To Do
-favorite extra sets
-combine sets
-hide items  https://www.curseforge.com/wow/addons/hideappearance
+copy set from others players
+list sets from other players
+queue set transmog from collection frame
+
+
+

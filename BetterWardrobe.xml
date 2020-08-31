@@ -7,14 +7,14 @@
 	<Frame name="HideVisualTemplate" parentKey="HideItemVisual" virtual="true" setAllPoints="true">
 				<Layers>
 					<Layer level="ARTWORK">
-						<Texture parentKey="Icon" atlas="transmog-icon-hidden" useAtlasSize="true" hidden="false">
+						<Texture parentKey="Icon" atlas="transmog-icon-hidden" useAtlasSize="true" hidden="true">
 							<Anchors>
 								<Anchor point="TOPRIGHT" x="-2" y="13" relativePoint="TOPRIGHT"/>
 							</Anchors>
 						</Texture>
 					</Layer>
 				</Layers>
-			</Frame>
+	</Frame>
 	
 	<DressUpModel name="BWWardrobeSetsTransmogModelTemplate" mixin="BetterWardrobeSetsTransmogModelMixin" virtual="true">
 		<Size x="129" y="186"/>
@@ -89,6 +89,27 @@
 			<OnModelLoaded method="OnModelLoaded"/>
 		</Scripts>
 	</DressUpModel>
+
+	<Button  name ="BW_LoadQueueButton" parent = "WardrobeFrame" parentKey="ClearAllPendingButton" inherits="UIMenuButtonStretchTemplate" hidden="false">
+	<Size x="20" y="20"/>
+	<Anchors>
+		<Anchor point="TOPLEFT" relativeto="WardrobeOutfitDropDown" relativePoint="TOPRIGHT" x="80" y="-5"/>
+	</Anchors>
+	<Layers>
+		<Layer level="ARTWORK">
+			<Texture parentKey="Icon" atlas="transmog-icon-checkmark" useAtlasSize="false">
+				<Size x="19" y="19"/>
+				<Anchors>
+					<Anchor point="LEFT" x="1"/>
+				</Anchors>
+			</Texture>
+		</Layer>
+	</Layers>
+	<HighlightTexture file="Interface\Buttons\UI-Common-MouseHilight" alphaMode="ADD"/>
+	<Scripts>
+		<OnLeave function="GameTooltip_Hide"/>
+	</Scripts>
+</Button>
 	
 	<Frame name="BW_WardrobeCollectionFrame" parent="WardrobeCollectionFrame" setAllPoints="true" hidden="false">
 		<Frames>

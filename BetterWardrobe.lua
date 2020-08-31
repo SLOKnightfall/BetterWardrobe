@@ -21,6 +21,7 @@ local playerNme
 local realmName
 
 addon.itemSourceID = {}
+addon.QueueList = {}
 
 
 
@@ -256,7 +257,7 @@ end
 
 
 
-function ClearHidden(setList, type)
+local function ClearHidden(setList, type)
 	if Profile.ShowHidden then return setList end
 	local newSet = {}
 	for i, setInfo in ipairs(setList) do 
@@ -273,9 +274,16 @@ end
 
 			--self:UpdateWardrobe()
 
-function GetSetCount(setID)
-	local setinfo = addon.GetSetInfo(setID)
-	return #setinfo["items"]
+--function GetSetCount(setID)
+	--local setinfo = addon.GetSetInfo(setID)
+	--return #setinfo["items"]
+--end
+
+function addon.QueueForTransmog(type, ID, name)
+
+	addon.QueueList = {type, ID, name}
+
+
 end
 
 
@@ -907,7 +915,7 @@ function WardrobeCollectionFrame.SetsCollectionFrame.ScrollFrame:Update()
 			button.SelectedTexture:SetShown(baseSet.setID == selectedBaseSetID);
 			button.Favorite:SetShown(baseSet.favoriteSetID);
 			local isHidden = addon.chardb.profile.set[baseSet.setID]
-			button.HideItemVisual:SetShown(isHidden)
+			button.HideItemVisual.Icon:SetShown(isHidden)
 
 			button.New:SetShown(SetsDataProvider:IsBaseSetNew(baseSet.setID));
 			button.setID = baseSet.setID;
@@ -1464,6 +1472,17 @@ local function BW_WardrobeSetsCollectionScrollFrame_FavoriteDropDownInit(self)
 	UIDropDownMenu_AddButton(info, level);
 
 	UIDropDownMenu_AddSeparator()
+	UIDropDownMenu_AddButton({
+		notCheckable = true,
+		text = L["Queue Transmog"],
+		func = function() 
+			local setInfo = addon.GetSetInfo(self.baseSetID)
+			local name = setInfo["name"]
+			addon.QueueForTransmog("extraset", self.baseSetID, name)
+		 end,
+	})
+
+	UIDropDownMenu_AddSeparator()
 	local isHidden = addon.chardb.profile.extraset[self.baseSetID] 
 	UIDropDownMenu_AddButton({
 		notCheckable = true,
@@ -1529,7 +1548,7 @@ function BetterWardrobeSetsCollectionScrollFrameMixin:Update()
 			button.Icon:SetDesaturation((topSourcesCollected == 0) and 1 or 0)
 			button.SelectedTexture:SetShown(baseSet.setID == selectedBaseSetID)
 			button.Favorite:SetShown(isFavorite)
-			button.HideItemVisual:SetShown(isHidden)
+			button.HideItemVisual.Icon:SetShown(isHidden)
 
 
 			--button.New:SetShown(SetsDataProvider:IsBaseSetNew(baseSet.setID))
@@ -1827,7 +1846,16 @@ function BetterWardrobeSetsTransmogMixin:OpenRightClickDropDown()
 	info.text = CANCEL;
 	UIDropDownMenu_AddButton(info);
 
-
+	UIDropDownMenu_AddSeparator()
+	UIDropDownMenu_AddButton({
+		notCheckable = true,
+		text = L["Queue Transmog"],
+		func = function() 
+			local setInfo = addon.GetSetInfo(setID)
+			local name = setInfo["name"]
+			addon.QueueForTransmog("extraset", setID, name)
+		 end,
+	})
 	UIDropDownMenu_AddSeparator()
 	local isHidden = addon.chardb.profile.extraset[setID] 
 	UIDropDownMenu_AddButton({
