@@ -1,8 +1,8 @@
 <Ui xmlns="http://www.blizzard.com/wow/ui/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.blizzard.com/wow/ui/
 ..\FrameXML\UI.xsd">
-	<Script file="DataBase.lua"/>
+	<Script file="Data\DataBase.lua"/>
 	<Script file="BetterWardrobe.lua"/>
-	<Script file="UI.lua"/>
+	<Script file="Modules\UI.lua"/>
 
 	<Frame name="HideVisualTemplate" parentKey="HideItemVisual" virtual="true" setAllPoints="true">
 				<Layers>
@@ -90,26 +90,40 @@
 		</Scripts>
 	</DressUpModel>
 
-	<Button  name ="BW_LoadQueueButton" parent = "WardrobeFrame" parentKey="ClearAllPendingButton" inherits="UIMenuButtonStretchTemplate" hidden="false">
-	<Size x="20" y="20"/>
-	<Anchors>
-		<Anchor point="TOPLEFT" relativeto="WardrobeOutfitDropDown" relativePoint="TOPRIGHT" x="80" y="-5"/>
-	</Anchors>
-	<Layers>
-		<Layer level="ARTWORK">
-			<Texture parentKey="Icon" atlas="transmog-icon-checkmark" useAtlasSize="false">
-				<Size x="19" y="19"/>
-				<Anchors>
-					<Anchor point="LEFT" x="1"/>
-				</Anchors>
-			</Texture>
-		</Layer>
-	</Layers>
-	<HighlightTexture file="Interface\Buttons\UI-Common-MouseHilight" alphaMode="ADD"/>
-	<Scripts>
-		<OnLeave function="GameTooltip_Hide"/>
-	</Scripts>
-</Button>
+	<Button name ="BW_LoadQueueButton" parent = "WardrobeFrame" parentKey="ClearAllPendingButton" inherits="UIMenuButtonStretchTemplate" hidden="false">
+		<Size x="20" y="20"/>
+		<Anchors>
+			<Anchor point="TOPLEFT" relativeto="WardrobeOutfitDropDown" relativePoint="TOPRIGHT" x="80" y="-5"/>
+		</Anchors>
+		<Layers>
+			<Layer level="ARTWORK">
+				<Texture parentKey="Icon" atlas="transmog-icon-checkmark" useAtlasSize="false">
+					<Size x="19" y="19"/>
+					<Anchors>
+						<Anchor point="LEFT" x="1"/>
+					</Anchors>
+				</Texture>
+			</Layer>
+		</Layers>
+		<HighlightTexture file="Interface\Buttons\UI-Common-MouseHilight" alphaMode="ADD"/>
+		<Scripts>
+			<OnLeave function="GameTooltip_Hide"/>
+		</Scripts>
+	</Button>
+
+	<Button name="BW_RandomizeButton" parent = "WardrobeFrame" inherits="MainMenuBarMicroButton" hidden="false">
+			<Size x="20" y="20"/>
+		<Anchors>
+			<Anchor point="TOPLEFT" relativeTo="BW_LoadQueueButton" relativePoint="TOPRIGHT" x="-2" y="0"/>
+		</Anchors>
+		<Scripts>
+			<OnLoad>
+				LoadMicroButtonTextures(self, "MainMenu");
+			</OnLoad>
+			<OnClick function="BW_RanomizeSet"/>
+		</Scripts>
+	</Button>
+
 	
 	<Frame name="BW_WardrobeCollectionFrame" parent="WardrobeCollectionFrame" setAllPoints="true" hidden="false">
 		<Frames>

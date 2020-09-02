@@ -1,9 +1,9 @@
 issues
+Handle hide variant sets better
 
 To Do
 copy set from others players
 list sets from other players
-queue set transmog from collection frame
 
 
 

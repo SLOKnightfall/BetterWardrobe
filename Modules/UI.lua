@@ -299,11 +299,11 @@ function BW_WardrobeCollectionFrame_SetTab(tabID)
 			BW_SortDropDown:SetPoint("TOPLEFT", BW_WardrobeToggle, "TOPRIGHT")
 
 		end
+		
 		WardrobeCollectionFrame.searchBox:Show()
 		WardrobeCollectionFrame.searchBox:SetEnabled(true)
 		BW_WardrobeCollectionFrame.BW_SetsCollectionFrame:SetShown(not atTransmogrifier)
 		BW_WardrobeCollectionFrame.BW_SetsTransmogFrame:SetShown(atTransmogrifier)
-
 	end
 end
 
@@ -391,7 +391,6 @@ local function CreateVisualViewButton()
 		b:SetScript("OnLeave", function(self)
 			GameTooltip:Hide()
 		end)
-
 end
 
 
@@ -464,20 +463,22 @@ end
 
 local FILTER_SOURCES = {"Classic Set","Quest Set","Dunegon Set","Raid Recolor","Raid Lookalike","Garrison","Island Expidetion"}
 local EXPANSIONS = {"Classic", "Burning Crusade", "Wrath of the Litch Kink", "Cataclysm", "Mists", "WOD", "Legion", "BFA" }
+
 local filterSelection = {} 
 for i = 1, 7 do
 	filterSelection[i] = true
 end
+
 local xpacSelection = {}
 for i = 1, 8 do
 	xpacSelection[i] = true
 end
+
 local filterCollected = {true, true}
 addon.filterCollected = filterCollected
 addon.xpacSelection = xpacSelection
 addon.filterSelection = filterSelection
---local 
---local SetFilter()
+
 
 function BW_WardrobeFilterDropDown_InitializeItems(self, level)
 	local info = UIDropDownMenu_CreateInfo()
@@ -639,7 +640,6 @@ function BW_WardrobeFilterDropDown_InitializeItems(self, level)
 end
 
 
-
 function addon.ToggleHidden(model, isHidden)
 	local tabID = GetTab()
 	if tabID == 1 then 
@@ -719,12 +719,8 @@ function UI.HideButton_Initialize()
 				local f = CreateFrame("frame", nil, model, "HideVisualTemplate")
 				--f:Show()
 				--f.Icon:SetPoint("CENTER")
-
-				
-
 			end
 		end
-
 
 		local buttons = WardrobeCollectionFrameScrollFrame.buttons
 		for i = 1, #buttons do
@@ -789,6 +785,8 @@ function UI.HideButton_Initialize()
 		--end)
 
 end
+
+
 
 
 

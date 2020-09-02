@@ -29,8 +29,12 @@ Locale\enUS.lua
 #Core files
 Inspect.lua
 BetterWardrobe.xml
-SortingFunctions.lua
 
+#Modules
+Modules\SortingFunctions.lua
+Modules\Randomizer.lua
+
+#3rd party addon compatability
 Plugins\ElvUI.lua
 Plugins\CanIMogIt.lua
 
