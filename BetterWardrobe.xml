@@ -120,7 +120,25 @@
 			<OnLoad>
 				LoadMicroButtonTextures(self, "MainMenu");
 			</OnLoad>
-			<OnClick function="BW_RanomizeSet"/>
+			<OnShow>
+				 --self:OnShow()
+			</OnShow> 
+			<OnMouseDown>
+				if IsModifierKeyDown() then
+				self:Randomize("outfit")
+				else
+				self:BuildAppearanceList()
+				self:Randomize()
+				end
+			</OnMouseDown>
+			<OnMouseUp>
+				self.Stop = true
+			</OnMouseUp>
+			<OnEnter>
+				self:OnEnter()
+			</OnEnter>
+
+			<OnLeave function="GameTooltip_Hide"/>
 		</Scripts>
 	</Button>
 

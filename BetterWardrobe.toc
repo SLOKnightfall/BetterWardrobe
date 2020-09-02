@@ -27,7 +27,7 @@ Libs\AceLocale-3.0\AceLocale-3.0.xml
 Locale\enUS.lua
 
 #Core files
-Inspect.lua
+#Modules\Inspect.lua
 BetterWardrobe.xml
 
 #Modules
