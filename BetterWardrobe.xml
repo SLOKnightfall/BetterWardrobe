@@ -112,7 +112,7 @@
 	</Button>
 
 	<Button name="BW_RandomizeButton" parent = "WardrobeTransmogFrame" inherits="MainMenuBarMicroButton" hidden="false">
-			<Size x="20" y="20"/>
+		<Size x="20" y="20"/>
 		<Anchors>
 			<Anchor point="TOPLEFT" relativeTo="BW_LoadQueueButton" relativePoint="TOPRIGHT" x="-2" y="0"/>
 		</Anchors>
@@ -137,18 +137,13 @@
 			<OnEnter>
 				self:OnEnter()
 			</OnEnter>
-
 			<OnLeave function="GameTooltip_Hide"/>
 		</Scripts>
 	</Button>
 
-
-
-
-	
 	<Frame name="BW_WardrobeCollectionFrame" parent="WardrobeCollectionFrame" setAllPoints="true" hidden="false">
 		<Frames>
-			<Button name="$parentTab1" parentKey="ItemsTab" inherits="TabButtonTemplate" text="WARDROBE_ITEMS" id="1" frameLevel="4" parentArray="Tabs">
+			<Button name="$parentTab1" parentKey="ItemsTab" inherits="TabButtonTemplate" text="WARDROBE_ITEMS" id="1"  parentArray="Tabs">
 				<KeyValues>
 					<KeyValue key="minWidth" value="57" type="number"/>
 				</KeyValues>
@@ -159,7 +154,7 @@
 					<OnClick function="BW_WardrobeCollectionFrame_ClickTab"/>
 				</Scripts>
 			</Button>
-			<Button name="$parentTab2" parentKey="SetsTab" inherits="TabButtonTemplate" text="WARDROBE_SETS" id="2" frameLevel="4" parentArray="Tabs">
+			<Button name="$parentTab2" parentKey="SetsTab" inherits="TabButtonTemplate" text="WARDROBE_SETS" id="2"  parentArray="Tabs">
 				<KeyValues>
 					<KeyValue key="minWidth" value="57" type="number"/>
 				</KeyValues>
@@ -192,7 +187,7 @@
 					<OnClick function="BW_WardrobeCollectionFrame_ClickTab"/>
 				</Scripts>
 			</Button>
-			<Button name="$parentTab3" parentKey="ExtraSetsTab" inherits="TabButtonTemplate" text="Extra Sets" id="3" frameLevel="4" parentArray="Tabs">
+			<Button name="$parentTab3" parentKey="ExtraSetsTab" inherits="TabButtonTemplate" text="Extra Sets" id="3" parentArray="Tabs">
 				<KeyValues>
 					<KeyValue key="minWidth" value="57" type="number"/>
 				</KeyValues>
@@ -271,8 +266,7 @@
 				</Scripts>
 			</Frame>
 
-
-			<Frame name ="BW_SetsCollectionFrame" parentKey="BW_SetsCollectionFrame"  parentArray="ContentFrames" mixin="BetterWardrobeSetsCollectionMixin" hidden="true">
+			<Frame name ="BW_SetsCollectionFrame" parentKey="BW_SetsCollectionFrame"  parentArray="ContentFrames" mixin="BetterWardrobeSetsCollectionMixin" hidden="true" useParentLevel="true">
 
 				<KeyValues>
 					<KeyValue key="searchType" value="LE_TRANSMOG_SEARCH_TYPE_BASE_SETS" type="global"/>
@@ -330,7 +324,7 @@
 							<OnModelLoaded method="OnModelLoaded"/>
 						</Scripts>
 					</DressUpModel>
-					<Frame parentKey="DetailsFrame" frameLevel="5">
+					<Frame parentKey="DetailsFrame" >
 						<Anchors>
 							<Anchor point="TOPLEFT" relativeKey="$parent.RightInset" x="0" y="-3"/>
 							<Anchor point="BOTTOMRIGHT" relativeKey="$parent.RightInset" x="-3" y="2"/>
@@ -394,7 +388,7 @@
 					<OnEvent method="OnEvent"/>
 				</Scripts>
 			</Frame>
-			<Frame name="BW_SetsTransmogFrame"  parentKey="BW_SetsTransmogFrame" parentArray="ContentFrames" inherits="CollectionsBackgroundTemplate" mixin="BetterWardrobeSetsTransmogMixin" hidden="true">
+			<Frame name="BW_SetsTransmogFrame"  parentKey="BW_SetsTransmogFrame" parentArray="ContentFrames" inherits="CollectionsBackgroundTemplate" mixin="BetterWardrobeSetsTransmogMixin" hidden="true" useParentLevel="true">
 				<KeyValues>
 					<KeyValue key="searchType" value="LE_TRANSMOG_SEARCH_TYPE_USABLE_SETS" type="global"/>
 				</KeyValues>

@@ -1935,6 +1935,19 @@ local TABS_MAX_WIDTH = 185
 function BW_WardrobeCollectionFrame_OnLoad(self)
 	WardrobeCollectionFrameTab1:Hide()
 	WardrobeCollectionFrameTab2:Hide()
+	BW_WardrobeCollectionFrameTab1:Show()
+	BW_WardrobeCollectionFrameTab2:Show()
+	BW_WardrobeCollectionFrameTab3:Show()
+	--local level = CollectionsJournal:GetFrameLevel()
+	local level = BW_WardrobeCollectionFrame:GetFrameLevel()
+	CollectionsJournal:SetFrameLevel(level -1 )
+
+	--BW_WardrobeCollectionFrame:SetFrameLevel(level+10)
+	--BW_WardrobeCollectionFrameTab1:SetFrameLevel(level+10)
+	--BW_WardrobeCollectionFrameTab2:SetFrameLevel(level+10)
+	--BW_WardrobeCollectionFrameTab3:SetFrameLevel(level+10)
+	--BW_SetsCollectionFrame:SetFrameLevel(level+10)
+	--CollectionsJournal:SetFrameLevel(1)
 	PanelTemplates_SetNumTabs(self, 3)
 	PanelTemplates_SetTab(self, TAB_ITEMS)
 	PanelTemplates_ResizeTabsToFit(self, TABS_MAX_WIDTH)
@@ -1962,6 +1975,8 @@ end
 
 function BW_WardrobeCollectionFrame_OnShow(self)
 	CollectionsJournal:SetPortraitToAsset("Interface\\Icons\\inv_chest_cloth_17")
+		local level = CollectionsJournal:GetFrameLevel()
+	BW_WardrobeCollectionFrame:SetFrameLevel(level+10)
 
 	self:RegisterUnitEvent("UNIT_MODEL_CHANGED", "player")
 	self:RegisterEvent("TRANSMOG_SEARCH_UPDATED")
