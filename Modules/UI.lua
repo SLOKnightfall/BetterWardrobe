@@ -489,6 +489,8 @@ function BW_WardrobeFilterDropDown_InitializeItems(self, level)
 		info.text = COLLECTED
 		info.func = function(_, _, _, value)
 						filterCollected[1] = value
+						BW_SetsCollectionFrame:OnSearchUpdate()
+						BW_SetsTransmogFrame:OnSearchUpdate()
 					end
 		info.checked = 	function() return filterCollected[1] end
 		info.isNotRadio = true
@@ -497,6 +499,8 @@ function BW_WardrobeFilterDropDown_InitializeItems(self, level)
 		info.text = NOT_COLLECTED
 		info.func = function(_, _, _, value)
 						filterCollected[2] =  value
+						BW_SetsCollectionFrame:OnSearchUpdate()
+						BW_SetsTransmogFrame:OnSearchUpdate()
 					end
 		info.checked = 	function() return filterCollected[2] end
 		info.isNotRadio = true

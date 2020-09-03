@@ -985,11 +985,14 @@ function SetsDataProvider:FilterSearch(useBaseSet)
 		local searchString = string.lower(WardrobeCollectionFrameSearchBox:GetText())
 
 		for i, data in ipairs(baseSets) do
-		
-						--if (addon.filterCollected[1] and data.collected) or (addon.filterCollected[2] and not data.collected) and
-		if  addon.xpacSelection[data.expansionID] and 
-			addon.filterSelection[data.filter]  
-			and (searchString and string.find(string.lower(data.name), searchString)) then -- or string.find(baseSet.label, searchString) or string.find(baseSet.description, searchString)then
+
+			local count , total  = SetsDataProvider:GetSetSourceCounts(data.setID)
+			local collected = count == total
+			if ((addon.filterCollected[1] and collected) or 
+				(addon.filterCollected[2] and not collected)) and
+		 		addon.xpacSelection[data.expansionID] and 
+				addon.filterSelection[data.filter] and 
+				(searchString and string.find(string.lower(data.name), searchString)) then -- or string.find(baseSet.label, searchString) or string.find(baseSet.description, searchString)then
 				tinsert(filteredSets, data)
 		end
 
