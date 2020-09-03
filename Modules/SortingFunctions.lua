@@ -222,6 +222,24 @@ local function CacheHeaders()
 	end
 end
 
+function SortXpac(source1, source2)
+			local item1 = WardrobeCollectionFrame_GetSortedAppearanceSources(source1.visualID)[1]
+			local item2 = WardrobeCollectionFrame_GetSortedAppearanceSources(source2.visualID)[1]
+			item1.itemID = item1.itemID or 0
+			item2.itemID = item2.itemID or 0
+			item1.expacID = select(15,  GetItemInfo(item1.itemID)) or -1
+			item2.expacID = select(15,  GetItemInfo(item2.itemID)) or -1
+
+			if ( item1.expacID ~= item2.expacID ) then
+				return item1.expacID > item2.expacID;
+			end
+
+			if item1.name  and item2.name then 
+				return item1.name < item2.name
+			end
+end
+
+
 
 addon.Sort = {
 	[TAB_ITEMS] = {
@@ -291,28 +309,13 @@ addon.Sort = {
 		end,
 
 		[LE_EXPANSION] = function(self)
-
-			sort(self:GetFilteredVisualsList(), function(source1, source2)
-			local item1 = WardrobeCollectionFrame_GetSortedAppearanceSources(source1.visualID)[1]
-			local item2 = WardrobeCollectionFrame_GetSortedAppearanceSources(source2.visualID)[1]
-			item1.itemID = item1.itemID or 0
-			item2.itemID = item2.itemID or 0
-
-				_, _, _, _, _, _, _, _,_, _, _, _, _, _, item1.expacID = GetItemInfo(item1.itemID)
-				_, _, _, _, _, _, _, _,_, _, _, _, _, _, item2.expacID = GetItemInfo(item2.itemID)
-
-			if ( item1.expacID ~= item2.expacID ) then
-				return item1.expacID > item2.expacID;
-			end
-
-			--	return item1.name > item2.name;
-
-			end)
+			C_Timer.After(0, function()	sort(Wardrobe:GetFilteredVisualsList(), SortXpac) end )
+			sort(Wardrobe:GetFilteredVisualsList(), SortXpac) -- Runs twice because some times the first run does not return item info
 		end,
 	},
 	[TAB_SETS] = {
 		[LE_DEFAULT] = function(self, sets, reverseUIOrder, ignorePatchID)
-		SortDefault(sets, reverseUIOrder, ignorePatchID)
+			SortDefault(sets, reverseUIOrder, ignorePatchID)
 		end,
 
 		[LE_ALPHABETIC] = function(self, sets, reverseUIOrder, ignorePatchID)
