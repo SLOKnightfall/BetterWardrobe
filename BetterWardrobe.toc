@@ -33,7 +33,7 @@ BetterWardrobe.xml
 #Modules
 Modules\SortingFunctions.lua
 Modules\Randomizer.lua
-
+Modules\SavedOutfits.xml
 #3rd party addon compatability
 Plugins\ElvUI.lua
 Plugins\CanIMogIt.lua

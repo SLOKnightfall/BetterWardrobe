@@ -124,7 +124,7 @@ MIN_SET_COLLECTED = 1
 
 --ACE Profile Saved Variables Defaults
 local defaults = {
-	profile ={
+	profile = {
 		['*'] = true,
 		PartialLimit = 4,
 		ShowHidden = false,
@@ -137,6 +137,8 @@ local char_defaults = {
 		set = {},
 		extraset = {},
 		favorite = {},
+		outfits = {},
+		lastTransmogOutfitIDSpec = {},
 	}
 }
 
@@ -162,10 +164,11 @@ end
 function addon:OnEnable()
 	self.db = LibStub("AceDB-3.0"):New("BetterWardrobe_Options", defaults, true)
 	options.args.profiles  = LibStub("AceDBOptions-3.0"):GetOptionsTable(self.db)
+	options.args.profiles.name = L["Profiles - Options Settings"]
 
 	self.chardb = LibStub("AceDB-3.0"):New("BetterWardrobe_CharacterData", char_defaults)
 	options.args.charprofiles  = LibStub("AceDBOptions-3.0"):GetOptionsTable(self.chardb)
-	options.args.charprofiles.name = L["Hidden Set Profiles"]
+	options.args.charprofiles.name = L["Profiles - Collection Settings"]
 
 	LibStub("AceConfigRegistry-3.0"):ValidateOptionsTable(options, addonName)
 	LibStub("AceConfig-3.0"):RegisterOptionsTable(addonName, options)
@@ -186,6 +189,14 @@ function addon:OnEnable()
 
 	self:SecureHook(WardrobeCollectionFrame.ItemsCollectionFrame,"SetActiveSlot")
 	self:SecureHook(WardrobeCollectionFrame.ItemsCollectionFrame,"UpdateItems")
+
+	--self:SecureHook(WardrobeOutfitDropDown,"OnUpdate")
+
+		--WardrobeOutfi--tDropDownButton:SetScript("OnMouseDown", function(self)
+					--	PlaySound(SOUNDKIT.IG_MAINMENU_OPTION_CHECKBOX_ON);
+						--BW_WardrobeOutfitFrame:Toggle(self:GetParent());
+						--end
+				--	);
 end
 
 

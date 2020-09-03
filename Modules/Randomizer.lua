@@ -8,11 +8,10 @@ local AppearanceList
 
 
 function BW_RandomizeButton:OnEnter()
-
-				GameTooltip:ClearAllPoints();
-				GameTooltip:SetPoint("BOTTOM", self, "TOP", 0, 0);
-				GameTooltip:SetOwner(self, "ANCHOR_PRESERVE");
-				GameTooltip:SetText(L["Click: Randomize Items"].."\n"..L["Shift Click:Randomize Outfit"]);
+	GameTooltip:ClearAllPoints();
+	GameTooltip:SetPoint("BOTTOM", self, "TOP", 0, 0);
+	GameTooltip:SetOwner(self, "ANCHOR_PRESERVE");
+	GameTooltip:SetText(L["Click: Randomize Items"].."\n"..L["Shift Click:Randomize Outfit"]);
 end
 
 
@@ -86,6 +85,14 @@ local function RandomizeAllSlots()
 end
 
 
+local function RandomizeOutfit()
+	local outfits, currentOutfit = C_TransmogCollection.GetOutfits()
+	local numOutfits = #outfits
+	local randomOutfitID = outfits[random(numOutfits)].outfitID
+	WardrobeOutfitDropDown:SelectOutfit(randomOutfitID, true)
+end
+
+
 local DEFAULT_THROTTLE = 0.1
 local SpinThrottle = DEFAULT_THROTTLE
 local totalTime = 0
@@ -101,14 +108,6 @@ local function RandomizeOnUpdate(self, elapsed)
 		end
 		totalTime = 0
 	end
-end
-
-
-local function RandomizeOutfit()
-	local outfits, currentOutfit = C_TransmogCollection.GetOutfits()
-	local numOutfits = #outfits
-	local randomOutfitID = outfits[random(numOutfits)].outfitID
-	WardrobeOutfitDropDown:SelectOutfit(randomOutfitID, true)
 end
 
 
