@@ -461,11 +461,11 @@ BW_WardrobeFilterDropDown_InitializeItems(self, level)
 end
 
 
-local FILTER_SOURCES = {"Classic Set","Quest Set","Dunegon Set","Raid Recolor","Raid Lookalike","Garrison","Island Expidetion"}
+local FILTER_SOURCES = {"Classic Set","Quest Set","Dunegon Set","Raid Recolor","Raid Lookalike","Garrison","Island Expidetion", "Warfronts"}
 local EXPANSIONS = {"Classic", "Burning Crusade", "Wrath of the Litch Kink", "Cataclysm", "Mists", "WOD", "Legion", "BFA" }
 
 local filterSelection = {} 
-for i = 1, 7 do
+for i = 1, 8 do
 	filterSelection[i] = true
 end
 

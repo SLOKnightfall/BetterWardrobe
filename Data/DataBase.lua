@@ -99,7 +99,6 @@ do
 
 
 local coreSetList = {}
-
 local function GetCoreSets(incVariants)
 		local sets = C_TransmogSets.GetBaseSets()
  	local fullSetList = {}
@@ -120,22 +119,8 @@ local function GetCoreSets(incVariants)
 end
 
 
-
-local function getMod(data)
-
-local name = data.name
-
-local normal  = string.find(string.lower(name), string.lower("normal")) and 1 or nil
-local heroic = string.find(string.lower(name), string.lower("heroic")) and 2 or nil
-local mythic = string.find(string.lower(name), string.lower("Mythic")) and 3 or nil
-local raidfinder = string.find(string.lower(name), string.lower("Raid Finder")) and 4 or nil
-
-data.mod = normal or heroic or mythic or raidfinder or nil
-
-
-end
 local f = CreateFrame("Frame")
- missing= {}
+missing= {}
 
  local function CacheHeaders()
 
@@ -180,7 +165,7 @@ end
 				--or string.find(setData.name, BFAFaction)
 				or string.find(setData.name, City)
 			local heritageArmor = string.find(setData.name, "Heritage")
-				getMod(setData)
+				--getMod(setData)
 		
 				for i, item in ipairs( setData["items"]) do
 					--print(item)

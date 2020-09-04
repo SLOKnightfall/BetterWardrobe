@@ -239,12 +239,16 @@ addon.frame = f
 
 
 function addon.GetItemSource(itemID, itemMod)
-	if addon.modArmor[itemID] and addon.modArmor[itemID][itemMod] then return nil, addon.modArmor[itemID][itemMod] end
+	--if addon.modArmor[itemID] and addon.modArmor[itemID][itemMod] then return nil, addon.modArmor[itemID][itemMod] end
 
 		local itemSource
 		local visualID, sourceID
+		if itemMod then 
+		visualID, sourceID = C_TransmogCollection.GetItemInfo(itemID, itemMod or 0)
+	else
+				visualID, sourceID = C_TransmogCollection.GetItemInfo(itemID)
 
-		visualID, sourceID = C_TransmogCollection.GetItemInfo(itemID)--, itemMod or 0)
+	end
 
 		if not sourceID then
 			local itemlink = "item:"..itemID..":0"

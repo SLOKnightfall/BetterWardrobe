@@ -8,6 +8,7 @@ addon.ArmorSets["MAIL"] ={
 		["label"] =  71 ,
 		["setID"] =  2024 ,
 		["expansionID"] =  6 ,
+		["mod"] =  1 ,
 		["maxLevel"] =  100 ,
 		["filter"] =  5 ,
 		["recolor"] =  false ,
@@ -21,6 +22,7 @@ addon.ArmorSets["MAIL"] ={
 		["label"] =  71 ,
 		["setID"] =  2025 ,
 		["expansionID"] =  6 ,
+		["mod"] =  3 ,
 		["maxLevel"] =  100 ,
 		["filter"] =  5 ,
 		["recolor"] =  false ,
@@ -99,6 +101,7 @@ addon.ArmorSets["MAIL"] ={
 		["label"] =  71 ,
 		["setID"] =  2030 ,
 		["expansionID"] =  6 ,
+		["mod"] =  1 ,
 		["maxLevel"] =  100 ,
 		["filter"] =  5 ,
 		["recolor"] =  false ,
@@ -112,6 +115,7 @@ addon.ArmorSets["MAIL"] ={
 		["label"] =  71 ,
 		["setID"] =  2031 ,
 		["expansionID"] =  6 ,
+		["mod"] =  3 ,
 		["maxLevel"] =  100 ,
 		["filter"] =  5 ,
 		["recolor"] =  false ,
@@ -176,8 +180,8 @@ addon.ArmorSets["MAIL"] ={
 		["source"] =  18 ,
 		["label"] =  52 ,
 		["setID"] =  1527 ,
-		["items"] = { 90127,90128,90129,90130,90131,90132,90133,90134, },
 		["recolor"] =  false ,
+		["items"] = { 90127,90128,90129,90130,90131,90132,90133,90134, },
 		["name"] =  "Windfury Set" ,
 		["filter"] =  3 ,
 		["minLevel"] =  90 ,
@@ -190,8 +194,8 @@ addon.ArmorSets["MAIL"] ={
 		["source"] =  18 ,
 		["label"] =  52 ,
 		["setID"] =  1528 ,
-		["items"] = { 90075,90074,90068,90069,90070,90071,90072,90073, },
 		["recolor"] =  false ,
+		["items"] = { 90075,90074,90068,90069,90070,90071,90072,90073, },
 		["name"] =  "Howling Beast Set" ,
 		["filter"] =  3 ,
 		["minLevel"] =  90 ,
@@ -485,18 +489,18 @@ addon.ArmorSets["MAIL"] ={
 		["name"] =  "Ironhide Mail (Recolor)" ,
 		["items"] = { 14798,14799,14805,14803,14802,14807, },
 	},
-	[1297]={
+	[905]={
 		["armorType"] =  3 ,
-		["source"] =  8 ,
-		["label"] =  55 ,
-		["setID"] =  1297 ,
-		["expansionID"] =  4 ,
-		["maxLevel"] =  80 ,
-		["filter"] =  2 ,
+		["source"] =  0 ,
+		["label"] =  45 ,
+		["setID"] =  905 ,
+		["expansionID"] =  1 ,
+		["maxLevel"] =  40 ,
+		["filter"] =  3 ,
 		["recolor"] =  false ,
-		["minLevel"] =  80 ,
-		["name"] =  "Earthen Mail (Recolor)" ,
-		["items"] = { 57381,57310,57351,57317,57295,57364,57313, },
+		["minLevel"] =  40 ,
+		["name"] =  "Bloodmail Regalia" ,
+		["items"] = { 14614,14616,14615,14611,14612, },
 	},
 	[227]={
 		["armorType"] =  3 ,
@@ -543,6 +547,7 @@ addon.ArmorSets["MAIL"] ={
 		["label"] =  69 ,
 		["setID"] =  2087 ,
 		["expansionID"] =  6 ,
+		["mod"] =  8 ,
 		["maxLevel"] =  91 ,
 		["filter"] =  6 ,
 		["recolor"] =  false ,
@@ -556,6 +561,7 @@ addon.ArmorSets["MAIL"] ={
 		["label"] =  69 ,
 		["setID"] =  2088 ,
 		["expansionID"] =  6 ,
+		["mod"] =  8 ,
 		["maxLevel"] =  91 ,
 		["filter"] =  6 ,
 		["recolor"] =  false ,
@@ -672,8 +678,8 @@ addon.ArmorSets["MAIL"] ={
 		["source"] =  26 ,
 		["label"] =  48 ,
 		["setID"] =  1313 ,
-		["items"] = { 44590,44182,44189,44109,47245,47244,47211,47561, },
 		["recolor"] =  false ,
+		["items"] = { 44590,44182,44189,44109,47245,47244,47211,47561, },
 		["name"] =  "Ravenous Fiend Set" ,
 		["filter"] =  3 ,
 		["minLevel"] =  67 ,
@@ -699,8 +705,8 @@ addon.ArmorSets["MAIL"] ={
 		["source"] =  18 ,
 		["label"] =  48 ,
 		["setID"] =  1314 ,
-		["items"] = { 44592,44110,46074,47250,47178, },
 		["recolor"] =  false ,
+		["items"] = { 44592,44110,46074,47250,47178, },
 		["name"] =  "Ravenous Fiend Set (Recolor)" ,
 		["filter"] =  3 ,
 		["minLevel"] =  76 ,
@@ -752,8 +758,8 @@ addon.ArmorSets["MAIL"] ={
 		["source"] =  24 ,
 		["label"] =  77 ,
 		["setID"] =  2117 ,
-		["items"] = { 139714,139713,139712,139711,139710,139709,139708,139707, },
 		["recolor"] =  false ,
+		["items"] = { 139714,139713,139712,139711,139710,139709,139708,139707, },
 		["name"] =  "Guise of the Unseen Path" ,
 		["filter"] =  3 ,
 		["minLevel"] =  110 ,
@@ -779,8 +785,8 @@ addon.ArmorSets["MAIL"] ={
 		["source"] =  24 ,
 		["label"] =  77 ,
 		["setID"] =  2123 ,
-		["items"] = { 139705,139704,139703,139702,139701,139700,139699,139698, },
 		["recolor"] =  false ,
+		["items"] = { 139705,139704,139703,139702,139701,139700,139699,139698, },
 		["name"] =  "Raiment of the Farseer" ,
 		["filter"] =  3 ,
 		["minLevel"] =  110 ,
@@ -819,8 +825,8 @@ addon.ArmorSets["MAIL"] ={
 		["source"] =  16 ,
 		["label"] =  2 ,
 		["setID"] =  662 ,
-		["items"] = { 97627,97625,97770,97626,97631,97630,97628,22095, },
 		["recolor"] =  false ,
+		["items"] = { 97627,97625,97770,97626,97631,97630,97628,22095, },
 		["name"] =  "The Five Thunders" ,
 		["filter"] =  3 ,
 		["minLevel"] =  60 ,
@@ -1028,8 +1034,8 @@ addon.ArmorSets["MAIL"] ={
 		["source"] =  26 ,
 		["label"] =  54 ,
 		["setID"] =  1342 ,
-		["items"] = { 72910,72911,72912,72913,72914,72915,72916,72917, },
 		["recolor"] =  false ,
+		["items"] = { 72910,72911,72912,72913,72914,72915,72916,72917, },
 		["name"] =  "Swiftarrow Battlegear (Recolor)" ,
 		["filter"] =  2 ,
 		["minLevel"] =  58 ,
@@ -1068,8 +1074,8 @@ addon.ArmorSets["MAIL"] ={
 		["source"] =  27 ,
 		["label"] =  54 ,
 		["setID"] =  1344 ,
-		["items"] = { 127496,72698,72699,72700,72701,72702,72704,72705, },
 		["recolor"] =  false ,
+		["items"] = { 127496,72698,72699,72700,72701,72702,72704,72705, },
 		["name"] =  "Swiftarrow Battlegear (Recolor)" ,
 		["filter"] =  2 ,
 		["minLevel"] =  58 ,
@@ -1121,8 +1127,8 @@ addon.ArmorSets["MAIL"] ={
 		["source"] =  10 ,
 		["label"] =  44 ,
 		["setID"] =  274 ,
-		["items"] = { 24837,24830,24836,24832,24833,24831,24834,24835, },
 		["recolor"] =  false ,
+		["items"] = { 24837,24830,24836,24832,24833,24831,24834,24835, },
 		["name"] =  "Felstone Mail (Recolor)" ,
 		["filter"] =  1 ,
 		["minLevel"] =  10 ,
@@ -1162,6 +1168,7 @@ addon.ArmorSets["MAIL"] ={
 		["label"] =  86 ,
 		["setID"] =  2704 ,
 		["expansionID"] =  7 ,
+		["mod"] =  1 ,
 		["maxLevel"] =  110 ,
 		["filter"] =  5 ,
 		["recolor"] =  false ,
@@ -1175,6 +1182,7 @@ addon.ArmorSets["MAIL"] ={
 		["label"] =  86 ,
 		["setID"] =  2705 ,
 		["expansionID"] =  7 ,
+		["mod"] =  2 ,
 		["maxLevel"] =  110 ,
 		["filter"] =  5 ,
 		["recolor"] =  false ,
@@ -1226,8 +1234,8 @@ addon.ArmorSets["MAIL"] ={
 		["source"] =  18 ,
 		["label"] =  2 ,
 		["setID"] =  552 ,
-		["items"] = { 133455,122374,97685,97643,97659,97651,97667,22011, },
 		["recolor"] =  false ,
+		["items"] = { 133455,122374,97685,97643,97659,97651,97667,22011, },
 		["name"] =  "Beastmaster Armor" ,
 		["filter"] =  3 ,
 		["minLevel"] =  60 ,
@@ -1241,6 +1249,7 @@ addon.ArmorSets["MAIL"] ={
 		["label"] =  86 ,
 		["setID"] =  2712 ,
 		["expansionID"] =  7 ,
+		["mod"] =  1 ,
 		["maxLevel"] =  110 ,
 		["filter"] =  5 ,
 		["recolor"] =  false ,
@@ -1254,6 +1263,7 @@ addon.ArmorSets["MAIL"] ={
 		["label"] =  86 ,
 		["setID"] =  2713 ,
 		["expansionID"] =  7 ,
+		["mod"] =  2 ,
 		["maxLevel"] =  110 ,
 		["filter"] =  5 ,
 		["recolor"] =  false ,
@@ -1267,6 +1277,7 @@ addon.ArmorSets["MAIL"] ={
 		["label"] =  86 ,
 		["setID"] =  2714 ,
 		["expansionID"] =  7 ,
+		["mod"] =  3 ,
 		["maxLevel"] =  110 ,
 		["filter"] =  5 ,
 		["recolor"] =  false ,
@@ -1280,6 +1291,7 @@ addon.ArmorSets["MAIL"] ={
 		["label"] =  86 ,
 		["setID"] =  2715 ,
 		["expansionID"] =  7 ,
+		["mod"] =  4 ,
 		["maxLevel"] =  110 ,
 		["filter"] =  5 ,
 		["recolor"] =  false ,
@@ -1323,7 +1335,7 @@ addon.ArmorSets["MAIL"] ={
 		["filter"] =  5 ,
 		["recolor"] =  false ,
 		["minLevel"] =  100 ,
-		["name"] =  "Rylakstalker\'s Battlegear (Normal Lookalike)" ,
+		["name"] =  "Rylakstalkeru2019s Battlegear (Normal Lookalike)" ,
 		["items"] = { 113943,113902,113888,113593,113608,113875,113867,113955, },
 	},
 	[1108]={
@@ -1345,11 +1357,12 @@ addon.ArmorSets["MAIL"] ={
 		["label"] =  65 ,
 		["setID"] =  1875 ,
 		["expansionID"] =  6 ,
+		["mod"] =  1 ,
 		["maxLevel"] =  100 ,
 		["filter"] =  5 ,
 		["recolor"] =  false ,
 		["minLevel"] =  100 ,
-		["name"] =  "Rylakstalker\'s Battlegear (Heroic Lookalike)" ,
+		["name"] =  "Rylakstalkeru2019s Battlegear (Heroic Lookalike)" ,
 		["items"] = { 113943,113902,113888,113593,113608,113875,113867,113955, },
 	},
 	[1620]={
@@ -1371,11 +1384,12 @@ addon.ArmorSets["MAIL"] ={
 		["label"] =  65 ,
 		["setID"] =  1876 ,
 		["expansionID"] =  6 ,
+		["mod"] =  3 ,
 		["maxLevel"] =  100 ,
 		["filter"] =  5 ,
 		["recolor"] =  false ,
 		["minLevel"] =  100 ,
-		["name"] =  "Rylakstalker\'s Battlegear (Mythic Lookalike)" ,
+		["name"] =  "Rylakstalkeru2019s Battlegear (Mythic Lookalike)" ,
 		["items"] = { 113943,113902,113888,113593,113608,113875,113867,113955, },
 	},
 	[1622]={
@@ -1404,18 +1418,18 @@ addon.ArmorSets["MAIL"] ={
 		["name"] =  "Fenclaw Mail (Recolor)" ,
 		["items"] = { 24877,24870,24872,24873,24871,24875,57446, },
 	},
-	[407]={
+	[1624]={
 		["armorType"] =  3 ,
-		["source"] =  3 ,
-		["label"] =  13 ,
-		["setID"] =  407 ,
-		["expansionID"] =  2 ,
-		["maxLevel"] =  70 ,
-		["filter"] =  4 ,
+		["source"] =  8194 ,
+		["label"] =  43 ,
+		["setID"] =  1624 ,
+		["expansionID"] =  5 ,
+		["maxLevel"] =  90 ,
+		["filter"] =  5 ,
 		["recolor"] =  false ,
-		["minLevel"] =  70 ,
-		["name"] =  "Cataclysm Raiment (Recolor)" ,
-		["items"] = { 30097,30068,29921,29976,29991,30066,30047, },
+		["minLevel"] =  90 ,
+		["name"] =  "Battlegear of the Saurok Stalker (Heroic Lookalike)" ,
+		["items"] = { 96798,96847,96867,95026,95000,96797,96744,96788, },
 	},
 	[1880]={
 		["armorType"] =  3 ,
@@ -1427,7 +1441,7 @@ addon.ArmorSets["MAIL"] ={
 		["filter"] =  5 ,
 		["recolor"] =  false ,
 		["minLevel"] =  100 ,
-		["name"] =  "Windspeaker\'s Regalia (Normal Lookalike)" ,
+		["name"] =  "Windspeakeru2019s Regalia (Normal Lookalike)" ,
 		["items"] = { 113968,113982,113954,114568,114572,114576,114580,113930, },
 	},
 	[1881]={
@@ -1436,11 +1450,12 @@ addon.ArmorSets["MAIL"] ={
 		["label"] =  65 ,
 		["setID"] =  1881 ,
 		["expansionID"] =  6 ,
+		["mod"] =  1 ,
 		["maxLevel"] =  100 ,
 		["filter"] =  5 ,
 		["recolor"] =  false ,
 		["minLevel"] =  100 ,
-		["name"] =  "Windspeaker\'s Regalia (Heroic Lookalike)" ,
+		["name"] =  "Windspeakeru2019s Regalia (Heroic Lookalike)" ,
 		["items"] = { 113968,113982,113954,113915,114572,113944,113899,113930, },
 	},
 	[1626]={
@@ -1482,18 +1497,18 @@ addon.ArmorSets["MAIL"] ={
 		["name"] =  "Marshcreeper Mail (Recolor)" ,
 		["items"] = { 24885,24878,24880,24881,24879,24882,24883,24884, },
 	},
-	[1628]={
+	[408]={
 		["armorType"] =  3 ,
-		["source"] =  2 ,
-		["label"] =  43 ,
-		["setID"] =  1628 ,
-		["expansionID"] =  5 ,
-		["maxLevel"] =  90 ,
-		["filter"] =  5 ,
+		["source"] =  3 ,
+		["label"] =  13 ,
+		["setID"] =  408 ,
+		["expansionID"] =  2 ,
+		["maxLevel"] =  70 ,
+		["filter"] =  4 ,
 		["recolor"] =  false ,
-		["minLevel"] =  90 ,
-		["name"] =  "Battlegear of the Saurok Stalker (Raid Finder Lookalike)" ,
-		["items"] = { 95731,95682,95751,95672,95627,95628,95972,95681, },
+		["minLevel"] =  70 ,
+		["name"] =  "Rift Stalker Armor (Recolor)" ,
+		["items"] = { 30085,30054,30091,30046,29985,30045, },
 	},
 	[472]={
 		["armorType"] =  3 ,
@@ -1513,8 +1528,8 @@ addon.ArmorSets["MAIL"] ={
 		["source"] =  2 ,
 		["label"] =  78 ,
 		["setID"] =  2234 ,
-		["items"] = { 140874,138368,141574,141575,139221,140873,140869,140917,140868, },
 		["recolor"] =  false ,
+		["items"] = { 140874,138368,141574,141575,139221,140873,140869,140917,140868, },
 		["name"] =  "Eagletalon Battlegear (Normal Lookalike)" ,
 		["filter"] =  5 ,
 		["minLevel"] =  101 ,
@@ -1527,8 +1542,9 @@ addon.ArmorSets["MAIL"] ={
 		["source"] =  2 ,
 		["label"] =  78 ,
 		["setID"] =  2235 ,
-		["items"] = { 140874,138368,139221,140873,140869,140903,140871,140917,140868, },
 		["recolor"] =  false ,
+		["items"] = { 140874,138368,139221,140873,140869,140903,140871,140917,140868, },
+		["mod"] =  1 ,
 		["name"] =  "Eagletalon Battlegear (Heroic Lookalike)" ,
 		["filter"] =  5 ,
 		["minLevel"] =  110 ,
@@ -1541,8 +1557,9 @@ addon.ArmorSets["MAIL"] ={
 		["source"] =  2 ,
 		["label"] =  78 ,
 		["setID"] =  2236 ,
-		["items"] = { 140874,138368,139221,140873,140869,140903,140871,140917,140868, },
 		["recolor"] =  false ,
+		["items"] = { 140874,138368,139221,140873,140869,140903,140871,140917,140868, },
+		["mod"] =  3 ,
 		["name"] =  "Eagletalon Battlegear (Mythic Lookalike)" ,
 		["filter"] =  5 ,
 		["minLevel"] =  110 ,
@@ -1555,8 +1572,9 @@ addon.ArmorSets["MAIL"] ={
 		["source"] =  2 ,
 		["label"] =  78 ,
 		["setID"] =  2237 ,
-		["items"] = { 140874,138368,139221,140873,140869,140903,140871,140917,140868, },
 		["recolor"] =  false ,
+		["items"] = { 140874,138368,139221,140873,140869,140903,140871,140917,140868, },
+		["mod"] =  4 ,
 		["name"] =  "Eagletalon Battlegear (Raid Finder Lookalike)" ,
 		["filter"] =  5 ,
 		["minLevel"] =  110 ,
@@ -1569,8 +1587,8 @@ addon.ArmorSets["MAIL"] ={
 		["source"] =  2 ,
 		["label"] =  78 ,
 		["setID"] =  2242 ,
-		["items"] = { 139222,138372,141572,141573,140875,138214,140870,139215,140872, },
 		["recolor"] =  false ,
+		["items"] = { 139222,138372,141572,141573,140875,138214,140870,139215,140872, },
 		["name"] =  "Regalia of Bound Elements (Normal Lookalike)" ,
 		["filter"] =  5 ,
 		["minLevel"] =  101 ,
@@ -1583,8 +1601,9 @@ addon.ArmorSets["MAIL"] ={
 		["source"] =  2 ,
 		["label"] =  78 ,
 		["setID"] =  2243 ,
-		["items"] = { 139222,138372,140875,140867,138214,140870,139215,140872,140890, },
 		["recolor"] =  false ,
+		["items"] = { 139222,138372,140875,140867,138214,140870,139215,140872,140890, },
+		["mod"] =  1 ,
 		["name"] =  "Regalia of Bound Elements (Heroic Lookalike)" ,
 		["filter"] =  5 ,
 		["minLevel"] =  110 ,
@@ -1610,8 +1629,9 @@ addon.ArmorSets["MAIL"] ={
 		["source"] =  2 ,
 		["label"] =  78 ,
 		["setID"] =  2245 ,
-		["items"] = { 139222,138372,140875,140867,138214,140870,139215,140872,140890, },
 		["recolor"] =  false ,
+		["items"] = { 139222,138372,140875,140867,138214,140870,139215,140872,140890, },
+		["mod"] =  3 ,
 		["name"] =  "Regalia of Bound Elements (Mythic Lookalike)" ,
 		["filter"] =  5 ,
 		["minLevel"] =  110 ,
@@ -1624,8 +1644,9 @@ addon.ArmorSets["MAIL"] ={
 		["source"] =  2 ,
 		["label"] =  78 ,
 		["setID"] =  2246 ,
-		["items"] = { 139222,138372,140875,140867,138214,140870,139215,140872,140890, },
 		["recolor"] =  false ,
+		["items"] = { 139222,138372,140875,140867,138214,140870,139215,140872,140890, },
+		["mod"] =  4 ,
 		["name"] =  "Regalia of Bound Elements (Raid Finder Lookalike)" ,
 		["filter"] =  5 ,
 		["minLevel"] =  110 ,
@@ -1938,6 +1959,7 @@ addon.ArmorSets["MAIL"] ={
 		["label"] =  87 ,
 		["setID"] =  2813 ,
 		["expansionID"] =  8 ,
+		["mod"] =  1 ,
 		["maxLevel"] =  120 ,
 		["filter"] =  3 ,
 		["recolor"] =  false ,
@@ -1964,6 +1986,7 @@ addon.ArmorSets["MAIL"] ={
 		["label"] =  76 ,
 		["setID"] =  2304 ,
 		["expansionID"] =  7 ,
+		["mod"] =  1 ,
 		["maxLevel"] =  119 ,
 		["filter"] =  3 ,
 		["recolor"] =  false ,
@@ -1990,6 +2013,7 @@ addon.ArmorSets["MAIL"] ={
 		["label"] =  87 ,
 		["setID"] =  2817 ,
 		["expansionID"] =  8 ,
+		["mod"] =  1 ,
 		["maxLevel"] =  120 ,
 		["filter"] =  3 ,
 		["recolor"] =  false ,
@@ -2016,6 +2040,7 @@ addon.ArmorSets["MAIL"] ={
 		["label"] =  87 ,
 		["setID"] =  2819 ,
 		["expansionID"] =  8 ,
+		["mod"] =  3 ,
 		["maxLevel"] =  120 ,
 		["filter"] =  3 ,
 		["recolor"] =  false ,
@@ -2087,6 +2112,34 @@ addon.ArmorSets["MAIL"] ={
 		["minLevel"] =  59 ,
 		["name"] =  "Swiftarrow Battlegear" ,
 		["items"] = { 127525,127540,127595,43183,43444,43446,43445,43448, },
+	},
+	[2828]={
+		["armorType"] =  3 ,
+		["source"] =  2 ,
+		["label"] =  89 ,
+		["setID"] =  2828 ,
+		["expansionID"] =  8 ,
+		["mod"] =  2 ,
+		["maxLevel"] =  120 ,
+		["filter"] =  8 ,
+		["recolor"] =  false ,
+		["minLevel"] =  110 ,
+		["name"] =  "Warfronts Alliance Mail (Arathi Recolor)" ,
+		["items"] = { 161464,161469,163265,163277,163389,163397,163400,163401, },
+	},
+	[2829]={
+		["armorType"] =  3 ,
+		["source"] =  2 ,
+		["label"] =  89 ,
+		["setID"] =  2829 ,
+		["expansionID"] =  8 ,
+		["mod"] =  3 ,
+		["maxLevel"] =  110 ,
+		["filter"] =  8 ,
+		["recolor"] =  false ,
+		["minLevel"] =  110 ,
+		["name"] =  "Warfronts Alliance Mail (Weekly Recolor)" ,
+		["items"] = { 163265,163277,163389,163394,163397,163398,163400,163401, },
 	},
 	[1162]={
 		["armorType"] =  3 ,
@@ -2418,8 +2471,8 @@ addon.ArmorSets["MAIL"] ={
 		["source"] =  514 ,
 		["label"] =  69 ,
 		["setID"] =  1950 ,
-		["items"] = { 117102,117103,117104,117105,117107,117108,117101, },
 		["recolor"] =  false ,
+		["items"] = { 117102,117103,117104,117105,117107,117108,117101, },
 		["name"] =  "Trailseeker Set" ,
 		["filter"] =  6 ,
 		["minLevel"] =  90 ,
@@ -2432,8 +2485,8 @@ addon.ArmorSets["MAIL"] ={
 		["source"] =  514 ,
 		["label"] =  69 ,
 		["setID"] =  1951 ,
-		["items"] = { 117285,117271,117272,117273,117274,117277,117278,117280, },
 		["recolor"] =  false ,
+		["items"] = { 117285,117271,117272,117273,117274,117277,117278,117280, },
 		["name"] =  "Streamtalker Set" ,
 		["filter"] =  6 ,
 		["minLevel"] =  90 ,
@@ -2466,6 +2519,48 @@ addon.ArmorSets["MAIL"] ={
 		["minLevel"] =  77 ,
 		["name"] =  "Kavem's Mail (Recolor)" ,
 		["items"] = { 55623,55560,55587,55578,55596,55605,55614,55569, },
+	},
+	[2885]={
+		["armorType"] =  3 ,
+		["source"] =  2 ,
+		["label"] =  89 ,
+		["setID"] =  2885 ,
+		["expansionID"] =  8 ,
+		["mod"] =  1 ,
+		["maxLevel"] =  110 ,
+		["filter"] =  8 ,
+		["recolor"] =  false ,
+		["minLevel"] =  110 ,
+		["name"] =  "Warfronts Horde Mail" ,
+		["items"] = { 163282,163308,163441,163445,163446,163448,163449,163451, },
+	},
+	[2886]={
+		["armorType"] =  3 ,
+		["source"] =  2 ,
+		["label"] =  89 ,
+		["setID"] =  2886 ,
+		["expansionID"] =  8 ,
+		["mod"] =  2 ,
+		["maxLevel"] =  120 ,
+		["filter"] =  8 ,
+		["recolor"] =  false ,
+		["minLevel"] =  110 ,
+		["name"] =  "Warfronts Horde Mail (Arathi Recolor)" ,
+		["items"] = { 161453,161458,163308,163441,163445,163448,163449,163451, },
+	},
+	[2887]={
+		["armorType"] =  3 ,
+		["source"] =  2 ,
+		["label"] =  89 ,
+		["setID"] =  2887 ,
+		["expansionID"] =  8 ,
+		["mod"] =  3 ,
+		["maxLevel"] =  110 ,
+		["filter"] =  8 ,
+		["recolor"] =  false ,
+		["minLevel"] =  110 ,
+		["name"] =  "Warfronts Horde Mail (Weekly Recolor)" ,
+		["items"] = { 163282,163308,163441,163445,163446,163448,163449,163451, },
 	},
 	[1191]={
 		["armorType"] =  3 ,
@@ -2532,18 +2627,19 @@ addon.ArmorSets["MAIL"] ={
 		["name"] =  "War Paint Mail (Recolor)" ,
 		["items"] = { 15488,15493,15489,15491,15492,15495, },
 	},
-	[246]={
+	[1451]={
 		["armorType"] =  3 ,
-		["source"] =  2 ,
-		["label"] =  44 ,
-		["setID"] =  246 ,
-		["expansionID"] =  1 ,
-		["maxLevel"] =  41 ,
-		["filter"] =  1 ,
+		["source"] =  8210 ,
+		["label"] =  39 ,
+		["setID"] =  1451 ,
 		["recolor"] =  false ,
-		["minLevel"] =  36 ,
-		["name"] =  "Sparkleshell Mail (Recolor)" ,
-		["items"] = { 15601,15599,15607,15605,15600,15606, },
+		["items"] = { 87143,89925,89927,89942,90515,86962,87183,87042, },
+		["name"] =  "Regalia of the Firebird (Heroic Lookalike)" ,
+		["filter"] =  5 ,
+		["minLevel"] =  90 ,
+		["expansionID"] =  5 ,
+		["maxLevel"] =  90 ,
+		["classMask"] =  7 ,
 	},
 	[1453]={
 		["armorType"] =  3 ,
@@ -2649,6 +2745,60 @@ addon.ArmorSets["MAIL"] ={
 		["name"] =  "Crystal-Leaf Set (Recolor)" ,
 		["items"] = { 114437,120113,114446,114450,114454,114458,114462, },
 	},
+	[2922]={
+		["armorType"] =  3 ,
+		["source"] =  2 ,
+		["label"] =  93 ,
+		["setID"] =  2922 ,
+		["expansionID"] =  8 ,
+		["maxLevel"] =  120 ,
+		["filter"] =  8 ,
+		["recolor"] =  false ,
+		["minLevel"] =  120 ,
+		["name"] =  "Darkshore Warfront Alliance Mail" ,
+		["items"] = { 165448,165449,165450,165451,165452,165453,165454,165455, },
+	},
+	[2923]={
+		["armorType"] =  3 ,
+		["source"] =  2 ,
+		["label"] =  93 ,
+		["setID"] =  2923 ,
+		["expansionID"] =  8 ,
+		["maxLevel"] =  120 ,
+		["filter"] =  8 ,
+		["recolor"] =  false ,
+		["minLevel"] =  120 ,
+		["name"] =  "Darkshore Warfront Horde Mail" ,
+		["items"] = { 165480,165481,165482,165483,165484,165485,165486,165487, },
+	},
+	[2924]={
+		["armorType"] =  3 ,
+		["source"] =  2 ,
+		["label"] =  93 ,
+		["setID"] =  2924 ,
+		["expansionID"] =  8 ,
+		["mod"] =  3 ,
+		["maxLevel"] =  120 ,
+		["filter"] =  8 ,
+		["recolor"] =  false ,
+		["minLevel"] =  120 ,
+		["name"] =  "Darkshore Warfront Alliance Mail (Elaborate)" ,
+		["items"] = { 165448,165449,165450,165451,165452,165453,165454,165455, },
+	},
+	[2925]={
+		["armorType"] =  3 ,
+		["source"] =  2 ,
+		["label"] =  93 ,
+		["setID"] =  2925 ,
+		["expansionID"] =  8 ,
+		["mod"] =  3 ,
+		["maxLevel"] =  120 ,
+		["filter"] =  8 ,
+		["recolor"] =  false ,
+		["minLevel"] =  120 ,
+		["name"] =  "Darkshore Warfront Horde Mail (Elaborate)" ,
+		["items"] = { 165480,165481,165482,165483,165484,165485,165486,165487, },
+	},
 	[216]={
 		["armorType"] =  3 ,
 		["source"] =  2 ,
@@ -2681,6 +2831,7 @@ addon.ArmorSets["MAIL"] ={
 		["label"] =  69 ,
 		["setID"] =  1980 ,
 		["expansionID"] =  6 ,
+		["mod"] =  7 ,
 		["maxLevel"] =  91 ,
 		["filter"] =  6 ,
 		["recolor"] =  false ,
@@ -2694,6 +2845,7 @@ addon.ArmorSets["MAIL"] ={
 		["label"] =  69 ,
 		["setID"] =  1981 ,
 		["expansionID"] =  6 ,
+		["mod"] =  8 ,
 		["maxLevel"] =  91 ,
 		["filter"] =  6 ,
 		["recolor"] =  false ,
@@ -2714,6 +2866,20 @@ addon.ArmorSets["MAIL"] ={
 		["name"] =  "Tsunami Mail" ,
 		["items"] = { 56504,56498,56482,56494,56481,56490,56512,56508, },
 	},
+	[2827]={
+		["armorType"] =  3 ,
+		["source"] =  2 ,
+		["label"] =  89 ,
+		["setID"] =  2827 ,
+		["expansionID"] =  8 ,
+		["mod"] =  1 ,
+		["maxLevel"] =  110 ,
+		["filter"] =  8 ,
+		["recolor"] =  false ,
+		["minLevel"] =  110 ,
+		["name"] =  "Warfronts Alliance Mail" ,
+		["items"] = { 163265,163277,163389,163394,163397,163398,163400,163401, },
+	},
 	[2866]={
 		["armorType"] =  3 ,
 		["source"] =  16777218 ,
@@ -2733,6 +2899,7 @@ addon.ArmorSets["MAIL"] ={
 		["label"] =  69 ,
 		["setID"] =  1960 ,
 		["expansionID"] =  6 ,
+		["mod"] =  6 ,
 		["maxLevel"] =  91 ,
 		["filter"] =  6 ,
 		["recolor"] =  false ,
@@ -2740,31 +2907,33 @@ addon.ArmorSets["MAIL"] ={
 		["name"] =  "Wayfaring Set" ,
 		["items"] = { 116187,116188,116189,116190,116191,116192,116193,116194, },
 	},
-	[2814]={
-		["armorType"] =  3 ,
-		["source"] =  18 ,
-		["label"] =  87 ,
-		["setID"] =  2814 ,
-		["expansionID"] =  8 ,
-		["maxLevel"] =  120 ,
-		["filter"] =  3 ,
-		["recolor"] =  false ,
-		["minLevel"] =  120 ,
-		["name"] =  "Kul Tiras Dungeon Mail (Heroic Recolor)" ,
-		["items"] = { 159353,158356,159356,159294,159354,155892,155887,159359,159376, },
-	},
 	[2818]={
 		["armorType"] =  3 ,
 		["source"] =  18 ,
 		["label"] =  87 ,
 		["setID"] =  2818 ,
 		["expansionID"] =  8 ,
+		["mod"] =  2 ,
 		["maxLevel"] =  120 ,
 		["filter"] =  3 ,
 		["recolor"] =  false ,
 		["minLevel"] =  120 ,
 		["name"] =  "Zandalar Dungeon Mail (Heroic Recolor)" ,
 		["items"] = { 158347,158308,158309,159288,158307,158317,159358,155868,159360, },
+	},
+	[2815]={
+		["armorType"] =  3 ,
+		["source"] =  18 ,
+		["label"] =  87 ,
+		["setID"] =  2815 ,
+		["expansionID"] =  8 ,
+		["mod"] =  3 ,
+		["maxLevel"] =  120 ,
+		["filter"] =  3 ,
+		["recolor"] =  false ,
+		["minLevel"] =  120 ,
+		["name"] =  "Kul Tiras Dungeon Mail (Mythic Recolor)" ,
+		["items"] = { 159353,158356,159356,159294,159354,155892,155887,159359,159376, },
 	},
 	[217]={
 		["armorType"] =  3 ,
@@ -2785,6 +2954,7 @@ addon.ArmorSets["MAIL"] ={
 		["label"] =  82 ,
 		["setID"] =  2435 ,
 		["expansionID"] =  7 ,
+		["mod"] =  1 ,
 		["maxLevel"] =  110 ,
 		["filter"] =  5 ,
 		["recolor"] =  false ,
@@ -2798,6 +2968,7 @@ addon.ArmorSets["MAIL"] ={
 		["label"] =  82 ,
 		["setID"] =  2436 ,
 		["expansionID"] =  7 ,
+		["mod"] =  2 ,
 		["maxLevel"] =  110 ,
 		["filter"] =  5 ,
 		["recolor"] =  false ,
@@ -2824,6 +2995,7 @@ addon.ArmorSets["MAIL"] ={
 		["label"] =  82 ,
 		["setID"] =  2438 ,
 		["expansionID"] =  7 ,
+		["mod"] =  4 ,
 		["maxLevel"] =  110 ,
 		["filter"] =  5 ,
 		["recolor"] =  false ,
@@ -2831,17 +3003,18 @@ addon.ArmorSets["MAIL"] ={
 		["name"] =  "Wildstalker Armor (Raid Finder Lookalike)" ,
 		["items"] = { 147053,147051,147050,147047,147044,147055,147057,147426, },
 	},
-	[2815]={
+	[2814]={
 		["armorType"] =  3 ,
 		["source"] =  18 ,
 		["label"] =  87 ,
-		["setID"] =  2815 ,
+		["setID"] =  2814 ,
 		["expansionID"] =  8 ,
+		["mod"] =  2 ,
 		["maxLevel"] =  120 ,
 		["filter"] =  3 ,
 		["recolor"] =  false ,
 		["minLevel"] =  120 ,
-		["name"] =  "Kul Tiras Dungeon Mail (Mythic Recolor)" ,
+		["name"] =  "Kul Tiras Dungeon Mail (Heroic Recolor)" ,
 		["items"] = { 159353,158356,159356,159294,159354,155892,155887,159359,159376, },
 	},
 	[2809]={
@@ -2870,18 +3043,18 @@ addon.ArmorSets["MAIL"] ={
 		["name"] =  "Northrend Frozen Mail (Recolor)" ,
 		["items"] = { 127523,127633,39391,39274,39217,43996,39405,37788, },
 	},
-	[2706]={
+	[1297]={
 		["armorType"] =  3 ,
-		["source"] =  2 ,
-		["label"] =  86 ,
-		["setID"] =  2706 ,
-		["expansionID"] =  7 ,
-		["maxLevel"] =  110 ,
-		["filter"] =  5 ,
+		["source"] =  8 ,
+		["label"] =  55 ,
+		["setID"] =  1297 ,
+		["expansionID"] =  4 ,
+		["maxLevel"] =  80 ,
+		["filter"] =  2 ,
 		["recolor"] =  false ,
-		["minLevel"] =  110 ,
-		["name"] =  "Serpentstalker Guise (Mythic Lookalike)" ,
-		["items"] = { 152007,151996,152280,151994,151999,152000,152003,152004, },
+		["minLevel"] =  80 ,
+		["name"] =  "Earthen Mail (Recolor)" ,
+		["items"] = { 57381,57310,57351,57317,57295,57364,57313, },
 	},
 	[2443]={
 		["armorType"] =  3 ,
@@ -2889,6 +3062,7 @@ addon.ArmorSets["MAIL"] ={
 		["label"] =  82 ,
 		["setID"] =  2443 ,
 		["expansionID"] =  7 ,
+		["mod"] =  1 ,
 		["maxLevel"] =  110 ,
 		["filter"] =  5 ,
 		["recolor"] =  false ,
@@ -2902,6 +3076,7 @@ addon.ArmorSets["MAIL"] ={
 		["label"] =  82 ,
 		["setID"] =  2444 ,
 		["expansionID"] =  7 ,
+		["mod"] =  2 ,
 		["maxLevel"] =  110 ,
 		["filter"] =  5 ,
 		["recolor"] =  false ,
@@ -2915,6 +3090,7 @@ addon.ArmorSets["MAIL"] ={
 		["label"] =  82 ,
 		["setID"] =  2445 ,
 		["expansionID"] =  7 ,
+		["mod"] =  3 ,
 		["maxLevel"] =  110 ,
 		["filter"] =  5 ,
 		["recolor"] =  false ,
@@ -2928,12 +3104,27 @@ addon.ArmorSets["MAIL"] ={
 		["label"] =  82 ,
 		["setID"] =  2446 ,
 		["expansionID"] =  7 ,
+		["mod"] =  4 ,
 		["maxLevel"] =  110 ,
 		["filter"] =  5 ,
 		["recolor"] =  false ,
 		["minLevel"] =  110 ,
 		["name"] =  "Regalia of the Skybreaker (Raid Finder Lookalike)" ,
 		["items"] = { 147054,147052,147049,147048,147043,147045,147056,147058, },
+	},
+	[2706]={
+		["armorType"] =  3 ,
+		["source"] =  2 ,
+		["label"] =  86 ,
+		["setID"] =  2706 ,
+		["expansionID"] =  7 ,
+		["mod"] =  3 ,
+		["maxLevel"] =  110 ,
+		["filter"] =  5 ,
+		["recolor"] =  false ,
+		["minLevel"] =  110 ,
+		["name"] =  "Serpentstalker Guise (Mythic Lookalike)" ,
+		["items"] = { 152007,151996,152280,151994,151999,152000,152003,152004, },
 	},
 	[492]={
 		["armorType"] =  3 ,
@@ -2974,19 +3165,6 @@ addon.ArmorSets["MAIL"] ={
 		["name"] =  "Burnished Mail (Recolor)" ,
 		["items"] = { 6573,6577,6578,6580,6574,6576, },
 	},
-	[278]={
-		["armorType"] =  3 ,
-		["source"] =  32778 ,
-		["label"] =  44 ,
-		["setID"] =  278 ,
-		["expansionID"] =  1 ,
-		["maxLevel"] =  67 ,
-		["filter"] =  1 ,
-		["recolor"] =  false ,
-		["minLevel"] =  22 ,
-		["name"] =  "Blood Knight Mail" ,
-		["items"] = { 24862,30004,24869,24864,24865,24867, },
-	},
 	[250]={
 		["armorType"] =  3 ,
 		["source"] =  2 ,
@@ -3000,31 +3178,31 @@ addon.ArmorSets["MAIL"] ={
 		["name"] =  "Green Iron Set (Recolor)" ,
 		["items"] = { 14778,14783,14779,14782,14784,14786,14787, },
 	},
-	[905]={
+	[278]={
 		["armorType"] =  3 ,
-		["source"] =  0 ,
-		["label"] =  45 ,
-		["setID"] =  905 ,
+		["source"] =  32778 ,
+		["label"] =  44 ,
+		["setID"] =  278 ,
 		["expansionID"] =  1 ,
-		["maxLevel"] =  40 ,
-		["filter"] =  3 ,
+		["maxLevel"] =  67 ,
+		["filter"] =  1 ,
 		["recolor"] =  false ,
-		["minLevel"] =  40 ,
-		["name"] =  "Bloodmail Regalia" ,
-		["items"] = { 14614,14616,14615,14611,14612, },
+		["minLevel"] =  22 ,
+		["name"] =  "Blood Knight Mail" ,
+		["items"] = { 24862,30004,24869,24864,24865,24867, },
 	},
-	[1120]={
+	[266]={
 		["armorType"] =  3 ,
-		["source"] =  18 ,
-		["label"] =  25 ,
-		["setID"] =  1120 ,
-		["expansionID"] =  3 ,
-		["maxLevel"] =  80 ,
-		["filter"] =  4 ,
+		["source"] =  2 ,
+		["label"] =  44 ,
+		["setID"] =  266 ,
+		["expansionID"] =  1 ,
+		["maxLevel"] =  57 ,
+		["filter"] =  1 ,
 		["recolor"] =  false ,
-		["minLevel"] =  80 ,
-		["name"] =  "Worldbreaker Regalia (Recolor)" ,
-		["items"] = { 45828,45845,45687,46044,45288,45943,45701, },
+		["minLevel"] =  51 ,
+		["name"] =  "Radiant Set (Recolor)" ,
+		["items"] = { 8303,8309,8307,8306,8305,8302, },
 	},
 	[379]={
 		["armorType"] =  3 ,
@@ -3039,31 +3217,18 @@ addon.ArmorSets["MAIL"] ={
 		["name"] =  "Beaststalker Armor (Recolor)" ,
 		["items"] = { 127217,127182,27414,24366,24465,24090,24451,24022, },
 	},
-	[1624]={
-		["armorType"] =  3 ,
-		["source"] =  8194 ,
-		["label"] =  43 ,
-		["setID"] =  1624 ,
-		["expansionID"] =  5 ,
-		["maxLevel"] =  90 ,
-		["filter"] =  5 ,
-		["recolor"] =  false ,
-		["minLevel"] =  90 ,
-		["name"] =  "Battlegear of the Saurok Stalker (Heroic Lookalike)" ,
-		["items"] = { 96798,96847,96867,95026,95000,96797,96744,96788, },
-	},
-	[1764]={
+	[1628]={
 		["armorType"] =  3 ,
 		["source"] =  2 ,
-		["label"] =  64 ,
-		["setID"] =  1764 ,
+		["label"] =  43 ,
+		["setID"] =  1628 ,
 		["expansionID"] =  5 ,
 		["maxLevel"] =  90 ,
 		["filter"] =  5 ,
 		["recolor"] =  false ,
 		["minLevel"] =  90 ,
-		["name"] =  "Battlegear of the Unblinking Vigil (Raid Finder Lookalike)" ,
-		["items"] = { 112836,112779,112480,112762,112551,112927,112831,105119, },
+		["name"] =  "Battlegear of the Saurok Stalker (Raid Finder Lookalike)" ,
+		["items"] = { 95731,95682,95751,95672,95627,95628,95972,95681, },
 	},
 	[1109]={
 		["armorType"] =  3 ,
@@ -3084,12 +3249,26 @@ addon.ArmorSets["MAIL"] ={
 		["label"] =  86 ,
 		["setID"] =  2707 ,
 		["expansionID"] =  7 ,
+		["mod"] =  4 ,
 		["maxLevel"] =  110 ,
 		["filter"] =  5 ,
 		["recolor"] =  false ,
 		["minLevel"] =  110 ,
 		["name"] =  "Serpentstalker Guise (Raid Finder Lookalike)" ,
 		["items"] = { 152007,151996,152280,151994,151999,152000,152003,152004, },
+	},
+	[407]={
+		["armorType"] =  3 ,
+		["source"] =  3 ,
+		["label"] =  13 ,
+		["setID"] =  407 ,
+		["expansionID"] =  2 ,
+		["maxLevel"] =  70 ,
+		["filter"] =  4 ,
+		["recolor"] =  false ,
+		["minLevel"] =  70 ,
+		["name"] =  "Cataclysm Raiment (Recolor)" ,
+		["items"] = { 30097,30068,29921,29976,29991,30066,30047, },
 	},
 	[1000]={
 		["armorType"] =  3 ,
@@ -3130,19 +3309,18 @@ addon.ArmorSets["MAIL"] ={
 		["name"] =  "Gryphon Mail" ,
 		["items"] = { 9388,28181,15619,15622,15625,15626,15627,15628, },
 	},
-	[1451]={
+	[237]={
 		["armorType"] =  3 ,
-		["source"] =  8210 ,
-		["label"] =  39 ,
-		["setID"] =  1451 ,
-		["items"] = { 87143,89925,89927,89942,90515,86962,87183,87042, },
+		["source"] =  10 ,
+		["label"] =  44 ,
+		["setID"] =  237 ,
+		["expansionID"] =  1 ,
+		["maxLevel"] =  60 ,
+		["filter"] =  1 ,
 		["recolor"] =  false ,
-		["name"] =  "Regalia of the Firebird (Heroic Lookalike)" ,
-		["filter"] =  5 ,
-		["minLevel"] =  90 ,
-		["expansionID"] =  5 ,
-		["maxLevel"] =  90 ,
-		["classMask"] =  7 ,
+		["minLevel"] =  30 ,
+		["name"] =  "Marauder's Mail" ,
+		["items"] = { 27726,15565,15566,15570,15573,15567, },
 	},
 	[1001]={
 		["armorType"] =  3 ,
@@ -3157,31 +3335,31 @@ addon.ArmorSets["MAIL"] ={
 		["name"] =  "Northrend Frozen Mail (Recolor)" ,
 		["items"] = { 40283,40288,40196,40302,40340,45184,40737, },
 	},
-	[408]={
+	[230]={
 		["armorType"] =  3 ,
-		["source"] =  3 ,
-		["label"] =  13 ,
-		["setID"] =  408 ,
-		["expansionID"] =  2 ,
-		["maxLevel"] =  70 ,
-		["filter"] =  4 ,
-		["recolor"] =  false ,
-		["minLevel"] =  70 ,
-		["name"] =  "Rift Stalker Armor (Recolor)" ,
-		["items"] = { 30085,30054,30091,30046,29985,30045, },
-	},
-	[223]={
-		["armorType"] =  3 ,
-		["source"] =  10 ,
+		["source"] =  32778 ,
 		["label"] =  44 ,
-		["setID"] =  223 ,
+		["setID"] =  230 ,
 		["expansionID"] =  1 ,
-		["maxLevel"] =  65 ,
+		["maxLevel"] =  58 ,
 		["filter"] =  1 ,
 		["recolor"] =  false ,
-		["minLevel"] =  20 ,
-		["name"] =  "War Paint Mail (Recolor)" ,
-		["items"] = { 15518,15515,15520,15521,15523,15516,15517, },
+		["minLevel"] =  18 ,
+		["name"] =  "Banded Mail" ,
+		["items"] = { 9836,10409,9841,9839,9840,9837, },
+	},
+	[1936]={
+		["armorType"] =  3 ,
+		["source"] =  11 ,
+		["label"] =  68 ,
+		["setID"] =  1936 ,
+		["expansionID"] =  6 ,
+		["maxLevel"] =  100 ,
+		["filter"] =  2 ,
+		["recolor"] =  false ,
+		["minLevel"] =  90 ,
+		["name"] =  "Spirestrider Set (Recolor)" ,
+		["items"] = { 114681,114685,119368,118156,114697,114336,118141, },
 	},
 	[219]={
 		["armorType"] =  3 ,
@@ -3222,31 +3400,46 @@ addon.ArmorSets["MAIL"] ={
 		["name"] =  "Crystal-Leaf Set (Recolor)" ,
 		["items"] = { 119367,109888,109853,109981,109814,109940,109834, },
 	},
+	[2437]={
+		["armorType"] =  3 ,
+		["source"] =  2 ,
+		["label"] =  82 ,
+		["setID"] =  2437 ,
+		["expansionID"] =  7 ,
+		["mod"] =  3 ,
+		["maxLevel"] =  110 ,
+		["filter"] =  5 ,
+		["recolor"] =  false ,
+		["minLevel"] =  110 ,
+		["name"] =  "Wildstalker Armor (Mythic Lookalike)" ,
+		["items"] = { 147053,147051,147050,147047,147044,147055,147057,147426, },
+	},
 	[1882]={
 		["armorType"] =  3 ,
 		["source"] =  8194 ,
 		["label"] =  65 ,
 		["setID"] =  1882 ,
 		["expansionID"] =  6 ,
+		["mod"] =  3 ,
 		["maxLevel"] =  100 ,
 		["filter"] =  5 ,
 		["recolor"] =  false ,
 		["minLevel"] =  100 ,
-		["name"] =  "Windspeaker\'s Regalia (Mythic Lookalike)" ,
+		["name"] =  "Windspeakeru2019s Regalia (Mythic Lookalike)" ,
 		["items"] = { 113968,113982,113954,113915,113891,113944,113899,113930, },
 	},
-	[1015]={
+	[223]={
 		["armorType"] =  3 ,
-		["source"] =  27 ,
-		["label"] =  27 ,
-		["setID"] =  1015 ,
-		["expansionID"] =  3 ,
-		["maxLevel"] =  80 ,
-		["filter"] =  5 ,
+		["source"] =  10 ,
+		["label"] =  44 ,
+		["setID"] =  223 ,
+		["expansionID"] =  1 ,
+		["maxLevel"] =  65 ,
+		["filter"] =  1 ,
 		["recolor"] =  false ,
-		["minLevel"] =  80 ,
-		["name"] =  "Thrall's Battlegear (Lookalike)" ,
-		["items"] = { 47687,90300,90309,90318,47860,47441,47893,47426, },
+		["minLevel"] =  20 ,
+		["name"] =  "War Paint Mail (Recolor)" ,
+		["items"] = { 15518,15515,15520,15521,15523,15516,15517, },
 	},
 	[205]={
 		["armorType"] =  3 ,
@@ -3261,6 +3454,20 @@ addon.ArmorSets["MAIL"] ={
 		["name"] =  "Unyielding Mail (Recolor)" ,
 		["items"] = { 2966,2965,9870,15523, },
 	},
+	[1494]={
+		["armorType"] =  3 ,
+		["source"] =  538 ,
+		["label"] =  56 ,
+		["setID"] =  1494 ,
+		["recolor"] =  false ,
+		["items"] = { 101261,101260,101259,101257,101256,101255,101254,101253, },
+		["name"] =  "Wild Plains Set (Recolor)" ,
+		["filter"] =  2 ,
+		["minLevel"] =  80 ,
+		["expansionID"] =  5 ,
+		["maxLevel"] =  90 ,
+		["classMask"] =  7 ,
+	},
 	[221]={
 		["armorType"] =  3 ,
 		["source"] =  3 ,
@@ -3274,40 +3481,13 @@ addon.ArmorSets["MAIL"] ={
 		["name"] =  "Slayer's Mail (Recolor)" ,
 		["items"] = { 14746,14743,25655,14744,14747,14748, },
 	},
-	[1494]={
-		["armorType"] =  3 ,
-		["source"] =  538 ,
-		["label"] =  56 ,
-		["setID"] =  1494 ,
-		["items"] = { 101261,101260,101259,101257,101256,101255,101254,101253, },
-		["recolor"] =  false ,
-		["name"] =  "Wild Plains Set (Recolor)" ,
-		["filter"] =  2 ,
-		["minLevel"] =  80 ,
-		["expansionID"] =  5 ,
-		["maxLevel"] =  90 ,
-		["classMask"] =  7 ,
-	},
-	[237]={
-		["armorType"] =  3 ,
-		["source"] =  10 ,
-		["label"] =  44 ,
-		["setID"] =  237 ,
-		["expansionID"] =  1 ,
-		["maxLevel"] =  60 ,
-		["filter"] =  1 ,
-		["recolor"] =  false ,
-		["minLevel"] =  30 ,
-		["name"] =  "Marauder's Mail" ,
-		["items"] = { 27726,15565,15566,15570,15573,15567, },
-	},
 	[1495]={
 		["armorType"] =  3 ,
 		["source"] =  520 ,
 		["label"] =  56 ,
 		["setID"] =  1495 ,
-		["items"] = { 101235,101234,101233,101231,101230,101229,101228,101227, },
 		["recolor"] =  false ,
+		["items"] = { 101235,101234,101233,101231,101230,101229,101228,101227, },
 		["name"] =  "Wild Plains Set (Recolor)" ,
 		["filter"] =  2 ,
 		["minLevel"] =  80 ,
@@ -3315,26 +3495,26 @@ addon.ArmorSets["MAIL"] ={
 		["maxLevel"] =  90 ,
 		["classMask"] =  7 ,
 	},
-	[266]={
+	[1015]={
 		["armorType"] =  3 ,
-		["source"] =  2 ,
-		["label"] =  44 ,
-		["setID"] =  266 ,
-		["expansionID"] =  1 ,
-		["maxLevel"] =  57 ,
-		["filter"] =  1 ,
+		["source"] =  27 ,
+		["label"] =  27 ,
+		["setID"] =  1015 ,
+		["expansionID"] =  3 ,
+		["maxLevel"] =  80 ,
+		["filter"] =  5 ,
 		["recolor"] =  false ,
-		["minLevel"] =  51 ,
-		["name"] =  "Radiant Set (Recolor)" ,
-		["items"] = { 8303,8309,8307,8306,8305,8302, },
+		["minLevel"] =  80 ,
+		["name"] =  "Thrall's Battlegear (Lookalike)" ,
+		["items"] = { 47687,90300,90309,90318,47860,47441,47893,47426, },
 	},
 	[1496]={
 		["armorType"] =  3 ,
 		["source"] =  520 ,
 		["label"] =  56 ,
 		["setID"] =  1496 ,
-		["items"] = { 101244,101243,101242,101241,101240,101239,101238,101237, },
 		["recolor"] =  false ,
+		["items"] = { 101244,101243,101242,101241,101240,101239,101238,101237, },
 		["name"] =  "Wild Plains Set" ,
 		["filter"] =  2 ,
 		["minLevel"] =  81 ,
@@ -3342,26 +3522,26 @@ addon.ArmorSets["MAIL"] ={
 		["maxLevel"] =  90 ,
 		["classMask"] =  7 ,
 	},
-	[1934]={
+	[1120]={
 		["armorType"] =  3 ,
-		["source"] =  26 ,
-		["label"] =  68 ,
-		["setID"] =  1934 ,
-		["expansionID"] =  6 ,
-		["maxLevel"] =  95 ,
-		["filter"] =  2 ,
+		["source"] =  18 ,
+		["label"] =  25 ,
+		["setID"] =  1120 ,
+		["expansionID"] =  3 ,
+		["maxLevel"] =  80 ,
+		["filter"] =  4 ,
 		["recolor"] =  false ,
-		["minLevel"] =  90 ,
-		["name"] =  "Warpscale Set (Recolor)" ,
-		["items"] = { 112589,114257,114261,114265,106585,106586,114277, },
+		["minLevel"] =  80 ,
+		["name"] =  "Worldbreaker Regalia (Recolor)" ,
+		["items"] = { 45828,45845,45687,46044,45288,45943,45701, },
 	},
 	[1497]={
 		["armorType"] =  3 ,
 		["source"] =  530 ,
 		["label"] =  56 ,
 		["setID"] =  1497 ,
-		["items"] = { 101065,101064,101063,101062,101061,101060,101059,101058, },
 		["recolor"] =  false ,
+		["items"] = { 101065,101064,101063,101062,101061,101060,101059,101058, },
 		["name"] =  "Stormscale Set (Recolor)" ,
 		["filter"] =  2 ,
 		["minLevel"] =  86 ,
@@ -3369,18 +3549,18 @@ addon.ArmorSets["MAIL"] ={
 		["maxLevel"] =  90 ,
 		["classMask"] =  3 ,
 	},
-	[2437]={
+	[271]={
 		["armorType"] =  3 ,
 		["source"] =  2 ,
-		["label"] =  82 ,
-		["setID"] =  2437 ,
-		["expansionID"] =  7 ,
-		["maxLevel"] =  110 ,
-		["filter"] =  5 ,
+		["label"] =  44 ,
+		["setID"] =  271 ,
+		["expansionID"] =  2 ,
+		["maxLevel"] =  57 ,
+		["filter"] =  1 ,
 		["recolor"] =  false ,
-		["minLevel"] =  110 ,
-		["name"] =  "Wildstalker Armor (Mythic Lookalike)" ,
-		["items"] = { 147053,147051,147050,147047,147044,147055,147057,147426, },
+		["minLevel"] =  57 ,
+		["name"] =  "Unyielding Mail" ,
+		["items"] = { 24808,24813,24809,24807,24810,24811,24812,24806, },
 	},
 	[1498]={
 		["armorType"] =  3 ,
@@ -3460,31 +3640,31 @@ addon.ArmorSets["MAIL"] ={
 		["name"] =  "Regalia of Celestial Harmony (Mythic Lookalike)" ,
 		["items"] = { 105544,105578,105410,105508,105653,105470,105597,105598, },
 	},
-	[1936]={
+	[1934]={
 		["armorType"] =  3 ,
-		["source"] =  11 ,
+		["source"] =  26 ,
 		["label"] =  68 ,
-		["setID"] =  1936 ,
+		["setID"] =  1934 ,
 		["expansionID"] =  6 ,
-		["maxLevel"] =  100 ,
+		["maxLevel"] =  95 ,
 		["filter"] =  2 ,
 		["recolor"] =  false ,
 		["minLevel"] =  90 ,
-		["name"] =  "Spirestrider Set (Recolor)" ,
-		["items"] = { 114681,114685,119368,118156,114697,114336,118141, },
+		["name"] =  "Warpscale Set (Recolor)" ,
+		["items"] = { 112589,114257,114261,114265,106585,106586,114277, },
 	},
-	[230]={
+	[246]={
 		["armorType"] =  3 ,
-		["source"] =  32778 ,
+		["source"] =  2 ,
 		["label"] =  44 ,
-		["setID"] =  230 ,
+		["setID"] =  246 ,
 		["expansionID"] =  1 ,
-		["maxLevel"] =  58 ,
+		["maxLevel"] =  41 ,
 		["filter"] =  1 ,
 		["recolor"] =  false ,
-		["minLevel"] =  18 ,
-		["name"] =  "Banded Mail" ,
-		["items"] = { 9836,10409,9841,9839,9840,9837, },
+		["minLevel"] =  36 ,
+		["name"] =  "Sparkleshell Mail (Recolor)" ,
+		["items"] = { 15601,15599,15607,15605,15600,15606, },
 	},
 	[254]={
 		["armorType"] =  3 ,
@@ -3647,8 +3827,8 @@ addon.ArmorSets["MAIL"] ={
 		["source"] =  2 ,
 		["label"] =  1 ,
 		["setID"] =  378 ,
-		["items"] = { 127223,127228,127180,24046,24388,27428, },
 		["recolor"] =  false ,
+		["items"] = { 127223,127228,127180,24046,24388,27428, },
 		["name"] =  "The Elements (Recolor)" ,
 		["filter"] =  3 ,
 		["minLevel"] =  60 ,
@@ -3669,18 +3849,18 @@ addon.ArmorSets["MAIL"] ={
 		["name"] =  "Spiritwalker's Regalia (Normal Lookalike)" ,
 		["items"] = { 71997,133527,77151,77242,77237,71988,77174,77163, },
 	},
-	[271]={
+	[1764]={
 		["armorType"] =  3 ,
 		["source"] =  2 ,
-		["label"] =  44 ,
-		["setID"] =  271 ,
-		["expansionID"] =  2 ,
-		["maxLevel"] =  57 ,
-		["filter"] =  1 ,
+		["label"] =  64 ,
+		["setID"] =  1764 ,
+		["expansionID"] =  5 ,
+		["maxLevel"] =  90 ,
+		["filter"] =  5 ,
 		["recolor"] =  false ,
-		["minLevel"] =  57 ,
-		["name"] =  "Unyielding Mail" ,
-		["items"] = { 24808,24813,24809,24807,24810,24811,24812,24806, },
+		["minLevel"] =  90 ,
+		["name"] =  "Battlegear of the Unblinking Vigil (Raid Finder Lookalike)" ,
+		["items"] = { 112836,112779,112480,112762,112551,112927,112831,105119, },
 	},
 	[224]={
 		["armorType"] =  3 ,
@@ -3760,19 +3940,6 @@ addon.ArmorSets["MAIL"] ={
 		["name"] =  "Battlegear of the Savage Hunt (Normal Lookalike)" ,
 		["items"] = { 124314,124310,124285,124291,124306,124281,124294,124298, },
 	},
-	[210]={
-		["armorType"] =  3 ,
-		["source"] =  2 ,
-		["label"] =  44 ,
-		["setID"] =  210 ,
-		["expansionID"] =  1 ,
-		["maxLevel"] =  66 ,
-		["filter"] =  1 ,
-		["recolor"] =  false ,
-		["minLevel"] =  9 ,
-		["name"] =  "Brackwater Mail (Recolor)" ,
-		["items"] = { 15487,15485,14147,31197, },
-	},
 	[910]={
 		["armorType"] =  3 ,
 		["source"] =  10 ,
@@ -3786,1615 +3953,17 @@ addon.ArmorSets["MAIL"] ={
 		["name"] =  "Beast Lord Armor" ,
 		["items"] = { 127529,28228,27474,28275,27801,29261,29262, },
 	},
-}
-
-addon.ArmorSetMods["MAIL"] = {
-	[86866] = {
-		[4] = 44738,
-	},
-	[112480] = {
-		[3] = 60992,
-		[4] = 60991,
-	},
-	[159360] = {
-		98400, -- [1]
-		95133, -- [2]
-		98401, -- [3]
-	},
-	[95681] = {
-		[4] = 50206,
-	},
-	[65055] = {
-		[2] = 32646,
-	},
-	[138218] = {
-		[2] = 104,
-	},
-	[86228] = {
-		44360, -- [1]
-	},
-	[152016] = {
-		[2] = 104,
-	},
-	[113982] = {
-		62904, -- [1]
-		62902, -- [2]
-		67278, -- [3]
-	},
-	[141413] = {
-		104, -- [1]
-	},
-	[124298] = {
-		69894, -- [1]
-		69892, -- [2]
-		69895, -- [3]
-	},
-	[104912] = {
-		[4] = 56449,
-	},
-	[51019] = {
-		24995, -- [1]
-	},
-	[140903] = {
-		nil, -- [1]
-		81978, -- [2]
-		81980, -- [3]
-		81981, -- [4]
-	},
-	[71442] = {
-		[2] = 36672,
-	},
-	[69941] = {
-		35605, -- [1]
-	},
-	[133622] = {
-		[2] = 76860,
-	},
-	[86900] = {
-		[4] = 44763,
-	},
-	[140904] = {
-		[2] = 104,
-	},
-	[152019] = {
-		[2] = 104,
-	},
-	[71315] = {
-		36591, -- [1]
-	},
-	[65120] = {
-		[2] = 32695,
-	},
-	[65136] = {
-		[2] = 32708,
-	},
-	[30069] = {
-		[2] = 104,
-	},
-	[152020] = {
-		[2] = 104,
-	},
-	[86901] = {
-		[4] = 44764,
-	},
-	[86965] = {
-		[2] = 44823,
-	},
-	[124300] = {
-		69902, -- [1]
-		69900, -- [2]
-		69903, -- [3]
-	},
-	[23482] = {
-		[2] = 104,
-	},
-	[133625] = {
-		[2] = 76863,
-	},
-	[23514] = {
-		[2] = 104,
-	},
-	[105617] = {
-		[3] = 57018,
-	},
-	[71412] = {
-		[2] = 36644,
-	},
-	[95972] = {
-		[4] = 50452,
-	},
-	[71987] = {
-		36883, -- [1]
-	},
-	[59324] = {
-		29574, -- [1]
-	},
-	[105809] = {
-		57131, -- [1]
-	},
-	[129890] = {
-		74360, -- [1]
-	},
-	[96867] = {
-		[2] = 51200,
-	},
-	[86168] = {
-		44307, -- [1]
-	},
-	[158347] = {
-		98388, -- [1]
-		94348, -- [2]
-		98389, -- [3]
-	},
-	[147744] = {
-		86851, -- [1]
-	},
-	[71988] = {
-		36884, -- [1]
-	},
-	[133628] = {
-		[2] = 104,
-	},
-	[152280] = {
-		nil, -- [1]
-		90340, -- [2]
-		90342, -- [3]
-		90339, -- [4]
-	},
-	[54566] = {
-		26515, -- [1]
-	},
-	[71254] = {
-		36539, -- [1]
-	},
-	[133629] = {
-		[2] = 104,
-	},
-	[137334] = {
-		[2] = 104,
-	},
-	[147746] = {
-		86859, -- [1]
-	},
-	[113891] = {
-		[3] = 67271,
-	},
-	[133630] = {
-		[2] = 104,
-	},
-	[152090] = {
-		[2] = 104,
-	},
-	[147044] = {
-		86549, -- [1]
-		86548, -- [2]
-		86550, -- [3]
-		86547, -- [4]
-	},
-	[147747] = {
-		86863, -- [1]
-	},
-	[95751] = {
-		[4] = 50264,
-	},
-	[65074] = {
-		[2] = 32662,
-	},
-	[133631] = {
-		[2] = 104,
-	},
-	[59485] = {
-		29702, -- [1]
-	},
-	[140913] = {
-		[2] = 104,
-	},
-	[56563] = {
-		27833, -- [1]
-	},
-	[55062] = {
-		104, -- [1]
-	},
-	[51006] = {
-		24985, -- [1]
-	},
-	[50000] = {
-		24482, -- [1]
-	},
-	[23515] = {
-		[2] = 104,
-	},
-	[141426] = {
-		104, -- [1]
-	},
-	[50064] = {
-		24529, -- [1]
-	},
-	[105653] = {
-		[3] = 57047,
-	},
-	[59310] = {
-		29562, -- [1]
-	},
-	[89940] = {
-		[2] = 46668,
-	},
-	[50671] = {
-		[2] = 24784,
-	},
-	[147048] = {
-		86713, -- [1]
-		86712, -- [2]
-		86714, -- [3]
-		86711, -- [4]
-	},
-	[159376] = {
-		95859, -- [1]
-		95859, -- [2]
-		95859, -- [3]
-	},
-	[124305] = {
-		69919, -- [1]
-		69917, -- [2]
-		69920, -- [3]
-	},
-	[51929] = {
-		25644, -- [1]
-	},
-	[51873] = {
-		25594, -- [1]
-	},
-	[53488] = {
-		26210, -- [1]
-	},
-	[50971] = {
-		24952, -- [1]
-	},
-	[90739] = {
-		[4] = 47151,
-	},
-	[147049] = {
-		86717, -- [1]
-		86716, -- [2]
-		86718, -- [3]
-		86715, -- [4]
-	},
-	[86204] = {
-		44340, -- [1]
-	},
-	[71417] = {
-		[2] = 36649,
-	},
-	[50059] = {
-		24525, -- [1]
-	},
-	[124281] = {
-		69833, -- [1]
-		69831, -- [2]
-		69834, -- [3]
-	},
-	[85821] = {
-		44055, -- [1]
-	},
-	[49900] = {
-		24443, -- [1]
-	},
-	[50703] = {
-		[2] = 24811,
-	},
-	[147050] = {
-		86561, -- [1]
-		86560, -- [2]
-		86562, -- [3]
-		86559, -- [4]
-	},
-	[158356] = {
-		94365, -- [1]
-		94364, -- [2]
-		95836, -- [3]
-	},
-	[124306] = {
-		69923, -- [1]
-		69921, -- [2]
-		69924, -- [3]
-	},
-	[134467] = {
-		[2] = 78984,
-	},
-	[50626] = {
-		[2] = 24753,
-	},
-	[50652] = {
-		[2] = 24771,
-	},
-	[50723] = {
-		[2] = 24828,
-	},
-	[51566] = {
-		25406, -- [1]
-	},
-	[147051] = {
-		86565, -- [1]
-		86564, -- [2]
-		86566, -- [3]
-		86563, -- [4]
-	},
-	[50698] = {
-		[2] = 24807,
-	},
-	[50687] = {
-		[2] = 24797,
-	},
-	[50777] = {
-		24862, -- [1]
-	},
-	[51583] = {
-		25420, -- [1]
-	},
-	[90421] = {
-		46989, -- [1]
-	},
-	[50797] = {
-		24881, -- [1]
-	},
-	[95714] = {
-		[4] = 50232,
-	},
-	[147052] = {
-		nil, -- [1]
-		86720, -- [2]
-		86722, -- [3]
-		86719, -- [4]
-	},
-	[50774] = {
-		24859, -- [1]
-	},
-	[65028] = {
-		[2] = 32622,
-	},
-	[113608] = {
-		62388, -- [1]
-		62386, -- [2]
-		67194, -- [3]
-	},
-	[49952] = {
-		24459, -- [1]
-	},
-	[86342] = {
-		44390, -- [1]
-	},
-	[50784] = {
-		24869, -- [1]
-	},
-	[50800] = {
-		24884, -- [1]
-	},
-	[147053] = {
-		86569, -- [1]
-		86568, -- [2]
-		86570, -- [3]
-		86567, -- [4]
-	},
-	[50413] = {
-		24708, -- [1]
-	},
-	[155868] = {
-		98377, -- [1]
-		92518, -- [2]
-		98378, -- [3]
-	},
-	[134470] = {
-		[2] = 78937,
-	},
-	[133530] = {
-		76808, -- [1]
-	},
-	[49901] = {
-		24444, -- [1]
-	},
-	[96831] = {
-		[2] = 51169,
-	},
-	[149034] = {
-		104, -- [1]
-		104, -- [2]
-		104, -- [3]
-		104, -- [4]
-	},
-	[147054] = {
-		86725, -- [1]
-		86724, -- [2]
-		86726, -- [3]
-		86723, -- [4]
-	},
-	[95149] = {
-		49924, -- [1]
-	},
-	[50789] = {
-		24874, -- [1]
-	},
-	[23484] = {
-		[2] = 104,
-	},
-	[51325] = {
-		25196, -- [1]
-	},
-	[51002] = {
-		24981, -- [1]
-	},
-	[51551] = {
-		25395, -- [1]
-	},
-	[50812] = {
-		24894, -- [1]
-	},
-	[147055] = {
-		86573, -- [1]
-		86572, -- [2]
-		86574, -- [3]
-		86571, -- [4]
-	},
-	[112779] = {
-		[3] = 61681,
-		[4] = 61680,
-	},
-	[50711] = {
-		[2] = 24818,
-	},
-	[50605] = {
-		[2] = 24737,
-	},
-	[50655] = {
-		[2] = 24774,
-	},
-	[71005] = {
-		36387, -- [1]
-	},
-	[50688] = {
-		[2] = 24798,
-	},
-	[50673] = {
-		[2] = 24786,
-	},
-	[133770] = {
-		[2] = 104,
-	},
-	[114568] = {
-		63491, -- [1]
-	},
-	[124309] = {
-		69933, -- [1]
-		69931, -- [2]
-		69934, -- [3]
-	},
-	[50645] = {
-		[2] = 24765,
-	},
-	[50619] = {
-		[2] = 24747,
-	},
-	[96811] = {
-		[2] = 51155,
-	},
-	[96332] = {
-		50754, -- [1]
-	},
-	[50689] = {
-		[2] = 24799,
-	},
-	[147057] = {
-		nil, -- [1]
-		86576, -- [2]
-		86578, -- [3]
-		86575, -- [4]
-	},
-	[65141] = {
-		[2] = 32712,
-	},
-	[71356] = {
-		36611, -- [1]
-	},
-	[112844] = {
-		61826, -- [1]
-	},
-	[71996] = {
-		36892, -- [1]
-	},
-	[113930] = {
-		62792, -- [1]
-		62790, -- [2]
-		67274, -- [3]
-	},
-	[70985] = {
-		36376, -- [1]
-	},
-	[14936] = {
-		[2] = 104,
-	},
-	[141437] = {
-		104, -- [1]
-	},
-	[105410] = {
-		[3] = 56851,
-	},
-	[124310] = {
-		69937, -- [1]
-		69935, -- [2]
-		69938, -- [3]
-	},
-	[71009] = {
-		36390, -- [1]
-	},
-	[71042] = {
-		36412, -- [1]
-	},
-	[71027] = {
-		36402, -- [1]
-	},
-	[71030] = {
-		36405, -- [1]
-	},
-	[86985] = {
-		[2] = 44838,
-	},
-	[138372] = {
-		81537, -- [1]
-		nil, -- [2]
-		81538, -- [3]
-		81539, -- [4]
-	},
-	[71255] = {
-		36540, -- [1]
-	},
-	[71018] = {
-		36395, -- [1]
-	},
-	[113867] = {
-		62664, -- [1]
-		62662, -- [2]
-		67198, -- [3]
-	},
-	[113899] = {
-		[3] = 67272,
-		[2] = 62731,
-	},
-	[86848] = {
-		104, -- [1]
-	},
-	[70736] = {
-		36158, -- [1]
-	},
-	[69939] = {
-		35604, -- [1]
-	},
-	[152006] = {
-		89899, -- [1]
-		89898, -- [2]
-		89900, -- [3]
-		89897, -- [4]
-	},
-	[95663] = {
-		[4] = 50192,
-	},
-	[95695] = {
-		[4] = 50219,
-	},
-	[65046] = {
-		[2] = 32639,
-	},
-	[105080] = {
-		[4] = 56587,
-	},
-	[51792] = {
-		25530, -- [1]
-	},
-	[63505] = {
-		31857, -- [1]
-	},
-	[89929] = {
-		[2] = 46660,
-	},
-	[138374] = {
-		[2] = 104,
-	},
-	[31581] = {
-		[2] = 104,
-	},
-	[140892] = {
-		[2] = 104,
-	},
-	[65114] = {
-		[2] = 32690,
-	},
-	[65033] = {
-		[2] = 32626,
-	},
-	[65004] = {
-		[2] = 32601,
-	},
-	[95188] = {
-		49935, -- [1]
-	},
-	[105820] = {
-		[4] = 57142,
-	},
-	[59355] = {
-		29599, -- [1]
-	},
-	[96242] = {
-		50674, -- [1]
-	},
-	[59504] = {
-		29714, -- [1]
-	},
-	[59472] = {
-		29695, -- [1]
-	},
-	[67144] = {
-		104, -- [1]
-	},
-	[94276] = {
-		49268, -- [1]
-	},
-	[59346] = {
-		29591, -- [1]
-	},
-	[140867] = {
-		[3] = 81868,
-		[4] = 81869,
-	},
-	[141442] = {
-		104, -- [1]
-	},
-	[25522] = {
-		[2] = 104,
-	},
-	[65132] = {
-		[2] = 32705,
-	},
-	[65063] = {
-		[2] = 32653,
-	},
-	[86818] = {
-		[4] = 44697,
-	},
-	[95026] = {
-		[2] = 49828,
-	},
-	[86882] = {
-		[4] = 44748,
-	},
-	[140868] = {
-		81871, -- [1]
-		81870, -- [2]
-		81872, -- [3]
-		81873, -- [4]
-	},
-	[77237] = {
-		38951, -- [1]
-	},
-	[114572] = {
-		63503, -- [1]
-		63503, -- [2]
-	},
-	[124313] = {
-		69949, -- [1]
-		69947, -- [2]
-		69950, -- [3]
-	},
-	[152366] = {
-		90429, -- [1]
-	},
-	[105470] = {
-		[3] = 56903,
-	},
-	[152011] = {
-		[2] = 104,
-	},
-	[96847] = {
-		[2] = 51183,
-	},
-	[140869] = {
-		81875, -- [1]
-		81874, -- [2]
-		81876, -- [3]
-		81877, -- [4]
-	},
-	[105598] = {
-		[3] = 57006,
-	},
-	[105119] = {
-		[4] = 56616,
-	},
-	[71425] = {
-		[2] = 36656,
-	},
-	[152367] = {
-		90433, -- [1]
-	},
-	[113902] = {
-		62736, -- [1]
-		62734, -- [2]
-		67201, -- [3]
-	},
-	[95027] = {
-		[2] = 49829,
-	},
-	[105790] = {
-		57112, -- [1]
-	},
-	[140870] = {
-		81879, -- [1]
-		nil, -- [2]
-		81880, -- [3]
-		81881, -- [4]
-	},
-	[158308] = {
-		94311, -- [1]
-		94310, -- [2]
-		98382, -- [3]
-	},
-	[96177] = {
-		50619, -- [1]
-	},
-	[124314] = {
-		69953, -- [1]
-		69951, -- [2]
-		69954, -- [3]
-	},
-	[152368] = {
-		90437, -- [1]
-	},
-	[60230] = {
-		[2] = 29984,
-	},
-	[71616] = {
-		[2] = 36823,
-	},
-	[105183] = {
-		56670, -- [1]
-	},
-	[140871] = {
-		nil, -- [1]
-		81882, -- [2]
-		81884, -- [3]
-		81885, -- [4]
-	},
-	[19693] = {
-		[2] = 104,
-	},
-	[71438] = {
-		[2] = 36668,
-	},
-	[141574] = {
-		82846, -- [1]
-	},
-	[152369] = {
-		90441, -- [1]
-	},
-	[59315] = {
-		29567, -- [1]
-	},
-	[86852] = {
-		104, -- [1]
-	},
-	[71451] = {
-		[2] = 36679,
-	},
-	[140872] = {
-		81887, -- [1]
-		nil, -- [2]
-		81888, -- [3]
-		81889, -- [4]
-	},
-	[138369] = {
-		[2] = 104,
-	},
-	[124283] = {
-		69841, -- [1]
-		69839, -- [2]
-		69842, -- [3]
-	},
-	[141575] = {
-		82815, -- [1]
-	},
-	[152370] = {
-		90445, -- [1]
-	},
-	[133527] = {
-		76805, -- [1]
-	},
-	[71561] = {
-		[2] = 36787,
-	},
-	[71457] = {
-		[2] = 36685,
-	},
-	[140873] = {
-		81891, -- [1]
-		81890, -- [2]
-		81892, -- [3]
-		81893, -- [4]
-	},
-	[147056] = {
-		86729, -- [1]
-		86728, -- [2]
-		86730, -- [3]
-		86727, -- [4]
-	},
-	[86214] = {
-		44348, -- [1]
-	},
-	[141576] = {
-		104, -- [1]
-	},
-	[152371] = {
-		90449, -- [1]
-	},
-	[71429] = {
-		[2] = 36660,
-	},
-	[85831] = {
-		44065, -- [1]
-	},
-	[113968] = {
-		62872, -- [1]
-		62870, -- [2]
-		67277, -- [3]
-	},
-	[140874] = {
-		81895, -- [1]
-		81894, -- [2]
-		81896, -- [3]
-		81897, -- [4]
-	},
-	[77251] = {
-		38965, -- [1]
-	},
-	[77162] = {
-		38900, -- [1]
-	},
-	[141577] = {
-		104, -- [1]
-	},
-	[152372] = {
-		90453, -- [1]
-	},
-	[77124] = {
-		38883, -- [1]
-	},
-	[77150] = {
-		38891, -- [1]
-	},
-	[50022] = {
-		24497, -- [1]
-	},
-	[140875] = {
-		81899, -- [1]
-		nil, -- [2]
-		81900, -- [3]
-		81901, -- [4]
-	},
-	[77163] = {
-		38901, -- [1]
-	},
-	[77174] = {
-		38910, -- [1]
-	},
-	[141578] = {
-		104, -- [1]
-	},
-	[139598] = {
-		104, -- [1]
-	},
-	[86822] = {
-		104, -- [1]
-	},
-	[139215] = {
-		81243, -- [1]
-		nil, -- [2]
-		81244, -- [3]
-		81245, -- [4]
-	},
-	[77242] = {
-		38956, -- [1]
-	},
-	[77151] = {
-		38892, -- [1]
-	},
-	[71997] = {
-		36893, -- [1]
-	},
-	[124285] = {
-		69847, -- [1]
-		69846, -- [2]
-		69848, -- [3]
-	},
-	[155887] = {
-		95832, -- [1]
-		92531, -- [2]
-		95833, -- [3]
-	},
-	[86997] = {
-		[2] = 44850,
-	},
-	[95765] = {
-		[4] = 50275,
-	},
-	[89951] = {
-		[2] = 46679,
-	},
-	[59476] = {
-		104, -- [1]
-	},
-	[140877] = {
-		[2] = 104,
-	},
-	[71365] = {
-		36618, -- [1]
-	},
-	[86861] = {
-		[4] = 44733,
-	},
-	[105155] = {
-		[4] = 56645,
-	},
-	[152375] = {
-		104, -- [1]
-	},
-	[86823] = {
-		104, -- [1]
-	},
-	[86855] = {
-		[4] = 44729,
-	},
-	[56538] = {
-		27811, -- [1]
-	},
-	[140878] = {
-		[2] = 104,
-	},
-	[147074] = {
-		104, -- [1]
-		104, -- [2]
-		104, -- [3]
-		104, -- [4]
-	},
-	[89920] = {
-		[2] = 46651,
-	},
-	[89979] = {
-		[4] = 46703,
-	},
-	[152376] = {
-		104, -- [1]
-	},
-	[96788] = {
-		[2] = 51135,
-	},
-	[95673] = {
-		[4] = 50200,
-	},
-	[87695] = {
-		[4] = 45312,
-	},
-	[140879] = {
-		[2] = 104,
-	},
-	[19694] = {
-		[2] = 104,
-	},
-	[50071] = {
-		24535, -- [1]
-	},
-	[112726] = {
-		61559, -- [1]
-	},
-	[152377] = {
-		104, -- [1]
-	},
-	[95000] = {
-		[2] = 49807,
-	},
-	[151994] = {
-		89851, -- [1]
-		89850, -- [2]
-		89852, -- [3]
-		89849, -- [4]
-	},
-	[23518] = {
-		[2] = 104,
-	},
-	[140880] = {
-		[2] = 104,
-	},
-	[113943] = {
-		62817, -- [1]
-		62815, -- [2]
-		67203, -- [3]
-	},
-	[124287] = {
-		69855, -- [1]
-		69853, -- [2]
-		69856, -- [3]
-	},
-	[89885] = {
-		46634, -- [1]
-	},
-	[96881] = {
-		[2] = 51211,
-	},
-	[96789] = {
-		[2] = 51136,
-	},
-	[151995] = {
-		nil, -- [1]
-		89854, -- [2]
-		89856, -- [3]
-		89853, -- [4]
-	},
-	[147426] = {
-		86581, -- [1]
-		86580, -- [2]
-		86582, -- [3]
-		86579, -- [4]
-	},
-	[140881] = {
-		[2] = 104,
-	},
-	[59509] = {
-		104, -- [1]
-	},
-	[31583] = {
-		[2] = 104,
-	},
-	[155892] = {
-		95834, -- [1]
-		92536, -- [2]
-		95835, -- [3]
-	},
-	[96917] = {
-		[2] = 51240,
-	},
-	[30074] = {
-		[2] = 104,
-	},
-	[139221] = {
-		81234, -- [1]
-		80522, -- [2]
-		81235, -- [3]
-		81236, -- [4]
-	},
-	[89955] = {
-		[4] = 46682,
-	},
-	[140882] = {
-		[2] = 104,
-	},
-	[129877] = {
-		74354, -- [1]
-	},
-	[95672] = {
-		[4] = 50199,
-	},
-	[95649] = {
-		[4] = 50181,
-	},
-	[23487] = {
-		[2] = 104,
-	},
-	[96045] = {
-		50512, -- [1]
-	},
-	[151997] = {
-		89863, -- [1]
-		89862, -- [2]
-		89864, -- [3]
-		89861, -- [4]
-	},
-	[59222] = {
-		29490, -- [1]
-	},
-	[140883] = {
-		[2] = 104,
-	},
-	[65386] = {
-		[2] = 32922,
-	},
-	[86847] = {
-		[4] = 44722,
-	},
-	[95150] = {
-		49925, -- [1]
-	},
-	[71464] = {
-		[2] = 36692,
-	},
-	[86826] = {
-		[4] = 44703,
-	},
-	[151998] = {
-		nil, -- [1]
-		89866, -- [2]
-		89868, -- [3]
-		89865, -- [4]
-	},
-	[59350] = {
-		29595, -- [1]
-	},
-	[95701] = {
-		[4] = 50224,
-	},
-	[141459] = {
-		104, -- [1]
-	},
-	[114580] = {
-		63527, -- [1]
-	},
-	[147047] = {
-		86557, -- [1]
-		86556, -- [2]
-		86558, -- [3]
-		86555, -- [4]
-	},
-	[96759] = {
-		[2] = 51112,
-	},
-	[96744] = {
-		[2] = 51100,
-	},
-	[151999] = {
-		89871, -- [1]
-		89870, -- [2]
-		89872, -- [3]
-		89869, -- [4]
-	},
-	[147045] = {
-		nil, -- [1]
-		86708, -- [2]
-		86710, -- [3]
-		86707, -- [4]
-	},
-	[147043] = {
-		86705, -- [1]
-		86704, -- [2]
-		86706, -- [3]
-		86703, -- [4]
-	},
-	[59510] = {
-		29719, -- [1]
-	},
-	[158309] = {
-		94313, -- [1]
-		94312, -- [2]
-		98383, -- [3]
-	},
-	[159353] = {
-		95841, -- [1]
-		95123, -- [2]
-		95842, -- [3]
-	},
-	[95189] = {
-		49936, -- [1]
-	},
-	[95197] = {
-		49944, -- [1]
-	},
-	[152000] = {
-		89875, -- [1]
-		89874, -- [2]
-		89876, -- [3]
-		89873, -- [4]
-	},
-	[86891] = {
-		104, -- [1]
-	},
-	[94272] = {
-		49264, -- [1]
-	},
-	[94271] = {
-		49263, -- [1]
-	},
-	[124290] = {
-		69866, -- [1]
-		69864, -- [2]
-		69867, -- [3]
-	},
-	[95628] = {
-		[4] = 50164,
-	},
-	[95627] = {
-		[4] = 50163,
-	},
-	[95682] = {
-		[4] = 50207,
-	},
-	[95731] = {
-		[4] = 50247,
-	},
-	[112772] = {
-		61665, -- [1]
-	},
-	[112564] = {
-		61095, -- [1]
-	},
-	[19695] = {
-		[2] = 104,
-	},
-	[158317] = {
-		98384, -- [1]
-		94324, -- [2]
-		98385, -- [3]
-	},
-	[89830] = {
-		46609, -- [1]
-	},
-	[134500] = {
-		[2] = 104,
-	},
-	[31480] = {
-		[2] = 104,
-	},
-	[152002] = {
-		nil, -- [1]
-		89882, -- [2]
-		89884, -- [3]
-		89881, -- [4]
-	},
-	[112943] = {
-		61963, -- [1]
-	},
-	[96122] = {
-		50575, -- [1]
-	},
-	[95643] = {
-		[4] = 50176,
-	},
-	[124291] = {
-		69870, -- [1]
-		69868, -- [2]
-		69871, -- [3]
-	},
-	[133623] = {
-		[2] = 76861,
-	},
-	[112919] = {
-		61896, -- [1]
-	},
-	[65068] = {
-		[2] = 32658,
-	},
-	[152003] = {
-		89887, -- [1]
-		89886, -- [2]
-		89888, -- [3]
-		89885, -- [4]
-	},
-	[105544] = {
-		[3] = 56961,
-	},
-	[139225] = {
-		[2] = 104,
-	},
-	[112762] = {
-		[3] = 61643,
-		[4] = 61642,
-	},
-	[71403] = {
-		[2] = 36635,
-	},
-	[113888] = {
-		62712, -- [1]
-		62710, -- [2]
-		67200, -- [3]
-	},
-	[105597] = {
-		[3] = 57005,
-	},
-	[112890] = {
-		61868, -- [1]
-	},
-	[152004] = {
-		nil, -- [1]
-		89890, -- [2]
-		89892, -- [3]
-		89889, -- [4]
-	},
-	[105800] = {
-		57122, -- [1]
-	},
-	[140890] = {
-		[3] = 81960,
-		[4] = 81961,
-	},
-	[105792] = {
-		57114, -- [1]
-	},
-	[86189] = {
-		44326, -- [1]
-	},
-	[113593] = {
-		62362, -- [1]
-		62361, -- [2]
-		62363, -- [3]
-	},
-	[152008] = {
-		89907, -- [1]
-		89906, -- [2]
-		89908, -- [3]
-		89905, -- [4]
-	},
-	[23532] = {
-		[2] = 104,
-	},
-	[152005] = {
-		89895, -- [1]
-		89894, -- [2]
-		89896, -- [3]
-		89893, -- [4]
-	},
-	[13077] = {
-		[2] = 104,
-	},
-	[71340] = {
-		36597, -- [1]
-	},
-	[152373] = {
-		90457, -- [1]
-	},
-	[140917] = {
-		82023, -- [1]
-		82022, -- [2]
-		82024, -- [3]
-		82025, -- [4]
-	},
-	[31209] = {
-		[2] = 104,
-	},
-	[71468] = {
-		[2] = 36696,
-	},
-	[86319] = {
-		44372, -- [1]
-	},
-	[105258] = {
-		56731, -- [1]
-	},
-	[86343] = {
-		44391, -- [1]
-	},
-	[159288] = {
-		97058, -- [1]
-		97058, -- [2]
-		97058, -- [3]
-	},
-	[138368] = {
-		81553, -- [1]
-		81552, -- [2]
-		81554, -- [3]
-		81079, -- [4]
-	},
-	[50202] = {
-		24613, -- [1]
-	},
-	[65037] = {
-		[2] = 32630,
-	},
-	[127423] = {
-		[2] = 104,
-	},
-	[25948] = {
-		[2] = 104,
-	},
-	[152007] = {
-		nil, -- [1]
-		89902, -- [2]
-		89904, -- [3]
-		89901, -- [4]
-	},
-	[113954] = {
-		62839, -- [1]
-		62837, -- [2]
-		67276, -- [3]
-	},
-	[105578] = {
-		[3] = 56989,
-	},
-	[105099] = {
-		[4] = 56603,
-	},
-	[105754] = {
-		57081, -- [1]
-	},
-	[71437] = {
-		[2] = 36667,
-	},
-	[114576] = {
-		63515, -- [1]
-	},
-	[139231] = {
-		[2] = 104,
-	},
-	[139233] = {
-		[2] = 104,
-	},
-	[113875] = {
-		62683, -- [1]
-		62681, -- [2]
-		67199, -- [3]
-	},
-	[105336] = {
-		56794, -- [1]
-	},
-	[159354] = {
-		95125, -- [1]
-		95124, -- [2]
-		95843, -- [3]
-	},
-	[124294] = {
-		69880, -- [1]
-		69878, -- [2]
-		69881, -- [3]
-	},
-	[105508] = {
-		[3] = 56933,
-	},
-	[105779] = {
-		57101, -- [1]
-	},
-	[104972] = {
-		[4] = 56501,
-	},
-	[139234] = {
-		[2] = 104,
-	},
-	[113955] = {
-		62842, -- [1]
-		62840, -- [2]
-		67204, -- [3]
-	},
-	[105046] = {
-		[4] = 56559,
-	},
-	[133805] = {
-		[2] = 76928,
-	},
-	[62365] = {
-		104, -- [1]
-	},
-	[89834] = {
-		46613, -- [1]
-	},
-	[105100] = {
-		[4] = 56604,
-	},
-	[113915] = {
-		[3] = 67273,
-		[2] = 62758,
-	},
-	[112551] = {
-		[3] = 61066,
-		[4] = 61065,
-	},
-	[112927] = {
-		[3] = 61919,
-		[4] = 61918,
-	},
-	[90505] = {
-		[2] = 47049,
-	},
-	[159356] = {
-		95129, -- [1]
-		95128, -- [2]
-		98395, -- [3]
-	},
-	[124295] = {
-		69884, -- [1]
-		69882, -- [2]
-		69885, -- [3]
-	},
-	[95200] = {
-		49947, -- [1]
-	},
-	[133769] = {
-		[2] = 76911,
-	},
-	[96797] = {
-		[2] = 51142,
-	},
-	[138214] = {
-		81237, -- [1]
-		nil, -- [2]
-		81238, -- [3]
-		81239, -- [4]
-	},
-	[59481] = {
-		29699, -- [1]
-	},
-	[59497] = {
-		104, -- [1]
-	},
-	[31582] = {
-		[2] = 104,
-	},
-	[113944] = {
-		[3] = 67275,
-		[2] = 62818,
-	},
-	[89835] = {
-		46614, -- [1]
-	},
-	[95999] = {
-		50475, -- [1]
-	},
-	[86833] = {
-		[4] = 44709,
-	},
-	[152012] = {
-		[2] = 104,
-	},
-	[89963] = {
-		104, -- [1]
-	},
-	[159294] = {
-		97053, -- [1]
-		95047, -- [2]
-		97054, -- [3]
-	},
-	[159358] = {
-		98398, -- [1]
-		95131, -- [2]
-		98399, -- [3]
-	},
-	[90570] = {
-		47077, -- [1]
-	},
-	[112836] = {
-		[3] = 61804,
-		[4] = 61803,
-	},
-	[23489] = {
-		[2] = 104,
-	},
-	[96798] = {
-		[2] = 51143,
-	},
-	[96830] = {
-		[2] = 51168,
-	},
-	[23513] = {
-		[2] = 104,
-	},
-	[158307] = {
-		94309, -- [1]
-		94308, -- [2]
-		98381, -- [3]
-	},
-	[159359] = {
-		95844, -- [1]
-		95132, -- [2]
-		95845, -- [3]
-	},
-	[151996] = {
-		nil, -- [1]
-		89858, -- [2]
-		89860, -- [3]
-		89857, -- [4]
-	},
-	[112831] = {
-		[3] = 61789,
-		[4] = 61788,
-	},
-	[96000] = {
-		50476, -- [1]
-	},
-	[139222] = {
-		81255, -- [1]
-		nil, -- [2]
-		81256, -- [3]
-		81257, -- [4]
-	},
-	[86664] = {
-		104, -- [1]
+	[210]={
+		["armorType"] =  3 ,
+		["source"] =  2 ,
+		["label"] =  44 ,
+		["setID"] =  210 ,
+		["expansionID"] =  1 ,
+		["maxLevel"] =  66 ,
+		["filter"] =  1 ,
+		["recolor"] =  false ,
+		["minLevel"] =  9 ,
+		["name"] =  "Brackwater Mail (Recolor)" ,
+		["items"] = { 15487,15485,14147,31197, },
 	},
 }

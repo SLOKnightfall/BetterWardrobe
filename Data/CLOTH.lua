@@ -215,8 +215,8 @@ addon.ArmorSets["CLOTH"] ={
 		["source"] =  18 ,
 		["label"] =  44 ,
 		["setID"] =  21 ,
-		["items"] = { 14183,14181,14185,14176,14177,14180, },
 		["recolor"] =  false ,
+		["items"] = { 14183,14181,14185,14176,14177,14180, },
 		["name"] =  "Sanguine Regalia (Recolor)" ,
 		["filter"] =  1 ,
 		["minLevel"] =  21 ,
@@ -346,8 +346,8 @@ addon.ArmorSets["CLOTH"] ={
 		["source"] =  23 ,
 		["label"] =  44 ,
 		["setID"] =  36 ,
-		["items"] = { 14236,14226,14235,14233,14231,14230, },
 		["recolor"] =  false ,
+		["items"] = { 14236,14226,14235,14233,14231,14230, },
 		["name"] =  "Darkmist Regalia (Recolor)" ,
 		["filter"] =  1 ,
 		["minLevel"] =  24 ,
@@ -425,8 +425,8 @@ addon.ArmorSets["CLOTH"] ={
 		["source"] =  11 ,
 		["label"] =  44 ,
 		["setID"] =  43 ,
-		["items"] = { 7113,4047,4045,6428,4046,4736, },
 		["recolor"] =  false ,
+		["items"] = { 7113,4047,4045,6428,4046,4736, },
 		["name"] =  "Runecloth Regalia (Recolor)" ,
 		["filter"] =  1 ,
 		["minLevel"] =  36 ,
@@ -452,8 +452,8 @@ addon.ArmorSets["CLOTH"] ={
 		["source"] =  27 ,
 		["label"] =  44 ,
 		["setID"] =  46 ,
-		["items"] = { 30398,14260,14258,14267,14262,14264, },
 		["recolor"] =  false ,
+		["items"] = { 30398,14260,14258,14267,14262,14264, },
 		["name"] =  "Bloodwoven Regalia" ,
 		["filter"] =  1 ,
 		["minLevel"] =  37 ,
@@ -479,8 +479,8 @@ addon.ArmorSets["CLOTH"] ={
 		["source"] =  18 ,
 		["label"] =  44 ,
 		["setID"] =  48 ,
-		["items"] = { 14276,14268,14272,14274,14269,14277, },
 		["recolor"] =  false ,
+		["items"] = { 14276,14268,14272,14274,14269,14277, },
 		["name"] =  "Bloodwoven Regalia (Recolor)" ,
 		["filter"] =  1 ,
 		["minLevel"] =  40 ,
@@ -519,8 +519,8 @@ addon.ArmorSets["CLOTH"] ={
 		["source"] =  32786 ,
 		["label"] =  44 ,
 		["setID"] =  52 ,
-		["items"] = { 14286,14285,14279,14282,14283,14287, },
 		["recolor"] =  false ,
+		["items"] = { 14286,14285,14279,14282,14283,14287, },
 		["name"] =  "Bloodwoven Regalia (Recolor)" ,
 		["filter"] =  1 ,
 		["minLevel"] =  28 ,
@@ -533,8 +533,8 @@ addon.ArmorSets["CLOTH"] ={
 		["source"] =  18 ,
 		["label"] =  44 ,
 		["setID"] =  53 ,
-		["items"] = { 10057,17603,10059,10062,20054, },
 		["recolor"] =  false ,
+		["items"] = { 10057,17603,10059,10062,20054, },
 		["name"] =  "Arcane Regalia (Recolor)" ,
 		["filter"] =  1 ,
 		["minLevel"] =  28 ,
@@ -573,8 +573,8 @@ addon.ArmorSets["CLOTH"] ={
 		["source"] =  27 ,
 		["label"] =  44 ,
 		["setID"] =  56 ,
-		["items"] = { 10023,14448,14454,14447,14455,15119, },
 		["recolor"] =  false ,
+		["items"] = { 10023,14448,14454,14447,14455,15119, },
 		["name"] =  "Bloodwoven Regalia (Recolor)" ,
 		["filter"] =  1 ,
 		["minLevel"] =  35 ,
@@ -613,8 +613,8 @@ addon.ArmorSets["CLOTH"] ={
 		["source"] =  10 ,
 		["label"] =  44 ,
 		["setID"] =  59 ,
-		["items"] = { 10095,10096,10099,10101,10104, },
 		["recolor"] =  false ,
+		["items"] = { 10095,10096,10099,10101,10104, },
 		["name"] =  "Runecloth Regalia (Recolor)" ,
 		["filter"] =  1 ,
 		["minLevel"] =  49 ,
@@ -874,8 +874,8 @@ addon.ArmorSets["CLOTH"] ={
 		["source"] =  32795 ,
 		["label"] =  54 ,
 		["setID"] =  93 ,
-		["items"] = { 127569,72627,72626,72625,72624,72623,72621,51972, },
 		["recolor"] =  false ,
+		["items"] = { 127569,72627,72626,72625,72624,72623,72621,51972, },
 		["name"] =  "Frostsavage Battlegear (Recolor)" ,
 		["filter"] =  2 ,
 		["minLevel"] =  58 ,
@@ -1018,8 +1018,8 @@ addon.ArmorSets["CLOTH"] ={
 		["source"] =  18 ,
 		["label"] =  52 ,
 		["setID"] =  1521 ,
-		["items"] = { 90112,90110,90116,90115,90117,90113,90114,90111, },
 		["recolor"] =  false ,
+		["items"] = { 90112,90110,90116,90115,90117,90113,90114,90111, },
 		["name"] =  "Light Regalia" ,
 		["filter"] =  3 ,
 		["minLevel"] =  90 ,
@@ -1032,8 +1032,8 @@ addon.ArmorSets["CLOTH"] ={
 		["source"] =  18 ,
 		["label"] =  52 ,
 		["setID"] =  1522 ,
-		["items"] = { 90080,90086,90079,90081,90082,90083,90084,90085, },
 		["recolor"] =  false ,
+		["items"] = { 90080,90086,90079,90081,90082,90083,90084,90085, },
 		["name"] =  "Elemental Triad Regalia" ,
 		["filter"] =  3 ,
 		["minLevel"] =  90 ,
@@ -1046,8 +1046,8 @@ addon.ArmorSets["CLOTH"] ={
 		["source"] =  26 ,
 		["label"] =  44 ,
 		["setID"] =  1267 ,
-		["items"] = { 10217,10218,31456, },
 		["recolor"] =  false ,
+		["items"] = { 10217,10218,31456, },
 		["name"] =  "Mageweave Regalia (Recolor)" ,
 		["filter"] =  1 ,
 		["minLevel"] =  56 ,
@@ -1060,8 +1060,8 @@ addon.ArmorSets["CLOTH"] ={
 		["source"] =  18 ,
 		["label"] =  52 ,
 		["setID"] =  1523 ,
-		["items"] = { 90138,90136,90137,90139,90141,90142,90143,90140, },
 		["recolor"] =  false ,
+		["items"] = { 90138,90136,90137,90139,90141,90142,90143,90140, },
 		["name"] =  "Betrayer Regalia" ,
 		["filter"] =  3 ,
 		["minLevel"] =  90 ,
@@ -1074,8 +1074,8 @@ addon.ArmorSets["CLOTH"] ={
 		["source"] =  27 ,
 		["label"] =  44 ,
 		["setID"] =  1268 ,
-		["items"] = { 21888,13869,29928,31452,28491, },
 		["recolor"] =  false ,
+		["items"] = { 21888,13869,29928,31452,28491, },
 		["name"] =  "Mageweave Regalia (Recolor)" ,
 		["filter"] =  1 ,
 		["minLevel"] =  46 ,
@@ -1088,8 +1088,8 @@ addon.ArmorSets["CLOTH"] ={
 		["source"] =  11 ,
 		["label"] =  44 ,
 		["setID"] =  1269 ,
-		["items"] = { 19375,10253,21838,19842,94063,94062,94061, },
 		["recolor"] =  false ,
+		["items"] = { 19375,10253,21838,19842,94063,94062,94061, },
 		["name"] =  "Royal Ascension Regalia" ,
 		["filter"] =  1 ,
 		["minLevel"] =  90 ,
@@ -1311,6 +1311,7 @@ addon.ArmorSets["CLOTH"] ={
 		["label"] =  69 ,
 		["setID"] =  2083 ,
 		["expansionID"] =  6 ,
+		["mod"] =  8 ,
 		["maxLevel"] =  91 ,
 		["filter"] =  6 ,
 		["recolor"] =  false ,
@@ -1324,6 +1325,7 @@ addon.ArmorSets["CLOTH"] ={
 		["label"] =  69 ,
 		["setID"] =  2084 ,
 		["expansionID"] =  6 ,
+		["mod"] =  8 ,
 		["maxLevel"] =  91 ,
 		["filter"] =  6 ,
 		["recolor"] =  false ,
@@ -1414,8 +1416,8 @@ addon.ArmorSets["CLOTH"] ={
 		["source"] =  24 ,
 		["label"] =  77 ,
 		["setID"] =  2121 ,
-		["items"] = { 139762,139761,139760,139759,139758,139757,139756,139755, },
 		["recolor"] =  false ,
+		["items"] = { 139762,139761,139760,139759,139758,139757,139756,139755, },
 		["name"] =  "Regalia of the High Priest" ,
 		["filter"] =  3 ,
 		["minLevel"] =  110 ,
@@ -1454,8 +1456,8 @@ addon.ArmorSets["CLOTH"] ={
 		["source"] =  2 ,
 		["label"] =  4 ,
 		["setID"] =  395 ,
-		["items"] = { 127443,127152,127241,27466,28317,27517,27768,27902, },
 		["recolor"] =  false ,
+		["items"] = { 127443,127152,127241,27466,28317,27517,27768,27902, },
 		["name"] =  "Netherwind Regalia (Recolor)" ,
 		["filter"] =  4 ,
 		["minLevel"] =  68 ,
@@ -1495,6 +1497,7 @@ addon.ArmorSets["CLOTH"] ={
 		["label"] =  86 ,
 		["setID"] =  2648 ,
 		["expansionID"] =  7 ,
+		["mod"] =  1 ,
 		["maxLevel"] =  110 ,
 		["filter"] =  5 ,
 		["recolor"] =  false ,
@@ -1515,18 +1518,19 @@ addon.ArmorSets["CLOTH"] ={
 		["name"] =  "Regalia of the Chromatic Hydra (Normal Lookalike)" ,
 		["items"] = { 94277,95194,96027,96060,96091,96112,96184,96333, },
 	},
-	[1838]={
+	[2650]={
 		["armorType"] =  1 ,
-		["source"] =  8194 ,
-		["label"] =  65 ,
-		["setID"] =  1838 ,
-		["expansionID"] =  6 ,
-		["maxLevel"] =  100 ,
+		["source"] =  2 ,
+		["label"] =  86 ,
+		["setID"] =  2650 ,
+		["expansionID"] =  7 ,
+		["mod"] =  3 ,
+		["maxLevel"] =  110 ,
 		["filter"] =  5 ,
 		["recolor"] =  false ,
-		["minLevel"] =  100 ,
-		["name"] =  "Arcanoshatter Regalia (Normal Lookalike)" ,
-		["items"] = { 119332,113898,113942,113933,113868,113914,113609,113967, },
+		["minLevel"] =  110 ,
+		["name"] =  "Runebound Regalia (Mythic Lookalike)" ,
+		["items"] = { 151951,151939,151953,152679,151941,153018, },
 	},
 	[1072]={
 		["armorType"] =  1 ,
@@ -1547,6 +1551,7 @@ addon.ArmorSets["CLOTH"] ={
 		["label"] =  65 ,
 		["setID"] =  1839 ,
 		["expansionID"] =  6 ,
+		["mod"] =  1 ,
 		["maxLevel"] =  100 ,
 		["filter"] =  5 ,
 		["recolor"] =  false ,
@@ -1573,6 +1578,7 @@ addon.ArmorSets["CLOTH"] ={
 		["label"] =  65 ,
 		["setID"] =  1840 ,
 		["expansionID"] =  6 ,
+		["mod"] =  3 ,
 		["maxLevel"] =  100 ,
 		["filter"] =  5 ,
 		["recolor"] =  false ,
@@ -1599,6 +1605,7 @@ addon.ArmorSets["CLOTH"] ={
 		["label"] =  86 ,
 		["setID"] =  2656 ,
 		["expansionID"] =  7 ,
+		["mod"] =  1 ,
 		["maxLevel"] =  110 ,
 		["filter"] =  5 ,
 		["recolor"] =  false ,
@@ -1612,6 +1619,7 @@ addon.ArmorSets["CLOTH"] ={
 		["label"] =  86 ,
 		["setID"] =  2657 ,
 		["expansionID"] =  7 ,
+		["mod"] =  2 ,
 		["maxLevel"] =  110 ,
 		["filter"] =  5 ,
 		["recolor"] =  false ,
@@ -1625,6 +1633,7 @@ addon.ArmorSets["CLOTH"] ={
 		["label"] =  86 ,
 		["setID"] =  2658 ,
 		["expansionID"] =  7 ,
+		["mod"] =  3 ,
 		["maxLevel"] =  110 ,
 		["filter"] =  5 ,
 		["recolor"] =  false ,
@@ -1638,6 +1647,7 @@ addon.ArmorSets["CLOTH"] ={
 		["label"] =  86 ,
 		["setID"] =  2659 ,
 		["expansionID"] =  7 ,
+		["mod"] =  4 ,
 		["maxLevel"] =  110 ,
 		["filter"] =  5 ,
 		["recolor"] =  false ,
@@ -1668,21 +1678,22 @@ addon.ArmorSets["CLOTH"] ={
 		["filter"] =  5 ,
 		["recolor"] =  false ,
 		["minLevel"] =  100 ,
-		["name"] =  "Soul Priest\'s Raiment (Normal Lookalike)" ,
+		["name"] =  "Soul Priestu2019s Raiment (Normal Lookalike)" ,
 		["items"] = { 113887,113958,113864,114566,113596,113828,114578,113656, },
 	},
-	[2664]={
+	[1845]={
 		["armorType"] =  1 ,
-		["source"] =  2 ,
-		["label"] =  86 ,
-		["setID"] =  2664 ,
-		["expansionID"] =  7 ,
-		["maxLevel"] =  110 ,
+		["source"] =  8194 ,
+		["label"] =  65 ,
+		["setID"] =  1845 ,
+		["expansionID"] =  6 ,
+		["mod"] =  1 ,
+		["maxLevel"] =  100 ,
 		["filter"] =  5 ,
 		["recolor"] =  false ,
-		["minLevel"] =  110 ,
-		["name"] =  "Gilded Seraph's Raiment (Normal Lookalike)" ,
-		["items"] = { 152349,152356,152353,151952,152084,151943,151946,151950, },
+		["minLevel"] =  100 ,
+		["name"] =  "Soul Priestu2019s Raiment (Heroic Lookalike)" ,
+		["items"] = { 113887,113958,113864,113876,113596,113828,113903,113656, },
 	},
 	[2665]={
 		["armorType"] =  1 ,
@@ -1690,6 +1701,7 @@ addon.ArmorSets["CLOTH"] ={
 		["label"] =  86 ,
 		["setID"] =  2665 ,
 		["expansionID"] =  7 ,
+		["mod"] =  2 ,
 		["maxLevel"] =  110 ,
 		["filter"] =  5 ,
 		["recolor"] =  false ,
@@ -1703,11 +1715,12 @@ addon.ArmorSets["CLOTH"] ={
 		["label"] =  65 ,
 		["setID"] =  1846 ,
 		["expansionID"] =  6 ,
+		["mod"] =  3 ,
 		["maxLevel"] =  100 ,
 		["filter"] =  5 ,
 		["recolor"] =  false ,
 		["minLevel"] =  100 ,
-		["name"] =  "Soul Priest\'s Raiment (Mythic Lookalike)" ,
+		["name"] =  "Soul Priestu2019s Raiment (Mythic Lookalike)" ,
 		["items"] = { 113887,113958,113864,113876,113596,113828,113903,113656, },
 	},
 	[2667]={
@@ -1716,6 +1729,7 @@ addon.ArmorSets["CLOTH"] ={
 		["label"] =  86 ,
 		["setID"] =  2667 ,
 		["expansionID"] =  7 ,
+		["mod"] =  4 ,
 		["maxLevel"] =  110 ,
 		["filter"] =  5 ,
 		["recolor"] =  false ,
@@ -1759,7 +1773,7 @@ addon.ArmorSets["CLOTH"] ={
 		["filter"] =  5 ,
 		["recolor"] =  false ,
 		["minLevel"] =  100 ,
-		["name"] =  "Shadow Council\'s Garb (Normal Lookalike)" ,
+		["name"] =  "Shadow Councilu2019s Garb (Normal Lookalike)" ,
 		["items"] = { 113956,113655,119342,113610,113981,113970,113928,113941, },
 	},
 	[1851]={
@@ -1768,11 +1782,12 @@ addon.ArmorSets["CLOTH"] ={
 		["label"] =  65 ,
 		["setID"] =  1851 ,
 		["expansionID"] =  6 ,
+		["mod"] =  1 ,
 		["maxLevel"] =  100 ,
 		["filter"] =  5 ,
 		["recolor"] =  false ,
 		["minLevel"] =  100 ,
-		["name"] =  "Shadow Council\'s Garb (Heroic Lookalike)" ,
+		["name"] =  "Shadow Councilu2019s Garb (Heroic Lookalike)" ,
 		["items"] = { 113956,113655,119342,113610,113981,113970,113928,113941, },
 	},
 	[1596]={
@@ -1794,11 +1809,12 @@ addon.ArmorSets["CLOTH"] ={
 		["label"] =  65 ,
 		["setID"] =  1852 ,
 		["expansionID"] =  6 ,
+		["mod"] =  3 ,
 		["maxLevel"] =  100 ,
 		["filter"] =  5 ,
 		["recolor"] =  false ,
 		["minLevel"] =  100 ,
-		["name"] =  "Shadow Council\'s Garb (Mythic Lookalike)" ,
+		["name"] =  "Shadow Councilu2019s Garb (Mythic Lookalike)" ,
 		["items"] = { 113956,113655,119342,113610,113981,113970,113928,113941, },
 	},
 	[1598]={
@@ -1845,8 +1861,8 @@ addon.ArmorSets["CLOTH"] ={
 		["source"] =  18 ,
 		["label"] =  78 ,
 		["setID"] =  2178 ,
-		["items"] = { 140850,138365,141470,141449,141443,141416,140848,138217,139595, },
 		["recolor"] =  false ,
+		["items"] = { 140850,138365,141470,141449,141443,141416,140848,138217,139595, },
 		["name"] =  "Regalia of Everburning Knowledge (Normal Lookalike)" ,
 		["filter"] =  5 ,
 		["minLevel"] =  110 ,
@@ -1859,8 +1875,9 @@ addon.ArmorSets["CLOTH"] ={
 		["source"] =  18 ,
 		["label"] =  78 ,
 		["setID"] =  2179 ,
-		["items"] = { 140850,138365,140885,140848,138217,140888,140851,139595,140853, },
 		["recolor"] =  false ,
+		["items"] = { 140850,138365,140885,140848,138217,140888,140851,139595,140853, },
+		["mod"] =  1 ,
 		["name"] =  "Regalia of Everburning Knowledge (Heroic Lookalike)" ,
 		["filter"] =  5 ,
 		["minLevel"] =  110 ,
@@ -1873,8 +1890,9 @@ addon.ArmorSets["CLOTH"] ={
 		["source"] =  18 ,
 		["label"] =  78 ,
 		["setID"] =  2180 ,
-		["items"] = { 140850,138365,140885,140848,138217,140888,140851,139595,140853, },
 		["recolor"] =  false ,
+		["items"] = { 140850,138365,140885,140848,138217,140888,140851,139595,140853, },
+		["mod"] =  3 ,
 		["name"] =  "Regalia of Everburning Knowledge (Mythic Lookalike)" ,
 		["filter"] =  5 ,
 		["minLevel"] =  110 ,
@@ -1887,8 +1905,9 @@ addon.ArmorSets["CLOTH"] ={
 		["source"] =  18 ,
 		["label"] =  78 ,
 		["setID"] =  2181 ,
-		["items"] = { 140850,138365,140885,140848,138217,140888,140851,139595,140853, },
 		["recolor"] =  false ,
+		["items"] = { 140850,138365,140885,140848,138217,140888,140851,139595,140853, },
+		["mod"] =  4 ,
 		["name"] =  "Regalia of Everburning Knowledge (Raid Finder Lookalike)" ,
 		["filter"] =  5 ,
 		["minLevel"] =  110 ,
@@ -1901,8 +1920,8 @@ addon.ArmorSets["CLOTH"] ={
 		["source"] =  2 ,
 		["label"] =  78 ,
 		["setID"] =  2186 ,
-		["items"] = { 140886,138373,140887,140914,139193,138212,139189,139190,140911, },
 		["recolor"] =  false ,
+		["items"] = { 140886,138373,140887,140914,139193,138212,139189,139190,140911, },
 		["name"] =  "Legacy of Azj'Aqir (Normal Lookalike)" ,
 		["filter"] =  5 ,
 		["minLevel"] =  110 ,
@@ -1915,8 +1934,9 @@ addon.ArmorSets["CLOTH"] ={
 		["source"] =  2 ,
 		["label"] =  78 ,
 		["setID"] =  2187 ,
-		["items"] = { 140886,138373,140887,140914,139193,138212,139189,139190,140911, },
 		["recolor"] =  false ,
+		["items"] = { 140886,138373,140887,140914,139193,138212,139189,139190,140911, },
+		["mod"] =  1 ,
 		["name"] =  "Legacy of Azj'Aqir (Heroic Lookalike)" ,
 		["filter"] =  5 ,
 		["minLevel"] =  110 ,
@@ -1929,8 +1949,9 @@ addon.ArmorSets["CLOTH"] ={
 		["source"] =  2 ,
 		["label"] =  78 ,
 		["setID"] =  2188 ,
-		["items"] = { 140886,138373,140887,140914,139193,138212,139189,139190,140911, },
 		["recolor"] =  false ,
+		["items"] = { 140886,138373,140887,140914,139193,138212,139189,139190,140911, },
+		["mod"] =  3 ,
 		["name"] =  "Legacy of Azj'Aqir (Mythic Lookalike)" ,
 		["filter"] =  5 ,
 		["minLevel"] =  110 ,
@@ -1943,8 +1964,9 @@ addon.ArmorSets["CLOTH"] ={
 		["source"] =  2 ,
 		["label"] =  78 ,
 		["setID"] =  2189 ,
-		["items"] = { 140886,138373,140887,140914,139193,138212,139189,139190,140911, },
 		["recolor"] =  false ,
+		["items"] = { 140886,138373,140887,140914,139193,138212,139189,139190,140911, },
+		["mod"] =  4 ,
 		["name"] =  "Legacy of Azj'Aqir (Raid Finder Lookalike)" ,
 		["filter"] =  5 ,
 		["minLevel"] =  110 ,
@@ -1970,8 +1992,8 @@ addon.ArmorSets["CLOTH"] ={
 		["source"] =  27 ,
 		["label"] =  54 ,
 		["setID"] =  1354 ,
-		["items"] = { 127590,127553,127518,127606,72643,72640,72638,35654, },
 		["recolor"] =  false ,
+		["items"] = { 127590,127553,127518,127606,72643,72640,72638,35654, },
 		["name"] =  "Frostsavage Battlegear (Recolor)" ,
 		["filter"] =  2 ,
 		["minLevel"] =  58 ,
@@ -1984,8 +2006,8 @@ addon.ArmorSets["CLOTH"] ={
 		["source"] =  2 ,
 		["label"] =  78 ,
 		["setID"] =  2194 ,
-		["items"] = { 141428,138370,140849,139194,138215,140993,139188,140852,139192, },
 		["recolor"] =  false ,
+		["items"] = { 141428,138370,140849,139194,138215,140993,139188,140852,139192, },
 		["name"] =  "Vestments of the Purifier (Normal Lookalike)" ,
 		["filter"] =  5 ,
 		["minLevel"] =  110 ,
@@ -1998,8 +2020,9 @@ addon.ArmorSets["CLOTH"] ={
 		["source"] =  2 ,
 		["label"] =  78 ,
 		["setID"] =  2195 ,
-		["items"] = { 139196,138370,140849,139194,138215,140993,139188,140852,139192, },
 		["recolor"] =  false ,
+		["items"] = { 139196,138370,140849,139194,138215,140993,139188,140852,139192, },
+		["mod"] =  1 ,
 		["name"] =  "Vestments of the Purifier (Heroic Lookalike)" ,
 		["filter"] =  5 ,
 		["minLevel"] =  110 ,
@@ -2012,8 +2035,9 @@ addon.ArmorSets["CLOTH"] ={
 		["source"] =  2 ,
 		["label"] =  78 ,
 		["setID"] =  2196 ,
-		["items"] = { 139196,138370,140849,139194,138215,140993,139188,140852,139192, },
 		["recolor"] =  false ,
+		["items"] = { 139196,138370,140849,139194,138215,140993,139188,140852,139192, },
+		["mod"] =  3 ,
 		["name"] =  "Vestments of the Purifier (Mythic Lookalike)" ,
 		["filter"] =  5 ,
 		["minLevel"] =  110 ,
@@ -2026,8 +2050,9 @@ addon.ArmorSets["CLOTH"] ={
 		["source"] =  2 ,
 		["label"] =  78 ,
 		["setID"] =  2197 ,
-		["items"] = { 139196,138370,140849,139194,138215,140993,139188,140852,139192, },
 		["recolor"] =  false ,
+		["items"] = { 139196,138370,140849,139194,138215,140993,139188,140852,139192, },
+		["mod"] =  4 ,
 		["name"] =  "Vestments of the Purifier (Raid Finder Lookalike)" ,
 		["filter"] =  5 ,
 		["minLevel"] =  110 ,
@@ -2040,8 +2065,8 @@ addon.ArmorSets["CLOTH"] ={
 		["source"] =  2 ,
 		["label"] =  45 ,
 		["setID"] =  1101 ,
-		["items"] = { 22306,22311,22313,22302,22304,22305,22303,22301, },
 		["recolor"] =  false ,
+		["items"] = { 22306,22311,22313,22302,22304,22305,22303,22301, },
 		["name"] =  "Ironweave Battlesuit" ,
 		["filter"] =  3 ,
 		["minLevel"] =  55 ,
@@ -2192,18 +2217,18 @@ addon.ArmorSets["CLOTH"] ={
 		["name"] =  "Aurora Regalia" ,
 		["items"] = { 52927,4729,4041, },
 	},
-	[683]={
+	[1364]={
 		["armorType"] =  1 ,
-		["source"] =  2064 ,
-		["label"] =  1 ,
-		["setID"] =  683 ,
+		["source"] =  32778 ,
+		["label"] =  44 ,
+		["setID"] =  1364 ,
 		["expansionID"] =  1 ,
-		["maxLevel"] =  85 ,
-		["filter"] =  3 ,
+		["maxLevel"] =  35 ,
+		["filter"] =  1 ,
 		["recolor"] =  false ,
-		["minLevel"] =  52 ,
-		["name"] =  "Dreadmist Raiment" ,
-		["items"] = { 122250,122256,122360,122384,16702,16703,16704,16705, },
+		["minLevel"] =  20 ,
+		["name"] =  "Aurora Regalia (Recolor)" ,
+		["items"] = { 4035,11310, },
 	},
 	[406]={
 		["armorType"] =  1 ,
@@ -2244,18 +2269,19 @@ addon.ArmorSets["CLOTH"] ={
 		["name"] =  "Embersilk Battlegear" ,
 		["items"] = { 54495,54496,54497,54498,54499,54500,54501,54502, },
 	},
-	[1366]={
+	[684]={
 		["armorType"] =  1 ,
-		["source"] =  32779 ,
-		["label"] =  44 ,
-		["setID"] =  1366 ,
-		["expansionID"] =  1 ,
-		["maxLevel"] =  70 ,
-		["filter"] =  1 ,
+		["source"] =  16 ,
+		["label"] =  2 ,
+		["setID"] =  684 ,
 		["recolor"] =  false ,
-		["minLevel"] =  10 ,
-		["name"] =  "Aurora Regalia (Recolor)" ,
-		["items"] = { 5770,4718,7526, },
+		["items"] = { 97681,97662,97673,97653,97669,97638,97646,22071, },
+		["name"] =  "Deathmist Raiment" ,
+		["filter"] =  3 ,
+		["minLevel"] =  60 ,
+		["expansionID"] =  1 ,
+		["maxLevel"] =  90 ,
+		["classMask"] =  9 ,
 	},
 	[1111]={
 		["armorType"] =  1 ,
@@ -2314,8 +2340,8 @@ addon.ArmorSets["CLOTH"] ={
 		["source"] =  3 ,
 		["label"] =  44 ,
 		["setID"] =  1370 ,
-		["items"] = { 50213,7520,7526, },
 		["recolor"] =  false ,
+		["items"] = { 50213,7520,7526, },
 		["name"] =  "Royal Ascension Regalia (Recolor)" ,
 		["filter"] =  1 ,
 		["minLevel"] =  41 ,
@@ -2433,6 +2459,7 @@ addon.ArmorSets["CLOTH"] ={
 		["label"] =  87 ,
 		["setID"] =  2747 ,
 		["expansionID"] =  8 ,
+		["mod"] =  1 ,
 		["maxLevel"] =  120 ,
 		["filter"] =  3 ,
 		["recolor"] =  false ,
@@ -2510,8 +2537,8 @@ addon.ArmorSets["CLOTH"] ={
 		["source"] =  27 ,
 		["label"] =  54 ,
 		["setID"] =  1123 ,
-		["items"] = { 72661,72660,72659,72658,72657,72656,72655,72653, },
 		["recolor"] =  false ,
+		["items"] = { 72661,72660,72659,72658,72657,72656,72655,72653, },
 		["name"] =  "Frostsavage Battlegear" ,
 		["filter"] =  2 ,
 		["minLevel"] =  61 ,
@@ -2610,6 +2637,20 @@ addon.ArmorSets["CLOTH"] ={
 		["name"] =  "Mageweave Regalia" ,
 		["items"] = { 29117,31442,10026,13525,31531, },
 	},
+	[2762]={
+		["armorType"] =  1 ,
+		["source"] =  2 ,
+		["label"] =  89 ,
+		["setID"] =  2762 ,
+		["expansionID"] =  8 ,
+		["mod"] =  2 ,
+		["maxLevel"] =  120 ,
+		["filter"] =  8 ,
+		["recolor"] =  false ,
+		["minLevel"] =  110 ,
+		["name"] =  "Warfronts Alliance Cloth (Arathi Recolor)" ,
+		["items"] = { 161465,161466,163248,163253,163264,163275,163341,163342, },
+	},
 	[1128]={
 		["armorType"] =  1 ,
 		["source"] =  27 ,
@@ -2654,8 +2695,8 @@ addon.ArmorSets["CLOTH"] ={
 		["source"] =  19 ,
 		["label"] =  44 ,
 		["setID"] =  1135 ,
-		["items"] = { 13864,13863,13865,13857,24604, },
 		["recolor"] =  false ,
+		["items"] = { 13864,13863,13865,13857,24604, },
 		["name"] =  "Runecloth Regalia" ,
 		["filter"] =  1 ,
 		["minLevel"] =  47 ,
@@ -2811,8 +2852,8 @@ addon.ArmorSets["CLOTH"] ={
 		["source"] =  10 ,
 		["label"] =  44 ,
 		["setID"] =  1655 ,
-		["items"] = { 31158,19849,22306,22303,28179, },
 		["recolor"] =  false ,
+		["items"] = { 31158,19849,22306,22303,28179, },
 		["name"] =  "Gossamer Regalia (Recolor)" ,
 		["filter"] =  1 ,
 		["minLevel"] =  16 ,
@@ -2851,8 +2892,8 @@ addon.ArmorSets["CLOTH"] ={
 		["source"] =  16 ,
 		["label"] =  2 ,
 		["setID"] =  574 ,
-		["items"] = { 97686,97642,97658,97649,97666,97677,97671,22063, },
 		["recolor"] =  false ,
+		["items"] = { 97686,97642,97658,97649,97666,97677,97671,22063, },
 		["name"] =  "Sorcerer's Regalia" ,
 		["filter"] =  3 ,
 		["minLevel"] =  60 ,
@@ -2892,6 +2933,7 @@ addon.ArmorSets["CLOTH"] ={
 		["label"] =  76 ,
 		["setID"] =  2300 ,
 		["expansionID"] =  7 ,
+		["mod"] =  1 ,
 		["maxLevel"] =  119 ,
 		["filter"] =  3 ,
 		["recolor"] =  false ,
@@ -3177,8 +3219,8 @@ addon.ArmorSets["CLOTH"] ={
 		["source"] =  514 ,
 		["label"] =  69 ,
 		["setID"] =  1944 ,
-		["items"] = { 117218,117219,117220,117225,117227,117228,117229,117217, },
 		["recolor"] =  false ,
+		["items"] = { 117218,117219,117220,117225,117227,117228,117229,117217, },
 		["name"] =  "Communal Regalia" ,
 		["filter"] =  6 ,
 		["minLevel"] =  90 ,
@@ -3204,8 +3246,8 @@ addon.ArmorSets["CLOTH"] ={
 		["source"] =  514 ,
 		["label"] =  69 ,
 		["setID"] =  1946 ,
-		["items"] = { 117316,117310,117313,117314,117315,117312,117317,117311, },
 		["recolor"] =  false ,
+		["items"] = { 117316,117310,117313,117314,117315,117312,117317,117311, },
 		["name"] =  "Felsoul Regalia" ,
 		["filter"] =  6 ,
 		["minLevel"] =  90 ,
@@ -3225,6 +3267,48 @@ addon.ArmorSets["CLOTH"] ={
 		["minLevel"] =  80 ,
 		["name"] =  "Sanctification Regalia (Recolor)" ,
 		["items"] = { 45558,45514,45135,45520,45497,45240,45468, },
+	},
+	[2873]={
+		["armorType"] =  1 ,
+		["source"] =  2 ,
+		["label"] =  89 ,
+		["setID"] =  2873 ,
+		["expansionID"] =  8 ,
+		["mod"] =  1 ,
+		["maxLevel"] =  110 ,
+		["filter"] =  8 ,
+		["recolor"] =  false ,
+		["minLevel"] =  110 ,
+		["name"] =  "Warfronts Horde Cloth" ,
+		["items"] = { 163280,163285,163296,163306,163424,163426,163428,163430, },
+	},
+	[2874]={
+		["armorType"] =  1 ,
+		["source"] =  2 ,
+		["label"] =  89 ,
+		["setID"] =  2874 ,
+		["expansionID"] =  8 ,
+		["mod"] =  2 ,
+		["maxLevel"] =  120 ,
+		["filter"] =  8 ,
+		["recolor"] =  false ,
+		["minLevel"] =  110 ,
+		["name"] =  "Warfronts Horde Cloth (Arathi Recolor)" ,
+		["items"] = { 161454,161455,163280,163285,163296,163306,163428,163430, },
+	},
+	[2875]={
+		["armorType"] =  1 ,
+		["source"] =  2 ,
+		["label"] =  89 ,
+		["setID"] =  2875 ,
+		["expansionID"] =  8 ,
+		["mod"] =  3 ,
+		["maxLevel"] =  110 ,
+		["filter"] =  8 ,
+		["recolor"] =  false ,
+		["minLevel"] =  110 ,
+		["name"] =  "Warfronts Horde Cloth (Weekly Recolor)" ,
+		["items"] = { 163280,163285,163296,163306,163424,163426,163428,163430, },
 	},
 	[1188]={
 		["armorType"] =  1 ,
@@ -3258,6 +3342,7 @@ addon.ArmorSets["CLOTH"] ={
 		["label"] =  69 ,
 		["setID"] =  1956 ,
 		["expansionID"] =  6 ,
+		["mod"] =  6 ,
 		["maxLevel"] =  91 ,
 		["filter"] =  6 ,
 		["recolor"] =  false ,
@@ -3271,6 +3356,7 @@ addon.ArmorSets["CLOTH"] ={
 		["label"] =  82 ,
 		["setID"] =  2379 ,
 		["expansionID"] =  7 ,
+		["mod"] =  1 ,
 		["maxLevel"] =  110 ,
 		["filter"] =  5 ,
 		["recolor"] =  false ,
@@ -3284,6 +3370,7 @@ addon.ArmorSets["CLOTH"] ={
 		["label"] =  82 ,
 		["setID"] =  2380 ,
 		["expansionID"] =  7 ,
+		["mod"] =  2 ,
 		["maxLevel"] =  110 ,
 		["filter"] =  5 ,
 		["recolor"] =  false ,
@@ -3297,6 +3384,7 @@ addon.ArmorSets["CLOTH"] ={
 		["label"] =  82 ,
 		["setID"] =  2381 ,
 		["expansionID"] =  7 ,
+		["mod"] =  3 ,
 		["maxLevel"] =  110 ,
 		["filter"] =  5 ,
 		["recolor"] =  false ,
@@ -3310,6 +3398,7 @@ addon.ArmorSets["CLOTH"] ={
 		["label"] =  82 ,
 		["setID"] =  2382 ,
 		["expansionID"] =  7 ,
+		["mod"] =  4 ,
 		["maxLevel"] =  110 ,
 		["filter"] =  5 ,
 		["recolor"] =  false ,
@@ -3349,6 +3438,7 @@ addon.ArmorSets["CLOTH"] ={
 		["label"] =  82 ,
 		["setID"] =  2387 ,
 		["expansionID"] =  7 ,
+		["mod"] =  1 ,
 		["maxLevel"] =  110 ,
 		["filter"] =  5 ,
 		["recolor"] =  false ,
@@ -3375,6 +3465,7 @@ addon.ArmorSets["CLOTH"] ={
 		["label"] =  82 ,
 		["setID"] =  2389 ,
 		["expansionID"] =  7 ,
+		["mod"] =  3 ,
 		["maxLevel"] =  110 ,
 		["filter"] =  5 ,
 		["recolor"] =  false ,
@@ -3388,6 +3479,7 @@ addon.ArmorSets["CLOTH"] ={
 		["label"] =  82 ,
 		["setID"] =  2390 ,
 		["expansionID"] =  7 ,
+		["mod"] =  4 ,
 		["maxLevel"] =  110 ,
 		["filter"] =  5 ,
 		["recolor"] =  false ,
@@ -3427,6 +3519,7 @@ addon.ArmorSets["CLOTH"] ={
 		["label"] =  82 ,
 		["setID"] =  2395 ,
 		["expansionID"] =  7 ,
+		["mod"] =  1 ,
 		["maxLevel"] =  110 ,
 		["filter"] =  5 ,
 		["recolor"] =  false ,
@@ -3453,6 +3546,7 @@ addon.ArmorSets["CLOTH"] ={
 		["label"] =  82 ,
 		["setID"] =  2397 ,
 		["expansionID"] =  7 ,
+		["mod"] =  3 ,
 		["maxLevel"] =  110 ,
 		["filter"] =  5 ,
 		["recolor"] =  false ,
@@ -3466,6 +3560,7 @@ addon.ArmorSets["CLOTH"] ={
 		["label"] =  82 ,
 		["setID"] =  2398 ,
 		["expansionID"] =  7 ,
+		["mod"] =  4 ,
 		["maxLevel"] =  110 ,
 		["filter"] =  5 ,
 		["recolor"] =  false ,
@@ -3518,6 +3613,7 @@ addon.ArmorSets["CLOTH"] ={
 		["label"] =  69 ,
 		["setID"] =  1976 ,
 		["expansionID"] =  6 ,
+		["mod"] =  7 ,
 		["maxLevel"] =  91 ,
 		["filter"] =  6 ,
 		["recolor"] =  false ,
@@ -3531,6 +3627,7 @@ addon.ArmorSets["CLOTH"] ={
 		["label"] =  69 ,
 		["setID"] =  1977 ,
 		["expansionID"] =  6 ,
+		["mod"] =  8 ,
 		["maxLevel"] =  91 ,
 		["filter"] =  6 ,
 		["recolor"] =  false ,
@@ -3551,6 +3648,34 @@ addon.ArmorSets["CLOTH"] ={
 		["name"] =  "Regalia of Ternion Glory (Raid Finder Lookalike)" ,
 		["items"] = { 105021,104998,104920,105040,104944,104965,104921, },
 	},
+	[2761]={
+		["armorType"] =  1 ,
+		["source"] =  2 ,
+		["label"] =  89 ,
+		["setID"] =  2761 ,
+		["expansionID"] =  8 ,
+		["mod"] =  1 ,
+		["maxLevel"] =  110 ,
+		["filter"] =  8 ,
+		["recolor"] =  false ,
+		["minLevel"] =  110 ,
+		["name"] =  "Warfronts Alliance Cloth" ,
+		["items"] = { 163248,163253,163264,163275,163337,163339,163341,163342, },
+	},
+	[2763]={
+		["armorType"] =  1 ,
+		["source"] =  2 ,
+		["label"] =  89 ,
+		["setID"] =  2763 ,
+		["expansionID"] =  8 ,
+		["mod"] =  3 ,
+		["maxLevel"] =  110 ,
+		["filter"] =  8 ,
+		["recolor"] =  false ,
+		["minLevel"] =  110 ,
+		["name"] =  "Warfronts Alliance Cloth (Weekly Recolor)" ,
+		["items"] = { 163248,163253,163264,163275,163337,163339,163341,163342, },
+	},
 	[1724]={
 		["armorType"] =  1 ,
 		["source"] =  8194 ,
@@ -3564,6 +3689,46 @@ addon.ArmorSets["CLOTH"] ={
 		["name"] =  "Chronomancer Regalia (Normal and Heroic Lookalike)" ,
 		["items"] = { 103802,105288,105364,105171,105212,105266,105215, },
 	},
+	[2908]={
+		["armorType"] =  1 ,
+		["source"] =  2 ,
+		["label"] =  93 ,
+		["setID"] =  2908 ,
+		["expansionID"] =  8 ,
+		["mod"] =  3 ,
+		["maxLevel"] =  120 ,
+		["filter"] =  8 ,
+		["recolor"] =  false ,
+		["minLevel"] =  120 ,
+		["name"] =  "Darkshore Warfront Alliance Cloth (Elaborate)" ,
+		["items"] = { 165433,165434,165435,165436,165437,165438,165439,165460, },
+	},
+	[2906]={
+		["armorType"] =  1 ,
+		["source"] =  2 ,
+		["label"] =  93 ,
+		["setID"] =  2906 ,
+		["expansionID"] =  8 ,
+		["maxLevel"] =  120 ,
+		["filter"] =  8 ,
+		["recolor"] =  false ,
+		["minLevel"] =  120 ,
+		["name"] =  "Darkshore Warfront Alliance Cloth" ,
+		["items"] = { 165433,165434,165435,165436,165437,165438,165439,165460, },
+	},
+	[2907]={
+		["armorType"] =  1 ,
+		["source"] =  2 ,
+		["label"] =  93 ,
+		["setID"] =  2907 ,
+		["expansionID"] =  8 ,
+		["maxLevel"] =  120 ,
+		["filter"] =  8 ,
+		["recolor"] =  false ,
+		["minLevel"] =  120 ,
+		["name"] =  "Darkshore Warfront Horde Cloth" ,
+		["items"] = { 165465,165466,165467,165468,165469,165470,165471,165492, },
+	},
 	[1726]={
 		["armorType"] =  1 ,
 		["source"] =  8194 ,
@@ -3576,6 +3741,20 @@ addon.ArmorSets["CLOTH"] ={
 		["minLevel"] =  90 ,
 		["name"] =  "Chronomancer Regalia (Mythic Lookalike)" ,
 		["items"] = { 105440,105613,105420,105537,105461,105515,105464, },
+	},
+	[2909]={
+		["armorType"] =  1 ,
+		["source"] =  2 ,
+		["label"] =  93 ,
+		["setID"] =  2909 ,
+		["expansionID"] =  8 ,
+		["mod"] =  3 ,
+		["maxLevel"] =  120 ,
+		["filter"] =  8 ,
+		["recolor"] =  false ,
+		["minLevel"] =  120 ,
+		["name"] =  "Darkshore Warfront Horde Cloth (Elaborate)" ,
+		["items"] = { 165465,165466,165467,165468,165469,165470,165471,165492, },
 	},
 	[2901]={
 		["armorType"] =  1 ,
@@ -3686,8 +3865,8 @@ addon.ArmorSets["CLOTH"] ={
 		["source"] =  514 ,
 		["label"] =  69 ,
 		["setID"] =  1945 ,
-		["items"] = { 117116,117118,117119,117120,117121,117123,117117, },
 		["recolor"] =  false ,
+		["items"] = { 117116,117118,117119,117120,117121,117123,117117, },
 		["name"] =  "Mountainsage Regalia" ,
 		["filter"] =  6 ,
 		["minLevel"] =  90 ,
@@ -3740,6 +3919,7 @@ addon.ArmorSets["CLOTH"] ={
 		["label"] =  87 ,
 		["setID"] =  2752 ,
 		["expansionID"] =  8 ,
+		["mod"] =  2 ,
 		["maxLevel"] =  120 ,
 		["filter"] =  3 ,
 		["recolor"] =  false ,
@@ -3753,6 +3933,7 @@ addon.ArmorSets["CLOTH"] ={
 		["label"] =  71 ,
 		["setID"] =  1989 ,
 		["expansionID"] =  6 ,
+		["mod"] =  3 ,
 		["maxLevel"] =  100 ,
 		["filter"] =  5 ,
 		["recolor"] =  false ,
@@ -3804,8 +3985,8 @@ addon.ArmorSets["CLOTH"] ={
 		["source"] =  520 ,
 		["label"] =  56 ,
 		["setID"] =  1480 ,
-		["items"] = { 101078,101073,101075,101076,101077,101074,101079,101080, },
 		["recolor"] =  false ,
+		["items"] = { 101078,101073,101075,101076,101077,101074,101079,101080, },
 		["name"] =  "Nayeli Regalia" ,
 		["filter"] =  2 ,
 		["minLevel"] =  81 ,
@@ -3831,40 +4012,14 @@ addon.ArmorSets["CLOTH"] ={
 		["source"] =  538 ,
 		["label"] =  56 ,
 		["setID"] =  1481 ,
-		["items"] = { 101174,101175,101176,101177,101182,101184,101185,101186, },
 		["recolor"] =  false ,
+		["items"] = { 101174,101175,101176,101177,101182,101184,101185,101186, },
 		["name"] =  "Nayeli Regalia (Recolor)" ,
 		["filter"] =  2 ,
 		["minLevel"] =  80 ,
 		["expansionID"] =  5 ,
 		["maxLevel"] =  90 ,
 		["classMask"] =  5 ,
-	},
-	[2751]={
-		["armorType"] =  1 ,
-		["source"] =  18 ,
-		["label"] =  87 ,
-		["setID"] =  2751 ,
-		["expansionID"] =  8 ,
-		["maxLevel"] =  120 ,
-		["filter"] =  3 ,
-		["recolor"] =  false ,
-		["minLevel"] =  120 ,
-		["name"] =  "Zandalar Dungeon Cloth (Normal Recolor)" ,
-		["items"] = { 159226,158303,158348,158375,158349,159231,158315,158350,158344, },
-	},
-	[1993]={
-		["armorType"] =  1 ,
-		["source"] =  8194 ,
-		["label"] =  71 ,
-		["setID"] =  1993 ,
-		["expansionID"] =  6 ,
-		["maxLevel"] =  100 ,
-		["filter"] =  5 ,
-		["recolor"] =  false ,
-		["minLevel"] =  100 ,
-		["name"] =  "Attire of Piety (Normal Lookalike)" ,
-		["items"] = { 124185,124180,124149,124175,124170,124153, },
 	},
 	[2750]={
 		["armorType"] =  1 ,
@@ -3879,32 +4034,60 @@ addon.ArmorSets["CLOTH"] ={
 		["name"] =  "Kul Tiras Dungeon Cloth (Reputation Recolor)" ,
 		["items"] = { 161576,161503,161591,161568, },
 	},
+	[1993]={
+		["armorType"] =  1 ,
+		["source"] =  8194 ,
+		["label"] =  71 ,
+		["setID"] =  1993 ,
+		["expansionID"] =  6 ,
+		["maxLevel"] =  100 ,
+		["filter"] =  5 ,
+		["recolor"] =  false ,
+		["minLevel"] =  100 ,
+		["name"] =  "Attire of Piety (Normal Lookalike)" ,
+		["items"] = { 124185,124180,124149,124175,124170,124153, },
+	},
+	[2753]={
+		["armorType"] =  1 ,
+		["source"] =  18 ,
+		["label"] =  87 ,
+		["setID"] =  2753 ,
+		["expansionID"] =  8 ,
+		["mod"] =  3 ,
+		["maxLevel"] =  120 ,
+		["filter"] =  3 ,
+		["recolor"] =  false ,
+		["minLevel"] =  120 ,
+		["name"] =  "Zandalar Dungeon Cloth (Mythic Recolor)" ,
+		["items"] = { 159226,158303,158348,158375,158349,159231,158315,158350,158344, },
+	},
 	[1994]={
 		["armorType"] =  1 ,
 		["source"] =  8194 ,
 		["label"] =  71 ,
 		["setID"] =  1994 ,
 		["expansionID"] =  6 ,
+		["mod"] =  1 ,
 		["maxLevel"] =  100 ,
 		["filter"] =  5 ,
 		["recolor"] =  false ,
 		["minLevel"] =  100 ,
 		["name"] =  "Attire of Piety (Heroic Lookalike)" ,
 		["items"] = { 124185,124180,124149,124175,124170,124153, },
-		["mod"] = true,
 	},
-	[2748]={
+	[2751]={
 		["armorType"] =  1 ,
-		["source"] =  19 ,
+		["source"] =  18 ,
 		["label"] =  87 ,
-		["setID"] =  2748 ,
+		["setID"] =  2751 ,
 		["expansionID"] =  8 ,
+		["mod"] =  1 ,
 		["maxLevel"] =  120 ,
 		["filter"] =  3 ,
 		["recolor"] =  false ,
-		["minLevel"] =  110 ,
-		["name"] =  "Kul Tiras Dungeon Cloth (Heroic Recolor)" ,
-		["items"] = { 158346,159227,160533,158301,155891,155886,158302,159238, },
+		["minLevel"] =  120 ,
+		["name"] =  "Zandalar Dungeon Cloth (Normal Recolor)" ,
+		["items"] = { 159226,158303,158348,158375,158349,159231,158315,158350,158344, },
 	},
 	[1995]={
 		["armorType"] =  1 ,
@@ -3912,6 +4095,7 @@ addon.ArmorSets["CLOTH"] ={
 		["label"] =  71 ,
 		["setID"] =  1995 ,
 		["expansionID"] =  6 ,
+		["mod"] =  3 ,
 		["maxLevel"] =  100 ,
 		["filter"] =  5 ,
 		["recolor"] =  false ,
@@ -3937,8 +4121,8 @@ addon.ArmorSets["CLOTH"] ={
 		["source"] =  1049106 ,
 		["label"] =  56 ,
 		["setID"] =  1485 ,
-		["items"] = { 101189,101190,101191,101192,101193,101194,101195,101196, },
 		["recolor"] =  false ,
+		["items"] = { 101189,101190,101191,101192,101193,101194,101195,101196, },
 		["name"] =  "Swampwalker Regalia (Recolor)" ,
 		["filter"] =  2 ,
 		["minLevel"] =  81 ,
@@ -3946,18 +4130,19 @@ addon.ArmorSets["CLOTH"] ={
 		["maxLevel"] =  90 ,
 		["classMask"] =  5 ,
 	},
-	[2753]={
+	[2748]={
 		["armorType"] =  1 ,
-		["source"] =  18 ,
+		["source"] =  19 ,
 		["label"] =  87 ,
-		["setID"] =  2753 ,
+		["setID"] =  2748 ,
 		["expansionID"] =  8 ,
+		["mod"] =  2 ,
 		["maxLevel"] =  120 ,
 		["filter"] =  3 ,
 		["recolor"] =  false ,
-		["minLevel"] =  120 ,
-		["name"] =  "Zandalar Dungeon Cloth (Mythic Recolor)" ,
-		["items"] = { 159226,158303,158348,158375,158349,159231,158315,158350,158344, },
+		["minLevel"] =  110 ,
+		["name"] =  "Kul Tiras Dungeon Cloth (Heroic Recolor)" ,
+		["items"] = { 158346,159227,160533,158301,155891,155886,158302,159238, },
 	},
 	[2749]={
 		["armorType"] =  1 ,
@@ -3965,6 +4150,7 @@ addon.ArmorSets["CLOTH"] ={
 		["label"] =  87 ,
 		["setID"] =  2749 ,
 		["expansionID"] =  8 ,
+		["mod"] =  3 ,
 		["maxLevel"] =  120 ,
 		["filter"] =  3 ,
 		["recolor"] =  false ,
@@ -3985,18 +4171,18 @@ addon.ArmorSets["CLOTH"] ={
 		["name"] =  "Kul Tiras Quest Cloth (Tidespeaker Recolor)" ,
 		["items"] = { 155178,155185,155188,155170,155175,155182,155191,155194, },
 	},
-	[1482]={
+	[2746]={
 		["armorType"] =  1 ,
-		["source"] =  8 ,
-		["label"] =  56 ,
-		["setID"] =  1482 ,
-		["expansionID"] =  5 ,
-		["maxLevel"] =  80 ,
+		["source"] =  10 ,
+		["label"] =  92 ,
+		["setID"] =  2746 ,
+		["expansionID"] =  8 ,
+		["maxLevel"] =  120 ,
 		["filter"] =  2 ,
 		["recolor"] =  false ,
-		["minLevel"] =  80 ,
-		["name"] =  "Nayeli Regalia (Recolor)" ,
-		["items"] = { 87283,80731,80749,80740,80686,80704,80722,80695, },
+		["minLevel"] =  120 ,
+		["name"] =  "Zandalar Quest Cloth (Lastwind Recolor)" ,
+		["items"] = { 155397,155404,155407,155389,155394,155401,155410,155413, },
 	},
 	[617]={
 		["armorType"] =  1 ,
@@ -4016,8 +4202,8 @@ addon.ArmorSets["CLOTH"] ={
 		["source"] =  8210 ,
 		["label"] =  71 ,
 		["setID"] =  1999 ,
-		["items"] = { 127981,124181,124169,124163,124157,124152, },
 		["recolor"] =  false ,
+		["items"] = { 127981,124181,124169,124163,124157,124152, },
 		["name"] =  "Deathrattle Regalia (Normal Lookalike)" ,
 		["filter"] =  5 ,
 		["minLevel"] =  100 ,
@@ -4044,6 +4230,7 @@ addon.ArmorSets["CLOTH"] ={
 		["label"] =  71 ,
 		["setID"] =  2000 ,
 		["expansionID"] =  6 ,
+		["mod"] =  1 ,
 		["maxLevel"] =  100 ,
 		["filter"] =  5 ,
 		["recolor"] =  false ,
@@ -4056,8 +4243,8 @@ addon.ArmorSets["CLOTH"] ={
 		["source"] =  24 ,
 		["label"] =  2 ,
 		["setID"] =  618 ,
-		["items"] = { 97683,97657,97648,97674,97670,97641,97664,22079, },
 		["recolor"] =  false ,
+		["items"] = { 97683,97657,97648,97674,97670,97641,97664,22079, },
 		["name"] =  "Vestments of the Virtuous" ,
 		["filter"] =  3 ,
 		["minLevel"] =  60 ,
@@ -4071,6 +4258,7 @@ addon.ArmorSets["CLOTH"] ={
 		["label"] =  71 ,
 		["setID"] =  2001 ,
 		["expansionID"] =  6 ,
+		["mod"] =  3 ,
 		["maxLevel"] =  100 ,
 		["filter"] =  5 ,
 		["recolor"] =  false ,
@@ -4091,6 +4279,19 @@ addon.ArmorSets["CLOTH"] ={
 		["name"] =  "Hallowed Raiment" ,
 		["items"] = { 123997,127169,44668,44302,27775,27875,29251, },
 	},
+	[1482]={
+		["armorType"] =  1 ,
+		["source"] =  8 ,
+		["label"] =  56 ,
+		["setID"] =  1482 ,
+		["expansionID"] =  5 ,
+		["maxLevel"] =  80 ,
+		["filter"] =  2 ,
+		["recolor"] =  false ,
+		["minLevel"] =  80 ,
+		["name"] =  "Nayeli Regalia (Recolor)" ,
+		["items"] = { 87283,80731,80749,80740,80686,80704,80722,80695, },
+	},
 	[2574]={
 		["armorType"] =  1 ,
 		["source"] =  2 ,
@@ -4103,19 +4304,6 @@ addon.ArmorSets["CLOTH"] ={
 		["minLevel"] =  110 ,
 		["name"] =  "Ceremonial Karabor Regalia (Recolor)" ,
 		["items"] = { 153282,153280,153279,153286,153281,153283,153284,153285, },
-	},
-	[2746]={
-		["armorType"] =  1 ,
-		["source"] =  10 ,
-		["label"] =  92 ,
-		["setID"] =  2746 ,
-		["expansionID"] =  8 ,
-		["maxLevel"] =  120 ,
-		["filter"] =  2 ,
-		["recolor"] =  false ,
-		["minLevel"] =  120 ,
-		["name"] =  "Zandalar Quest Cloth (Lastwind Recolor)" ,
-		["items"] = { 155397,155404,155407,155389,155394,155401,155410,155413, },
 	},
 	[374]={
 		["armorType"] =  1 ,
@@ -4161,8 +4349,8 @@ addon.ArmorSets["CLOTH"] ={
 		["source"] =  520 ,
 		["label"] =  56 ,
 		["setID"] =  1483 ,
-		["items"] = { 101272,101267,101269,101270,101271,101268,101273,101274, },
 		["recolor"] =  false ,
+		["items"] = { 101272,101267,101269,101270,101271,101268,101273,101274, },
 		["name"] =  "Swampwalker Regalia" ,
 		["filter"] =  2 ,
 		["minLevel"] =  83 ,
@@ -4209,19 +4397,18 @@ addon.ArmorSets["CLOTH"] ={
 		["name"] =  "Tirisfal Regalia (Recolor)" ,
 		["items"] = { 30038,29986,30024,30107,29987,29972,30067,29918, },
 	},
-	[2118]={
+	[1366]={
 		["armorType"] =  1 ,
-		["source"] =  24 ,
-		["label"] =  77 ,
-		["setID"] =  2118 ,
-		["items"] = { 139749,139751,139752,139753,139748,139750,139747,139754, },
+		["source"] =  32779 ,
+		["label"] =  44 ,
+		["setID"] =  1366 ,
+		["expansionID"] =  1 ,
+		["maxLevel"] =  70 ,
+		["filter"] =  1 ,
 		["recolor"] =  false ,
-		["name"] =  "Vesture of Tirisgarde" ,
-		["filter"] =  3 ,
-		["minLevel"] =  110 ,
-		["expansionID"] =  7 ,
-		["maxLevel"] =  110 ,
-		["classMask"] =  8 ,
+		["minLevel"] =  10 ,
+		["name"] =  "Aurora Regalia (Recolor)" ,
+		["items"] = { 5770,4718,7526, },
 	},
 	[375]={
 		["armorType"] =  1 ,
@@ -4249,26 +4436,27 @@ addon.ArmorSets["CLOTH"] ={
 		["name"] =  "Mana-Etched Regalia" ,
 		["items"] = { 127208,127252,127166,127450,27465,27907,28191, },
 	},
-	[1075]={
+	[2118]={
 		["armorType"] =  1 ,
-		["source"] =  8 ,
-		["label"] =  53 ,
-		["setID"] =  1075 ,
-		["expansionID"] =  2 ,
-		["maxLevel"] =  40 ,
-		["filter"] =  2 ,
+		["source"] =  24 ,
+		["label"] =  77 ,
+		["setID"] =  2118 ,
 		["recolor"] =  false ,
-		["minLevel"] =  35 ,
-		["name"] =  "Flirtation Regalia" ,
-		["items"] = { 62951,63624,56871,62935,62939,63550,63566, },
+		["items"] = { 139749,139751,139752,139753,139748,139750,139747,139754, },
+		["name"] =  "Vesture of Tirisgarde" ,
+		["filter"] =  3 ,
+		["minLevel"] =  110 ,
+		["expansionID"] =  7 ,
+		["maxLevel"] =  110 ,
+		["classMask"] =  8 ,
 	},
 	[2124]={
 		["armorType"] =  1 ,
 		["source"] =  24 ,
 		["label"] =  77 ,
 		["setID"] =  2124 ,
-		["items"] = { 139765,139767,139768,139769,139763,139764,139766,139770, },
 		["recolor"] =  false ,
+		["items"] = { 139765,139767,139768,139769,139763,139764,139766,139770, },
 		["name"] =  "Vestments of the Black Harvest" ,
 		["filter"] =  3 ,
 		["minLevel"] =  110 ,
@@ -4276,18 +4464,18 @@ addon.ArmorSets["CLOTH"] ={
 		["maxLevel"] =  110 ,
 		["classMask"] =  9 ,
 	},
-	[1364]={
+	[683]={
 		["armorType"] =  1 ,
-		["source"] =  32778 ,
-		["label"] =  44 ,
-		["setID"] =  1364 ,
+		["source"] =  2064 ,
+		["label"] =  1 ,
+		["setID"] =  683 ,
 		["expansionID"] =  1 ,
-		["maxLevel"] =  35 ,
-		["filter"] =  1 ,
+		["maxLevel"] =  85 ,
+		["filter"] =  3 ,
 		["recolor"] =  false ,
-		["minLevel"] =  20 ,
-		["name"] =  "Aurora Regalia (Recolor)" ,
-		["items"] = { 4035,11310, },
+		["minLevel"] =  52 ,
+		["name"] =  "Dreadmist Raiment" ,
+		["items"] = { 122250,122256,122360,122384,16702,16703,16704,16705, },
 	},
 	[878]={
 		["armorType"] =  1 ,
@@ -4302,31 +4490,32 @@ addon.ArmorSets["CLOTH"] ={
 		["name"] =  "Necropile Raiment" ,
 		["items"] = { 14631,14629,14632,14633,14626, },
 	},
-	[1845]={
+	[1838]={
 		["armorType"] =  1 ,
 		["source"] =  8194 ,
 		["label"] =  65 ,
-		["setID"] =  1845 ,
+		["setID"] =  1838 ,
 		["expansionID"] =  6 ,
 		["maxLevel"] =  100 ,
 		["filter"] =  5 ,
 		["recolor"] =  false ,
 		["minLevel"] =  100 ,
-		["name"] =  "Soul Priest\'s Raiment (Heroic Lookalike)" ,
-		["items"] = { 113887,113958,113864,113876,113596,113828,113903,113656, },
+		["name"] =  "Arcanoshatter Regalia (Normal Lookalike)" ,
+		["items"] = { 119332,113898,113942,113933,113868,113914,113609,113967, },
 	},
-	[2649]={
+	[1988]={
 		["armorType"] =  1 ,
-		["source"] =  2 ,
-		["label"] =  86 ,
-		["setID"] =  2649 ,
-		["expansionID"] =  7 ,
-		["maxLevel"] =  110 ,
+		["source"] =  8194 ,
+		["label"] =  71 ,
+		["setID"] =  1988 ,
+		["expansionID"] =  6 ,
+		["mod"] =  1 ,
+		["maxLevel"] =  100 ,
 		["filter"] =  5 ,
 		["recolor"] =  false ,
-		["minLevel"] =  110 ,
-		["name"] =  "Runebound Regalia (Heroic Lookalike)" ,
-		["items"] = { 151951,151939,151953,152679,151941,153018, },
+		["minLevel"] =  100 ,
+		["name"] =  "Raiment of the Arcanic Conclave (Heroic Lookalike)" ,
+		["items"] = { 124186,124148,124174,124168,124164,124158,124151, },
 	},
 	[2570]={
 		["armorType"] =  1 ,
@@ -4354,84 +4543,19 @@ addon.ArmorSets["CLOTH"] ={
 		["name"] =  "Oblivion Raiment" ,
 		["items"] = { 123998,127171,127175,127212,28232,27778,27948, },
 	},
-	[2651]={
-		["armorType"] =  1 ,
-		["source"] =  2 ,
-		["label"] =  86 ,
-		["setID"] =  2651 ,
-		["expansionID"] =  7 ,
-		["maxLevel"] =  110 ,
-		["filter"] =  5 ,
-		["recolor"] =  false ,
-		["minLevel"] =  110 ,
-		["name"] =  "Runebound Regalia (Raid Finder Lookalike)" ,
-		["items"] = { 151951,151939,151953,152679,151941,153018, },
-	},
-	[2650]={
-		["armorType"] =  1 ,
-		["source"] =  2 ,
-		["label"] =  86 ,
-		["setID"] =  2650 ,
-		["expansionID"] =  7 ,
-		["maxLevel"] =  110 ,
-		["filter"] =  5 ,
-		["recolor"] =  false ,
-		["minLevel"] =  110 ,
-		["name"] =  "Runebound Regalia (Mythic Lookalike)" ,
-		["items"] = { 151951,151939,151953,152679,151941,153018, },
-	},
-	[684]={
-		["armorType"] =  1 ,
-		["source"] =  16 ,
-		["label"] =  2 ,
-		["setID"] =  684 ,
-		["items"] = { 97681,97662,97673,97653,97669,97638,97646,22071, },
-		["recolor"] =  false ,
-		["name"] =  "Deathmist Raiment" ,
-		["filter"] =  3 ,
-		["minLevel"] =  60 ,
-		["expansionID"] =  1 ,
-		["maxLevel"] =  90 ,
-		["classMask"] =  9 ,
-	},
-	[2388]={
+	[2396]={
 		["armorType"] =  1 ,
 		["source"] =  2 ,
 		["label"] =  82 ,
-		["setID"] =  2388 ,
+		["setID"] =  2396 ,
 		["expansionID"] =  7 ,
+		["mod"] =  2 ,
 		["maxLevel"] =  110 ,
 		["filter"] =  5 ,
 		["recolor"] =  false ,
 		["minLevel"] =  110 ,
-		["name"] =  "Diabolic Raiment (Heroic Lookalike)" ,
-		["items"] = { 146986,146999,147000,146997,146992,146991,146988, },
-	},
-	[1988]={
-		["armorType"] =  1 ,
-		["source"] =  8194 ,
-		["label"] =  71 ,
-		["setID"] =  1988 ,
-		["expansionID"] =  6 ,
-		["maxLevel"] =  100 ,
-		["filter"] =  5 ,
-		["recolor"] =  false ,
-		["minLevel"] =  100 ,
-		["name"] =  "Raiment of the Arcanic Conclave (Heroic Lookalike)" ,
-		["items"] = { 124186,124148,124174,124168,124164,124158,124151, },
-	},
-	[1091]={
-		["armorType"] =  1 ,
-		["source"] =  24 ,
-		["label"] =  53 ,
-		["setID"] =  1091 ,
-		["expansionID"] =  1 ,
-		["maxLevel"] =  35 ,
-		["filter"] =  2 ,
-		["recolor"] =  false ,
-		["minLevel"] =  25 ,
-		["name"] =  "Dream Bough Regalia" ,
-		["items"] = { 54919,53308,61534,57501,53287,61513,55945, },
+		["name"] =  "Vestments of Blind Absolution (Heroic Lookalike)" ,
+		["items"] = { 146987,147736,147001,146996,146995,146990,146989, },
 	},
 	[573]={
 		["armorType"] =  1 ,
@@ -4446,6 +4570,73 @@ addon.ArmorSets["CLOTH"] ={
 		["name"] =  "Magister's Regalia" ,
 		["items"] = { 16685,16683,16686,16684,16687,16689,16688,16682, },
 	},
+	[2651]={
+		["armorType"] =  1 ,
+		["source"] =  2 ,
+		["label"] =  86 ,
+		["setID"] =  2651 ,
+		["expansionID"] =  7 ,
+		["mod"] =  4 ,
+		["maxLevel"] =  110 ,
+		["filter"] =  5 ,
+		["recolor"] =  false ,
+		["minLevel"] =  110 ,
+		["name"] =  "Runebound Regalia (Raid Finder Lookalike)" ,
+		["items"] = { 151951,151939,151953,152679,151941,153018, },
+	},
+	[2664]={
+		["armorType"] =  1 ,
+		["source"] =  2 ,
+		["label"] =  86 ,
+		["setID"] =  2664 ,
+		["expansionID"] =  7 ,
+		["mod"] =  1 ,
+		["maxLevel"] =  110 ,
+		["filter"] =  5 ,
+		["recolor"] =  false ,
+		["minLevel"] =  110 ,
+		["name"] =  "Gilded Seraph's Raiment (Normal Lookalike)" ,
+		["items"] = { 152349,152356,152353,151952,152084,151943,151946,151950, },
+	},
+	[1075]={
+		["armorType"] =  1 ,
+		["source"] =  8 ,
+		["label"] =  53 ,
+		["setID"] =  1075 ,
+		["expansionID"] =  2 ,
+		["maxLevel"] =  40 ,
+		["filter"] =  2 ,
+		["recolor"] =  false ,
+		["minLevel"] =  35 ,
+		["name"] =  "Flirtation Regalia" ,
+		["items"] = { 62951,63624,56871,62935,62939,63550,63566, },
+	},
+	[1073]={
+		["armorType"] =  1 ,
+		["source"] =  8 ,
+		["label"] =  53 ,
+		["setID"] =  1073 ,
+		["expansionID"] =  2 ,
+		["maxLevel"] =  40 ,
+		["filter"] =  2 ,
+		["recolor"] =  false ,
+		["minLevel"] =  35 ,
+		["name"] =  "Flirtation Regalia (Recolor)" ,
+		["items"] = { 63164,56840,63588,63151,63175,63183,63659,63617, },
+	},
+	[1091]={
+		["armorType"] =  1 ,
+		["source"] =  24 ,
+		["label"] =  53 ,
+		["setID"] =  1091 ,
+		["expansionID"] =  1 ,
+		["maxLevel"] =  35 ,
+		["filter"] =  2 ,
+		["recolor"] =  false ,
+		["minLevel"] =  25 ,
+		["name"] =  "Dream Bough Regalia" ,
+		["items"] = { 54919,53308,61534,57501,53287,61513,55945, },
+	},
 	[881]={
 		["armorType"] =  1 ,
 		["source"] =  11 ,
@@ -4459,12 +4650,41 @@ addon.ArmorSets["CLOTH"] ={
 		["name"] =  "The Postmaster" ,
 		["items"] = { 22256,13390,13388,13391,13389, },
 	},
+	[2388]={
+		["armorType"] =  1 ,
+		["source"] =  2 ,
+		["label"] =  82 ,
+		["setID"] =  2388 ,
+		["expansionID"] =  7 ,
+		["mod"] =  2 ,
+		["maxLevel"] =  110 ,
+		["filter"] =  5 ,
+		["recolor"] =  false ,
+		["minLevel"] =  110 ,
+		["name"] =  "Diabolic Raiment (Heroic Lookalike)" ,
+		["items"] = { 146986,146999,147000,146997,146992,146991,146988, },
+	},
+	[2649]={
+		["armorType"] =  1 ,
+		["source"] =  2 ,
+		["label"] =  86 ,
+		["setID"] =  2649 ,
+		["expansionID"] =  7 ,
+		["mod"] =  2 ,
+		["maxLevel"] =  110 ,
+		["filter"] =  5 ,
+		["recolor"] =  false ,
+		["minLevel"] =  110 ,
+		["name"] =  "Runebound Regalia (Heroic Lookalike)" ,
+		["items"] = { 151951,151939,151953,152679,151941,153018, },
+	},
 	[2666]={
 		["armorType"] =  1 ,
 		["source"] =  2 ,
 		["label"] =  86 ,
 		["setID"] =  2666 ,
 		["expansionID"] =  7 ,
+		["mod"] =  3 ,
 		["maxLevel"] =  110 ,
 		["filter"] =  5 ,
 		["recolor"] =  false ,
@@ -4484,19 +4704,6 @@ addon.ArmorSets["CLOTH"] ={
 		["minLevel"] =  85 ,
 		["name"] =  "Mercurial Regalia (Normal Lookalike)" ,
 		["items"] = { 67147,67146,54505,54504,59337,59482,59508,59322, },
-	},
-	[2396]={
-		["armorType"] =  1 ,
-		["source"] =  2 ,
-		["label"] =  82 ,
-		["setID"] =  2396 ,
-		["expansionID"] =  7 ,
-		["maxLevel"] =  110 ,
-		["filter"] =  5 ,
-		["recolor"] =  false ,
-		["minLevel"] =  110 ,
-		["name"] =  "Vestments of Blind Absolution (Heroic Lookalike)" ,
-		["items"] = { 146987,147736,147001,146996,146995,146990,146989, },
 	},
 	[1963]={
 		["armorType"] =  1 ,
@@ -4523,19 +4730,6 @@ addon.ArmorSets["CLOTH"] ={
 		["minLevel"] =  0 ,
 		["name"] =  "Anchorite Regalia" ,
 		["items"] = { 106510,113250,107861,116110,118734,106162,109074, },
-	},
-	[1073]={
-		["armorType"] =  1 ,
-		["source"] =  8 ,
-		["label"] =  53 ,
-		["setID"] =  1073 ,
-		["expansionID"] =  2 ,
-		["maxLevel"] =  40 ,
-		["filter"] =  2 ,
-		["recolor"] =  false ,
-		["minLevel"] =  35 ,
-		["name"] =  "Flirtation Regalia (Recolor)" ,
-		["items"] = { 63164,56840,63588,63151,63175,63183,63659,63617, },
 	},
 	[1508]={
 		["armorType"] =  1 ,
@@ -4602,6 +4796,19 @@ addon.ArmorSets["CLOTH"] ={
 		["name"] =  "Firewool Regalia (Recolor)" ,
 		["items"] = { 81699,82848,87586,82430,82431,82432,82434,82436, },
 	},
+	[1732]={
+		["armorType"] =  1 ,
+		["source"] =  8194 ,
+		["label"] =  64 ,
+		["setID"] =  1732 ,
+		["expansionID"] =  5 ,
+		["maxLevel"] =  90 ,
+		["filter"] =  5 ,
+		["recolor"] =  false ,
+		["minLevel"] =  90 ,
+		["name"] =  "Regalia of the Horned Nightmare (Mythic Lookalike)" ,
+		["items"] = { 112866,112486,112854,112717,112744,112488,112808,105494, },
+	},
 	[1590]={
 		["armorType"] =  1 ,
 		["source"] =  2 ,
@@ -4641,19 +4848,6 @@ addon.ArmorSets["CLOTH"] ={
 		["name"] =  "Chronomancer Regalia (Raid Finder Lookalike)" ,
 		["items"] = { 112487,112765,113225,112937,112558,112743,104963, },
 	},
-	[1732]={
-		["armorType"] =  1 ,
-		["source"] =  8194 ,
-		["label"] =  64 ,
-		["setID"] =  1732 ,
-		["expansionID"] =  5 ,
-		["maxLevel"] =  90 ,
-		["filter"] =  5 ,
-		["recolor"] =  false ,
-		["minLevel"] =  90 ,
-		["name"] =  "Regalia of the Horned Nightmare (Mythic Lookalike)" ,
-		["items"] = { 112866,112486,112854,112717,112744,112488,112808,105494, },
-	},
 	[443]={
 		["armorType"] =  1 ,
 		["source"] =  19 ,
@@ -4679,671 +4873,5 @@ addon.ArmorSets["CLOTH"] ={
 		["minLevel"] =  70 ,
 		["name"] =  "Vestments of Prophecy (Recolor)" ,
 		["items"] = { 24264,21874,21875,21873,24261, },
-	},
-}
-
-addon.ArmorSetMods["CLOTH"] = {
-	[151942] = {
-		89739, -- [1]
-		nil, -- [2]
-		89740, -- [3]
-		89737, -- [4]
-	},
-	[113218] = {
-		[3] = 62171,
-	},
-	[140850] = {
-		81805, -- [1]
-		nil, -- [2]
-		81806, -- [3]
-		81807, -- [4]
-	},
-	[140914] = {
-		82019, -- [1]
-		nil, -- [2]
-		82020, -- [3]
-		82021, -- [4]
-	},
-	[151943] = {
-		89743, -- [1]
-		nil, -- [2]
-		89744, -- [3]
-		89741, -- [4]
-	},
-	[158350] = {
-		94353, -- [1]
-		[3] = 95547,
-	},
-	[140851] = {
-		[3] = 81810,
-		[4] = 81811,
-	},
-	[138365] = {
-		81419, -- [1]
-		nil, -- [2]
-		80174, -- [3]
-		81121, -- [4]
-	},
-	[124152] = {
-		69572, -- [1]
-		[3] = 69573,
-	},
-	[151944] = {
-		89747, -- [1]
-		nil, -- [2]
-		89748, -- [3]
-		89745, -- [4]
-	},
-	[124184] = {
-		[3] = 69681,
-	},
-	[112486] = {
-		[3] = 61005,
-		[4] = 61004,
-	},
-	[140852] = {
-		81813, -- [1]
-		nil, -- [2]
-		81814, -- [3]
-		81815, -- [4]
-	},
-	[151945] = {
-		89751, -- [1]
-		nil, -- [2]
-		89752, -- [3]
-		89749, -- [4]
-	},
-	[140853] = {
-		[3] = 81818,
-		[4] = 81819,
-	},
-	[140885] = {
-		[3] = 81940,
-		[4] = 81941,
-	},
-	[112423] = {
-		[3] = 60932,
-	},
-	[151946] = {
-		89755, -- [1]
-		nil, -- [2]
-		89756, -- [3]
-		89753, -- [4]
-	},
-	[124185] = {
-		69684, -- [1]
-		[3] = 69685,
-	},
-	[112487] = {
-		[4] = 61007,
-	},
-	[140886] = {
-		81943, -- [1]
-		nil, -- [2]
-		81944, -- [3]
-		81945, -- [4]
-	},
-	[152680] = {
-		[3] = 90567,
-		[4] = 90564,
-	},
-	[151947] = {
-		[3] = 89760,
-		[4] = 89757,
-	},
-	[112854] = {
-		[3] = 61843,
-		[4] = 61842,
-	},
-	[140887] = {
-		81947, -- [1]
-		nil, -- [2]
-		81948, -- [3]
-		81949, -- [4]
-	},
-	[113970] = {
-		62875, -- [1]
-		[3] = 67221,
-	},
-	[124186] = {
-		69688, -- [1]
-		[3] = 69689,
-	},
-	[147422] = {
-		86597, -- [1]
-		nil, -- [2]
-		86598, -- [3]
-		86595, -- [4]
-	},
-	[112488] = {
-		[3] = 61011,
-		[4] = 61010,
-	},
-	[140888] = {
-		[3] = 81952,
-		[4] = 81953,
-	},
-	[138370] = {
-		81564, -- [1]
-		nil, -- [2]
-		81565, -- [3]
-		81106, -- [4]
-	},
-	[151949] = {
-		[3] = 89768,
-		[4] = 89765,
-	},
-	[151950] = {
-		89771, -- [1]
-		nil, -- [2]
-		89772, -- [3]
-		89769, -- [4]
-	},
-	[138212] = {
-		81149, -- [1]
-		nil, -- [2]
-		81150, -- [3]
-		81151, -- [4]
-	},
-	[112744] = {
-		[3] = 61602,
-		[4] = 61601,
-	},
-	[112808] = {
-		[3] = 61737,
-		[4] = 61736,
-	},
-	[151951] = {
-		[3] = 89776,
-		[4] = 89773,
-	},
-	[113876] = {
-		[3] = 67253,
-	},
-	[138373] = {
-		81560, -- [1]
-		nil, -- [2]
-		81561, -- [3]
-		81562, -- [4]
-	},
-	[113956] = {
-		62845, -- [1]
-		[3] = 67220,
-	},
-	[151952] = {
-		89779, -- [1]
-		nil, -- [2]
-		89780, -- [3]
-		89777, -- [4]
-	},
-	[151953] = {
-		89783, -- [1]
-		nil, -- [2]
-		89784, -- [3]
-		89781, -- [4]
-	},
-	[138215] = {
-		81122, -- [1]
-		nil, -- [2]
-		81123, -- [3]
-		81124, -- [4]
-	},
-	[113941] = {
-		62811, -- [1]
-		[3] = 67219,
-	},
-	[112937] = {
-		[4] = 61948,
-	},
-	[151954] = {
-		89787, -- [1]
-		nil, -- [2]
-		89788, -- [3]
-		89785, -- [4]
-	},
-	[112746] = {
-		[3] = 61610,
-	},
-	[138217] = {
-		81125, -- [1]
-		nil, -- [2]
-		81126, -- [3]
-		81127, -- [4]
-	},
-	[113655] = {
-		62445, -- [1]
-		[3] = 67216,
-	},
-	[113942] = {
-		62813, -- [1]
-		[3] = 62814,
-	},
-	[124158] = {
-		69591, -- [1]
-		[3] = 69592,
-	},
-	[124174] = {
-		69644, -- [1]
-		[3] = 69645,
-	},
-	[113225] = {
-		[4] = 62187,
-	},
-	[152084] = {
-		89976, -- [1]
-		nil, -- [2]
-		89977, -- [3]
-		89974, -- [4]
-	},
-	[113656] = {
-		62448, -- [1]
-		[3] = 67250,
-	},
-	[158301] = {
-		94297, -- [1]
-		[3] = 95744,
-	},
-	[140993] = {
-		82031, -- [1]
-		nil, -- [2]
-		82032, -- [3]
-		82033, -- [4]
-	},
-	[159226] = {
-		95548, -- [1]
-		[3] = 95549,
-	},
-	[112557] = {
-		[3] = 61079,
-	},
-	[113864] = {
-		62661, -- [1]
-		[3] = 67252,
-	},
-	[159227] = {
-		95751, -- [1]
-		[3] = 95752,
-	},
-	[113928] = {
-		62788, -- [1]
-		[3] = 67218,
-	},
-	[158303] = {
-		94301, -- [1]
-		[3] = 95541,
-	},
-	[112717] = {
-		[3] = 61546,
-		[4] = 61545,
-	},
-	[112765] = {
-		[4] = 61651,
-	},
-	[112558] = {
-		[4] = 61081,
-	},
-	[113610] = {
-		62394, -- [1]
-		[3] = 67215,
-	},
-	[146989] = {
-		86653, -- [1]
-		nil, -- [2]
-		86654, -- [3]
-		86651, -- [4]
-	},
-	[119332] = {
-		66978, -- [1]
-		[3] = 67785,
-	},
-	[112718] = {
-		[3] = 61549,
-	},
-	[146990] = {
-		86657, -- [1]
-		nil, -- [2]
-		86658, -- [3]
-		86655, -- [4]
-	},
-	[113898] = {
-		62729, -- [1]
-		[3] = 62730,
-	},
-	[159231] = {
-		95550, -- [1]
-		[3] = 95551,
-	},
-	[146992] = {
-		86753, -- [1]
-		nil, -- [2]
-		86754, -- [3]
-		86751, -- [4]
-	},
-	[113596] = {
-		62368, -- [1]
-		[3] = 62369,
-	},
-	[155886] = {
-		95740, -- [1]
-		[3] = 95741,
-	},
-	[146993] = {
-		86585, -- [1]
-		nil, -- [2]
-		86586, -- [3]
-		86583, -- [4]
-	},
-	[124157] = {
-		69588, -- [1]
-		[3] = 69589,
-	},
-	[124163] = {
-		69608, -- [1]
-		[3] = 69609,
-	},
-	[124169] = {
-		69628, -- [1]
-		[3] = 69629,
-	},
-	[153018] = {
-		90709, -- [1]
-		nil, -- [2]
-		90710, -- [3]
-		90707, -- [4]
-	},
-	[127981] = {
-		72847, -- [1]
-	},
-	[113967] = {
-		62868, -- [1]
-		[3] = 62869,
-	},
-	[146994] = {
-		86589, -- [1]
-		nil, -- [2]
-		86590, -- [3]
-		86587, -- [4]
-	},
-	[113903] = {
-		[3] = 67255,
-	},
-	[124153] = {
-		69576, -- [1]
-		[3] = 69577,
-	},
-	[124170] = {
-		69631, -- [1]
-		[3] = 69632,
-	},
-	[124175] = {
-		69648, -- [1]
-		[3] = 69649,
-	},
-	[113868] = {
-		62666, -- [1]
-		[3] = 62667,
-	},
-	[139194] = {
-		81140, -- [1]
-		nil, -- [2]
-		81141, -- [3]
-		81142, -- [4]
-	},
-	[113958] = {
-		62848, -- [1]
-		[3] = 67256,
-	},
-	[146995] = {
-		86661, -- [1]
-		nil, -- [2]
-		86662, -- [3]
-		86659, -- [4]
-	},
-	[113609] = {
-		62391, -- [1]
-		[3] = 67093,
-	},
-	[124148] = {
-		69557, -- [1]
-		[3] = 69558,
-	},
-	[124164] = {
-		69611, -- [1]
-		[3] = 69612,
-	},
-	[124180] = {
-		69665, -- [1]
-		[3] = 69666,
-	},
-	[158375] = {
-		97055, -- [1]
-		[3] = 97056,
-	},
-	[113828] = {
-		62606, -- [1]
-		[3] = 67251,
-	},
-	[158349] = {
-		94351, -- [1]
-		[3] = 95546,
-	},
-	[146996] = {
-		86665, -- [1]
-		nil, -- [2]
-		86666, -- [3]
-		86663, -- [4]
-	},
-	[152424] = {
-		90518, -- [1]
-		nil, -- [2]
-		90519, -- [3]
-		90516, -- [4]
-	},
-	[151948] = {
-		89763, -- [1]
-		nil, -- [2]
-		89764, -- [3]
-		89761, -- [4]
-	},
-	[112813] = {
-		[3] = 61745,
-	},
-	[158344] = {
-		[3] = 95747,
-	},
-	[158315] = {
-		95542, -- [1]
-		[3] = 95543,
-	},
-	[152679] = {
-		90562, -- [1]
-		nil, -- [2]
-		90563, -- [3]
-		90560, -- [4]
-	},
-	[124181] = {
-		69669, -- [1]
-		[3] = 69670,
-	},
-	[146997] = {
-		86757, -- [1]
-		nil, -- [2]
-		86758, -- [3]
-		86755, -- [4]
-	},
-	[113933] = {
-		62794, -- [1]
-		[3] = 62795,
-	},
-	[124149] = {
-		69561, -- [1]
-		[3] = 69562,
-	},
-	[139188] = {
-		81137, -- [1]
-		nil, -- [2]
-		81138, -- [3]
-		81139, -- [4]
-	},
-	[113981] = {
-		62901, -- [1]
-		[3] = 67222,
-	},
-	[158302] = {
-		94299, -- [1]
-		[3] = 95745,
-	},
-	[124168] = {
-		69624, -- [1]
-		[3] = 69625,
-	},
-	[155891] = {
-		95742, -- [1]
-		[3] = 95743,
-	},
-	[146998] = {
-		86593, -- [1]
-		nil, -- [2]
-		86594, -- [3]
-		86591, -- [4]
-	},
-	[159238] = {
-		95755, -- [1]
-		[3] = 95756,
-	},
-	[119342] = {
-		67008, -- [1]
-		[3] = 67787,
-	},
-	[139189] = {
-		81155, -- [1]
-		nil, -- [2]
-		81156, -- [3]
-		81157, -- [4]
-	},
-	[158346] = {
-		95748, -- [1]
-		[3] = 95749,
-	},
-	[151939] = {
-		89727, -- [1]
-		nil, -- [2]
-		89728, -- [3]
-		89725, -- [4]
-	},
-	[112866] = {
-		[3] = 61855,
-		[4] = 61854,
-	},
-	[146986] = {
-		86741, -- [1]
-		nil, -- [2]
-		86742, -- [3]
-		86739, -- [4]
-	},
-	[146999] = {
-		86761, -- [1]
-		nil, -- [2]
-		86762, -- [3]
-		86759, -- [4]
-	},
-	[140911] = {
-		82007, -- [1]
-		nil, -- [2]
-		82008, -- [3]
-		82009, -- [4]
-	},
-	[112743] = {
-		[4] = 61598,
-	},
-	[139190] = {
-		81158, -- [1]
-		nil, -- [2]
-		81159, -- [3]
-		81160, -- [4]
-	},
-	[151940] = {
-		[3] = 89732,
-		[4] = 89729,
-	},
-	[113914] = {
-		62756, -- [1]
-		[3] = 62757,
-	},
-	[146987] = {
-		86649, -- [1]
-		nil, -- [2]
-		86650, -- [3]
-		86647, -- [4]
-	},
-	[140848] = {
-		81797, -- [1]
-		nil, -- [2]
-		81798, -- [3]
-		81799, -- [4]
-	},
-	[147000] = {
-		86765, -- [1]
-		nil, -- [2]
-		86766, -- [3]
-		86763, -- [4]
-	},
-	[146988] = {
-		86745, -- [1]
-		nil, -- [2]
-		86746, -- [3]
-		86743, -- [4]
-	},
-	[146991] = {
-		86749, -- [1]
-		nil, -- [2]
-		86750, -- [3]
-		86747, -- [4]
-	},
-	[151941] = {
-		89735, -- [1]
-		nil, -- [2]
-		89736, -- [3]
-		89733, -- [4]
-	},
-	[158348] = {
-		95544, -- [1]
-		[3] = 95545,
-	},
-	[139192] = {
-		81131, -- [1]
-		nil, -- [2]
-		81132, -- [3]
-		81133, -- [4]
-	},
-	[113887] = {
-		62709, -- [1]
-		[3] = 67254,
-	},
-	[140849] = {
-		81801, -- [1]
-		nil, -- [2]
-		81802, -- [3]
-		81803, -- [4]
-	},
-	[147001] = {
-		86669, -- [1]
-		nil, -- [2]
-		86670, -- [3]
-		86667, -- [4]
-	},
-	[139193] = {
-		81134, -- [1]
-		nil, -- [2]
-		81135, -- [3]
-		81136, -- [4]
-	},
-	[124151] = {
-		69568, -- [1]
-		[3] = 69569,
-	},
-	[139196] = {
-		[3] = 81147,
-		[4] = 81148,
 	},
 }
