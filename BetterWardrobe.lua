@@ -1217,7 +1217,7 @@ function BetterWardrobeSetsCollectionMixin:OnLoad()
 	self.RightInset.BGCornerTopRight:Hide()
 
 	self.DetailsFrame.Name:SetFontObjectsToTry(Fancy24Font, Fancy20Font, Fancy16Font)
-	self.DetailsFrame.itemFramesPool = CreateFramePool("FRAME", self.DetailsFrame, "WardrobeSetsDetailsItemFrameTemplate")
+	self.DetailsFrame.itemFramesPool = CreateFramePool("FRAME", self.DetailsFrame, "BW_WardrobeSetsDetailsItemFrameTemplate")
 
 	self.selectedVariantSets = { }
 end
@@ -1447,6 +1447,173 @@ function BetterWardrobeSetsCollectionMixin:SetAppearanceTooltip(frame)
 	self:RefreshAppearanceTooltip()
 end
 
+local function GetDropDifficulties(drop)
+	local text = drop.difficulties[1];
+	if ( text ) then
+		for i = 2, #drop.difficulties do
+			text = text..", "..drop.difficulties[i];
+		end
+	end
+	return text;
+end
+
+local needsRefresh = false
+function BW_WardrobeCollectionFrame_SetAppearanceTooltip(contentFrame, sources, primarySourceID)
+	BW_WardrobeCollectionFrame.tooltipContentFrame = contentFrame;
+
+	for i = 1, #sources do
+		if ( sources[i].isHideVisual ) then
+			GameTooltip:SetText(sources[i].name);
+			return;
+		end
+	end
+
+	local firstVisualID = sources[1].visualID;
+	local passedFirstVisualID = false;
+
+	local headerIndex;
+	if ( not BW_WardrobeCollectionFrame.tooltipSourceIndex ) then
+		headerIndex = WardrobeCollectionFrame_GetDefaultSourceIndex(sources, primarySourceID);
+	else
+		headerIndex = WardrobeUtils_GetValidIndexForNumSources(BW_WardrobeCollectionFrame.tooltipSourceIndex, #sources);
+	end
+	BW_WardrobeCollectionFrame.tooltipSourceIndex = headerIndex;
+	headerSourceID = sources[headerIndex].sourceID;
+
+	
+	local name, nameColor, sourceText, sourceColor = WardrobeCollectionFrameModel_GetSourceTooltipInfo(sources[headerIndex]);
+	if name == RETRIEVING_ITEM_INFO then needsRefresh = true end
+
+	GameTooltip:SetText(name, nameColor.r, nameColor.g, nameColor.b);
+
+	if ( sources[headerIndex].sourceType == TRANSMOG_SOURCE_BOSS_DROP and not sources[headerIndex].isCollected ) then
+		local drops = C_TransmogCollection.GetAppearanceSourceDrops(headerSourceID);
+		if ( drops and #drops > 0 ) then
+			local showDifficulty = false;
+			if ( #drops == 1 ) then
+				sourceText = _G["TRANSMOG_SOURCE_"..TRANSMOG_SOURCE_BOSS_DROP]..": "..string.format(WARDROBE_TOOLTIP_ENCOUNTER_SOURCE, drops[1].encounter, drops[1].instance);
+				showDifficulty = true;
+			else
+				-- check if the drops are the same instance
+				local sameInstance = true;
+				local firstInstance = drops[1].instance;
+				for i = 2, #drops do
+					if ( drops[i].instance ~= firstInstance ) then
+						sameInstance = false;
+						break;
+					end
+				end
+				-- ok, if multiple instances check if it's the same tier if the drops have a single tier
+				local sameTier = true;
+				local firstTier = drops[1].tiers[1];
+				if ( not sameInstance and #drops[1].tiers == 1 ) then
+					for i = 2, #drops do
+						if ( #drops[i].tiers > 1 or drops[i].tiers[1] ~= firstTier ) then
+							sameTier = false;
+							break;
+						end
+					end
+				end
+				-- if same instance or tier, check if we have same difficulties and same instanceType
+				local sameDifficulty = false;
+				local sameInstanceType = false;
+				if ( sameInstance or sameTier ) then
+					sameDifficulty = true;
+					sameInstanceType = true;
+					for i = 2, #drops do
+						if ( drops[1].instanceType ~= drops[i].instanceType ) then
+							sameInstanceType = false;
+						end
+						if ( #drops[1].difficulties ~= #drops[i].difficulties ) then
+							sameDifficulty = false;
+						else
+							for j = 1, #drops[1].difficulties do
+								if ( drops[1].difficulties[j] ~= drops[i].difficulties[j] ) then
+									sameDifficulty = false;
+									break;
+								end
+							end
+						end
+					end
+				end
+				-- override sourceText if sameInstance or sameTier
+				if ( sameInstance ) then
+					sourceText = _G["TRANSMOG_SOURCE_"..TRANSMOG_SOURCE_BOSS_DROP]..": "..firstInstance;
+					showDifficulty = sameDifficulty;
+				elseif ( sameTier ) then
+					local location = firstTier;
+					if ( sameInstanceType ) then
+						if ( drops[1].instanceType == INSTANCE_TYPE_DUNGEON ) then
+							location = string.format(WARDROBE_TOOLTIP_DUNGEONS, location);
+						elseif ( drops[1].instanceType == INSTANCE_TYPE_RAID ) then
+							location = string.format(WARDROBE_TOOLTIP_RAIDS, location);
+						end
+					end
+					sourceText = _G["TRANSMOG_SOURCE_"..TRANSMOG_SOURCE_BOSS_DROP]..": "..location;
+				end
+			end
+			if ( showDifficulty ) then
+				local diffText = GetDropDifficulties(drops[1]);
+				if ( diffText ) then
+					sourceText = sourceText.." "..string.format(PARENS_TEMPLATE, diffText);
+				end
+			end
+		end
+	end
+	if ( not sources[headerIndex].isCollected ) then
+		GameTooltip:AddLine(sourceText, sourceColor.r, sourceColor.g, sourceColor.b, 1, 1);
+	end
+
+	local useError;
+	local appearanceCollected = sources[headerIndex].isCollected
+	if ( #sources > 1 and not appearanceCollected ) then
+		-- only add "Other items using this appearance" if we're continuing to the same visualID
+		if ( firstVisualID == sources[2].visualID ) then
+			GameTooltip:AddLine(" ");
+			GameTooltip:AddLine(WARDROBE_OTHER_ITEMS, NORMAL_FONT_COLOR.r, NORMAL_FONT_COLOR.g, NORMAL_FONT_COLOR.b);
+		end
+		for i = 1, #sources do
+			-- first time we transition to a different visualID, add "Other items that unlock this slot"
+			if ( not passedFirstVisualID and firstVisualID ~= sources[i].visualID ) then
+				passedFirstVisualID = true;
+				GameTooltip:AddLine(" ");
+				GameTooltip:AddLine(WARDROBE_ALTERNATE_ITEMS);
+			end
+
+			local name, nameColor, sourceText, sourceColor = WardrobeCollectionFrameModel_GetSourceTooltipInfo(sources[i]);
+			if name == RETRIEVING_ITEM_INFO then needsRefresh = true end
+			if ( i == headerIndex ) then
+				name = WARDROBE_TOOLTIP_CYCLE_ARROW_ICON..name;
+				useError = sources[i].useError;
+			else
+				name = WARDROBE_TOOLTIP_CYCLE_SPACER_ICON..name;
+			end
+			GameTooltip:AddDoubleLine(name, sourceText, nameColor.r, nameColor.g, nameColor.b, sourceColor.r, sourceColor.g, sourceColor.b);
+		end
+		GameTooltip:AddLine(" ");
+		GameTooltip:AddLine(WARDROBE_TOOLTIP_CYCLE, GRAY_FONT_COLOR.r, GRAY_FONT_COLOR.g, GRAY_FONT_COLOR.b, true);
+		BW_WardrobeCollectionFrame.tooltipCycle = true;
+	else
+		useError = sources[headerIndex].useError;
+		BW_WardrobeCollectionFrame.tooltipCycle = nil;
+	end
+
+	if ( appearanceCollected  ) then
+		if ( useError ) then
+			GameTooltip:AddLine(useError, RED_FONT_COLOR.r, RED_FONT_COLOR.g, RED_FONT_COLOR.b, true);
+		elseif ( not WardrobeFrame_IsAtTransmogrifier() ) then
+			GameTooltip:AddLine(WARDROBE_TOOLTIP_TRANSMOGRIFIER, GRAY_FONT_COLOR.r, GRAY_FONT_COLOR.g, GRAY_FONT_COLOR.b, 1, 1);
+		end
+		if ( not useError ) then
+			local holidayName = C_TransmogCollection.GetSourceRequiredHoliday(headerSourceID);
+			if ( holidayName ) then
+				GameTooltip:AddLine(TRANSMOG_APPEARANCE_USABLE_HOLIDAY:format(holidayName), LIGHTBLUE_FONT_COLOR.r, LIGHTBLUE_FONT_COLOR.g, LIGHTBLUE_FONT_COLOR.b, true);
+			end
+		end
+	end
+
+	GameTooltip:Show();
+end
 
 function BetterWardrobeSetsCollectionMixin:RefreshAppearanceTooltip()
 	if (not self.tooltipTransmogSlot) then
@@ -1455,7 +1622,7 @@ function BetterWardrobeSetsCollectionMixin:RefreshAppearanceTooltip()
 
 	local sourceInfo = C_TransmogCollection.GetSourceInfo(self.tooltipPrimarySourceID)
 	local visualID = sourceInfo.visualID
-	local sources = C_TransmogCollection.GetAppearanceSources(visualID) or {}
+	local sources = C_TransmogCollection.GetAppearanceSources(visualID) or {} --Can return nil if no longer in game
 	
 	if (#sources == 0) then
 		-- can happen if a slot only has HiddenUntilCollected sources
@@ -1464,9 +1631,11 @@ function BetterWardrobeSetsCollectionMixin:RefreshAppearanceTooltip()
 	end
 
 	WardrobeCollectionFrame_SortSources(sources, sources[1].visualID, self.tooltipPrimarySourceID)
-	WardrobeCollectionFrame_SetAppearanceTooltip(self, sources, self.tooltipPrimarySourceID)
-end
+	BW_WardrobeCollectionFrame_SetAppearanceTooltip(self, sources, self.tooltipPrimarySourceID)
 
+	C_Timer.After(.1, function() if needsRefresh then  self:RefreshAppearanceTooltip(); needsRefresh = false; end; end) --Fix for items that returned retreaving info 
+
+end
 
 BetterWardrobeSetsCollectionScrollFrameMixin = CreateFromMixins(WardrobeSetsCollectionScrollFrameMixin)
 
@@ -1612,6 +1781,54 @@ function BetterWardrobeSetsCollectionScrollFrameMixin:Update()
 	HybridScrollFrame_Update(self, totalHeight, self:GetHeight())
 end
 
+BW_WardrobeSetsDetailsItemMixin = CreateFromMixins(WardrobeSetsDetailsItemMixin)
+function BW_WardrobeSetsDetailsItemMixin:OnEnter()
+	self:GetParent():GetParent():SetAppearanceTooltip(self)
+
+	self:SetScript("OnUpdate",
+		function()
+			if IsModifiedClick("DRESSUP") then
+				ShowInspectCursor();
+			else
+				ResetCursor();
+			end
+		end
+	);
+
+	if ( self.New:IsShown() ) then
+		local transmogSlot = C_Transmog.GetSlotForInventoryType(self.invType);
+		local setID = BW_WardrobeCollectionFrame.SetsCollectionFrame:GetSelectedSetID();
+		C_TransmogSets.ClearSetNewSourcesForSlot(setID, transmogSlot);
+		local baseSetID = C_TransmogSets.GetBaseSetID(setID);
+		SetsDataProvider:ResetBaseSetNewStatus(baseSetID);
+		BW_WardrobeCollectionFrame.SetsCollectionFrame:Refresh();
+	end
+end
+
+function BW_WardrobeSetsDetailsItemMixin:OnMouseDown()
+	if ( IsModifiedClick("CHATLINK") ) then
+		local sourceInfo = C_TransmogCollection.GetSourceInfo(self.sourceID);
+		local slot = C_Transmog.GetSlotForInventoryType(sourceInfo.invType);
+		local sources = C_TransmogCollection.GetAppearanceSources(sourceInfo.visualID)
+
+		if ( not sources or #sources == 0 ) then
+			-- can happen if a slot only has HiddenUntilCollected sources or if no longer in game
+			sources = sources or {}
+			tinsert(sources, sourceInfo);
+		end
+
+		WardrobeCollectionFrame_SortSources(sources, sourceInfo.visualID, self.sourceID);
+		if ( BW_WardrobeCollectionFrame.tooltipSourceIndex ) then
+			local index = WardrobeUtils_GetValidIndexForNumSources(BW_WardrobeCollectionFrame.tooltipSourceIndex, #sources);
+			local link = select(6, C_TransmogCollection.GetAppearanceSourceInfo(sources[index].sourceID));
+			if ( link ) then
+				HandleModifiedItemClick(link);
+			end
+		end
+	elseif ( IsModifiedClick("DRESSUP") ) then
+		DressUpVisual(self.sourceID);
+	end
+end
 
 --========--
 -----Extra Sets Transmog Vendor Window

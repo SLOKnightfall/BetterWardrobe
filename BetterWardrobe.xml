@@ -141,6 +141,9 @@
 		</Scripts>
 	</Button>
 
+	<Frame name="BW_WardrobeSetsDetailsItemFrameTemplate" inherits ="WardrobeSetsDetailsItemFrameTemplate" mixin="BW_WardrobeSetsDetailsItemMixin" virtual="true">
+	</Frame>
+
 	<Frame name="BW_WardrobeCollectionFrame" parent="WardrobeCollectionFrame" setAllPoints="true" hidden="false">
 		<Frames>
 			<Button name="$parentTab1" parentKey="ItemsTab" inherits="TabButtonTemplate" text="WARDROBE_ITEMS" id="1"  parentArray="Tabs">
