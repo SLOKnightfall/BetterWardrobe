@@ -40,7 +40,7 @@ Plugins\CanIMogIt.lua
 
 #Data files
 Data\AppearanceData.lua
-#Data\SourceData.lua
+Data\SourceData.lua
 Data\CLOTH.lua
 Data\LEATHER.lua
 Data\MAIL.lua
