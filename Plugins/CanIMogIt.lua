@@ -54,6 +54,8 @@ end
 
       -- When the scrollbar moves, update the display.
     _G["BW_SetsCollectionFrameScrollFrameScrollBar"]:HookScript("OnValueChanged", BW_WardrobeCollectionFrame_CIMIOnValueChanged)
+    addon:SecureHook(BW_SetsCollectionFrame,"Refresh", function() C_Timer.After(.25,BW_WardrobeCollectionFrame_CIMIOnValueChanged) end)
+
     _G["BW_WardrobeCollectionFrameTab2"]:HookScript("OnClick", WardrobeCollectionFrame_CIMIOnValueChanged)
     _G["BW_WardrobeCollectionFrameTab3"]:HookScript("OnClick", BW_WardrobeCollectionFrame_CIMIOnValueChanged)
 

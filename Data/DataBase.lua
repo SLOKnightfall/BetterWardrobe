@@ -26,45 +26,32 @@ local CLASS_INFO = {
 	WARRIOR = {1,1,"PLATE"},
 }
 
-local classMask = {
-	DEATHKNIGHT = 32,
-	DRUID = 1024,
-	HUNTER = 4,
-	MAGE = 128,
-	PALADIN = 2,
-	PRIEST = 16,
-	ROGUE = 8,
-	SHAMAN = 64,
-	WARLOCK = 256,
-	WARRIOR = 1,
-	MONK = 512,
-	DEMONHUNTER = 2048,
-}
 
 local EmptyArmor = {
-		[1] = 134110,
-		--[2] = 134112, neck
-		[3] = 134112,
-		--[4] = 168659, shirt
-		[5] = 168659,
-		[6] = 143539,
-		--[7] = 158329, pants
-		[8] = 168664,
-		[9] = 168665,  --wrist
-		[10] = 158329, --handr
+	[1] = 134110,
+	--[2] = 134112, neck
+	[3] = 134112,
+	--[4] = 168659, shirt
+	[5] = 168659,
+	[6] = 143539,
+	--[7] = 158329, pants
+	[8] = 168664,
+	[9] = 168665,  --wrist
+	[10] = 158329, --handr
 }
 
 local hiddenSet ={
-		["setID"] =  0 ,
-		["name"] =  "Hidden" ,
-		["items"] = { 134110, 134112, 168659, 168665, 158329, 143539, 168664 },
-		["expansionID"] =  9999 ,
-	}
+	["setID"] =  0 ,
+	["name"] =  "Hidden",
+	["items"] = { 134110, 134112, 168659, 168665, 158329, 143539, 168664 },
+	--["expansionID"] =  9999 ,
+	["expansionID"] =  1,
+	["filter"] =  1,
+	["recolor"] =  false,
+	["minLevel"] =  1,
+	["uiOrder"] = 100,
+}
 
-
-
-
---cloak 134111
 
 local function GetFactionID(faction)
 	if faction == "Horde" then
@@ -73,6 +60,7 @@ local function GetFactionID(faction)
 		return --4
 	end
 end
+
 
 local function OpposingFaction(faction)
 	local faction = UnitFactionGroup("player")
@@ -83,121 +71,68 @@ local function OpposingFaction(faction)
 	end
 end
 
+
 do
 	local baseList = {}
 	local setsInfo = {}
-	local defaultSets = {}
 
 
-	local function BuildDefaultList()
-		local baseSets = C_TransmogSets.GetAllSets()
-
-		for id, setData in ipairs(baseSets) do
-					defaultSets[id] = setData
-		end
-	end
-
-
-local coreSetList = {}
-local function GetCoreSets(incVariants)
+	local coreSetList = {}
+	local function GetCoreSets(incVariants)
 		local sets = C_TransmogSets.GetBaseSets()
- 	local fullSetList = {}
+ 		local fullSetList = {}
 		--Generates Useable Set
-		for i, set in ipairs(sets) do
+		for _, set in ipairs(sets) do
 			--if string.find(set.name, "Brawl") then print (set.setID)end
 			--tinsert(self.usableSets, set)
 			coreSetList[set.setID] = true
 			if incVariants then 
 				local variantSets = C_TransmogSets.GetVariantSets(set.setID);
-				for i, set in ipairs(variantSets) do
+				for _, set in ipairs(variantSets) do
 					coreSetList[set.setID] = true
 
 				end
 			end
 
 		end
-end
-
-
-local f = CreateFrame("Frame")
-missing= {}
-
- local function CacheHeaders()
-
-			local count = 0
-	for item, mod  in pairs(missing) do
-		-- oh my god so much wasted tables
-		local _, source = addon.GetItemSource(item, mod or nil )
-		if source then
-			
-			missing[item] = nil
-		end
-		count = count +1
 	end
-	print("Count:"..count)
-	if not next(missing) then
-		--catCompleted[Wardrobe:GetActiveCategory()] = true
-		f:SetScript("OnUpdate", nil)
-		--SortAlphabetic()
-	end
-end
 
-	local function addArmor(armorSet)
-		--local baseSets = C_TransmogSets.GetAllSets()
 
-		--BuildDefaultList()
-		--GetCoreSets(true)
-	--local addon:GetUsableSets(incVariants)
-		
+local fixSets = {2282, 2296, 2129, 2126, 2135, 2132, 2289, 2275}
+	local function addArmor(armorSet)	
 		for id, setData in pairs(armorSet) do
-			-- if not  defaultSets[id] then
 			
 			local setInfo = C_TransmogSets.GetSetInfo(id)
 			local classInfo = CLASS_INFO[playerClass]
-			--if not setInfo then
-			--local class = (setInfo and setInfo.classMask == classInfo[2]) or (setData.classMask and setData.classMask == classInfo[1]) or not setData.classMask
 			local class = (setData.classMask and setData.classMask == classInfo[1]) or not setData.classMask
 
 			--local faction = setData[5]
 			local opposingFaction , City = OpposingFaction(faction) -- BFAFaction,
 			
-			local factionLocked =  string.find(setData.name, opposingFaction) 
+			local factionLocked = string.find(setData.name, opposingFaction) 
 				--or string.find(setData.name, BFAFaction)
-				or string.find(setData.name, City)
+				--or string.find(setData.name, City)
 			local heritageArmor = string.find(setData.name, "Heritage")
-				--getMod(setData)
 		
-				for i, item in ipairs( setData["items"]) do
-					--print(item)
-					local _, source = addon.GetItemSource(item, setData.mod or nil )
-					if not source then missing[item] = setData.mod or 0 end
-					--f:SetScript("OnUpdate", CacheHeaders)
+			for _, item in ipairs( setData["items"]) do
+				local _, source = addon.GetItemSource(item, setData.mod or nil )
+			end
+	
+			if not  setInfo  or not coreSetList[id] then 
+				if  (class) 
+					and not factionLocked 
+					and not heritageArmor  then
+
+					setData["name"] = L[setData["name"]]
+					local note = "NOTE_"..(setData.label or 0)
+					setData.label =(L[note] and L[note]) or ""
+					setData.uiOrder = id*100
+
+
+					setsInfo[id] = setData
+					tinsert(baseList, setsInfo[id])	
 				end
-		
-
-
---print(coreSetList[2953])
-				if not  setInfo  or not coreSetList[id] then 
-					if  (class) 
-						and not factionLocked 
-						and not heritageArmor  then
-
-						--setsByExpansion[setData.expansionID] = setByExpansion[setData.expansionID] or {}
-						--setsByExpansion[setData.expansionID][id] = true
-
-						--setsByFilter[setData.label] = setsByFilter[setData.label] or {}
-						--setsByFilter[setData.label][id] = true
-
-						setData["name"] = L[setData["name"]]
-						local note = "NOTE_"..(setData.label or 0)
-						setData.label =(L[note] and L[note]) or ""
-						setData.uiOrder = id*100
-
-
-						setsInfo[id] = setData
-						tinsert(baseList, setsInfo[id])	
-					end
-				else --print(setInfo)
+			else --print(setInfo)
 			end
 		end
 	end
@@ -207,56 +142,49 @@ end
 	--local faction = GetFactionID(UnitFactionGroup("player"))
 		local armorSet = addon.ArmorSets[CLASS_INFO[playerClass][3]]
 		addon.modArmor = addon.ArmorSetMods[CLASS_INFO[playerClass][3]]
-		--addon.ArmorSetMods["CLOTH"]
 
 		addArmor(armorSet)
 		addArmor(addon.ArmorSets["COSMETIC"])
 
 		--Add Hidden Set
-		--setsInfo[0] = hiddenSet
-		--ztinsert(baseList, setsInfo[0])
+		setsInfo[0] = hiddenSet
+		tinsert(baseList, setsInfo[0])
 		wipe(addon.ArmorSets)
 	end
 
 
 	function addon.GetBaseList()
 		local list = {}
-
-		for i, data in ipairs(baseList) do 
-
-					tinsert(list, data)
-			--end
+		for _, data in ipairs(baseList) do 
+			tinsert(list, data)
 		end
 
 		return list
 	end
 
-	
 
-	function addon.AddSet(setData)
-	--function addon.AddSet(id,name,items,class,faction)
-
-		local id = setData[1]
-
-		local info = {}
-		info.classMask = setData[4] --class
-		info.collected = false 	
-		info.description = ""
-		info.expansionID	= ""
-		info.favorite = ""
-		info.hiddenUtilCollected = false
-		info.label = ""
-		info.limitedTimeSet = false
-		info.name = setData[2]--name
-		info.patchID = ""
-		info.requiredFaction = setData[5]--faction
-		info.setID = id
-		info.uiOrder = ""
-		info.items = setData[3]--items
-
-		setInfo[id] = info
-		tinsert(baseList, setInfo[id])
-	end
+	--[[function addon.AddSet(setData)
+				local id = setData[1]
+		
+				local info = {}
+				info.classMask = setData[4] --class
+				info.collected = false 	
+				info.description = ""
+				info.expansionID	= ""
+				info.favorite = ""
+				info.hiddenUtilCollected = false
+				info.label = ""
+				info.limitedTimeSet = false
+				info.name = setData[2]--name
+				info.patchID = ""
+				info.requiredFaction = setData[5]--faction
+				info.setID = id
+				info.uiOrder = ""
+				info.items = setData[3]--items
+		
+				setInfo[id] = info
+				tinsert(baseList, setInfo[id])
+			end]]
 
 
 	function addon.GetSetInfo(setID)

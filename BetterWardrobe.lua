@@ -179,6 +179,8 @@ function addon:OnEnable()
 	self.db.RegisterCallback(addon, "OnProfileReset", "RefreshConfig")	
 	--WardrobeTransmogFrameSpecDropDown_Initialize()
 
+	--BWData = BWData or {}
+
 	addon.Profile = self.db.profile
 	Profile = addon.Profile
 	addon.BuildDB()
@@ -238,17 +240,17 @@ f.model:SetUnit("PLAYER")
 addon.frame = f
 
 
-function addon.GetItemSource(itemID, itemMod)
-	--if addon.modArmor[itemID] and addon.modArmor[itemID][itemMod] then return nil, addon.modArmor[itemID][itemMod] end
 
+function addon.GetItemSource(itemID, itemMod)
+	if addon.modArmor[itemID] and addon.modArmor[itemID][itemMod] then return nil, addon.modArmor[itemID][itemMod] end
 		local itemSource
 		local visualID, sourceID
-		if itemMod then 
-		visualID, sourceID = C_TransmogCollection.GetItemInfo(itemID, itemMod or 0)
-	else
-				visualID, sourceID = C_TransmogCollection.GetItemInfo(itemID)
-
-	end
+		if itemMod then
+		--print(itemMod) 
+			visualID, sourceID = C_TransmogCollection.GetItemInfo(itemID, itemMod)
+		else
+			visualID, sourceID = C_TransmogCollection.GetItemInfo(itemID)
+		end
 
 		if not sourceID then
 			local itemlink = "item:"..itemID..":0"
@@ -263,10 +265,14 @@ function addon.GetItemSource(itemID, itemMod)
 					break
 				end
 			end
-			
 		end
 
-	f.model:Hide()
+	--[[	if itemMod and itemMod ~= 0 and sourceID then 
+					BWData[itemID] = BWData[itemID] or {}
+					BWData[itemID][itemMod] = sourceID
+				end]]
+
+		f.model:Hide()
 	return visualID ,sourceID
 end
 
@@ -312,7 +318,8 @@ function addon.GetSetsources(setID)
 		--local sources = C_TransmogCollection.GetAppearanceSources(sourceInfo.visualID)	
 		if sourceID then
 			local sourceInfo = C_TransmogCollection.GetSourceInfo(sourceID)
-			local sources = C_TransmogCollection.GetAppearanceSources(sourceInfo.visualID)
+
+			local sources = sourceInfo and C_TransmogCollection.GetAppearanceSources(sourceInfo.visualID)
 			if sources then 
 				if #sources > 1 then 
 					WardrobeCollectionFrame_SortSources(sources)
@@ -367,6 +374,7 @@ end
 
 local function isMogKnown(sourceID)
 	local sourceInfo = C_TransmogCollection.GetSourceInfo(sourceID)
+	--if not sourceInfo then return false end
 	local slotSources = C_TransmogCollection.GetAppearanceSources(sourceInfo.visualID)
 
 	local slotColected 
