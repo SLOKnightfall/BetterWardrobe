@@ -3,7 +3,7 @@ addon = LibStub("AceAddon-3.0"):GetAddon(addonName)
 
 local L = LibStub("AceLocale-3.0"):GetLocale(addonName)
 
-local MAX_DEFAULT_OUTFITS = 4 --C_TransmogCollection.GetNumMaxOutfits()
+local MAX_DEFAULT_OUTFITS = C_TransmogCollection.GetNumMaxOutfits()
 local FullList = {}
 
 local function GetOutfits()
@@ -15,6 +15,7 @@ local function GetOutfits()
 		return FullList
 end
 
+addon.GetOutfits = GetOutfits
 
 local function GetOutfitIndex(outfitID)
 	local numOutfits = #C_TransmogCollection.GetOutfits()

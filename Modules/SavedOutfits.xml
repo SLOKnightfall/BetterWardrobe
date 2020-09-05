@@ -9,7 +9,7 @@
 			<KeyValue key="maxMenuStringWidth" value="216" type="number"/>
 		</KeyValues>
 		<Anchors>
-			<Anchor point="TOPLEFT" x="-14" y="55"/>
+			<Anchor point="TOPLEFT" x="-14" y="28"/>
 		</Anchors>
 	</Frame>
 

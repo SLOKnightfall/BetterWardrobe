@@ -37,7 +37,19 @@ function MyPlugin:Initialize()
 
 	S:HandleButton(BW_LoadQueueButton)
 	BW_LoadQueueButton:ClearAllPoints()
-	BW_LoadQueueButton:Point("TOPLEFT",WardrobeOutfitDropDown, "TOPRIGHT", 90, -2)
+	BW_LoadQueueButton:Point("TOPLEFT",BW_WardrobeOutfitDropDown, "TOPRIGHT", 90, -2)
+
+	S:HandleButton(BW_RandomizeButton)
+	BW_RandomizeButton:ClearAllPoints()
+	BW_RandomizeButton:Point("TOPLEFT",BW_LoadQueueButton, "TOPRIGHT", 0, 0)
+
+	BW_WardrobeOutfitFrame:StripTextures()
+	BW_WardrobeOutfitFrame:SetTemplate('Transparent')
+	S:HandleButton(BW_WardrobeOutfitDropDown.SaveButton)
+	S:HandleDropDownBox(BW_WardrobeOutfitDropDown, 221)
+	BW_WardrobeOutfitDropDown:SetHeight(34)
+	BW_WardrobeOutfitDropDown.SaveButton:ClearAllPoints()
+	BW_WardrobeOutfitDropDown.SaveButton:SetPoint('TOPLEFT', BW_WardrobeOutfitDropDown, 'TOPRIGHT', -2, -2)
 
 
 	for _, Frame in ipairs(BW_WardrobeCollectionFrame.ContentFrames) do

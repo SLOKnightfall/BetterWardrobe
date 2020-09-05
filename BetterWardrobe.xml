@@ -90,7 +90,7 @@
 		</Scripts>
 	</DressUpModel>
 
-	<Button name ="BW_LoadQueueButton" parent = "WardrobeFrame" parentKey="ClearAllPendingButton" inherits="UIMenuButtonStretchTemplate" hidden="false">
+	<Button name ="BW_LoadQueueButton" parent = "WardrobeFrame" parentKey="LoadQueue" inherits="UIMenuButtonStretchTemplate" hidden="false">
 		<Size x="20" y="20"/>
 		<Anchors>
 			<Anchor point="TOPLEFT" relativeto="WardrobeOutfitDropDown" relativePoint="TOPRIGHT" x="80" y="-5"/>
@@ -111,14 +111,25 @@
 		</Scripts>
 	</Button>
 
-	<Button name="BW_RandomizeButton" parent = "WardrobeTransmogFrame" inherits="MainMenuBarMicroButton" hidden="false">
+	<Button name="BW_RandomizeButton" parent = "WardrobeTransmogFrame" inherits="UIMenuButtonStretchTemplate" hidden="false">
 		<Size x="20" y="20"/>
 		<Anchors>
-			<Anchor point="TOPLEFT" relativeTo="BW_LoadQueueButton" relativePoint="TOPRIGHT" x="-2" y="0"/>
+			<Anchor point="TOPLEFT" relativeTo="BW_LoadQueueButton" relativePoint="TOPRIGHT" x="0" y="0"/>
 		</Anchors>
+		<Layers>
+			<Layer level="ARTWORK">
+				<Texture file="Interface\Buttons\UI-GroupLoot-Dice-Up" useAtlasSize="false">
+					<Size x="15" y="15"/>
+					<Anchors>
+						<Anchor point="LEFT" x="1"/>
+					</Anchors>
+				</Texture>
+			</Layer>
+		</Layers>
+		<HighlightTexture file="Interface\Buttons\UI-Common-MouseHilight" alphaMode="ADD"/>
 		<Scripts>
 			<OnLoad>
-				LoadMicroButtonTextures(self, "MainMenu");
+				--LoadMicroButtonTextures(self, "MainMenu");
 			</OnLoad>
 			<OnShow>
 				 --self:OnShow()

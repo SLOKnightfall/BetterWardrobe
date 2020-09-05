@@ -86,10 +86,12 @@ end
 
 
 local function RandomizeOutfit()
-	local outfits, currentOutfit = C_TransmogCollection.GetOutfits()
+	local outfits, currentOutfit = addon.GetOutfits() --C_TransmogCollection.GetOutfits()
 	local numOutfits = #outfits
 	local randomOutfitID = outfits[random(numOutfits)].outfitID
-	WardrobeOutfitDropDown:SelectOutfit(randomOutfitID, true)
+
+	BW_WardrobeOutfitDropDown:SelectOutfit(randomOutfitID, true)
+	--WardrobeOutfitDropDown:SelectOutfit(randomOutfitID, true)
 end
 
 
