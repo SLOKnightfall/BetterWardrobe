@@ -51,7 +51,8 @@ function MyPlugin:Initialize()
 	BW_WardrobeOutfitDropDown.SaveButton:ClearAllPoints()
 	BW_WardrobeOutfitDropDown.SaveButton:SetPoint('TOPLEFT', BW_WardrobeOutfitDropDown, 'TOPRIGHT', -2, -2)
 
-
+	S:HandleScrollBar(BW_WardrobeOutfitFrameScrollFrameScrollBar)
+	
 	for _, Frame in ipairs(BW_WardrobeCollectionFrame.ContentFrames) do
 		if Frame.Models then
 			for _, Model in pairs(Frame.Models) do

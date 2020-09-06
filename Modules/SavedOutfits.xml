@@ -139,16 +139,13 @@
 		</Anchors>
 		<Frames>
 			<Frame parentKey="Border" inherits="DialogBorderDarkTemplate"/>
-			<Button inherits="BW_WardrobeOutfitButtonTemplate">
-				<Anchors>
-					<Anchor point="TOPLEFT" x="11" y="-15"/>
-					<Anchor point="TOPRIGHT" x="-11" y="-15"/>
-				</Anchors>
-			</Button>
 		</Frames>
 		<Scripts>
 			<OnHide method="OnHide"/>
 			<OnUpdate method="OnUpdate"/>
+			<OnLoad>
+				self:CreateScrollFrame()
+			</OnLoad>
 		</Scripts>
 	</Frame>
 

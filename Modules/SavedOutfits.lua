@@ -453,6 +453,10 @@ function BW_WardrobeOutfitFrameMixin:Toggle(dropDown)
 end
 
 
+
+--			BW_WardrobeOutfitFrame.But = self.moduleoptions.Buttons
+--			BW_WardrobeOutfitFrame.Content = self.moduleoptions
+
 function BW_WardrobeOutfitFrameMixin:Update()
 	local outfits = GetOutfits()
 	local buttons = self.Buttons
@@ -466,7 +470,7 @@ function BW_WardrobeOutfitFrameMixin:Update()
 		if (outfits[i] or newOutfitButton) then
 			local button = buttons[i]
 			if (not button) then
-				button = CreateFrame("BUTTON", nil, self, "BW_WardrobeOutfitButtonTemplate")
+				button = CreateFrame("BUTTON", nil, BW_WardrobeOutfitFrame.Content, "BW_WardrobeOutfitButtonTemplate")
 				button.EditButton:SetScript("OnClick", function(self)
 					PlaySound(SOUNDKIT.IG_MAINMENU_OPTION_CHECKBOX_ON)
 					BW_WardrobeOutfitEditFrame:ShowForOutfit(self:GetParent().outfitID)
@@ -517,7 +521,7 @@ function BW_WardrobeOutfitFrameMixin:Update()
 	stringWidth = max(stringWidth, minStringWidth)
 	stringWidth = min(stringWidth, maxStringWidth)
 	self:SetWidth(stringWidth + OUTFIT_FRAME_ADDED_PIXELS)
-	self:SetHeight(30 + numButtons * 20)
+	self:SetHeight(30 + 7 * 20)
 end
 
 
@@ -684,6 +688,58 @@ function BW_WardrobeOutfitFrameMixin:ContinueWithSave()
 	end
 end
 
+
+function BW_WardrobeOutfitFrameMixin:CreateScrollFrame()
+	self.scrollframe = self.scrollframe or CreateFrame("ScrollFrame", self:GetName().."ScrollFrame", self, "UIPanelScrollFrameTemplate");
+	self.scrollchild = self.scrollchild or CreateFrame("Frame"); -- not sure what happens if you do, but to be safe, don't parent this yet (or do anything with it)
+	 
+	local scrollbarName = self.scrollframe:GetName()
+	self.scrollbar = _G[scrollbarName.."ScrollBar"];
+	self.scrollupbutton = _G[scrollbarName.."ScrollBarScrollUpButton"];
+	self.scrolldownbutton = _G[scrollbarName.."ScrollBarScrollDownButton"];
+	 
+	self.scrollupbutton:ClearAllPoints();
+	self.scrollupbutton:SetPoint("TOPRIGHT", self.scrollframe, "TOPRIGHT", -2, -2);
+	 
+	self.scrolldownbutton:ClearAllPoints();
+	self.scrolldownbutton:SetPoint("BOTTOMRIGHT", self.scrollframe, "BOTTOMRIGHT", -2, 2);
+	 
+	self.scrollbar:ClearAllPoints();
+	self.scrollbar:SetPoint("TOP", self.scrollupbutton, "BOTTOM", 0, -2);
+	self.scrollbar:SetPoint("BOTTOM", self.scrolldownbutton, "TOP", 0, 2);
+	 
+	self.scrollframe:SetScrollChild(self.scrollchild);
+	self.scrollframe:SetAllPoints(self);
+	self.scrollframe:ClearAllPoints();
+	self.scrollframe:SetPoint("TOPLEFT", self, "TOPLEFT", 11, -15)
+	self.scrollframe:SetPoint("BOTTOMRIGHT", self, "BOTTOMRIGHT", -11, 15)
+	self.scrollchild:SetSize(self.scrollframe:GetWidth(), ( self.scrollframe:GetHeight() * 2 ));
+
+	self.moduleoptions = self.moduleoptions or CreateFrame("Frame", nil, self.scrollchild);
+	self.moduleoptions:SetAllPoints(self.scrollchild);
+
+	BW_WardrobeOutfitFrame.Content = self.moduleoptions
+
+	local button = CreateFrame("BUTTON", nil, BW_WardrobeOutfitFrame.Content, "BW_WardrobeOutfitButtonTemplate")
+	button.EditButton:SetScript("OnClick", function(self)
+		PlaySound(SOUNDKIT.IG_MAINMENU_OPTION_CHECKBOX_ON)
+		BW_WardrobeOutfitEditFrame:ShowForOutfit(self:GetParent().outfitID)
+	end)
+
+	button:SetPoint("TOPLEFT", BW_WardrobeOutfitFrame.Content, "TOPLEFT")
+	button:SetPoint("TOPRIGHT", BW_WardrobeOutfitFrame.Content, "TOPRIGHT")
+
+	function self.moduleoptions:StartHideCountDown()
+		return BW_WardrobeOutfitFrame:StartHideCountDown()
+	end
+
+	function self.moduleoptions:StopHideCountDown()
+		return BW_WardrobeOutfitFrame:StopHideCountDown()
+	end
+
+	BW_WardrobeOutfitFrame.Buttons = self.moduleoptions.Buttons
+end
+
 --===================================================================================================================================
 BW_WardrobeOutfitButtonMixin = {} --CreateFromMixins(WardrobeOutfitButtonMixin)
 
@@ -744,3 +800,7 @@ function WardrobeOutfitCheckAppearancesMixin:OnEvent(event, sourceID, canCollect
 		BW_WardrobeOutfitFrame:EvaluateSaveState()
 	end
 end
+
+
+
+
