@@ -8,31 +8,53 @@ local FullList = {}
 
 local function GetOutfits()
 		FullList = C_TransmogCollection.GetOutfits()
+		local baseID = 0
+		for i, data in ipairs(FullList) do
+			data.set = "default"
+			data.index = i
+		end
+
 		for i, data in ipairs(addon.chardb.profile.outfits) do
+
+			data.outfitID = MAX_DEFAULT_OUTFITS + i
+			data.set = "extra"
+			data.index = i
 			tinsert(FullList, data)
-			FullList[#FullList].outfitID = #FullList-1
+			--FullList[#FullList].outfitID = MAX_DEFAULT_OUTFITS + i
+			--data.set = "default"
 		end
 		return FullList
 end
-
 addon.GetOutfits = GetOutfits
 
-local function GetOutfitIndex(outfitID)
+
+local function GetTableIndex(index)
 	local numOutfits = #C_TransmogCollection.GetOutfits()
-	return outfitID - numOutfits + 1
+	return index - numOutfits + 1
 end
 
 
 local function IsDefaultSet(outfitID)
-		return outfitID <= MAX_DEFAULT_OUTFITS 
+		return outfitID < MAX_DEFAULT_OUTFITS  -- #C_TransmogCollection.GetOutfits()--MAX_DEFAULT_OUTFITS 
 end
 
 
-function LookupIndexFromName(name)
+function LookupOutfitIDFromName(name)
 	local outfits = GetOutfits()
-	for i = 1, #outfits do
-		if outfits[i]["name"] == name then
-			return i-1
+	for i, data in ipairs(outfits) do
+		if data.name == name then
+			return data.outfitID
+		end
+	end
+	return nil
+end
+
+
+function LookupIndexFromID(outfitID)
+	local outfits = GetOutfits()
+	for i, data in ipairs(outfits) do
+		if data.outfitID == outfitID then
+			return data.index
 		end
 	end
 	return nil
@@ -40,9 +62,9 @@ end
 
 
 local function GetOutfitName(outfitID)
-	return C_TransmogCollection.GetOutfitName(outfitID) or addon.chardb.profile.outfits[GetOutfitIndex(outfitID)].name
+	local index = LookupIndexFromID(outfitID)
+	return C_TransmogCollection.GetOutfitName(outfitID) or (index and addon.chardb.profile.outfits[index].name )
 end
-
 
 StaticPopupDialogs["BW_NAME_TRANSMOG_OUTFIT"] = {
 	text = TRANSMOG_OUTFIT_NAME,
@@ -203,7 +225,7 @@ function BW_WardrobeOutfitMixin:LoadOutfit(outfitID)
 	if IsDefaultSet(outfitID) then 
 		C_Transmog.LoadOutfit(outfitID)
 	else
-		local outfit = addon.chardb.profile.outfits[GetOutfitIndex(outfitID)]
+		local outfit = addon.chardb.profile.outfits[LookupIndexFromID(outfitID)]
 		for slot , data in pairs(outfit) do
 			if type(slot) == "number" then 
 			C_Transmog.SetPending(slot, LE_TRANSMOG_TYPE_APPEARANCE, data)
@@ -303,7 +325,7 @@ function BW_WardrobeOutfitMixin:IsOutfitDressed()
 	if IsDefaultSet(self.selectedOutfitID) then 
 		appearanceSources, mainHandEnchant, offHandEnchant = C_TransmogCollection.GetOutfitSources(self.selectedOutfitID)
 	else
-		local outfit = addon.chardb.profile.outfits[GetOutfitIndex(self.selectedOutfitID)]
+		local outfit = addon.chardb.profile.outfits[LookupIndexFromID(self.selectedOutfitID)]
 		appearanceSources = outfit
 		mainHandEnchant = outfit["mainHandEnchant"]
 		offHandEnchant = outfit["offHandEnchant"]
@@ -500,7 +522,7 @@ end
 
 
 function BW_WardrobeOutfitFrameMixin:SaveOutfit(name)
-	local index = LookupIndexFromName(name)
+	local outfitID = LookupOutfitIDFromName(name) --or  ((#C_TransmogCollection.GetOutfits() <= MAX_DEFAULT_OUTFITS) and #C_TransmogCollection.GetOutfits() -1 ) -- or #GetOutfits()-1
 	local icon
 	for i = 1, #TRANSMOG_SLOTS do
 		if (TRANSMOG_SLOTS[i].transmogType == LE_TRANSMOG_TYPE_APPEARANCE) then
@@ -515,14 +537,12 @@ function BW_WardrobeOutfitFrameMixin:SaveOutfit(name)
 		end
 	end
 
-	local outfitID
-	if index and index <= MAX_DEFAULT_OUTFITS then 
+	if (outfitID and IsDefaultSet(outfitID)) or (#C_TransmogCollection.GetOutfits() < MAX_DEFAULT_OUTFITS)  then 
 		outfitID = C_TransmogCollection.SaveOutfit(name, self.sources, self.mainHandEnchant, self.offHandEnchant, icon)
 	else
-		local outfit
-		if index then 
-			addon.chardb.profile.outfits[GetOutfitIndex(index)] = self.sources
-			outfit = addon.chardb.profile.outfits[GetOutfitIndex(index)]
+		if outfitID then 
+			addon.chardb.profile.outfits[LookupIndexFromID(outfitID)] = self.sources
+			outfit = addon.chardb.profile.outfits[LookupIndexFromID(outfitID)]
 		else
 			tinsert(addon.chardb.profile.outfits, self.sources)
 			outfit = addon.chardb.profile.outfits[#addon.chardb.profile.outfits]
@@ -547,7 +567,22 @@ function BW_WardrobeOutfitFrameMixin:DeleteOutfit(outfitID)
 	if IsDefaultSet(outfitID) then
 		C_TransmogCollection.DeleteOutfit(outfitID)
 	else
-		tremove(addon.chardb.profile.outfits, GetOutfitIndex(outfitID))
+		tremove(addon.chardb.profile.outfits, LookupIndexFromID(outfitID))
+	end
+
+	if GetCVarBool("transmogCurrentSpecOnly") then
+		local specIndex = GetSpecialization()
+		local value = addon.chardb.profile.lastTransmogOutfitIDSpec[specIndex]
+		if value > 0 then  addon.chardb.profile.lastTransmogOutfitIDSpec[specIndex] = value -1 end
+
+		--SetCVar("lastTransmogOutfitIDSpec"..specIndex, value)
+	else
+		for specIndex = 1, GetNumSpecializations() do
+			--SetCVar("lastTransmogOutfitIDSpec"..specIndex, value)
+		local value = addon.chardb.profile.lastTransmogOutfitIDSpec[specIndex]
+		if value > 0 then  addon.chardb.profile.lastTransmogOutfitIDSpec[specIndex] = value -1 end
+
+		end
 	end
 end
 
@@ -569,7 +604,7 @@ function BW_WardrobeOutfitFrameMixin:NameOutfit(newName, outfitID)
 			-- this is a rename
 		C_TransmogCollection.ModifyOutfit(outfitID, newName)
 	elseif outfitID then 
-		local index = GetOutfitIndex(outfitID)
+		local index = LookupIndexFromID(outfitID)
 		addon.chardb.profile.outfits[index].name = newName
 	else
 		-- this is a new outfit
