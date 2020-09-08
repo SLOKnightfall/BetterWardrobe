@@ -139,6 +139,7 @@ local char_defaults = {
 		favorite = {},
 		outfits = {},
 		lastTransmogOutfitIDSpec = {},
+		collectionList = {item = {},set = {},extraset = {},},
 	}
 }
 
@@ -215,6 +216,9 @@ function addon:UpdateItems(self)
 		local setID = (model.visualInfo and model.visualInfo.visualID) or model.setID
 		local isHidden = addon.chardb.profile.item[setID]
 		model.HideItemVisual.Icon:SetShown(isHidden)
+		local isInList = addon.chardb.profile.collectionList["item"][setID] 
+		model.CollectionListVisual.Icon:SetShown(isInList)
+		model.CollectionListVisual.CollectedIcon:SetShown(model.visualInfo and model.visualInfo.isCollected and isInList)
 	end
 end
 
@@ -710,6 +714,10 @@ function WardrobeCollectionFrame.SetsTransmogFrame:UpdateSets()
 			local isHidden = addon.chardb.profile.set[set.setID]
 			model.HideItemVisual.Icon:SetShown(isHidden)
 
+			local isInList = addon.chardb.profile.collectionList["set"][set.setID] 
+			model.CollectionListVisual.Icon:SetShown(isInList)
+			model.CollectionListVisual.CollectedIcon:SetShown(false)
+
 			model.setName:SetText((Profile.ShowNames and setInfo["name"].."\n"..(setInfo["description"] or "")) or "")
 			model.progress:SetText((Profile.ShowSetCount and topSourcesCollected.."/".. topSourcesTotal) or "")
 
@@ -939,6 +947,10 @@ function WardrobeCollectionFrame.SetsCollectionFrame.ScrollFrame:Update()
 			button.Favorite:SetShown(baseSet.favoriteSetID)
 			local isHidden = addon.chardb.profile.set[baseSet.setID]
 			button.HideItemVisual.Icon:SetShown(isHidden)
+
+			local isInList = addon.chardb.profile.collectionList["set"][baseSet.setID] 
+			button.CollectionListVisual.Icon:SetShown(isInList)
+			button.CollectionListVisual.CollectedIcon:SetShown(false)
 
 			button.New:SetShown(SetsDataProvider:IsBaseSetNew(baseSet.setID))
 			button.setID = baseSet.setID
@@ -1718,6 +1730,16 @@ local function BW_WardrobeSetsCollectionScrollFrame_FavoriteDropDownInit(self)
 			BW_SetsCollectionFrame:OnSearchUpdate()
 		end,
 	})
+
+	UIDropDownMenu_AddSeparator()
+	local isInList = addon.chardb.profile.collectionList["extraset"][self.baseSetID] 
+	UIDropDownMenu_AddButton({
+		notCheckable = true,
+		text = isInList and L["Remove from Collection List"] or L["Add to Collection List"],
+		func = function()
+					addon.CollectionList:UpdateList("extraset", self.baseSetID, not isInList )
+			end,
+	})
 end
 
 function BetterWardrobeSetsCollectionScrollFrameMixin:OnLoad()
@@ -1771,6 +1793,9 @@ function BetterWardrobeSetsCollectionScrollFrameMixin:Update()
 			button.SelectedTexture:SetShown(baseSet.setID == selectedBaseSetID)
 			button.Favorite:SetShown(isFavorite)
 			button.HideItemVisual.Icon:SetShown(isHidden)
+			local isInList = addon.chardb.profile.collectionList["extraset"][baseSet.setID] 
+			button.CollectionListVisual.Icon:SetShown(isInList)
+			button.CollectionListVisual.CollectedIcon:SetShown(false)
 
 
 			--button.New:SetShown(SetsDataProvider:IsBaseSetNew(baseSet.setID))
@@ -2019,6 +2044,9 @@ function BetterWardrobeSetsTransmogMixin:UpdateSets()
 
 			model.Favorite.Icon:SetShown(isFavorite)
 			model.HideItemVisual.Icon:SetShown(isHidden)
+			local isInList = addon.chardb.profile.collectionList["extraset"][set.setID] 
+			model.CollectionListVisual.Icon:SetShown(isInList)
+			model.CollectionListVisual.CollectedIcon:SetShown(false)
 
 			model.setID = set.setID
 			model.setName:SetText(setInfo["name"].."\n"..(setInfo["description"] or ""))
@@ -2143,6 +2171,18 @@ function BetterWardrobeSetsTransmogMixin:OpenRightClickDropDown()
 			BW_SetsTransmogFrame:OnSearchUpdate()
 		end,
 	})
+
+
+	UIDropDownMenu_AddSeparator()
+	local isInList = addon.chardb.profile.collectionList["extraset"][setID] 
+	UIDropDownMenu_AddButton({
+		notCheckable = true,
+		text = isInList and L["Remove to Collection List"] or L["Add to Collection List"],
+		func = function() 
+					addon.CollectionList:UpdateList("extraset", setID, not isInList )
+			end,
+	})
+
 end
 
 

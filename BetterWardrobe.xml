@@ -5,17 +5,40 @@
 	<Script file="Modules\UI.lua"/>
 
 	<Frame name="HideVisualTemplate" parentKey="HideItemVisual" virtual="true" setAllPoints="true">
-				<Layers>
-					<Layer level="ARTWORK">
-						<Texture parentKey="Icon" atlas="transmog-icon-hidden" useAtlasSize="true" hidden="true">
-							<Anchors>
-								<Anchor point="TOPRIGHT" x="-2" y="13" relativePoint="TOPRIGHT"/>
-							</Anchors>
-						</Texture>
-					</Layer>
-				</Layers>
+		<Layers>
+			<Layer level="ARTWORK">
+				<Texture parentKey="Icon" atlas="transmog-icon-hidden" useAtlasSize="true" hidden="true">
+					<Anchors>
+						<Anchor point="TOPRIGHT" x="-2" y="13" relativePoint="TOPRIGHT"/>
+					</Anchors>
+				</Texture>
+			</Layer>
+		</Layers>
 	</Frame>
 	
+	<Frame name="CollectionListTemplate" parentKey="CollectionListVisual" virtual="true" setAllPoints="trye">
+		<Size x="25" y="25"/>
+		<Anchors>
+			<Anchor point="BOTTOMRIGHT" x="2" y="-2" relativePoint="BOTTOMRIGHT"/>
+		</Anchors>
+		<Layers>
+			<Layer level="ARTWORK">
+				<Texture parentKey="Icon" file="Interface\Minimap\Tracking\Profession" hidden="true">
+					<Size x="25" y="25"/>
+					<Anchor point="CENTER" />
+				</Texture>
+			</Layer>
+			<Layer level="OVERLAY">
+				<Texture parentKey="CollectedIcon" atlas="transmog-icon-checkmark" useAtlasSize="false" hidden="true">
+					<Size x="20" y="20"/>
+					<Anchors>
+						<Anchor point="CENTER" />
+					</Anchors>
+				</Texture>
+			</Layer>
+		</Layers>
+	</Frame>
+
 	<DressUpModel name="BWWardrobeSetsTransmogModelTemplate" mixin="BetterWardrobeSetsTransmogModelMixin" virtual="true">
 		<Size x="129" y="186"/>
 		<Layers>
@@ -59,18 +82,13 @@
 				</Layers>
 			</Frame>
 	
-				<Frame parentKey="HideItemVisual" setAllPoints="true">
-				<Layers>
-					<Layer level="ARTWORK">
-						<Texture parentKey="Icon" atlas="transmog-icon-hidden" useAtlasSize="true" hidden="false">
-							<Anchors>
-								<Anchor point="TOPRIGHT" x="-2" y="13" relativePoint="TOPRIGHT"/>
-							</Anchors>
-						</Texture>
-					</Layer>
-				</Layers>
-			</Frame>
-				</Frames>
+			<Frame inherits="HideVisualTemplate" setAllPoints="true"/>
+			<Frame inherits="CollectionListTemplate" setAllPoints="true">
+			<Anchors>
+			<Anchor point="BOTTOMRIGHT" x="2" y="-2" relativePoint="BOTTOMRIGHT"/>
+		</Anchors>
+	</Frame>
+		</Frames>
 		<Layer level="OVERLAY">
 			<FontString parentKey="progress" inherits="GameFontNormalMed2" text="+++">
 				<Anchors>

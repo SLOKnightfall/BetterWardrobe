@@ -701,7 +701,8 @@ local function AddHideButton(model, button)
 					addon.QueueForTransmog(type, setID, name)
 				 end,
 			})
-end
+		end
+
 		UIDropDownMenu_AddSeparator()
 		local isHidden = addon.chardb.profile[type][setID] 
 		UIDropDownMenu_AddButton({
@@ -709,9 +710,21 @@ end
 			text = isHidden and SHOW or HIDE,
 			func = function() addon.ToggleHidden(model, isHidden) end,
 		})
+
+		--Collection List Right Click options
+		if (type == "item" and not (model.visualInfo and model.visualInfo.isCollected )) or type == "set" or type == "extraset" then 
+			UIDropDownMenu_AddSeparator()
+			local isInList = addon.chardb.profile.collectionList[type][setID] 
+			UIDropDownMenu_AddButton({
+				notCheckable = true,
+				text = isInList and L["Remove to Collection List"] or L["Add to Collection List"],
+				func = function() 
+							addon.CollectionList:UpdateList(type, setID, not isInList )
+					end,
+			})
+		end
 	end
 end
-
 
 function UI.HideButton_Initialize()
 		local Wardrobe = {WardrobeCollectionFrame.ItemsCollectionFrame, WardrobeCollectionFrame.SetsTransmogFrame}
@@ -721,8 +734,7 @@ function UI.HideButton_Initialize()
 			for _, model in pairs(frame.Models) do
 				model:HookScript("OnMouseDown", AddHideButton)
 				local f = CreateFrame("frame", nil, model, "HideVisualTemplate")
-				--f:Show()
-				--f.Icon:SetPoint("CENTER")
+				f = CreateFrame("frame", nil, model, "CollectionListTemplate")
 			end
 		end
 
@@ -731,37 +743,40 @@ function UI.HideButton_Initialize()
 			local button = buttons[i];
 			local f = CreateFrame("frame", nil, button, "HideVisualTemplate")
 			f.Icon:ClearAllPoints()
-			f.Icon:SetPoint("BOTTOMRIGHT", button, "BOTTOMRIGHT", 2, -2)
-			button:HookScript("OnMouseUp", function() 
+			f.Icon:SetPoint("BOTTOMRIGHT", button, "BOTTOMRIGHT", -2, 5)
+			button:HookScript("OnMouseUp", AddHideButton)
 
-			local setID = button.setID
-			UIDropDownMenu_AddSeparator()
-			UIDropDownMenu_AddButton({
-				notCheckable = true,
-				text = L["Queue Transmog"],
-				func = function() 
-					local setInfo = C_TransmogSets.GetSetInfo(setID)
-					local name = setInfo["name"]
-					addon.QueueForTransmog("set", setID, name)
-				 end,
-			})
-
-			UIDropDownMenu_AddSeparator()
-			local isHidden = addon.chardb.profile.set[setID] 
-			UIDropDownMenu_AddButton({
-				notCheckable = true,
-				text = isHidden and SHOW or HIDE,
-				func = function() 
-				local setInfo = C_TransmogSets.GetSetInfo(setID)
-				local name = setInfo["name"]
-					addon.chardb.profile.set[setID] = not isHidden and name
-					print(format("%s "..name, isHidden and "Unhiding" or "Hiding"))
-					WardrobeCollectionFrame.SetsCollectionFrame:Refresh()
-					WardrobeCollectionFrame.SetsCollectionFrame:OnSearchUpdate()
-				 end,
-			})
-		end)
-
+			f = CreateFrame("frame", nil, button, "CollectionListTemplate")
+			f:ClearAllPoints()
+			f:SetPoint("BOTTOMRIGHT", button, "BOTTOMLEFT", -3, 0)
+		--[[	local setID = button.setID
+							UIDropDownMenu_AddSeparator()
+							UIDropDownMenu_AddButton({
+								notCheckable = true,
+								text = L["Queue Transmog"],
+								func = function() 
+									local setInfo = C_TransmogSets.GetSetInfo(setID)
+									local name = setInfo["name"]
+									addon.QueueForTransmog("set", setID, name)
+								 end,
+							})
+				
+							UIDropDownMenu_AddSeparator()
+							local isHidden = addon.chardb.profile.set[setID] 
+							UIDropDownMenu_AddButton({
+								notCheckable = true,
+								text = isHidden and SHOW or HIDE,
+								func = function() 
+								local setInfo = C_TransmogSets.GetSetInfo(setID)
+								local name = setInfo["name"]
+									addon.chardb.profile.set[setID] = not isHidden and name
+									print(format("%s "..name, isHidden and "Unhiding" or "Hiding"))
+									WardrobeCollectionFrame.SetsCollectionFrame:Refresh()
+									WardrobeCollectionFrame.SetsCollectionFrame:OnSearchUpdate()
+								 end,
+							})
+						end)
+				]]
 		end
 
 		local buttons = BW_SetsCollectionFrameScrollFrame.buttons
@@ -771,6 +786,10 @@ function UI.HideButton_Initialize()
 			f.Icon:ClearAllPoints()
 			f.Icon:SetPoint("BOTTOMRIGHT", button, "BOTTOMRIGHT", 2, -2)
 
+			f = CreateFrame("frame", nil, button, "CollectionListTemplate")
+			--f.Icon:SetSize(17,17)
+			f:ClearAllPoints()
+			f:SetPoint("BOTTOMRIGHT", button, "BOTTOMLEFT", -3, 0)
 		end
 		   -- for i=1,CanIMogIt.NUM_WARDROBE_COLLECTION_BUTTONS do
        -- local frame = _G["BW_SetsCollectionFrameScrollFrameButton"..i]

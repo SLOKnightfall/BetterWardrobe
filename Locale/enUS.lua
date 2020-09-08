@@ -26,6 +26,14 @@ L["None Selected"] = true
 L["Profiles - Options Settings"] = true
 L["Profiles - Collection Settings"] = true
 
+L["Add to Collection List"] = true
+L["Remove to Collection List"] = true
+
+L["%s: Uncollected items added"] = true
+L["No new appearces needed."] = true
+L["Appearance added."] = true
+L["Appearance removed."] = true
+
 	L[LE_DEFAULT] = DEFAULT
 	L[LE_APPEARANCE] = APPEARANCE_LABEL
 	L[LE_ALPHABETIC] = COMPACT_UNIT_FRAME_PROFILE_SORTBY_ALPHABETICAL
