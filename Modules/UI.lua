@@ -70,7 +70,7 @@ end
 
 
 local f = CreateFrame("Frame")
-local function InitSortDropdown()
+function UI.SortDropdowns_Initialize()
 	if not addon.sortDB or addon.sortDB.db_version < defaults.db_version then
 		addon.sortDB = CopyTable(defaults)
 	end
@@ -78,10 +78,9 @@ local function InitSortDropdown()
 	db = addon.sortDB
 	
 	f:RegisterEvent("TRANSMOG_COLLECTION_ITEM_UPDATE")
-	f:SetScript("OnEvent", OnItemUpdate)
+	--f:SetScript("OnEvent", OnItemUpdate)
 	--local dropdown = CreateFrame("Frame", "BW_SortDropDown", WardrobeCollectionFrame, "UIDropDownMenuTemplate")
 	UIDropDownMenu_SetWidth(BW_SortDropDown, 140)
-	
 	UIDropDownMenu_Initialize(BW_SortDropDown, function(self)
 		local info = UIDropDownMenu_CreateInfo()
 		local selectedValue = UIDropDownMenu_GetSelectedValue(self)
@@ -226,11 +225,11 @@ function BW_WardrobeCollectionFrame_SetTab(tabID)
 		BW_WardrobeToggle:Hide()
 		BW_SortDropDown:ClearAllPoints()
 
-
 		if WardrobeFrame_IsAtTransmogrifier() then
 			local _, isWeapon = C_TransmogCollection.GetCategoryInfo(WardrobeCollectionFrame.ItemsCollectionFrame:GetActiveCategory() or -1)
 			BW_SortDropDown:SetPoint("TOPLEFT", WardrobeCollectionFrame.ItemsCollectionFrame.WeaponDropDown, "BOTTOMLEFT", 0, isWeapon and 55 or 32)
 		else
+			BW_CollectionListButton:Show()
 			BW_SortDropDown:SetPoint("TOPLEFT", WardrobeCollectionFrame.ItemsCollectionFrame.WeaponDropDown, "BOTTOMLEFT", 0, LegionWardrobeY)
 		end
 
@@ -244,6 +243,7 @@ function BW_WardrobeCollectionFrame_SetTab(tabID)
 		BW_SortDropDown:ClearAllPoints()
 		BW_WardrobeToggle.VisualMode = false
 		BW_WardrobeToggle:Show()
+		BW_CollectionListButton:Hide()
 
 
 		if ( atTransmogrifier )  then
@@ -281,6 +281,7 @@ function BW_WardrobeCollectionFrame_SetTab(tabID)
 		UIDropDownMenu_EnableDropDown(BW_SortDropDown)
 		BW_WardrobeToggle.VisualMode = flase
 		BW_WardrobeToggle:Show()
+		BW_CollectionListButton:Hide()
 					
 		if ( atTransmogrifier )  then
 			WardrobeCollectionFrame.activeFrame = BW_WardrobeCollectionFrame.BW_SetsTransmogFrame
@@ -428,9 +429,9 @@ end
 
 
 function addon.BuildUI()
-	AddSetDetailFrames(WardrobeCollectionFrame.SetsTransmogFrame)
+	AddSetDetailFrames(WardrobeCollectionFrame.SetsTransmogFrame.ModelR1C1)
 	AddSetDetailFrames(BW_SetsTransmogFrame)
-	InitSortDropdown()
+	UI.SortDropdowns_Initialize()
 	CreateVisualViewButton()
 	ExtendTransmogView()
 --BW_WardrobeCollectionFrame:GetFrameLevel()
@@ -440,7 +441,7 @@ function addon.BuildUI()
 	BW_WardrobeCollectionFrame.FilterButton:SetPoint("TOPLEFT", WardrobeCollectionFrame.FilterButton, "TOPLEFT")
 
  	BuildLoadQueueButton()
-	UI.HideButton_Initialize()
+	UI.Buttons_Initialize()
 
 	hooksecurefunc(Wardrobe, "UpdateWeaponDropDown", PositionDropDown )
 end
@@ -457,7 +458,7 @@ function BW_WardrobeFilterDropDown_Initialize(self, level)
 		return
 	end
 
-BW_WardrobeFilterDropDown_InitializeItems(self, level)
+	BW_WardrobeFilterDropDown_InitializeItems(self, level)
 end
 
 
@@ -726,7 +727,7 @@ local function AddHideButton(model, button)
 	end
 end
 
-function UI.HideButton_Initialize()
+function UI.Buttons_Initialize()
 		local Wardrobe = {WardrobeCollectionFrame.ItemsCollectionFrame, WardrobeCollectionFrame.SetsTransmogFrame}
 
 		-- hook all models
@@ -749,34 +750,6 @@ function UI.HideButton_Initialize()
 			f = CreateFrame("frame", nil, button, "CollectionListTemplate")
 			f:ClearAllPoints()
 			f:SetPoint("BOTTOMRIGHT", button, "BOTTOMLEFT", -3, 0)
-		--[[	local setID = button.setID
-							UIDropDownMenu_AddSeparator()
-							UIDropDownMenu_AddButton({
-								notCheckable = true,
-								text = L["Queue Transmog"],
-								func = function() 
-									local setInfo = C_TransmogSets.GetSetInfo(setID)
-									local name = setInfo["name"]
-									addon.QueueForTransmog("set", setID, name)
-								 end,
-							})
-				
-							UIDropDownMenu_AddSeparator()
-							local isHidden = addon.chardb.profile.set[setID] 
-							UIDropDownMenu_AddButton({
-								notCheckable = true,
-								text = isHidden and SHOW or HIDE,
-								func = function() 
-								local setInfo = C_TransmogSets.GetSetInfo(setID)
-								local name = setInfo["name"]
-									addon.chardb.profile.set[setID] = not isHidden and name
-									print(format("%s "..name, isHidden and "Unhiding" or "Hiding"))
-									WardrobeCollectionFrame.SetsCollectionFrame:Refresh()
-									WardrobeCollectionFrame.SetsCollectionFrame:OnSearchUpdate()
-								 end,
-							})
-						end)
-				]]
 		end
 
 		local buttons = BW_SetsCollectionFrameScrollFrame.buttons
@@ -807,9 +780,11 @@ function UI.HideButton_Initialize()
 			--f:UpdateWardrobe()
 		--end)
 
+
+
 end
 
 
 
 
-
+--INV_Artifact_tome01

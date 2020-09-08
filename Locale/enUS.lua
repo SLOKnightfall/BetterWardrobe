@@ -34,6 +34,8 @@ L["No new appearces needed."] = true
 L["Appearance added."] = true
 L["Appearance removed."] = true
 
+L["Collection List"] = true
+
 	L[LE_DEFAULT] = DEFAULT
 	L[LE_APPEARANCE] = APPEARANCE_LABEL
 	L[LE_ALPHABETIC] = COMPACT_UNIT_FRAME_PROFILE_SORTBY_ALPHABETICAL

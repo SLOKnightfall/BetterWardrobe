@@ -2,5 +2,72 @@
 ..\FrameXML\UI.xsd">
 <Script file="CollectionList.lua"/>
 
+	<Frame parent = "WardrobeCollectionFrame"  hidden="false" setAllPoints="true" mixin="BetterWardrobeSetsCollectionListMixin">
+		<Frames>
+			<Frame name = "BW_CollectionListTitle" parentKey="CollectionListTitle" hidden="true" enableMouse="false" >
+				<Anchors>
+					<Anchor point="TOPLEFT" relativePoint="TOPLEFT" y="-60" x="4"/>
+					<Anchor point="BOTTOMRIGHT" relativePoint="BOTTOMRIGHT" x="-6" y="5"/>
+				</Anchors>
+				<Layers>
+					<Layer level="ARTWORK">
+						<FontString parentKey="Name" inherits="Fancy24Font" maxLines="1" text="--">
+							<Anchors>
+								<Anchor point="TOP" x="0" y="-37"/>
+							</Anchors>
+							<Color r="1" g="0.82" b="0"/>
+							<Shadow>
+								<Offset x="1" y="-1" />
+								<Color r="0" g="0" b="0"/>
+							</Shadow>
+						</FontString>
+					</Layer>
+				</Layers>
+			</Frame>
 
+			<Button name = "BW_CollectionListButton" parentKey="CollectionListButton" inherits="UIMenuButtonStretchTemplate" hidden="false">
+				<Size x="50" y="50"/>
+				<Anchors>
+					<Anchor point="BOTTOMRIGHT" relativePoint="BOTTOMRIGHT" x="-25" y="25"/>
+				</Anchors>
+				<Layers>
+					<Layer level="ARTWORK">
+						<Texture parentKey="Icon" file="Interface\Icons\INV_Artifact_tome01" useAtlasSize="false">
+							<Size x="49" y="49"/>
+							<Anchors>
+								<Anchor point="LEFT" x="1"/>
+							</Anchors>
+						</Texture>
+					</Layer>
+				</Layers>
+				<HighlightTexture file="Interface\Buttons\UI-Common-MouseHilight" alphaMode="ADD">
+					<Size x="49" y="49"/>
+					</HighlightTexture>
+				<Scripts>
+					<OnEnter>
+						--	self:OnEnter()
+					</OnEnter>
+					<OnLeave function="GameTooltip_Hide"/>
+					<OnClick>
+						self.ToggleState = not self.ToggleState
+						self:GetParent():Toggle(self.ToggleState)
+					</OnClick>
+					<OnHide>
+						self.ToggleState = false
+					</OnHide>
+				</Scripts>
+			</Button>
+		</Frames>
+		<Scripts>
+			<OnLoad>
+				self:SetTitle()
+			</OnLoad>
+			<OnShow>
+				self.CollectionListButton:SetShown(not WardrobeFrame_IsAtTransmogrifier())
+			</OnShow>
+			<OnHide>
+				self:Toggle(false)
+			</OnHide>
+		</Scripts>
+	</Frame>
 </Ui>

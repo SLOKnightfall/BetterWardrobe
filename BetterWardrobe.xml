@@ -4,6 +4,7 @@
 	<Script file="BetterWardrobe.lua"/>
 	<Script file="Modules\UI.lua"/>
 
+
 	<Frame name="HideVisualTemplate" parentKey="HideItemVisual" virtual="true" setAllPoints="true">
 		<Layers>
 			<Layer level="ARTWORK">
@@ -169,6 +170,7 @@
 			<OnLeave function="GameTooltip_Hide"/>
 		</Scripts>
 	</Button>
+
 
 	<Frame name="BW_WardrobeSetsDetailsItemFrameTemplate" inherits ="WardrobeSetsDetailsItemFrameTemplate" mixin="BW_WardrobeSetsDetailsItemMixin" virtual="true">
 	</Frame>
@@ -435,7 +437,7 @@
 					</Layer>
 				</Layers>
 				<Frames>
-					<Frame name="WardrobeSetsTransmogModelRightClickDropDown" parentKey="RightClickDropDown" inherits="UIDropDownMenuTemplate" hidden="false">
+					<Frame name="BW_WardrobeSetsTransmogModelRightClickDropDown" parentKey="RightClickDropDown" inherits="UIDropDownMenuTemplate" hidden="false">
 						<Scripts>
 							<OnLoad function="BW_WardrobeSetsTransmogModelRightClickDropDown_OnLoad"/>
 						</Scripts>

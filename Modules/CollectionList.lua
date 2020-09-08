@@ -5,8 +5,21 @@ local L = LibStub("AceLocale-3.0"):GetLocale(addonName)
 
 local CollectionList = {}
 addon.CollectionList = CollectionList
+--WardrobeCollectionFrame = 
 
 
+function CollectionList:BuildCollectionList()
+	local list = {}
+	for visualID, _ in pairs(addon.chardb.profile.collectionList["item"]) do 
+		local sources = C_TransmogCollection.GetAppearanceSources(visualID)
+
+	local sourceInfo = C_TransmogCollection.GetSourceInfo(sources[1].sourceID)
+	sourceInfo.isUseable = true
+		tinsert(list, sourceInfo)
+	end
+
+	return list
+end
 --Needs to to take account of variant
 function CollectionList:UpdateList(type, typeID, add)
 	typeID = tonumber(typeID)
@@ -57,4 +70,19 @@ function CollectionList:UpdateList(type, typeID, add)
 			--print( addSet and L["%s: Uncollected items added"]:format(setName) or L["No new appearces needed."])
 			return addSet
 	end	
+end
+
+
+BetterWardrobeSetsCollectionListMixin = {}
+function BetterWardrobeSetsCollectionListMixin:Toggle(toggleState)
+	local atTransmogrifier = WardrobeFrame_IsAtTransmogrifier()
+	WardrobeCollectionFrame.ItemsCollectionFrame:RefreshVisualsList();
+	WardrobeCollectionFrame.ItemsCollectionFrame:UpdateItems()
+	WardrobeCollectionFrame.ItemsCollectionFrame.SlotsFrame:SetShown(not toggleState and not atTransmogrifier)
+	WardrobeCollectionFrameWeaponDropDown:SetShown(not toggleState)
+	self.CollectionListTitle:SetShown(toggleState)
+end
+
+function BetterWardrobeSetsCollectionListMixin:SetTitle()
+	self.CollectionListTitle.Name:SetText(L["Collection List"])
 end
