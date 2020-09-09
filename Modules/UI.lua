@@ -363,8 +363,8 @@ function BW_WardrobeFilterDropDown_OnLoad(self)
 end
 
 
-local FILTER_SOURCES = {"Classic Set","Quest Set","Dunegon Set","Raid Recolor","Raid Lookalike","Garrison","Island Expidetion", "Warfronts"}
-local EXPANSIONS = {"Classic", "Burning Crusade", "Wrath of the Litch Kink", "Cataclysm", "Mists", "WOD", "Legion", "BFA" }
+local FILTER_SOURCES = {L["Classic Set"],L["Quest Set"],L["Dunegon Set"],L["Raid Recolor"],L["Raid Lookalike"],L["Garrison"],L["Island Expidetion"], L["Warfronts"]}
+local EXPANSIONS = {EXPANSION_NAME0 , EXPANSION_NAME1, EXPANSION_NAME2, EXPANSION_NAME3 , EXPANSION_NAME4, EXPANSION_NAME5, EXPANSION_NAME6, EXPANSION_NAME7, EXPANSION_NAME8 }
 
 local filterSelection = {} 
 for i = 1, 8 do
@@ -423,7 +423,7 @@ function UI:FilterDropDown_InitializeItems(level)
 			info.value = 1
 		UIDropDownMenu_AddButton(info, level)
 
-		info.text = "Xpac"
+		info.text = L["Expansion"]
 		info.value = 2
 		UIDropDownMenu_AddButton(info, level)
 

@@ -36,6 +36,16 @@ L["Appearance removed."] = true
 
 L["Collection List"] = true
 
+L["Expansion"] = true
+L["Classic Set"]= true
+L["Quest Set"] = true
+L["Dunegon Set"] = true
+L["Raid Recolor"] = true
+L["Raid Lookalike"] = true
+L["Garrison"] = true
+L["Island Expidetion"]= true
+L["Warfronts"] = true
+
 	L[LE_DEFAULT] = DEFAULT
 	L[LE_APPEARANCE] = APPEARANCE_LABEL
 	L[LE_ALPHABETIC] = COMPACT_UNIT_FRAME_PROFILE_SORTBY_ALPHABETICAL
