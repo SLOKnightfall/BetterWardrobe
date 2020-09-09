@@ -5,39 +5,81 @@
 	<Script file="Modules\UI.lua"/>
 
 
-	<Frame name="HideVisualTemplate" parentKey="HideItemVisual" virtual="true" setAllPoints="true">
-		<Layers>
-			<Layer level="ARTWORK">
-				<Texture parentKey="Icon" atlas="transmog-icon-hidden" useAtlasSize="true" hidden="true">
-					<Anchors>
-						<Anchor point="TOPRIGHT" x="-2" y="13" relativePoint="TOPRIGHT"/>
-					</Anchors>
-				</Texture>
-			</Layer>
-		</Layers>
-	</Frame>
-	
-	<Frame name="CollectionListTemplate" parentKey="CollectionListVisual" virtual="true" setAllPoints="trye">
-		<Size x="25" y="25"/>
+		<Frame name="BetterWardrobeSetInfoTemplate" parentKey="SetInfo" virtual="true" setAllPoints="true">
 		<Anchors>
+			<Anchor point="TOPLEFT" x="2" y="-2" relativePoint="TOPLEFT"/>
 			<Anchor point="BOTTOMRIGHT" x="2" y="-2" relativePoint="BOTTOMRIGHT"/>
 		</Anchors>
 		<Layers>
-			<Layer level="ARTWORK">
-				<Texture parentKey="Icon" file="Interface\Minimap\Tracking\Profession" hidden="true">
-					<Size x="25" y="25"/>
-					<Anchor point="CENTER" />
-				</Texture>
-			</Layer>
 			<Layer level="OVERLAY">
-				<Texture parentKey="CollectedIcon" atlas="transmog-icon-checkmark" useAtlasSize="false" hidden="true">
-					<Size x="20" y="20"/>
+				<FontString parentKey="progress" inherits="GameFontHighlightMedium" text="">
 					<Anchors>
-						<Anchor point="CENTER" />
+						<Anchor point="TOP" y="-2"/>
 					</Anchors>
-				</Texture>
+					<Color r="0.804" g="0.725" b="0.616"/>
+				</FontString>
+			</Layer>
+		<Layer level="OVERLAY">
+				<FontString parentKey="setName" inherits="GameFontHighlightMedium" text="">
+					<Anchors>
+				<Anchor point="BOTTOMLEFT"  y="15" relativePoint="BOTTOMLEFT"/>
+			<Anchor point="BOTTOMRIGHT"  relativePoint="BOTTOMRIGHT"/>
+					</Anchors>
+					
+					<Shadow>
+					<Offset x="5" y="-5" />
+				<Color r="0.804" g="0.725" b="0.616"/>
+									</Shadow>
+				</FontString>
 			</Layer>
 		</Layers>
+	</Frame>
+
+	
+	<Frame name="BetterWardrobeIconsTemplate" parentKey="CollectionListVisual" virtual="true" setAllPoints="true">
+		<Anchors>
+			<Anchor point="TOPLEFT" x="2" y="-2" relativePoint="TOPLEFT"/>
+			<Anchor point="BOTTOMRIGHT" x="2" y="-2" relativePoint="BOTTOMRIGHT"/>
+		</Anchors>
+				<Frames>
+			<Frame parentKey="Hidden">
+			<Size x="20" y="20"/>
+				<Anchors>
+					<Anchor point="TOP" y="12"/>
+				</Anchors>
+				<Layers>
+					<Layer level="ARTWORK">
+						<Texture parentKey="Icon" atlas="transmog-icon-hidden" useAtlasSize="true" hidden="true">
+							<Anchors>
+								<Anchor point="CENTER"/>
+							</Anchors>
+						</Texture>
+					</Layer>
+				</Layers>
+			</Frame>
+			<Frame parentKey="Collection" hidden="false">
+				<Size x="20" y="20"/>
+				<Anchors>
+					<Anchor point="BOTTOMRIGHT" x="0" y="0" relativePoint="BOTTOMRIGHT"/>
+				</Anchors>
+				<Layers>
+					<Layer level="ARTWORK">
+						<Texture parentKey="Collection_Icon" file="Interface\Minimap\Tracking\Profession" hidden="true" >
+							<Size x="25" y="25"/>
+							<Anchor point="CENTER" />
+						</Texture>
+					</Layer>
+					<Layer level="OVERLAY">
+						<Texture parentKey="Collected_Icon" atlas="ParagonReputation_Checkmark" useAtlasSize="false" hidden="true">
+							<Size x="12" y="12"/>
+							<Anchors>
+								<Anchor point="CENTER" />
+							</Anchors>
+						</Texture>
+					</Layer>
+				</Layers>
+			</Frame>
+		</Frames>
 	</Frame>
 
 	<DressUpModel name="BWWardrobeSetsTransmogModelTemplate" mixin="BetterWardrobeSetsTransmogModelMixin" virtual="true">
@@ -82,9 +124,7 @@
 					</Layer>
 				</Layers>
 			</Frame>
-	
-			<Frame inherits="HideVisualTemplate" setAllPoints="true"/>
-			<Frame inherits="CollectionListTemplate" setAllPoints="true">
+				<Frame inherits="BetterWardrobeIconsTemplate" setAllPoints="true">
 			<Anchors>
 			<Anchor point="BOTTOMRIGHT" x="2" y="-2" relativePoint="BOTTOMRIGHT"/>
 		</Anchors>

@@ -210,15 +210,16 @@ function addon:SetActiveSlot()
 	end
 end
 
+
 function addon:UpdateItems(self)
 	for i = 1, self.PAGE_SIZE do
 		local model = self.Models[i]
 		local setID = (model.visualInfo and model.visualInfo.visualID) or model.setID
 		local isHidden = addon.chardb.profile.item[setID]
-		model.HideItemVisual.Icon:SetShown(isHidden)
+		model.CollectionListVisual.Hidden.Icon:SetShown(isHidden)
 		local isInList = addon.chardb.profile.collectionList["item"][setID] 
-		model.CollectionListVisual.Icon:SetShown(isInList)
-		model.CollectionListVisual.CollectedIcon:SetShown(model.visualInfo and model.visualInfo.isCollected and isInList)
+		model.CollectionListVisual.Collection.Collection_Icon:SetShown(isInList)
+		model.CollectionListVisual.Collection.Collected_Icon:SetShown(isInList and model.visualInfo and model.visualInfo.isCollected)
 	end
 end
 
@@ -394,31 +395,32 @@ local function isMogKnown(sourceID)
 end
 
 
+--CollectionList:BuildCollectionList()
+
 --===WardrobeCollectionFrame.ItemsCollectionFrame overwrites
 
-function WardrobeCollectionFrame.ItemsCollectionFrame:FilterVisuals()
-	local isAtTransmogrifier = WardrobeFrame_IsAtTransmogrifier()
-	local visualsList = self.visualsList
-	local filteredVisualsList = { }
-	for i = 1, #visualsList do
-		if (isAtTransmogrifier) then
-			if ((visualsList[i].isUsable and visualsList[i].isCollected) or visualsList[i].alwaysShowItem) then
-				tinsert(filteredVisualsList, visualsList[i])
-			end
+function WardrobeCollectionFrame.ItemsCollectionFrame:RefreshVisualsList()
+	if ( self.transmogType == LE_TRANSMOG_TYPE_ILLUSION ) then
+		self.visualsList = C_TransmogCollection.GetIllusions();
+	else
+		if( WardrobeCollectionFrame.ItemsCollectionFrame:GetActiveSlot() == "MAINHANDSLOT" ) then
+			self.visualsList = C_TransmogCollection.GetCategoryAppearances(self.activeCategory, EXCLUSION_CATEGORY_MAINHAND);
+		elseif (WardrobeCollectionFrame.ItemsCollectionFrame:GetActiveSlot() == "SECONDARYHANDSLOT" ) then
+			self.visualsList = C_TransmogCollection.GetCategoryAppearances(self.activeCategory, EXCLUSION_CATEGORY_OFFHAND);
 		else
-			if (not visualsList[i].isHideVisual) then
-				tinsert(filteredVisualsList, visualsList[i])
-			end
+			self.visualsList = C_TransmogCollection.GetCategoryAppearances(self.activeCategory);
 		end
+
 	end
 
-	self.filteredVisualsList = ClearHidden(filteredVisualsList, "item")
+	if  BW_CollectionListButton.ToggleState then self.visualsList = addon.CollectionList:BuildCollectionList() end
+
+	self:FilterVisuals();
+	self.filteredVisualsList = ClearHidden(self.filteredVisualsList, "item")
+	self:SortVisuals();
+
+	self.PagingFrame:SetMaxPages(ceil(#self.filteredVisualsList / self.PAGE_SIZE));
 end
-
-
-
-
-
 
 local SetsDataProvider = CreateFromMixins(WardrobeSetsDataProviderMixin)
 
@@ -712,14 +714,14 @@ function WardrobeCollectionFrame.SetsTransmogFrame:UpdateSets()
 			model.setID = set.setID
 
 			local isHidden = addon.chardb.profile.set[set.setID]
-			model.HideItemVisual.Icon:SetShown(isHidden)
+			model.CollectionListVisual.Hidden.Icon:SetShown(isHidden)
 
 			local isInList = addon.chardb.profile.collectionList["set"][set.setID] 
-			model.CollectionListVisual.Icon:SetShown(isInList)
-			model.CollectionListVisual.CollectedIcon:SetShown(false)
+			model.CollectionListVisual.Collection.Collection_Icon:SetShown(isInList)
+			--model.CollectionListVisual.Collection.Collected_Icon:SetShown(false)
 
-			model.setName:SetText((Profile.ShowNames and setInfo["name"].."\n"..(setInfo["description"] or "")) or "")
-			model.progress:SetText((Profile.ShowSetCount and topSourcesCollected.."/".. topSourcesTotal) or "")
+			model.SetInfo.setName:SetText((Profile.ShowNames and setInfo["name"].."\n"..(setInfo["description"] or "")) or "")
+			model.SetInfo.progress:SetText((Profile.ShowSetCount and topSourcesCollected.."/".. topSourcesTotal) or "")
 
 		else
 			model:Hide()
@@ -946,11 +948,11 @@ function WardrobeCollectionFrame.SetsCollectionFrame.ScrollFrame:Update()
 			button.SelectedTexture:SetShown(baseSet.setID == selectedBaseSetID)
 			button.Favorite:SetShown(baseSet.favoriteSetID)
 			local isHidden = addon.chardb.profile.set[baseSet.setID]
-			button.HideItemVisual.Icon:SetShown(isHidden)
+			button.CollectionListVisual.Hidden.Icon:SetShown(isHidden)
 
 			local isInList = addon.chardb.profile.collectionList["set"][baseSet.setID] 
-			button.CollectionListVisual.Icon:SetShown(isInList)
-			button.CollectionListVisual.CollectedIcon:SetShown(false)
+			button.CollectionListVisual.Collection.Collection_Icon:SetShown(isInList)
+			--button.CollectionListVisual.Collection.Collected_Icon:SetShown(false)
 
 			button.New:SetShown(SetsDataProvider:IsBaseSetNew(baseSet.setID))
 			button.setID = baseSet.setID
@@ -1704,42 +1706,6 @@ local function BW_WardrobeSetsCollectionScrollFrame_FavoriteDropDownInit(self)
 	info.text = CANCEL
 	info.func = nil
 	UIDropDownMenu_AddButton(info, level)
-
-	UIDropDownMenu_AddSeparator()
-	UIDropDownMenu_AddButton({
-		notCheckable = true,
-		text = L["Queue Transmog"],
-		func = function() 
-			local setInfo = addon.GetSetInfo(self.baseSetID)
-			local name = setInfo["name"]
-			addon.QueueForTransmog("extraset", self.baseSetID, name)
-		 end,
-	})
-
-	UIDropDownMenu_AddSeparator()
-	local isHidden = addon.chardb.profile.extraset[self.baseSetID] 
-	UIDropDownMenu_AddButton({
-		notCheckable = true,
-		text = isHidden and SHOW or HIDE,
-		func = function()  
-			local setInfo = addon.GetSetInfo(self.baseSetID)
-			local name = setInfo["name"]
-			addon.chardb.profile.extraset[self.baseSetID] = not isHidden and name
-			print(format("%s "..name, isHidden and "Unhiding" or "Hiding"))
-			BW_SetsCollectionFrame:Refresh()
-			BW_SetsCollectionFrame:OnSearchUpdate()
-		end,
-	})
-
-	UIDropDownMenu_AddSeparator()
-	local isInList = addon.chardb.profile.collectionList["extraset"][self.baseSetID] 
-	UIDropDownMenu_AddButton({
-		notCheckable = true,
-		text = isInList and L["Remove from Collection List"] or L["Add to Collection List"],
-		func = function()
-					addon.CollectionList:UpdateList("extraset", self.baseSetID, not isInList )
-			end,
-	})
 end
 
 function BetterWardrobeSetsCollectionScrollFrameMixin:OnLoad()
@@ -1792,10 +1758,10 @@ function BetterWardrobeSetsCollectionScrollFrameMixin:Update()
 			button.Icon:SetDesaturation((topSourcesCollected == 0) and 1 or 0)
 			button.SelectedTexture:SetShown(baseSet.setID == selectedBaseSetID)
 			button.Favorite:SetShown(isFavorite)
-			button.HideItemVisual.Icon:SetShown(isHidden)
+			button.CollectionListVisual.Hidden.Icon:SetShown(isHidden)
 			local isInList = addon.chardb.profile.collectionList["extraset"][baseSet.setID] 
-			button.CollectionListVisual.Icon:SetShown(isInList)
-			button.CollectionListVisual.CollectedIcon:SetShown(false)
+			button.CollectionListVisual.Collection.Collection_Icon:SetShown(isInList)
+			--button.CollectionListVisual.Collection.Collected_Icon:SetShown(false)
 
 
 			--button.New:SetShown(SetsDataProvider:IsBaseSetNew(baseSet.setID))
@@ -2043,14 +2009,14 @@ function BetterWardrobeSetsTransmogMixin:UpdateSets()
 			local isHidden = addon.chardb.profile.extraset[set.setID]
 
 			model.Favorite.Icon:SetShown(isFavorite)
-			model.HideItemVisual.Icon:SetShown(isHidden)
+			model.CollectionListVisual.Hidden.Icon:SetShown(isHidden)
 			local isInList = addon.chardb.profile.collectionList["extraset"][set.setID] 
-			model.CollectionListVisual.Icon:SetShown(isInList)
-			model.CollectionListVisual.CollectedIcon:SetShown(false)
+			model.CollectionListVisual.Collection.Collection_Icon:SetShown(isInList)
+			--model.CollectionListVisual.Collection.Collected_Icon:SetShown(false)
 
 			model.setID = set.setID
-			model.setName:SetText(setInfo["name"].."\n"..(setInfo["description"] or ""))
-			model.progress:SetText(topSourcesCollected.."/".. topSourcesTotal)
+			model.SetInfo.setName:SetText(setInfo["name"].."\n"..(setInfo["description"] or ""))
+			model.SetInfo.progress:SetText(topSourcesCollected.."/".. topSourcesTotal)
 		else
 			model:Hide()
 		end
@@ -2145,44 +2111,6 @@ function BetterWardrobeSetsTransmogMixin:OpenRightClickDropDown()
 	info.notCheckable = true
 	info.text = CANCEL
 	UIDropDownMenu_AddButton(info)
-
-	UIDropDownMenu_AddSeparator()
-	UIDropDownMenu_AddButton({
-		notCheckable = true,
-		text = L["Queue Transmog"],
-		func = function() 
-			local setInfo = addon.GetSetInfo(setID)
-			local name = setInfo["name"]
-			addon.QueueForTransmog("extraset", setID, name)
-		 end,
-	})
-	UIDropDownMenu_AddSeparator()
-	local isHidden = addon.chardb.profile.extraset[setID] 
-	UIDropDownMenu_AddButton({
-		notCheckable = true,
-		text = isHidden and SHOW or HIDE,
-		func = function() 
-			local setInfo = addon.GetSetInfo(setID)
-			local name = setInfo["name"]
-			addon.chardb.profile.extraset[setID] = not isHidden and name
-			print(format("%s "..name, isHidden and "Unhiding" or "Hiding"))
-			SetsDataProvider:ClearSets()
-			BW_SetsTransmogFrame:Refresh()
-			BW_SetsTransmogFrame:OnSearchUpdate()
-		end,
-	})
-
-
-	UIDropDownMenu_AddSeparator()
-	local isInList = addon.chardb.profile.collectionList["extraset"][setID] 
-	UIDropDownMenu_AddButton({
-		notCheckable = true,
-		text = isInList and L["Remove to Collection List"] or L["Add to Collection List"],
-		func = function() 
-					addon.CollectionList:UpdateList("extraset", setID, not isInList )
-			end,
-	})
-
 end
 
 

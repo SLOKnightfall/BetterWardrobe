@@ -14,6 +14,7 @@ local LE_COLOR = 4
 local TAB_ITEMS = 1
 local TAB_SETS = 2
 local TAB_EXTRASETS = 3
+local TABS_MAX_WIDTH = 185
 
 local Wardrobe = WardrobeCollectionFrame.ItemsCollectionFrame
 
@@ -45,30 +46,6 @@ local function GetTab()
 end
 
 
-local function UpdateMouseFocus()
-	local focus = GetMouseFocus()
-	if focus and focus:GetObjectType() == "DressUpModel" and focus:GetParent() == Wardrobe then
-		focus:GetScript("OnEnter")(focus)
-	end
-end
-
-local function OnItemUpdate()
-	-- sort again when we are sure all items are cached. not the most efficient way to do this
-	-- this event does not seem to fire for weapons or only when mouseovering a weapon appearance (?)
-	if Wardrobe:IsVisible() and (db.sortDropdown == LE_ITEM_SOURCE) then
-		--addon.Sort[db.sortDropdown](Wardrobe)
-		--addon.Sort[GetTab()][db.sortDropdown](Wardrobe)
-
-		--Wardrobe:UpdateItems()
-	end
-	
-	if GameTooltip:IsShown() then
-		-- when mouse scrolling the tooltip waits for uncached item info and gets refreshed
-		C_Timer.After(.01, UpdateMouseFocus)
-	end
-end
-
-
 local f = CreateFrame("Frame")
 function UI.SortDropdowns_Initialize()
 	if not addon.sortDB or addon.sortDB.db_version < defaults.db_version then
@@ -78,15 +55,12 @@ function UI.SortDropdowns_Initialize()
 	db = addon.sortDB
 	
 	f:RegisterEvent("TRANSMOG_COLLECTION_ITEM_UPDATE")
-	--f:SetScript("OnEvent", OnItemUpdate)
-	--local dropdown = CreateFrame("Frame", "BW_SortDropDown", WardrobeCollectionFrame, "UIDropDownMenuTemplate")
 	UIDropDownMenu_SetWidth(BW_SortDropDown, 140)
 	UIDropDownMenu_Initialize(BW_SortDropDown, function(self)
 		local info = UIDropDownMenu_CreateInfo()
 		local selectedValue = UIDropDownMenu_GetSelectedValue(self)
 		
 		info.func = function(self)
-		
 			db.sortDropdown = self.value
 			UIDropDownMenu_SetSelectedValue(BW_SortDropDown, self.value)
 			UIDropDownMenu_SetText(BW_SortDropDown, COMPACT_UNIT_FRAME_PROFILE_SORTBY.." "..L[self.value])
@@ -121,7 +95,7 @@ end
 
 
 -- Base Transmog Sets Window Upates
-local function ExtendTransmogView()
+function UI.ExtendTransmogView()
     WardrobeFrame:SetWidth(1170)
     WardrobeTransmogFrame:SetWidth(500)
     WardrobeTransmogFrame.ModelScene:ClearAllPoints()
@@ -148,44 +122,7 @@ local function ExtendTransmogView()
 end
 
 
-local function InitTextFrames(frame, button, name, height)
-		local frame = CreateFrame("Frame", nil, frame[button] )
-        frame:SetHeight(height)
-        frame:SetWidth(120)
-        frame.text = frame:CreateFontString(nil, "OVERLAY", "GameFontHighlightMedium")
-        frame.text:SetWidth(frame:GetWidth())
-        frame.text:SetHeight(frame:GetHeight())
-        frame.text:SetPoint("TOP", frame, "TOP", 0, 0)        
-        frame.text:SetSize(frame:GetWidth(), frame:GetHeight())
-        frame.text:SetJustifyV("CENTER")
-        frame.text:SetJustifyH("CENTER")
-        frame.text:SetText("--")
-		return frame
-end
-
-
-local buttons = {"ModelR1C1","ModelR1C2","ModelR1C3","ModelR1C4","ModelR2C1","ModelR2C2","ModelR2C3","ModelR2C4"}
-local function AddSetDetailFrames(frame)
-	local frame1, frame2
-	for i, button in ipairs(buttons) do
-
-		frame1 = InitTextFrames(frame, button,"progress", 20)
-        frame1:SetPoint("TOP", frame[button], "TOP", 0, 0)  
-		frame[button].progress = frame1.text
-
-		frame2 = InitTextFrames(frame, button,"setName", 90)
-        frame2:SetPoint("BOTTOM", frame[button], "BOTTOM", 0, 0)  
-		frame[button].setName = frame2.text
-    end
-end
-
-
 --- Functionality to add 3rd tab to windows
-local TAB_ITEMS = 1
-local TAB_SETS = 2
-local TAB_EXTRASETS = 3
-local TABS_MAX_WIDTH = 185
-
 
 function BW_WardrobeCollectionFrame_ClickTab(tab)
 	BW_WardrobeCollectionFrame_SetTab(tab:GetID())
@@ -193,120 +130,95 @@ function BW_WardrobeCollectionFrame_ClickTab(tab)
 	PlaySound(SOUNDKIT.IG_MAINMENU_OPTION_CHECKBOX_ON)
 end
 
+
+
 --hooks into WardrobeCollectionFrame_SetTab
 function BW_WardrobeCollectionFrame_SetTab(tabID)
 	PanelTemplates_SetTab(BW_WardrobeCollectionFrame, tabID)
 	local atTransmogrifier = WardrobeFrame_IsAtTransmogrifier()
-	if ( atTransmogrifier ) then
+
+	if atTransmogrifier then
 		WardrobeCollectionFrame.selectedTransmogTab = tabID
-	BW_WardrobeCollectionFrame.selectedTransmogTab = tabID
+		BW_WardrobeCollectionFrame.selectedTransmogTab = tabID
 
 	else
 		WardrobeCollectionFrame.selectedCollectionTab = tabID
 		BW_WardrobeCollectionFrame.selectedCollectionTab = tabID
-
 	end
-	--addon.setDropdown(1)
-	if ( tabID == TAB_ITEMS ) then
+
+	local tab1 = (tabID == TAB_ITEMS)
+	local tab2 = (tabID == TAB_SETS)
+	local tab3 = (tabID == TAB_EXTRASETS)
+
+		WardrobeCollectionFrame.ItemsCollectionFrame:SetShown(tab1)
+		WardrobeCollectionFrame.SetsCollectionFrame:SetShown(tab2 and not atTransmogrifier)
+		WardrobeCollectionFrame.SetsTransmogFrame:SetShown(tab2 and atTransmogrifier)
+		BW_WardrobeCollectionFrame.BW_SetsCollectionFrame:SetShown(tab3 and not atTransmogrifier)
+		BW_WardrobeCollectionFrame.BW_SetsTransmogFrame:SetShown(tab3 and atTransmogrifier)
+
+		BW_WardrobeToggle:SetShown(tab2 or tab3)
+		BW_WardrobeToggle.VisualMode = false
+
+		local searchBox_X = ((tab1 or ((tab2 or tab3) and atTransmogrifier)) and -107) or 19
+		local searchBox_Y = ((tab1 or ((tab2 or tab3) and atTransmogrifier)) and -35) or -69
+		local searchBox_Anchor = ((tab1 or ((tab2 or tab3) and atTransmogrifier)) and "TOPRIGHT") or "TOPLEFT"
+
+		WardrobeCollectionFrame.searchBox:ClearAllPoints()
+		WardrobeCollectionFrame.searchBox:SetEnabled(tab1 and WardrobeCollectionFrame.ItemsCollectionFrame.transmogType == LE_TRANSMOG_TYPE_APPEARANCE or tab2 or tab3)
+		WardrobeCollectionFrame.searchBox:SetPoint(searchBox_Anchor, searchBox_X, searchBox_Y )
+		WardrobeCollectionFrame.searchBox:SetWidth(((tab2 or tab3) and not atTransmogrifier and 145) or 115)
+
+		WardrobeCollectionFrame.FilterButton:SetShown(not atTransmogrifier)
+		WardrobeCollectionFrame.FilterButton:SetEnabled(tab1 and WardrobeCollectionFrame.ItemsCollectionFrame.transmogType == LE_TRANSMOG_TYPE_APPEARANCE or tab2)
+
+		BW_CollectionListButton:SetShown(tab1 and not atTransmogrifier)
+
+		BW_WardrobeCollectionFrame.FilterButton:SetShown(tab3)
+
+		BW_SortDropDown:ClearAllPoints()
+
+	if tab1 then
 		WardrobeCollectionFrame.activeFrame = WardrobeCollectionFrame.ItemsCollectionFrame
 		BW_WardrobeCollectionFrame.activeFrame = WardrobeCollectionFrame.ItemsCollectionFrame
-		WardrobeCollectionFrame.ItemsCollectionFrame:Show()
-		WardrobeCollectionFrame.SetsCollectionFrame:Hide()
-		WardrobeCollectionFrame.SetsTransmogFrame:Hide()
-		BW_WardrobeCollectionFrame.BW_SetsTransmogFrame:Hide()
-		BW_WardrobeCollectionFrame.BW_SetsCollectionFrame:Hide()
-		WardrobeCollectionFrame.searchBox:ClearAllPoints()
-		WardrobeCollectionFrame.searchBox:SetPoint("TOPRIGHT", -107, -35)
-		WardrobeCollectionFrame.searchBox:SetWidth(115)
-		WardrobeCollectionFrame.searchBox:SetEnabled(WardrobeCollectionFrame.ItemsCollectionFrame.transmogType == LE_TRANSMOG_TYPE_APPEARANCE)
-		WardrobeCollectionFrame.FilterButton:Show()
-		WardrobeCollectionFrame.FilterButton:SetEnabled(WardrobeCollectionFrame.ItemsCollectionFrame.transmogType == LE_TRANSMOG_TYPE_APPEARANCE)
-		BW_WardrobeCollectionFrame.FilterButton:Hide()
-		BW_WardrobeToggle:Hide()
-		BW_SortDropDown:ClearAllPoints()
 
-		if WardrobeFrame_IsAtTransmogrifier() then
-			local _, isWeapon = C_TransmogCollection.GetCategoryInfo(WardrobeCollectionFrame.ItemsCollectionFrame:GetActiveCategory() or -1)
-			BW_SortDropDown:SetPoint("TOPLEFT", WardrobeCollectionFrame.ItemsCollectionFrame.WeaponDropDown, "BOTTOMLEFT", 0, isWeapon and 55 or 32)
-		else
-			BW_CollectionListButton:Show()
-			BW_SortDropDown:SetPoint("TOPLEFT", WardrobeCollectionFrame.ItemsCollectionFrame.WeaponDropDown, "BOTTOMLEFT", 0, LegionWardrobeY)
-		end
+		local _, isWeapon = C_TransmogCollection.GetCategoryInfo(WardrobeCollectionFrame.ItemsCollectionFrame:GetActiveCategory() or -1)
+		BW_SortDropDown:SetPoint("TOPLEFT", WardrobeCollectionFrame.ItemsCollectionFrame.WeaponDropDown, "BOTTOMLEFT", 0, (atTransmogrifier and (isWeapon and 55 or 32)) or LegionWardrobeY)
 
-	elseif ( tabID == TAB_SETS ) then
-		WardrobeCollectionFrame.ItemsCollectionFrame:Hide()
-		BW_WardrobeCollectionFrame.BW_SetsTransmogFrame:Hide()
-		BW_WardrobeCollectionFrame.BW_SetsCollectionFrame:Hide()
-		WardrobeCollectionFrame.searchBox:ClearAllPoints()
-		WardrobeCollectionFrame.FilterButton:Show()
-		BW_WardrobeCollectionFrame.FilterButton:Hide()
-		BW_SortDropDown:ClearAllPoints()
-		BW_WardrobeToggle.VisualMode = false
-		BW_WardrobeToggle:Show()
-		BW_CollectionListButton:Hide()
-
-
-		if ( atTransmogrifier )  then
+	elseif tab2 then
+		if atTransmogrifier  then
 			WardrobeCollectionFrame.activeFrame = WardrobeCollectionFrame.SetsTransmogFrame
 			BW_WardrobeCollectionFrame.activeFrame = WardrobeCollectionFrame.SetsTransmogFrame
-			WardrobeCollectionFrame.searchBox:SetPoint("TOPRIGHT", -107, -35)
-			WardrobeCollectionFrame.searchBox:SetWidth(115)
-			WardrobeCollectionFrame.FilterButton:Hide()
+
 			BW_SortDropDown:SetPoint("TOPRIGHT", WardrobeCollectionFrame.ItemsCollectionFrame, "TOPRIGHT", -27, -10)
 
 		else
 			WardrobeCollectionFrame.activeFrame = WardrobeCollectionFrame.SetsCollectionFrame
 			BW_WardrobeCollectionFrame.activeFrame = WardrobeCollectionFrame.SetsCollectionFrame
-			WardrobeCollectionFrame.searchBox:SetPoint("TOPLEFT", 19, -69)
-			WardrobeCollectionFrame.searchBox:SetWidth(145)
-			WardrobeCollectionFrame.FilterButton:Show()
-			WardrobeCollectionFrame.FilterButton:SetEnabled(true)
-			BW_WardrobeCollectionFrame.FilterButton:Hide()
-			
+
 			BW_SortDropDown:SetPoint("TOPLEFT", BW_WardrobeToggle, "TOPRIGHT")
 		end
 
-		WardrobeCollectionFrame.searchBox:SetEnabled(true)
-		WardrobeCollectionFrame.SetsCollectionFrame:SetShown(not atTransmogrifier)
-		WardrobeCollectionFrame.SetsTransmogFrame:SetShown(atTransmogrifier)
-
-	elseif ( tabID == TAB_EXTRASETS ) then
-		WardrobeCollectionFrame.ItemsCollectionFrame:Hide()
-		WardrobeCollectionFrame.SetsCollectionFrame:Hide()
-		WardrobeCollectionFrame.SetsTransmogFrame:Hide()
-		WardrobeCollectionFrame.searchBox:ClearAllPoints()
-		WardrobeCollectionFrame.FilterButton:Hide()
-		BW_WardrobeCollectionFrame.FilterButton:Show()
-		BW_SortDropDown:ClearAllPoints()
+	elseif tab3 then
 		UIDropDownMenu_EnableDropDown(BW_SortDropDown)
-		BW_WardrobeToggle.VisualMode = flase
-		BW_WardrobeToggle:Show()
-		BW_CollectionListButton:Hide()
-					
-		if ( atTransmogrifier )  then
+		
+		if atTransmogrifier then
 			WardrobeCollectionFrame.activeFrame = BW_WardrobeCollectionFrame.BW_SetsTransmogFrame
 			BW_WardrobeCollectionFrame.activeFrame = BW_WardrobeCollectionFrame.BW_SetsTransmogFrame
-			WardrobeCollectionFrame.searchBox:SetPoint("TOPRIGHT", -107, -35)
-			WardrobeCollectionFrame.searchBox:SetWidth(115)
-			WardrobeCollectionFrame.FilterButton:Hide()
+	
 			BW_SortDropDown:SetPoint("TOPRIGHT", WardrobeCollectionFrame.ItemsCollectionFrame, "TOPRIGHT",-27, -10)
 
 		else
 			WardrobeCollectionFrame.activeFrame = BW_WardrobeCollectionFrame.BW_SetsCollectionFrame
 			BW_WardrobeCollectionFrame.activeFrame = BW_WardrobeCollectionFrame.BW_SetsCollectionFrame
-			WardrobeCollectionFrame.searchBox:SetPoint("TOPLEFT", 19, -69)
-			WardrobeCollectionFrame.searchBox:SetWidth(145)
-			--BW_WardrobeToggle:Show()
+
 			BW_SortDropDown:SetPoint("TOPLEFT", BW_WardrobeToggle, "TOPRIGHT")
 
 		end
 		
 		WardrobeCollectionFrame.searchBox:Show()
-		WardrobeCollectionFrame.searchBox:SetEnabled(true)
-		BW_WardrobeCollectionFrame.BW_SetsCollectionFrame:SetShown(not atTransmogrifier)
-		BW_WardrobeCollectionFrame.BW_SetsTransmogFrame:SetShown(atTransmogrifier)
 	end
 end
+
 
 
 local function CreateVisualViewButton()
@@ -372,11 +284,8 @@ local function CreateVisualViewButton()
 					BW_WardrobeCollectionFrame.BW_SetsCollectionFrame:Show()
 					WardrobeCollectionFrame.activeFrame = BW_WardrobeCollectionFrame.BW_SetsCollectionFrame
 					BW_WardrobeCollectionFrame.activeFrame = BW_WardrobeCollectionFrame.BW_SetsCollectionFrame
-
 				end
-
 			end
-
 		end
 	end)
 	
@@ -384,12 +293,14 @@ local function CreateVisualViewButton()
 			BW_WardrobeCollectionFrame.BW_SetsTransmogFrame:Hide()
 			self.VisualMode = false
 		end)
+
 	b:SetScript("OnEnter", function(self)
 			GameTooltip:SetOwner(self, "ANCHOR_RIGHT")
 			GameTooltip:SetText("Visual View")
 			GameTooltip:Show()
 		end)
-		b:SetScript("OnLeave", function(self)
+
+	b:SetScript("OnLeave", function(self)
 			GameTooltip:Hide()
 		end)
 end
@@ -405,7 +316,7 @@ local function PositionDropDown()
 end
 
 
-local function BuildLoadQueueButton()
+function UI.BuildLoadQueueButton()
 	BW_LoadQueueButton:SetScript("OnClick", function(self)
 		local setType = addon.QueueList[1]
 		local setID = addon.QueueList[2]
@@ -429,19 +340,17 @@ end
 
 
 function addon.BuildUI()
-	AddSetDetailFrames(WardrobeCollectionFrame.SetsTransmogFrame.ModelR1C1)
-	AddSetDetailFrames(BW_SetsTransmogFrame)
 	UI.SortDropdowns_Initialize()
 	CreateVisualViewButton()
-	ExtendTransmogView()
+	UI.ExtendTransmogView()
 --BW_WardrobeCollectionFrame:GetFrameLevel()
 	WardrobeCollectionFrame.searchBox:SetFrameLevel(BW_WardrobeCollectionFrame:GetFrameLevel()+10)
 	WardrobeCollectionFrame.FilterButton:SetFrameLevel(BW_WardrobeCollectionFrame:GetFrameLevel()+10)
 	BW_WardrobeCollectionFrame.FilterButton:SetFrameLevel(BW_WardrobeCollectionFrame:GetFrameLevel()+10)
 	BW_WardrobeCollectionFrame.FilterButton:SetPoint("TOPLEFT", WardrobeCollectionFrame.FilterButton, "TOPLEFT")
 
- 	BuildLoadQueueButton()
-	UI.Buttons_Initialize()
+ 	UI.BuildLoadQueueButton()
+	UI.DefaultButtons_Update()
 
 	hooksecurefunc(Wardrobe, "UpdateWeaponDropDown", PositionDropDown )
 end
@@ -450,15 +359,7 @@ end
 -- ***** FILTER
 
 function BW_WardrobeFilterDropDown_OnLoad(self)
-	UIDropDownMenu_Initialize(self, BW_WardrobeFilterDropDown_Initialize, "MENU")
-end
-
-function BW_WardrobeFilterDropDown_Initialize(self, level)
-	if ( not WardrobeCollectionFrame.activeFrame ) then
-		return
-	end
-
-	BW_WardrobeFilterDropDown_InitializeItems(self, level)
+	UIDropDownMenu_Initialize(self, UI.FilterDropDown_InitializeItems, "MENU")
 end
 
 
@@ -481,7 +382,11 @@ addon.xpacSelection = xpacSelection
 addon.filterSelection = filterSelection
 
 
-function BW_WardrobeFilterDropDown_InitializeItems(self, level)
+function UI:FilterDropDown_InitializeItems(level)
+	if ( not WardrobeCollectionFrame.activeFrame ) then
+		return
+	end
+
 	local info = UIDropDownMenu_CreateInfo()
 	info.keepShownOnClick = true
 	local atTransmogrifier = WardrobeFrame_IsAtTransmogrifier()
@@ -663,6 +568,8 @@ function addon.ToggleHidden(model, isHidden)
 
 		addon.chardb.profile.set[model.setID] = not isHidden and name
 		--self:UpdateWardrobe()
+		WardrobeCollectionFrame.SetsCollectionFrame:OnSearchUpdate()
+		WardrobeCollectionFrame.SetsTransmogFrame:OnSearchUpdate()
 		print(format("%s "..name, isHidden and "Unhiding" or "Hiding"))
 
 	else
@@ -682,7 +589,7 @@ end
 local tabType = {"item", "set", "extraset"}
 ---==== Hide Buttons
 
-local function AddHideButton(model, button)
+function UI:DefaultDropdown_Update(model, button)
 	if button == "RightButton" then
 		if not DropDownList1:IsShown() then -- force show dropdown
 			WardrobeModelRightClickDropDown.activeFrame = model
@@ -727,64 +634,31 @@ local function AddHideButton(model, button)
 	end
 end
 
-function UI.Buttons_Initialize()
-		local Wardrobe = {WardrobeCollectionFrame.ItemsCollectionFrame, WardrobeCollectionFrame.SetsTransmogFrame}
-
+--Adds icons and added right click menu options to the various frames
+function UI.DefaultButtons_Update()
+		local Wardrobe = {WardrobeCollectionFrame.ItemsCollectionFrame, WardrobeCollectionFrame.SetsTransmogFrame, BW_SetsTransmogFrame}
+		local ScrollFrames = {WardrobeCollectionFrameScrollFrame.buttons, BW_SetsCollectionFrameScrollFrame.buttons}
 		-- hook all models
 		for _, frame in ipairs(Wardrobe) do
 			for _, model in pairs(frame.Models) do
-				model:HookScript("OnMouseDown", AddHideButton)
-				local f = CreateFrame("frame", nil, model, "HideVisualTemplate")
-				f = CreateFrame("frame", nil, model, "CollectionListTemplate")
+				model:HookScript("OnMouseDown", function(...) UI:DefaultDropdown_Update(...) end)
+
+				local f = CreateFrame("frame", nil, model, "BetterWardrobeIconsTemplate")
+				f = CreateFrame("frame", nil, model, "BetterWardrobeSetInfoTemplate")
+
 			end
 		end
 
-		local buttons = WardrobeCollectionFrameScrollFrame.buttons
-		for i = 1, #buttons do
-			local button = buttons[i];
-			local f = CreateFrame("frame", nil, button, "HideVisualTemplate")
-			f.Icon:ClearAllPoints()
-			f.Icon:SetPoint("BOTTOMRIGHT", button, "BOTTOMRIGHT", -2, 5)
-			button:HookScript("OnMouseUp", AddHideButton)
+		for _, buttons in ipairs(ScrollFrames) do
+			for i = 1, #buttons do
+				local button = buttons[i];
+				button:HookScript("OnMouseUp", function(...) UI:DefaultDropdown_Update(...) end)
 
-			f = CreateFrame("frame", nil, button, "CollectionListTemplate")
-			f:ClearAllPoints()
-			f:SetPoint("BOTTOMRIGHT", button, "BOTTOMLEFT", -3, 0)
+				f = CreateFrame("frame", nil, button, "BetterWardrobeIconsTemplate")
+				f.Hidden:ClearAllPoints()
+				f.Hidden:SetPoint("CENTER", button.Icon, "CENTER", 0, 0)
+				f.Collection:ClearAllPoints()
+				f.Collection:SetPoint("BOTTOMRIGHT", button.Icon, "BOTTOMRIGHT", 2, -3)
+			end
 		end
-
-		local buttons = BW_SetsCollectionFrameScrollFrame.buttons
-		for i = 1, #buttons do
-			local button = buttons[i];
-			local f = CreateFrame("frame", nil, button, "HideVisualTemplate")
-			f.Icon:ClearAllPoints()
-			f.Icon:SetPoint("BOTTOMRIGHT", button, "BOTTOMRIGHT", 2, -2)
-
-			f = CreateFrame("frame", nil, button, "CollectionListTemplate")
-			--f.Icon:SetSize(17,17)
-			f:ClearAllPoints()
-			f:SetPoint("BOTTOMRIGHT", button, "BOTTOMLEFT", -3, 0)
-		end
-		   -- for i=1,CanIMogIt.NUM_WARDROBE_COLLECTION_BUTTONS do
-       -- local frame = _G["BW_SetsCollectionFrameScrollFrameButton"..i]
-      --  if frame and frame.CanIMogItOverlay and frame.setID then
-          --  frame.CanIMogItOverlay:UpdateText()
-       --end
-   -- end
---end
-		-- toggle for showing only hidden Appearances
-		--local cb = CreateFrame("CheckButton", nil, Wardrobe, "UICheckButtonTemplate")
-		--cb:SetPoint("TOPLEFT", Wardrobe.WeaponDropDown, "BOTTOMLEFT", 14, 5)
-		--cb.text:SetText("Show hidden")
-		--cb:SetScript("OnClick", function(btn)
-			--showHidden = btn:GetChecked()
-			--f:UpdateWardrobe()
-		--end)
-
-
-
 end
-
-
-
-
---INV_Artifact_tome01

@@ -5,8 +5,6 @@ local L = LibStub("AceLocale-3.0"):GetLocale(addonName)
 
 local CollectionList = {}
 addon.CollectionList = CollectionList
---WardrobeCollectionFrame = 
-
 
 function CollectionList:BuildCollectionList()
 	local list = {}
@@ -20,6 +18,8 @@ function CollectionList:BuildCollectionList()
 
 	return list
 end
+
+
 --Needs to to take account of variant
 function CollectionList:UpdateList(type, typeID, add)
 	typeID = tonumber(typeID)
@@ -76,12 +76,14 @@ end
 BetterWardrobeSetsCollectionListMixin = {}
 function BetterWardrobeSetsCollectionListMixin:Toggle(toggleState)
 	local atTransmogrifier = WardrobeFrame_IsAtTransmogrifier()
+	WardrobeCollectionFrame.ItemsCollectionFrame:SetActiveSlot("HEADSLOT", LE_TRANSMOG_TYPE_APPEARANCE)
 	WardrobeCollectionFrame.ItemsCollectionFrame:RefreshVisualsList();
 	WardrobeCollectionFrame.ItemsCollectionFrame:UpdateItems()
 	WardrobeCollectionFrame.ItemsCollectionFrame.SlotsFrame:SetShown(not toggleState and not atTransmogrifier)
 	WardrobeCollectionFrameWeaponDropDown:SetShown(not toggleState)
 	self.CollectionListTitle:SetShown(toggleState)
 end
+
 
 function BetterWardrobeSetsCollectionListMixin:SetTitle()
 	self.CollectionListTitle.Name:SetText(L["Collection List"])
