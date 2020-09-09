@@ -549,6 +549,11 @@ function UI:FilterDropDown_InitializeItems(level)
 	--end
 end
 
+--  C_TransmogCollection.GetSourceInfo(sourceID)  .itemID
+
+
+--sources = C_TransmogSets.GetSetSources(baseSetID)
+
 
 function addon.ToggleHidden(model, isHidden)
 	local tabID = GetTab()
@@ -563,11 +568,29 @@ function addon.ToggleHidden(model, isHidden)
 		WardrobeCollectionFrame.ItemsCollectionFrame:UpdateItems()
 
 	elseif tabID == 2 then 
-		local setInfo = C_TransmogSets.GetSetInfo(model.setID)
+		local setInfo = C_TransmogSets.GetSetInfo(tonumber(model.setID))
 		local name = setInfo["name"]
 
-		addon.chardb.profile.set[model.setID] = not isHidden and name
-		--self:UpdateWardrobe()
+		local baseSetID = C_TransmogSets.GetBaseSetID(model.setID);
+		addon.chardb.profile.set[baseSetID] = not isHidden and name or nil
+
+		local sourceinfo = C_TransmogSets.GetSetSources(baseSetID)
+		for i,data in pairs(sourceinfo) do
+			local info = C_TransmogCollection.GetSourceInfo(i)
+				addon.chardb.profile.item[info.visualID] = not isHidden and info.name or nil
+		end
+
+		local variantSets = C_TransmogSets.GetVariantSets(baseSetID)
+			for i, data in ipairs(variantSets) do
+				addon.chardb.profile.set[data.setID] = not isHidden and data.name or nil
+
+				local sourceinfo = C_TransmogSets.GetSetSources(data.setID)
+				for i,data in pairs(sourceinfo) do
+					local info = C_TransmogCollection.GetSourceInfo(i)
+						addon.chardb.profile.item[info.visualID] = not isHidden and info.name or nil
+				end
+		end	
+
 		WardrobeCollectionFrame.SetsCollectionFrame:OnSearchUpdate()
 		WardrobeCollectionFrame.SetsTransmogFrame:OnSearchUpdate()
 		print(format("%s "..name, isHidden and "Unhiding" or "Hiding"))
@@ -575,7 +598,7 @@ function addon.ToggleHidden(model, isHidden)
 	else
 		local setInfo = addon.GetSetInfo(model.setID)
 		local name = setInfo["name"]
-		addon.chardb.profile.extraset[model.setID] = not isHidden and name
+		addon.chardb.profile.extraset[model.setID] = not isHidden and name or hil
 		print(format("%s "..name, isHidden and "Unhiding" or "Hiding"))
 		BW_SetsCollectionFrame:OnSearchUpdate()
 		BW_SetsTransmogFrame:OnSearchUpdate()
@@ -583,7 +606,6 @@ function addon.ToggleHidden(model, isHidden)
 	end
 			--self:UpdateWardrobe()
 end
-
 
 
 local tabType = {"item", "set", "extraset"}
