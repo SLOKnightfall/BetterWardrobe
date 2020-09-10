@@ -598,7 +598,7 @@ function addon.ToggleHidden(model, isHidden)
 	else
 		local setInfo = addon.GetSetInfo(model.setID)
 		local name = setInfo["name"]
-		addon.chardb.profile.extraset[model.setID] = not isHidden and name or hil
+		addon.chardb.profile.extraset[model.setID] = not isHidden and name or nil
 		print(format("%s "..name, isHidden and "Unhiding" or "Hiding"))
 		BW_SetsCollectionFrame:OnSearchUpdate()
 		BW_SetsTransmogFrame:OnSearchUpdate()
@@ -608,29 +608,36 @@ function addon.ToggleHidden(model, isHidden)
 end
 
 
+
 local tabType = {"item", "set", "extraset"}
 ---==== Hide Buttons
 
 function UI:DefaultDropdown_Update(model, button)
 	if button == "RightButton" then
-		if not DropDownList1:IsShown() then -- force show dropdown
+		if not DropDownList1:IsShown() then
+			 -- force show dropdown
 			WardrobeModelRightClickDropDown.activeFrame = model
 			ToggleDropDownMenu(1, nil, WardrobeModelRightClickDropDown, model, -6, -3)
 		end
 
 		local setID = (model.visualInfo and model.visualInfo.visualID ) or model.setID
 		local type = tabType[GetTab()]
+		local variantTarget, match, matchType
+		local variantType = ""
 		if type == "set" then 
-		UIDropDownMenu_AddSeparator()
-		UIDropDownMenu_AddButton({
-				notCheckable = true,
-				text = L["Queue Transmog"],
-				func = function() 
-					local setInfo = C_TransmogSets.GetSetInfo(setID)
-					local name = setInfo["name"]
-					addon.QueueForTransmog(type, setID, name)
-				 end,
-			})
+			UIDropDownMenu_AddSeparator()
+			UIDropDownMenu_AddButton({
+					notCheckable = true,
+					text = L["Queue Transmog"],
+					func = function() 
+						local setInfo = C_TransmogSets.GetSetInfo(setID)
+						local name = setInfo["name"]
+						addon.QueueForTransmog(type, setID, name)
+					 end,
+				})
+
+			variantTarget, variantType, match, matchType = addon.SelectedVariant(setID)
+ print(match)
 		end
 
 		UIDropDownMenu_AddSeparator()
@@ -641,15 +648,22 @@ function UI:DefaultDropdown_Update(model, button)
 			func = function() addon.ToggleHidden(model, isHidden) end,
 		})
 
+
+		local collected = (model.visualInfo and model.visualInfo.isCollected ) or C_TransmogSets.IsBaseSetCollected(setID) or model.setCollected
 		--Collection List Right Click options
-		if (type == "item" and not (model.visualInfo and model.visualInfo.isCollected )) or type == "set" or type == "extraset" then 
+		local isInList = match or addon.chardb.profile.collectionList[type][setID] 
+
+
+		if (isInList and collected) or not collected then --(type == "item" and not (model.visualInfo and model.visualInfo.isCollected )) or type == "set" or type == "extraset" then 
+			local targetSet = match or variantTarget or setID
+			local targetText = match and " - "..matchType or variantTarget and " - "..variantType or ""
 			UIDropDownMenu_AddSeparator()
-			local isInList = addon.chardb.profile.collectionList[type][setID] 
+			local isInList = addon.chardb.profile.collectionList[type][targetSet] 
 			UIDropDownMenu_AddButton({
 				notCheckable = true,
-				text = isInList and L["Remove to Collection List"] or L["Add to Collection List"],
+				text = isInList and L["Remove to Collection List"]..targetText or L["Add to Collection List"]..targetText,
 				func = function() 
-							addon.CollectionList:UpdateList(type, setID, not isInList )
+							addon.CollectionList:UpdateList(type, targetSet, not isInList )
 					end,
 			})
 		end

@@ -23,15 +23,52 @@ local realmName
 addon.itemSourceID = {}
 addon.QueueList = {}
 
-
-
 local L = LibStub("AceLocale-3.0"):GetLocale(addonName)
 
+local optionHandler = {}
+function optionHandler:Setter(info, value)
+	Profile[info[#info]] = value
+end
+
+
+function optionHandler:Getter(info)
+	return Profile[info[#info]]
+end
+
+
+function optionHandler:TSMDisable(info)
+	return not IsAddOnLoaded("TradeSkillMaster")
+
+end
+
+
+function optionHandler:TSMSources(info)
+	local sources = {}
+	local table = {}
+	if ( IsAddOnLoaded("TradeSkillMaster")) then 
+		TSM_API.GetPriceSourceKeys(sources)
+	end
+	return sources
+end
+
+
+function optionHandler:TSM_MarketGetter( info )
+	if Profile[info[#info]] == "DBMarket" then 
+		local table = optionHandler:TSMSources(info)
+		for i, name in ipairs(table) do
+			if name == "DBMarket" then
+				Profile[info[#info]] = i
+				break
+			end	
+		end
+	end
+	return optionHandler:Getter(info)
+end
 
 --ACE3 Options Constuctor
 local options = {
 	name = "BetterWardrobe",
-	handler = BetterWardrobe,
+	handler = optionHandler,
 	type = 'group',
 	childGroups = "tab",
 	inline = true,
@@ -52,24 +89,24 @@ local options = {
 					order = 1,
 					name = L["Show Incomplete Sets"],
 					type = "toggle",
-					set = function(info,val) Profile.ShowIncomplete = val end,
-					get = function(info) return Profile.ShowIncomplete end,
+					get = "Getter",
+					set = "Setter",
 					width = "full",
 				},
 				HideMissing = {
 					order = 2,
 					name = L["Hide Missing Set Pieces at Transmog Vendor"],
 					type = "toggle",
-					set = function(info,val) Profile.HideMissing = val end,
-					get = function(info) return Profile.HideMissing end,
+					get = "Getter",
+					set = "Setter",
 					width = "full",
 				},
 				HiddenMog = {
 					order = 2.5,
 					name = L["Use Hidden Transmog for Missing Set Pieces"],
 					type = "toggle",
-					set = function(info,val) Profile.HiddenMog = val end,
-					get = function(info) return Profile.HiddenMog end,
+					get = "Getter",
+					set = "Setter",
 					width = "full",
 				},
 				PartialLimit = {
@@ -77,8 +114,8 @@ local options = {
 					name = L["Required pieces"],
 					type = "select",
 					type = "range",
-					set = function(info,val) Profile.PartialLimit = val end,
-					get = function(info) return Profile.PartialLimit end,
+					get = "Getter",
+					set = "Setter",
 					width = "double",
 					min = 1,
 					max = 8,
@@ -89,8 +126,8 @@ local options = {
 					order = 4,
 					name = L["Show Set Names"],
 					type = "toggle",
-					set = function(info,val) Profile.ShowNames = val end,
-					get = function(info) return Profile.ShowNames end,
+					get = "Getter",
+					set = "Setter",
 					width = "full",
 				},
 
@@ -98,8 +135,8 @@ local options = {
 					order = 5,
 					name = L["Show Collected Count"],
 					type = "toggle",
-					set = function(info,val) Profile.ShowSetCount = val end,
-					get = function(info) return Profile.ShowSetCount end,
+					get = "Getter",
+					set = "Setter",
 					width = "full",
 				},
 
@@ -107,9 +144,21 @@ local options = {
 					order = 6,
 					name = L["Show Items set to Hidden"],
 					type = "toggle",
-					set = function(info,val) Profile.ShowHidden = val end,
-					get = function(info) return Profile.ShowHidden end,
+					get = "Getter",
+					set = "Setter",
 					width = "full",
+				},
+
+				TSM_Market = {
+					order = 18,
+					name = L["TSM Source to Use"],
+					--desc = "TSM Source to get price data.",
+					type = "select",
+					get = "TSM_MarketGetter",
+					set = "Setter",
+					width = "normal",
+					values = "TSMSources",
+					disabled = "TSMDisable",
 				},
 
 
@@ -118,6 +167,10 @@ local options = {
 
 	},
 }
+
+
+
+
 
 MIN_SET_COLLECTED = 1
 
@@ -128,6 +181,7 @@ local defaults = {
 		['*'] = true,
 		PartialLimit = 4,
 		ShowHidden = false,
+		TSM_Market = "DBMarket",
 	}
 }
 
@@ -306,11 +360,10 @@ end
 --end
 
 function addon.QueueForTransmog(type, ID, name)
-
 	addon.QueueList = {type, ID, name}
-
-
 end
+
+
 
 
 function addon.GetSetsources(setID)
@@ -718,10 +771,12 @@ function WardrobeCollectionFrame.SetsTransmogFrame:UpdateSets()
 
 			local isInList = addon.chardb.profile.collectionList["set"][set.setID] 
 			model.CollectionListVisual.Collection.Collection_Icon:SetShown(isInList)
-			--model.CollectionListVisual.Collection.Collected_Icon:SetShown(false)
+			model.CollectionListVisual.Collection.Collected_Icon:SetShown(isInList and C_TransmogSets.IsBaseSetCollected(set.setID))
 
 			model.SetInfo.setName:SetText((Profile.ShowNames and setInfo["name"].."\n"..(setInfo["description"] or "")) or "")
 			model.SetInfo.progress:SetText((Profile.ShowSetCount and topSourcesCollected.."/".. topSourcesTotal) or "")
+			model.setCollected = topSourcesCollected == topSourcesTotal
+
 
 		else
 			model:Hide()
@@ -950,10 +1005,17 @@ function WardrobeCollectionFrame.SetsCollectionFrame.ScrollFrame:Update()
 			local isHidden = addon.chardb.profile.set[baseSet.setID]
 			button.CollectionListVisual.Hidden.Icon:SetShown(isHidden)
 
-			local isInList = addon.chardb.profile.collectionList["set"][baseSet.setID] 
-			button.CollectionListVisual.Collection.Collection_Icon:SetShown(isInList)
-			--button.CollectionListVisual.Collection.Collected_Icon:SetShown(false)
+			local variantSets = SetsDataProvider:GetVariantSets(baseSet.setID)
+			local variantSelected
+			for i, data in ipairs(variantSets) do
+				if  addon.chardb.profile.collectionList["set"][data.setID] then 
+					variantSelected = data.setID
+				end
+			end
 
+			local isInList = addon.chardb.profile.collectionList["set"][variantSelected and variantSelected or baseSet.setID] 
+			button.CollectionListVisual.Collection.Collection_Icon:SetShown(isInList)
+			button.CollectionListVisual.Collection.Collected_Icon:SetShown(isInList and C_TransmogSets.IsBaseSetCollected(baseSet.setID))
 			button.New:SetShown(SetsDataProvider:IsBaseSetNew(baseSet.setID))
 			button.setID = baseSet.setID
 
@@ -1665,9 +1727,6 @@ end
 
 BetterWardrobeSetsCollectionScrollFrameMixin = CreateFromMixins(WardrobeSetsCollectionScrollFrameMixin)
 
-local function SetFavorite(setid, value)
-
-	end
 
 local function BW_WardrobeSetsCollectionScrollFrame_FavoriteDropDownInit(self)
 	if (not self.baseSetID) then
@@ -1751,7 +1810,7 @@ function BetterWardrobeSetsCollectionScrollFrameMixin:Update()
 			elseif (topSourcesCollected == 0) then
 				color = GRAY_FONT_COLOR
 			end
-
+			button.setCollected = setCollected
 			button.Name:SetTextColor(color.r, color.g, color.b)
 			button.Label:SetText(baseSet.label) --(L["NOTE_"..(baseSet.label or 0)] and L["NOTE_"..(baseSet.label or 0)]) or "")--((L["NOTE_"..baseSet.label] or "X"))
 			button.Icon:SetTexture(SetsDataProvider:GetIconForSet(baseSet.setID))
@@ -1761,6 +1820,9 @@ function BetterWardrobeSetsCollectionScrollFrameMixin:Update()
 			button.CollectionListVisual.Hidden.Icon:SetShown(isHidden)
 			local isInList = addon.chardb.profile.collectionList["extraset"][baseSet.setID] 
 			button.CollectionListVisual.Collection.Collection_Icon:SetShown(isInList)
+			button.CollectionListVisual.Collection.Collected_Icon:SetShown(isInList and setCollected)
+
+			
 			--button.CollectionListVisual.Collection.Collected_Icon:SetShown(false)
 
 
@@ -2007,11 +2069,14 @@ function BetterWardrobeSetsTransmogMixin:UpdateSets()
 			local setInfo = addon.GetSetInfo(set.setID)
 			local isFavorite = addon.chardb.profile.favorite[set.setID]
 			local isHidden = addon.chardb.profile.extraset[set.setID]
+			model.setCollected = topSourcesCollected == topSourcesTotal
 
 			model.Favorite.Icon:SetShown(isFavorite)
 			model.CollectionListVisual.Hidden.Icon:SetShown(isHidden)
 			local isInList = addon.chardb.profile.collectionList["extraset"][set.setID] 
 			model.CollectionListVisual.Collection.Collection_Icon:SetShown(isInList)
+			model.CollectionListVisual.Collection.Collected_Icon:SetShown(isInList and model.setCollected)
+
 			--model.CollectionListVisual.Collection.Collected_Icon:SetShown(false)
 
 			model.setID = set.setID
@@ -2258,5 +2323,29 @@ function BW_WardrobeCollectionFrame_OnKeyDown(self, key)
 		end
 	else
 		self:SetPropagateKeyboardInput(true)
+	end
+end
+
+
+
+function addon.SelectedVariant(setID)
+
+	local baseSetID = SetsDataProvider:GetBaseSetByID(setID) or setID
+	local variantSets = SetsDataProvider:GetVariantSets(baseSetID)
+	local useDescription = (#variantSets > 0)
+	local targetSetID = WardrobeCollectionFrame.SetsCollectionFrame:GetDefaultSetIDForBaseSet(baseSetID)
+	local match = false
+
+	for i, data in ipairs(variantSets) do
+		if  addon.chardb.profile.collectionList["set"][data.setID] then 
+			match = data.setID
+		end
+	end
+
+	if useDescription then
+		local setInfo = C_TransmogSets.GetSetInfo(targetSetID)
+		local matchInfo = match and  C_TransmogSets.GetSetInfo(match).description or nil
+
+		return targetSetID, setInfo.description, match, matchInfo
 	end
 end

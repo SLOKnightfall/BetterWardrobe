@@ -13,6 +13,9 @@ local TAB_ITEMS = 1
 local TAB_SETS = 2
 local TAB_EXTRASETS = 3
 
+L.OM_GOLD	= "|c00FFD200";
+L.ENDCOLOR ="|r"
+
 L["Transmog Window"] = true
 L["Show Incomplete Sets"] = true
 L["Show Set Names"] = true
@@ -25,7 +28,7 @@ L["Load Set: %s"] = true
 L["None Selected"] = true
 L["Profiles - Options Settings"] = true
 L["Profiles - Collection Settings"] = true
-
+L["TSM Source to Use"] = true
 L["Add to Collection List"] = true
 L["Remove to Collection List"] = true
 
@@ -46,12 +49,19 @@ L["Garrison"] = true
 L["Island Expidetion"]= true
 L["Warfronts"] = true
 
+L["Export TSM Groups"] = true
+L["%sgroup:Appearance Group %s,"] = true
+L["Collected"] = true
+
+L["COLLECTIONLIST_TEXT"] = "%s - %s"
+L["SHOPPINGLIST_TEXT"] = "%s - %s: %s"
+
 	L[LE_DEFAULT] = DEFAULT
 	L[LE_APPEARANCE] = APPEARANCE_LABEL
 	L[LE_ALPHABETIC] = COMPACT_UNIT_FRAME_PROFILE_SORTBY_ALPHABETICAL
 	L[LE_ITEM_SOURCE] = SOURCE:gsub("[:：]", "")
 	L[LE_COLOR] = COLOR
-	L[LE_EXPANSION] = "Expansion.."
+	L[LE_EXPANSION] = "Expansion"
 
 --PvP Set
 L["NOTE_17"] = "Arena Season 1 Set"
