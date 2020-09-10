@@ -453,6 +453,8 @@ end
 --CollectionList:BuildCollectionList()
 
 --===WardrobeCollectionFrame.ItemsCollectionFrame overwrites
+local EXCLUSION_CATEGORY_OFFHAND	= 1;
+local EXCLUSION_CATEGORY_MAINHAND	= 2;
 
 function WardrobeCollectionFrame.ItemsCollectionFrame:RefreshVisualsList()
 	if ( self.transmogType == LE_TRANSMOG_TYPE_ILLUSION ) then
