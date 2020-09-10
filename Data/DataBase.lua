@@ -83,8 +83,6 @@ do
  		local fullSetList = {}
 		--Generates Useable Set
 		for _, set in ipairs(sets) do
-			--if string.find(set.name, "Brawl") then print (set.setID)end
-			--tinsert(self.usableSets, set)
 			coreSetList[set.setID] = true
 			if incVariants then 
 				local variantSets = C_TransmogSets.GetVariantSets(set.setID);
@@ -98,7 +96,6 @@ do
 	end
 
 
-local fixSets = {2282, 2296, 2129, 2126, 2135, 2132, 2289, 2275}
 	local function addArmor(armorSet)	
 		for id, setData in pairs(armorSet) do
 			
@@ -141,7 +138,7 @@ local fixSets = {2282, 2296, 2129, 2126, 2135, 2132, 2289, 2275}
 	function addon.BuildDB()
 	--local faction = GetFactionID(UnitFactionGroup("player"))
 		local armorSet = addon.ArmorSets[CLASS_INFO[playerClass][3]]
-		addon.modArmor = addon.ArmorSetMods[CLASS_INFO[playerClass][3]]
+		--addon.modArmor = addon.ArmorSetMods[CLASS_INFO[playerClass][3]]
 
 		addArmor(armorSet)
 		addArmor(addon.ArmorSets["COSMETIC"])

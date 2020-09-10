@@ -307,6 +307,12 @@ function addon.GetItemSource(itemID, itemMod)
 		if itemMod then
 		--print(itemMod) 
 			visualID, sourceID = C_TransmogCollection.GetItemInfo(itemID, itemMod)
+				if source and setData.mod then 
+					addon.modArmor[item] = addon.modArmor[item] or {}
+					addon.modArmor[item][setData.mod] = source 
+				else C_Timer.After(0, function()  visualID, sourceID = addon.GetItemSource(itemID, itemMod) end);
+
+				end
 		else
 			visualID, sourceID = C_TransmogCollection.GetItemInfo(itemID)
 		end
