@@ -432,7 +432,9 @@ end
 
 local function isMogKnown(sourceID)
 	local sourceInfo = C_TransmogCollection.GetSourceInfo(sourceID)
-	--if not sourceInfo then return false end
+	
+	if not sourceInfo then return false end
+	
 	local slotSources = C_TransmogCollection.GetAppearanceSources(sourceInfo.visualID)
 
 	local slotColected 

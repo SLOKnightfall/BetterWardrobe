@@ -45,7 +45,10 @@
 					</HighlightTexture>
 				<Scripts>
 					<OnEnter>
-						--	self:OnEnter()
+						GameTooltip:SetOwner(self, "ANCHOR_RIGHT")
+						GameTooltip:SetText("Click: Show Collection List")
+						GameTooltip:AddLine("Shift Click: Show Detail List")
+						GameTooltip:Show()
 					</OnEnter>
 					<OnLeave function="GameTooltip_Hide"/>
 					<OnClick>
@@ -55,6 +58,9 @@
 					<OnHide>
 						self.ToggleState = false
 					</OnHide>
+					<OnLeave> 
+						GameTooltip:Show()
+					</OnLeave>
 				</Scripts>
 			</Button>
 		</Frames>
