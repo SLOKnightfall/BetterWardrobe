@@ -11,6 +11,8 @@ addon.ArmorSets = addon.ArmorSets or {}
 addon.ArmorSetMods = addon.ArmorSetMods or {}
 addon.modArmor = addon.modArmor or {}
 
+
+
 local CLASS_INFO = {
 	DEATHKNIGHT = {6,32,"PLATE"},
 	DEMONHUNTER = {12, 2048, "LEATHER"},
@@ -96,6 +98,18 @@ do
 	end
 
 
+
+--[[local function sourceLookup(item, modID)
+	C_Timer.After(0, function() 
+			local _, source = C_TransmogCollection.GetItemInfo(item, modID)
+				if source and modID then 
+					addon.modArmor[item] = addon.modArmor[item] or {}
+					addon.modArmor[item][modID] = source 
+					--print ("SavedA")
+				end
+	end);
+end]]
+
 	local function addArmor(armorSet)	
 		for id, setData in pairs(armorSet) do
 			
@@ -112,7 +126,15 @@ do
 			local heritageArmor = string.find(setData.name, "Heritage")
 		
 			for _, item in ipairs( setData["items"]) do
-				local _, source = addon.GetItemSource(item, setData.mod or nil )
+--[[				if setData.mod then 
+					for i= 1, 150 do
+						--sourceLookup(item, setData.mod or nil ) --addon.GetItemSource(item, setData.mod or nil )
+						if 	addon.modArmor[item] and addon.modArmor[item][modID] then 
+							break
+						end
+					end
+				end]]
+
 			end
 	
 			if not  setInfo  or not coreSetList[id] then 
@@ -138,11 +160,11 @@ do
 	function addon.BuildDB()
 	--local faction = GetFactionID(UnitFactionGroup("player"))
 		local armorSet = addon.ArmorSets[CLASS_INFO[playerClass][3]]
-		--addon.modArmor = addon.ArmorSetMods[CLASS_INFO[playerClass][3]]
+		addon.modArmor = addon.ArmorSetMods[CLASS_INFO[playerClass][3]]
 
 		addArmor(armorSet)
 		addArmor(addon.ArmorSets["COSMETIC"])
-
+		--BWSets = addon.modArmor
 		--Add Hidden Set
 		setsInfo[0] = hiddenSet
 		tinsert(baseList, setsInfo[0])

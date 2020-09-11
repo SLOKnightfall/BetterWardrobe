@@ -299,7 +299,6 @@ f.model:SetUnit("PLAYER")
 addon.frame = f
 
 
-
 function addon.GetItemSource(itemID, itemMod)
 	if addon.modArmor[itemID] and addon.modArmor[itemID][itemMod] then return nil, addon.modArmor[itemID][itemMod] end
 		local itemSource
@@ -307,12 +306,8 @@ function addon.GetItemSource(itemID, itemMod)
 		if itemMod then
 		--print(itemMod) 
 			visualID, sourceID = C_TransmogCollection.GetItemInfo(itemID, itemMod)
-				if source and setData.mod then 
-					addon.modArmor[item] = addon.modArmor[item] or {}
-					addon.modArmor[item][setData.mod] = source 
-				else C_Timer.After(0, function()  visualID, sourceID = addon.GetItemSource(itemID, itemMod) end);
 
-				end
+
 		else
 			visualID, sourceID = C_TransmogCollection.GetItemInfo(itemID)
 		end
@@ -332,15 +327,14 @@ function addon.GetItemSource(itemID, itemMod)
 			end
 		end
 
-	--[[	if itemMod and itemMod ~= 0 and sourceID then 
-					BWData[itemID] = BWData[itemID] or {}
-					BWData[itemID][itemMod] = sourceID
-				end]]
+			if sourceID and itemMod then 
+				addon.modArmor[itemID] = addon.modArmor[itemID] or {}
+				addon.modArmor[itemID][itemMod] = sourceID 
+			end
 
 		f.model:Hide()
 	return visualID ,sourceID
 end
-
 
 
 local function ClearHidden(setList, type)
