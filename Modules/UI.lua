@@ -637,7 +637,6 @@ function UI:DefaultDropdown_Update(model, button)
 				})
 
 			variantTarget, variantType, match, matchType = addon.SelectedVariant(setID)
- print(match)
 		end
 
 		UIDropDownMenu_AddSeparator()
@@ -654,7 +653,7 @@ function UI:DefaultDropdown_Update(model, button)
 		local isInList = match or addon.chardb.profile.collectionList[type][setID] 
 
 
-		if (isInList and collected) or not collected then --(type == "item" and not (model.visualInfo and model.visualInfo.isCollected )) or type == "set" or type == "extraset" then 
+		if  type  == "set" or ((isInList and collected ) or not collected )then --(type == "item" and not (model.visualInfo and model.visualInfo.isCollected )) or type == "set" or type == "extraset" then 
 			local targetSet = match or variantTarget or setID
 			local targetText = match and " - "..matchType or variantTarget and " - "..variantType or ""
 			UIDropDownMenu_AddSeparator()

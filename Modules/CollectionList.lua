@@ -30,7 +30,7 @@ function CollectionList:BuildCollectionList(complete)
 			if searchString then 
 
 				for i, data in pairs(sources) do
-					local match = string.find(string.lower(data.name), searchString) -- or string.find(baseSet.label, searchString) or string.find(baseSet.description, searchString)
+					local match = string.find(string.lower(data.name or ""), searchString) -- or string.find(baseSet.label, searchString) or string.find(baseSet.description, searchString)
 					if match then 
 						tinsert(list, sourceInfo)
 						break

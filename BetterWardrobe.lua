@@ -2340,7 +2340,9 @@ end
 
 function addon.SelectedVariant(setID)
 
-	local baseSetID = SetsDataProvider:GetBaseSetByID(setID) or setID
+	local baseSetID = C_TransmogSets.GetBaseSetID(setID) --or setID
+	if not baseSetID then return end
+
 	local variantSets = SetsDataProvider:GetVariantSets(baseSetID)
 	local useDescription = (#variantSets > 0)
 	local targetSetID = WardrobeCollectionFrame.SetsCollectionFrame:GetDefaultSetIDForBaseSet(baseSetID)
