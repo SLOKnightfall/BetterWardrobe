@@ -613,7 +613,7 @@ local tabType = {"item", "set", "extraset"}
 ---==== Hide Buttons
 
 function UI:DefaultDropdown_Update(model, button)
-	if button == "RightButton" then
+	if button == "RightButton" and model:GetParent().transmogType ~= LE_TRANSMOG_TYPE_ILLUSION then
 		if not DropDownList1:IsShown() then
 			 -- force show dropdown
 			WardrobeModelRightClickDropDown.activeFrame = model
