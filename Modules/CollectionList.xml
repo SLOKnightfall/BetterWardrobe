@@ -57,6 +57,7 @@
 					</OnClick>
 					<OnHide>
 						self.ToggleState = false
+						self:GetParent():Toggle(false)
 					</OnHide>
 					<OnLeave> 
 						GameTooltip:Show()
