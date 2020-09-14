@@ -327,10 +327,10 @@ function addon.GetItemSource(itemID, itemMod)
 			end
 		end
 
-			if sourceID and itemMod then 
-				addon.modArmor[itemID] = addon.modArmor[itemID] or {}
-				addon.modArmor[itemID][itemMod] = sourceID 
-			end
+	--[[		if sourceID and itemMod then 
+						addon.modArmor[itemID] = addon.modArmor[itemID] or {}
+						addon.modArmor[itemID][itemMod] = sourceID 
+					end]]
 
 		f.model:Hide()
 	return visualID ,sourceID

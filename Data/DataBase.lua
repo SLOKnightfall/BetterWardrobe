@@ -99,7 +99,7 @@ do
 
 
 
---[[local function sourceLookup(item, modID)
+local function sourceLookup(item, modID)
 	C_Timer.After(0, function() 
 			local _, source = C_TransmogCollection.GetItemInfo(item, modID)
 				if source and modID then 
@@ -108,7 +108,7 @@ do
 					--print ("SavedA")
 				end
 	end);
-end]]
+end
 
 	local function addArmor(armorSet)	
 		for id, setData in pairs(armorSet) do
@@ -126,14 +126,14 @@ end]]
 			local heritageArmor = string.find(setData.name, "Heritage")
 		
 			for _, item in ipairs( setData["items"]) do
---[[				if setData.mod then 
-					for i= 1, 150 do
-						--sourceLookup(item, setData.mod or nil ) --addon.GetItemSource(item, setData.mod or nil )
+				if setData.mod then 
+					for i= 1, 50 do
+						sourceLookup(item, setData.mod or 0 ) --addon.GetItemSource(item, setData.mod or nil )
 						if 	addon.modArmor[item] and addon.modArmor[item][modID] then 
 							break
 						end
 					end
-				end]]
+				end
 
 			end
 	
@@ -160,7 +160,7 @@ end]]
 	function addon.BuildDB()
 	--local faction = GetFactionID(UnitFactionGroup("player"))
 		local armorSet = addon.ArmorSets[CLASS_INFO[playerClass][3]]
-		addon.modArmor = addon.ArmorSetMods[CLASS_INFO[playerClass][3]]
+		addon.modArmor = {}--addon.ArmorSetMods[CLASS_INFO[playerClass][3]]
 
 		addArmor(armorSet)
 		addArmor(addon.ArmorSets["COSMETIC"])
