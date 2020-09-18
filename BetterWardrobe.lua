@@ -366,8 +366,6 @@ function addon.QueueForTransmog(type, ID, name)
 end
 
 
-
-
 function addon.GetSetsources(setID)
 	local setInfo = addon.GetSetInfo(setID)
 	local setSources = {}
