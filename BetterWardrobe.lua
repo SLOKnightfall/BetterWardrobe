@@ -22,6 +22,8 @@ local realmName
 
 addon.itemSourceID = {}
 addon.QueueList = {}
+addon.validSetCache = {}
+addon.usableSourceCache = {}
 
 local L = LibStub("AceLocale-3.0"):GetLocale(addonName)
 
@@ -186,7 +188,7 @@ local defaults = {
 }
 
 local char_defaults = {
-	profile  = {
+	profile = {
 		item = {},
 		set = {},
 		extraset = {},
@@ -218,11 +220,11 @@ end
 
 function addon:OnEnable()
 	self.db = LibStub("AceDB-3.0"):New("BetterWardrobe_Options", defaults, true)
-	options.args.profiles  = LibStub("AceDBOptions-3.0"):GetOptionsTable(self.db)
+	options.args.profiles = LibStub("AceDBOptions-3.0"):GetOptionsTable(self.db)
 	options.args.profiles.name = L["Profiles - Options Settings"]
 
 	self.chardb = LibStub("AceDB-3.0"):New("BetterWardrobe_CharacterData", char_defaults)
-	options.args.charprofiles  = LibStub("AceDBOptions-3.0"):GetOptionsTable(self.chardb)
+	options.args.charprofiles = LibStub("AceDBOptions-3.0"):GetOptionsTable(self.chardb)
 	options.args.charprofiles.name = L["Profiles - Collection Settings"]
 
 	LibStub("AceConfigRegistry-3.0"):ValidateOptionsTable(options, addonName)
@@ -258,7 +260,7 @@ end
 
 
 function addon:SetActiveSlot()
-	if BW_WardrobeCollectionFrame.activeFrame ~= WardrobeCollectionFrame.ItemsCollectionFrame  then
+	if BW_WardrobeCollectionFrame.activeFrame ~= WardrobeCollectionFrame.ItemsCollectionFrame then
 		BW_WardrobeCollectionFrame_SetTab(1)
 		--PanelTemplates_ResizeTabsToFit(WardrobeCollectionFrame, TABS_MAX_WIDTH)
 	end
@@ -320,8 +322,8 @@ function addon.GetItemSource(itemID, itemMod)
 			for i = 1, 19 do
 				local source = f.model:GetSlotTransmogSources(i)
 				if source ~= 0 then
-					--addon.itemSourceID[itemID] =  source
-					sourceID =  source
+					--addon.itemSourceID[itemID] = source
+					sourceID = source
 					break
 				end
 			end
@@ -343,7 +345,7 @@ local function ClearHidden(setList, type)
 	for i, setInfo in ipairs(setList) do 
 		local itemID = setInfo.setID or setInfo.visualID
 
-		if not addon.chardb.profile[type][itemID]  then
+		if not addon.chardb.profile[type][itemID] then
 			tinsert(newSet, setInfo)
 		else
 			--print("setInfo.name")
@@ -403,7 +405,7 @@ local EmptyArmor = {
 	[6] = 143539,
 	--[7] = 158329, pants
 	[8] = 168664,
-	[9] = 168665,  --wrist
+	[9] = 168665, --wrist
 	[10] = 158329, --handr
 }
 
@@ -470,7 +472,7 @@ function WardrobeCollectionFrame.ItemsCollectionFrame:RefreshVisualsList()
 
 	end
 
-	if  BW_CollectionListButton.ToggleState then self.visualsList = addon.CollectionList:BuildCollectionList() end
+	if BW_CollectionListButton.ToggleState then self.visualsList = addon.CollectionList:BuildCollectionList() end
 
 	self:FilterVisuals();
 	self.filteredVisualsList = ClearHidden(self.filteredVisualsList, "item")
@@ -576,6 +578,7 @@ function SetsDataProvider:SortSets(sets, reverseUIOrder, ignorePatchID)
 	--addon.Sort["DefaultSortSet"](self, sets, reverseUIOrder, ignorePatchID)
 end
 
+
 function SetsDataProvider:GetBaseSets()
 	if (not self.baseSets) then
 		self.baseSets = ClearHidden(C_TransmogSets.GetBaseSets(), "set")
@@ -586,65 +589,113 @@ function SetsDataProvider:GetBaseSets()
 	return self.baseSets
 end
 
---[[
-function SetsDataProvider:GetUsableSets(incVariants)
-	if (not self.usableSets) then
-		local availableSets = self:GetBaseSets()
-		self.usableSets = C_TransmogSets.GetUsableSets()
+
+function SetsDataProvider:GetAvailableSets()
+	local sets = {}
+
+	for _, set in ipairs(C_TransmogSets.GetAllSets()) do
+		if self:IsValidSet(set.setID) then
+		 sets[set.setID] = set
+		end
+	end
+
+	return sets
+end
 
 
-		--Generates Useable Set
-		self.usableSets = {} --SetsDataProvider:GetUsableSets()
-		for i, set in ipairs(availableSets) do
-			local topSourcesCollected, topSourcesTotal = SetsDataProvider:GetSetSourceCounts(set.setID)
+function SetsDataProvider:GetCollectedSetSources(setId)
+	local sources = {}
 
-			--if topSourcesCollected >= Profile.PartialLimit  then --and not C_TransmogSets.IsSetUsable(set.setID) then
-				tinsert(self.usableSets, set)
-			--end
+	for sourceId, collected in pairs(C_TransmogSets.GetSetSources(setId)) do
+		if collected or self:IsUsableSource(sourceId) then
+		 sources[sourceId] = true
+		end
+	end
 
-			if incVariants then 
-				local variantSets = C_TransmogSets.GetVariantSets(set.setID)
-				for i, set in ipairs(variantSets) do
-					local topSourcesCollected, topSourcesTotal = SetsDataProvider:GetSetSourceCounts(set.setID)
-					if topSourcesCollected == topSourcesTotal then set.collected = true end
-					if topSourcesCollected >= Profile.PartialLimit  then --and not C_TransmogSets.IsSetUsable(set.setID) then
-						tinsert(self.usableSets, set)
+	return sources
+end
+
+
+function SetsDataProvider:IsUsableSource(sourceId)
+	if addon.usableSourceCache[sourceId] == nil then
+		local loaded = true
+		local usable = false
+		local sourceInfo = C_TransmogCollection.GetSourceInfo(sourceId)
+
+		if sourceInfo then
+			local appearanceSources = C_TransmogCollection.GetAppearanceSources(sourceInfo.visualID)
+
+			if appearanceSources then
+				for _ , appearanceInfo in pairs(appearanceSources) do
+					if appearanceInfo.isCollected and appearanceInfo.useError == nil and not appearanceInfo.isHideVisual then
+					 usable = true
+					 loaded = GetItemInfo(appearanceInfo.itemID) ~= nil
+					 break
 					end
 				end
 			end
-
 		end
-		self:SortSets(self.usableSets)	
+
+		if not loaded then
+			return usable
+		end
+
+		addon.usableSourceCache[sourceId] = usable
 	end
 
-	return self.usableSets
-end
-]]--
-local function inTable(tabel, id)
-	local found = false
-	for i, data in ipairs(table) do
-		if data == id then
-			found = true
-			break
-		end
-	end
-	return found
+	return addon.usableSourceCache[sourceId]
 end
 
+
+function SetsDataProvider:IsValidSet(setId)
+	if addon.validSetCache[setId] == nil then
+		for sourceId in pairs(self:GetCollectedSetSources(setId)) do
+			local sourceInfo = C_TransmogCollection.GetSourceInfo(sourceId)
+			local slot = C_Transmog.GetSlotForInventoryType(sourceInfo.invType)
+			local slotSources = C_TransmogSets.GetSourcesForSlot(setId, slot)
+			local index = WardrobeCollectionFrame_GetDefaultSourceIndex(slotSources, sourceId)
+
+			if slotSources[index] == nil then
+			 addon.validSetCache[setId] = false
+			 break
+			end
+		end
+
+		if addon.validSetCache[setId] == nil then
+			addon.validSetCache[setId] = true
+		end
+	end
+
+	return addon.validSetCache[setId]
+end
 
 
 function SetsDataProvider:GetUsableSets(incVariants)
 	if (not self.usableSets) then
-		self.usableSets = ClearHidden(C_TransmogSets.GetUsableSets(), "set")
 		local atTransmogrifier = WardrobeFrame_IsAtTransmogrifier()
-
 		local setIDS = {}
 
+		if Profile.ShowIncomplete or BW_WardrobeToggle.VisualMode then
+			self.usableSets = {}
+			local availableSets = self:GetAvailableSets()
+				
+			for _, set in pairs(availableSets) do
+				local collectedSlots, totalSlots = SetsDataProvider:GetSetSourceCounts(set.setID)
+
+				if ((not atTransmogrifier and BW_WardrobeToggle.VisualMode) or collectedSlots >= Profile.PartialLimit) and not setIDS[set.setID] then
+					table.insert(self.usableSets, set)
+					setIDS[set.setID] = true
+				end
+			end
+
+		elseif not Profile.ShowIncomplete then 
+			self.usableSets = C_TransmogSets.GetUsableSets()
+		end
 
 		self:SortSets(self.usableSets)
 		-- group sets by baseSetID, except for favorited sets since those are to remain bucketed to the front
 		for i, set in ipairs(self.usableSets) do
-			setIDS[set.baseSetID or set.setID] = true
+			--setIDS[set.baseSetID or set.setID] = true
 			if (not set.favorite) then
 				local baseSetID = set.baseSetID or set.setID
 				local numRelatedSets = 0
@@ -661,42 +712,10 @@ function SetsDataProvider:GetUsableSets(incVariants)
 				end
 			end
 		end
-
-		if Profile.ShowIncomplete or BW_WardrobeToggle.VisualMode then 
-			local availableSets = self:GetBaseSets()
-			for i, set in ipairs(availableSets) do
-				if not setIDS[set.setID or set.baseSetID] then 
-					local topSourcesCollected, topSourcesTotal = SetsDataProvider:GetSetSourceCounts(set.setID)
-
-					if ((not atTransmogrifier and BW_WardrobeToggle.VisualMode) or topSourcesCollected >= Profile.PartialLimit) and not inTable(self.usableSets, set)  then --and not C_TransmogSets.IsSetUsable(set.setID) then
-						
-						tinsert(self.usableSets, set)
-					end
-				end
-
-				if incVariants then 
-					local variantSets = C_TransmogSets.GetVariantSets(set.setID)
-					for i, set in ipairs(variantSets) do
-						if not setIDS[set.setID or set.baseSetID] then 
-							local topSourcesCollected, topSourcesTotal = SetsDataProvider:GetSetSourceCounts(set.setID)
-							if topSourcesCollected == topSourcesTotal then set.collected = true end
-							if ((not atTransmogrifier and BW_WardrobeToggle.VisualMode) or topSourcesCollected >= Profile.PartialLimit) and not inTable(self.usableSets, set)  then --and not C_TransmogSets.IsSetUsable(set.setID) then
-								tinsert(self.usableSets, set)
-							end
-						end
-						
-					end
-				end
-
-			end
-				
-		end
-		self:SortSets(self.usableSets)
-
 	end
-	return self.usableSets
-end
 
+	return ClearHidden(self.usableSets, "set") 
+end
 
 
 function SetsDataProvider:FilterSearch()
@@ -721,6 +740,7 @@ function SetsDataProvider:FilterSearch()
 	self:SortSets(self.usableSets)
 
 end
+
 
 function WardrobeCollectionFrame.SetsCollectionFrame:OnSearchUpdate()
 	if (self.init) then
@@ -763,7 +783,7 @@ function WardrobeCollectionFrame.SetsCollectionFrame:OnShow()
 	self:UpdateProgressBar()
 	self:RefreshCameras()
 
-	if (self:GetParent().SetsTabHelpBox:IsShown()) or BW_WardrobeCollectionFrame.SetsTabHelpBox:IsShown()  then
+	if (self:GetParent().SetsTabHelpBox:IsShown()) or BW_WardrobeCollectionFrame.SetsTabHelpBox:IsShown() then
 		self:GetParent().SetsTabHelpBox:Hide()
 		BW_WardrobeCollectionFrame.SetsTabHelpBox:Hide()
 		SetCVarBitfield("closedInfoFrames", LE_FRAME_TUTORIAL_TRANSMOG_SETS_TAB, true)
@@ -842,7 +862,7 @@ function WardrobeCollectionFrame.SetsTransmogFrame:UpdateSets()
 				model:Undress()
 				local sourceData = SetsDataProvider:GetSetSourceData(set.setID)
 
-				for sourceID  in pairs(sourceData.sources) do
+				for sourceID in pairs(sourceData.sources) do
 					--if (not Profile.HideMissing and not BW_WardrobeToggle.VisualMode) or (Profile.HideMissing and BW_WardrobeToggle.VisualMode) or (Profile.HideMissing and isMogKnown(sourceID)) then 
 					if (not Profile.HideMissing and (not BW_WardrobeToggle.VisualMode or (isMogKnown(sourceID) and BW_WardrobeToggle.VisualMode))) or 
 						(Profile.HideMissing and (BW_WardrobeToggle.VisualMode or isMogKnown(sourceID))) then 
@@ -932,8 +952,8 @@ function WardrobeCollectionFrame.SetsTransmogFrame:LoadSet(setID)
 			if knownID then transmogSources[slot] = knownID end
 
 			if combineSources then 
-				local _, hasPending  = C_Transmog.GetSlotInfo(slot, LE_TRANSMOG_TYPE_APPEARANCE)
-				if  hasPending then 
+				local _, hasPending = C_Transmog.GetSlotInfo(slot, LE_TRANSMOG_TYPE_APPEARANCE)
+				if hasPending then 
 					local _,_,_,_,sourceID, appearanceID = C_Transmog.GetSlotVisualInfo(slot, LE_TRANSMOG_TYPE_APPEARANCE)
 
 					local emptyappearanceID, emptySourceID = EmptyArmor[slot] and C_TransmogCollection.GetItemInfo(EmptyArmor[slot])
@@ -975,8 +995,8 @@ function WardrobeCollectionFrame.SetsTransmogFrame:LoadSet(setID)
 		if Profile.HiddenMog then				
 			local emptySlotData = GetEmptySlots()
 			for i, x in pairs(transmogSources) do
-				if not C_TransmogCollection.PlayerHasTransmogItemModifiedAppearance(x) and i ~= 7  and emptySlotData[i] then
-					local _,  source = addon.GetItemSource(emptySlotData[i]) -- C_TransmogCollection.GetItemInfo(emptySlotData[i])
+				if not C_TransmogCollection.PlayerHasTransmogItemModifiedAppearance(x) and i ~= 7 and emptySlotData[i] then
+					local _, source = addon.GetItemSource(emptySlotData[i]) -- C_TransmogCollection.GetItemInfo(emptySlotData[i])
 					C_Transmog.SetPending(i, LE_TRANSMOG_TYPE_APPEARANCE, source)
 				end
 			end
@@ -1021,7 +1041,7 @@ function WardrobeCollectionFrame.SetsTransmogFrame:OnShow()
 	self:UpdateProgressBar()
 	self.sourceQualityTable = { }
 
-	if (self:GetParent().SetsTabHelpBox:IsShown())  or (BW_WardrobeCollectionFrame.SetsTabHelpBox:IsShown()) then
+	if (self:GetParent().SetsTabHelpBox:IsShown()) or (BW_WardrobeCollectionFrame.SetsTabHelpBox:IsShown()) then
 		self:GetParent().SetsTabHelpBox:Hide()
 		BW_WardrobeCollectionFrame.SetsTabHelpBox:Hide()
 		SetCVarBitfield("closedInfoFrames", LE_FRAME_TUTORIAL_TRANSMOG_SETS_VENDOR_TAB, true)
@@ -1047,7 +1067,7 @@ end
 function WardrobeCollectionFrame.SetsTransmogFrame:OnEvent(event, ...)
 	if (event == "TRANSMOGRIFY_UPDATE" and not self.ignoreTransmogrifyUpdateEvent) then
 		self:Refresh()
-	elseif (event == "TRANSMOGRIFY_SUCCESS")  then
+	elseif (event == "TRANSMOGRIFY_SUCCESS") then
 		-- this event fires once per slot so in the case of a set there would be up to 9 of them
 		if (not self.transmogrifySuccessUpdate) then
 			self.transmogrifySuccessUpdate = true
@@ -1076,7 +1096,7 @@ end
 
 WardrobeCollectionFrame.SetsTransmogFrame:SetScript("OnShow", WardrobeCollectionFrame.SetsTransmogFrame.OnShow)
 WardrobeCollectionFrame.SetsTransmogFrame:SetScript("OnHide", WardrobeCollectionFrame.SetsTransmogFrame.OnHide)
-WardrobeCollectionFrame.SetsTransmogFrame:SetScript("OnEvent",  WardrobeCollectionFrame.SetsTransmogFrame.OnEvent)
+WardrobeCollectionFrame.SetsTransmogFrame:SetScript("OnEvent", WardrobeCollectionFrame.SetsTransmogFrame.OnEvent)
 
 
 function WardrobeCollectionFrame.SetsCollectionFrame.ScrollFrame:Update()
@@ -1115,7 +1135,7 @@ function WardrobeCollectionFrame.SetsCollectionFrame.ScrollFrame:Update()
 			local variantSets = SetsDataProvider:GetVariantSets(baseSet.setID)
 			local variantSelected
 			for i, data in ipairs(variantSets) do
-				if  addon.chardb.profile.collectionList["set"][data.setID] then 
+				if addon.chardb.profile.collectionList["set"][data.setID] then 
 					variantSelected = data.setID
 				end
 			end
@@ -1142,7 +1162,7 @@ function WardrobeCollectionFrame.SetsCollectionFrame.ScrollFrame:Update()
 	local totalHeight = #baseSets * BASE_SET_BUTTON_HEIGHT + extraHeight
 	HybridScrollFrame_Update(self, totalHeight, self:GetHeight())
 end
---This bit sets "update" which is set via on load and triggers when scrolling.  Its what caused sorting issues
+--This bit sets "update" which is set via on load and triggers when scrolling. Its what caused sorting issues
 WardrobeCollectionFrame.SetsCollectionFrame.ScrollFrame.update = WardrobeCollectionFrame.SetsCollectionFrame.ScrollFrame.Update
 
 --=======
@@ -1181,7 +1201,7 @@ function SetsDataProvider:FilterSearch(useBaseSet)
 
 		for i, data in ipairs(baseSets) do
 
-			local count , total  = SetsDataProvider:GetSetSourceCounts(data.setID)
+			local count , total = SetsDataProvider:GetSetSourceCounts(data.setID)
 			local collected = count == total
 			if ((addon.filterCollected[1] and collected) or 
 				(addon.filterCollected[2] and not collected)) and
@@ -1235,7 +1255,7 @@ function SetsDataProvider:GetUsableSets(incVariants)
 		for i, set in ipairs(availableSets) do
 
 			local topSourcesCollected, topSourcesTotal = SetsDataProvider:GetSetSourceCounts(set.setID)
-			if (BW_WardrobeToggle.viewAll and BW_WardrobeToggle.VisualMode) or (not atTransmogrifier and BW_WardrobeToggle.VisualMode) or topSourcesCollected >= Profile.PartialLimit  then --and not C_TransmogSets.IsSetUsable(set.setID) then
+			if (BW_WardrobeToggle.viewAll and BW_WardrobeToggle.VisualMode) or (not atTransmogrifier and BW_WardrobeToggle.VisualMode) or topSourcesCollected >= Profile.PartialLimit then --and not C_TransmogSets.IsSetUsable(set.setID) then
 				tinsert(self.usableSets, set)
 			end
  
@@ -1244,7 +1264,7 @@ function SetsDataProvider:GetUsableSets(incVariants)
 				for i, set in ipairs(variantSets) do
 					local topSourcesCollected, topSourcesTotal = SetsDataProvider:GetSetSourceCounts(set.setID)
 					if topSourcesCollected == topSourcesTotal then set.collected = true end
-					if (BW_WardrobeToggle.viewAll and BW_WardrobeToggle.VisualMode) or (not atTransmogrifier and BW_WardrobeToggle.VisualMode) or topSourcesCollected >= Profile.PartialLimit  then --and not C_TransmogSets.IsSetUsable(set.setID) then
+					if (BW_WardrobeToggle.viewAll and BW_WardrobeToggle.VisualMode) or (not atTransmogrifier and BW_WardrobeToggle.VisualMode) or topSourcesCollected >= Profile.PartialLimit then --and not C_TransmogSets.IsSetUsable(set.setID) then
 						tinsert(self.usableSets, set)
 					end
 				end
@@ -1404,7 +1424,7 @@ end
 --==
 
 --=======--
--- Extra Sets Collection  List
+-- Extra Sets Collection List
 BetterWardrobeSetsCollectionMixin = CreateFromMixins(WardrobeSetsCollectionMixin)
 
 function BetterWardrobeSetsCollectionMixin:OnLoad()
@@ -1597,7 +1617,7 @@ function BetterWardrobeSetsCollectionMixin:DisplaySet(setID)
 	-- variant sets
 	--local baseSetID = C_TransmogSets.GetBaseSetID(setID)
 	--local variantSets = SetsDataProvider:GetVariantSets(baseSetID)
-	--if (#variantSets == 0)  then
+	--if (#variantSets == 0) then
 		--self.DetailsFrame.VariantSetsButton:Hide()
 	--else
 		--self.DetailsFrame.VariantSetsButton:Show()
@@ -1793,7 +1813,7 @@ function BW_WardrobeCollectionFrame_SetAppearanceTooltip(contentFrame, sources, 
 		BW_WardrobeCollectionFrame.tooltipCycle = nil;
 	end
 
-	if ( appearanceCollected  ) then
+	if ( appearanceCollected ) then
 		if ( useError ) then
 			GameTooltip:AddLine(useError, RED_FONT_COLOR.r, RED_FONT_COLOR.g, RED_FONT_COLOR.b, true);
 		elseif ( not WardrobeFrame_IsAtTransmogrifier() ) then
@@ -1828,7 +1848,7 @@ function BetterWardrobeSetsCollectionMixin:RefreshAppearanceTooltip()
 	WardrobeCollectionFrame_SortSources(sources, sources[1].visualID, self.tooltipPrimarySourceID)
 	BW_WardrobeCollectionFrame_SetAppearanceTooltip(self, sources, self.tooltipPrimarySourceID)
 
-	C_Timer.After(.1, function() if needsRefresh then  self:RefreshAppearanceTooltip(); needsRefresh = false; end; end) --Fix for items that returned retreaving info 
+	C_Timer.After(.1, function() if needsRefresh then self:RefreshAppearanceTooltip(); needsRefresh = false; end; end) --Fix for items that returned retreaving info 
 
 end
 
@@ -1889,7 +1909,7 @@ function BetterWardrobeSetsCollectionScrollFrameMixin:Update()
 
 	local offset = HybridScrollFrame_GetOffset(self)
 	local buttons = self.buttons
-	local baseSets =  SetsDataProvider:GetBaseSets() --addon.GetBaseList()
+	local baseSets = SetsDataProvider:GetBaseSets() --addon.GetBaseList()
 
 	-- show the base set as selected
 	local selectedSetID = self:GetParent():GetSelectedSetID()
@@ -2032,8 +2052,8 @@ function BetterWardrobeSetsTransmogMixin:LoadSet(setID)
 			--WardrobeCollectionFrame_SortSources(slotSources, sourceInfo.visualID)
 
 			if combineSources then 
-				local _, hasPending  = C_Transmog.GetSlotInfo(slot, LE_TRANSMOG_TYPE_APPEARANCE)
-				if  hasPending then 
+				local _, hasPending = C_Transmog.GetSlotInfo(slot, LE_TRANSMOG_TYPE_APPEARANCE)
+				if hasPending then 
 					local _,_,_,_,sourceID, appearanceID = C_Transmog.GetSlotVisualInfo(slot, LE_TRANSMOG_TYPE_APPEARANCE)
 					local emptyappearanceID, emptySourceID = EmptyArmor[slot] and C_TransmogCollection.GetItemInfo(EmptyArmor[slot])
 
@@ -2075,14 +2095,14 @@ function BetterWardrobeSetsTransmogMixin:LoadSet(setID)
 		if Profile.HiddenMog then	
 			local clearSlots = EmptySlots(transmogSources)
 			for i, x in pairs(clearSlots) do
-				local _,  source = addon.GetItemSource(x) --C_TransmogCollection.GetItemInfo(x)
+				local _, source = addon.GetItemSource(x) --C_TransmogCollection.GetItemInfo(x)
 				C_Transmog.SetPending(i, LE_TRANSMOG_TYPE_APPEARANCE,source)
 			end
 
 			local emptySlotData = GetEmptySlots()
 			for i, x in pairs(transmogSources) do
-				if not C_TransmogCollection.PlayerHasTransmogItemModifiedAppearance(x) and i ~= 7  and emptySlotData[i] then
-					local _,  source = addon.GetItemSource(emptySlotData[i]) --C_TransmogCollection.GetItemInfo(emptySlotData[i])
+				if not C_TransmogCollection.PlayerHasTransmogItemModifiedAppearance(x) and i ~= 7 and emptySlotData[i] then
+					local _, source = addon.GetItemSource(emptySlotData[i]) --C_TransmogCollection.GetItemInfo(emptySlotData[i])
 					C_Transmog.SetPending(i, LE_TRANSMOG_TYPE_APPEARANCE, source)
 				end
 			end
@@ -2148,7 +2168,7 @@ function BetterWardrobeSetsTransmogMixin:UpdateSets()
 				model:Undress()
 				local sourceData = SetsDataProvider:GetSetSourceData(set.setID)
 
-				for sourceID  in pairs(sourceData.sources) do
+				for sourceID in pairs(sourceData.sources) do
 					if (not Profile.HideMissing and (not BW_WardrobeToggle.VisualMode or (isMogKnown(sourceID) and BW_WardrobeToggle.VisualMode))) or 
 						(Profile.HideMissing and (BW_WardrobeToggle.VisualMode or isMogKnown(sourceID))) then 
 						model:TryOn(sourceID)
@@ -2458,14 +2478,14 @@ function addon.SelectedVariant(setID)
 	local match = false
 
 	for i, data in ipairs(variantSets) do
-		if  addon.chardb.profile.collectionList["set"][data.setID] then 
+		if addon.chardb.profile.collectionList["set"][data.setID] then 
 			match = data.setID
 		end
 	end
 
 	if useDescription then
 		local setInfo = C_TransmogSets.GetSetInfo(targetSetID)
-		local matchInfo = match and  C_TransmogSets.GetSetInfo(match).description or nil
+		local matchInfo = match and C_TransmogSets.GetSetInfo(match).description or nil
 
 		return targetSetID, setInfo.description, match, matchInfo
 	end
