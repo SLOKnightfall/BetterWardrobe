@@ -248,6 +248,12 @@ function addon:OnEnable()
 
 	self:SecureHook(WardrobeCollectionFrame.ItemsCollectionFrame,"SetActiveSlot")
 	self:SecureHook(WardrobeCollectionFrame.ItemsCollectionFrame,"UpdateItems")
+	self:Hook(C_TransmogSets,"SetIsFavorite",function() 
+		C_Timer.After(0, function() 
+			WardrobeCollectionFrame.SetsCollectionFrame.ScrollFrame:Update()
+			WardrobeCollectionFrame.SetsCollectionFrame:OnSearchUpdate()
+		end)
+	end, true)
 
 	--self:SecureHook(WardrobeOutfitDropDown,"OnUpdate")
 
@@ -605,7 +611,7 @@ function SetsDataProvider:GetCollectedSetSources(setId)
 	local sources = {}
 
 	for sourceId, collected in pairs(C_TransmogSets.GetSetSources(setId)) do
-		if collected or self:IsUsableSource(sourceId) then
+		if collected and self:IsUsableSource(sourceId) then
 		 sources[sourceId] = true
 		end
 	end
@@ -673,43 +679,85 @@ function SetsDataProvider:GetUsableSets(incVariants)
 		local atTransmogrifier = WardrobeFrame_IsAtTransmogrifier()
 		local setIDS = {}
 
-		if Profile.ShowIncomplete or BW_WardrobeToggle.VisualMode then
-			self.usableSets = {}
-			local availableSets = self:GetAvailableSets()
-				
-			for _, set in pairs(availableSets) do
-				local collectedSlots, totalSlots = SetsDataProvider:GetSetSourceCounts(set.setID)
+		if not Profile.ShowIncomplete  then 
+		self.usableSets = C_TransmogSets.GetUsableSets()
+		self:SortSets(self.usableSets)
+		-- group sets by baseSetID, except for favorited sets since those are to remain bucketed to the front
+			for i, set in ipairs(self.usableSets) do
+				setIDS[set.baseSetID or set.setID] = true
+				if (not set.favorite) then
+					local baseSetID = set.baseSetID or set.setID
+					local numRelatedSets = 0
+					for j = i + 1, #self.usableSets do
+						if (self.usableSets[j].baseSetID == baseSetID or self.usableSets[j].setID == baseSetID) then
+							numRelatedSets = numRelatedSets + 1
+							-- no need to do anything if already contiguous
+							if (j ~= i + numRelatedSets) then
+								local relatedSet = self.usableSets[j]
+								tremove(self.usableSets, j)
+								tinsert(self.usableSets, i + numRelatedSets, relatedSet)
+							end
+						end
+					end
+				end
+			end
+			return self.usableSets
+		end
 
-				if ((not atTransmogrifier and BW_WardrobeToggle.VisualMode) or collectedSlots >= Profile.PartialLimit) and not setIDS[set.setID] then
-					table.insert(self.usableSets, set)
-					setIDS[set.setID] = true
+		if Profile.ShowIncomplete or BW_WardrobeToggle.VisualMode then 
+			self.usableSets = {}
+			local availableSets = self:GetBaseSets()
+			for i, set in ipairs(availableSets) do
+				if not setIDS[set.setID or set.baseSetID] then 
+					local topSourcesCollected, topSourcesTotal = SetsDataProvider:GetSetSourceCounts(set.setID)
+
+					if ((not atTransmogrifier and BW_WardrobeToggle.VisualMode) or topSourcesCollected >= Profile.PartialLimit)  then --and not C_TransmogSets.IsSetUsable(set.setID) then
+						
+						tinsert(self.usableSets, set)
+					end
+				end
+
+				if incVariants then 
+					local variantSets = C_TransmogSets.GetVariantSets(set.setID)
+					for i, set in ipairs(variantSets) do
+						if not setIDS[set.setID or set.baseSetID] then 
+							local topSourcesCollected, topSourcesTotal = SetsDataProvider:GetSetSourceCounts(set.setID)
+							if topSourcesCollected == topSourcesTotal then set.collected = true end
+							if ((not atTransmogrifier and BW_WardrobeToggle.VisualMode) or topSourcesCollected >= Profile.PartialLimit)  then --and not C_TransmogSets.IsSetUsable(set.setID) then
+								tinsert(self.usableSets, set)
+							end
+						end
+						
+					end
 				end
 			end
 
-		elseif not Profile.ShowIncomplete then 
-			self.usableSets = C_TransmogSets.GetUsableSets()
-		end
+		elseif not Profile.ShowIncomplete  then 
+		self.usableSets = C_TransmogSets.GetUsableSets()
 
 		self:SortSets(self.usableSets)
 		-- group sets by baseSetID, except for favorited sets since those are to remain bucketed to the front
-		for i, set in ipairs(self.usableSets) do
-			--setIDS[set.baseSetID or set.setID] = true
-			if (not set.favorite) then
-				local baseSetID = set.baseSetID or set.setID
-				local numRelatedSets = 0
-				for j = i + 1, #self.usableSets do
-					if (self.usableSets[j].baseSetID == baseSetID or self.usableSets[j].setID == baseSetID) then
-						numRelatedSets = numRelatedSets + 1
-						-- no need to do anything if already contiguous
-						if (j ~= i + numRelatedSets) then
-							local relatedSet = self.usableSets[j]
-							tremove(self.usableSets, j)
-							tinsert(self.usableSets, i + numRelatedSets, relatedSet)
+			for i, set in ipairs(self.usableSets) do
+				setIDS[set.baseSetID or set.setID] = true
+				if (not set.favorite) then
+					local baseSetID = set.baseSetID or set.setID
+					local numRelatedSets = 0
+					for j = i + 1, #self.usableSets do
+						if (self.usableSets[j].baseSetID == baseSetID or self.usableSets[j].setID == baseSetID) then
+							numRelatedSets = numRelatedSets + 1
+							-- no need to do anything if already contiguous
+							if (j ~= i + numRelatedSets) then
+								local relatedSet = self.usableSets[j]
+								tremove(self.usableSets, j)
+								tinsert(self.usableSets, i + numRelatedSets, relatedSet)
+							end
 						end
 					end
 				end
 			end
 		end
+				
+		self:SortSets(self.usableSets)
 	end
 
 	return ClearHidden(self.usableSets, "set") 
@@ -1126,7 +1174,7 @@ function WardrobeCollectionFrame.SetsCollectionFrame.ScrollFrame:Update()
 			button.Icon:SetTexture(SetsDataProvider:GetIconForSet(baseSet.setID))
 			button.Icon:SetDesaturation((topSourcesCollected == 0) and 1 or 0)
 			button.SelectedTexture:SetShown(baseSet.setID == selectedBaseSetID)
-			button.Favorite:SetShown(baseSet.favoriteSetID)
+			button.Favorite:SetShown(baseSet.favoriteSetID and true)
 			local isHidden = addon.chardb.profile.set[baseSet.setID]
 			button.CollectionListVisual.Hidden.Icon:SetShown(isHidden)
 
@@ -2297,7 +2345,7 @@ function BetterWardrobeSetsTransmogMixin:OpenRightClickDropDown()
 	info.notCheckable = true
 	UIDropDownMenu_AddButton(info)
 	-- Cancel
-	info = L_UIDropDownMenu_CreateInfo()
+	info = UIDropDownMenu_CreateInfo()
 	info.notCheckable = true
 	info.text = CANCEL
 	UIDropDownMenu_AddButton(info)
