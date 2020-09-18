@@ -479,6 +479,95 @@ function WardrobeCollectionFrame.ItemsCollectionFrame:RefreshVisualsList()
 	self.PagingFrame:SetMaxPages(ceil(#self.filteredVisualsList / self.PAGE_SIZE));
 end
 
+function WardrobeCollectionFrame.ItemsCollectionFrame:ShouldShowSetsHelpTip()
+	if (WardrobeFrame_IsAtTransmogrifier()) then
+		if (GetCVarBitfield("closedInfoFrames", LE_FRAME_TUTORIAL_TRANSMOG_SETS_VENDOR_TAB)) then
+			return false;
+		end
+
+		if (not GetCVarBitfield("closedInfoFrames", LE_FRAME_TUTORIAL_TRANSMOG_SPECS_BUTTON)) then
+			return false;
+		end
+
+		if (not GetCVarBitfield("closedInfoFrames", LE_FRAME_TUTORIAL_TRANSMOG_OUTFIT_DROPDOWN)) then
+			return false;
+		end
+
+		local sets = C_TransmogSets.GetAllSets();
+		local hasCollected = false;
+		if (sets) then
+			for i = 1, #sets do
+				if (sets[i].collected) then
+					hasCollected = true;
+					break;
+				end
+			end
+		end
+		if (not hasCollected) then
+			return false;
+		end
+
+		self:GetParent().SetsTabHelpBox.BigText:SetText(TRANSMOG_SETS_VENDOR_TUTORIAL);
+		self:GetParent().SetsTabHelpBox:SetHeight(self:GetParent().SetsTabHelpBox.BigText:GetHeight() + HELPTIP_HEIGHT_PADDING);
+
+		BW_WardrobeCollectionFrame.SetsTabHelpBox.BigText:SetText(TRANSMOG_SETS_VENDOR_TUTORIAL);
+		BW_WardrobeCollectionFrame.SetsTabHelpBox:SetHeight(self:GetParent().SetsTabHelpBox.BigText:GetHeight() + HELPTIP_HEIGHT_PADDING);
+		return true;
+	else
+		if (GetCVarBitfield("closedInfoFrames", LE_FRAME_TUTORIAL_TRANSMOG_SETS_TAB)) then
+			return false;
+		end
+
+		if (not GetCVarBitfield("closedInfoFrames", LE_FRAME_TUTORIAL_TRANSMOG_MODEL_CLICK)) then
+			return false;
+		end
+
+		self:GetParent().SetsTabHelpBox.BigText:SetText(TRANSMOG_SETS_TAB_TUTORIAL);
+		self:GetParent().SetsTabHelpBox:SetHeight(self:GetParent().SetsTabHelpBox.BigText:GetHeight() + HELPTIP_HEIGHT_PADDING)
+
+		BW_WardrobeCollectionFrame.SetsTabHelpBox.BigText:SetText(TRANSMOG_SETS_TAB_TUTORIAL);
+		BW_WardrobeCollectionFrame.SetsTabHelpBox:SetHeight(self:GetParent().SetsTabHelpBox.BigText:GetHeight() + HELPTIP_HEIGHT_PADDING);
+		return true;
+	end
+end
+
+function WardrobeCollectionFrame.ItemsCollectionFrame:OnShow()
+	self:RegisterEvent("TRANSMOGRIFY_UPDATE");
+	self:RegisterEvent("PLAYER_EQUIPMENT_CHANGED");
+	self:RegisterEvent("TRANSMOGRIFY_SUCCESS");
+
+	local needsUpdate = false;	-- we don't need to update if we call WardrobeCollectionFrame_SetActiveSlot as that will do an update
+	if ( self.jumpToLatestCategoryID and self.jumpToLatestCategoryID ~= self.activeCategory and not WardrobeFrame_IsAtTransmogrifier() ) then
+		local slot = WardrobeCollectionFrame_GetSlotFromCategoryID(self.jumpToLatestCategoryID);
+		-- The model got reset from OnShow, which restored all equipment.
+		-- But ChangeModelsSlot tries to be smart and only change the difference from the previous slot to the current slot, so some equipment will remain left on.
+		local ignorePreviousSlot = true;
+		self:SetActiveSlot(slot, LE_TRANSMOG_TYPE_APPEARANCE, self.jumpToLatestCategoryID, ignorePreviousSlot);
+		self.jumpToLatestCategoryID = nil;
+	elseif ( self.activeSlot ) then
+		-- redo the model for the active slot
+		self:ChangeModelsSlot(nil, self.activeSlot);
+		needsUpdate = true;
+	else
+		self:SetActiveSlot("HEADSLOT", LE_TRANSMOG_TYPE_APPEARANCE);
+	end
+
+	WardrobeCollectionFrame.progressBar:SetShown(not WardrobeUtils_IsCategoryLegionArtifact(self:GetActiveCategory()));
+
+	if ( needsUpdate ) then
+		WardrobeCollectionFrame_UpdateUsableAppearances();
+		self:RefreshVisualsList();
+		self:UpdateItems();
+		self:UpdateWeaponDropDown();
+	end
+
+	-- tab tutorial
+	SetCVarBitfield("closedInfoFrames", LE_FRAME_TUTORIAL_TRANSMOG_JOURNAL_TAB, true);
+	self:GetParent().SetsTabHelpBox:SetShown(self:ShouldShowSetsHelpTip());
+	BW_WardrobeCollectionFrame.SetsTabHelpBox:SetShown(self:ShouldShowSetsHelpTip());
+
+end
+
 local SetsDataProvider = CreateFromMixins(WardrobeSetsDataProviderMixin)
 
 function SetsDataProvider:SortSets(sets, reverseUIOrder, ignorePatchID)
@@ -531,6 +620,17 @@ function SetsDataProvider:GetUsableSets(incVariants)
 	return self.usableSets
 end
 ]]--
+local function inTable(tabel, id)
+	local found = false
+	for i, data in ipairs(table) do
+		if data == id then
+			found = true
+			break
+		end
+	end
+	return found
+end
+
 
 
 function SetsDataProvider:GetUsableSets(incVariants)
@@ -568,7 +668,7 @@ function SetsDataProvider:GetUsableSets(incVariants)
 				if not setIDS[set.setID or set.baseSetID] then 
 					local topSourcesCollected, topSourcesTotal = SetsDataProvider:GetSetSourceCounts(set.setID)
 
-					if (not atTransmogrifier and BW_WardrobeToggle.VisualMode) or topSourcesCollected >= Profile.PartialLimit  then --and not C_TransmogSets.IsSetUsable(set.setID) then
+					if ((not atTransmogrifier and BW_WardrobeToggle.VisualMode) or topSourcesCollected >= Profile.PartialLimit) and not inTable(self.usableSets, set)  then --and not C_TransmogSets.IsSetUsable(set.setID) then
 						
 						tinsert(self.usableSets, set)
 					end
@@ -580,7 +680,7 @@ function SetsDataProvider:GetUsableSets(incVariants)
 						if not setIDS[set.setID or set.baseSetID] then 
 							local topSourcesCollected, topSourcesTotal = SetsDataProvider:GetSetSourceCounts(set.setID)
 							if topSourcesCollected == topSourcesTotal then set.collected = true end
-							if (not atTransmogrifier and BW_WardrobeToggle.VisualMode) or topSourcesCollected >= Profile.PartialLimit  then --and not C_TransmogSets.IsSetUsable(set.setID) then
+							if ((not atTransmogrifier and BW_WardrobeToggle.VisualMode) or topSourcesCollected >= Profile.PartialLimit) and not inTable(self.usableSets, set)  then --and not C_TransmogSets.IsSetUsable(set.setID) then
 								tinsert(self.usableSets, set)
 							end
 						end
@@ -589,8 +689,9 @@ function SetsDataProvider:GetUsableSets(incVariants)
 				end
 
 			end
-			self:SortSets(self.usableSets)	
+				
 		end
+		self:SortSets(self.usableSets)
 
 	end
 	return self.usableSets
@@ -662,8 +763,9 @@ function WardrobeCollectionFrame.SetsCollectionFrame:OnShow()
 	self:UpdateProgressBar()
 	self:RefreshCameras()
 
-	if (self:GetParent().SetsTabHelpBox:IsShown()) then
+	if (self:GetParent().SetsTabHelpBox:IsShown()) or BW_WardrobeCollectionFrame.SetsTabHelpBox:IsShown()  then
 		self:GetParent().SetsTabHelpBox:Hide()
+		BW_WardrobeCollectionFrame.SetsTabHelpBox:Hide()
 		SetCVarBitfield("closedInfoFrames", LE_FRAME_TUTORIAL_TRANSMOG_SETS_TAB, true)
 	end
 end
@@ -919,8 +1021,9 @@ function WardrobeCollectionFrame.SetsTransmogFrame:OnShow()
 	self:UpdateProgressBar()
 	self.sourceQualityTable = { }
 
-	if (self:GetParent().SetsTabHelpBox:IsShown()) then
+	if (self:GetParent().SetsTabHelpBox:IsShown())  or (BW_WardrobeCollectionFrame.SetsTabHelpBox:IsShown()) then
 		self:GetParent().SetsTabHelpBox:Hide()
+		BW_WardrobeCollectionFrame.SetsTabHelpBox:Hide()
 		SetCVarBitfield("closedInfoFrames", LE_FRAME_TUTORIAL_TRANSMOG_SETS_VENDOR_TAB, true)
 	end
 end
@@ -1352,10 +1455,10 @@ function BetterWardrobeSetsCollectionMixin:OnShow()
 	self:UpdateProgressBar()
 	self:RefreshCameras()
 
-	--if (self:GetParent().SetsTabHelpBox:IsShown()) then
-		--self:GetParent().SetsTabHelpBox:Hide()
-		--SetCVarBitfield("closedInfoFrames", LE_FRAME_TUTORIAL_TRANSMOG_SETS_TAB, true)
-	--end
+	if (self:GetParent().SetsTabHelpBox:IsShown()) then
+		self:GetParent().SetsTabHelpBox:Hide()
+		SetCVarBitfield("closedInfoFrames", LE_FRAME_TUTORIAL_TRANSMOG_SETS_TAB, true)
+	end
 end
 
 
@@ -2002,10 +2105,10 @@ function BetterWardrobeSetsTransmogMixin:OnShow()
 	self:UpdateProgressBar()
 	self.sourceQualityTable = { }
 
-	--if (self:GetParent().SetsTabHelpBox:IsShown()) then
-		--self:GetParent().SetsTabHelpBox:Hide()
-		--SetCVarBitfield("closedInfoFrames", LE_FRAME_TUTORIAL_TRANSMOG_SETS_VENDOR_TAB, true)
-	--end
+	if (self:GetParent().SetsTabHelpBox:IsShown()) then
+		self:GetParent().SetsTabHelpBox:Hide()
+		SetCVarBitfield("closedInfoFrames", LE_FRAME_TUTORIAL_TRANSMOG_SETS_VENDOR_TAB, true)
+	end
 end
 
 
@@ -2176,7 +2279,7 @@ function BetterWardrobeSetsTransmogMixin:OpenRightClickDropDown()
 	info.notCheckable = true
 	UIDropDownMenu_AddButton(info)
 	-- Cancel
-	info = UIDropDownMenu_CreateInfo()
+	info = L_UIDropDownMenu_CreateInfo()
 	info.notCheckable = true
 	info.text = CANCEL
 	UIDropDownMenu_AddButton(info)
@@ -2198,6 +2301,10 @@ local TAB_SETS = 2
 local TAB_EXTRASETS = 3
 local TABS_MAX_WIDTH = 185
 
+
+
+
+
 function BW_WardrobeCollectionFrame_OnLoad(self)
 	WardrobeCollectionFrameTab1:Hide()
 	WardrobeCollectionFrameTab2:Hide()
@@ -2206,7 +2313,7 @@ function BW_WardrobeCollectionFrame_OnLoad(self)
 	BW_WardrobeCollectionFrameTab3:Show()
 	--local level = CollectionsJournal:GetFrameLevel()
 	local level = BW_WardrobeCollectionFrame:GetFrameLevel()
-	CollectionsJournal:SetFrameLevel(level -1 )
+	CollectionsJournal:SetFrameLevel(level - 1 )
 
 	--BW_WardrobeCollectionFrame:SetFrameLevel(level+10)
 	--BW_WardrobeCollectionFrameTab1:SetFrameLevel(level+10)
@@ -2239,6 +2346,13 @@ function BW_WardrobeCollectionFrame_OnEvent(self, event, ...)
 	end
 end
 
+
+function BW_WardrobeCollectionFrame_UpdateTabButtons()
+	-- sets tab
+	BW_WardrobeCollectionFrame.SetsTab.FlashFrame:SetShown(C_TransmogSets.GetLatestSource() ~= NO_TRANSMOG_SOURCE_ID and not WardrobeFrame_IsAtTransmogrifier());
+end
+
+
 function BW_WardrobeCollectionFrame_OnShow(self)
 	CollectionsJournal:SetPortraitToAsset("Interface\\Icons\\inv_chest_cloth_17")
 		local level = CollectionsJournal:GetFrameLevel()
@@ -2255,8 +2369,9 @@ function BW_WardrobeCollectionFrame_OnShow(self)
 	else
 		BW_WardrobeCollectionFrame_SetTab(TAB_ITEMS)
 	end
-	--WardrobeCollectionFrame_UpdateTabButtons()
+	BW_WardrobeCollectionFrame_UpdateTabButtons()
 end
+
 
 function BW_WardrobeCollectionFrame_OnHide(self)
 	self:UnregisterEvent("UNIT_MODEL_CHANGED")

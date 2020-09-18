@@ -29,13 +29,16 @@ Locale\enUS.lua
 
 #Core files
 #Modules\Inspect.lua
+Modules\Templates.xml
 BetterWardrobe.xml
+
 
 #Modules
 Modules\SortingFunctions.lua
 Modules\Randomizer.lua
 Modules\SavedOutfits.xml
 Modules\CollectionList.xml
+Modules\UIDropDownMenu.lua
 
 #3rd party addon compatability
 Plugins\ElvUI.lua

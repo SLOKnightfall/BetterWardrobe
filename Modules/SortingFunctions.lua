@@ -155,8 +155,8 @@ end
 
 local function SortDefault(sets, reverseUIOrder, ignorePatchID)
 	local comparison = function(set1, set2)	
-		local groupFavorite1 = addon.chardb.profile.favorite[set1.setID] and true;
-		local groupFavorite2 = addon.chardb.profile.favorite[set2.setID] and true;
+		local groupFavorite1 = (addon.chardb.profile.favorite[set1.setID] or set1.favoriteSetID) and true;
+		local groupFavorite2 = (addon.chardb.profile.favorite[set2.setID] or set2.favoriteSetID) and true;
 		if ( groupFavorite1 ~= groupFavorite2 ) then
 			return groupFavorite1;
 		end
