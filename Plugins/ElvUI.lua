@@ -116,6 +116,9 @@ function MyPlugin:Initialize()
 	end
 end
 
-
+	local DetailsFrame = BW_SetsCollectionFrame.DetailsFrame
+	DetailsFrame.Name:FontTemplate(nil, 16)
+	DetailsFrame.LongName:FontTemplate(nil, 16)
+	--S:HandleButton(DetailsFrame.VariantSetsButton)
 
 E:RegisterModule(MyPlugin:GetName()) --Register the module with ElvUI. ElvUI will now call MyPlugin:Initialize() when ElvUI is ready to load our plugin.
