@@ -680,9 +680,9 @@ function SetsDataProvider:GetUsableSets(incVariants)
 		local setIDS = {}
 
 		if not Profile.ShowIncomplete  then 
-		self.usableSets = C_TransmogSets.GetUsableSets()
-		self:SortSets(self.usableSets)
-		-- group sets by baseSetID, except for favorited sets since those are to remain bucketed to the front
+			self.usableSets = C_TransmogSets.GetUsableSets()
+			self:SortSets(self.usableSets)
+			-- group sets by baseSetID, except for favorited sets since those are to remain bucketed to the front
 			for i, set in ipairs(self.usableSets) do
 				setIDS[set.baseSetID or set.setID] = true
 				if (not set.favorite) then
@@ -1242,6 +1242,11 @@ function SetsDataProvider:FilterSearch(useBaseSet)
 		baseSets = SetsDataProvider:GetUsableSets()
 	end
 
+	if 	BW_WardrobeCollectionFrame.selectedTransmogTab == 4 or BW_WardrobeCollectionFrame.selectedCollectionTab == 4 then 
+		self.baseSets = baseSets 
+		return 
+	end
+
 	local filteredSets = {}
 		local searchString = string.lower(WardrobeCollectionFrameSearchBox:GetText())
 
@@ -1269,11 +1274,17 @@ function SetsDataProvider:FilterSearch(useBaseSet)
 end
 
 
+
 function SetsDataProvider:GetBaseSets()
 	if (not self.baseSets) then
+		if BW_WardrobeCollectionFrame.selectedCollectionTab ~= 4 then 
 		self.baseSets = ClearHidden(addon.GetBaseList(), "extraset") --C_TransmogSets.GetBaseSets()
 		--self:DetermineFavorites()
 		self:SortSets(self.baseSets)
+		elseif BW_WardrobeCollectionFrame.selectedCollectionTab == 4 then 
+			self.baseSets = addon.GetSavedList()
+
+		end
 	end
 
 	return self.baseSets
@@ -1561,10 +1572,21 @@ function BetterWardrobeSetsCollectionMixin:OnEvent(event, ...)
 
 end
 
-
+local shouldRefresh = true
 function BetterWardrobeSetsCollectionMixin:Refresh()
 	self.ScrollFrame:Update()
-	self:DisplaySet(self:GetSelectedSetID())
+	if BW_WardrobeCollectionFrame.selectedCollectionTab == 4 then 
+		if shouldRefresh then 
+			self.selectedSetID = addon.GetSavedList()[1].setID
+			shouldRefresh = false
+		end
+		self:DisplaySavedSet(self.selectedSavedSetID)
+	else
+		self:DisplaySet(self:GetSelectedSetID())
+		
+	end
+
+
 end
 
 local function GetSetCounts()
@@ -1671,6 +1693,114 @@ function BetterWardrobeSetsCollectionMixin:DisplaySet(setID)
 --	end
 end
 
+
+function BetterWardrobeSetsCollectionMixin:DisplaySavedSet(setID)
+	local setInfo = (setID and addon.GetSetInfo(setID)) or nil
+	if (not setInfo) then
+		self.DetailsFrame:Hide()
+		self.Model:Hide()
+		return
+	else
+		self.DetailsFrame:Show()
+		self.Model:Show()
+	end
+
+	self.DetailsFrame.Name:SetText(setInfo.name)
+	if (self.DetailsFrame.Name:IsTruncated()) then
+		self.DetailsFrame.Name:Hide()
+		self.DetailsFrame.LongName:SetText(setInfo.name)
+		self.DetailsFrame.LongName:Show()
+	else
+		self.DetailsFrame.Name:Show()
+		self.DetailsFrame.LongName:Hide()
+	end
+
+	self.DetailsFrame.Label:SetText(setInfo.label)
+
+	self.DetailsFrame.itemFramesPool:ReleaseAll()
+	self.Model:Undress()
+	local row1 = 0
+	local row2 = 0
+	local yOffset1 = -94
+
+	if setInfo then 
+		for i = 1, #setInfo.sources do
+			local sourceInfo = setInfo.sources[i] and C_TransmogCollection.GetSourceInfo(setInfo.sources[i])
+			if sourceInfo then
+				row1 = row1 + 1
+			end
+		end
+		if row1 > 10 then 
+			row2 = row1 - 10
+			row1 = 10
+			yOffset1 = -74
+
+		end
+	end
+
+	local BUTTON_SPACE = 37	-- button width + spacing between 2 buttons
+	local sortedSources = setInfo.sources --SetsDataProvider:GetSortedSetSources(setID)
+	local xOffset = -floor((row1 - 1) * BUTTON_SPACE / 2)
+	local xOffset2 = -floor((row2 - 1) * BUTTON_SPACE / 2)
+	local yOffset2 = yOffset1 - 40
+	local itemCount = 0
+
+	for i = 1, #sortedSources do
+		if sortedSources[i] then 
+	
+		local sourceInfo = C_TransmogCollection.GetSourceInfo(sortedSources[i])
+		if sourceInfo then
+		itemCount = itemCount + 1 
+			local itemFrame = self.DetailsFrame.itemFramesPool:Acquire()
+			itemFrame.sourceID = sourceInfo.sourceID
+			--itemFrame.itemID = sourceInfo.itemID
+			itemFrame.collected = sourceInfo.isCollected
+			itemFrame.invType = sourceInfo.invType
+			local texture = C_TransmogCollection.GetSourceIcon(sourceInfo.sourceID)
+			itemFrame.Icon:SetTexture(texture)
+			if (sourceInfo.isCollected) then
+				itemFrame.Icon:SetDesaturated(false)
+				itemFrame.Icon:SetAlpha(1)
+				itemFrame.IconBorder:SetDesaturation(0)
+				itemFrame.IconBorder:SetAlpha(1)
+			else
+				itemFrame.Icon:SetDesaturated(true)
+				itemFrame.Icon:SetAlpha(0.3)
+				itemFrame.IconBorder:SetDesaturation(1)
+				itemFrame.IconBorder:SetAlpha(0.3)
+				itemFrame.New:Hide()
+			end
+
+			self:SetItemFrameQuality(itemFrame)
+			local move = (itemCount > 10)
+
+			if itemCount <= 10 then 
+				itemFrame:SetPoint("TOP", self.DetailsFrame, "TOP", xOffset + (itemCount - 1) * BUTTON_SPACE, yOffset1)
+
+			else
+				itemFrame:SetPoint("TOP", self.DetailsFrame, "TOP", xOffset2 + (itemCount - 11) * BUTTON_SPACE, yOffset2)
+
+
+			end
+
+				self.DetailsFrame.IconRowBackground:ClearAllPoints()
+				self.DetailsFrame.IconRowBackground:SetPoint("TOP", 0, move and -50 or -78)
+				self.DetailsFrame.IconRowBackground:SetHeight(move and 120 or 64)
+				self.DetailsFrame.Name:ClearAllPoints()
+				self.DetailsFrame.Name:SetPoint("TOP", 0,  move and -17 or -37)
+				self.DetailsFrame.LongName:ClearAllPoints()
+				self.DetailsFrame.LongName:SetPoint("TOP", 0, move and -10 or -30)
+				self.DetailsFrame.Label:ClearAllPoints()
+				self.DetailsFrame.Label:SetPoint("TOP", 0, move and -43 or -63)
+
+			itemFrame:Show()
+			self.Model:TryOn(sourceInfo.sourceID)
+			end
+		end
+	end
+end
+
+
 function BetterWardrobeSetsCollectionMixin:OnSearchUpdate()
 	if (self.init) then
 		SetsDataProvider:ClearBaseSets()
@@ -1688,15 +1818,16 @@ function BetterWardrobeSetsCollectionMixin:SelectSetFromButton(setID)
 	self:SelectSet(setID)
 end
 
+function BetterWardrobeSetsCollectionMixin:GetSelectedSavedSetID()
+	return self.selectedSavedSetID
+end
 
 function BetterWardrobeSetsCollectionMixin:SelectSet(setID)
-	self.selectedSetID = setID
-
-	--local baseSetID = C_TransmogSets.GetBaseSetID(setID)
-	--local variantSets = SetsDataProvider:GetVariantSets(baseSetID)
-	--if (#variantSets > 0) then
-	--	self.selectedVariantSets[baseSetID] = setID
-	--end
+	if BW_WardrobeCollectionFrame.selectedCollectionTab == 4 then 
+		self.selectedSavedSetID = setID
+	else
+		self.selectedSetID = setID
+	end
 
 	self:Refresh()
 end
@@ -1956,17 +2087,24 @@ function BetterWardrobeSetsCollectionScrollFrameMixin:Update()
 	local offset = HybridScrollFrame_GetOffset(self)
 	local buttons = self.buttons
 	local baseSets = SetsDataProvider:GetBaseSets() --addon.GetBaseList()
-
+	local selectedBaseSetID
 	-- show the base set as selected
-	local selectedSetID = self:GetParent():GetSelectedSetID()
-	local selectedBaseSetID = selectedSetID --and C_TransmogSets.GetBaseSetID(selectedSetID)
 
+	if BW_WardrobeCollectionFrame.selectedCollectionTab == 4 then 
+		selectedBaseSetID = self:GetParent():GetSelectedSavedSetID()
+	else
+
+		selectedBaseSetID = self:GetParent():GetSelectedSetID()
+	end
+
+	 
 	for i = 1, #buttons do
 		local button = buttons[i]
 		local setIndex = i + offset
 
 		if (setIndex <= #baseSets) then
 			local baseSet = baseSets[setIndex]
+
 			local isFavorite = addon.chardb.profile.favorite[baseSet.setID]
 			local isHidden = addon.chardb.profile.extraset[baseSet.setID]
 
@@ -1986,8 +2124,8 @@ function BetterWardrobeSetsCollectionScrollFrameMixin:Update()
 			button.setCollected = setCollected
 			button.Name:SetTextColor(color.r, color.g, color.b)
 			button.Label:SetText(baseSet.label) --(L["NOTE_"..(baseSet.label or 0)] and L["NOTE_"..(baseSet.label or 0)]) or "")--((L["NOTE_"..baseSet.label] or "X"))
-			button.Icon:SetTexture(SetsDataProvider:GetIconForSet(baseSet.setID))
-			button.Icon:SetDesaturation((topSourcesCollected == 0) and 1 or 0)
+			button.Icon:SetTexture(baseSet.icon or SetsDataProvider:GetIconForSet(baseSet.setID))
+			button.Icon:SetDesaturation((baseSet.collected and 0 )or( (topSourcesCollected == 0) and 1) or 0)
 			button.SelectedTexture:SetShown(baseSet.setID == selectedBaseSetID)
 			button.Favorite:SetShown(isFavorite)
 			button.CollectionListVisual.Hidden.Icon:SetShown(isHidden)
@@ -2365,10 +2503,8 @@ end
 local TAB_ITEMS = 1
 local TAB_SETS = 2
 local TAB_EXTRASETS = 3
-local TABS_MAX_WIDTH = 185
-
-
-
+local TAB_SAVED_SETS = 4
+local TABS_MAX_WIDTH = 245
 
 
 function BW_WardrobeCollectionFrame_OnLoad(self)
@@ -2377,21 +2513,24 @@ function BW_WardrobeCollectionFrame_OnLoad(self)
 	BW_WardrobeCollectionFrameTab1:Show()
 	BW_WardrobeCollectionFrameTab2:Show()
 	BW_WardrobeCollectionFrameTab3:Show()
+	BW_WardrobeCollectionFrameTab4:Show()
 	--local level = CollectionsJournal:GetFrameLevel()
 	local level = BW_WardrobeCollectionFrame:GetFrameLevel()
 	CollectionsJournal:SetFrameLevel(level - 1 )
 
-	--BW_WardrobeCollectionFrame:SetFrameLevel(level+10)
-	--BW_WardrobeCollectionFrameTab1:SetFrameLevel(level+10)
-	--BW_WardrobeCollectionFrameTab2:SetFrameLevel(level+10)
-	--BW_WardrobeCollectionFrameTab3:SetFrameLevel(level+10)
-	--BW_SetsCollectionFrame:SetFrameLevel(level+10)
-	--CollectionsJournal:SetFrameLevel(1)
-	PanelTemplates_SetNumTabs(self, 3)
+	PanelTemplates_SetNumTabs(self, 4)
 	PanelTemplates_SetTab(self, TAB_ITEMS)
 	PanelTemplates_ResizeTabsToFit(self, TABS_MAX_WIDTH)
 	self.selectedCollectionTab = TAB_ITEMS
 	self.selectedTransmogTab = TAB_ITEMS
+
+	WardrobeCollectionFrame.progressBar:SetWidth(170)
+	WardrobeCollectionFrame.progressBar.border:SetWidth(179)
+	WardrobeCollectionFrame.progressBar:ClearAllPoints()
+	WardrobeCollectionFrame.progressBar:SetPoint("TOPLEFT", WardrobeCollectionFrame.ItemsTab, "TOPLEFT", 250, -11)
+	WardrobeCollectionFrame.searchBox:SetWidth(105)
+
+
 end
 
 

@@ -11,10 +11,12 @@ local LE_ALPHABETIC = 3
 local LE_ITEM_SOURCE = 6
 local LE_EXPANSION = 5
 local LE_COLOR = 4
+
 local TAB_ITEMS = 1
 local TAB_SETS = 2
 local TAB_EXTRASETS = 3
-local TABS_MAX_WIDTH = 185
+local TAB_SAVED_SETS = 4
+local TABS_MAX_WIDTH = 245
 
 local Wardrobe = WardrobeCollectionFrame.ItemsCollectionFrame
 
@@ -122,8 +124,7 @@ function UI.ExtendTransmogView()
 end
 
 
---- Functionality to add 3rd tab to windows
-
+--- Functionality to add tabs to window
 function BW_WardrobeCollectionFrame_ClickTab(tab)
 	BW_WardrobeCollectionFrame_SetTab(tab:GetID())
 	PanelTemplates_ResizeTabsToFit(WardrobeCollectionFrame, TABS_MAX_WIDTH)
@@ -131,8 +132,6 @@ function BW_WardrobeCollectionFrame_ClickTab(tab)
 end
 
 
-
---hooks into WardrobeCollectionFrame_SetTab
 function BW_WardrobeCollectionFrame_SetTab(tabID)
 	PanelTemplates_SetTab(BW_WardrobeCollectionFrame, tabID)
 	local atTransmogrifier = WardrobeFrame_IsAtTransmogrifier()
@@ -149,14 +148,15 @@ function BW_WardrobeCollectionFrame_SetTab(tabID)
 	local tab1 = (tabID == TAB_ITEMS)
 	local tab2 = (tabID == TAB_SETS)
 	local tab3 = (tabID == TAB_EXTRASETS)
+	local tab4 = (tabID == TAB_SAVED_SETS)
 
 		WardrobeCollectionFrame.ItemsCollectionFrame:SetShown(tab1)
 		WardrobeCollectionFrame.SetsCollectionFrame:SetShown(tab2 and not atTransmogrifier)
 		WardrobeCollectionFrame.SetsTransmogFrame:SetShown(tab2 and atTransmogrifier)
-		BW_WardrobeCollectionFrame.BW_SetsCollectionFrame:SetShown(tab3 and not atTransmogrifier)
-		BW_WardrobeCollectionFrame.BW_SetsTransmogFrame:SetShown(tab3 and atTransmogrifier)
+		BW_WardrobeCollectionFrame.BW_SetsCollectionFrame:SetShown((tab3 or tab4) and not atTransmogrifier)
+		BW_WardrobeCollectionFrame.BW_SetsTransmogFrame:SetShown((tab3 or tab4) and atTransmogrifier)
 
-		BW_WardrobeToggle:SetShown(tab2 or tab3)
+		BW_WardrobeToggle:SetShown(tab2 or tab3 or tab4)
 		BW_WardrobeToggle.VisualMode = false
 
 		local searchBox_X = ((tab1 or ((tab2 or tab3) and atTransmogrifier)) and -107) or 19
@@ -166,15 +166,16 @@ function BW_WardrobeCollectionFrame_SetTab(tabID)
 		WardrobeCollectionFrame.searchBox:ClearAllPoints()
 		WardrobeCollectionFrame.searchBox:SetEnabled(tab1 and WardrobeCollectionFrame.ItemsCollectionFrame.transmogType == LE_TRANSMOG_TYPE_APPEARANCE or tab2 or tab3)
 		WardrobeCollectionFrame.searchBox:SetPoint(searchBox_Anchor, searchBox_X, searchBox_Y )
-		WardrobeCollectionFrame.searchBox:SetWidth(((tab2 or tab3) and not atTransmogrifier and 145) or 115)
+		WardrobeCollectionFrame.searchBox:SetWidth(((tab2 or tab3) and not atTransmogrifier and 145) or 105)
 
 		WardrobeCollectionFrame.FilterButton:SetShown(not atTransmogrifier)
 		WardrobeCollectionFrame.FilterButton:SetEnabled(tab1 and WardrobeCollectionFrame.ItemsCollectionFrame.transmogType == LE_TRANSMOG_TYPE_APPEARANCE or tab2)
-
+WardrobeCollectionFrame.progressBar:SetShown(not tab4)
 		BW_CollectionListButton:SetShown(tab1 and not atTransmogrifier)
 
 		BW_WardrobeCollectionFrame.FilterButton:SetShown(tab3)
-
+		
+		UIDropDownMenu_EnableDropDown(BW_SortDropDown)
 		BW_SortDropDown:ClearAllPoints()
 
 	if tab1 then
@@ -199,7 +200,6 @@ function BW_WardrobeCollectionFrame_SetTab(tabID)
 		end
 
 	elseif tab3 then
-		UIDropDownMenu_EnableDropDown(BW_SortDropDown)
 		
 		if atTransmogrifier then
 			WardrobeCollectionFrame.activeFrame = BW_WardrobeCollectionFrame.BW_SetsTransmogFrame
@@ -216,6 +216,22 @@ function BW_WardrobeCollectionFrame_SetTab(tabID)
 		end
 		
 		WardrobeCollectionFrame.searchBox:Show()
+	elseif tab4 then
+		--WardrobeCollectionFrame.searchBox:Hide()
+		UIDropDownMenu_DisableDropDown(BW_SortDropDown)
+		if atTransmogrifier then
+			WardrobeCollectionFrame.activeFrame = BW_WardrobeCollectionFrame.BW_SetsTransmogFrame
+			BW_WardrobeCollectionFrame.activeFrame = BW_WardrobeCollectionFrame.BW_SetsTransmogFrame
+	
+			BW_SortDropDown:SetPoint("TOPRIGHT", WardrobeCollectionFrame.ItemsCollectionFrame, "TOPRIGHT",-27, -10)
+
+		else
+			WardrobeCollectionFrame.activeFrame = BW_WardrobeCollectionFrame.BW_SetsCollectionFrame
+			BW_WardrobeCollectionFrame.activeFrame = BW_WardrobeCollectionFrame.BW_SetsCollectionFrame
+
+			BW_SortDropDown:SetPoint("TOPLEFT", BW_WardrobeToggle, "TOPRIGHT")
+		end
+
 	end
 end
 

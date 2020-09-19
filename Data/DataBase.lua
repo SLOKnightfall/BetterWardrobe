@@ -182,6 +182,75 @@ end
 	end
 
 
+	function addon.GetSavedList()
+		local savedOutfits = addon.GetOutfits()
+		local list = {}
+		for index, data in ipairs(savedOutfits) do
+		--print(data.name) 
+			local info = {}
+			info.items = {}
+			info.sources = {}
+			info.collected = true
+			info.name = data.name
+			info.description = ""
+			info.expansionID	= 1
+			info.source = 1
+			filter = 1 
+			info.favorite = false
+			info.hiddenUtilCollected = false
+			info.label = L["Saved Set"]
+			info.limitedTimeSet = false
+			info.patchID = ""
+			info.setID = index+5000
+			info.uiOrder = index*100
+			info.icon = data.icon
+
+			if data.set == "default" then 
+
+				info.sources = C_TransmogCollection.GetOutfitSources(data.outfitID)
+			else
+
+			for i = 1, 16 do
+				info.sources[i] = data[i]
+			end
+		end
+
+			setsInfo[info.setID] = info
+			tinsert(list, setsInfo[info.setID])
+			
+		end
+
+		return list
+	end
+
+--[[
+				{
+					77497, -- [1]
+					nil, -- [2]
+					94136, -- [3]
+					84536, -- [4]
+					54411, -- [5]
+					4307, -- [6]
+					45096, -- [7]
+					10642, -- [8]
+					25667, -- [9]
+					53708, -- [10]
+					nil, -- [11]
+					nil, -- [12]
+					nil, -- [13]
+					nil, -- [14]
+					22804, -- [15]
+					0, -- [16]
+					["outfitID"] = 21,
+					["index"] = 1,
+					["name"] = "5-554",
+					["set"] = "extra",
+					[19] = 35448,
+					["mainHandEnchant"] = 0,
+					["icon"] = 1130280,
+					["offHandEnchant"] = 0,]]
+
+
 	--[[function addon.AddSet(setData)
 				local id = setData[1]
 		

@@ -19,6 +19,7 @@ local function GetOutfits()
 			data.outfitID = MAX_DEFAULT_OUTFITS + i
 			data.set = "extra"
 			data.index = i
+			data.name = addon.chardb.profile.outfits[i].name
 			tinsert(FullList, data)
 			--FullList[#FullList].outfitID = MAX_DEFAULT_OUTFITS + i
 			--data.set = "default"
@@ -65,6 +66,7 @@ local function GetOutfitName(outfitID)
 	local index = LookupIndexFromID(outfitID)
 	return C_TransmogCollection.GetOutfitName(outfitID) or (index and addon.chardb.profile.outfits[index].name )
 end
+addon.GetOutfitName = GetOutfitName
 
 StaticPopupDialogs["BW_NAME_TRANSMOG_OUTFIT"] = {
 	text = TRANSMOG_OUTFIT_NAME,

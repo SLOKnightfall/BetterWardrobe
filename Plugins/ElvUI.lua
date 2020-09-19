@@ -20,6 +20,7 @@ function MyPlugin:Initialize()
 	S:HandleTab(BW_WardrobeCollectionFrame.ItemsTab)
 	S:HandleTab(BW_WardrobeCollectionFrame.SetsTab)
 	S:HandleTab(BW_WardrobeCollectionFrame.ExtraSetsTab)
+	S:HandleTab(BW_WardrobeCollectionFrame.SavedSetsTab)
 
 	UIDropDownMenu_SetWidth(BW_SortDropDown, 110)
 	S:HandleDropDownBox(BW_SortDropDown)

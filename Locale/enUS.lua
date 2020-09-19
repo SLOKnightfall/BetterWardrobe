@@ -55,6 +55,7 @@ L["Collected"] = true
 
 L["COLLECTIONLIST_TEXT"] = "%s - %s"
 L["SHOPPINGLIST_TEXT"] = "%s - %s: %s"
+L["Saved Set"] = true
 
 	L[LE_DEFAULT] = DEFAULT
 	L[LE_APPEARANCE] = APPEARANCE_LABEL

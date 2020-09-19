@@ -22,9 +22,10 @@ local LE_ALPHABETIC = 3
 local LE_COLOR = 4
 local LE_EXPANSION = 5
 local LE_ITEM_SOURCE = 6
-local TAB_ITEMS = 1;
-local TAB_SETS = 2;
-local TAB_EXTRASETS = 3;
+local TAB_ITEMS = 1
+local TAB_SETS = 2
+local TAB_EXTRASETS = 3
+local TAB_SAVED_SETS = 4
 
 local L = {
 	[LE_DEFAULT] = DEFAULT,
@@ -484,6 +485,11 @@ addon.Sort = {
 			table.sort(sets, comparison)
 		end,
 	},
+
+	[TAB_SAVED_SETS] = {
+		[LE_DEFAULT] = function(self, sets, reverseUIOrder, ignorePatchID)
+		end,
+	},
 }
 
 function addon.SetSortOrder()
@@ -492,17 +498,17 @@ end
 
 
 function addon.SortCollection(frame)
-if getTab() == 1 then 
-addon.Sort[1][addon.sortDB.sortDropdown](Wardrobe)
-Wardrobe:UpdateItems()
-end
+	if getTab() == 1 then 
+		addon.Sort[1][addon.sortDB.sortDropdown](Wardrobe)
+		Wardrobe:UpdateItems()
+	end
 end
 
 
 function addon.SortSet(sets, reverseUIOrder, ignorePatchID)
- 			if not sets then return end
-	addon.Sort[getTab()][addon.sortDB.sortDropdown](self, sets, reverseUIOrder or IsModifierKeyDown(), ignorePatchID)
+ 	if not sets  or getTab() == 4 then return end
 
+	addon.Sort[getTab()][addon.sortDB.sortDropdown](self, sets, reverseUIOrder or IsModifierKeyDown(), ignorePatchID)
 end
 	--===
 	-- sort and update
