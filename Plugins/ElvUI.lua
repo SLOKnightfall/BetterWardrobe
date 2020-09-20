@@ -5,14 +5,18 @@
 if not IsAddOnLoaded("ElvUI") then return end
 local addonName, addon = ...
 
-local E, L, V, P, G = unpack(ElvUI); --Import: Engine, Locales, PrivateDB, ProfileDB, GlobalDB
-local MyPlugin = E:NewModule('addonName', 'AceHook-3.0', 'AceEvent-3.0', 'AceTimer-3.0'); --Create a plugin within ElvUI and adopt AceHook-3.0, AceEvent-3.0 and AceTimer-3.0. We can make use of these later.
+local E, L, V, P, G = unpack(ElvUI) --Import: Engine, Locales, PrivateDB, ProfileDB, GlobalDB
+local MyPlugin = E:NewModule('addonName', 'AceHook-3.0', 'AceEvent-3.0', 'AceTimer-3.0') --Create a plugin within ElvUI and adopt AceHook-3.0, AceEvent-3.0 and AceTimer-3.0. We can make use of these later.
 local EP = LibStub("LibElvUIPlugin-1.0") --We can use this to automatically insert our GUI tables when ElvUI_Config is loaded.
 local S = E:GetModule('Skins')
 
 function MyPlugin:Initialize()
 	--Register plugin so options are properly inserted when config is loaded
 	EP:RegisterPlugin(addonName, MyPlugin.InsertOptions)
+end
+
+function S:BetterWardrobe()
+		if not (E.private.skins.blizzard.enable and E.private.skins.blizzard.collections) then return end
 
 	--Collection Frame Tabs
 	local BW_WardrobeCollectionFrame = _G.BW_WardrobeCollectionFrame
@@ -53,6 +57,10 @@ function MyPlugin:Initialize()
 	BW_WardrobeOutfitDropDown.SaveButton:SetPoint('TOPLEFT', BW_WardrobeOutfitDropDown, 'TOPRIGHT', -2, -2)
 
 	S:HandleScrollBar(BW_WardrobeOutfitFrameScrollFrameScrollBar)
+
+	S:HandleButton(BW_CollectionListButton)
+	S:HandleIcon(BW_CollectionListButton.Icon)
+
 	
 	for _, Frame in ipairs(BW_WardrobeCollectionFrame.ContentFrames) do
 		if Frame.Models then
@@ -115,11 +123,31 @@ function MyPlugin:Initialize()
 		bu.SelectedTexture:SetColorTexture(1, 1, 1, 0.1)
 		--bu.HideItemVisual.Icon:Point("TOPRIGHT", bu, "TOPRIGHT", -8, -8)
 	end
-end
 
+	-- DetailsFrame
 	local DetailsFrame = BW_SetsCollectionFrame.DetailsFrame
 	DetailsFrame.Name:FontTemplate(nil, 16)
 	DetailsFrame.LongName:FontTemplate(nil, 16)
-	--S:HandleButton(DetailsFrame.VariantSetsButton)
 
+	hooksecurefunc(BW_WardrobeCollectionFrame.BW_SetsCollectionFrame, 'SetItemFrameQuality', function(_, itemFrame)
+		local icon = itemFrame.Icon
+		if not icon.backdrop then
+			icon:CreateBackdrop()
+			icon:SetTexCoord(unpack(E.TexCoords))
+			itemFrame.IconBorder:Hide()
+		end
+
+		if itemFrame.collected then
+			local quality = C_TransmogCollection.GetSourceInfo(itemFrame.sourceID).quality
+			local color = BAG_ITEM_QUALITY_COLORS[quality or 1]
+			icon.backdrop:SetBackdropBorderColor(color.r, color.g, color.b)
+		else
+			icon.backdrop:SetBackdropBorderColor(unpack(E.media.bordercolor))
+		end
+	end)
+end
+
+
+
+S:AddCallbackForAddon('BetterWardrobe')
 E:RegisterModule(MyPlugin:GetName()) --Register the module with ElvUI. ElvUI will now call MyPlugin:Initialize() when ElvUI is ready to load our plugin.

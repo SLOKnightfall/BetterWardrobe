@@ -171,12 +171,6 @@ local options = {
 }
 
 
-
-
-
-MIN_SET_COLLECTED = 1
-
-
 --ACE Profile Saved Variables Defaults
 local defaults = {
 	profile = {
@@ -2025,7 +2019,7 @@ function BetterWardrobeSetsCollectionMixin:RefreshAppearanceTooltip()
 	WardrobeCollectionFrame_SortSources(sources, sources[1].visualID, self.tooltipPrimarySourceID)
 	BW_WardrobeCollectionFrame_SetAppearanceTooltip(self, sources, self.tooltipPrimarySourceID)
 
-	C_Timer.After(.1, function() if needsRefresh then self:RefreshAppearanceTooltip(); needsRefresh = false; end; end) --Fix for items that returned retreaving info 
+	C_Timer.After(.05, function() if needsRefresh then self:RefreshAppearanceTooltip(); needsRefresh = false; end; end) --Fix for items that returned retreaving info 
 
 end
 
