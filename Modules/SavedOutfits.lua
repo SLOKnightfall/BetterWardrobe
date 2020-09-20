@@ -413,7 +413,6 @@ function BW_WardrobeOutfitMixin:CheckOutfitForSave(name)
 	end
 	-- store the state for this save
 	BW_WardrobeOutfitFrame.sources = sources
-
 	BW_WardrobeOutfitFrame.mainHandEnchant = mainHandEnchant
 	BW_WardrobeOutfitFrame.offHandEnchant = offHandEnchant
 	BW_WardrobeOutfitFrame.pendingSources = pendingSources
@@ -454,10 +453,6 @@ function BW_WardrobeOutfitFrameMixin:Toggle(dropDown)
 	end
 end
 
-
-
---			BW_WardrobeOutfitFrame.But = self.moduleoptions.Buttons
---			BW_WardrobeOutfitFrame.Content = self.moduleoptions
 
 function BW_WardrobeOutfitFrameMixin:Update()
 	local outfits = GetOutfits()
@@ -579,14 +574,14 @@ function BW_WardrobeOutfitFrameMixin:DeleteOutfit(outfitID)
 	if GetCVarBool("transmogCurrentSpecOnly") then
 		local specIndex = GetSpecialization()
 		local value = addon.chardb.profile.lastTransmogOutfitIDSpec[specIndex]
-		if value > 0 then  addon.chardb.profile.lastTransmogOutfitIDSpec[specIndex] = value -1 end
+		if value > 0 then  addon.chardb.profile.lastTransmogOutfitIDSpec[specIndex] = value - 1 end
 
 		--SetCVar("lastTransmogOutfitIDSpec"..specIndex, value)
 	else
 		for specIndex = 1, GetNumSpecializations() do
 			--SetCVar("lastTransmogOutfitIDSpec"..specIndex, value)
 		local value = addon.chardb.profile.lastTransmogOutfitIDSpec[specIndex]
-		if value > 0 then  addon.chardb.profile.lastTransmogOutfitIDSpec[specIndex] = value -1 end
+		if value > 0 then  addon.chardb.profile.lastTransmogOutfitIDSpec[specIndex] = value - 1 end
 
 		end
 	end
@@ -692,33 +687,33 @@ end
 
 
 function BW_WardrobeOutfitFrameMixin:CreateScrollFrame()
-	self.scrollframe = self.scrollframe or CreateFrame("ScrollFrame", self:GetName().."ScrollFrame", self, "UIPanelScrollFrameTemplate");
-	self.scrollchild = self.scrollchild or CreateFrame("Frame"); -- not sure what happens if you do, but to be safe, don't parent this yet (or do anything with it)
+	self.scrollframe = self.scrollframe or CreateFrame("ScrollFrame", self:GetName().."ScrollFrame", self, "UIPanelScrollFrameTemplate")
+	self.scrollchild = self.scrollchild or CreateFrame("Frame") -- not sure what happens if you do, but to be safe, don't parent this yet (or do anything with it)
 	 
 	local scrollbarName = self.scrollframe:GetName()
-	self.scrollbar = _G[scrollbarName.."ScrollBar"];
-	self.scrollupbutton = _G[scrollbarName.."ScrollBarScrollUpButton"];
-	self.scrolldownbutton = _G[scrollbarName.."ScrollBarScrollDownButton"];
+	self.scrollbar = _G[scrollbarName.."ScrollBar"]
+	self.scrollupbutton = _G[scrollbarName.."ScrollBarScrollUpButton"]
+	self.scrolldownbutton = _G[scrollbarName.."ScrollBarScrollDownButton"]
 	 
-	self.scrollupbutton:ClearAllPoints();
-	self.scrollupbutton:SetPoint("TOPRIGHT", self.scrollframe, "TOPRIGHT", -2, -2);
+	self.scrollupbutton:ClearAllPoints()
+	self.scrollupbutton:SetPoint("TOPRIGHT", self.scrollframe, "TOPRIGHT", -2, -2)
 	 
-	self.scrolldownbutton:ClearAllPoints();
-	self.scrolldownbutton:SetPoint("BOTTOMRIGHT", self.scrollframe, "BOTTOMRIGHT", -2, 2);
+	self.scrolldownbutton:ClearAllPoints()
+	self.scrolldownbutton:SetPoint("BOTTOMRIGHT", self.scrollframe, "BOTTOMRIGHT", -2, 2)
 	 
-	self.scrollbar:ClearAllPoints();
-	self.scrollbar:SetPoint("TOP", self.scrollupbutton, "BOTTOM", 0, -2);
-	self.scrollbar:SetPoint("BOTTOM", self.scrolldownbutton, "TOP", 0, 2);
+	self.scrollbar:ClearAllPoints()
+	self.scrollbar:SetPoint("TOP", self.scrollupbutton, "BOTTOM", 0, -2)
+	self.scrollbar:SetPoint("BOTTOM", self.scrolldownbutton, "TOP", 0, 2)
 	 
-	self.scrollframe:SetScrollChild(self.scrollchild);
-	self.scrollframe:SetAllPoints(self);
-	self.scrollframe:ClearAllPoints();
+	self.scrollframe:SetScrollChild(self.scrollchild)
+	self.scrollframe:SetAllPoints(self)
+	self.scrollframe:ClearAllPoints()
 	self.scrollframe:SetPoint("TOPLEFT", self, "TOPLEFT", 11, -15)
 	self.scrollframe:SetPoint("BOTTOMRIGHT", self, "BOTTOMRIGHT", -11, 15)
-	self.scrollchild:SetSize(self.scrollframe:GetWidth(), ( self.scrollframe:GetHeight() * 2 ));
+	self.scrollchild:SetSize(self.scrollframe:GetWidth(), ( self.scrollframe:GetHeight() * 2 ))
 
-	self.moduleoptions = self.moduleoptions or CreateFrame("Frame", nil, self.scrollchild);
-	self.moduleoptions:SetAllPoints(self.scrollchild);
+	self.moduleoptions = self.moduleoptions or CreateFrame("Frame", nil, self.scrollchild)
+	self.moduleoptions:SetAllPoints(self.scrollchild)
 
 	BW_WardrobeOutfitFrame.Content = self.moduleoptions
 
@@ -783,6 +778,7 @@ function BW_WardrobeOutfitEditFrameMixin:OnAccept()
 	if (not self.AcceptButton:IsEnabled()) then
 		return
 	end
+
 	StaticPopupSpecial_Hide(self)
 	BW_WardrobeOutfitFrame:NameOutfit(self.EditBox:GetText(), self.outfitID)
 end
@@ -798,11 +794,8 @@ function WardrobeOutfitCheckAppearancesMixin:OnEvent(event, sourceID, canCollect
 		else
 			BW_WardrobeOutfitFrame.hadInvalidSources = true
 		end
+
 		BW_WardrobeOutfitFrame.pendingSources[sourceID] = nil
 		BW_WardrobeOutfitFrame:EvaluateSaveState()
 	end
 end
-
-
-
-

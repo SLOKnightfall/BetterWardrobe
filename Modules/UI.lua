@@ -24,33 +24,17 @@ local db, active
 local FileData
 local SortOrder
 		
-local dropdownOrder = {LE_DEFAULT, LE_ALPHABETIC, LE_APPEARANCE, LE_COLOR, LE_EXPANSION, LE_ITEM_SOURCE }
+local dropdownOrder = {LE_DEFAULT, LE_ALPHABETIC, LE_APPEARANCE, LE_COLOR, LE_EXPANSION, LE_ITEM_SOURCE}
 local defaults = {
-	db_version = 2,
 	sortDropdown = LE_DEFAULT,
 	reverse = false,
 }
 
 local LegionWardrobeY = IsAddOnLoaded("LegionWardrobe") and 55 or 5
 
-local function GetTab()
-	local atTransmogrifier = WardrobeFrame_IsAtTransmogrifier()
-	local tabID
-
-	if ( atTransmogrifier ) then
-		tabID = WardrobeCollectionFrame.selectedTransmogTab
-
-	else
-		tabID = WardrobeCollectionFrame.selectedCollectionTab
-	end
-
-	return tabID, atTransmogrifier
-end
-
-
 local f = CreateFrame("Frame")
 function UI.SortDropdowns_Initialize()
-	if not addon.sortDB or addon.sortDB.db_version < defaults.db_version then
+	if not addon.sortDB then
 		addon.sortDB = CopyTable(defaults)
 	end
 
@@ -68,7 +52,7 @@ function UI.SortDropdowns_Initialize()
 			UIDropDownMenu_SetText(BW_SortDropDown, COMPACT_UNIT_FRAME_PROFILE_SORTBY.." "..L[self.value])
 			db.reverse = IsModifierKeyDown()
 			addon.SetSortOrder(db.reverse)
-			local tabID = GetTab()
+			local tabID = addon.GetTab()
 			if tabID == 1 then 
 				Wardrobe:SortVisuals()
 			elseif tabID == 2 then
@@ -80,7 +64,7 @@ function UI.SortDropdowns_Initialize()
 			end
 		end
 		
-		local tabID = GetTab()
+		local tabID = addon.GetTab()
 		for _, id in pairs(dropdownOrder) do
 			if id == LE_ITEM_SOURCE and (tabID == 2 or tabID == 3) then
 			else
@@ -170,7 +154,7 @@ function BW_WardrobeCollectionFrame_SetTab(tabID)
 
 		WardrobeCollectionFrame.FilterButton:SetShown(not atTransmogrifier)
 		WardrobeCollectionFrame.FilterButton:SetEnabled(tab1 and WardrobeCollectionFrame.ItemsCollectionFrame.transmogType == LE_TRANSMOG_TYPE_APPEARANCE or tab2)
-WardrobeCollectionFrame.progressBar:SetShown(not tab4)
+		WardrobeCollectionFrame.progressBar:SetShown(not tab4)
 		BW_CollectionListButton:SetShown(tab1 and not atTransmogrifier)
 
 		BW_WardrobeCollectionFrame.FilterButton:SetShown(tab3)
@@ -234,7 +218,6 @@ WardrobeCollectionFrame.progressBar:SetShown(not tab4)
 
 	end
 end
-
 
 
 local function CreateVisualViewButton()
@@ -339,7 +322,7 @@ function UI.BuildLoadQueueButton()
 		if setType == "set" then
 			WardrobeCollectionFrame.SetsTransmogFrame:LoadSet(setID)
 		elseif setType == "extraset" then 
-		BW_SetsTransmogFrame:LoadSet(setID)
+			BW_SetsTransmogFrame:LoadSet(setID)
 		end
 	end)
 
@@ -572,7 +555,7 @@ end
 
 
 function addon.ToggleHidden(model, isHidden)
-	local tabID = GetTab()
+	local tabID = addon.GetTab()
 	if tabID == 1 then 
 		local visualID = model.visualInfo.visualID
 		local source = WardrobeCollectionFrame_GetSortedAppearanceSources(visualID)[1]
@@ -637,16 +620,17 @@ function UI:DefaultDropdown_Update(model, button)
 		end
 
 		local setID = (model.visualInfo and model.visualInfo.visualID ) or model.setID
-		local type = tabType[GetTab()]
+		local type = tabType[addon.GetTab()]
 		local variantTarget, match, matchType
 		local variantType = ""
-		if type == "set" then 
+		if type == "set" or type =="extraset" then 
 			UIDropDownMenu_AddSeparator()
 			UIDropDownMenu_AddButton({
 					notCheckable = true,
 					text = L["Queue Transmog"],
 					func = function() 
-						local setInfo = C_TransmogSets.GetSetInfo(setID)
+
+						local setInfo = addon.GetSetInfo(setID) or C_TransmogSets.GetSetInfo(setID)
 						local name = setInfo["name"]
 						addon.QueueForTransmog(type, setID, name)
 					 end,

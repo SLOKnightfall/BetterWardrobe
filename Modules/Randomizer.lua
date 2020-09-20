@@ -8,10 +8,10 @@ local AppearanceList
 
 
 function BW_RandomizeButton:OnEnter()
-	GameTooltip:ClearAllPoints();
-	GameTooltip:SetPoint("BOTTOM", self, "TOP", 0, 0);
-	GameTooltip:SetOwner(self, "ANCHOR_PRESERVE");
-	GameTooltip:SetText(L["Click: Randomize Items"].."\n"..L["Shift Click:Randomize Outfit"]);
+	GameTooltip:ClearAllPoints()
+	GameTooltip:SetPoint("BOTTOM", self, "TOP", 0, 0)
+	GameTooltip:SetOwner(self, "ANCHOR_PRESERVE")
+	GameTooltip:SetText(L["Click: Randomize Items"].."\n"..L["Shift Click:Randomize Outfit"])
 end
 
 
@@ -41,7 +41,7 @@ function BW_RandomizeButton:BuildAppearanceList()
 			AddSlotAppearances(slotID, categoryID)
 
 			for weaponCategoryID = FIRST_TRANSMOG_COLLECTION_WEAPON_TYPE, LAST_TRANSMOG_COLLECTION_WEAPON_TYPE do
-				local name, isWeapon, _, canMainHand, canOffHand = C_TransmogCollection.GetCategoryInfo(weaponCategoryID);
+				local name, isWeapon, _, canMainHand, canOffHand = C_TransmogCollection.GetCategoryInfo(weaponCategoryID)
 				if name and isWeapon and weaponCategoryID ~= categoryID then
 					if (slot == 'MAINHANDSLOT' and canMainHand) or (slot == 'SECONDARYHANDSLOT' and canOffHand) then
 						local equippedItemID = GetInventoryItemID('player', GetInventorySlotInfo(slot))
@@ -108,6 +108,7 @@ local function RandomizeOnUpdate(self, elapsed)
 				self:SetScript('OnUpdate', nil)
 			end
 		end
+		
 		totalTime = 0
 	end
 end
@@ -121,7 +122,7 @@ function BW_RandomizeButton:Randomize(type)
 	if type == "outfit" then
 			RandomizeOutfit()
 			self.RunRandom = RandomizeOutfit
-	elseif type == "item" then 
+	elseif type == "item" then
 			self.Slot = slotID
 			RandomizeBySlot(slotID)
 			self.RunRandom = RandomizeBySlot(slotID)

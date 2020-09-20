@@ -1,5 +1,3 @@
-
-
 local addonName, addon = ...
 addon = LibStub("AceAddon-3.0"):GetAddon(addonName)
 
@@ -12,26 +10,27 @@ function CollectionList:BuildCollectionList(complete)
 	local list = {}
 	local searchString = string.lower(WardrobeCollectionFrameSearchBox:GetText())
 	local filterCollected = C_TransmogCollection.GetCollectedShown()
-	local filterUncollected = C_TransmogCollection.GetUncollectedShown();
+	local filterUncollected = C_TransmogCollection.GetUncollectedShown()
 	local filterSource = {}
-	for i=1,6 do
+	
+	for i = 1, 6 do
 		filterSource[i] = C_TransmogCollection.IsSourceTypeFilterChecked(i)
 	end
 
-	for visualID, _ in pairs(addon.chardb.profile.collectionList["item"]) do 
+	for visualID, _ in pairs(addon.chardb.profile.collectionList["item"]) do
 		local sources = C_TransmogCollection.GetAppearanceSources(visualID)
 		local sourceInfo = C_TransmogCollection.GetSourceInfo(sources[1].sourceID)
 		local isCollected = sourceInfo.isCollected
 		local sourceType = sourceInfo.sourceType
 
-		if complete then 
+		if complete then
 			tinsert(list, sourceInfo)
-		elseif ((not isCollected and filterUncollected)  and (sourceType and not filterSource[sourceType])) or (isCollected and filterCollected)  then 
-			if searchString then 
+		elseif ((not isCollected and filterUncollected)  and (sourceType and not filterSource[sourceType])) or (isCollected and filterCollected)  then
+			if searchString then
 
 				for i, data in pairs(sources) do
 					local match = string.find(string.lower(data.name or ""), searchString) -- or string.find(baseSet.label, searchString) or string.find(baseSet.description, searchString)
-					if match then 
+					if match then
 						tinsert(list, sourceInfo)
 						break
 					end
@@ -44,7 +43,6 @@ function CollectionList:BuildCollectionList(complete)
 
 	return list
 end
-
 
 
 function CollectionList:BuildShoppingList()
@@ -71,7 +69,7 @@ function CollectionList:UpdateList(type, typeID, add)
 	if type == "item" then --TypeID is visualID
 		addon.chardb.profile.collectionList[type][typeID] = add or nil
 		if WardrobeCollectionFrame.ItemsCollectionFrame:IsShown() then
-			WardrobeCollectionFrame.ItemsCollectionFrame:RefreshVisualsList() 
+			WardrobeCollectionFrame.ItemsCollectionFrame:RefreshVisualsList()
 			WardrobeCollectionFrame.ItemsCollectionFrame:UpdateItems()
 			print(add and L["Appearance added."] or L["Appearance removed."] )
 		end
@@ -79,10 +77,10 @@ function CollectionList:UpdateList(type, typeID, add)
 		return addon.chardb.profile.collectionList[type][typeID]
 	else
 		local sources
-		if type == "set" then 
+		if type == "set" then
 			sources = C_TransmogSets.GetSetSources(typeID)
 			setName = C_TransmogSets.GetSetInfo(typeID).name
-		else 
+		else
 			setInfo = addon.GetSetInfo(typeID)
 			sources = addon.GetSetsources(typeID)
 			setName = "name"
@@ -103,7 +101,7 @@ function CollectionList:UpdateList(type, typeID, add)
 			addSet = self:UpdateList("item", visualID, (add and not isCollected) or nil)	
 		end
 
-		if type == "set" then 
+		if type == "set" then
 			WardrobeCollectionFrame.SetsCollectionFrame:OnSearchUpdate()
 			WardrobeCollectionFrame.SetsTransmogFrame:OnSearchUpdate()
 		else
@@ -121,10 +119,10 @@ BetterWardrobeSetsCollectionListMixin = {}
 function BetterWardrobeSetsCollectionListMixin:Toggle(toggleState)
 	if ( IsShiftKeyDown() ) then
 		CollectionList:GenerateListView()
-	else 
+	else
 		local atTransmogrifier = WardrobeFrame_IsAtTransmogrifier()
 		WardrobeCollectionFrame.ItemsCollectionFrame:SetActiveSlot("HEADSLOT", LE_TRANSMOG_TYPE_APPEARANCE)
-		WardrobeCollectionFrame.ItemsCollectionFrame:RefreshVisualsList();
+		WardrobeCollectionFrame.ItemsCollectionFrame:RefreshVisualsList()
 		WardrobeCollectionFrame.ItemsCollectionFrame:UpdateItems()
 		WardrobeCollectionFrame.ItemsCollectionFrame.SlotsFrame:SetShown(not toggleState and not atTransmogrifier)
 		WardrobeCollectionFrameWeaponDropDown:SetShown(not toggleState)
@@ -147,18 +145,19 @@ end
 
 local function GetCustomPriceValue(source, itemID)
 	return TSM_API.GetCustomPriceValue(source, itemID)
-
 end
+
 
 local function MoneyToString(priceMarket)
 	return TSM_API.FormatMoneyString(priceMarket)
 end
 
-local TSMSources 
+
+local TSMSources
 local function TSMPricelookup(itemID)
 	if (not IsAddOnLoaded("TradeSkillMaster")) then return "" end
 
-	if not TSMSources  then 
+	if not TSMSources  then
 		TSMSources = {}
 		TSM_API.GetPriceSourceKeys(TSMSources)
 	end
@@ -169,12 +168,11 @@ end
 
 
 local function GetBossInfo(itemID)
-local drops = C_TransmogCollection.GetAppearanceSourceDrops(itemID)
+	local drops = C_TransmogCollection.GetAppearanceSourceDrops(itemID)
 	local sourceText = ""
 	if ( #drops == 1 ) then
-		sourceText = _G["TRANSMOG_SOURCE_"..TRANSMOG_SOURCE_BOSS_DROP]..": "..string.format(WARDROBE_TOOLTIP_ENCOUNTER_SOURCE, drops[1].encounter, drops[1].instance);
-		showDifficulty = true;
-	else
+		sourceText = _G["TRANSMOG_SOURCE_"..TRANSMOG_SOURCE_BOSS_DROP]..": "..string.format(WARDROBE_TOOLTIP_ENCOUNTER_SOURCE, drops[1].encounter, drops[1].instance)
+		showDifficulty = true
 	end
 	return sourceText
 end
@@ -211,7 +209,7 @@ function CollectionList:GenerateListView()
 	local scroll = AceGUI:Create("ScrollFrame")
 	scroll:SetLayout("Flow")
 	scroll:SetFullWidth(true)
-	scroll:SetFullHeight(true) 
+	scroll:SetFullHeight(true)
 	scrollcontainer:AddChild(scroll)	
 
 	local btn = AceGUI:Create("Button")
@@ -227,9 +225,9 @@ function CollectionList:GenerateListView()
 
 	for i, data in ipairs(list) do
 			--cal itemID, itemType, itemSubType, itemEquipLoc, icon, itemClassID, itemSubClassID = GetItemInfoInstant(data.itemID)
-		if data then 
+		if data then
 			local _, itemLink, _, _, _, _, _, _, _, itemIcon, _, _, _, _, expacID = GetItemInfo(data.itemID)
-			local nameColor = ITEM_QUALITY_COLORS[data.quality] or "";
+			local nameColor = ITEM_QUALITY_COLORS[data.quality] or ""
 			local transmogSource = data.sourceType and _G["TRANSMOG_SOURCE_"..(data.sourceType)] or L.OM_GOLD..L["Collected"]..L.ENDCOLOR
 			local bossInfo = ""
 
@@ -237,7 +235,7 @@ function CollectionList:GenerateListView()
 			local priceText = TSMPricelookup(data.itemID)
 			local name = data.name and nameColor.hex..data.name..L.ENDCOLOR or ""
 
-			if data.sourceType and data.sourceType == 1 then 
+			if data.sourceType and data.sourceType == 1 then
 				bossinfo = GetBossInfo(data.sourceID)
 				CheckBox:SetText(L.COLLECTIONLIST_TEXT:format(name, bossinfo))
 			elseif data.sourceType and (data.sourceType == 3 or data.sourceType == 4 or data.sourceType == 6) then
@@ -250,28 +248,28 @@ function CollectionList:GenerateListView()
 			CheckBox:SetImageSize(20,20)
 			CheckBox:SetFullWidth(true)
 
-						if i == 1 or list[i-1].visualID ~= data.visualID then 
+						if i == 1 or list[i-1].visualID ~= data.visualID then
 							local Heading = AceGUI:Create("Heading")
 							Heading:SetFullWidth(true)
 							--Checkbox2:SetRelativeWidth(.02)
 							scroll:AddChild(Heading)
 						end
-			CheckBox:SetCallback("OnClick", function() 
+			CheckBox:SetCallback("OnClick", function()
 				if ( IsModifiedClick("CHATLINK") ) then
 						if ( itemLink ) then
-							print(itemLink)
-							HandleModifiedItemClick(itemLink);
+							--print(itemLink)
+							HandleModifiedItemClick(itemLink)
 						end
 				elseif ( IsModifiedClick("DRESSUP") ) then
-					DressUpVisual(data.sourceID);
+					DressUpVisual(data.sourceID)
 				end
 			end)
-			CheckBox:SetCallback("OnEnter", function() 
-				GameTooltip:SetOwner(UIParent, "ANCHOR_CURSOR", 0, 0);
+			CheckBox:SetCallback("OnEnter", function()
+				GameTooltip:SetOwner(UIParent, "ANCHOR_CURSOR", 0, 0)
 				GameTooltip:SetHyperlink(itemLink)
 				GameTooltip:Show()
 			end)
-			CheckBox:SetCallback("OnLeave", function() 
+			CheckBox:SetCallback("OnLeave", function()
 				GameTooltip:Hide()
 			end)
 			scroll:AddChild(CheckBox)
@@ -296,16 +294,16 @@ function CollectionList:TSMGroupExport()
 	local CheckBox = AceGUI:Create("MultiLineEditBox")
 	CheckBox:SetFullHeight(true)
 	CheckBox:SetFullWidth(true)
-	CheckBox:SetLabel("") 
+	CheckBox:SetLabel("")
 	f:AddChild(CheckBox)
 
 	local list = CollectionList:BuildShoppingList()
 	local itemString = ""
 	local groupCount = 1
-	local lastVisual 
+	local lastVisual
 	for i, data in ipairs(list) do
-		if data.sourceType and (data.sourceType == 3 or data.sourceType == 4 or data.sourceType == 6) then 
-			if i == 1 or lastVisual ~= data.visualID then 
+		if data.sourceType and (data.sourceType == 3 or data.sourceType == 4 or data.sourceType == 6) then
+			if i == 1 or lastVisual ~= data.visualID then
 				itemString = L["%sgroup:Appearance Group %s,"]:format(itemString, groupCount)
 				groupCount = groupCount + 1
 				lastVisual = data.visualID
@@ -316,4 +314,3 @@ function CollectionList:TSMGroupExport()
 	end
 	CheckBox:SetText(itemString)
 end
-
