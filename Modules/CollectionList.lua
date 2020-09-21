@@ -84,7 +84,7 @@ function CollectionList:UpdateList(type, typeID, add)
 			setInfo = addon.GetSetInfo(typeID)
 			sources = addon.GetSetsources(typeID)
 			setName = "name"
-			itemModID = setInfo.mod
+			itemModID = setInfo.mod or 0
 		end
 
 		addon.chardb.profile.collectionList[type][typeID] = (add and {}) or nil
@@ -94,7 +94,7 @@ function CollectionList:UpdateList(type, typeID, add)
 			local sourceInfo = C_TransmogCollection.GetSourceInfo(sourceID)
 			local visualID = C_TransmogCollection.GetItemInfo(sourceInfo.itemID, itemModID)--(type == "set" and sourceInfo.visualID) or addon.GetItemSource(sourceID, setInfo.mod)
 
-			if add then
+			if add and visualID then
 				addon.chardb.profile.collectionList[type][typeID][visualID] = (add and not isCollected and add)
 			end
 
@@ -179,7 +179,6 @@ end
 
 
 local  LISTWINDOW
---local pGuid, pBattlePetID, _, pNickname, pLevel, pIsFav, _, pName, _, _, _, _, _, _, _, pIsTradeable = C_PetJournal.GetPetInfoByIndex(index)
 local AceGUI = LibStub("AceGUI-3.0")
 function CollectionList:GenerateListView()
 	if self.LISTWINDOW then self.LISTWINDOW:Hide() end

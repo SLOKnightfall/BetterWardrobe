@@ -1,7 +1,8 @@
 <Ui xmlns="http://www.blizzard.com/wow/ui/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.blizzard.com/wow/ui/
 ..\FrameXML\UI.xsd">
-	<Script file="Data\DataBase.lua"/>
 	<Script file="BetterWardrobe.lua"/>
+	<Script file="Data\DataBase.lua"/>
+	<Script file="Modules\Blizzard_Wardrobe.lua"/>
 	<Script file="Modules\UI.lua"/>
 
 	<Button name ="BW_LoadQueueButton" parent = "WardrobeFrame" parentKey="LoadQueue" inherits="UIMenuButtonStretchTemplate" hidden="false">
@@ -418,42 +419,42 @@
 							<Anchor point="BOTTOM" x="22" y="38"/>
 						</Anchors>
 					</Frame>
-					<DressUpModel parentArray="Models" parentKey="ModelR1C1" inherits="BWWardrobeSetsTransmogModelTemplate">
+					<DressUpModel parentArray="Models" parentKey="ModelR1C1" inherits="BW_WardrobeSetsTransmogModelTemplate">
 						<Anchors>
 							<Anchor point="TOPLEFT" x="50" y="-50"/>
 						</Anchors>
 					</DressUpModel>
-					<DressUpModel parentArray="Models" parentKey="ModelR1C2" inherits="BWWardrobeSetsTransmogModelTemplate">
+					<DressUpModel parentArray="Models" parentKey="ModelR1C2" inherits="BW_WardrobeSetsTransmogModelTemplate">
 						<Anchors>
 							<Anchor point="TOPLEFT" relativeKey="$parent.ModelR1C1" relativePoint="TOPRIGHT" x="13" y="0"/>
 						</Anchors>
 					</DressUpModel>
-					<DressUpModel parentArray="Models" parentKey="ModelR1C3" inherits="BWWardrobeSetsTransmogModelTemplate">
+					<DressUpModel parentArray="Models" parentKey="ModelR1C3" inherits="BW_WardrobeSetsTransmogModelTemplate">
 						<Anchors>
 							<Anchor point="TOPLEFT" relativeKey="$parent.ModelR1C2" relativePoint="TOPRIGHT" x="13" y="0"/>
 						</Anchors>
 					</DressUpModel>
-					<DressUpModel parentArray="Models" parentKey="ModelR1C4" inherits="BWWardrobeSetsTransmogModelTemplate">
+					<DressUpModel parentArray="Models" parentKey="ModelR1C4" inherits="BW_WardrobeSetsTransmogModelTemplate">
 						<Anchors>
 							<Anchor point="TOPLEFT" relativeKey="$parent.ModelR1C3" relativePoint="TOPRIGHT" x="13" y="0"/>
 						</Anchors>
 					</DressUpModel>
-					<DressUpModel parentArray="Models" parentKey="ModelR2C1" inherits="BWWardrobeSetsTransmogModelTemplate">
+					<DressUpModel parentArray="Models" parentKey="ModelR2C1" inherits="BW_WardrobeSetsTransmogModelTemplate">
 						<Anchors>
 							<Anchor point="TOPLEFT" relativeKey="$parent.ModelR1C1" relativePoint="BOTTOMLEFT" x="0" y="-14"/>
 						</Anchors>
 					</DressUpModel>
-					<DressUpModel parentArray="Models" parentKey="ModelR2C2" inherits="BWWardrobeSetsTransmogModelTemplate">
+					<DressUpModel parentArray="Models" parentKey="ModelR2C2" inherits="BW_WardrobeSetsTransmogModelTemplate">
 						<Anchors>
 							<Anchor point="TOPLEFT" relativeKey="$parent.ModelR2C1" relativePoint="TOPRIGHT" x="13" y="0"/>
 						</Anchors>
 					</DressUpModel>
-					<DressUpModel parentArray="Models" parentKey="ModelR2C3" inherits="BWWardrobeSetsTransmogModelTemplate">
+					<DressUpModel parentArray="Models" parentKey="ModelR2C3" inherits="BW_WardrobeSetsTransmogModelTemplate">
 						<Anchors>
 							<Anchor point="TOPLEFT" relativeKey="$parent.ModelR2C2" relativePoint="TOPRIGHT" x="13" y="0"/>
 						</Anchors>
 					</DressUpModel>
-					<DressUpModel parentArray="Models" parentKey="ModelR2C4" inherits="BWWardrobeSetsTransmogModelTemplate">
+					<DressUpModel parentArray="Models" parentKey="ModelR2C4" inherits="BW_WardrobeSetsTransmogModelTemplate">
 						<Anchors>
 							<Anchor point="TOPLEFT" relativeKey="$parent.ModelR2C3" relativePoint="TOPRIGHT" x="13" y="0"/>
 						</Anchors>

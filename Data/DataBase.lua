@@ -1,7 +1,9 @@
 local addonName, addon = ...
 
 --local TextDump = LibStub("LibTextDump-1.0")
-addon = LibStub("AceAddon-3.0"):NewAddon(addon, addonName, "AceEvent-3.0", "AceConsole-3.0", "AceHook-3.0")
+--addon = LibStub("AceAddon-3.0"):NewAddon(addon, addonName, "AceEvent-3.0", "AceConsole-3.0", "AceHook-3.0")
+addon = LibStub("AceAddon-3.0"):GetAddon(addonName)
+
 local L = LibStub("AceLocale-3.0"):GetLocale(addonName)
 
 local _, playerClass, classID = UnitClass("player")
@@ -193,7 +195,7 @@ end
 					end]]
 
 
-	function addon.BuildDB()
+	function addon.Init:BuildDB()
 	--local faction = GetFactionID(UnitFactionGroup("player"))
 		--AllSets()
 		local armorSet = addon.ArmorSets[CLASS_INFO[playerClass][3]]

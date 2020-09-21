@@ -155,7 +155,7 @@ function BW_WardrobeCollectionFrame_SetTab(tabID)
 		WardrobeCollectionFrame.searchBox:SetWidth(((tab2 or tab3 or tab4) and not atTransmogrifier and 145) or 105)
 		--WardrobeCollectionFrame.searchBox:SetShown(not tab4)
 
-		WardrobeCollectionFrame.FilterButton:SetShown(not atTransmogrifier)
+		WardrobeCollectionFrame.FilterButton:SetShown(tab2)--(not atTransmogrifier)
 		WardrobeCollectionFrame.FilterButton:SetEnabled(tab1 and WardrobeCollectionFrame.ItemsCollectionFrame.transmogType == LE_TRANSMOG_TYPE_APPEARANCE or tab2)
 		--WardrobeCollectionFrame.progressBar:SetShown(not tab4)
 		BW_CollectionListButton:SetShown(tab1 and not atTransmogrifier)
@@ -346,7 +346,7 @@ function UI.BuildLoadQueueButton()
 end
 
 
-function addon.BuildUI()
+function addon.Init:BuildUI()
 	UI.SortDropdowns_Initialize()
 	CreateVisualViewButton()
 	UI.ExtendTransmogView()
@@ -642,7 +642,8 @@ function UI:DefaultDropdown_Update(model, button)
 
 						local setInfo = addon.GetSetInfo(setID) or C_TransmogSets.GetSetInfo(setID)
 						local name = setInfo["name"]
-						addon.QueueForTransmog(type, setID, name)
+						--addon.QueueForTransmog(type, setID, name)
+						addon.QueueList = {type, setID, name}
 					 end,
 				})
 
