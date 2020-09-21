@@ -18,14 +18,20 @@ local CLASS_INFO = {
 	DEMONHUNTER = {12, 2048, "LEATHER"},
 	DRUID = {11, 1024,"LEATHER"},
 	HUNTER = {3, 4, "MAIL"},
-	MAGE = {8,128,"CLOTH"},
+	MAGE = {8, 128, "CLOTH"},
 	MONK = {10, 512, "LEATHER"},
 	PALADIN = {2, 2,"PLATE"},
 	PRIEST = {5, 16, "CLOTH"},
 	ROGUE = {4, 8, "LEATHER"},
 	SHAMAN = {7, 64, "MAIL"},
 	WARLOCK = {9, 256, "CLOTH"},
-	WARRIOR = {1,1,"PLATE"},
+	WARRIOR = {1, 1, "PLATE"},
+}
+local ARMOR_MASK = {
+	CLOTH = 400,
+	LEATHER = 3592,
+	MAIL = 68,
+	PLATE = 35,
 }
 
 
@@ -157,8 +163,39 @@ end
 	end
 
 
+	--local function AllSets()
+		--if not addon.allSetCache then 
+			--local faction = UnitFactionGroup("player")
+			--local classInfo = CLASS_INFO[playerClass]
+			--local armorTypeMask = ARMOR_MASK[classInfo[3]]
+
+		--[[	local allSets = C_TransmogSets.GetAllSets()
+							local filteredList = {}
+							local baseSets = {}
+				
+							for index, data in ipairs(allSets) do
+								if (data.requiredFaction == nil or data.requiredFaction == faction )  and
+								(data.classMask == nil or data.classMask == 0 or data.classMask == classInfo[2] or data.classMask == armorTypeMask) then
+									if data.baseSetID == nil then 
+								baseSets[data.setID] = data
+							end
+								end
+							end
+				
+							for setID, data in pairs(baseSets) do
+								--print(setID)
+								 	tinsert(filteredList, data)
+				
+							end
+				
+							addon.allSetCache = filteredList
+						end
+					end]]
+
+
 	function addon.BuildDB()
 	--local faction = GetFactionID(UnitFactionGroup("player"))
+		--AllSets()
 		local armorSet = addon.ArmorSets[CLASS_INFO[playerClass][3]]
 		addon.modArmor = {}--addon.ArmorSetMods[CLASS_INFO[playerClass][3]]
 
@@ -173,54 +210,60 @@ end
 
 
 	function addon.GetBaseList()
-		local list = {}
-		for _, data in ipairs(baseList) do 
-			tinsert(list, data)
+		if not addon.extraSetsCache then 
+			local list = {}
+			for _, data in ipairs(baseList) do 
+				tinsert(list, data)
+			end
+			addon.extraSetsCache = list
 		end
 
-		return list
+		return addon.extraSetsCache
 	end
 
 
 	function addon.GetSavedList()
-		local savedOutfits = addon.GetOutfits()
-		local list = {}
-		for index, data in ipairs(savedOutfits) do
-		--print(data.name) 
-			local info = {}
-			info.items = {}
-			info.sources = {}
-			info.collected = true
-			info.name = data.name
-			info.description = ""
-			info.expansionID	= 1
-			info.source = 1
-			filter = 1 
-			info.favorite = false
-			info.hiddenUtilCollected = false
-			info.label = L["Saved Set"]
-			info.limitedTimeSet = false
-			info.patchID = ""
-			info.setID = index+5000
-			info.uiOrder = index*100
-			info.icon = data.icon
+		if not addon.savedSetCache then 
+			local savedOutfits = addon.GetOutfits()
+			local list = {}
+			for index, data in ipairs(savedOutfits) do
+			--print(data.name) 
+				local info = {}
+				info.items = {}
+				info.sources = {}
+				info.collected = true
+				info.name = data.name
+				info.description = ""
+				info.expansionID	= 1
+				info.source = 1
+				filter = 1 
+				info.favorite = false
+				info.hiddenUtilCollected = false
+				info.label = L["Saved Set"]
+				info.limitedTimeSet = false
+				info.patchID = ""
+				info.setID = data.outfitID+5000
+				info.uiOrder = data.index*100
+				info.icon = data.icon
 
-			if data.set == "default" then 
+				if data.set == "default" then 
 
-				info.sources = C_TransmogCollection.GetOutfitSources(data.outfitID)
-			else
+					info.sources = C_TransmogCollection.GetOutfitSources(data.outfitID)
+				else
 
-			for i = 1, 16 do
-				info.sources[i] = data[i]
+				for i = 1, 16 do
+					info.sources[i] = data[i]
+				end
 			end
+
+				setsInfo[info.setID] = info
+				tinsert(list, setsInfo[info.setID])
+				
+			end
+			addon.SavedSetCache = list
 		end
 
-			setsInfo[info.setID] = info
-			tinsert(list, setsInfo[info.setID])
-			
-		end
-
-		return list
+		return addon.SavedSetCache
 	end
 
 --[[

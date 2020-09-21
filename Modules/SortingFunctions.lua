@@ -161,36 +161,53 @@ addon.Sort = {
 		end
 	end,
 
-	["SortColor"] = function(source1, source2)
-		local file1 = addon.ItemAppearance[source1.visualID]
-		local file2 = addon.ItemAppearance[source2.visualID]
-		
-		if file1 and file2 then
-			local index1 = #colors+1
-			for k, v in pairs(colors) do
-				if strfind(file1, v) then
-					index1 = k
-					break
-				end
-			end
-			
-			local index2 = #colors+1
-			for k, v in pairs(colors) do
-				if strfind(file2, v) then
-					index2 = k
-					break
-				end
-			end
-			
-			if index1 == index2 then
-				return SortOrder(file1, file2)
-			else
-				return SortOrder(index1, index2)
+	["SortSetAlphabetic"] = function(sets, reverseUIOrder, ignorePatchID)
+		local comparison = function(set1, set2)
+
+			if ( set1.favorite ~= set2.favorite ) then
+				return set1.favorite
 			end
 
-		else
-			return SortOrder(source1.uiOrder, source2.uiOrder)
+			return SortOrder(set1.name, set2.name)
 		end
+
+		table.sort(sets, comparison)
+	end,
+
+	["SortColor"] = function(sets, reverseUIOrder)
+		local comparison = function(source1, source2)
+			local file1 = addon.ItemAppearance[source1.visualID]
+			local file2 = addon.ItemAppearance[source2.visualID]
+			
+			if file1 and file2 then
+				local index1 = #colors+1
+				for k, v in pairs(colors) do
+					if strfind(file1, v) then
+						index1 = k
+						break
+					end
+				end
+				
+				local index2 = #colors+1
+				for k, v in pairs(colors) do
+					if strfind(file2, v) then
+						index2 = k
+						break
+					end
+				end
+				
+				if index1 == index2 then
+					return SortOrder(file1, file2)
+				else
+					return SortOrder(index1, index2)
+				end
+
+			else
+				return SortOrder(source1.uiOrder, source2.uiOrder)
+			end
+		end
+
+		table.sort(sets, comparison)
 	end,
 
 	["SortItemByExpansion"] = function(source1, source2)
@@ -325,7 +342,7 @@ addon.Sort = {
 		
 		-- sort by the color in filename
 		[LE_COLOR] = function(self)
-			sort(Wardrobe:GetFilteredVisualsList(), addon.Sort.SortColor)
+			addon.Sort.SortColor(Wardrobe:GetFilteredVisualsList())
 		end,
 
 		[LE_EXPANSION] = function(self)
@@ -340,10 +357,7 @@ addon.Sort = {
 		end,
 
 		[LE_ALPHABETIC] = function(self, sets, reverseUIOrder, ignorePatchID)
-			local comparison = function(set1, set2)
-				return SortOrder(set1.name, set2.name)
-			end
-			table.sort(sets, comparison)
+			addon.Sort.SortSetAlphabetic(sets, reverseUIOrder, ignorePatchID)
 		end,
 
 		[LE_APPEARANCE] = function(self, sets, reverseUIOrder, ignorePatchID)
@@ -386,7 +400,7 @@ addon.Sort = {
 				data.visualID = sourceInfo.visualID
 			end
 
-			sort(sets, addon.Sort.SortColor)
+			addon.Sort.SortColor(sets)
 		end,
 
 		[LE_ITEM_SOURCE] = function(self, sets, reverseUIOrder, ignorePatchID)
@@ -403,10 +417,7 @@ addon.Sort = {
 		end,
 
 		[LE_ALPHABETIC] = function(self, sets, reverseUIOrder, ignorePatchID)
-			local comparison = function(set1, set2)
-				return SortOrder(set1.name, set2.name)
-			end
-			table.sort(sets, comparison)
+			addon.Sort.SortSetAlphabetic(sets, reverseUIOrder, ignorePatchID)
 		end,
 
 		[LE_APPEARANCE] = function(self, sets, reverseUIOrder, ignorePatchID)
@@ -437,7 +448,7 @@ addon.Sort = {
 				data.visualID = sourceInfo and sourceInfo.visualID
 			end
 
-			sort(sets, addon.Sort.SortColor)
+			addon.Sort.SortColor(sets)
 		end,
 
 		[LE_ITEM_SOURCE] = function(self, sets, reverseUIOrder, ignorePatchID)
@@ -451,6 +462,18 @@ addon.Sort = {
 
 	[TAB_SAVED_SETS] = {
 		[LE_DEFAULT] = function(self, sets, reverseUIOrder, ignorePatchID)
+			local comparison = function(set1, set2)
+
+				local groupFavorite1 = (addon.chardb.profile.favorite[set1.setID] or set1.favoriteSetID) and true
+				local groupFavorite2 = (addon.chardb.profile.favorite[set2.setID] or set2.favoriteSetID) and true
+				if ( groupFavorite1 ~= groupFavorite2 ) then
+					return groupFavorite1
+				end
+
+				return SortOrder(set1.uiOrder, set2.uiOrder)
+			end
+
+			table.sort(sets, comparison)
 		end,
 	},
 }
@@ -469,10 +492,18 @@ end
 
 
 function addon.SortSet(sets, reverseUIOrder, ignorePatchID)
- 	if not sets  or CheckTab(4) then return end
+ 	if not sets  then return end
  	if DropDownList1:IsShown() then return end
-	addon.sortDB.reverse = IsModifierKeyDown()
-	addon.Sort[GetTab()][addon.sortDB.sortDropdown](self, sets, reverseUIOrder or IsModifierKeyDown(), ignorePatchID)
+ 	if not CheckTab(4) then 
+		addon.sortDB.reverse = IsModifierKeyDown()
+		addon.SetSortOrder()
+		addon.Sort[GetTab()][addon.sortDB.sortDropdown](self, sets, reverseUIOrder or IsModifierKeyDown(), ignorePatchID)
+	else
+		addon.sortDB.reverse = false
+		addon.SetSortOrder()
+		addon.Sort[TAB_SAVED_SETS][LE_DEFAULT](self, sets, reverseUIOrder or IsModifierKeyDown(), ignorePatchID)
+
+	end
 end
 	--===
 	-- sort and update
