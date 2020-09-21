@@ -234,7 +234,18 @@ local function CreateVisualViewButton()
 	b:SetScript("OnClick", function(self)
 		local baseFrame
 		self.viewAll = false
+		local aCtrlKeyIsDown = IsControlKeyDown();
 
+		if aCtrlKeyIsDown then 
+				addon.Profile.ShowHidden = not addon.Profile.ShowHidden
+				WardrobeCollectionFrame.SetsTransmogFrame:OnSearchUpdate()
+				BW_SetsTransmogFrame:OnSearchUpdate()
+				WardrobeCollectionFrame.SetsCollectionFrame:OnSearchUpdate()
+				BW_SetsCollectionFrame:OnSearchUpdate()
+
+
+				return
+		end
 		local atTransmogrifier = WardrobeFrame_IsAtTransmogrifier()
 		
 		--self.VisualMode = not self.VisualMode

@@ -114,7 +114,7 @@ end
 
 addon.Sort = {
 	["SortDefault"] = function(sets,  ignorePatchID)
-		addon.sortDB.reverse = not IsModifierKeyDown()
+		addon.sortDB.reverse = not IsShiftKeyDown()
 		addon.SetSortOrder()
 
 		local comparison = function(set1, set2)	
