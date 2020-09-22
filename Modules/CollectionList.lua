@@ -27,7 +27,6 @@ function CollectionList:BuildCollectionList(complete)
 			tinsert(list, sourceInfo)
 		elseif ((not isCollected and filterUncollected)  and (sourceType and not filterSource[sourceType])) or (isCollected and filterCollected)  then
 			if searchString then
-
 				for i, data in pairs(sources) do
 					local match = string.find(string.lower(data.name or ""), searchString) -- or string.find(baseSet.label, searchString) or string.find(baseSet.description, searchString)
 					if match then
@@ -221,7 +220,6 @@ function CollectionList:GenerateListView()
 	btn:SetPoint("BOTTOMRIGHT")
 
 	local list = CollectionList:BuildShoppingList()
-
 	for i, data in ipairs(list) do
 			--cal itemID, itemType, itemSubType, itemEquipLoc, icon, itemClassID, itemSubClassID = GetItemInfoInstant(data.itemID)
 		if data then
@@ -263,11 +261,13 @@ function CollectionList:GenerateListView()
 					DressUpVisual(data.sourceID)
 				end
 			end)
+
 			CheckBox:SetCallback("OnEnter", function()
 				GameTooltip:SetOwner(UIParent, "ANCHOR_CURSOR", 0, 0)
 				GameTooltip:SetHyperlink(itemLink)
 				GameTooltip:Show()
 			end)
+			
 			CheckBox:SetCallback("OnLeave", function()
 				GameTooltip:Hide()
 			end)

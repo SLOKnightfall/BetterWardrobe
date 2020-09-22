@@ -16,11 +16,13 @@ function MyPlugin:Initialize()
 end
 
 function S:BetterWardrobe()
-		if not (E.private.skins.blizzard.enable and E.private.skins.blizzard.collections) then return end
+	if not (E.private.skins.blizzard.enable and E.private.skins.blizzard.collections) then return end
 
 	--Collection Frame Tabs
 	local BW_WardrobeCollectionFrame = _G.BW_WardrobeCollectionFrame
+	local SetsCollectionFrame = _G.BW_WardrobeCollectionFrame.BW_SetsCollectionFrame
 	local BW_SortDropDown = _G.BW_SortDropDown
+
 	S:HandleTab(BW_WardrobeCollectionFrame.ItemsTab)
 	S:HandleTab(BW_WardrobeCollectionFrame.SetsTab)
 	S:HandleTab(BW_WardrobeCollectionFrame.ExtraSetsTab)
@@ -28,17 +30,12 @@ function S:BetterWardrobe()
 
 	UIDropDownMenu_SetWidth(BW_SortDropDown, 110)
 	S:HandleDropDownBox(BW_SortDropDown)
-	
 	BW_SortDropDown:SetScript("OnShow", function() UIDropDownMenu_SetWidth(BW_SortDropDown, 110) end)
-	--BW_SetsTransmogFrame
 
 	S:HandleButton(BW_WardrobeCollectionFrame.FilterButton)
 
 	BW_SetsTransmogFrame:StripTextures()
 	BW_SetsTransmogFrame:SetTemplate("Transparent")
-	S:HandleNextPrevButton(BW_SetsTransmogFrame.PagingFrame.NextPageButton)
-	S:HandleNextPrevButton(BW_SetsTransmogFrame.PagingFrame.PrevPageButton)
-
 
 	S:HandleButton(BW_LoadQueueButton)
 	BW_LoadQueueButton:ClearAllPoints()
@@ -51,6 +48,7 @@ function S:BetterWardrobe()
 	BW_WardrobeOutfitFrame:StripTextures()
 	BW_WardrobeOutfitFrame:SetTemplate('Transparent')
 	S:HandleButton(BW_WardrobeOutfitDropDown.SaveButton)
+
 	S:HandleDropDownBox(BW_WardrobeOutfitDropDown, 221)
 	BW_WardrobeOutfitDropDown:SetHeight(34)
 	BW_WardrobeOutfitDropDown.SaveButton:ClearAllPoints()
@@ -59,9 +57,9 @@ function S:BetterWardrobe()
 	S:HandleScrollBar(BW_WardrobeOutfitFrameScrollFrameScrollBar)
 
 	S:HandleButton(BW_CollectionListButton)
+
 	S:HandleIcon(BW_CollectionListButton.Icon)
 
-	
 	for _, Frame in ipairs(BW_WardrobeCollectionFrame.ContentFrames) do
 		if Frame.Models then
 			for _, Model in pairs(Frame.Models) do
@@ -89,45 +87,28 @@ function S:BetterWardrobe()
 		end
 
 		if Frame.PendingTransmogFrame then
-				Frame.PendingTransmogFrame.Glowframe:SetAtlas(nil)
-				Frame.PendingTransmogFrame.Glowframe:CreateBackdrop()
-				Frame.PendingTransmogFrame.Glowframe.backdrop:SetOutside()
-				Frame.PendingTransmogFrame.Glowframe.backdrop:SetBackdropColor(0, 0, 0, 0)
-				Frame.PendingTransmogFrame.Glowframe.backdrop:SetBackdropBorderColor(1, .77, 1, 1)
-				Frame.PendingTransmogFrame.Glowframe = Frame.PendingTransmogFrame.Glowframe.backdrop
+			Frame.PendingTransmogFrame.Glowframe:SetAtlas(nil)
+			Frame.PendingTransmogFrame.Glowframe:CreateBackdrop()
+			Frame.PendingTransmogFrame.Glowframe.backdrop:SetOutside()
+			Frame.PendingTransmogFrame.Glowframe.backdrop:SetBackdropColor(0, 0, 0, 0)
+			Frame.PendingTransmogFrame.Glowframe.backdrop:SetBackdropBorderColor(1, .77, 1, 1)
+			Frame.PendingTransmogFrame.Glowframe = Frame.PendingTransmogFrame.Glowframe.backdrop
 
-				for i = 1, 12 do
-					Frame.PendingTransmogFrame['Wisp'..i]:Hide()
-				end
+			for i = 1, 12 do
+				Frame.PendingTransmogFrame['Wisp'..i]:Hide()
+			end
 		end
 
 		if Frame.PagingFrame then
-				S:HandleNextPrevButton(Frame.PagingFrame.PrevPageButton, nil, nil, true)
-				S:HandleNextPrevButton(Frame.PagingFrame.NextPageButton, nil, nil, true)
+			S:HandleNextPrevButton(Frame.PagingFrame.PrevPageButton, nil, nil, true)
+			S:HandleNextPrevButton(Frame.PagingFrame.NextPageButton, nil, nil, true)
 		end
 	end
 
-		--Sets
-	local SetsCollectionFrame = BW_WardrobeCollectionFrame.BW_SetsCollectionFrame
+	--Sets
 	SetsCollectionFrame.RightInset:StripTextures()
 	SetsCollectionFrame:SetTemplate("Transparent")
 	SetsCollectionFrame.LeftInset:StripTextures()
-
-	local ScrollFrame = BW_SetsCollectionFrame.ScrollFrame
-	S:HandleScrollBar(ScrollFrame.scrollBar)
-	for i = 1, #ScrollFrame.buttons do
-		local bu = ScrollFrame.buttons[i]
-		S:HandleItemButton(bu)
-		bu.Favorite:SetAtlas("PetJournal-FavoritesIcon", true)
-		bu.Favorite:Point("TOPLEFT", bu.Icon, "TOPLEFT", -8, 8)
-		bu.SelectedTexture:SetColorTexture(1, 1, 1, 0.1)
-		--bu.HideItemVisual.Icon:Point("TOPRIGHT", bu, "TOPRIGHT", -8, -8)
-	end
-
-	-- DetailsFrame
-	local DetailsFrame = BW_SetsCollectionFrame.DetailsFrame
-	DetailsFrame.Name:FontTemplate(nil, 16)
-	DetailsFrame.LongName:FontTemplate(nil, 16)
 
 	hooksecurefunc(BW_WardrobeCollectionFrame.BW_SetsCollectionFrame, 'SetItemFrameQuality', function(_, itemFrame)
 		local icon = itemFrame.Icon
@@ -145,9 +126,24 @@ function S:BetterWardrobe()
 			icon.backdrop:SetBackdropBorderColor(unpack(E.media.bordercolor))
 		end
 	end)
+
+
+	local ScrollFrame = BW_SetsCollectionFrame.ScrollFrame
+	S:HandleScrollBar(ScrollFrame.scrollBar)
+	for i = 1, #ScrollFrame.buttons do
+		local bu = ScrollFrame.buttons[i]
+		S:HandleItemButton(bu)
+		bu.Favorite:SetAtlas("PetJournal-FavoritesIcon", true)
+		bu.Favorite:Point("TOPLEFT", bu.Icon, "TOPLEFT", -8, 8)
+		bu.SelectedTexture:SetColorTexture(1, 1, 1, 0.1)
+		--bu.HideItemVisual.Icon:Point("TOPRIGHT", bu, "TOPRIGHT", -8, -8)
+	end
+
+	-- DetailsFrame
+	local DetailsFrame = BW_SetsCollectionFrame.DetailsFrame
+	DetailsFrame.Name:FontTemplate(nil, 16)
+	DetailsFrame.LongName:FontTemplate(nil, 16)
 end
-
-
 
 S:AddCallbackForAddon('BetterWardrobe')
 E:RegisterModule(MyPlugin:GetName()) --Register the module with ElvUI. ElvUI will now call MyPlugin:Initialize() when ElvUI is ready to load our plugin.

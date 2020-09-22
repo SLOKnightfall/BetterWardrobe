@@ -1,19 +1,11 @@
 local addonName, addon = ...
 
---local TextDump = LibStub("LibTextDump-1.0")
---addon = LibStub("AceAddon-3.0"):NewAddon(addon, addonName, "AceEvent-3.0", "AceConsole-3.0", "AceHook-3.0")
 addon = LibStub("AceAddon-3.0"):GetAddon(addonName)
+addon.ArmorSets = addon.ArmorSets or {}
 
 local L = LibStub("AceLocale-3.0"):GetLocale(addonName)
-
 local _, playerClass, classID = UnitClass("player")
---local armorType = DB.GetClassArmorType(class)		  
 --local role = GetFilteredRole()
-addon.ArmorSets = addon.ArmorSets or {}
-addon.ArmorSetMods = addon.ArmorSetMods or {}
-addon.modArmor = addon.modArmor or {}
-
-
 
 local CLASS_INFO = {
 	DEATHKNIGHT = {6,32,"PLATE"},
@@ -29,13 +21,13 @@ local CLASS_INFO = {
 	WARLOCK = {9, 256, "CLOTH"},
 	WARRIOR = {1, 1, "PLATE"},
 }
+
 local ARMOR_MASK = {
 	CLOTH = 400,
 	LEATHER = 3592,
 	MAIL = 68,
 	PLATE = 35,
 }
-
 
 local EmptyArmor = {
 	[1] = 134110,
@@ -62,7 +54,6 @@ local hiddenSet ={
 	["uiOrder"] = 100,
 }
 
-
 local function GetFactionID(faction)
 	if faction == "Horde" then
 		return -- 64
@@ -83,42 +74,21 @@ end
 
 
 do
-	local baseList = {}
+	--local baseList = {}
 	local setsInfo = {}
 
-
-	local coreSetList = {}
-	local function GetCoreSets(incVariants)
-		local sets = C_TransmogSets.GetBaseSets()
- 		local fullSetList = {}
-		--Generates Useable Set
-		for _, set in ipairs(sets) do
-			coreSetList[set.setID] = true
-			if incVariants then 
-				local variantSets = C_TransmogSets.GetVariantSets(set.setID);
-				for _, set in ipairs(variantSets) do
-					coreSetList[set.setID] = true
-
-				end
-			end
-
-		end
+	local function sourceLookup(item, modID)
+		C_Timer.After(0, function() 
+				local _, source = C_TransmogCollection.GetItemInfo(item, modID)
+					if source and modID then 
+						addon.ArmorSetModCache[item] = addon.ArmorSetModCache[item] or {}
+						addon.ArmorSetModCache[item][modID] = source 
+					end
+		end);
 	end
 
-
-
-local function sourceLookup(item, modID)
-	C_Timer.After(0, function() 
-			local _, source = C_TransmogCollection.GetItemInfo(item, modID)
-				if source and modID then 
-					addon.modArmor[item] = addon.modArmor[item] or {}
-					addon.modArmor[item][modID] = source 
-					--print ("SavedA")
-				end
-	end);
-end
-
-	local function addArmor(armorSet)	
+	local function addArmor(armorSet)
+	local list = addon.extraSetsCache or {}	
 		for id, setData in pairs(armorSet) do
 			
 			local setInfo = C_TransmogSets.GetSetInfo(id)
@@ -137,7 +107,7 @@ end
 				if setData.mod then 
 					for i= 1, 50 do
 						sourceLookup(item, setData.mod or 0 ) --addon.GetItemSource(item, setData.mod or nil )
-						if 	addon.modArmor[item] and addon.modArmor[item][modID] then 
+						if 	addon.ArmorSetModCache[item] and addon.ArmorSetModCache[item][modID] then 
 							break
 						end
 					end
@@ -145,7 +115,7 @@ end
 
 			end
 	
-			if not  setInfo  or not coreSetList[id] then 
+			if not  setInfo  then 
 				if  (class) 
 					and not factionLocked 
 					and not heritageArmor  then
@@ -155,13 +125,13 @@ end
 					setData.label =(L[note] and L[note]) or ""
 					setData.uiOrder = id*100
 
-
 					setsInfo[id] = setData
-					tinsert(baseList, setsInfo[id])	
+					tinsert(list, setsInfo[id])	
 				end
 			else --print(setInfo)
 			end
 		end
+		addon.extraSetsCache = list
 	end
 
 
@@ -199,25 +169,33 @@ end
 	--local faction = GetFactionID(UnitFactionGroup("player"))
 		--AllSets()
 		local armorSet = addon.ArmorSets[CLASS_INFO[playerClass][3]]
-		addon.modArmor = {}--addon.ArmorSetMods[CLASS_INFO[playerClass][3]]
+		addon.ArmorSetModCache = addon.ArmorSetModCache or {}
 
 		addArmor(armorSet)
 		addArmor(addon.ArmorSets["COSMETIC"])
 		--BWSets = addon.modArmor
 		--Add Hidden Set
 		setsInfo[0] = hiddenSet
-		tinsert(baseList, setsInfo[0])
-		wipe(addon.ArmorSets)
+		tinsert(addon.extraSetsCache, setsInfo[0])
+		--wipe(addon.ArmorSets)
+	end
+
+	function addon:ClearCache()
+		--addon.ArmorSets = nil
+		addon.ArmorSetModCache = nil
+		addon.extraSetsCache = nil
+		setsInfo = nil
 	end
 
 
 	function addon.GetBaseList()
 		if not addon.extraSetsCache then 
-			local list = {}
+--[[			local list = {}
 			for _, data in ipairs(baseList) do 
 				tinsert(list, data)
 			end
-			addon.extraSetsCache = list
+			addon.extraSetsCache = list]]
+			addon.Init:BuildDB()
 		end
 
 		return addon.extraSetsCache
@@ -229,39 +207,34 @@ end
 			local savedOutfits = addon.GetOutfits()
 			local list = {}
 			for index, data in ipairs(savedOutfits) do
-			--print(data.name) 
 				local info = {}
 				info.items = {}
 				info.sources = {}
 				info.collected = true
 				info.name = data.name
 				info.description = ""
-				info.expansionID	= 1
-				info.source = 1
-				filter = 1 
+				info.expansionID = 1
 				info.favorite = false
 				info.hiddenUtilCollected = false
 				info.label = L["Saved Set"]
 				info.limitedTimeSet = false
 				info.patchID = ""
-				info.setID = data.outfitID+5000
-				info.uiOrder = data.index*100
+				info.setID = data.outfitID + 5000
+				info.uiOrder = data.index * 100
 				info.icon = data.icon
 
 				if data.set == "default" then 
-
 					info.sources = C_TransmogCollection.GetOutfitSources(data.outfitID)
 				else
-
-				for i = 1, 16 do
-					info.sources[i] = data[i]
+					for i = 1, 16 do
+						info.sources[i] = data[i]
+					end
 				end
-			end
 
 				setsInfo[info.setID] = info
 				tinsert(list, setsInfo[info.setID])
-				
 			end
+			
 			addon.SavedSetCache = list
 		end
 
@@ -325,5 +298,3 @@ end
 	end
 
 end
-
-
