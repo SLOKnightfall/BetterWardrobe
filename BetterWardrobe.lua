@@ -485,10 +485,64 @@ function SetsDataProvider:ClearSets()
 end
 
 
+local function CheckMissingLocation(set)
+--function addon.Sets:GetLocationBasedCount(set)
+	local filtered = false
+	local invType = {}
+
+	if not set.items then
+		local sources = C_TransmogSets.GetSetSources(set.setID)
+		for sourceID in pairs(sources) do
+			local sourceInfo = C_TransmogCollection.GetSourceInfo(sourceID)
+			local sources = sourceInfo and C_TransmogCollection.GetAppearanceSources(sourceInfo.visualID)
+			if sources then
+				if #sources > 1 then
+					WardrobeCollectionFrame_SortSources(sources)
+				end
+			
+				if  addon.missingSelection[sourceInfo.invType] and not sources[1].isCollected then
+
+					return true
+				elseif addon.missingSelection[sourceInfo.invType] then 
+					--filtered = true
+				end
+			end
+		end
+
+	else
+		for i, itemID in ipairs(set.items) do
+			local visualID, sourceID = addon.GetItemSource(itemID, set.mod)	
+			if sourceID then
+				local sourceInfo = C_TransmogCollection.GetSourceInfo(sourceID)
+				local sources = sourceInfo and C_TransmogCollection.GetAppearanceSources(sourceInfo.visualID)
+				if sources then
+					if #sources > 1 then
+						WardrobeCollectionFrame_SortSources(sources)
+					end
+					invType[sourceInfo.invType] = true
+--print(addon.missingSelection[sourceInfo.invType])
+					if  addon.missingSelection[sourceInfo.invType] and not sources[1].isCollected then
+						return true
+					elseif addon.missingSelection[sourceInfo.invType] then 
+					--filtered = true 
+					end
+				end
+			end
+		end
+	end
+
+	for type, value in pairs(addon.missingSelection) do
+		if value and invType[type] then
+			--filtered = true
+		end
+	end
+
+
+	return not filtered
+end
+
 local setsByExpansion = {}
 local setsByFilter = {}
-	
-
 function SetsDataProvider:FilterSearch(useBaseSet)
 	local baseSets
 	if useBaseSet then
@@ -511,12 +565,14 @@ function SetsDataProvider:FilterSearch(useBaseSet)
 			local collected = count == total
 			if ((addon.filterCollected[1] and collected) or
 				(addon.filterCollected[2] and not collected)) and
+				CheckMissingLocation(data) and
 		 		addon.xpacSelection[data.expansionID] and
 				addon.filterSelection[data.filter] and
 				(searchString and string.find(string.lower(data.name), searchString)) then -- or string.find(baseSet.label, searchString) or string.find(baseSet.description, searchString)then
 				tinsert(filteredSets, data)
 		end
 
+self:SortSets(filteredSets)
 		if useBaseSet then
 				self.baseSets = filteredSets
 		else

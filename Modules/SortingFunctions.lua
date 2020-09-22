@@ -493,7 +493,7 @@ end
 
 function addon.SortSet(sets, reverseUIOrder, ignorePatchID)
  	if not sets  then return end
- 	if DropDownList1:IsShown() then return end
+ --	if DropDownList1:IsShown() then return end
  	if not CheckTab(4) then 
 		addon.sortDB.reverse = IsModifierKeyDown()
 		addon.SetSortOrder()

@@ -182,9 +182,9 @@ do
 
 	function addon:ClearCache()
 		--addon.ArmorSets = nil
-		addon.ArmorSetModCache = nil
-		addon.extraSetsCache = nil
-		setsInfo = nil
+		--addon.ArmorSetModCache = nil
+		--addon.extraSetsCache = nil
+		--setsInfo = nil
 	end
 
 

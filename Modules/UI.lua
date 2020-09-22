@@ -159,6 +159,7 @@ function UI.LocationDropdowns_Initialize(self, level)
 		
 		for index, id in pairs(locationDrowpDown) do
 			if index ~= 21 then --Skip "robe" type
+				info.notCheckable = false
 				info.text = id
 				info.func = function(_, _, _, value)
 							addon.includeLocation[index] = value
@@ -484,10 +485,25 @@ function BW_WardrobeFilterDropDown_OnLoad(self)
 	UIDropDownMenu_Initialize(self, UI.FilterDropDown_InitializeItems, "MENU")
 end
 
+local function RefreshLists()
+	local tabID = addon.GetTab()
+			if tabID == 1 then
+				Wardrobe:SortVisuals()
+			elseif tabID == 2 then
+				WardrobeCollectionFrame.SetsCollectionFrame:OnSearchUpdate()
+				--WardrobeCollectionFrame.SetsTransmogFrame:OnSearchUpdate()
+			elseif tabID == 3 then
+				BW_SetsCollectionFrame:OnSearchUpdate()
+			--	BW_SetsTransmogFrame:OnSearchUpdate()
+			end
+	end
+
 local FILTER_SOURCES = {L["Classic Set"],L["Quest Set"],L["Dunegon Set"],L["Raid Recolor"],L["Raid Lookalike"],L["Garrison"],L["Island Expidetion"], L["Warfronts"]}
 local EXPANSIONS = {EXPANSION_NAME0 , EXPANSION_NAME1, EXPANSION_NAME2, EXPANSION_NAME3 , EXPANSION_NAME4, EXPANSION_NAME5, EXPANSION_NAME6, EXPANSION_NAME7, EXPANSION_NAME8}
-
+--locationDrowpDown
 do
+	local filterCollected = {true, true}
+	local missingSelection = {}
 	local filterSelection = {}
 	for i = 1, 8 do
 		filterSelection[i] = true
@@ -498,11 +514,10 @@ do
 		xpacSelection[i] = true
 	end
 
-	local filterCollected = {true, true}
 	addon.filterCollected = filterCollected
 	addon.xpacSelection = xpacSelection
 	addon.filterSelection = filterSelection
-	
+	addon.missingSelection = missingSelection
 	function UI:FilterDropDown_InitializeItems(level)
 		if (not WardrobeCollectionFrame.activeFrame) then
 			return
@@ -513,11 +528,12 @@ do
 		local atTransmogrifier = WardrobeFrame_IsAtTransmogrifier()
 
 		if level == 1 then
+			local refreshLevel = 1
 			info.text = COLLECTED
 			info.func = function(_, _, _, value)
 							filterCollected[1] = value
-							BW_SetsCollectionFrame:OnSearchUpdate()
-							BW_SetsTransmogFrame:OnSearchUpdate()
+							RefreshLists()
+							UIDropDownMenu_Refresh(BW_WardrobeFilterDropDown, 1, refreshLevel)
 						end
 			info.checked = 	function() return filterCollected[1] end
 			info.isNotRadio = true
@@ -526,13 +542,14 @@ do
 			info.text = NOT_COLLECTED
 			info.func = function(_, _, _, value)
 							filterCollected[2] =  value
-							BW_SetsCollectionFrame:OnSearchUpdate()
-							BW_SetsTransmogFrame:OnSearchUpdate()
+							RefreshLists()
+							UIDropDownMenu_Refresh(BW_WardrobeFilterDropDown, 1, refreshLevel)
 						end
 			info.checked = 	function() return filterCollected[2] end
 			info.isNotRadio = true
 
 			UIDropDownMenu_AddButton(info, level)
+			UIDropDownMenu_AddSeparator()
 
 			info.checked = 	nil
 			info.isNotRadio = nil
@@ -541,108 +558,153 @@ do
 			info.notCheckable = true
 
 			info.text = SOURCES
-				info.value = 1
+			info.value = 1
 			UIDropDownMenu_AddButton(info, level)
 
 			info.text = L["Expansion"]
 			info.value = 2
 			UIDropDownMenu_AddButton(info, level)
 
+			info.text = "Missing:"
+			info.value = 3
+			UIDropDownMenu_AddButton(info, level)
+
 		elseif level == 2  and UIDROPDOWNMENU_MENU_VALUE == 1 then
-				local refreshLevel = 2
-				info.hasArrow = false
-				info.isNotRadio = true
-				info.notCheckable = true
-				--tinsert(filterSelection,true)
-				info.text = CHECK_ALL
-				info.func = function()
-								for i = 1, #filterSelection do
-										filterSelection[i] = true
-								end
-
-								BW_SetsCollectionFrame:OnSearchUpdate()
-								BW_SetsTransmogFrame:OnSearchUpdate()
-								UIDropDownMenu_Refresh(BW_WardrobeFilterDropDown, 1, refreshLevel)
+			local refreshLevel = 2
+			info.hasArrow = false
+			info.isNotRadio = true
+			info.notCheckable = true
+			--tinsert(filterSelection,true)
+			info.text = CHECK_ALL
+			info.func = function()
+							for i = 1, #filterSelection do
+									filterSelection[i] = true
 							end
-				UIDropDownMenu_AddButton(info, level)
-
-				local refreshLevel = 2
-				info.hasArrow = false
-				info.isNotRadio = true
-				info.notCheckable = true
-				--tinsert(filterSelection,true)
-
-				info.text = UNCHECK_ALL
-				info.func = function()
-								for i = 1, #filterSelection do
-										filterSelection[i] = false
-								end
-
-								BW_SetsCollectionFrame:OnSearchUpdate()
-								BW_SetsTransmogFrame:OnSearchUpdate()
-								UIDropDownMenu_Refresh(BW_WardrobeFilterDropDown, 1, refreshLevel)
-							end
-				UIDropDownMenu_AddButton(info, level)
-				info.notCheckable = false
-
-				local numSources = #FILTER_SOURCES --C_TransmogCollection.GetNumTransmogSources()
-				for i = 1, numSources do
-					--tinsert(filterSelection,true)
-					info.text = FILTER_SOURCES[i]
-						info.func = function(_, _, _, value)
-							filterSelection[i] = value
-							BW_SetsCollectionFrame:OnSearchUpdate()
-							BW_SetsTransmogFrame:OnSearchUpdate()
+							RefreshLists()
+							UIDropDownMenu_Refresh(BW_WardrobeFilterDropDown, 1, refreshLevel)
 						end
-						info.checked = 	function() return filterSelection[i] end
+			UIDropDownMenu_AddButton(info, level)
+
+			local refreshLevel = 2
+			info.hasArrow = false
+			info.isNotRadio = true
+			info.notCheckable = true
+			--tinsert(filterSelection,true)
+
+			info.text = UNCHECK_ALL
+			info.func = function()
+							for i = 1, #filterSelection do
+									filterSelection[i] = false
+							end
+							RefreshLists()
+							UIDropDownMenu_Refresh(BW_WardrobeFilterDropDown, 1, refreshLevel)
+						end
+			UIDropDownMenu_AddButton(info, level)
+			UIDropDownMenu_AddSeparator(level)
+
+			info.notCheckable = false
+
+			local numSources = #FILTER_SOURCES --C_TransmogCollection.GetNumTransmogSources()
+			for i = 1, numSources do
+				--tinsert(filterSelection,true)
+				info.text = FILTER_SOURCES[i]
+					info.func = function(_, _, _, value)
+						filterSelection[i] = value
+						RefreshLists()
+					end
+					info.checked = 	function() return filterSelection[i] end
+				UIDropDownMenu_AddButton(info, level)
+			end
+
+		elseif level == 2  and UIDROPDOWNMENU_MENU_VALUE == 2 then
+			local refreshLevel = 2
+			info.hasArrow = false
+			info.isNotRadio = true
+			info.notCheckable = true
+			info.text = CHECK_ALL
+			info.func = function()
+							for i = 1, #xpacSelection do
+								xpacSelection[i] = true
+							end
+							RefreshLists()
+							UIDropDownMenu_Refresh(BW_WardrobeFilterDropDown, 1, refreshLevel)
+						end
+			UIDropDownMenu_AddButton(info, level)
+
+			local refreshLevel = 2
+			info.hasArrow = false
+			info.isNotRadio = true
+			info.notCheckable = true
+
+			info.text = UNCHECK_ALL
+			info.func = function()
+							for i = 1, #xpacSelection do
+									xpacSelection[i] = false
+							end
+							RefreshLists()
+							UIDropDownMenu_Refresh(BW_WardrobeFilterDropDown, 1, refreshLevel)
+						end
+			UIDropDownMenu_AddButton(info, level)
+			UIDropDownMenu_AddSeparator(level)
+
+			info.notCheckable = false
+			for i = 1, #EXPANSIONS do
+				info.text = EXPANSIONS[i]
+					info.func = function(_, _, _, value)
+						xpacSelection[i] = value
+						RefreshLists()
+					end
+					info.checked = 	function() return xpacSelection[i] end
+				UIDropDownMenu_AddButton(info, level)
+			end
+	
+		elseif level == 2  and UIDROPDOWNMENU_MENU_VALUE == 3 then
+			info.hasArrow = false
+			info.isNotRadio = true
+			info.notCheckable = true
+			local refreshLevel = 2
+
+			info.text = CHECK_ALL
+			info.func = function()
+							for i in pairs(locationDrowpDown) do
+								missingSelection[i] = true
+							end
+							RefreshLists()
+							UIDropDownMenu_Refresh(BW_WardrobeFilterDropDown, 1, refreshLevel)
+						end
+			UIDropDownMenu_AddButton(info, level)
+
+			info.text = UNCHECK_ALL
+			info.func = function()
+							for i in pairs(locationDrowpDown) do
+								missingSelection[i] = false
+							end
+							RefreshLists()
+							UIDropDownMenu_Refresh(BW_WardrobeFilterDropDown, 1, refreshLevel)
+						end
+			UIDropDownMenu_AddButton(info, level)
+			UIDropDownMenu_AddSeparator(level)
+
+			for index, id in pairs(locationDrowpDown) do
+				if index ~= 21 then --Skip "robe" type
+					info.text = id
+					info.notCheckable = false
+					info.func = function(_, _, _, value)
+								missingSelection[index] = value
+
+								if index == 6 then
+									missingSelection[21] = value
+								end
+
+								UIDropDownMenu_Refresh(BW_WardrobeFilterDropDown, 1, refreshLevel)
+								RefreshLists()
+							end
+					info.checked = function() return missingSelection[index] end
 					UIDropDownMenu_AddButton(info, level)
 				end
-
-			elseif level == 2  and UIDROPDOWNMENU_MENU_VALUE == 2 then
-				local refreshLevel = 2
-				info.hasArrow = false
-				info.isNotRadio = true
-				info.notCheckable = true
-				info.text = CHECK_ALL
-				info.func = function()
-								for i = 1, #xpacSelection do
-										xpacSelection[i] = true
-								end
-								BW_SetsCollectionFrame:OnSearchUpdate()
-								BW_SetsTransmogFrame:OnSearchUpdate()
-								UIDropDownMenu_Refresh(BW_WardrobeFilterDropDown, 1, refreshLevel)
-							end
-				UIDropDownMenu_AddButton(info, level)
-
-				local refreshLevel = 2
-				info.hasArrow = false
-				info.isNotRadio = true
-				info.notCheckable = true
-
-				info.text = UNCHECK_ALL
-				info.func = function()
-								for i = 1, #xpacSelection do
-										xpacSelection[i] = false
-								end
-									BW_SetsCollectionFrame:OnSearchUpdate()
-									BW_SetsTransmogFrame:OnSearchUpdate()
-								UIDropDownMenu_Refresh(BW_WardrobeFilterDropDown, 1, refreshLevel)
-							end
-				UIDropDownMenu_AddButton(info, level)
-
-				info.notCheckable = false
-				for i = 1, #EXPANSIONS do
-					info.text = EXPANSIONS[i]
-						info.func = function(_, _, _, value)
-							xpacSelection[i] = value
-							BW_SetsCollectionFrame:OnSearchUpdate()
-							BW_SetsTransmogFrame:OnSearchUpdate()
-						end
-						info.checked = 	function() return xpacSelection[i] end
-					UIDropDownMenu_AddButton(info, level)
-				end
+			end
 		end
-		--end
+	--end
 	end
 end
 
