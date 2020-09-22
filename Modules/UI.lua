@@ -37,7 +37,8 @@ local locationDrowpDown = {
 	[8] = INVTYPE_LEGS,-- pants
 	[9] = INVTYPE_FEET,
 	[10] = INVTYPE_WRIST,  --wrist
-	[11] = INVTYPE_HAND, --handr
+	[11] = INVTYPE_HAND,
+	[21] = INVTYPE_ROBE,--handr
 }
 
 --= {INVTYPE_HEAD, INVTYPE_SHOULDER, INVTYPE_CLOAK, INVTYPE_CHEST, INVTYPE_WAIST, INVTYPE_LEGS, INVTYPE_FEET, INVTYPE_WRIST, INVTYPE_HAND}
@@ -166,15 +167,21 @@ function UI.LocationDropdowns_Initialize(self, level)
 
 			
 			for index, id in pairs(locationDrowpDown) do
-				info.text = id;
-				info.func = function(_, _, _, value)
-							addon.includeLocation[index] = value
-						UIDropDownMenu_Refresh(BW_LocationFilterDropDown, 1, 1)
-						WardrobeCollectionFrame.SetsTransmogFrame:OnSearchUpdate()
-						BW_SetsTransmogFrame:OnSearchUpdate()
-						end
-				info.checked = function() return addon.includeLocation[index] end
-				UIDropDownMenu_AddButton(info, level);
+				if index ~= 21 then 
+					info.text = id;
+					info.func = function(_, _, _, value)
+								addon.includeLocation[index] = value
+								if index == 6 then 
+									addon.includeLocation[21] = value
+								end
+
+							UIDropDownMenu_Refresh(BW_LocationFilterDropDown, 1, 1)
+							WardrobeCollectionFrame.SetsTransmogFrame:OnSearchUpdate()
+							BW_SetsTransmogFrame:OnSearchUpdate()
+							end
+					info.checked = function() return addon.includeLocation[index] end
+					UIDropDownMenu_AddButton(info, level);
+				end
 			end
 
 
@@ -289,7 +296,7 @@ function BW_WardrobeCollectionFrame_SetTab(tabID)
 		BW_WardrobeCollectionFrame.FilterButton:SetShown(tab3 or tab4)
 		BW_WardrobeCollectionFrame.FilterButton:SetEnabled(tab3)
 
-		BW_WardrobeCollectionFrame.LocationFilterButton:SetShown((tab2 or tab3) and atTransmogrifier)
+		BW_WardrobeCollectionFrame.LocationFilterButton:SetShown((tab2 or tab3) and atTransmogrifier and addon.Profile.ShowIncomplete)
 		
 		UIDropDownMenu_EnableDropDown(BW_SortDropDown)
 		BW_SortDropDown:ClearAllPoints()

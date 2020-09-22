@@ -17,6 +17,8 @@ local IN_PROGRESS_FONT_COLOR = CreateColor(0.251, 0.753, 0.251)
 local IN_PROGRESS_FONT_COLOR_CODE = "|cff40c040"
 local COLLECTION_LIST_WIDTH = 260
 
+local EmptyArmor = addon.Sets.EmptyArmor 
+
 function addon.Init:Blizzard_Wardrobe()
 	Profile = addon.Profile
 	Sets = addon.Sets
@@ -146,9 +148,12 @@ function SetsDataProvider:GetUsableSets(incVariants)
 			local availableSets = self:GetBaseSets()
 			for i, set in ipairs(availableSets) do
 				if not setIDS[set.setID or set.baseSetID] then 
-					local topSourcesCollected, topSourcesTotal = SetsDataProvider:GetSetSourceCounts(set.setID)
+					local topSourcesCollected, topSourcesTotal = addon.Sets:GetLocationBasedCount(set) --SetsDataProvider:GetSetSourceCounts(set.setID)
+					local cutoffLimit = (topSourcesTotal <= Profile.PartialLimit and topSourcesTotal) or Profile.PartialLimit --SetsDataProvider:GetSetSourceCounts(set.setID)
 
-					if ((not atTransmogrifier and BW_WardrobeToggle.VisualMode) or topSourcesCollected >= Profile.PartialLimit)  then --and not C_TransmogSets.IsSetUsable(set.setID) then
+					if ((not atTransmogrifier and BW_WardrobeToggle.VisualMode) or topSourcesCollected >= cutoffLimit and topSourcesTotal > 0 )then --and not C_TransmogSets.IsSetUsable(set.setID) then
+					--if (BW_WardrobeToggle.viewAll and BW_WardrobeToggle.VisualMode) or (not atTransmogrifier and BW_WardrobeToggle.VisualMode) or topSourcesCollected >= cutoffLimit  and topSourcesTotal > 0 then --and not C_TransmogSets.IsSetUsable(set.setID) then
+
 						
 						tinsert(self.usableSets, set)
 					end
@@ -158,9 +163,9 @@ function SetsDataProvider:GetUsableSets(incVariants)
 					local variantSets = C_TransmogSets.GetVariantSets(set.setID)
 					for i, set in ipairs(variantSets) do
 						if not setIDS[set.setID or set.baseSetID] then 
-							local topSourcesCollected, topSourcesTotal = SetsDataProvider:GetSetSourceCounts(set.setID)
+							local topSourcesCollected, topSourcesTotal = addon.Sets:GetLocationBasedCount(set)--SetsDataProvider:GetSetSourceCounts(set.setID)
 							if topSourcesCollected == topSourcesTotal then set.collected = true end
-							if ((not atTransmogrifier and BW_WardrobeToggle.VisualMode) or topSourcesCollected >= Profile.PartialLimit)  then --and not C_TransmogSets.IsSetUsable(set.setID) then
+							if ((not atTransmogrifier and BW_WardrobeToggle.VisualMode) or topSourcesCollected >= Profile.PartialLimit and topSourcesTotal > 0)  then --and not C_TransmogSets.IsSetUsable(set.setID) then
 								tinsert(self.usableSets, set)
 							end
 						end
@@ -370,7 +375,13 @@ function WardrobeCollectionFrame.SetsTransmogFrame:UpdateSets()
 				model.TransmogStateTexture:Hide()
 			end
 
-			local topSourcesCollected, topSourcesTotal = SetsDataProvider:GetSetSourceCounts(set.setID)
+			local topSourcesCollected, topSourcesTotal
+			if addon.Profile.ShowIncomplete then 
+				topSourcesCollected, topSourcesTotal = addon.Sets:GetLocationBasedCount(set)
+			else
+				topSourcesCollected, topSourcesTotal = SetsDataProvider:GetSetSourceCounts(set.setID) 
+			end
+ 
 			local setInfo = C_TransmogSets.GetSetInfo(set.setID)
 
 			model.Favorite.Icon:SetShown(C_TransmogSets.GetIsFavorite(set.setID))

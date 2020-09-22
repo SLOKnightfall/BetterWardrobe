@@ -403,8 +403,10 @@ local EmptyArmor = {
 	[10] = 158329, --handr
 }
 
+
 local Sets = {}
 addon.Sets = Sets
+addon.Sets.EmptyArmor = EmptyArmor
 
 function Sets:GetEmptySlots()
 	local setInfo = {}
@@ -548,6 +550,7 @@ function SetsDataProvider:GetSetSourceCounts(setID)
 	return sourceData.numCollected, sourceData.numTotal
 end
 
+
 --Lets CanIMogIt plugin get extra sets count
  function addon.GetSetSourceCounts(setID)
 	return SetsDataProvider:GetSetSourceCounts(setID)
@@ -555,47 +558,74 @@ end
 end
 
 
-function GetLocationBasedCount(set)
-	local baseSetList = SetsDataProvider:GetBaseSets()
-	local validSets = {}
+function addon.Sets:GetLocationBasedCount(set)
+	local collectedCount = 0
+	local totalCount = 0 
+	local items = {}
 
-
-		local validSet = false
-		local collectedCount = 0
-		local totalCount = 0 
-		for i, itemID in ipairs(set.items) do
-			local visualID, sourceID = addon.GetItemSource(itemID, set.mod)	
-			if sourceID then
-				local sourceInfo = C_TransmogCollection.GetSourceInfo(sourceID)
-				if  addon.includeLocation[sourceInfo.invType] then 
-					--validSet = true
-
+	if not set.items then 
+		local sources = C_TransmogSets.GetSetSources(set.setID)
+		for sourceID in pairs(sources) do
+			local sourceInfo = C_TransmogCollection.GetSourceInfo(sourceID)
+			local sources = sourceInfo and C_TransmogCollection.GetAppearanceSources(sourceInfo.visualID)
+			if sources then 
+				if #sources > 1 then 
+					WardrobeCollectionFrame_SortSources(sources)
+				end
+			
+				if  addon.includeLocation[sourceInfo.invType] then
 					totalCount = totalCount + 1
 
-					if sourceInfo.isCollected then 
+					if sources[1].isCollected then 
 						collectedCount = collectedCount + 1
 					end 
 				end
 			end
-	
+		end
+
+	else
+		for i, itemID in ipairs(set.items) do
+			local visualID, sourceID = addon.GetItemSource(itemID, set.mod)	
+			if sourceID then
+				local sourceInfo = C_TransmogCollection.GetSourceInfo(sourceID)
+				local sources = sourceInfo and C_TransmogCollection.GetAppearanceSources(sourceInfo.visualID)
+				if sources then 
+					if #sources > 1 then 
+						WardrobeCollectionFrame_SortSources(sources)
+					end
+
+					if  addon.includeLocation[sourceInfo.invType] then 
+						totalCount = totalCount + 1
+
+						if sources[1].isCollected then 
+							collectedCount = collectedCount + 1
+						end 
+					end
+				end
+			end
+		end
 	end
 
 	return collectedCount, totalCount
 end 
 
+
 function SetsDataProvider:GetUsableSets(incVariants)
 	if (not self.usableSets) then
 		local availableSets = SetsDataProvider:GetBaseSets()
 		local atTransmogrifier = WardrobeFrame_IsAtTransmogrifier()
+		local countData
 
 		--Generates Useable Set
 		self.usableSets = {} --SetsDataProvider:GetUsableSets()
 		for i, set in ipairs(availableSets) do
+			local topSourcesCollected, topSourcesTotal
+			if addon.Profile.ShowIncomplete then 
+				topSourcesCollected, topSourcesTotal = addon.Sets:GetLocationBasedCount(set)
+			else
+				topSourcesCollected, topSourcesTotal = SetsDataProvider:GetSetSourceCounts(set.setID)
+			end
 
-			--local sourceInfo = C_TransmogCollection.GetSourceInfo(set.setID)
-			--local include = (atTransmogrifier and sourceInfo and addon.includeLocation[sourceInfo.invType]) or (not atTransmogrifier and true)
-
-			local topSourcesCollected, topSourcesTotal = GetLocationBasedCount(set)
 			local cutoffLimit = (topSourcesTotal <= Profile.PartialLimit and topSourcesTotal) or Profile.PartialLimit --SetsDataProvider:GetSetSourceCounts(set.setID)
 			if (BW_WardrobeToggle.viewAll and BW_WardrobeToggle.VisualMode) or (not atTransmogrifier and BW_WardrobeToggle.VisualMode) or topSourcesCollected >= cutoffLimit  and topSourcesTotal > 0 then --and not C_TransmogSets.IsSetUsable(set.setID) then
 				tinsert(self.usableSets, set)
@@ -604,7 +634,13 @@ function SetsDataProvider:GetUsableSets(incVariants)
 			if incVariants then 
 				local variantSets = C_TransmogSets.GetVariantSets(set.setID)
 				for i, set in ipairs(variantSets) do
-					local topSourcesCollected, topSourcesTotal = GetLocationBasedCount(set) --SetsDataProvider:GetSetSourceCounts(set.setID)
+					local topSourcesCollected, topSourcesTotal
+					if addon.Profile.ShowIncomplete then 
+						topSourcesCollected, topSourcesTotal = addon.Sets:GetLocationBasedCount(set)
+					else
+						topSourcesCollected, topSourcesTotal = SetsDataProvider:GetSetSourceCounts(set.setID)
+					end
+
 					if topSourcesCollected == topSourcesTotal then set.collected = true end
 					local cutoffLimit = (topSourcesTotal <= Profile.PartialLimit and topSourcesTotal) or Profile.PartialLimit
 					if (BW_WardrobeToggle.viewAll and BW_WardrobeToggle.VisualMode) or (not atTransmogrifier and BW_WardrobeToggle.VisualMode) or topSourcesCollected >= cutoffLimit and topSourcesTotal > 0   then --and not C_TransmogSets.IsSetUsable(set.setID) then
@@ -619,6 +655,7 @@ function SetsDataProvider:GetUsableSets(incVariants)
 
 	return self.usableSets
 end
+
 
 function SetsDataProvider:GetSetSourceData(setID)
 	if (not self.sourceData) then
@@ -1644,11 +1681,10 @@ end
 function BetterWardrobeSetsTransmogMixin:UpdateSets()
 	local usableSets = SetsDataProvider:GetUsableSets()
 
+	if BW_WardrobeCollectionFrame.selectedTransmogTab == 4 or BW_WardrobeCollectionFrame.selectedCollectionTab == 4 then 
+			usableSets = addon.GetSavedList()
+	end
 
-
-	--if BW_WardrobeCollectionFrame.selectedTransmogTab == 4 or BW_WardrobeCollectionFrame.selectedCollectionTab == 4 then 
-			--usableSets = addon.GetSavedList()
---	end
 	self.PagingFrame:SetMaxPages(ceil(#usableSets / self.PAGE_SIZE))
 	local pendingTransmogModelFrame = nil
 	local indexOffset = (self.PagingFrame:GetCurrentPage() - 1) * self.PAGE_SIZE
@@ -1693,7 +1729,12 @@ function BetterWardrobeSetsTransmogMixin:UpdateSets()
 			end
 
 			--local topSourcesCollected, topSourcesTotal = SetsDataProvider:GetSetSourceCounts(set.setID)
-			local topSourcesCollected, topSourcesTotal = GetLocationBasedCount(set)
+			local topSourcesCollected, topSourcesTotal
+			if addon.Profile.ShowIncomplete then 
+				topSourcesCollected, topSourcesTotal = addon.Sets:GetLocationBasedCount(set)
+			else
+				topSourcesCollected, topSourcesTotal = SetsDataProvider:GetSetSourceCounts(set.setID) 
+			end
 			local setInfo = addon.GetSetInfo(set.setID)
 			local isFavorite = addon.chardb.profile.favorite[set.setID]
 			local isHidden = addon.chardb.profile.extraset[set.setID]
