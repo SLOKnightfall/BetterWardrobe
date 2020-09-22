@@ -477,7 +477,7 @@ function WardrobeCollectionFrame.SetsTransmogFrame:LoadSet(setID)
 		C_Transmog.LoadSources(transmogSources, -1, -1)
 
 		if Profile.HiddenMog then				
-			local emptySlotData = adon.Sets:GetEmptySlots()
+			local emptySlotData = addon.Sets:GetEmptySlots()
 			for i, x in pairs(transmogSources) do
 				if not C_TransmogCollection.PlayerHasTransmogItemModifiedAppearance(x) and i ~= 7 and emptySlotData[i] then
 					local _, source = addon.GetItemSource(emptySlotData[i]) -- C_TransmogCollection.GetItemInfo(emptySlotData[i])

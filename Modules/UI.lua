@@ -23,8 +23,24 @@ local Wardrobe = WardrobeCollectionFrame.ItemsCollectionFrame
 local db, active
 local FileData
 local SortOrder
-		
+
+
 local dropdownOrder = {LE_DEFAULT, LE_ALPHABETIC, LE_APPEARANCE, LE_COLOR, LE_EXPANSION, LE_ITEM_SOURCE}
+local locationDrowpDown = {
+	[2] = INVTYPE_HEAD,
+	--[2] = 134112, neck
+	[4] = INVTYPE_SHOULDER,
+	--[4] = 168659, shirt
+	[16] = INVTYPE_CLOAK,
+	[6] = INVTYPE_CHEST,
+	[7] = INVTYPE_WAIST,
+	[8] = INVTYPE_LEGS,-- pants
+	[9] = INVTYPE_FEET,
+	[10] = INVTYPE_WRIST,  --wrist
+	[11] = INVTYPE_HAND, --handr
+}
+
+--= {INVTYPE_HEAD, INVTYPE_SHOULDER, INVTYPE_CLOAK, INVTYPE_CHEST, INVTYPE_WAIST, INVTYPE_LEGS, INVTYPE_FEET, INVTYPE_WRIST, INVTYPE_HAND}
 local defaults = {
 	sortDropdown = LE_DEFAULT,
 	reverse = false,
@@ -64,7 +80,6 @@ function UI.SortDropdowns_Initialize()
 			end
 		end
 		
-		local tabID = addon.GetTab()
 		for _, id in pairs(dropdownOrder) do
 			if id == LE_ITEM_SOURCE and (tabID == 2 or tabID == 3) then
 			else
@@ -79,6 +94,117 @@ function UI.SortDropdowns_Initialize()
 	UIDropDownMenu_SetText(BW_SortDropDown, COMPACT_UNIT_FRAME_PROFILE_SORTBY.." "..L[db.sortDropdown])
 end
 
+
+
+function BW_WardrobeFilterLocationDropDown_OnLoad(self)
+	UIDropDownMenu_Initialize(self, UI.LocationDropdowns_Initialize, "MENU");
+end
+
+addon.includeLocation = {}
+for i, location in pairs(locationDrowpDown ) do
+	addon.includeLocation[i] = true
+end
+function UI.LocationDropdowns_Initialize(self, level)
+	--UIDropDownMenu_SetWidth(BW_LocationDropDown, 140)
+	--UIDropDownMenu_Initialize(BW_LocationDropDown, function(self)
+				local refreshLevel = 1
+
+		local info = UIDropDownMenu_CreateInfo()
+		info.keepShownOnClick = true
+		
+		if level == 1 then
+
+		info.hasArrow = true
+		info.isNotRadio = true
+		info.notCheckable = true
+
+		info.text = "Include:"
+		info.value = 1
+		UIDropDownMenu_AddButton(info, level)
+
+		info.hasArrow = true
+		info.isNotRadio = true
+		info.notCheckable = true
+		info.checked = false
+
+		info.text = "Cuttoff:"
+		info.value = 2
+		UIDropDownMenu_AddButton(info, level)
+
+		elseif level == 2  and UIDROPDOWNMENU_MENU_VALUE == 1 then
+			info.hasArrow = false;
+			info.isNotRadio = true;
+			info.notCheckable = true;
+			local refreshLevel = 2
+
+			info.text = CHECK_ALL
+			info.func = function()
+							--C_TransmogCollection.SetAllSourceTypeFilters(true);
+							--UIDropDownMenu_Refresh(WardrobeFilterDropDown, 1, refreshLevel);
+							for i in pairs(locationDrowpDown ) do
+								addon.includeLocation[i] = true
+							end
+							WardrobeCollectionFrame.SetsTransmogFrame:OnSearchUpdate()
+							BW_SetsTransmogFrame:OnSearchUpdate()
+							UIDropDownMenu_Refresh(BW_LocationFilterDropDown, 1, refreshLevel)
+						end
+			UIDropDownMenu_AddButton(info, level)
+
+			info.text = UNCHECK_ALL
+			info.func = function()
+							--C_TransmogCollection.SetAllSourceTypeFilters(false);
+							--UIDropDownMenu_Refresh(WardrobeFilterDropDown, 1, refreshLevel);
+							for i in pairs(locationDrowpDown ) do
+								addon.includeLocation[i] = false
+							end
+							WardrobeCollectionFrame.SetsTransmogFrame:OnSearchUpdate()
+							BW_SetsTransmogFrame:OnSearchUpdate()
+							UIDropDownMenu_Refresh(BW_LocationFilterDropDown, 1, refreshLevel)
+						end
+			UIDropDownMenu_AddButton(info, level)
+			info.notCheckable = false;
+
+			
+			for index, id in pairs(locationDrowpDown) do
+				info.text = id;
+				info.func = function(_, _, _, value)
+							addon.includeLocation[index] = value
+						UIDropDownMenu_Refresh(BW_LocationFilterDropDown, 1, 1)
+						WardrobeCollectionFrame.SetsTransmogFrame:OnSearchUpdate()
+						BW_SetsTransmogFrame:OnSearchUpdate()
+						end
+				info.checked = function() return addon.includeLocation[index] end
+				UIDropDownMenu_AddButton(info, level);
+			end
+
+
+		elseif level == 2 and UIDROPDOWNMENU_MENU_VALUE == 2 then
+			local refreshLevel = 2
+			info.notCheckable = false
+			info.keepShownOnClick = false
+			for i = 1, 7 do
+				local info = UIDropDownMenu_CreateInfo()
+				--tinsert(xpacSelection,true)
+				info.text = i
+				info.value = i
+					info.func = function(a, b, c, value)
+						addon.Profile.PartialLimit = info.value
+						UIDropDownMenu_Refresh(BW_LocationFilterDropDown, 1, 1)
+						WardrobeCollectionFrame.SetsTransmogFrame:OnSearchUpdate()
+						BW_SetsTransmogFrame:OnSearchUpdate()
+					end
+				info.checked = 	function() return info.value == addon.Profile.PartialLimit end
+				UIDropDownMenu_AddButton(info, level)
+			end
+	end
+
+			
+		
+--end)
+
+	--UIDropDownMenu_SetSelectedValue(BW_LocationDropDown, db.sortDropdown)
+	--UIDropDownMenu_SetText(BW_LocationDropDown, COMPACT_UNIT_FRAME_PROFILE_SORTBY.." "..L[db.sortDropdown])
+end
 
 -- Base Transmog Sets Window Upates
 function UI.ExtendTransmogView()
@@ -162,6 +288,8 @@ function BW_WardrobeCollectionFrame_SetTab(tabID)
 
 		BW_WardrobeCollectionFrame.FilterButton:SetShown(tab3 or tab4)
 		BW_WardrobeCollectionFrame.FilterButton:SetEnabled(tab3)
+
+		BW_WardrobeCollectionFrame.LocationFilterButton:SetShown((tab2 or tab3) and atTransmogrifier)
 		
 		UIDropDownMenu_EnableDropDown(BW_SortDropDown)
 		BW_SortDropDown:ClearAllPoints()
@@ -359,6 +487,7 @@ end
 
 function addon.Init:BuildUI()
 	UI.SortDropdowns_Initialize()
+	UI.LocationDropdowns_Initialize()
 	CreateVisualViewButton()
 	UI.ExtendTransmogView()
 --BW_WardrobeCollectionFrame:GetFrameLevel()
@@ -444,12 +573,6 @@ function UI:FilterDropDown_InitializeItems(level)
 		info.text = L["Expansion"]
 		info.value = 2
 		UIDropDownMenu_AddButton(info, level)
-
-		if  WardrobeFrame_IsAtTransmogrifier() then
-			info.text = "cutoff"
-			info.value = 3
-			UIDropDownMenu_AddButton(info, level)
-		end
 
 	elseif level == 2  and UIDROPDOWNMENU_MENU_VALUE == 1 then
 			local refreshLevel = 2
@@ -542,25 +665,6 @@ function UI:FilterDropDown_InitializeItems(level)
 						BW_SetsTransmogFrame:OnSearchUpdate()
 					end
 					info.checked = 	function() return xpacSelection[i] end
-				UIDropDownMenu_AddButton(info, level)
-			end
-
-	elseif level == 2 and UIDROPDOWNMENU_MENU_VALUE == 3 and WardrobeFrame_IsAtTransmogrifier() then
-			local refreshLevel = 2
-			info.notCheckable = false
-			info.keepShownOnClick = false
-			for i = 1, 7 do
-				local info = UIDropDownMenu_CreateInfo()
-				--tinsert(xpacSelection,true)
-				info.text = i
-				info.value = i
-					info.func = function(a, b, c, value)
-						addon.Profile.PartialLimit = info.value
-						UIDropDownMenu_Refresh(BW_WardrobeFilterDropDown, 1, 1)
-						BW_SetsCollectionFrame:OnSearchUpdate()
-						BW_SetsTransmogFrame:OnSearchUpdate()
-					end
-				info.checked = 	function() return info.value == addon.Profile.PartialLimit end
 				UIDropDownMenu_AddButton(info, level)
 			end
 	end

@@ -341,6 +341,7 @@ end
 function addon.GetSetsources(setID)
 	local setInfo = addon.GetSetInfo(setID)
 	local setSources = {}
+	local atTransmogrifier = WardrobeFrame_IsAtTransmogrifier()
 
 	if BW_WardrobeCollectionFrame.selectedTransmogTab == 4 or BW_WardrobeCollectionFrame.selectedCollectionTab == 4 then 
 		if setInfo.sources then 
@@ -377,6 +378,7 @@ function addon.GetSetsources(setID)
 					end
 
 					setSources[sourceID] = sources[1].isCollected--and sourceInfo.isCollected
+
 				else
 					setSources[sourceID] = false
 				end
@@ -549,8 +551,37 @@ end
 --Lets CanIMogIt plugin get extra sets count
  function addon.GetSetSourceCounts(setID)
 	return SetsDataProvider:GetSetSourceCounts(setID)
+
 end
 
+
+function GetLocationBasedCount(set)
+	local baseSetList = SetsDataProvider:GetBaseSets()
+	local validSets = {}
+
+
+		local validSet = false
+		local collectedCount = 0
+		local totalCount = 0 
+		for i, itemID in ipairs(set.items) do
+			local visualID, sourceID = addon.GetItemSource(itemID, set.mod)	
+			if sourceID then
+				local sourceInfo = C_TransmogCollection.GetSourceInfo(sourceID)
+				if  addon.includeLocation[sourceInfo.invType] then 
+					--validSet = true
+
+					totalCount = totalCount + 1
+
+					if sourceInfo.isCollected then 
+						collectedCount = collectedCount + 1
+					end 
+				end
+			end
+	
+	end
+
+	return collectedCount, totalCount
+end 
 
 function SetsDataProvider:GetUsableSets(incVariants)
 	if (not self.usableSets) then
@@ -561,17 +592,22 @@ function SetsDataProvider:GetUsableSets(incVariants)
 		self.usableSets = {} --SetsDataProvider:GetUsableSets()
 		for i, set in ipairs(availableSets) do
 
-			local topSourcesCollected, topSourcesTotal = SetsDataProvider:GetSetSourceCounts(set.setID)
-			if (BW_WardrobeToggle.viewAll and BW_WardrobeToggle.VisualMode) or (not atTransmogrifier and BW_WardrobeToggle.VisualMode) or topSourcesCollected >= Profile.PartialLimit then --and not C_TransmogSets.IsSetUsable(set.setID) then
+			--local sourceInfo = C_TransmogCollection.GetSourceInfo(set.setID)
+			--local include = (atTransmogrifier and sourceInfo and addon.includeLocation[sourceInfo.invType]) or (not atTransmogrifier and true)
+
+			local topSourcesCollected, topSourcesTotal = GetLocationBasedCount(set)
+			local cutoffLimit = (topSourcesTotal <= Profile.PartialLimit and topSourcesTotal) or Profile.PartialLimit --SetsDataProvider:GetSetSourceCounts(set.setID)
+			if (BW_WardrobeToggle.viewAll and BW_WardrobeToggle.VisualMode) or (not atTransmogrifier and BW_WardrobeToggle.VisualMode) or topSourcesCollected >= cutoffLimit  and topSourcesTotal > 0 then --and not C_TransmogSets.IsSetUsable(set.setID) then
 				tinsert(self.usableSets, set)
 			end
  
 			if incVariants then 
 				local variantSets = C_TransmogSets.GetVariantSets(set.setID)
 				for i, set in ipairs(variantSets) do
-					local topSourcesCollected, topSourcesTotal = SetsDataProvider:GetSetSourceCounts(set.setID)
+					local topSourcesCollected, topSourcesTotal = GetLocationBasedCount(set) --SetsDataProvider:GetSetSourceCounts(set.setID)
 					if topSourcesCollected == topSourcesTotal then set.collected = true end
-					if (BW_WardrobeToggle.viewAll and BW_WardrobeToggle.VisualMode) or (not atTransmogrifier and BW_WardrobeToggle.VisualMode) or topSourcesCollected >= Profile.PartialLimit then --and not C_TransmogSets.IsSetUsable(set.setID) then
+					local cutoffLimit = (topSourcesTotal <= Profile.PartialLimit and topSourcesTotal) or Profile.PartialLimit
+					if (BW_WardrobeToggle.viewAll and BW_WardrobeToggle.VisualMode) or (not atTransmogrifier and BW_WardrobeToggle.VisualMode) or topSourcesCollected >= cutoffLimit and topSourcesTotal > 0   then --and not C_TransmogSets.IsSetUsable(set.setID) then
 						tinsert(self.usableSets, set)
 					end
 				end
@@ -1608,6 +1644,8 @@ end
 function BetterWardrobeSetsTransmogMixin:UpdateSets()
 	local usableSets = SetsDataProvider:GetUsableSets()
 
+
+
 	--if BW_WardrobeCollectionFrame.selectedTransmogTab == 4 or BW_WardrobeCollectionFrame.selectedCollectionTab == 4 then 
 			--usableSets = addon.GetSavedList()
 --	end
@@ -1627,7 +1665,9 @@ function BetterWardrobeSetsTransmogMixin:UpdateSets()
 				model:Undress()
 
 				local sourceData =  SetsDataProvider:GetSetSourceData(set.setID)
+
 				for sourceID in pairs(sourceData.sources) do
+
 					if (not Profile.HideMissing and (not BW_WardrobeToggle.VisualMode or (Sets.isMogKnown(sourceID) and BW_WardrobeToggle.VisualMode))) or 
 						(Profile.HideMissing and (BW_WardrobeToggle.VisualMode or Sets.isMogKnown(sourceID))) then 
 						model:TryOn(sourceID)
@@ -1652,7 +1692,8 @@ function BetterWardrobeSetsTransmogMixin:UpdateSets()
 				model.TransmogStateTexture:Hide()
 			end
 
-			local topSourcesCollected, topSourcesTotal = SetsDataProvider:GetSetSourceCounts(set.setID)
+			--local topSourcesCollected, topSourcesTotal = SetsDataProvider:GetSetSourceCounts(set.setID)
+			local topSourcesCollected, topSourcesTotal = GetLocationBasedCount(set)
 			local setInfo = addon.GetSetInfo(set.setID)
 			local isFavorite = addon.chardb.profile.favorite[set.setID]
 			local isHidden = addon.chardb.profile.extraset[set.setID]
