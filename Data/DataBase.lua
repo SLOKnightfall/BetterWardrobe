@@ -62,7 +62,8 @@ local function GetFactionID(faction)
 	end
 end
 
-
+local RepSets ={["Horde"] = {2574,2844,2796,2820}, ["Alliance"] = {[2816] = "mail" ,[2840] = "plate ",[2750] = "cloth",}}
+local AliznceRepSets = {2574,2844,2796,2820}
 local function OpposingFaction(faction)
 	local faction = UnitFactionGroup("player")
 	if faction == "Horde" then
@@ -100,16 +101,16 @@ do
 			
 			local factionLocked = string.find(setData.name, opposingFaction) 
 				--or string.find(setData.name, BFAFaction)
-				--or string.find(setData.name, City)
+				or string.find(setData.name, City)
 			local heritageArmor = string.find(setData.name, "Heritage")
 		
 			for _, item in ipairs( setData["items"]) do
 				if setData.mod then 
 					for i= 1, 50 do
-						sourceLookup(item, setData.mod or 0 ) --addon.GetItemSource(item, setData.mod or nil )
-						if 	addon.ArmorSetModCache[item] and addon.ArmorSetModCache[item][modID] then 
-							break
-						end
+						--sourceLookup(item, setData.mod or 0 ) --addon.GetItemSource(item, setData.mod or nil )
+						--if 	addon.ArmorSetModCache[item] and addon.ArmorSetModCache[item][modID] then 
+							--break
+						--end
 					end
 				end
 
@@ -222,6 +223,7 @@ do
 				info.setID = data.outfitID + 5000
 				info.uiOrder = data.index * 100
 				info.icon = data.icon
+				info.type = "Saved"
 
 				if data.set == "default" then 
 					info.sources = C_TransmogCollection.GetOutfitSources(data.outfitID)

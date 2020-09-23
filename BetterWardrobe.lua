@@ -328,6 +328,10 @@ function addon.GetItemSource(itemID, itemMod)
 			end
 		end
 
+		if not sourceID then 
+			visualID, sourceID = C_TransmogCollection.GetItemInfo(itemID, 0)
+		end
+
 	--[[		if sourceID and itemMod then
 						addon.modArmor[itemID] = addon.modArmor[itemID] or {}
 						addon.modArmor[itemID][itemMod] = sourceID
@@ -363,6 +367,40 @@ function addon.GetSetsources(setID)
 			end
 		end
 
+	elseif setInfo.sources then
+		for itemID, visualID in pairs(setInfo.sources) do
+			local sources =  C_TransmogCollection.GetAppearanceSources(visualID)
+			local sourceID, _
+
+			if not sources then 
+				_, sourceID = addon.GetItemSource(itemID, setInfo.mod)
+
+				-- Try to generate a source when the item has a
+				if not sourceID then
+					for i = 0, 4 , 1 do
+						_, sourceID = addon.GetItemSource(itemID, setInfo.mod)
+
+						if sourceID then 
+							break
+						end
+					end
+				end
+
+				local sourceInfo = sourceID and C_TransmogCollection.GetSourceInfo(sourceID)
+				sources = sourceInfo and C_TransmogCollection.GetAppearanceSources(sourceInfo.visualID)
+			end
+
+			if sources then
+				--items[sources.itemID] = true
+				if #sources > 1 then
+					WardrobeCollectionFrame_SortSources(sources)
+				end
+				setSources[sources[1].sourceID] = sources[1].isCollected--and sourceInfo.isCollected
+			elseif sourceID then 
+				setSources[sourceID] = false
+			end
+		end
+
 	else
 		for i, itemID in ipairs(setInfo.items) do
 			local visualID, sourceID = addon.GetItemSource(itemID, setInfo.mod) --C_TransmogCollection.GetItemInfo(itemID)
@@ -388,7 +426,6 @@ function addon.GetSetsources(setID)
 			--setSources[sourceID] = sourceInfo and sourceInfo.isCollected
 	return setSources
 end
-
 
 local EmptyArmor = {
 	[1] = 134110,
@@ -504,7 +541,7 @@ local function CheckMissingLocation(set)
 
 					return true
 				elseif addon.missingSelection[sourceInfo.invType] then 
-					--filtered = true
+					filtered = true
 				end
 			end
 		end
@@ -524,7 +561,7 @@ local function CheckMissingLocation(set)
 					if  addon.missingSelection[sourceInfo.invType] and not sources[1].isCollected then
 						return true
 					elseif addon.missingSelection[sourceInfo.invType] then 
-					--filtered = true 
+					filtered = true 
 					end
 				end
 			end
@@ -533,7 +570,7 @@ local function CheckMissingLocation(set)
 
 	for type, value in pairs(addon.missingSelection) do
 		if value and invType[type] then
-			--filtered = true
+			filtered = true
 		end
 	end
 
