@@ -11,8 +11,8 @@
 --	///////////////////////////////////////////////////////////////////////////////////////////
 
 local addonName, addon = ...
-addon = LibStub("AceAddon-3.0"):NewAddon(addon, addonName, "AceEvent-3.0", "AceConsole-3.0", "AceHook-3.0")
-
+---addon = LibStub("AceAddon-3.0"):NewAddon(addon, addonName, "AceEvent-3.0", "AceConsole-3.0", "AceHook-3.0")
+addon = LibStub("AceAddon-3.0"):GetAddon(addonName)
 addon.Frame = LibStub("AceGUI-3.0")
 addon.itemSourceID = {}
 addon.QueueList = {}
@@ -281,12 +281,12 @@ function addon:UpdateItems(self)
 	end
 end
 
-local BASE_SET_BUTTON_HEIGHT = 46
-local VARIANT_SET_BUTTON_HEIGHT = 20
-local SET_PROGRESS_BAR_MAX_WIDTH = 204
-local IN_PROGRESS_FONT_COLOR = CreateColor(0.251, 0.753, 0.251)
-local IN_PROGRESS_FONT_COLOR_CODE = "|cff40c040"
-local COLLECTION_LIST_WIDTH = 260
+local BASE_SET_BUTTON_HEIGHT = addon.Globals.BASE_SET_BUTTON_HEIGHT
+local VARIANT_SET_BUTTON_HEIGHT = addon.Globals.VARIANT_SET_BUTTON_HEIGHT
+local SET_PROGRESS_BAR_MAX_WIDTH = addon.Globals.SET_PROGRESS_BAR_MAX_WIDTH
+local IN_PROGRESS_FONT_COLOR =addon.Globals.IN_PROGRESS_FONT_COLOR
+local IN_PROGRESS_FONT_COLOR_CODE = addon.Globals.IN_PROGRESS_FONT_COLOR_CODE
+local COLLECTION_LIST_WIDTH = addon.Globals.COLLECTION_LIST_WIDTH
 
 
 local f = CreateFrame("Frame",nil,UIParent)
@@ -427,23 +427,10 @@ function addon.GetSetsources(setID)
 	return setSources
 end
 
-local EmptyArmor = {
-	[1] = 134110,
-	--[2] = 134112, neck
-	[3] = 134112,
-	--[4] = 168659, shirt
-	[5] = 168659,
-	[6] = 143539,
-	--[7] = 158329, pants
-	[8] = 168664,
-	[9] = 168665, --wrist
-	[10] = 158329, --handr
-}
-
+local EmptyArmor = addon.Globals.EmptyArmor
 
 local Sets = {}
 addon.Sets = Sets
-addon.Sets.EmptyArmor = EmptyArmor
 
 function Sets:GetEmptySlots()
 	local setInfo = {}
@@ -519,6 +506,7 @@ function SetsDataProvider:ClearSets()
 	self.usableSets = nil
 	self.sourceData = nil
 	self.savedSetCache = nil
+	addon.DefaultUI:ClearSets()
 end
 
 
@@ -961,7 +949,6 @@ function BetterWardrobeSetsCollectionMixin:OnHide()
 	self:UnregisterEvent("TRANSMOG_COLLECTION_ITEM_UPDATE")
 	self:UnregisterEvent("TRANSMOG_COLLECTION_UPDATED")
 	SetsDataProvider:ClearSets()
-	addon:ClearCache()
 	--WardrobeCollectionFrame_ClearSearch(LE_TRANSMOG_SEARCH_TYPE_BASE_SETS)
 end
 
@@ -1933,12 +1920,12 @@ do
 	end
 end
 
+local TAB_ITEMS = addon.Globals.TAB_ITEMS
+local TAB_SETS = addon.Globals.TAB_SETS
+local TAB_EXTRASETS = addon.Globals.TAB_EXTRASETS
+local TAB_SAVED_SETS = addon.Globals.TAB_SAVED_SETS
+local TABS_MAX_WIDTH = addon.Globals.TABS_MAX_WIDTH
 
-local TAB_ITEMS = 1
-local TAB_SETS = 2
-local TAB_EXTRASETS = 3
-local TAB_SAVED_SETS = 4
-local TABS_MAX_WIDTH = 245
 function BW_WardrobeCollectionFrame_OnLoad(self)
 	WardrobeCollectionFrameTab1:Hide()
 	WardrobeCollectionFrameTab2:Hide()
@@ -2023,6 +2010,12 @@ function BW_WardrobeCollectionFrame_OnHide(self)
 
 	WardrobeCollectionFrame.selectedCollectionTab = TAB_ITEMS
 	BW_WardrobeCollectionFrame.selectedCollectionTab = TAB_ITEMS
+
+	addon:InitTables()
+	SetsDataProvider:ClearSets()
+	addon:ClearCache()
+
+
 end
 
 

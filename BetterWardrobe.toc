@@ -29,6 +29,7 @@ Locale\enUS.lua
 
 #Core files
 #Modules\Inspect.lua
+Modules\Globals.lua
 Modules\Templates.xml
 BetterWardrobe.xml
 

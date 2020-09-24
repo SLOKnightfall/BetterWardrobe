@@ -29,18 +29,7 @@ local ARMOR_MASK = {
 	PLATE = 35,
 }
 
-local EmptyArmor = {
-	[1] = 134110,
-	--[2] = 134112, neck
-	[3] = 134112,
-	--[4] = 168659, shirt
-	[5] = 168659,
-	[6] = 143539,
-	--[7] = 158329, pants
-	[8] = 168664,
-	[9] = 168665,  --wrist
-	[10] = 158329, --handr
-}
+local EmptyArmor = addon.Globals.EmptyArmor
 
 local hiddenSet ={
 	["setID"] =  0 ,
@@ -182,10 +171,10 @@ do
 	end
 
 	function addon:ClearCache()
-		--addon.ArmorSets = nil
-		--addon.ArmorSetModCache = nil
-		--addon.extraSetsCache = nil
-		--setsInfo = nil
+		addon.ArmorSets = nil
+		addon.ArmorSetModCache = nil
+		addon.extraSetsCache = nil
+		setsInfo = nil
 	end
 
 

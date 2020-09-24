@@ -9,15 +9,18 @@ addon = LibStub("AceAddon-3.0"):GetAddon(addonName)
 local Profile
 local Sets
 
+addon.DefaultUI = {}
 
-local BASE_SET_BUTTON_HEIGHT = 46
-local VARIANT_SET_BUTTON_HEIGHT = 20
-local SET_PROGRESS_BAR_MAX_WIDTH = 204
-local IN_PROGRESS_FONT_COLOR = CreateColor(0.251, 0.753, 0.251)
-local IN_PROGRESS_FONT_COLOR_CODE = "|cff40c040"
-local COLLECTION_LIST_WIDTH = 260
+local L = LibStub("AceLocale-3.0"):GetLocale(addonName)
 
-local EmptyArmor = addon.Sets.EmptyArmor 
+local BASE_SET_BUTTON_HEIGHT = addon.Globals.BASE_SET_BUTTON_HEIGHT
+local VARIANT_SET_BUTTON_HEIGHT = addon.Globals.VARIANT_SET_BUTTON_HEIGHT
+local SET_PROGRESS_BAR_MAX_WIDTH = addon.Globals.SET_PROGRESS_BAR_MAX_WIDTH
+local IN_PROGRESS_FONT_COLOR =addon.Globals.IN_PROGRESS_FONT_COLOR
+local IN_PROGRESS_FONT_COLOR_CODE = addon.Globals.IN_PROGRESS_FONT_COLOR_CODE
+local COLLECTION_LIST_WIDTH = addon.Globals.COLLECTION_LIST_WIDTH
+
+local EmptyArmor = addon.Globals.EmptyArmor
 
 function addon.Init:Blizzard_Wardrobe()
 	Profile = addon.Profile
@@ -103,9 +106,52 @@ function SetsDataProvider:SortSets(sets, reverseUIOrder, ignorePatchID)
 end
 
 
+local function CheckMissingLocation(set)
+--function addon.Sets:GetLocationBasedCount(set)
+	local filtered = false
+	local invType = {}
+
+		local sources = C_TransmogSets.GetSetSources(set.setID)
+		for sourceID in pairs(sources) do
+			local sourceInfo = C_TransmogCollection.GetSourceInfo(sourceID)
+			local sources = sourceInfo and C_TransmogCollection.GetAppearanceSources(sourceInfo.visualID)
+			if sources then
+				if #sources > 1 then
+					WardrobeCollectionFrame_SortSources(sources)
+				end
+				if  addon.missingSelection[sourceInfo.invType] and not sources[1].isCollected then
+
+					return true
+				elseif addon.missingSelection[sourceInfo.invType] then 
+					filtered = true
+				end
+			end
+		end
+
+	for type, value in pairs(addon.missingSelection) do
+		if value and invType[type] then
+			filtered = true
+		end
+	end
+
+	return not filtered
+end
+
+
 function SetsDataProvider:GetBaseSets()
 	if (not self.baseSets) then
 		self.baseSets = addon.Sets:ClearHidden(C_TransmogSets.GetBaseSets(), "set")
+		local atTransmogrifier = WardrobeFrame_IsAtTransmogrifier()
+
+		local filteredSets = {}
+		for i, data in ipairs(self.baseSets) do
+			if (addon.xpacSelection[data.expansionID + 1] and CheckMissingLocation(data)) or atTransmogrifier  then 
+				tinsert(filteredSets, data)
+			end
+		end
+
+		self.baseSets = filteredSets
+
 		self:DetermineFavorites()
 		self:SortSets(self.baseSets)
 	end
@@ -175,10 +221,10 @@ function SetsDataProvider:GetUsableSets(incVariants)
 			end
 
 		elseif not Profile.ShowIncomplete  then 
-		self.usableSets = C_TransmogSets.GetUsableSets()
+			self.usableSets = C_TransmogSets.GetUsableSets()
 
-		self:SortSets(self.usableSets)
-		-- group sets by baseSetID, except for favorited sets since those are to remain bucketed to the front
+			self:SortSets(self.usableSets)
+			-- group sets by baseSetID, except for favorited sets since those are to remain bucketed to the front
 			for i, set in ipairs(self.usableSets) do
 				setIDS[set.baseSetID or set.setID] = true
 				if (not set.favorite) then
@@ -229,6 +275,17 @@ function SetsDataProvider:FilterSearch()
 
 end
 
+function SetsDataProvider:ClearSets()
+	self.baseSets = nil;
+	self.baseSetsData = nil;
+	self.variantSets = nil;
+	self.usableSets = nil;
+	self.sourceData = nil;
+end
+
+function addon.DefaultUI:ClearSets()
+	SetsDataProvider:ClearSets()
+end
 
 --===WardrobeCollectionFrame.SetsCollectionFrame===--
 function WardrobeCollectionFrame.SetsCollectionFrame:OnSearchUpdate()
@@ -544,7 +601,9 @@ function WardrobeCollectionFrame.SetsTransmogFrame:OnShow()
 end
 
 
-function WardrobeCollectionFrame.SetsTransmogFrame:OnHide()
+
+
+local function SetsTransmogFrame_OnHide()
 	self:UnregisterEvent("TRANSMOGRIFY_UPDATE")
 	self:UnregisterEvent("TRANSMOGRIFY_SUCCESS")
 	self:UnregisterEvent("TRANSMOG_COLLECTION_ITEM_UPDATE")
@@ -557,6 +616,12 @@ function WardrobeCollectionFrame.SetsTransmogFrame:OnHide()
 	self.sourceQualityTable = nil
 	BW_WardrobeToggle.VisualMode = false
 end
+
+--self:SecureHook(WardrobeCollectionFrame.SetsTransmogFrame,function() SetsTransmogFrame_OnHide() end)
+--addon:SecureHook(WardrobeCollectionFrame_OnHide,function() SetsDataProvider:ClearSets() end)
+
+--addon:SecureHook(WardrobeCollectionFrame.SetsTransmogFrame,"OnShow", function()  SetsDataProvider:ClearSets() end)
+
 
 
 function WardrobeCollectionFrame.SetsTransmogFrame:OnEvent(event, ...)
@@ -590,8 +655,14 @@ function WardrobeCollectionFrame.SetsTransmogFrame:OnEvent(event, ...)
 end
 
 WardrobeCollectionFrame.SetsTransmogFrame:SetScript("OnShow", WardrobeCollectionFrame.SetsTransmogFrame.OnShow)
-WardrobeCollectionFrame.SetsTransmogFrame:SetScript("OnHide", WardrobeCollectionFrame.SetsTransmogFrame.OnHide)
+--WardrobeCollectionFrame.SetsTransmogFrame:SetScript("OnHide", WardrobeCollectionFrame.SetsTransmogFrame.OnHide)
 WardrobeCollectionFrame.SetsTransmogFrame:SetScript("OnEvent", WardrobeCollectionFrame.SetsTransmogFrame.OnEvent)
+
+local function RefreshLists()
+	local tabID = addon.GetTab()
+				WardrobeCollectionFrame.SetsCollectionFrame:OnSearchUpdate()
+				--WardrobeCollectionFrame.SetsTransmogFrame:OnSearchUpdate()
+	end
 
 
 function WardrobeCollectionFrame.SetsCollectionFrame.ScrollFrame:Update()
@@ -660,4 +731,221 @@ end
 --This bit sets "update" which is set via on load and triggers when scrolling. Its what caused sorting issues
 WardrobeCollectionFrame.SetsCollectionFrame.ScrollFrame.update = WardrobeCollectionFrame.SetsCollectionFrame.ScrollFrame.Update
 
+
+local locationDrowpDown = addon.Globals.locationDrowpDown
+local FILTER_SOURCES = {TRANSMOG_SOURCE_1, TRANSMOG_SOURCE_2, TRANSMOG_SOURCE_3, TRANSMOG_SOURCE_4, TRANSMOG_SOURCE_5, TRANSMOG_SOURCE_6}
+local EXPANSIONS = addon.Globals.EXPANSIONS
+
+
+
+	addon.filterCollected = filterCollected
+	addon.xpacSelection = xpacSelection
+	addon.filterSelection = filterSelection
+	addon.missingSelection = missingSelection
 --=======
+--local missingSelection = {}
+function WardrobeFilterDropDown_InitializeBaseSets(self, level)
+	local info = UIDropDownMenu_CreateInfo();
+	info.keepShownOnClick = true;
+	info.isNotRadio = true;
+
+	if level == 1 then
+		local refreshLevel = 1
+		info.text = COLLECTED;
+		info.func = function(_, _, _, value)
+						C_TransmogSets.SetBaseSetsFilter(LE_TRANSMOG_SET_FILTER_COLLECTED, value);
+						UIDropDownMenu_Refresh(WardrobeFilterDropDown)
+
+					end
+		info.checked = C_TransmogSets.GetBaseSetsFilter(LE_TRANSMOG_SET_FILTER_COLLECTED);
+		UIDropDownMenu_AddButton(info, level);
+
+		info.text = NOT_COLLECTED;
+		info.func = function(_, _, _, value)
+						C_TransmogSets.SetBaseSetsFilter(LE_TRANSMOG_SET_FILTER_UNCOLLECTED, value);
+						UIDropDownMenu_Refresh(WardrobeFilterDropDown)
+
+					end
+		info.checked = C_TransmogSets.GetBaseSetsFilter(LE_TRANSMOG_SET_FILTER_UNCOLLECTED);
+		UIDropDownMenu_AddButton(info, level);
+
+		UIDropDownMenu_AddSeparator();
+
+		info = UIDropDownMenu_CreateInfo();
+		info.keepShownOnClick = true;
+		info.isNotRadio = true;
+
+		info.text = TRANSMOG_SET_PVE;
+		info.func = function(_, _, _, value)
+						C_TransmogSets.SetBaseSetsFilter(LE_TRANSMOG_SET_FILTER_PVE, value);
+						UIDropDownMenu_Refresh(WardrobeFilterDropDown)
+
+					end
+		info.checked = C_TransmogSets.GetBaseSetsFilter(LE_TRANSMOG_SET_FILTER_PVE);
+		UIDropDownMenu_AddButton(info, level);
+
+		info.text = TRANSMOG_SET_PVP;
+		info.func = function(_, _, _, value)
+						C_TransmogSets.SetBaseSetsFilter(LE_TRANSMOG_SET_FILTER_PVP, value);
+						UIDropDownMenu_Refresh(WardrobeFilterDropDown)
+
+					end
+		info.checked = C_TransmogSets.GetBaseSetsFilter(LE_TRANSMOG_SET_FILTER_PVP);
+		UIDropDownMenu_AddButton(info, level);
+
+		UIDropDownMenu_AddSeparator()
+		info.checked = 	nil
+		info.isNotRadio = nil
+		info.func =  nil
+		info.hasArrow = true
+		info.notCheckable = true
+
+		--info.text = SOURCES
+		--info.value = 1
+		--UIDropDownMenu_AddButton(info, level)
+
+		info.text = L["Expansion"]
+		info.value = 2
+		UIDropDownMenu_AddButton(info, level)
+
+		info.text = "Missing:"
+		info.value = 3
+		UIDropDownMenu_AddButton(info, level)
+
+
+		--[[elseif level == 2  and UIDROPDOWNMENU_MENU_VALUE == 1 then
+							local refreshLevel = 2
+							info.hasArrow = false
+							info.isNotRadio = true
+							info.notCheckable = true
+							--tinsert(filterSelection,true)
+							info.text = CHECK_ALL
+							info.func = function()
+											for i = 1, #addon.filterSelection do
+													addon.filterSelection[i] = true
+											end
+											RefreshLists()
+											UIDropDownMenu_Refresh(WardrobeCollectionFrame.FilterButton, 1, refreshLevel)
+										end
+							UIDropDownMenu_AddButton(info, level)
+				
+							local refreshLevel = 2
+							info.hasArrow = false
+							info.isNotRadio = true
+							info.notCheckable = true
+							--tinsert(addon.filterSelection,true)
+				
+							info.text = UNCHECK_ALL
+							info.func = function()
+											for i = 1, #addon.filterSelection do
+													addon.filterSelection[i] = false
+											end
+											RefreshLists()
+											UIDropDownMenu_Refresh(WardrobeCollectionFrame.FilterButton, 1, refreshLevel)
+										end
+							UIDropDownMenu_AddButton(info, level)
+							UIDropDownMenu_AddSeparator(level)
+				
+							info.notCheckable = false
+				
+							local numSources = #FILTER_SOURCES --C_TransmogCollection.GetNumTransmogSources()
+							for i = 1, numSources do
+								--tinsert(addon.filterSelection,true)
+								info.text = FILTER_SOURCES[i]
+									info.func = function(_, _, _, value)
+										addon.filterSelection[i] = value
+										RefreshLists()
+									end
+									info.checked = 	function() return addon.filterSelection[i] end
+								UIDropDownMenu_AddButton(info, level)
+							end]]
+
+	elseif level == 2  and UIDROPDOWNMENU_MENU_VALUE == 2 then
+		local refreshLevel = 2
+		info.hasArrow = false
+		info.isNotRadio = true
+		info.notCheckable = true
+		info.text = CHECK_ALL
+		info.func = function()
+						for i = 1, #addon.xpacSelection do
+							addon.xpacSelection[i] = true
+						end
+						RefreshLists()
+						UIDropDownMenu_Refresh(WardrobeFilterDropDown)
+					end
+		UIDropDownMenu_AddButton(info, level)
+
+		local refreshLevel = 2
+		info.hasArrow = false
+		info.isNotRadio = true
+		info.notCheckable = true
+
+		info.text = UNCHECK_ALL
+		info.func = function()
+						for i = 1, #addon.xpacSelection do
+								addon.xpacSelection[i] = false
+						end
+						RefreshLists()
+						UIDropDownMenu_Refresh(WardrobeFilterDropDown)
+					end
+		UIDropDownMenu_AddButton(info, level)
+		UIDropDownMenu_AddSeparator(level)
+
+		info.notCheckable = false
+		for i = 1, #EXPANSIONS do
+			info.text = EXPANSIONS[i]
+				info.func = function(_, _, _, value)
+					addon.xpacSelection[i] = value
+					RefreshLists()
+				end
+				info.checked = 	function() return addon.xpacSelection[i] end
+			UIDropDownMenu_AddButton(info, level)
+		end
+
+	elseif level == 2  and UIDROPDOWNMENU_MENU_VALUE == 3 then
+		info.hasArrow = false
+		info.isNotRadio = true
+		info.notCheckable = true
+		local refreshLevel = 2
+
+		info.text = CHECK_ALL
+		info.func = function()
+						for i in pairs(locationDrowpDown) do
+							addon.missingSelection[i] = true
+						end
+						RefreshLists()
+						UIDropDownMenu_Refresh(WardrobeFilterDropDown)
+					end
+		UIDropDownMenu_AddButton(info, level)
+
+		info.text = UNCHECK_ALL
+		info.func = function()
+						for i in pairs(locationDrowpDown) do
+							addon.missingSelection[i] = false
+						end
+						RefreshLists()
+						UIDropDownMenu_Refresh(WardrobeFilterDropDown)
+					end
+		UIDropDownMenu_AddButton(info, level)
+		UIDropDownMenu_AddSeparator(level)
+
+		for index, id in pairs(locationDrowpDown) do
+			if index ~= 21 then --Skip "robe" type
+				info.text = id
+				info.notCheckable = false
+				info.func = function(_, _, _, value)
+							addon.missingSelection[index] = value
+
+							if index == 6 then
+								addon.missingSelection[21] = value
+							end
+
+							UIDropDownMenu_Refresh(WardrobeFilterDropDown)
+							RefreshLists()
+						end
+				info.checked = function() return addon.missingSelection[index] end
+				UIDropDownMenu_AddButton(info, level)
+			end
+		end
+	end
+end
