@@ -16,6 +16,9 @@ local TAB_EXTRASETS = 3
 L.OM_GOLD	= "|c00FFD200";
 L.ENDCOLOR ="|r"
 
+
+L["Part of Set:"] = true
+L["Show Set Info in Tooltips"] = true
 L["Transmog Window"] = true
 L["Show Incomplete Sets"] = true
 L["Show Set Names"] = true

@@ -2,6 +2,7 @@ local addonName, addon = ...
 
 addon = LibStub("AceAddon-3.0"):GetAddon(addonName)
 addon.ArmorSets = addon.ArmorSets or {}
+local ItemDB = {}
 
 local L = LibStub("AceLocale-3.0"):GetLocale(addonName)
 local _, playerClass, classID = UnitClass("player")
@@ -93,18 +94,6 @@ do
 				or string.find(setData.name, City)
 			local heritageArmor = string.find(setData.name, "Heritage")
 		
-			for _, item in ipairs( setData["items"]) do
-				if setData.mod then 
-					for i= 1, 50 do
-						--sourceLookup(item, setData.mod or 0 ) --addon.GetItemSource(item, setData.mod or nil )
-						--if 	addon.ArmorSetModCache[item] and addon.ArmorSetModCache[item][modID] then 
-							--break
-						--end
-					end
-				end
-
-			end
-	
 			if not  setInfo  then 
 				if  (class) 
 					and not factionLocked 
@@ -114,12 +103,20 @@ do
 					setData["name"] = L[setData["name"]]
 
 					if not setData.note then
-					local note = "NOTE_"..(setData.label or 0)
-					setData.note = note
+						local note = "NOTE_"..(setData.label or 0)
+						setData.note = note
 
-					setData.label =L[note] or ""
-				end
-					setData.uiOrder = id*100
+						setData.label =L[note] or ""
+					end
+					setData.uiOrder = id * 100
+
+					for _, item in ipairs( setData["items"]) do
+						if setData.sources and setData.sources[item] and setData.sources[item] ~= 0 then 
+							local appearanceID = setData.sources[item]
+							ItemDB[appearanceID] = ItemDB[appearanceID] or {}
+							ItemDB[appearanceID][id] = setData
+						end
+					end
 
 					setsInfo[id] = setData
 					tinsert(list, setsInfo[id])	
@@ -129,6 +126,16 @@ do
 		end
 		addon.extraSetsCache = list
 	end
+
+function addon.IsSetItem(itemLink)
+	local appearanceID, sourceID = C_TransmogCollection.GetItemInfo(itemLink)
+	if not ItemDB[appearanceID] then 
+		return nil 
+	else
+		return ItemDB[appearanceID]
+	end
+end
+
 
 
 	--local function AllSets()

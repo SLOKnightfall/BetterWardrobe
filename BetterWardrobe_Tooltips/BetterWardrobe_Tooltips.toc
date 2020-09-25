@@ -1,0 +1,8 @@
+﻿## Interface: 80300
+## Title: BetterWardrobe_Tooltips (@project-version@)
+## Version: @project-version@
+## Game Version: 8.3
+## Author: SLOKnightfall
+## Notes: Loader addon to display tooltips
+
+BetterWardrobe_Tooltips.lua

@@ -23,3 +23,7 @@ enable-nolib-creation: no
 ignore:
     - README.md
     - Libs/test.txt
+
+
+move-folders:
+   BetterWardrobe/BetterWardrobe_Tooltips: BetterWardrobe_Tooltips

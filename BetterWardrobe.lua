@@ -84,8 +84,16 @@ local options = {
 			--inline = true,
 			order = 0,
 			args={
+				ShowTooltips = {
+					order = 0.1,
+					name = L["Show Set Info in Tooltips"],
+					type = "toggle",
+					get = "Getter",
+					set = "Setter",
+					width = "full",
+				},
 				Options_Header = {
-					order = 0,
+					order = 0.2,
 					name = L["Transmog Vendor Window"],
 					type = "header",
 					width = "full",
@@ -206,9 +214,23 @@ function addon:RefreshCharConfig()
 	--Profile = addon.Profile
 end
 
+local function LoadDependencies()
+    if not WardrobeCollectionFrame  then
+      --  debugPrint("Loading Blizzard_Collections...")
+        if UIParentLoadAddOn("Blizzard_Collections") then
+           -- Garrison:OnDependencyLoaded()
+        end
+    end
+
+    --if not dependencyLoaded and _G.IsAddOnLoaded("Blizzard_GarrisonUI") then
+      --  Garrison:OnDependencyLoaded()
+   -- end
+end
+	C_Timer.After(0, function()  UIParentLoadAddOn("Blizzard_Collections") end)
 
 ---Ace based addon initilization
 function addon:OnInitialize()
+
 end
 
 
