@@ -1204,7 +1204,9 @@ end
 function BetterWardrobeSetsCollectionMixin:GetSelectedSavedSetID()
 	if not self.selectedSavedSetID then
 		local savedSets = addon.GetSavedList()
-		self.selectedSavedSetID = savedSets[1].setID
+		if savedSets then 
+			self.selectedSavedSetID = savedSets[1].setID
+		end
 	end
 
 	return self.selectedSavedSetID
@@ -1932,7 +1934,7 @@ function BW_WardrobeCollectionFrame_OnLoad(self)
 	BW_WardrobeCollectionFrameTab1:Show()
 	BW_WardrobeCollectionFrameTab2:Show()
 	BW_WardrobeCollectionFrameTab3:Show()
-	BW_WardrobeCollectionFrameTab4:Show()
+	BW_WardrobeCollectionFrameTab4:Hide()
 	--local level = CollectionsJournal:GetFrameLevel()
 	local level = BW_WardrobeCollectionFrame:GetFrameLevel()
 	CollectionsJournal:SetFrameLevel(level - 1)
@@ -1943,11 +1945,6 @@ function BW_WardrobeCollectionFrame_OnLoad(self)
 	self.selectedCollectionTab = TAB_ITEMS
 	self.selectedTransmogTab = TAB_ITEMS
 
-	WardrobeCollectionFrame.progressBar:SetWidth(160)
-	WardrobeCollectionFrame.progressBar.border:SetWidth(169)
-	WardrobeCollectionFrame.progressBar:ClearAllPoints()
-	WardrobeCollectionFrame.progressBar:SetPoint("TOPLEFT", WardrobeCollectionFrame.ItemsTab, "TOPLEFT", 250, -11)
-	WardrobeCollectionFrame.searchBox:SetWidth(105)
 end
 
 
@@ -1992,6 +1989,16 @@ function BW_WardrobeCollectionFrame_OnShow(self)
 		BW_WardrobeCollectionFrame_SetTab(TAB_ITEMS)
 	end
 	BW_WardrobeCollectionFrame_UpdateTabButtons()
+
+	if #addon.GetSavedList() > 0 then 
+		WardrobeCollectionFrame.progressBar:SetWidth(160)
+		WardrobeCollectionFrame.progressBar.border:SetWidth(169)
+		WardrobeCollectionFrame.progressBar:ClearAllPoints()
+		WardrobeCollectionFrame.progressBar:SetPoint("TOPLEFT", WardrobeCollectionFrame.ItemsTab, "TOPLEFT", 250, -11)
+		WardrobeCollectionFrame.searchBox:SetWidth(105)
+		BW_WardrobeCollectionFrameTab4:Show()
+
+	end
 end
 
 

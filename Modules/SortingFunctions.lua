@@ -84,12 +84,12 @@ addon.CheckTab = CheckTab
 
 
 local function SortNormal(a, b)
-	return a < b
+	return a > b
 end
 
 
 local function SortReverse(a, b)
-	return a > b
+	return a < b
 end
 
 
@@ -114,9 +114,6 @@ end
 
 addon.Sort = {
 	["SortDefault"] = function(sets,  ignorePatchID)
-		addon.sortDB.reverse = not IsShiftKeyDown()
-		addon.SetSortOrder()
-
 		local comparison = function(set1, set2)	
 			local groupFavorite1 = (addon.chardb.profile.favorite[set1.setID] or set1.favoriteSetID) and true
 			local groupFavorite2 = (addon.chardb.profile.favorite[set2.setID] or set2.favoriteSetID) and true
@@ -281,11 +278,11 @@ addon.Sort = {
 			return SortOrder(source1.sourceID, source2.sourceID)
 		end
 
-		table.sort(Wardrobe:GetFilteredVisualsList(), comparison)
+		table.sort(self.filteredVisualsList, comparison)
 		end,
 		
 		[LE_APPEARANCE] = function(self)
-			sort(self:GetFilteredVisualsList(), function(source1, source2)
+			sort(self.filteredVisualsList, function(source1, source2)
 				if addon.ItemAppearance[source1.visualID] and addon.ItemAppearance[source2.visualID] then
 					return SortOrder(addon.ItemAppearance[source1.visualID], addon.ItemAppearance[source2.visualID])
 				else
@@ -298,7 +295,7 @@ addon.Sort = {
 			if catCompleted[self:GetActiveCategory()] then
 				addon.Sort.SortItemAlphabetic()
 			else
-				for _, v in pairs(self:GetFilteredVisualsList()) do
+				for _, v in pairs(self.filteredVisualsList) do
 					nameCache[v.visualID] = true -- queue data to be cached	
 				end
 				f:SetScript("OnUpdate", CacheHeaders)
@@ -306,7 +303,7 @@ addon.Sort = {
 		end,
 		
 		[LE_ITEM_SOURCE] = function(self)
-			sort(self:GetFilteredVisualsList(), function(source1, source2)
+			sort(self.filteredVisualsList, function(source1, source2)
 			local item1 = WardrobeCollectionFrame_GetSortedAppearanceSources(source1.visualID)[1]
 			local item2 = WardrobeCollectionFrame_GetSortedAppearanceSources(source2.visualID)[1]
 			item1.sourceType = item1.sourceType or 7
@@ -342,12 +339,12 @@ addon.Sort = {
 		
 		-- sort by the color in filename
 		[LE_COLOR] = function(self)
-			addon.Sort.SortColor(Wardrobe:GetFilteredVisualsList())
+			addon.Sort.SortColor(self.filteredVisualsList)
 		end,
 
 		[LE_EXPANSION] = function(self)
-			C_Timer.After(0, function()	sort(Wardrobe:GetFilteredVisualsList(), addon.Sort.SortItemByExpansion) end )
-			sort(Wardrobe:GetFilteredVisualsList(), addon.Sort.SortItemByExpansion) -- Runs twice because some times the first run does not return item info
+			--C_Timer.After(0, function()	sort(Wardrobe:GetFilteredVisualsList(), addon.Sort.SortItemByExpansion) end )
+			sort(self.filteredVisualsList, addon.Sort.SortItemByExpansion) -- Runs twice because some times the first run does not return item info
 		end,
 	},
 
@@ -517,14 +514,3 @@ end
 			--UIDropDownMenu_DisableDropDown(BW_SortDropDown)
 		--end
 	--end)
-
-
-hooksecurefunc(Wardrobe, "SortVisuals", function(self)
--- exclude enchants/illusions by checking for category
-	if CheckTab(1) then 
-		if self:GetActiveCategory() then
-			addon.Sort[1][addon.sortDB.sortDropdown](self)
-			self:UpdateItems()
-		end
-	end
-end)

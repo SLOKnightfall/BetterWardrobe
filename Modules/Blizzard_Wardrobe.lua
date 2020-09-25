@@ -27,6 +27,10 @@ function addon.Init:Blizzard_Wardrobe()
 	Sets = addon.Sets
 end
 
+
+local function GetPage(entryIndex, pageSize)
+	return floor((entryIndex-1) / pageSize) + 1
+end
 --CollectionList:BuildCollectionList()
 
 --===WardrobeCollectionFrame.ItemsCollectionFrame overwrites
@@ -34,6 +38,253 @@ local EXCLUSION_CATEGORY_OFFHAND	= 1
 local EXCLUSION_CATEGORY_MAINHAND	= 2
 
 local ItemsCollectionFrame = WardrobeCollectionFrame.ItemsCollectionFrame
+
+function ItemsCollectionFrame:GoToSourceID(sourceID, slot, transmogType, forceGo, forTransmog)
+	local categoryID, visualID;
+	if ( transmogType == LE_TRANSMOG_TYPE_APPEARANCE ) then
+		if ( slot and forTransmog ) then
+			local slotID = GetInventorySlotInfo(slot);
+			categoryID, visualID = C_TransmogCollection.GetAppearanceSourceInfoForTransmog(slotID, transmogType, sourceID);
+		else
+			categoryID, visualID = C_TransmogCollection.GetAppearanceSourceInfo(sourceID);
+		end
+		slot = slot or WardrobeCollectionFrame_GetSlotFromCategoryID(categoryID);
+	elseif ( transmogType == LE_TRANSMOG_TYPE_ILLUSION ) then
+		visualID = C_TransmogCollection.GetIllusionSourceInfo(sourceID);
+		slot = slot or "MAINHANDSLOT";
+	end
+	if ( visualID or forceGo ) then
+		self.jumpToVisualID = visualID;
+		if ( self.activeCategory ~= categoryID or self.activeSlot ~= slot ) then
+			self:SetActiveSlot(slot, transmogType, categoryID);
+		else
+			if not self.filteredVisualsList then
+				self:RefreshVisualsList();
+			end
+			self:ResetPage();
+		end
+	end
+end
+
+function ItemsCollectionFrame:ResetPage()
+	local page = 1;
+	local selectedVisualID = NO_TRANSMOG_VISUAL_ID;
+	if ( C_TransmogCollection.IsSearchInProgress(WardrobeCollectionFrame.activeFrame.searchType) ) then
+		self.resetPageOnSearchUpdated = true;
+	else
+		if ( self.jumpToVisualID ) then
+			selectedVisualID = self.jumpToVisualID;
+			self.jumpToVisualID = nil;
+		elseif ( self.jumpToLatestAppearanceID and not WardrobeFrame_IsAtTransmogrifier() ) then
+			selectedVisualID = self.jumpToLatestAppearanceID;
+			self.jumpToLatestAppearanceID = nil;
+		end
+	end
+	if ( selectedVisualID and selectedVisualID ~= NO_TRANSMOG_VISUAL_ID ) then
+		local visualsList = self:GetFilteredVisualsList();
+		for i = 1, #visualsList do
+			if ( visualsList[i].visualID == selectedVisualID ) then
+				page = GetPage(i, self.PAGE_SIZE);
+				break;
+			end
+		end
+	end
+	self.PagingFrame:SetCurrentPage(page);
+	self:UpdateItems();
+end
+
+function ItemsCollectionFrame:UpdateItems()
+	local isArmor;
+	local cameraID;
+	local appearanceVisualID;	-- for weapon when looking at enchants
+	local appearanceVisualSubclass;
+	local changeModel = false;
+	local isAtTransmogrifier = WardrobeFrame_IsAtTransmogrifier();
+
+	if ( self.transmogType == LE_TRANSMOG_TYPE_ILLUSION ) then
+		-- for enchants we need to get the visual of the item in that slot
+		local appearanceSourceID;
+		appearanceSourceID, appearanceVisualID, appearanceVisualSubclass = WardrobeCollectionFrame_GetWeaponInfoForEnchant(self.activeSlot);
+		cameraID = C_TransmogCollection.GetAppearanceCameraIDBySource(appearanceSourceID);
+		if ( appearanceVisualID ~= self.illusionWeaponVisualID ) then
+			self.illusionWeaponVisualID = appearanceVisualID;
+			changeModel = true;
+		end
+	else
+		local _, isWeapon = C_TransmogCollection.GetCategoryInfo(self.activeCategory);
+		isArmor = not isWeapon;
+	end
+
+	local tutorialAnchorFrame;
+	local checkTutorialFrame = (self.transmogType == LE_TRANSMOG_TYPE_APPEARANCE) and not WardrobeFrame_IsAtTransmogrifier()
+								and not GetCVarBitfield("closedInfoFrames", LE_FRAME_TUTORIAL_TRANSMOG_MODEL_CLICK);
+
+	local baseSourceID, baseVisualID, appliedSourceID, appliedVisualID, pendingSourceID, pendingVisualID, hasPendingUndo;
+	local showUndoIcon;
+	if ( isAtTransmogrifier ) then
+		baseSourceID, baseVisualID, appliedSourceID, appliedVisualID, pendingSourceID, pendingVisualID, hasPendingUndo = C_Transmog.GetSlotVisualInfo(GetInventorySlotInfo(self.activeSlot), self.transmogType);
+		if ( appliedVisualID ~= NO_TRANSMOG_VISUAL_ID ) then
+			if ( hasPendingUndo ) then
+				pendingVisualID = baseVisualID;
+				showUndoIcon = true;
+			end
+			-- current border (yellow) should only show on untransmogrified items
+			baseVisualID = nil;
+		end
+		-- hide current border (yellow) or current-transmogged border (purple) if there's something pending
+		if ( pendingVisualID ~= NO_TRANSMOG_VISUAL_ID ) then
+			baseVisualID = nil;
+			appliedVisualID = nil;
+		end
+	end
+
+	local pendingTransmogModelFrame = nil;
+	local indexOffset = (self.PagingFrame:GetCurrentPage() - 1) * self.PAGE_SIZE;
+	for i = 1, self.PAGE_SIZE do
+		local model = self.Models[i];
+		local index = i + indexOffset;
+		local visualInfo = self.filteredVisualsList[index];
+		if ( visualInfo ) then
+			model:Show();
+
+			-- camera
+			if ( self.transmogType == LE_TRANSMOG_TYPE_APPEARANCE ) then
+				cameraID = C_TransmogCollection.GetAppearanceCameraID(visualInfo.visualID);
+			end
+			if ( model.cameraID ~= cameraID ) then
+				Model_ApplyUICamera(model, cameraID);
+				model.cameraID = cameraID;
+			end
+
+			-- ( visualInfo ~= model.visualInfo or changeModel ) then
+				if ( isArmor ) then
+					local sourceID = self:GetAnAppearanceSourceFromVisual(visualInfo.visualID, nil);
+					model:TryOn(sourceID);
+				elseif ( appearanceVisualID ) then
+					-- appearanceVisualID is only set when looking at enchants
+					model:SetItemAppearance(appearanceVisualID, visualInfo.visualID, appearanceVisualSubclass);
+				else
+					model:SetItemAppearance(visualInfo.visualID);
+				end
+			--end
+			model.visualInfo = visualInfo;
+
+			-- state at the transmogrifier
+			local transmogStateAtlas;
+			if ( visualInfo.visualID == appliedVisualID ) then
+				transmogStateAtlas = "transmog-wardrobe-border-current-transmogged";
+			elseif ( visualInfo.visualID == baseVisualID ) then
+				transmogStateAtlas = "transmog-wardrobe-border-current";
+			elseif ( visualInfo.visualID == pendingVisualID ) then
+				transmogStateAtlas = "transmog-wardrobe-border-selected";
+				pendingTransmogModelFrame = model;
+			end
+			if ( transmogStateAtlas ) then
+				model.TransmogStateTexture:SetAtlas(transmogStateAtlas, true);
+				model.TransmogStateTexture:Show();
+			else
+				model.TransmogStateTexture:Hide();
+			end
+
+			-- border
+			if ( not visualInfo.isCollected ) then
+				model.Border:SetAtlas("transmog-wardrobe-border-uncollected");
+			elseif ( not visualInfo.isUsable ) then
+				model.Border:SetAtlas("transmog-wardrobe-border-unusable");
+			else
+				model.Border:SetAtlas("transmog-wardrobe-border-collected");
+			end
+
+			if ( C_TransmogCollection.IsNewAppearance(visualInfo.visualID) ) then
+				model.NewString:Show();
+				model.NewGlow:Show();
+			else
+				model.NewString:Hide();
+				model.NewGlow:Hide();
+			end
+			-- favorite
+			model.Favorite.Icon:SetShown(visualInfo.isFavorite);
+			-- hide visual option
+			model.HideVisual.Icon:SetShown(isAtTransmogrifier and visualInfo.isHideVisual);
+
+			if ( GameTooltip:GetOwner() == model ) then
+				model:OnEnter();
+			end
+
+			-- find potential tutorial anchor in the 1st row
+			if ( checkTutorialFrame ) then
+				if ( i < self.NUM_COLS and not WardrobeCollectionFrame.tutorialVisualID and visualInfo.isCollected and not visualInfo.isHideVisual ) then
+					tutorialAnchorFrame = model;
+				elseif ( WardrobeCollectionFrame.tutorialVisualID and WardrobeCollectionFrame.tutorialVisualID == visualInfo.visualID ) then
+					tutorialAnchorFrame = model;
+				end
+			end
+		else
+			model:Hide();
+			model.visualInfo = nil;
+		end
+	end
+	if ( pendingTransmogModelFrame ) then
+		self.PendingTransmogFrame:SetParent(pendingTransmogModelFrame);
+		self.PendingTransmogFrame:SetPoint("CENTER");
+		self.PendingTransmogFrame:Show();
+		if ( self.PendingTransmogFrame.visualID ~= pendingVisualID ) then
+			self.PendingTransmogFrame.TransmogSelectedAnim:Stop();
+			self.PendingTransmogFrame.TransmogSelectedAnim:Play();
+			self.PendingTransmogFrame.TransmogSelectedAnim2:Stop();
+			self.PendingTransmogFrame.TransmogSelectedAnim2:Play();
+			self.PendingTransmogFrame.TransmogSelectedAnim3:Stop();
+			self.PendingTransmogFrame.TransmogSelectedAnim3:Play();
+			self.PendingTransmogFrame.TransmogSelectedAnim4:Stop();
+			self.PendingTransmogFrame.TransmogSelectedAnim4:Play();
+			self.PendingTransmogFrame.TransmogSelectedAnim5:Stop();
+			self.PendingTransmogFrame.TransmogSelectedAnim5:Play();
+		end
+		self.PendingTransmogFrame.UndoIcon:SetShown(showUndoIcon);
+		self.PendingTransmogFrame.visualID = pendingVisualID;
+	else
+		self.PendingTransmogFrame:Hide();
+	end
+	-- progress bar
+	self:UpdateProgressBar();
+	-- tutorial
+	if ( checkTutorialFrame ) then
+		if ( C_TransmogCollection.HasFavorites() ) then
+			SetCVarBitfield("closedInfoFrames", LE_FRAME_TUTORIAL_TRANSMOG_MODEL_CLICK, true);
+			tutorialAnchorFrame = nil;
+		elseif ( tutorialAnchorFrame ) then
+			if ( not WardrobeCollectionFrame.tutorialVisualID ) then
+				WardrobeCollectionFrame.tutorialVisualID = tutorialAnchorFrame.visualInfo.visualID;
+			end
+			if ( WardrobeCollectionFrame.tutorialVisualID ~= tutorialAnchorFrame.visualInfo.visualID ) then
+				tutorialAnchorFrame = nil;
+			end
+		end
+	end
+	if ( tutorialAnchorFrame ) then
+		self.HelpBox:SetPoint("TOP", tutorialAnchorFrame, "BOTTOM", 0, -22);
+		self.HelpBox:Show();
+	else
+		self.HelpBox:Hide();
+	end
+end
+
+
+function ItemsCollectionFrame:SortVisuals()
+		if WardrobeCollectionFrame.selectedCollectionTab == 1 then 
+
+		if self:GetActiveCategory() then
+			addon.Sort[1][addon.sortDB.sortDropdown](self)
+			UIDropDownMenu_EnableDropDown(BW_SortDropDown)
+			--self:UpdateItems()
+		else
+			addon.Sort[1][1](self)
+			UIDropDownMenu_DisableDropDown(BW_SortDropDown)
+			--self:UpdateItems()
+		end
+	end
+end
+
 
 function ItemsCollectionFrame:RefreshVisualsList()
 	if ( self.transmogType == LE_TRANSMOG_TYPE_ILLUSION ) then
@@ -557,9 +808,7 @@ function WardrobeCollectionFrame.SetsTransmogFrame:LoadSet(setID)
 end
 
 
-local function GetPage(entryIndex, pageSize)
-	return floor((entryIndex-1) / pageSize) + 1
-end
+
 
 
 function WardrobeCollectionFrame.SetsTransmogFrame:ResetPage()

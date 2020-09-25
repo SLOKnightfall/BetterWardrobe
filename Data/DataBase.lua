@@ -110,9 +110,15 @@ do
 					and not factionLocked 
 					and not heritageArmor  then
 
+
 					setData["name"] = L[setData["name"]]
+
+					if not setData.note then
 					local note = "NOTE_"..(setData.label or 0)
-					setData.label =(L[note] and L[note]) or ""
+					setData.note = note
+
+					setData.label =L[note] or ""
+				end
 					setData.uiOrder = id*100
 
 					setsInfo[id] = setData
@@ -160,6 +166,8 @@ do
 		--AllSets()
 		local armorSet = addon.ArmorSets[CLASS_INFO[playerClass][3]]
 		addon.ArmorSetModCache = addon.ArmorSetModCache or {}
+		addon.extraSetsCache = addon.extraSetsCache or {}
+		setsInfo = setsInfo or {}
 
 		addArmor(armorSet)
 		addArmor(addon.ArmorSets["COSMETIC"])
@@ -171,7 +179,7 @@ do
 	end
 
 	function addon:ClearCache()
-		addon.ArmorSets = nil
+		--addon.ArmorSets = nil
 		addon.ArmorSetModCache = nil
 		addon.extraSetsCache = nil
 		setsInfo = nil
@@ -196,6 +204,7 @@ do
 		if not addon.savedSetCache then 
 			local savedOutfits = addon.GetOutfits()
 			local list = {}
+			setsInfo = setsInfo or {}
 			for index, data in ipairs(savedOutfits) do
 				local info = {}
 				info.items = {}

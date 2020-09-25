@@ -235,7 +235,7 @@
 				</Scripts>
 			</Frame>
 
-			<DropDownToggleButton parentKey="LocationFilterButton" name="BW_LocationFilterButton" inherits="UIMenuButtonStretchTemplate" text="Options" hidden="false">
+			<DropDownToggleButton parentKey="TransmogOptionsButton" name="BW_TransmogOptionsButton" inherits="UIMenuButtonStretchTemplate" text="Options" hidden="false">
 				<Size x="93" y="22"/>
 				<Anchors>
 					<Anchor point="BOTTOMRIGHT" x="-55" y="80"/>

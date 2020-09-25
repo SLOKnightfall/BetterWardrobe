@@ -58,7 +58,10 @@ function UI.SortDropdowns_Initialize()
 			addon.SetSortOrder(db.reverse)
 			local tabID = addon.GetTab()
 			if tabID == 1 then
-				Wardrobe:SortVisuals()
+				--Wardrobe:OnShow()
+						Wardrobe:RefreshVisualsList()
+		Wardrobe:UpdateItems()
+		Wardrobe:UpdateWeaponDropDown()
 			elseif tabID == 2 then
 				WardrobeCollectionFrame.SetsCollectionFrame:OnSearchUpdate()
 				WardrobeCollectionFrame.SetsTransmogFrame:OnSearchUpdate()
@@ -223,11 +226,10 @@ end
 
 local function RefreshLists()
 	local tabID = addon.GetTab()
-			if tabID == 1 then
-				Wardrobe:SortVisuals()
-			elseif tabID == 2 then
+
+			if tabID == 2 then
 				WardrobeCollectionFrame.SetsCollectionFrame:OnSearchUpdate()
-				WardrobeCollectionFrame.SetsTransmogFrame:OnSearchUpdate()
+				--WardrobeCollectionFrame.SetsTransmogFrame:OnSearchUpdate()
 			elseif tabID == 3 then
 				BW_SetsCollectionFrame:OnSearchUpdate()
 			--	BW_SetsTransmogFrame:OnSearchUpdate()
@@ -280,12 +282,14 @@ function BW_WardrobeCollectionFrame_SetTab(tabID)
 	BW_WardrobeCollectionFrame.FilterButton:SetShown((tab3 or tab4 ) and not atTransmogrifier)
 	BW_WardrobeCollectionFrame.FilterButton:SetEnabled(tab3)
 
-	BW_WardrobeCollectionFrame.LocationFilterButton:SetShown((tab2 or tab3) and atTransmogrifier and addon.Profile.ShowIncomplete)
+	BW_WardrobeCollectionFrame.TransmogOptionsButton:SetShown((tab2 or tab3) and atTransmogrifier and addon.Profile.ShowIncomplete)
 	
+
 	UIDropDownMenu_EnableDropDown(BW_SortDropDown)
 	BW_SortDropDown:ClearAllPoints()
 
 	if tab1 then
+
 		WardrobeCollectionFrame.activeFrame = WardrobeCollectionFrame.ItemsCollectionFrame
 		BW_WardrobeCollectionFrame.activeFrame = WardrobeCollectionFrame.ItemsCollectionFrame
 

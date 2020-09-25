@@ -57,6 +57,10 @@ function S:BetterWardrobe()
 	S:HandleScrollBar(BW_WardrobeOutfitFrameScrollFrameScrollBar)
 
 	S:HandleButton(BW_CollectionListButton)
+	S:HandleButton(BW_TransmogOptionsButton)
+	--S:HandleButton(BW_WardrobeToggle)
+
+	
 
 	S:HandleIcon(BW_CollectionListButton.Icon)
 
