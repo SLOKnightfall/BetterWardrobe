@@ -236,7 +236,7 @@ end
 					info.sources = C_TransmogCollection.GetOutfitSources(data.outfitID)
 				else
 					for i = 1, 16 do
-						info.sources[i] = data[i]
+						info.sources[i] = data[i] or 0
 					end
 				end
 

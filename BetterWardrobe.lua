@@ -1094,7 +1094,6 @@ function BetterWardrobeSetsCollectionMixin:OnEvent(event, ...)
 		end
 
 	elseif (event == "TRANSMOG_COLLECTION_SOURCE_ADDED") then
-		print("SSSSSS")
 		if not addon.Profile.ShowCollectionUpdates then return end
 		local sourceID = ...
 		local categoryID, visualID, canEnchant, icon, isCollected, itemLink, transmogLink, _ = C_TransmogCollection.GetAppearanceSourceInfo(sourceID)
@@ -2002,12 +2001,12 @@ function BetterWardrobeSetsTransmogMixin:UpdateSets()
 
 			--if (model.setID ~= set.setID) then
 				model:Undress()
-
 				local sourceData =  SetsDataProvider:GetSetSourceData(set.setID)
 				for sourceID in pairs(sourceData.sources) do
 					if (not Profile.HideMissing and (not BW_WardrobeToggle.VisualMode or (Sets.isMogKnown(sourceID) and BW_WardrobeToggle.VisualMode))) or
 						(Profile.HideMissing and (BW_WardrobeToggle.VisualMode or Sets.isMogKnown(sourceID))) then
 						model:TryOn(sourceID)
+					else
 					end
 				end
 			--end
