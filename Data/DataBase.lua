@@ -128,6 +128,8 @@ do
 	end
 
 function addon.IsSetItem(itemLink)
+if not itemLink then return end
+
 	local appearanceID, sourceID = C_TransmogCollection.GetItemInfo(itemLink)
 	if not ItemDB[appearanceID] then 
 		return nil 
@@ -189,7 +191,7 @@ end
 		--addon.ArmorSets = nil
 		addon.ArmorSetModCache = nil
 		addon.extraSetsCache = nil
-		setsInfo = nil
+		--setsInfo = nil
 	end
 
 

@@ -17,19 +17,69 @@ end
 
 
 local function addToTooltip(tooltip, itemLink, bag, slot)
-	if not itemLink or tooltip.BW_tooltipWritten or not addon.Profile.ShowTooltips or not addon.IsSetItem(itemLink) then return end
-		local setData = addon.IsSetItem(itemLink)
+	
+	if not itemLink or tooltip.BW_tooltipWritten or not addon.Profile.ShowTooltips then tooltip.BW_tooltipWritten = true; return end
 
-		if setData then 
-			tooltip.BW_tooltipWritten = true
-			addLine(tooltip, '--------')
+	tooltip.BW_tooltipWritten = true
+	local appearanceID, sourceID = C_TransmogCollection.GetItemInfo(itemLink)
+	if not sourceID then return end
+	local addHeader = false
+
+	if addon.Profile.ShowCollectionListTooltips and addon.chardb.profile.collectionList["item"][appearanceID] then
+		if not addHeader then 
+			addHeader = true
+			addLine(tooltip, L["HEADERTEXT"])
+		end
+
+		addDoubleLine (tooltip,"|cff87aaff"..L["-Appearance in Collection List-"], " ")
+		tooltip:Show()
+	end
+
+	local setIDs = C_TransmogSets.GetSetsContainingSourceID(sourceID)
+	if addon.Profile.ShowSetTooltips and #setIDs > 0 then 
+		if not addHeader then 
+			addHeader = true
+			addLine(tooltip, L["HEADERTEXT"])
+		end
+
+		for i, setID in pairs(setIDs) do 
+			local setInfo = C_TransmogSets.GetSetInfo(setID)
+			--addLine(tooltip, '--------')
 			addDoubleLine (tooltip,"|cffffd100"..L["Part of Set:"], " ")
-			for _, data in pairs(setData) do
-				addDoubleLine (tooltip," ","-"..data.name or "")
+			local collected, total = addon.SetsDataProvider:GetSetSourceCounts(setID)
+			local color = YELLOW_FONT_COLOR_CODE
+			if collected == total then 
+				color = GREEN_FONT_COLOR_CODE
 			end
 
-			tooltip:Show()
-	  end
+			addDoubleLine (tooltip," ",L["-%s %s(%d/%d)"]:format(setInfo.name or "", color, collected, total))
+		end
+		tooltip:Show()
+	end
+
+	local setData = addon.IsSetItem(itemLink)
+	if addon.Profile.ShowExtraSetsTooltips and setData then 
+		if not addHeader then 
+			addHeader = true
+			addLine(tooltip, L["HEADERTEXT"])
+		end
+		addDoubleLine (tooltip,"|cffffd100"..L["Part of Extra Set:"], " ")
+		for _, data in pairs(setData) do
+			local collected, total = addon.ExtraSetsDataProvider:GetSetSourceCounts(data.setID)
+			local color = YELLOW_FONT_COLOR_CODE
+			if collected == total then 
+				color = GREEN_FONT_COLOR_CODE
+			end
+
+			addDoubleLine (tooltip," ",L["-%s %s(%d/%d)"]:format(data.name or "", color, collected, total))
+		end
+		tooltip:Show()
+	end
+
+	if addHeader then 
+		addLine(tooltip, L["HEADERTEXT"])
+		tooltip:Show()
+	end
 end
 
 

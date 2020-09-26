@@ -15,9 +15,15 @@ local TAB_EXTRASETS = 3
 
 L.OM_GOLD	= "|c00FFD200";
 L.ENDCOLOR ="|r"
-
-
+ L["Sets"] = true
+  L["Extra Sets"] = true
+L["Added missing appearances of: \124cffff7fff\124H%s:%s\124h[%s]\124h\124r"] = true
+L["Added missing appearances of: \124cffff7fff\124Htransmogset-extra:%s\124h[%s]\124h\124r"] = true
+L["HEADERTEXT"] = '|cffffd100--------================--------'
+L["-%s %s(%d/%d)"] = true
 L["Part of Set:"] = true
+L["Part of Extra Set:"] = true
+L["Print Set Collection alerts to chat"] = true
 L["Show Set Info in Tooltips"] = true
 L["Transmog Window"] = true
 L["Show Incomplete Sets"] = true

@@ -36,7 +36,6 @@ local defaults = {
 
 local LegionWardrobeY = IsAddOnLoaded("LegionWardrobe") and 55 or 5
 
-local f = CreateFrame("Frame")
 function UI.SortDropdowns_Initialize()
 	if not addon.sortDB then
 		addon.sortDB = CopyTable(defaults)
@@ -44,7 +43,9 @@ function UI.SortDropdowns_Initialize()
 
 	db = addon.sortDB
 	
-	f:RegisterEvent("TRANSMOG_COLLECTION_ITEM_UPDATE")
+	--f:RegisterEvent("TRANSMOG_COLLECTION_ITEM_UPDATE")
+
+
 	UIDropDownMenu_SetWidth(BW_SortDropDown, 140)
 	UIDropDownMenu_Initialize(BW_SortDropDown, function(self)
 		local info = UIDropDownMenu_CreateInfo()

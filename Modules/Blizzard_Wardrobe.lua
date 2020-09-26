@@ -28,6 +28,36 @@ function addon.Init:Blizzard_Wardrobe()
 end
 
 
+local TAB_ITEMS = 1;
+local TAB_SETS = 2;
+
+function WardrobeCollectionFrame_OpenTransmogLink(link, transmogType)
+	if ( not CollectionsJournal:IsVisible() or not WardrobeCollectionFrame:IsVisible() ) then
+		ToggleCollectionsJournal(5);
+	end
+
+	local linkType, id = strsplit(":", link);
+
+	if ( linkType == "transmogappearance" ) then
+		local sourceID = tonumber(id);
+		BW_WardrobeCollectionFrame_SetTab(TAB_ITEMS);
+		WardrobeCollectionFrame.ItemsCollectionFrame:GoToSourceID(sourceID, nil, LE_TRANSMOG_TYPE_APPEARANCE);
+
+	elseif ( linkType == "transmogset") then
+		local setID = tonumber(id);
+		BW_WardrobeCollectionFrame_SetTab(TAB_SETS);
+		BW_WardrobeCollectionFrame.BW_SetsCollectionFrame:SelectSet(setID);
+		--BW_WardrobeCollectionFrame.SetsCollectionFrame:SelectSet(setID);
+
+	elseif ( linkType == "transmogset-extra") then
+		local setID = tonumber(id);
+		BW_WardrobeCollectionFrame_SetTab(3);
+		--WardrobeCollectionFrame.SetsCollectionFrame:SelectSet(setID);
+		BW_WardrobeCollectionFrame.BW_SetsCollectionFrame:SelectSet(setID);
+	end
+end
+
+
 local function GetPage(entryIndex, pageSize)
 	return floor((entryIndex-1) / pageSize) + 1
 end
@@ -349,6 +379,7 @@ function ItemsCollectionFrame:OnShow()
 end
 
 local SetsDataProvider = CreateFromMixins(WardrobeSetsDataProviderMixin)
+addon.SetsDataProvider = SetsDataProvider
 
 function SetsDataProvider:SortSets(sets, reverseUIOrder, ignorePatchID)
 	--local sortedSources = SetsDataProvider:GetSortedSetSources(data.setID)
