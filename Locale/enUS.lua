@@ -17,6 +17,24 @@ L.OM_GOLD	= "|c00FFD200";
 L.ENDCOLOR ="|r"
  L["Sets"] = true
   L["Extra Sets"] = true
+
+  L["General Options"] = true
+  L["Character Options"] = true
+L["Display Options"] = true
+
+  L["Dressing Room Options"] = true
+L["Show Item Buttons"] = true
+
+L["Dim Backround Image"] = true
+L["Hide  Backround Image"] = true
+
+  L["Start Undressed"] = true
+
+  L["Hide Tabard"] = true
+
+  L["Hide Shirt"] = true
+   L["Hide Weapons"] = true
+    L["Show DressingRoom Controls"] = true
 L["Added missing appearances of: \124cffff7fff\124H%s:%s\124h[%s]\124h\124r"] = true
 L["Added missing appearances of: \124cffff7fff\124Htransmogset-extra:%s\124h[%s]\124h\124r"] = true
 L["HEADERTEXT"] = '|cffffd100--------================--------'

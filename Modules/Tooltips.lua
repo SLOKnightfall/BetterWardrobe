@@ -96,7 +96,7 @@ ShoppingTooltip1:HookScript("OnTooltipCleared", TooltipCleared)
 ShoppingTooltip2:HookScript("OnTooltipCleared", TooltipCleared)
 GameTooltip.ItemTooltip.Tooltip:HookScript("OnTooltipCleared", TooltipCleared)
 
-local function CanIMogIt_AttachItemTooltip(tooltip)
+local function AttachItemTooltip(tooltip)
 	-- Hook for normal tooltips.
 	local link = select(2, tooltip:GetItem())
 	if link then
@@ -105,13 +105,13 @@ local function CanIMogIt_AttachItemTooltip(tooltip)
 end
 
 
-GameTooltip:HookScript("OnTooltipSetItem", CanIMogIt_AttachItemTooltip)
-ItemRefTooltip:HookScript("OnTooltipSetItem", CanIMogIt_AttachItemTooltip)
-ItemRefShoppingTooltip1:HookScript("OnTooltipSetItem", CanIMogIt_AttachItemTooltip)
-ItemRefShoppingTooltip2:HookScript("OnTooltipSetItem", CanIMogIt_AttachItemTooltip)
-ShoppingTooltip1:HookScript("OnTooltipSetItem", CanIMogIt_AttachItemTooltip)
-ShoppingTooltip2:HookScript("OnTooltipSetItem", CanIMogIt_AttachItemTooltip)
-GameTooltip.ItemTooltip.Tooltip:HookScript("OnTooltipSetItem", CanIMogIt_AttachItemTooltip)
+GameTooltip:HookScript("OnTooltipSetItem", AttachItemTooltip)
+ItemRefTooltip:HookScript("OnTooltipSetItem", AttachItemTooltip)
+ItemRefShoppingTooltip1:HookScript("OnTooltipSetItem", AttachItemTooltip)
+ItemRefShoppingTooltip2:HookScript("OnTooltipSetItem", AttachItemTooltip)
+ShoppingTooltip1:HookScript("OnTooltipSetItem", AttachItemTooltip)
+ShoppingTooltip2:HookScript("OnTooltipSetItem", AttachItemTooltip)
+GameTooltip.ItemTooltip.Tooltip:HookScript("OnTooltipSetItem", AttachItemTooltip)
 
 hooksecurefunc(GameTooltip, "SetMerchantItem",
 	function(tooltip, index)

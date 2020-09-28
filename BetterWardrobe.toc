@@ -41,6 +41,7 @@ Modules\SavedOutfits.xml
 Modules\CollectionList.xml
 Modules\UIDropDownMenu.lua
 Modules\Tooltips.lua
+Modules\DressingRoom.xml
 
 #3rd party addon compatability
 Plugins\ElvUI.lua

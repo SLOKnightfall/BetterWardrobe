@@ -13,7 +13,7 @@
 		</Anchors>
 	</Frame>
 
-	<Button name="BW_WardrobeOutfitButtonTemplate" inherits="WardrobeOutfitButtonTemplate" virtual="true" mixin="BW_WardrobeOutfitButtonMixin">
+	<Button name="BW_WardrobeOutfitFrameButtonTemplate" inherits="WardrobeOutfitButtonTemplate" virtual="true" mixin="BW_WardrobeOutfitButtonMixin">
 	</Button>
 
 	<Frame name="BW_WardrobeOutfitEditFrame" parent="UIParent" hidden="true" frameStrata="DIALOG"  mixin="BW_WardrobeOutfitEditFrameMixin">
@@ -143,9 +143,7 @@
 		<Scripts>
 			<OnHide method="OnHide"/>
 			<OnUpdate method="OnUpdate"/>
-			<OnLoad>
-				self:CreateScrollFrame()
-			</OnLoad>
+			<OnLoad method="CreateScrollFrame"/>
 		</Scripts>
 	</Frame>
 

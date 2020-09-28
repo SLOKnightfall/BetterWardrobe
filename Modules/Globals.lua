@@ -19,6 +19,60 @@ addon.Globals.locationDrowpDown = {
   [21] = INVTYPE_ROBE,--handr
 }
 
+ addon.Globals.INVENTORY_SLOT_NAMES = {
+  [1]  = "HEADSLOT",
+  [3]  = "SHOULDERSLOT",
+  [4]  = "SHIRTSLOT",
+  [5]  = "CHESTSLOT",
+  [6]  = "WAISTSLOT",
+  [7]  = "LEGSSLOT",
+  [8]  = "FEETSLOT",
+  [9]  = "WRISTSLOT",
+  [10] = "HANDSSLOT",
+  [15] = "BACKSLOT",
+  [16] = "MAINHANDSLOT",
+  [17] = "SECONDARYHANDSLOT",
+  [19] = "TABARDSLOT",
+  
+  ["HEADSLOT"]          = 1,
+  ["SHOULDERSLOT"]      = 3,
+  ["SHIRTSLOT"]         = 4,
+  ["CHESTSLOT"]         = 5,
+  ["WAISTSLOT"]         = 6,
+  ["LEGSSLOT"]          = 7,
+  ["FEETSLOT"]          = 8,
+  ["WRISTSLOT"]         = 9,
+  ["HANDSSLOT"]         = 10,
+  ["BACKSLOT"]          = 15,
+  ["MAINHANDSLOT"]      = 16,
+  ["SECONDARYHANDSLOT"] = 17,
+  ["TABARDSLOT"]        = 19,
+
+  ["INVTYPE_HEAD"] =            1,
+  ["INVTYPE_NECK"] =            2,
+  ["INVTYPE_SHOULDER"] =        3,
+  ["INVTYPE_BODY"] =            4,
+  ["INVTYPE_CHEST"] =           5,
+  ["INVTYPE_ROBE"] =            5,
+  ["INVTYPE_WAIST"] =          6,
+  ["INVTYPE_LEGS"] =           7,
+  ["INVTYPE_FEET"] =            8,
+  ["INVTYPE_WRIST"] =           9,
+  ["INVTYPE_HAND"] =            10,
+  ["INVTYPE_CLOAK"] =           15,
+ -- ["INVTYPE_WEAPON"] =          16, 17,
+  ["INVTYPE_SHIELD"] =          17,
+  ["INVTYPE_2HWEAPON"] =        16,
+  ["INVTYPE_WEAPONMAINHAND"] =  16,
+  ["INVTYPE_WEAPONOFFHAND"] =   17,
+  ["INVTYPE_HOLDABLE"] =        17,
+  ["INVTYPE_RANGED"] =          18,
+  ["INVTYPE_THROWN"] =          18,
+  ["INVTYPE_RANGEDRIGHT"] =     18,
+  ["INVTYPE_RELIC"] =           18,
+  ["INVTYPE_TABARD"] =          19,
+}
+
 addon.Globals.BASE_SET_BUTTON_HEIGHT = 46
 addon.Globals.VARIANT_SET_BUTTON_HEIGHT = 20
 addon.Globals.SET_PROGRESS_BAR_MAX_WIDTH = 204

@@ -424,6 +424,10 @@ function BW_WardrobeOutfitMixin:CheckOutfitForSave(name)
 	BW_WardrobeOutfitFrame:EvaluateSaveState()
 end
 
+function BW_WardrobeOutfitMixin:IsDefaultSet(outfitID)
+		return IsDefaultSet(outfitID)
+end
+
 --===================================================================================================================================
 BW_WardrobeOutfitFrameMixin = CreateFromMixins(WardrobeOutfitFrameMixin)
 
@@ -467,7 +471,7 @@ function BW_WardrobeOutfitFrameMixin:Update()
 		if (outfits[i] or newOutfitButton) then
 			local button = buttons[i]
 			if (not button) then
-				button = CreateFrame("BUTTON", nil, BW_WardrobeOutfitFrame.Content, "BW_WardrobeOutfitButtonTemplate")
+				button = CreateFrame("BUTTON", nil, self.Content, self:GetName().."ButtonTemplate")
 				button.EditButton:SetScript("OnClick", function(self)
 					PlaySound(SOUNDKIT.IG_MAINMENU_OPTION_CHECKBOX_ON)
 					BW_WardrobeOutfitEditFrame:ShowForOutfit(self:GetParent().outfitID)
@@ -715,16 +719,16 @@ function BW_WardrobeOutfitFrameMixin:CreateScrollFrame()
 	self.moduleoptions = self.moduleoptions or CreateFrame("Frame", nil, self.scrollchild)
 	self.moduleoptions:SetAllPoints(self.scrollchild)
 
-	BW_WardrobeOutfitFrame.Content = self.moduleoptions
+	self.Content = self.moduleoptions
 
-	local button = CreateFrame("BUTTON", nil, BW_WardrobeOutfitFrame.Content, "BW_WardrobeOutfitButtonTemplate")
+	local button = CreateFrame("BUTTON", nil, self.Content, self:GetName().."ButtonTemplate")
 	button.EditButton:SetScript("OnClick", function(self)
 		PlaySound(SOUNDKIT.IG_MAINMENU_OPTION_CHECKBOX_ON)
 		BW_WardrobeOutfitEditFrame:ShowForOutfit(self:GetParent().outfitID)
 	end)
 
-	button:SetPoint("TOPLEFT", BW_WardrobeOutfitFrame.Content, "TOPLEFT")
-	button:SetPoint("TOPRIGHT", BW_WardrobeOutfitFrame.Content, "TOPRIGHT")
+	button:SetPoint("TOPLEFT", self.Content, "TOPLEFT")
+	button:SetPoint("TOPRIGHT", self.Content, "TOPRIGHT")
 
 	function self.moduleoptions:StartHideCountDown()
 		return BW_WardrobeOutfitFrame:StartHideCountDown()
@@ -734,7 +738,7 @@ function BW_WardrobeOutfitFrameMixin:CreateScrollFrame()
 		return BW_WardrobeOutfitFrame:StopHideCountDown()
 	end
 
-	BW_WardrobeOutfitFrame.Buttons = self.moduleoptions.Buttons
+	self.Buttons = self.moduleoptions.Buttons
 end
 
 --===================================================================================================================================
