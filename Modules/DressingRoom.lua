@@ -562,8 +562,16 @@ function BW_DressingRoomImportButton_OnClick(self)
 		{
 			text = L["Export Set"],
 			func = function()
-				ExportSet()
+				addon:ExportSet()
 
+			end,
+			notCheckable = true,
+			isNotRadio = true,
+		},
+				{
+			text = L["Create Dressing Room Command Link"],
+			func = function()
+				addon:CreateChatLink()
 			end,
 			notCheckable = true,
 			isNotRadio = true,
