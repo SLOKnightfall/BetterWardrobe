@@ -283,39 +283,44 @@ function BW_DressingRoomOutfitFrameMixin:Toggle(dropDown)
 end
 
 
+local MAX_DEFAULT_OUTFITS = C_TransmogCollection.GetNumMaxOutfits()
 function BW_DressingRoomOutfitFrameMixin:SaveOutfit(name)
 	local outfitID = LookupOutfitIDFromName(name) --or  ((#C_TransmogCollection.GetOutfits() <= MAX_DEFAULT_OUTFITS) and #C_TransmogCollection.GetOutfits() -1 ) -- or #GetOutfits()-1
 	local icon
-	for i = 1, #TRANSMOG_SLOTS do
-		if TRANSMOG_SLOTS[i].transmogType == LE_TRANSMOG_TYPE_APPEARANCE then
-			local sourceID = DressUpOutfitMixin:GetSlotSourceID(TRANSMOG_SLOTS[i].slot, TRANSMOG_SLOTS[i].transmogType) --self.sources[slotID]
+	local sources = {}
+	local Buttons = BW_DressingRoomFrame.PreviewButtonFrame.Slots
+	for index, button in pairs(Buttons) do
+		local itemlink = nil
+		local slot = button:GetID()
 
-			if sourceID then
+		itemlink = button.itemLink --GetInventoryItemLink("player", slot)
+		if itemlink then
+			local appearanceID, sourceID = C_TransmogCollection.GetItemInfo(itemlink)
+			
+			tinsert(sources, sourceID)
+			if sourceID and not icon then 
 				icon = select(4, C_TransmogCollection.GetAppearanceSourceInfo(sourceID))
-				if icon then
-					break
-				end
 			end
 		end
 	end
 
-	if outfitID and IsDefaultSet(outfitID) or (#C_TransmogCollection.GetOutfits() < MAX_DEFAULT_OUTFITS)  then
-		outfitID = C_TransmogCollection.SaveOutfit(name, self.sources, self.mainHandEnchant, self.offHandEnchant, icon)
+	if outfitID and BW_WardrobeOutfitMixin:IsDefaultSet(outfitID) or (#C_TransmogCollection.GetOutfits() < MAX_DEFAULT_OUTFITS)  then
+		outfitID = C_TransmogCollection.SaveOutfit(name, sources, 0, 0, icon)
 	else
 		if outfitID then
-			addon.chardb.profile.outfits[LookupIndexFromID(outfitID)] = self.sources
+			addon.chardb.profile.outfits[LookupIndexFromID(outfitID)] = sources
 			outfit = addon.chardb.profile.outfits[LookupIndexFromID(outfitID)]
 		else
-			tinsert(addon.chardb.profile.outfits, self.sources)
+			tinsert(addon.chardb.profile.outfits, sources)
 			outfit = addon.chardb.profile.outfits[#addon.chardb.profile.outfits]
 		end
 
 		outfit["name"] = name
-		outfit["mainHandEnchant"] = self.mainHandEnchant or 0
-		outfit["offHandEnchant"] = self.offHandEnchant or 0
-		local icon = select(4, C_TransmogCollection.GetAppearanceSourceInfo(outfit[1]))
+		outfit["mainHandEnchant"] = 0
+		outfit["offHandEnchant"] =  0
+		--local icon = select(4, C_TransmogCollection.GetAppearanceSourceInfo(outfit[1]))
 		outfit["icon"] = icon
-		outfitID = index
+		--outfitID = index
 	end
 
 	if self.popupDropDown then
@@ -500,8 +505,77 @@ function DressupSettingsButton_OnClick(self)
 	
 	ContextMenu:SetPoint("TOPLEFT", self, "TOPLEFT", 0, 0)
 	EasyMenu(contextMenuData, ContextMenu, "cursor", 0, 0, "MENU")
-	
+
 	DropDownList1:ClearAllPoints();
-	DropDownList1:SetPoint("TOPLEFT", self, "BOTTOMLEFT", 0, 0);
+	DropDownList1:SetPoint("BOTTOMLEFT", self, "BOTTOMLEFT", 0, 0);
 	DropDownList1:SetClampedToScreen(true)
 end
+
+
+function BW_DressingRoomImportButton_OnClick(self)
+	local Profile = addon.Profile
+	local name  = addon.QueueList[3]
+	local contextMenuData = {
+		{
+			text = L["Display Options"], isTitle = true, notCheckable = true,
+		},
+		{
+			text = L["Load Set: %s"]:format( name or L["None Selected"]),
+			func = function()
+				local sources
+				local setType = addon.QueueList[1]
+				local setID = addon.QueueList[2]
+				local playerActor = DressUpFrame.ModelScene:GetPlayerActor()
+
+				if not setID then return end
+				
+				if setType == "set" then
+					sources = C_TransmogSets.GetSetSources(setID);
+				elseif setType == "extraset" then
+					sources = addon.GetSetsources(setID)
+				end
+
+				for i, d in pairs(sources)do 
+					playerActor:TryOn(i)
+				end
+				DressUpSources(sources)
+			end,
+			isNotRadio = true,
+			notCheckable = true,
+		},
+		{
+			text = L["Import Item"],
+			func = function()
+				BW_WardrobeOutfitFrameMixin:ShowPopup("BETTER_WARDROBE_IMPORT_ITEM_POPUP")
+			end,
+			isNotRadio = true,
+			notCheckable = true,
+		},
+		{
+			text = L["Import Set"],
+			func = function()
+				BW_WardrobeOutfitFrameMixin:ShowPopup("BETTER_WARDROBE_IMPORT_SET_POPUP")
+			end,
+			isNotRadio = true,
+			notCheckable = true,
+		},
+		{
+			text = L["Export Set"],
+			func = function()
+				ExportSet()
+
+			end,
+			notCheckable = true,
+			isNotRadio = true,
+		},
+		
+	}
+	
+	ContextMenu:SetPoint("TOPLEFT", self, "TOPLEFT", 0, 0)
+	EasyMenu(contextMenuData, ContextMenu, "cursor", 0, 0, "MENU")
+	
+	DropDownList1:ClearAllPoints();
+	DropDownList1:SetPoint("BOTTOMLEFT", self, "BOTTOMLEFT", 0, 0);
+	DropDownList1:SetClampedToScreen(true)
+end
+

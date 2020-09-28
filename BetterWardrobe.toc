@@ -35,6 +35,7 @@ BetterWardrobe.xml
 
 
 #Modules
+Modules\ImportExport.lua
 Modules\SortingFunctions.lua
 Modules\Randomizer.lua
 Modules\SavedOutfits.xml

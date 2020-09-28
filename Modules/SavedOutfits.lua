@@ -140,7 +140,13 @@ StaticPopupDialogs["BW_CONFIRM_OVERWRITE_TRANSMOG_OUTFIT"] = {
 	text = TRANSMOG_OUTFIT_CONFIRM_OVERWRITE,
 	button1 = YES,
 	button2 = NO,
-	OnAccept = function (self) BW_WardrobeOutfitFrame:SaveOutfit(self.data) end,
+	OnAccept = function (self) 
+		if DressUpFrame:IsShown() then
+			BW_DressingRoomOutfitFrameMixin:SaveOutfit(self.data)
+		else
+			BW_WardrobeOutfitFrame:SaveOutfit(self.data)
+		end
+	end,
 	OnCancel = function (self)
 		local name = self.data
 		self:Hide()
@@ -439,6 +445,8 @@ BW_WardrobeOutfitFrameMixin.popups = {
 	"TRANSMOG_OUTFIT_CHECKING_APPEARANCES",
 	"BW_TRANSMOG_OUTFIT_SOME_INVALID_APPEARANCES",
 	"TRANSMOG_OUTFIT_ALL_INVALID_APPEARANCES",
+	"BETTER_WARDROBE_IMPORT_ITEM_POPUP",
+	"BETTER_WARDROBE_IMPORT_SET_POPUP"
 }
 
 local OUTFIT_FRAME_MIN_STRING_WIDTH = 152
@@ -613,7 +621,13 @@ function BW_WardrobeOutfitFrameMixin:NameOutfit(newName, outfitID)
 		addon.chardb.profile.outfits[index].name = newName
 	else
 		-- this is a new outfit
-		self:SaveOutfit(newName)
+		--self:SaveOutfit(newName)
+		if DressUpFrame:IsShown() then
+			BW_DressingRoomOutfitFrameMixin:SaveOutfit(newName)
+		else
+
+			self:SaveOutfit(newName)
+		end
 	end
 end
 
@@ -682,7 +696,12 @@ end
 
 function BW_WardrobeOutfitFrameMixin:ContinueWithSave()
 	if (self.name) then
-		BW_WardrobeOutfitFrame:SaveOutfit(self.name)
+		if DressUpFrame:IsShown() then
+			BW_DressingRoomOutfitFrameMixin:SaveOutfit(self.name)
+		else
+
+			BW_WardrobeOutfitFrame:SaveOutfit(self.name)
+		end
 		BW_WardrobeOutfitFrame:ClosePopups()
 	else
 		BW_WardrobeOutfitFrame:ShowPopup("BW_NAME_TRANSMOG_OUTFIT")

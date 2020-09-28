@@ -293,6 +293,7 @@ function CollectionList:TSMGroupExport()
 	local CheckBox = AceGUI:Create("MultiLineEditBox")
 	CheckBox:SetFullHeight(true)
 	CheckBox:SetFullWidth(true)
+	CheckBox:DisableButton(true)
 	CheckBox:SetLabel("")
 	f:AddChild(CheckBox)
 

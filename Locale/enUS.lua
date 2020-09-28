@@ -35,6 +35,9 @@ L["Hide  Backround Image"] = true
   L["Hide Shirt"] = true
    L["Hide Weapons"] = true
     L["Show DressingRoom Controls"] = true
+
+    L["Type the item ID or url in the text box below"] = true
+    L["Import Item"] = true
 L["Added missing appearances of: \124cffff7fff\124H%s:%s\124h[%s]\124h\124r"] = true
 L["Added missing appearances of: \124cffff7fff\124Htransmogset-extra:%s\124h[%s]\124h\124r"] = true
 L["HEADERTEXT"] = '|cffffd100--------================--------'
