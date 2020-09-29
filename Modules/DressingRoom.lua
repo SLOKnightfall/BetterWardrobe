@@ -189,13 +189,18 @@ function DressingRoom:HideConditionalSlots()
 	dressuplink = nil;
 end
 
-
+local itemlinkbase = [["item:%d::::::::::::9:%d]]
 function DressingRoom:TryOn(itemSource, previewSlot, enchantID)
-	if not itemSource then return end
+	if not itemSource or itemSource == 0 then return end
 
 	local itemlink
 	if type(itemSource) == "number" then
 		itemlink = select(6, C_TransmogCollection.GetAppearanceSourceInfo(itemSource))
+
+			if not itemlink then 
+				local sourceInfo = C_TransmogCollection.GetSourceInfo(itemSource)
+				itemlink = itemlinkbase:format(sourceInfo.itemID, sourceInfo.itemModID or 0)
+			end
 	else
 		itemlink = itemSource
 	end
@@ -248,7 +253,6 @@ DressUpFrameOutfitDropDown:Hide()
 				--WardrobeTransmogFrame.BW_OutfitDropDown:OnOutfitApplied(BW_WardrobeOutfitDropDown.selectedOutfitID)
 			--end
 		--end, true)
-
 end
 
 
@@ -256,8 +260,11 @@ function BW_DressingRoomMixin:LoadOutfit(outfitID)
 	if not outfitID then
 		return false
 	end
+	
 	dressuplink = nil;
-		DressingRoom:ResetItemButtons(false, true);
+	local playerActor = DressUpFrame.ModelScene:GetPlayerActor()
+	playerActor:Undress()
+	DressingRoom:ResetItemButtons(false, true);
 
 	if self:IsDefaultSet(outfitID) then
 		DressUpSources(C_TransmogCollection.GetOutfitSources(outfitID))
