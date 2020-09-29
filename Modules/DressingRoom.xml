@@ -22,21 +22,7 @@
 		</Scripts>
 	</Button>
 
-	<Button name="DressupSettingsButtonTemplate" virtual="true" inherits="BrowserButtonTemplate">
-		<Layers>
-			<Layer level="ARTWORK" textureSubLevel="5">
-				<Texture parentKey="Icon" file="Interface\Buttons\UI-OptionsButton">
-					<Size x="16" y="16"/>
-					<Anchors>
-						<Anchor point="CENTER" />
-					</Anchors>
-				</Texture>
-			</Layer>
-		</Layers>
-		<Scripts>
 
-		</Scripts>
-	</Button>
 
 	<Button name="BW_DressingRoomOutfitFrameButtonTemplate" inherits="WardrobeOutfitButtonTemplate" virtual="true" mixin="BW_DressingRoomOutfitButtonMixin"/>
 
@@ -146,32 +132,43 @@
 					</Button>
 				</Frames>
 			</Frame>
-			<Button parentKey="BW_DressingRoomSettingsButton" inherits="DressupSettingsButtonTemplate">
+
+			<Button parentKey="BW_DressingRoomSettingsButton" inherits="BrowserButtonTemplate">
 				<Anchors>
 					<Anchor point="BOTTOMLEFT" relativeTo="$parent" relativePoint="BOTTOMLEFT" x="2" y="-2"/>
 				</Anchors>
+				<Layers>
+					<Layer level="ARTWORK" textureSubLevel="5">
+						<Texture parentKey="Icon" file="Interface\Buttons\UI-OptionsButton">
+							<Size x="16" y="16"/>
+							<Anchors>
+								<Anchor point="CENTER" />
+							</Anchors>
+						</Texture>
+					</Layer>
+				</Layers>
 				<Scripts>
 					<OnClick>
 						DressupSettingsButton_OnClick(self)
 					</OnClick>
 				</Scripts>
 			</Button>
+
 			<Button parentKey="BW_DressingRoomExportButton" inherits="BrowserButtonTemplate" >
 				<Size x="32" y="32"/>
 				<Anchors>
 					<Anchor point="LEFT" relativeKey="$parent.BW_DressingRoomSettingsButton" relativePoint="RIGHT" x="-5" y="0"/>
-				</Anchors>
-								
-		<Layers>
-			<Layer level="ARTWORK" textureSubLevel="5">
-				<Texture parentKey="Icon" file="Interface\Buttons\UI-GuildButton-PublicNote-Up">
-					<Size x="16" y="16"/>
-					<Anchors>
-						<Anchor point="CENTER" />
-					</Anchors>
-				</Texture>
-			</Layer>
-		</Layers>
+				</Anchors>					
+				<Layers>
+					<Layer level="ARTWORK" textureSubLevel="5">
+						<Texture parentKey="Icon" file="Interface\Buttons\UI-GuildButton-PublicNote-Up">
+							<Size x="16" y="16"/>
+							<Anchors>
+								<Anchor point="CENTER" />
+							</Anchors>
+						</Texture>
+					</Layer>
+				</Layers>
 				<Scripts>
 					<OnClick>
 						BW_DressingRoomImportButton_OnClick(self)

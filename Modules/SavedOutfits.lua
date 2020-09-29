@@ -586,14 +586,14 @@ function BW_WardrobeOutfitFrameMixin:DeleteOutfit(outfitID)
 	if GetCVarBool("transmogCurrentSpecOnly") then
 		local specIndex = GetSpecialization()
 		local value = addon.chardb.profile.lastTransmogOutfitIDSpec[specIndex]
-		if value > 0 then  addon.chardb.profile.lastTransmogOutfitIDSpec[specIndex] = value - 1 end
+		if value ~= "" and value > 0 then  addon.chardb.profile.lastTransmogOutfitIDSpec[specIndex] = value - 1 end
 
 		--SetCVar("lastTransmogOutfitIDSpec"..specIndex, value)
 	else
 		for specIndex = 1, GetNumSpecializations() do
 			--SetCVar("lastTransmogOutfitIDSpec"..specIndex, value)
 		local value = addon.chardb.profile.lastTransmogOutfitIDSpec[specIndex]
-		if value > 0 then  addon.chardb.profile.lastTransmogOutfitIDSpec[specIndex] = value - 1 end
+		if value ~= "" and value > 0  then  addon.chardb.profile.lastTransmogOutfitIDSpec[specIndex] = value - 1 end
 
 		end
 	end
@@ -747,7 +747,7 @@ function BW_WardrobeOutfitFrameMixin:CreateScrollFrame()
 	end)
 
 	button:SetPoint("TOPLEFT", self.Content, "TOPLEFT")
-	button:SetPoint("TOPRIGHT", self.Content, "TOPRIGHT")
+	button:SetPoint("TOPRIGHT", self.Content, "TOPRIGHT", -20, 0)
 
 	function self.moduleoptions:StartHideCountDown()
 		return BW_WardrobeOutfitFrame:StartHideCountDown()
