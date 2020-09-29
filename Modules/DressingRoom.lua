@@ -118,6 +118,21 @@ function DressingRoom:GetInvSlotButton(slotID)
 end
 
 
+function addon:DressingRoom_SetItemFrameQuality(itemFrame)
+	if not itemFrame.itemLink then return end 
+	local _, _, quality, _, _, _, _, _, _, texture = GetItemInfo(itemFrame.itemLink)
+		--local quality = C_TransmogCollection.GetSourceInfo(itemFrame.sourceID).quality;
+		if ( quality == LE_ITEM_QUALITY_UNCOMMON ) then
+			itemFrame.IconBorder:SetAtlas("loottab-set-itemborder-green", true);
+		elseif ( quality == LE_ITEM_QUALITY_RARE ) then
+			itemFrame.IconBorder:SetAtlas("loottab-set-itemborder-blue", true);
+		elseif ( quality == LE_ITEM_QUALITY_EPIC ) then
+			itemFrame.IconBorder:SetAtlas("loottab-set-itemborder-purple", true);
+		end
+
+
+end
+
 function DressingRoom:SetItemButton(slot, itemlink)
 	local rarity, texture, _ = 0, nil
 	if itemlink then
@@ -133,28 +148,25 @@ function DressingRoom:SetItemButton(slot, itemlink)
 	if texture then
 		button.Icon:SetTexture(texture)
 		button.Icon:Show()
-	else
-		button.Icon:Hide()
-	end
-	
-	if rarity and (rarity >= LE_ITEM_QUALITY_UNCOMMON and rarity <= LE_ITEM_QUALITY_HEIRLOOM) then
-		local c = ITEM_QUALITY_COLORS[rarity]
-		if rarity == LE_ITEM_QUALITY_UNCOMMON then
-			button.IconBorder:SetAtlas("loottab-set-itemborder-green", true)
-		elseif rarity == LE_ITEM_QUALITY_RARE then
-			button.IconBorder:SetAtlas("loottab-set-itemborder-blue", true)
-		elseif rarity == LE_ITEM_QUALITY_EPIC then
-			button.IconBorder:SetAtlas("loottab-set-itemborder-purple", true)
-		--elseif rarity == LE_ITEM_QUALITY_LEGENDARY  or rarity == LE_ITEM_QUALITY_ARTIFACT then
-			--button.IconBorder:SetAtlas("loottoast-itemborder-orange", false)
-		end
-
 		button.IconBorder:SetDesaturation(0);
 		button.IconBorder:SetAlpha(1);
 	else
+		button.Icon:Hide()
 		button.IconBorder:SetDesaturation(1)
 		button.IconBorder:SetAlpha(0.3)
 	end
+
+
+	
+	
+	--if rarity then 
+addon:DressingRoom_SetItemFrameQuality(button)
+		--button.IconBorder:SetDesaturation(0);
+		--button.IconBorder:SetAlpha(1);
+--	else
+		--button.IconBorder:SetDesaturation(1)
+		--button.IconBorder:SetAlpha(0.3)
+	--end
 end
 
 
@@ -260,7 +272,7 @@ function BW_DressingRoomMixin:LoadOutfit(outfitID)
 	if not outfitID then
 		return false
 	end
-	
+
 	dressuplink = nil;
 	local playerActor = DressUpFrame.ModelScene:GetPlayerActor()
 	playerActor:Undress()
@@ -387,6 +399,7 @@ function BW_DressingRoomItemDetailsMixin:OnMouseDown(button)
 		self.IconBorder:SetDesaturation(1)
 		self.IconBorder:SetAlpha(0.3)
 		self.itemLink = nil
+		DressingRoom:SetItemButton(INVENTORY_SLOT_NAMES[self:GetID()], nil)
 		GameTooltip:ClearLines()
 		GameTooltip:AddLine(_G[INVENTORY_SLOT_NAMES[self:GetID()]])
 		GameTooltip:Show()

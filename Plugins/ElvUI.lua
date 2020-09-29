@@ -60,7 +60,27 @@ function S:BetterWardrobe()
 	S:HandleButton(BW_TransmogOptionsButton)
 	--S:HandleButton(BW_WardrobeToggle)
 
-	
+BW_DressingRoomFrame:SetTemplate("Transparent")
+	BW_DressingRoomOutfitFrame:StripTextures()
+	BW_DressingRoomOutfitFrame:SetTemplate('Transparent')
+
+
+S:HandleScrollBar(BW_DressingRoomOutfitFrameScrollFrameScrollBar)
+	S:HandleDropDownBox(BW_DressingRoomOutfitDropDown, 221)
+	S:HandleButton(BW_DressingRoomOutfitDropDown.SaveButton)
+	BW_DressingRoomOutfitDropDown:SetHeight(34)
+	BW_DressingRoomOutfitDropDown.SaveButton:ClearAllPoints()
+	BW_DressingRoomOutfitDropDown.SaveButton:SetPoint('TOPLEFT', BW_DressingRoomOutfitDropDown, 'TOPRIGHT', -2, -2)
+	S:HandleButton(BW_DressingRoomFrame.BW_DressingRoomSettingsButton)
+	S:HandleButton(BW_DressingRoomFrame.BW_DressingRoomHideArmorButton)
+	S:HandleButton(BW_DressingRoomFrame.BW_DressingRoomExportButton)
+for index, button in pairs(BW_DressingRoomFrame.PreviewButtonFrame.Slots) do
+S:HandleItemButton(button)
+	--button.IconBorder:SetColorTexture(1, 1, 1, 0.1)
+end
+
+
+
 
 	S:HandleIcon(BW_CollectionListButton.Icon)
 
@@ -131,6 +151,32 @@ function S:BetterWardrobe()
 		end
 	end)
 
+
+	hooksecurefunc(addon, 'DressingRoom_SetItemFrameQuality', function(_, itemFrame)
+		local icon = itemFrame.Icon
+		if not icon.backdrop then
+			icon:CreateBackdrop()
+			icon:SetTexCoord(unpack(E.TexCoords))
+			itemFrame.IconBorder:Hide()
+			local level = itemFrame:GetFrameLevel()
+			if icon then 
+				itemFrame:SetFrameLevel(level +1)
+			end
+			icon.backdrop:SetFrameLevel(level + .5)
+
+		end
+
+		if itemFrame.itemLink then
+			
+			--local quality = C_TransmogCollection.GetSourceInfo(itemFrame.sourceID).quality
+			local _, _, quality, _, _, _, _, _, _, texture = GetItemInfo(itemFrame.itemLink)
+			
+			local color = BAG_ITEM_QUALITY_COLORS[quality or 1]
+			icon.backdrop:SetBackdropBorderColor(color.r, color.g, color.b)
+		else
+			icon.backdrop:SetBackdropBorderColor(unpack(E.media.bordercolor))
+		end
+	end)
 
 	local ScrollFrame = BW_SetsCollectionFrame.ScrollFrame
 	S:HandleScrollBar(ScrollFrame.scrollBar)
