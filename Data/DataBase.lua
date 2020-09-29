@@ -94,11 +94,10 @@ do
 				or string.find(setData.name, City)
 			local heritageArmor = string.find(setData.name, "Heritage")
 		
-			if not  setInfo  then 
+			--if not  setInfo  then 
 				if  (class) 
 					and not factionLocked 
 					and not heritageArmor  then
-
 
 					setData["name"] = L[setData["name"]]
 
@@ -121,8 +120,8 @@ do
 					setsInfo[id] = setData
 					tinsert(list, setsInfo[id])	
 				end
-			else --print(setInfo)
-			end
+			--else --print(setInfo)
+			--end
 		end
 		addon.extraSetsCache = list
 	end
