@@ -45,7 +45,7 @@ function DressingRoom:IsSlotHidden(slot_id)
 	return isHideVisual
 end
 
-
+local initUndress = true
 function DressingRoom:OnShow()
 	DressUpModel = DressUpFrame.ModelScene:GetPlayerActor()
 	if DressUpModel and not  addon:IsHooked(DressUpModel, "TryOn") then
@@ -57,6 +57,10 @@ function DressingRoom:OnShow()
 	BW_DressingRoomFrame.PreviewButtonFrame:SetShown(addon.Profile.DR_ShowItemButtons)
 	DressingRoom:ToggleControlPanel(addon.Profile.DR_ShowControls)
 	DressingRoom:UpdateBackground()	
+end
+
+function DressingRoom:OnHide()
+	initUndress = true
 end
 
 
@@ -174,7 +178,13 @@ function DressingRoom:HideConditionalSlots()
 	local DressUpModel = DressUpFrame.ModelScene:GetPlayerActor()
 	local Profile = addon.Profile
 
-	if not Profile.DR_StartUndressed then
+
+	if Profile.DR_StartUndressed and initUndress then 
+		DressUpModel:Undress()
+		initUndress = false
+	
+
+	else
 		if Profile.DR_HideTabard then
 			DressUpModel:UndressSlot(INVSLOT_TABARD)
 			DressingRoom:SetItemButton(INVSLOT_TABARD, nil)
@@ -192,13 +202,15 @@ function DressingRoom:HideConditionalSlots()
 			DressUpModel:UndressSlot(INVSLOT_OFFHAND)
 			DressingRoom:SetItemButton(INVSLOT_OFFHAND, nil)
 		end
-	else
-		DressUpModel:Undress()
-		local _, _, _, _, _, itemType, itemSubType, _, itemEquipLoc = GetItemInfo(dressuplink)
+
 		
 	end
-	DressUpItemLink(dressuplink)
-	dressuplink = nil;
+		--local _, _, _, _, _, itemType, itemSubType, _, itemEquipLoc = GetItemInfo(dressuplink)
+		if dressuplink then 
+			DressUpItemLink(dressuplink)
+			dressuplink = nil;
+		end
+
 end
 
 local itemlinkbase = [["item:%d::::::::::::9:%d]]
