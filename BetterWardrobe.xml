@@ -234,7 +234,23 @@
 				<Scripts>
 				</Scripts>
 			</Frame>
+			<Frame parentKey="TransmogOptionsButtonCover" hidden="false" enableMouse="true">
+				<Size x="93" y="50"/>
+				<Anchors>
+					<Anchor point="BOTTOMRIGHT" x="-55" y="80"/>
+				</Anchors>
+				<Scripts>
+					<OnEnter>
+						BW_TransmogOptionsButton_OnEnter(self)
+					</OnEnter>
+					<OnShow>
+							local level = BW_WardrobeCollectionFrame.TransmogOptionsButton:GetFrameLevel()
+								BW_WardrobeCollectionFrame.TransmogOptionsButtonCover:SetFrameLevel(level+5)
 
+					</OnShow>
+					<OnLeave function="GameTooltip_Hide"/>
+				</Scripts>
+			</Frame>
 			<DropDownToggleButton parentKey="TransmogOptionsButton" name="BW_TransmogOptionsButton" inherits="UIMenuButtonStretchTemplate" text="Options" hidden="false">
 				<Size x="93" y="22"/>
 				<Anchors>
@@ -264,8 +280,11 @@
 					<OnDisable>
 						self.Icon:SetDesaturated(true);
 					</OnDisable>
+
 				</Scripts>
 			</DropDownToggleButton>
+
+
 			<Frame name="BW_LocationFilterDropDown" parentKey="LocationFilterDropDown" inherits="UIDropDownMenuTemplate">
 				<Scripts>
 					<OnLoad function="BW_WardrobeFilterLocationDropDown_OnLoad"/>

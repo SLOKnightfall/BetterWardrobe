@@ -842,7 +842,7 @@ function addon.Sets:GetLocationBasedCount(set)
 
 	return collectedCount, totalCount
 end
-
+--SetsDataProvider:GetSetSourceCounts(data.setID)
 
 function SetsDataProvider:GetUsableSets(incVariants)
 	if (not self.usableSets) then
@@ -860,7 +860,8 @@ function SetsDataProvider:GetUsableSets(incVariants)
 				topSourcesCollected, topSourcesTotal = SetsDataProvider:GetSetSourceCounts(set.setID)
 			end
 
-			local cutoffLimit = (topSourcesTotal <= Profile.PartialLimit and topSourcesTotal) or Profile.PartialLimit --SetsDataProvider:GetSetSourceCounts(set.setID)
+
+			local cutoffLimit = (addon.Profile.ShowIncomplete and ((topSourcesTotal <= Profile.PartialLimit and topSourcesTotal) or  Profile.PartialLimit)) or topSourcesTotal --SetsDataProvider:GetSetSourceCounts(set.setID)
 			if (BW_WardrobeToggle.viewAll and BW_WardrobeToggle.VisualMode) or (not atTransmogrifier and BW_WardrobeToggle.VisualMode) or topSourcesCollected >= cutoffLimit  and topSourcesTotal > 0 then --and not C_TransmogSets.IsSetUsable(set.setID) then
 				tinsert(self.usableSets, set)
 			end
@@ -876,7 +877,7 @@ function SetsDataProvider:GetUsableSets(incVariants)
 					end
 
 					if topSourcesCollected == topSourcesTotal then set.collected = true end
-					local cutoffLimit = (topSourcesTotal <= Profile.PartialLimit and topSourcesTotal) or Profile.PartialLimit
+					--local cutoffLimit = (topSourcesTotal <= Profile.PartialLimit and topSourcesTotal) or Profile.PartialLimit
 					if (BW_WardrobeToggle.viewAll and BW_WardrobeToggle.VisualMode) or (not atTransmogrifier and BW_WardrobeToggle.VisualMode) or topSourcesCollected >= cutoffLimit and topSourcesTotal > 0   then --and not C_TransmogSets.IsSetUsable(set.setID) then
 						tinsert(self.usableSets, set)
 					end

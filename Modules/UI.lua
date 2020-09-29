@@ -84,6 +84,17 @@ function UI.SortDropdowns_Initialize()
 
 	UIDropDownMenu_SetSelectedValue(BW_SortDropDown, db.sortDropdown)
 	UIDropDownMenu_SetText(BW_SortDropDown, COMPACT_UNIT_FRAME_PROFILE_SORTBY.." "..L[db.sortDropdown])
+
+				
+end
+
+function BW_TransmogOptionsButton_OnEnter(self)
+
+	if not addon.Profile.ShowIncomplete then 
+		GameTooltip:SetOwner(self, "ANCHOR_RIGHT")
+		GameTooltip:SetText(L["Requires 'Show Incomplete Sets' Enabled"])
+		GameTooltip:Show()
+	end
 end
 
 
@@ -283,8 +294,10 @@ function BW_WardrobeCollectionFrame_SetTab(tabID)
 	BW_WardrobeCollectionFrame.FilterButton:SetShown((tab3 or tab4 ) and not atTransmogrifier)
 	BW_WardrobeCollectionFrame.FilterButton:SetEnabled(tab3)
 
-	BW_WardrobeCollectionFrame.TransmogOptionsButton:SetShown((tab2 or tab3) and atTransmogrifier and addon.Profile.ShowIncomplete)
-	
+
+	BW_WardrobeCollectionFrame.TransmogOptionsButton:SetShown(atTransmogrifier and (tab2 or tab3))
+	BW_WardrobeCollectionFrame.TransmogOptionsButtonCover:SetShown(not addon.Profile.ShowIncomplete and atTransmogrifier and (tab2 or tab3))
+	BW_WardrobeCollectionFrame.TransmogOptionsButton:SetEnabled(addon.Profile.ShowIncomplete)
 
 	UIDropDownMenu_EnableDropDown(BW_SortDropDown)
 	BW_SortDropDown:ClearAllPoints()
