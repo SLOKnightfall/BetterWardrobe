@@ -15,6 +15,7 @@ function addon.Init:DressingRoom()
 
 	BW_DressingRoomFrame:SetScript("OnShow", function() C_Timer.After(0, function() DressingRoom:OnShow() end) end)
 	
+	BW_DressingRoomFrame:SetScript("OnHide", function() C_Timer.After(0, function() DressingRoom:OnHide() end) end)
 	addon:SecureHook("DressUpVisual", function(...)
 		dressuplink = ...
 		local _, _, _, _, _, itemType, itemSubType, _, itemEquipLoc = GetItemInfo(dressuplink)
