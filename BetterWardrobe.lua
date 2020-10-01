@@ -755,6 +755,7 @@ function SetsDataProvider:FilterSearch(useBaseSet)
 				self.baseSets = filteredSets
 		else
 				self.usableSets = filteredSets
+				self.baseSets = baseSets
 		end
 	
 	--else

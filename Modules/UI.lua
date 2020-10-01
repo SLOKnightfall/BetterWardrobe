@@ -286,7 +286,7 @@ function BW_WardrobeCollectionFrame_SetTab(tabID)
 	WardrobeCollectionFrame.searchBox:SetWidth(((tab2 or tab3 or tab4) and not atTransmogrifier and 145) or 105)
 	--WardrobeCollectionFrame.searchBox:SetShown(not tab4)
 
-	WardrobeCollectionFrame.FilterButton:SetShown(tab2 and not atTransmogrifier)
+	WardrobeCollectionFrame.FilterButton:SetShown(tab1 or (tab2 and not atTransmogrifier))
 	WardrobeCollectionFrame.FilterButton:SetEnabled(tab1 and WardrobeCollectionFrame.ItemsCollectionFrame.transmogType == LE_TRANSMOG_TYPE_APPEARANCE or tab2)
 	--WardrobeCollectionFrame.progressBar:SetShown(not tab4)
 	BW_CollectionListButton:SetShown(tab1 and not atTransmogrifier)
@@ -786,6 +786,8 @@ function UI:DefaultDropdown_Update(model, button)
 		return
 	end
 
+	print("SSSSSFDSDFA")
+
 	if button == "RightButton" and model:GetParent().transmogType ~= LE_TRANSMOG_TYPE_ILLUSION then
 		if not DropDownList1:IsShown() then
 			 -- force show dropdown
@@ -794,6 +796,7 @@ function UI:DefaultDropdown_Update(model, button)
 		end
 
 		local setID = (model.visualInfo and model.visualInfo.visualID) or model.setID
+		--if not setID then print("SSSSS"); return false end
 		local type = tabType[addon.GetTab()]
 		local variantTarget, match, matchType
 		local variantType = ""
