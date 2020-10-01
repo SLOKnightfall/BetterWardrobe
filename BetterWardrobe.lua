@@ -456,7 +456,7 @@ end
 
 
 function addon.GetItemSource(itemID, itemMod)
-	if addon.ArmorSetModCache[itemID] and addon.ArmorSetModCache[itemID][itemMod] then return nil, addon.ArmorSetModCache[itemID][itemMod] end
+	--if addon.ArmorSetModCache[itemID] and addon.ArmorSetModCache[itemID][itemMod] then return nil, addon.ArmorSetModCache[itemID][itemMod] end
 		local itemSource
 		local visualID, sourceID
 		if itemMod then

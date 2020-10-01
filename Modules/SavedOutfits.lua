@@ -782,6 +782,7 @@ BW_WardrobeOutfitEditFrameMixin = CreateFromMixins(WardrobeOutfitEditFrameMixin)
 
 function BW_WardrobeOutfitEditFrameMixin:ShowForOutfit(outfitID)
 	BW_WardrobeOutfitFrame:Hide()
+	BW_DressingRoomOutfitFrame:Hide()
 	BW_WardrobeOutfitFrame:ShowPopup(self)
 	self.outfitID = outfitID
 	local name = GetOutfitName(outfitID)
@@ -792,6 +793,7 @@ end
 
 function BW_WardrobeOutfitEditFrameMixin:OnDelete()
 	BW_WardrobeOutfitFrame:Hide()
+	BW_DressingRoomOutfitFrame:Hide()
 	local name = GetOutfitName(self.outfitID)
 	BW_WardrobeOutfitFrame:ShowPopup("BW_CONFIRM_DELETE_TRANSMOG_OUTFIT", name, nil, self.outfitID)
 end
@@ -801,7 +803,9 @@ function BW_WardrobeOutfitEditFrameMixin:OnAccept()
 	if (not self.AcceptButton:IsEnabled()) then
 		return
 	end
-
+	BW_WardrobeOutfitFrame:Hide()
+	BW_DressingRoomOutfitFrame:Hide()
+	
 	StaticPopupSpecial_Hide(self)
 	BW_WardrobeOutfitFrame:NameOutfit(self.EditBox:GetText(), self.outfitID)
 end

@@ -188,6 +188,14 @@
 				</Scripts>
 			</Button>
 		</Frames>
+		<Scripts>
+			<OnShow>
+				BW_DressingRoomFrame_OnShow()
+			</OnShow>
+			<OnHide>
+				BW_DressingRoomFrame_OnHide()
+			</OnHide>
+		</Scripts>
 	</Frame>
 
 </Ui>
