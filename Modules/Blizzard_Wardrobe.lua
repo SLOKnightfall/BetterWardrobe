@@ -1022,6 +1022,8 @@ local EXPANSIONS = addon.Globals.EXPANSIONS
 	addon.xpacSelection = xpacSelection
 	addon.filterSelection = filterSelection
 	addon.missingSelection = missingSelection
+
+
 --=======
 --local missingSelection = {}
 function WardrobeFilterDropDown_InitializeBaseSets(self, level)
@@ -1034,7 +1036,8 @@ function WardrobeFilterDropDown_InitializeBaseSets(self, level)
 		info.text = COLLECTED;
 		info.func = function(_, _, _, value)
 						C_TransmogSets.SetBaseSetsFilter(LE_TRANSMOG_SET_FILTER_COLLECTED, value);
-						UIDropDownMenu_Refresh(WardrobeFilterDropDown)
+						addon.TRANSMOG_SET_FILTER[LE_TRANSMOG_SET_FILTER_COLLECTED] = value
+						--UIDropDownMenu_Refresh(WardrobeFilterDropDown)
 
 					end
 		info.checked = C_TransmogSets.GetBaseSetsFilter(LE_TRANSMOG_SET_FILTER_COLLECTED);
@@ -1043,7 +1046,8 @@ function WardrobeFilterDropDown_InitializeBaseSets(self, level)
 		info.text = NOT_COLLECTED;
 		info.func = function(_, _, _, value)
 						C_TransmogSets.SetBaseSetsFilter(LE_TRANSMOG_SET_FILTER_UNCOLLECTED, value);
-						UIDropDownMenu_Refresh(WardrobeFilterDropDown)
+						addon.TRANSMOG_SET_FILTER[LE_TRANSMOG_SET_FILTER_UNCOLLECTED] = value
+						--UIDropDownMenu_Refresh(WardrobeFilterDropDown)
 
 					end
 		info.checked = C_TransmogSets.GetBaseSetsFilter(LE_TRANSMOG_SET_FILTER_UNCOLLECTED);
@@ -1058,7 +1062,8 @@ function WardrobeFilterDropDown_InitializeBaseSets(self, level)
 		info.text = TRANSMOG_SET_PVE;
 		info.func = function(_, _, _, value)
 						C_TransmogSets.SetBaseSetsFilter(LE_TRANSMOG_SET_FILTER_PVE, value);
-						UIDropDownMenu_Refresh(WardrobeFilterDropDown)
+						addon.TRANSMOG_SET_FILTER[LE_TRANSMOG_SET_FILTER_PVE] = value
+						--UIDropDownMenu_Refresh(WardrobeFilterDropDown)
 
 					end
 		info.checked = C_TransmogSets.GetBaseSetsFilter(LE_TRANSMOG_SET_FILTER_PVE);
@@ -1067,7 +1072,8 @@ function WardrobeFilterDropDown_InitializeBaseSets(self, level)
 		info.text = TRANSMOG_SET_PVP;
 		info.func = function(_, _, _, value)
 						C_TransmogSets.SetBaseSetsFilter(LE_TRANSMOG_SET_FILTER_PVP, value);
-						UIDropDownMenu_Refresh(WardrobeFilterDropDown)
+						addon.TRANSMOG_SET_FILTER[LE_TRANSMOG_SET_FILTER_PVP] = value
+						--UIDropDownMenu_Refresh(WardrobeFilterDropDown)
 
 					end
 		info.checked = C_TransmogSets.GetBaseSetsFilter(LE_TRANSMOG_SET_FILTER_PVP);

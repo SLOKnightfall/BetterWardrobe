@@ -20,7 +20,7 @@ addon.validSetCache = {}
 addon.usableSourceCache = {}
 addon.Init = {}
 local newTransmogInfo  = {["latestSource"] = NO_TRANSMOG_SOURCE_ID} --{[99999999] = {[58138] = 10}, }
-
+addon.TRANSMOG_SET_FILTER = {}
 
 local playerInv_DB
 local Profile
@@ -1126,7 +1126,8 @@ function BetterWardrobeSetsCollectionMixin:OnHide()
 	self:UnregisterEvent("TRANSMOG_COLLECTION_ITEM_UPDATE")
 	self:UnregisterEvent("TRANSMOG_COLLECTION_UPDATED")
 	SetsDataProvider:ClearSets()
-	--WardrobeCollectionFrame_ClearSearch(LE_TRANSMOG_SEARCH_TYPE_BASE_SETS)
+	--WardrobeCollectionFrame_ClearSearch(LE_TRANSMOG_SEARCH_TYPE_BASE_SETS
+
 end
 
 
@@ -2288,6 +2289,11 @@ function BW_WardrobeCollectionFrame_UpdateTabButtons()
 end
 
 
+	addon.TRANSMOG_SET_FILTER[LE_TRANSMOG_SET_FILTER_COLLECTED] = C_TransmogSets.GetBaseSetsFilter(LE_TRANSMOG_SET_FILTER_COLLECTED)
+	addon.TRANSMOG_SET_FILTER[LE_TRANSMOG_SET_FILTER_UNCOLLECTED] = C_TransmogSets.GetBaseSetsFilter(LE_TRANSMOG_SET_FILTER_UNCOLLECTED)
+	addon.TRANSMOG_SET_FILTER[LE_TRANSMOG_SET_FILTER_PVP] = C_TransmogSets.GetBaseSetsFilter(LE_TRANSMOG_SET_FILTER_PVP)
+	addon.TRANSMOG_SET_FILTER[LE_TRANSMOG_SET_FILTER_PVP] = C_TransmogSets.GetBaseSetsFilter(LE_TRANSMOG_SET_FILTER_PVP)
+
 function BW_WardrobeCollectionFrame_OnShow(self)
 	CollectionsJournal:SetPortraitToAsset("Interface\\Icons\\inv_chest_cloth_17")
 	local level = CollectionsJournal:GetFrameLevel()
@@ -2301,8 +2307,17 @@ function BW_WardrobeCollectionFrame_OnShow(self)
 
 	if (WardrobeFrame_IsAtTransmogrifier()) then
 		BW_WardrobeCollectionFrame_SetTab(TAB_ITEMS)
+		C_TransmogSets.SetBaseSetsFilter(LE_TRANSMOG_SET_FILTER_COLLECTED, true);
+		C_TransmogSets.SetBaseSetsFilter(LE_TRANSMOG_SET_FILTER_UNCOLLECTED, true);
+		C_TransmogSets.SetBaseSetsFilter(LE_TRANSMOG_SET_FILTER_PVP, true);
+		C_TransmogSets.SetBaseSetsFilter(LE_TRANSMOG_SET_FILTER_PVE, true);
+
 	else
 		BW_WardrobeCollectionFrame_SetTab(TAB_ITEMS)
+		C_TransmogSets.SetBaseSetsFilter(LE_TRANSMOG_SET_FILTER_COLLECTED, addon.TRANSMOG_SET_FILTER[LE_TRANSMOG_SET_FILTER_COLLECTED] );
+		C_TransmogSets.SetBaseSetsFilter(LE_TRANSMOG_SET_FILTER_UNCOLLECTED, addon.TRANSMOG_SET_FILTER[LE_TRANSMOG_SET_FILTER_UNCOLLECTED] );
+		C_TransmogSets.SetBaseSetsFilter(LE_TRANSMOG_SET_FILTER_PVP, addon.TRANSMOG_SET_FILTER[LE_TRANSMOG_SET_FILTER_PVP] );
+		C_TransmogSets.SetBaseSetsFilter(LE_TRANSMOG_SET_FILTER_PVE, addon.TRANSMOG_SET_FILTER[LE_TRANSMOG_SET_FILTER_PVP] );
 	end
 	BW_WardrobeCollectionFrame_UpdateTabButtons()
 
@@ -2313,7 +2328,6 @@ function BW_WardrobeCollectionFrame_OnShow(self)
 		WardrobeCollectionFrame.progressBar:SetPoint("TOPLEFT", WardrobeCollectionFrame.ItemsTab, "TOPLEFT", 250, -11)
 		WardrobeCollectionFrame.searchBox:SetWidth(105)
 		BW_WardrobeCollectionFrameTab4:Show()
-
 	end
 end
 
@@ -2337,7 +2351,6 @@ function BW_WardrobeCollectionFrame_OnHide(self)
 	addon:InitTables()
 	SetsDataProvider:ClearSets()
 	addon:ClearCache()
-
 
 end
 
