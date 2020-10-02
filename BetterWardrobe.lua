@@ -2427,6 +2427,7 @@ function addon.Sets:SelectedVariant(setID)
 	if not baseSetID then return end
 
 	local variantSets = SetsDataProvider:GetVariantSets(baseSetID)
+	if not variantSets then return end
 	local useDescription = (#variantSets > 0)
 	local targetSetID = WardrobeCollectionFrame.SetsCollectionFrame:GetDefaultSetIDForBaseSet(baseSetID)
 	local match = false

@@ -785,9 +785,6 @@ function UI:DefaultDropdown_Update(model, button)
 	if BW_WardrobeCollectionFrame.selectedTransmogTab == 4 or BW_WardrobeCollectionFrame.selectedCollectionTab == 4 then
 		return
 	end
-
-	print("SSSSSFDSDFA")
-
 	if button == "RightButton" and model:GetParent().transmogType ~= LE_TRANSMOG_TYPE_ILLUSION then
 		if not DropDownList1:IsShown() then
 			 -- force show dropdown
@@ -796,7 +793,6 @@ function UI:DefaultDropdown_Update(model, button)
 		end
 
 		local setID = (model.visualInfo and model.visualInfo.visualID) or model.setID
-		--if not setID then print("SSSSS"); return false end
 		local type = tabType[addon.GetTab()]
 		local variantTarget, match, matchType
 		local variantType = ""
@@ -812,9 +808,10 @@ function UI:DefaultDropdown_Update(model, button)
 						--addon.QueueForTransmog(type, setID, name)
 						addon.QueueList = {type, setID, name}
 					 end,
-				})
-
-			variantTarget, variantType, match, matchType = addon.Sets:SelectedVariant(setID)
+					})
+			if type == "set" then 
+				variantTarget, variantType, match, matchType = addon.Sets:SelectedVariant(setID)
+			end
 		end
 
 		UIDropDownMenu_AddSeparator()
