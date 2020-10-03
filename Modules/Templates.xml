@@ -146,5 +146,4 @@
 
 	<Frame name="BW_WardrobeSetsDetailsItemFrameTemplate" inherits ="WardrobeSetsDetailsItemFrameTemplate" mixin="BW_WardrobeSetsDetailsItemMixin" virtual="true">
 	</Frame>
-
 </Ui>

@@ -73,6 +73,58 @@ addon.Globals.locationDrowpDown = {
   ["INVTYPE_TABARD"] =          19,
 }
 
+
+addon.Globals.slots = {
+  "HeadSlot",
+  "ShoulderSlot",
+  "BackSlot",
+  "ChestSlot",
+  "ShirtSlot",
+  "TabardSlot",
+  "WristSlot",
+  "HandsSlot",
+  "WaistSlot",
+  "LegsSlot",
+  "FeetSlot",
+  "MainHandSlot",
+  "SecondaryHandSlot",
+};
+
+
+
+addon.Globals.tooltip_slots = {
+  INVTYPE_HEAD = 0,
+  INVTYPE_SHOULDER = 0,
+  INVTYPE_CLOAK = 3.4,
+  INVTYPE_CHEST = 0,
+  INVTYPE_BODY = 0,
+  INVTYPE_ROBE = 0,
+  INVTYPE_SHIRT = 0,
+  INVTYPE_TABARD = 0,
+  INVTYPE_WRIST = 0,
+  INVTYPE_2HWEAPON = 1.6,
+  INVTYPE_WEAPON = 1.6,
+  INVTYPE_WEAPONMAINHAND = 1.6,
+  INVTYPE_WEAPONOFFHAND = -0.7,
+  INVTYPE_SHIELD = -0.7,
+  INVTYPE_HOLDABLE = -0.7,
+  INVTYPE_RANGED = 1.6,
+  INVTYPE_RANGEDRIGHT = 1.6,
+  INVTYPE_THROWN = 1.6,
+  INVTYPE_HAND = 0,
+  INVTYPE_WAIST = 0,
+  INVTYPE_LEGS = 0,
+  INVTYPE_FEET = 0,
+};
+
+addon.Globals.mods = {
+  Shift = IsShiftKeyDown,
+  Ctrl = IsControlKeyDown,
+  Alt = IsAltKeyDown,
+};
+
+
+
 addon.Globals.BASE_SET_BUTTON_HEIGHT = 46
 addon.Globals.VARIANT_SET_BUTTON_HEIGHT = 20
 addon.Globals.SET_PROGRESS_BAR_MAX_WIDTH = 204

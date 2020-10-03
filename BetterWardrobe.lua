@@ -13,6 +13,7 @@
 local addonName, addon = ...
 ---addon = LibStub("AceAddon-3.0"):NewAddon(addon, addonName, "AceEvent-3.0", "AceConsole-3.0", "AceHook-3.0")
 addon = LibStub("AceAddon-3.0"):GetAddon(addonName)
+--_G[addonName] = {}
 addon.Frame = LibStub("AceGUI-3.0")
 addon.itemSourceID = {}
 addon.QueueList = {}
@@ -33,6 +34,16 @@ local L = LibStub("AceLocale-3.0"):GetLocale(addonName)
 local optionHandler = {}
 function optionHandler:Setter(info, value)
 	Profile[info[#info]] = value
+
+	if info.arg == "tooltipRotate" then
+		addon.tooltip.rotate:SetShown(value);	
+	elseif info.arg == "tooltipWidth" then
+		addon.tooltip:SetWidth(value);
+	elseif info.arg == "tooltipHeight" then
+		addon.tooltip:SetHeight(value);
+	elseif info.arg == "ShowAdditionalSourceTooltips" then
+		C_TransmogCollection.SetShowMissingSourceInItemTooltips(value);
+	end
 end
 
 
@@ -71,10 +82,14 @@ function optionHandler:TSM_MarketGetter(info)
 	return optionHandler:Getter(info)
 end
 
+
+
 --ACE3 Options Constuctor
 local options = {
 	name = "BetterWardrobe",
 	handler = optionHandler,
+	get = "Getter",
+	set = "Setter",
 	type = 'group',
 	childGroups = "tab",
 	inline = true,
@@ -85,233 +100,387 @@ local options = {
 			--inline = true,
 			order = 0,
 			args={
-				Options_Header = {
-					order = 0.1,
-					name = L["General Options"],
-					type = "header",
-					width = "full",
-				},
-				ShowTooltips = {
+				general_settings={
+					name = " ",
+					type = "group",
+					inline = true,
 					order = 1,
-					name = L["Show Set Info in Tooltips"],
-					type = "toggle",
-					get = "Getter",
-					set = "Setter",
-					width = 1.3,
+					args={
+						Options_Header = {
+							order = 1,
+							name = L["General Options"],
+							type = "header",
+							width = "full",
+						},
+						ShowCollectionUpdates = {
+							order = 2,
+							name = L["Print Set Collection alerts to chat:"],
+							type = "toggle",
+							width = 1.3,
+						},
+						ShowSetCollectionUpdates = {
+							order = 3,
+							name = L["Sets"],
+							type = "toggle",
+							width = .5,
+							disabled = function() return not addon.Profile.ShowCollectionUpdates end,
+						},
+						ShowExtraSetsCollectionUpdates = {
+							order = 4,
+							name = L["Extra Sets"],
+							type = "toggle",
+							width = .6,
+							disabled = function() return not addon.Profile.ShowCollectionUpdates end,
+						},
+						ShowCollectionListCollectionUpdates = {
+							order = 5,
+							name = L["Collection List"],
+							type = "toggle",
+							width = .7,
+							disabled = function() return not addon.Profile.ShowCollectionUpdates end,
+						},
+						TSM_Market = {
+							order = 6,
+							name = L["TSM Source to Use"],
+							--desc = "TSM Source to get price data.",
+							type = "select",
+							get = "TSM_MarketGetter",
+							set = "Setter",
+							width = "double",
+							values = "TSMSources",
+							disabled = "TSMDisable",
+						}, 
+					},
 				},
-				ShowSetTooltips = {
+				transmog_settings={
+					name = " ",
+					type = "group",
+					inline = true,
 					order = 2,
-					name = L["Sets"],
-					type = "toggle",
-					get = "Getter",
-					set = "Setter",
-					width = .5,
-					disabled = function() return not addon.Profile.ShowTooltips end,
+					args={
+						Options_Header_3 = {
+							order = 1,
+							name = L["Transmog Vendor Window"],
+							type = "header",
+							width = "full",
+						},
+						ShowIncomplete = {
+							order = 2,
+							name = L["Show Incomplete Sets"],
+							type = "toggle",
+						},
+						ShowHidden = {
+							order = 3,
+							name = L["Show Items set to Hidden"],
+							type = "toggle",
+							width = 1.6,
+						},
+						HideMissing = {
+							order = 4,
+							name = L["Hide Missing Set Pieces at Transmog Vendor"],
+							type = "toggle",
+							width = "full",
+						},
+						HiddenMog = {
+							order = 5,
+							name = L["Use Hidden Transmog for Missing Set Pieces"],
+							type = "toggle",
+							width = "full",
+						},
+						PartialLimit = {
+							order = 6,
+							name = L["Required pieces"],
+							type = "range",
+							width = "full",
+							min = 1,
+							max = 8,
+							step = 1,
+						},
+						ShowNames = {
+							order = 7,
+							name = L["Show Set Names"],
+							type = "toggle",
+						},
+						ShowSetCount = {
+							order = 8,
+							name = L["Show Collected Count"],
+							type = "toggle",
+						},
+					},
 				},
-				ShowExtraSetsTooltips = {
+				tooltip_settings={
+					name = " ",
+					type = "group",
+					inline = true,
 					order = 3,
-					name = L["Extra Sets"],
-					type = "toggle",
-					get = "Getter",
-					set = "Setter",
-					width = .6,
-					disabled = function() return not addon.Profile.ShowTooltips end,
+					args={
+						Tooltip_Header = {
+							order = 1,
+							name = L["Tooltip Options"],
+							type = "header",
+							width = "full",
+						},
+						ShowTooltips = {
+							order = 2,
+							name = L["Show Set Info in Tooltips"],
+							type = "toggle",
+							width = 1.2,
+						},
+						ShowSetTooltips = {
+							order = 3,
+							name = L["Sets"],
+							type = "toggle",
+							width = .5,
+							disabled = function() return not addon.Profile.ShowTooltips end,
+						},
+						ShowExtraSetsTooltips = {
+							order = 4,
+							name = L["Extra Sets"],
+							type = "toggle",
+							width = .6,
+							disabled = function() return not addon.Profile.ShowTooltips end,
+						},
+						ShowCollectionListTooltips = {
+							order = 5,
+							name = L["Collection List"],
+							type = "toggle",
+							width = .7,
+							disabled = function() return not addon.Profile.ShowTooltips end,
+						},
+						ShowDetailedListTooltips = {
+							order = 6,
+							name = L["Show Set Collection Details"],
+							type = "toggle",
+							width = "full",
+							disabled = function() return not addon.Profile.ShowTooltips end,
+						},
+						ShowDetailedListTooltips = {
+							order = 6,
+							name = L["Show Set Collection Details"],
+							type = "toggle",
+							width = 1.2,
+							disabled = function() return not addon.Profile.ShowTooltips end,
+						},
+						ShowMissingDetailedListTooltips = {
+							order = 6.1,
+							name = L["Only List Missing Pieces"],
+							type = "toggle",
+							width = 1.6,
+							disabled = function() return not addon.Profile.ShowTooltips or not addon.Profile.ShowDetailedListTooltips  end,
+						},
+						ShowItemIDTooltips = {
+							order = 7,
+							name = L["Show Item ID"],
+							type = "toggle",
+							width = "full",
+						},
+						ShowOwnedItemTooltips = {
+							order = 8,
+							name = L["Show if appearance is known"],
+							type = "toggle",
+							width = 1.2,
+						},
+						ShowAdditionalSourceTooltips = {
+							order = 9,
+							name = L["Show if additional sources are available"],
+							type = "toggle",
+							width = 1.6,
+							arg = "ShowAdditionalSourceTooltips"
+						},
+					},
+				},				
+				preview_settings={
+						name = " ",
+						type = "group",
+						inline = true,
+						order = 4,
+						disabled = function() return not addon.Profile.TooltipPreview_Show end,
+						args={
+							Options_Header_2 = {
+							order = 0,
+							name = L["Item Preview Options"],
+							type = "header",
+							width = "full",
+						},
+							TooltipPreview_Show = {
+								order = 1,
+								name = L["Appearance Preview"],
+								type = "toggle",
+								width = 1.2,
+								disabled = false,
+							},
+							TooltipPreview_Modifier = {
+								type = "select",
+								order =2,
+								name = L["Only show if modifier is pressed"],
+								values = function()
+											local tbl = {
+												None = "None",
+											};
+											for k,v in pairs(addon.Globals.mods) do
+												tbl[k] = k;
+											end
+											return tbl;
+										end,
+							},
+							TooltipPreview_Dress = {
+								order = 3,
+								name = L["Dress Preview Model"],
+								type = "toggle",
+								width = "full",
+							},
+							TooltipPreview_DressingDummy = {
+								order = 3.1,
+								name = L["Use Dressing Dummy Model"],
+								type = "toggle",
+								width = "full",
+							},
+							TooltipPreview_MogOnly = {
+								type = "toggle",
+								order =3.1,
+								name = L["Only transmogrification items"],
+								width = "full",
+							},
+							TooltipPreviewRotate = {
+								order = 4,
+								name = L["Auto Rotate"],
+								type = "toggle",
+								width = 1,
+								arg = "tooltipRotate",
+							},
+							TooltipPreview_MouseRotate = {
+								type = "toggle",
+								order = 5,
+								name = L["Rotate with mouse wheel"],
+								width = 1.6,
+							},
+							TooltipPreview_Anchor = {
+								type = "select",
+								order = 5.01,
+								name = L["Anchor point"],
+								values = {
+									vertical = "Top/bottom",
+									horizontal = "Left/right",
+								},
+							},
+							TooltipPreview_Width = {
+								type = "range",
+								order = 6,
+								name = L["Width"],
+								step = 1,
+								min = 100,
+								max = 500,
+								arg = "tooltipWidth",
+							},
+							TooltipPreview_Height = {
+								type = "range",
+								order = 7,
+								name = L["Height"],
+								step = 1,
+								min = 100,
+								max = 500,
+								arg = "tooltipHeight",
+							},
+							TooltipPreview_CustomModel = {
+								type = "toggle",
+								order = 9,
+								name = L["Use custom model"],
+								width = "full",
+							},
+							TooltipPreview_CustomRace = {
+								type = "select",
+								order = 10,
+								name = L["Model race"],
+								values = {
+									[1] =  C_CreatureInfo.GetRaceInfo(1).raceName, --LBR["Human"],
+									[3] = C_CreatureInfo.GetRaceInfo(3).raceName,--["Dwarf"],
+									[4] = C_CreatureInfo.GetRaceInfo(4).raceName,--["Night Elf"],
+									[7] = C_CreatureInfo.GetRaceInfo(7).raceName,--["Gnome"],
+									[11] = C_CreatureInfo.GetRaceInfo(11).raceName,--["Draenei"],
+									[22] = C_CreatureInfo.GetRaceInfo(22).raceName, --["Worgen"],
+									[2] = C_CreatureInfo.GetRaceInfo(2).raceName, --["Orc"],
+									[5] = C_CreatureInfo.GetRaceInfo(5).raceName,--["Undead"],
+									[6] = C_CreatureInfo.GetRaceInfo(6).raceName, --["Tauren"],
+									[8] = C_CreatureInfo.GetRaceInfo(8).raceName, --["Troll"],
+									[10] = C_CreatureInfo.GetRaceInfo(10).raceName, --["Blood Elf"],
+									[9] = C_CreatureInfo.GetRaceInfo(9).raceName, --["Goblin"],
+									[24] = C_CreatureInfo.GetRaceInfo(24).raceName, --["Pandaren"],
+								},
+								disabled = function() return not addon.Profile.TooltipPreview_CustomModel or not addon.Profile.ShowTooltipPreview end,
+								width = 1.2,
+							},
+							TooltipPreview_CustomGender = {
+								type = "select",
+								order =11,
+								name = L["Model gender"],
+								values = {
+									[0] = MALE,
+									[1] = FEMALE,
+								},
+								disabled = function() return not addon.Profile.TooltipPreview_CustomModel or not addon.Profile.ShowTooltipPreview end,
+								width = 1.2,
+							},
+						},
 				},
-				ShowCollectionListTooltips = {
-					order = 4,
-					name = L["Collection List"],
-					type = "toggle",
-					get = "Getter",
-					set = "Setter",
-					width = .7,
-					disabled = function() return not addon.Profile.ShowTooltips end,
-				},
-				ShowCollectionUpdates = {
+				dressingroom_settings={
+					name = " ",
+					type = "group",
+					inline = true,
 					order = 5,
-					name = L["Print Set Collection alerts to chat:"],
-					type = "toggle",
-					get = "Getter",
-					set = "Setter",
-					width = 1.3,
-				},--
-				ShowSetCollectionUpdates = {
-					order = 6,
-					name = L["Sets"],
-					type = "toggle",
-					get = "Getter",
-					set = "Setter",
-					width = .5,
-					disabled = function() return not addon.Profile.ShowCollectionUpdates end,
-				},
-				ShowExtraSetsCollectionUpdates = {
-					order = 7,
-					name = L["Extra Sets"],
-					type = "toggle",
-					get = "Getter",
-					set = "Setter",
-					width = .6,
-					disabled = function() return not addon.Profile.ShowCollectionUpdates end,
-				},
-				ShowCollectionListCollectionUpdates = {
-					order = 8,
-					name = L["Collection List"],
-					type = "toggle",
-					get = "Getter",
-					set = "Setter",
-					width = .7,
-					disabled = function() return not addon.Profile.ShowCollectionUpdates end,
-				},
-				Options_Header_2 = {
-					order = 9,
-					name = L["Dressing Room Options"],
-					type = "header",
-					width = "full",
-				},
-				DR_ShowItemButtons = {
-					order = 10,
-					name = L["Show Item Buttons"],
-					type = "toggle",
-					get = "Getter",
-					set = "Setter",
-					width = "full",
-				},
-				DR_ShowControls = {
-					order = 10.01,
-					name = L["Show DressingRoom Controls"],
-					type = "toggle",
-					get = "Getter",
-					set = "Setter",
-					width = "full",
-				},
-				DR_DimBackground = {
-					order = 10.1,
-					name = L["Dim Backround Image"],
-					type = "toggle",
-					get = "Getter",
-					set = "Setter",
-					width = "full",
-				},
-				DR_HideBackground = {
-					order = 10.2,
-					name = L["Hide  Backround Image"],
-					type = "toggle",
-					get = "Getter",
-					set = "Setter",
-					width = "full",
-				},
-				DR_StartUndressed = {
-					order = 11,
-					name = L["Start Undressed"],
-					type = "toggle",
-					get = "Getter",
-					set = "Setter",
-					width = "full",
-				},
-				DR_HideWeapons = {
-					order = 12,
-					name = L["Hide Weapons"],
-					type = "toggle",
-					get = "Getter",
-					set = "Setter",
-					width = "full",
-				},
-				DR_HideShirt = {
-					order = 13,
-					name = L["Hide Shirt"],
-					type = "toggle",
-					get = "Getter",
-					set = "Setter",
-					width = "full",
-				},
-				DR_HideTabard = {
-					order = 14,
-					name = L["Hide Tabard"],
-					type = "toggle",
-					get = "Getter",
-					set = "Setter",
-					width = "full",
-				},
-				Options_Header_3 = {
-					order = 15,
-					name = L["Transmog Vendor Window"],
-					type = "header",
-					width = "full",
-				},
-				ShowIncomplete = {
-					order = 16,
-					name = L["Show Incomplete Sets"],
-					type = "toggle",
-					get = "Getter",
-					set = "Setter",
-					width = "full",
-				},
-				HideMissing = {
-					order = 17,
-					name = L["Hide Missing Set Pieces at Transmog Vendor"],
-					type = "toggle",
-					get = "Getter",
-					set = "Setter",
-					width = "full",
-				},
-				HiddenMog = {
-					order = 18,
-					name = L["Use Hidden Transmog for Missing Set Pieces"],
-					type = "toggle",
-					get = "Getter",
-					set = "Setter",
-					width = "full",
-				},
-				PartialLimit = {
-					order = 19,
-					name = L["Required pieces"],
-					type = "select",
-					type = "range",
-					get = "Getter",
-					set = "Setter",
-					width = "double",
-					min = 1,
-					max = 8,
-					step = 1,
+					args={
+						Options_Header_2 = {
+							order = 1,
+							name = L["Dressing Room Options"],
+							type = "header",
+							width = "full",
+						},
+						DR_ShowItemButtons = {
+							order = 2,
+							name = L["Show Item Buttons"],
+							type = "toggle",
+
+						},
+						DR_ShowControls = {
+							order = 3,
+							name = L["Show DressingRoom Controls"],
+							type = "toggle",
+							width = 1.5,
+						},
+						DR_DimBackground = {
+							order = 4,
+							name = L["Dim Backround Image"],
+							type = "toggle",
+						},
+						DR_HideBackground = {
+							order = 5,
+							name = L["Hide  Backround Image"],
+							type = "toggle",
+							width = 1.5,
+						},
+						DR_StartUndressed = {
+							order = 6,
+							name = L["Start Undressed"],
+							type = "toggle",
+							width = "full",
+						},
+						DR_HideWeapons = {
+							order = 7,
+							name = L["Hide Weapons"],
+							type = "toggle",
+						},
+						DR_HideShirt = {
+							order = 8,
+							name = L["Hide Shirt"],
+							type = "toggle",
+						},
+						DR_HideTabard = {
+							order = 9,
+							name = L["Hide Tabard"],
+							type = "toggle",
+						},
+					},
 				},
 
-				ShowNames = {
-					order = 20,
-					name = L["Show Set Names"],
-					type = "toggle",
-					get = "Getter",
-					set = "Setter",
-					width = "full",
-				},
-
-				ShowSetCount = {
-					order = 21,
-					name = L["Show Collected Count"],
-					type = "toggle",
-					get = "Getter",
-					set = "Setter",
-					width = "full",
-				},
-
-				ShowHidden = {
-					order = 22,
-					name = L["Show Items set to Hidden"],
-					type = "toggle",
-					get = "Getter",
-					set = "Setter",
-					width = "full",
-				},
-
-				TSM_Market = {
-					order = 23,
-					name = L["TSM Source to Use"],
-					--desc = "TSM Source to get price data.",
-					type = "select",
-					get = "TSM_MarketGetter",
-					set = "Setter",
-					width = "normal",
-					values = "TSMSources",
-					disabled = "TSMDisable",
-				},
 			},
 		},
 	},
@@ -325,6 +494,16 @@ local defaults = {
 		ShowHidden = false,
 		TSM_Market = "DBMarket",
 		DR_HideBackground = false,
+		TooltipPreview_Width = 300,
+		TooltipPreview_Height = 300,
+		ShowItemIDTooltips = false,
+		TooltipPreview_Show = false,
+		TooltipPreview_Anchor = "vertical",
+		TooltipPreviewRotate = false,
+		TooltipPreview_Modifier = "None",
+		TooltipPreview_CustomRace = 1,
+		TooltipPreview_CustomGender = 0,
+		TooltipPreview_DressingDummy = false, 
 	}
 }
 
@@ -403,15 +582,20 @@ function addon:OnEnable()
 
 	addon.Profile = self.db.profile
 	Profile = addon.Profile
-	addon.Init:Blizzard_Wardrobe()
-	addon.Init:BuildDB()
-	addon.Init:BuildUI()
-	addon.Init:DressingRoom()
 
-	addon.SetSortOrder(false)
+		addon.Init:BuildDB()
+		addon.Init:Blizzard_Wardrobe()
+	C_Timer.After(0, function()
+		
+		addon.Init:BuildUI()
+		addon.Init:BuildTooltips()
+		addon.Init:DressingRoom()
+		addon.SetSortOrder(false)
+	
+	
 	WardrobeFilterDropDown_OnLoad(WardrobeCollectionFrame.FilterDropDown)
 	--WardrobeCollectionFrame.ItemsCollectionFrame:SetActiveSlot
-
+end )
 	self:SecureHook(WardrobeCollectionFrame.ItemsCollectionFrame,"SetActiveSlot")
 	self:SecureHook(WardrobeCollectionFrame.ItemsCollectionFrame,"UpdateItems")
 	self:Hook(C_TransmogSets,"SetIsFavorite",function()
@@ -2428,6 +2612,7 @@ function addon.Sets:SelectedVariant(setID)
 
 	local variantSets = SetsDataProvider:GetVariantSets(baseSetID)
 	if not variantSets then return end
+	
 	local useDescription = (#variantSets > 0)
 	local targetSetID = WardrobeCollectionFrame.SetsCollectionFrame:GetDefaultSetIDForBaseSet(baseSetID)
 	local match = false

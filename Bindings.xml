@@ -1,0 +1,10 @@
+<Bindings>
+	<Binding name="BetterWardrobe_TooltipScrollUp" hidden="true">
+		local BetterWardrobe = LibStub("AceAddon-3.0"):GetAddon("BetterWardrobe")
+		BetterWardrobe.tooltip.model:SetFacing(BetterWardrobe.tooltip.model:GetFacing()+0.3);
+	</Binding>
+	<Binding name="BetterWardrobe_TooltipScrollDown" hidden="true">
+		local BetterWardrobe = LibStub("AceAddon-3.0"):GetAddon("BetterWardrobe")
+		BetterWardrobe.tooltip.model:SetFacing(BetterWardrobe.tooltip.model:GetFacing()-0.3);
+	</Binding>
+</Bindings>
