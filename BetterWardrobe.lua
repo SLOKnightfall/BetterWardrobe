@@ -41,6 +41,11 @@ function optionHandler:Setter(info, value)
 		addon.tooltip:SetWidth(value);
 	elseif info.arg == "tooltipHeight" then
 		addon.tooltip:SetHeight(value);
+	elseif info.arg == "DR_Width" then
+		DressUpFrame:SetWidth(value);
+	elseif info.arg == "DR_Height" then
+		DressUpFrame:SetHeight(value)
+
 	elseif info.arg == "ShowAdditionalSourceTooltips" then
 		C_TransmogCollection.SetShowMissingSourceInItemTooltips(value);
 	end
@@ -81,7 +86,6 @@ function optionHandler:TSM_MarketGetter(info)
 
 	return optionHandler:Getter(info)
 end
-
 
 
 --ACE3 Options Constuctor
@@ -478,6 +482,37 @@ local options = {
 							name = L["Hide Tabard"],
 							type = "toggle",
 						},
+						DR_Width = {
+								type = "range",
+								order = 10,
+								name = L["Width"],
+								step = 1,
+								min = 300,
+								max = 1000,
+								arg = "DR_Width",
+							},
+							DR_Height = {
+								type = "range",
+								order = 11,
+								name = L["Height"],
+								step = 1,
+								min = 300,
+								max = 1000,
+								arg = "DR_Height",
+
+							},
+							DR_ScaleReset = {
+								type = "execute",
+								order = 112,
+								name = L["Reset"],
+								func = function() DressUpFrame:SetWidth(450)
+								;	DressUpFrame:SetHeight(545) 
+								addon.Profile.DR_Width = 450
+								addon.Profile.DR_Height = 545
+								end,
+
+
+							},
 					},
 				},
 
@@ -496,6 +531,8 @@ local defaults = {
 		DR_HideBackground = false,
 		TooltipPreview_Width = 300,
 		TooltipPreview_Height = 300,
+		DR_Width = 450,
+		DR_Height = 545,
 		ShowItemIDTooltips = false,
 		TooltipPreview_Show = false,
 		TooltipPreview_Anchor = "vertical",

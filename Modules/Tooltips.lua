@@ -145,7 +145,8 @@ end
 
 
 function addon.tooltip:ShowTooltip(itemLink)
-	if not itemLink then return end
+	addon.tooltip.owner = GameTooltip;
+	if not itemLink or self.ShowTooltips then return end
 
 	local itemID, _, _, slot = GetItemInfoInstant(itemLink);
 	if not itemID then return end
@@ -155,7 +156,7 @@ function addon.tooltip:ShowTooltip(itemLink)
 	for i = 1, GameTooltip:NumLines() do
 		local line = _G["GameTooltipTextLeft"..i]
 
-		local text = string.lower(line:GetText())
+		local text = string.lower(line:GetText() or " " )
 		--Check to see if another addon added appearance known text
 		if string.find(text, string.lower(TRANSMOGRIFY_TOOLTIP_APPEARANCE_KNOWN)) or
 			string.find(text, "item id") then 
@@ -275,7 +276,7 @@ function addon.tooltip:ShowTooltip(itemLink)
 					local sourceInfo = C_TransmogCollection.GetSourceInfo(sourceID)
 					if collected and not Profile.ShowMissingDetailedListTooltips then 
 						color = GREEN_FONT_COLOR_CODE
-						addDoubleLine (self," ",L["|TInterface\\RaidFrame\\ReadyCheck-NotReady:0|t %s%s"]:format(color, sourceInfo.name or ""))
+						addDoubleLine (self," ",L["|TInterface\\RaidFrame\\ReadyCheck-Ready:0|t %s%s"]:format(color, sourceInfo.name or ""))
 					elseif not collected then 
 						color = RED_FONT_COLOR_CODE
 						addDoubleLine (self," ",L["|TInterface\\RaidFrame\\ReadyCheck-NotReady:0|t %s%s"]:format(color, sourceInfo.name or ""))
@@ -288,8 +289,8 @@ function addon.tooltip:ShowTooltip(itemLink)
 	if addHeader then 
 		addLine(self, L["HEADERTEXT"])
 	end
-
-	self:Show()
+self.ShowTooltips = true
+	--/relself:Show()
 end
 
 
@@ -314,6 +315,8 @@ end);
 addon.tooltip.repos = CreateFrame("Frame");
 addon.tooltip.repos:Hide();
 addon.tooltip.repos:SetScript("OnUpdate", function(self)
+		if (not addon.tooltip.owner) then return end
+
 	local x,y = addon.tooltip.owner:GetCenter();
 	if x and y then
 		addon.tooltip:ClearAllPoints();
