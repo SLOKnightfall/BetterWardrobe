@@ -15,6 +15,30 @@ local import = false
 local useCharacterSources = true
 local Profile
 
+function DressingRoom:SetFrameSize()
+
+	local maxWidth, maxHeight = DressUpFrame:GetMaxResize();
+	if (addon.Profile.DR_Width > maxWidth or addon.Profile.DR_Height > maxHeight) then
+		DressUpFrame:SetSize(maxWidth, maxHeight);
+	
+		local width, height = DressUpFrame:GetSize();
+		addon.Profile.DR_Width = width;
+		addon.Profile.DR_Height = height;
+	else
+		DressUpFrame:SetSize(addon.Profile.DR_Width, addon.Profile.DR_Height);
+	end
+
+	UpdateUIPanelPositions(DressUpFrame);
+		UpdateUIPanelPositions(CharacterFrame);
+	if CharacterFrame:IsShown() then 
+		CharacterFrame:Hide();
+		UpdateUIPanelPositions();
+
+		CharacterFrame:Show()
+	end
+	UpdateUIPanelPositions();
+
+end
 
 function addon.Init:DressingRoom()
 	Buttons = BW_DressingRoomFrame.PreviewButtonFrame.Slots
@@ -28,29 +52,22 @@ function addon.Init:DressingRoom()
 	addon:SecureHook("DressUpFrame_OnDressModel",function(self) DressingRoom:OnDressModel(self) end)
 
 	addon:HookScript(DressUpFrameResetButton,"OnClick", function()  C_Timer.After(0.1, function() initHide = true; initUndress = true; BW_DressingRoomItemDetailsMixin:UpdateButtons() end) end)
+	addon:HookScript(DressUpFrame.MaximizeMinimizeFrame.MaximizeButton,"OnClick", function()  C_Timer.After(0.1, function() DressingRoom:SetFrameSize() end) end)
 
 	DressUpFrame:SetClampedToScreen(true);
 	DressUpFrame:SetMovable(true)
 	DressUpFrame:EnableMouse(true)
-DressUpFrame:RegisterForDrag("LeftButton")
-DressUpFrame:SetScript("OnDragStart", DressUpFrame.StartMoving)
-DressUpFrame:SetScript("OnDragStop", DressUpFrame.StopMovingOrSizing)
+	DressUpFrame:RegisterForDrag("LeftButton")
+	DressUpFrame:SetScript("OnDragStart", DressUpFrame.StartMoving)
+	DressUpFrame:SetScript("OnDragStop", DressUpFrame.StopMovingOrSizing)
 	DressUpFrame:SetMinResize(384, 474);
 	DressUpFrame:SetMaxResize(
 		min(GetScreenWidth() - 50, 950),
 		min(GetScreenHeight() - 50, 950)
 	);
 	
-	local maxWidth, maxHeight = DressUpFrame:GetMaxResize();
-	if (addon.Profile.DR_Width > maxWidth or addon.Profile.DR_Height > maxHeight) then
-		DressUpFrame:SetSize(maxWidth, maxHeight);
 	
-		local width, height = DressUpFrame:GetSize();
-		addon.Profile.DR_Width = width;
-		addon.Profile.DR_Height = height;
-	else
-		DressUpFrame:SetSize(addon.Profile.DR_Width, addon.Profile.DR_Height);
-	end
+
 end
 
 
@@ -183,16 +200,8 @@ function DressingRoom:OnShow()
 	DressingRoom:ToggleControlPanel(addon.Profile.DR_ShowControls)
 	DressingRoom:UpdateBackground()	
 	--DressUpFrame:SetSize(addon.Profile.DR_Width,addon.Profile.DR_Height)
-
-		local maxWidth, maxHeight = DressUpFrame:GetMaxResize();
-	if (addon.Profile.DR_Width > maxWidth or addon.Profile.DR_Height > maxHeight) then
-		DressUpFrame:SetSize(maxWidth, maxHeight);
-	
-		local width, height = DressUpFrame:GetSize();
-		addon.Profile.DR_Width = width;
-		addon.Profile.DR_Height = height;
-	else
-		DressUpFrame:SetSize(addon.Profile.DR_Width, addon.Profile.DR_Height);
+	if DressUpFrame.MaximizeMinimizeFrame.MinimizeButton:IsShown() then 
+		DressingRoom:SetFrameSize()
 	end
 end
 
