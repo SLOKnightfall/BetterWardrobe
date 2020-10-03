@@ -8,7 +8,9 @@ local SLOT_BUTTON_INDEX = {}
 local Buttons
 local INVENTORY_SLOT_NAMES = addon.Globals.INVENTORY_SLOT_NAMES
 local dressuplink
+local dressupslot
 local initUndress = true
+local initHide = true
 local import = false
 local useCharacterSources = true
 local Profile
@@ -25,7 +27,7 @@ function addon.Init:DressingRoom()
 	addon:SecureHook("DressUpSources", C_Timer.After(0.25,addon.DressUpSources))
 	addon:SecureHook("DressUpFrame_OnDressModel",function(self) DressingRoom:OnDressModel(self) end)
 
-	addon:HookScript(DressUpFrameResetButton,"OnClick", function()  C_Timer.After(0.1, function() BW_DressingRoomItemDetailsMixin:UpdateButtons() end) end)
+	addon:HookScript(DressUpFrameResetButton,"OnClick", function()  C_Timer.After(0.1, function() initHide = true; initUndress = true; BW_DressingRoomItemDetailsMixin:UpdateButtons() end) end)
 
 	DressUpFrame:SetClampedToScreen(true);
 	DressUpFrame:SetMovable(true)
@@ -79,9 +81,10 @@ function addon:DressUpVisual(...)
 		playerActor:TryOn(...)
 	end
 
+C_Timer.After(0, function() BW_DressingRoomItemDetailsMixin:UpdateButtons(false, true) end)
 	DressingRoom:TryOn(...)
 
-		C_Timer.After(0, function() BW_DressingRoomItemDetailsMixin:UpdateButtons(false, true) end)
+	
 
 end
 
@@ -136,17 +139,17 @@ function DressingRoom:TryOn(itemSource, previewSlot, enchantID)
 			targetSlotID = itemEquipLoc
 		end
 		dressuplink = itemLink
-
+dressupslot = targetSlotID
 		if not targetSlotID then return end
 		local button = DressingRoom:GetInvSlotButton(targetSlotID)
 
 		if (itemSource == 0 and previewSlot) then
 			C_Timer.After(0, function() button:Update( nil) end)
-		elseif 	(targetSlotID == INVSLOT_TABARD and Profile.DR_HideTabard) or
-				(targetSlotID == INVSLOT_BODY and Profile.DR_HideShirt) or
-				((targetSlotID == INVSLOT_MAINHAND or targetSlotID == INVSLOT_OFFHAND) and Profile.DR_HideWeapons ) then
-					C_Timer.After(0.2, function() button:Update(nil) end)	
-		else
+		--elseif 	(targetSlotID == INVSLOT_TABARD and Profile.DR_HideTabard) or
+				--(targetSlotID == INVSLOT_BODY and Profile.DR_HideShirt) or
+				--((targetSlotID == INVSLOT_MAINHAND or targetSlotID == INVSLOT_OFFHAND) and Profile.DR_HideWeapons ) then
+					--C_Timer.After(0.2, function() button:Update(nil) end)	
+		--else
 			C_Timer.After(0.2, function() button:Update(itemLink) end)
 		end
 	end
@@ -196,6 +199,7 @@ end
 
 function DressingRoom:OnHide()
 	initUndress = addon.Profile.DR_StartUndressed
+	initHide = true
 end
 
 
@@ -465,16 +469,20 @@ end
 
 local HIDDEN_SLOTS = {INVSLOT_TABARD, INVSLOT_BODY, INVSLOT_MAINHAND, INVSLOT_OFFHAND}
 function DressingRoom:SetHidden()
+	if not initHide then return end
 	 for _, slot in ipairs(HIDDEN_SLOTS) do
+	 	print(slot)
+	 	print(dressupslot)
 			button = DressingRoom:GetInvSlotButton(slot)
 
-		if (slot == INVSLOT_TABARD and Profile.DR_HideTabard) or
-			(slot == INVSLOT_BODY and Profile.DR_HideShirt) or
-			((slot == INVSLOT_MAINHAND or slot == INVSLOT_OFFHAND) and Profile.DR_HideWeapons ) then
+		if ((slot == INVSLOT_TABARD and Profile.DR_HideTabard) or
+					(slot == INVSLOT_BODY and Profile.DR_HideShirt) or
+					((slot == INVSLOT_MAINHAND or slot == INVSLOT_OFFHAND) and Profile.DR_HideWeapons )) and slot ~= dressupslot then
 				DressingRoom:Undress(slot)
 				button:Update(nil)
 		end
 	end
+	initHide = false
 end
 
 
@@ -492,7 +500,7 @@ function BW_DressingRoomItemDetailsMixin:Update(itemLink)
 	if (slot == INVSLOT_TABARD and Profile.DR_HideTabard) or
 		(slot == INVSLOT_BODY and Profile.DR_HideShirt) or
 		((slot == INVSLOT_MAINHAND or slot == INVSLOT_OFFHAND) and Profile.DR_HideWeapons ) then
-			skip = true 
+			--skip = true 
 	end
 
 	if dressuplink == itemLink then skip = false end
