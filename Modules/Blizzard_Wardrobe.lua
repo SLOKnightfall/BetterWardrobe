@@ -378,15 +378,6 @@ function ItemsCollectionFrame:OnShow()
 
 end
 
-local SetsDataProvider = CreateFromMixins(WardrobeSetsDataProviderMixin)
-addon.SetsDataProvider = SetsDataProvider
-
-function SetsDataProvider:SortSets(sets, reverseUIOrder, ignorePatchID)
-	--local sortedSources = SetsDataProvider:GetSortedSetSources(data.setID)
-	addon.SortSet(sets, reverseUIOrder, ignorePatchID)
-	--addon.Sort["DefaultSortSet"](self, sets, reverseUIOrder, ignorePatchID)
-end
-
 
 local function CheckMissingLocation(set)
 --function addon.Sets:GetLocationBasedCount(set)
@@ -419,6 +410,14 @@ local function CheckMissingLocation(set)
 	return not filtered
 end
 
+local SetsDataProvider = CreateFromMixins(WardrobeSetsDataProviderMixin)
+addon.SetsDataProvider = SetsDataProvider
+
+function SetsDataProvider:SortSets(sets, reverseUIOrder, ignorePatchID)
+	--local sortedSources = SetsDataProvider:GetSortedSetSources(data.setID)
+	addon.SortSet(sets, reverseUIOrder, ignorePatchID)
+	--addon.Sort["DefaultSortSet"](self, sets, reverseUIOrder, ignorePatchID)
+end
 
 function SetsDataProvider:GetBaseSets()
 	if (not self.baseSets) then
@@ -440,6 +439,15 @@ function SetsDataProvider:GetBaseSets()
 	return self.baseSets
 end
 
+function WardrobeSetsDataProviderMixin:GetBaseSetByID(baseSetID)
+	local baseSets = self:GetBaseSets();
+	for i = 1, #baseSets do
+		if ( baseSets[i].setID == baseSetID ) then
+			return baseSets[i], i;
+		end
+	end
+	return nil, nil;
+end
 
 function SetsDataProvider:GetUsableSets(incVariants)
 	if (not self.usableSets) then
@@ -618,6 +626,43 @@ function WardrobeCollectionFrame.SetsCollectionFrame:OnShow()
 	end
 end
 
+
+function WardrobeCollectionFrame.SetsCollectionFrame:GetDefaultSetIDForBaseSet(baseSetID)
+	if ( SetsDataProvider:IsBaseSetNew(baseSetID) ) then
+		if ( C_TransmogSets.SetHasNewSources(baseSetID) ) then
+			return baseSetID;
+		else
+			local variantSets = SetsDataProvider:GetVariantSets(baseSetID);
+			for i, variantSet in ipairs(variantSets) do
+				if ( C_TransmogSets.SetHasNewSources(variantSet.setID) ) then
+					return variantSet.setID;
+				end
+			end
+		end
+	end
+
+	if ( self.selectedVariantSets[baseSetID] ) then
+		return self.selectedVariantSets[baseSetID];
+	end
+
+	local baseSet = SetsDataProvider:GetBaseSetByID(baseSetID);
+	if ( baseSet.favoriteSetID ) then
+		return baseSet.favoriteSetID;
+	end
+	-- pick the one with most collected, higher difficulty wins ties
+	local highestCount = 0;
+	local highestCountSetID;
+	local variantSets = SetsDataProvider:GetVariantSets(baseSetID);
+	for i = 1, #variantSets do
+		local variantSetID = variantSets[i].setID;
+		local numCollected = SetsDataProvider:GetSetSourceCounts(variantSetID);
+		if ( numCollected > 0 and numCollected >= highestCount ) then
+			highestCount = numCollected;
+			highestCountSetID = variantSetID;
+		end
+	end
+	return highestCountSetID or baseSetID;
+end
 
 
 function WardrobeCollectionFrame.SetsCollectionFrame:HandleKey(key)
