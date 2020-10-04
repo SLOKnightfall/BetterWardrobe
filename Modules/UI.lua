@@ -318,6 +318,7 @@ function BW_WardrobeCollectionFrame_SetTab(tabID)
 		BW_SortDropDown:SetPoint("TOPLEFT", WardrobeCollectionFrame.ItemsCollectionFrame.WeaponDropDown, "BOTTOMLEFT", 0, (atTransmogrifier and (isWeapon and 55 or 32)) or LegionWardrobeY)
 
 	elseif tab2 then
+		WardrobeCollectionFrame.SetsTransmogFrame:UpdateProgressBar()
 		if atTransmogrifier  then
 			WardrobeCollectionFrame.activeFrame = WardrobeCollectionFrame.SetsTransmogFrame
 			BW_WardrobeCollectionFrame.activeFrame = WardrobeCollectionFrame.SetsTransmogFrame
@@ -329,7 +330,7 @@ function BW_WardrobeCollectionFrame_SetTab(tabID)
 		end
 
 	elseif tab3 then
-		
+		BW_WardrobeCollectionFrame.BW_SetsTransmogFrame:UpdateProgressBar()
 		if atTransmogrifier then
 			WardrobeCollectionFrame.activeFrame = BW_WardrobeCollectionFrame.BW_SetsTransmogFrame
 			BW_WardrobeCollectionFrame.activeFrame = BW_WardrobeCollectionFrame.BW_SetsTransmogFrame
