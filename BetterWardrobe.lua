@@ -622,7 +622,7 @@ function addon:OnEnable()
 
 		addon.Init:BuildDB()
 		addon.Init:Blizzard_Wardrobe()
-	C_Timer.After(0, function()
+	C_Timer.After(0.2, function()
 		
 		addon.Init:BuildUI()
 		addon.Init:BuildTooltips()

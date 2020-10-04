@@ -2,8 +2,6 @@ local addonName, addon = ...
 addon = LibStub("AceAddon-3.0"):GetAddon(addonName)
 local L = LibStub("AceLocale-3.0"):GetLocale(addonName)
 
-local Profile
-
 local IsDressableItem = IsDressableItem;
 local GetScreenWidth = GetScreenWidth;
 local GetScreenHeight = GetScreenHeight;
@@ -11,49 +9,87 @@ local GetScreenHeight = GetScreenHeight;
 local class = L.classBits[select(2, UnitClass("PLAYER"))];
 
 function addon.Init:BuildTooltips()
-	Profile = addon.Profile
 	addon.tooltip.model:SetUnit("player");
-	addon.tooltip.rotate:SetShown(Profile.TooltipPreviewRotate)
-	addon.tooltip:SetSize(Profile.TooltipPreview_Width, Profile.TooltipPreview_Height)
-	C_TransmogCollection.SetShowMissingSourceInItemTooltips(Profile.ShowAdditionalSourceTooltips);
-end
+	addon.tooltip.rotate:SetShown(addon.Profile.TooltipPreviewRotate)
+	addon.tooltip:SetSize(addon.Profile.TooltipPreview_Width, addon.Profile.TooltipPreview_Height)
+	C_TransmogCollection.SetShowMissingSourceInItemTooltips(addon.Profile.ShowAdditionalSourceTooltips);
 
-addon.tooltip = CreateFrame("Frame", "MogItTooltip", UIParent, "TooltipBorderedFrameTemplate");
-addon.tooltip:Hide();
-addon.tooltip:SetClampedToScreen(true);
-addon.tooltip:SetFrameStrata("TOOLTIP");
-
-
-addon.tooltip:SetScript("OnShow", function(self)
-	if Profile.TooltipPreview_MouseRotate and not InCombatLockdown() then
-		SetOverrideBinding(addon.tooltip, true, "MOUSEWHEELUP", "BetterWardrobe_TooltipScrollUp");
-		SetOverrideBinding(addon.tooltip, true, "MOUSEWHEELDOWN", "BetterWardrobe_TooltipScrollDown");
-	end
-end);
-
-addon.tooltip:SetScript("OnHide",function(self)
-	if not InCombatLockdown() then
-		ClearOverrideBindings(addon.tooltip);
-	end
-end);
-
-addon.tooltip:SetScript("OnEvent", function(self, event, arg1)
-	if event == "PLAYER_LOGIN" then
-		addon.tooltip.model:SetUnit("player");
-	elseif event == "PLAYER_REGEN_DISABLED" then
-		ClearOverrideBindings(addon.tooltip);
-	elseif event == "PLAYER_REGEN_ENABLED" then
-		if self:IsForbidden() then return end
-		if self:IsShown() and Profile.TooltipPreview_MouseRotate then
+	addon.tooltip:SetScript("OnShow", function(self)
+		if addon.Profile.TooltipPreview_MouseRotate and not InCombatLockdown() then
 			SetOverrideBinding(addon.tooltip, true, "MOUSEWHEELUP", "BetterWardrobe_TooltipScrollUp");
 			SetOverrideBinding(addon.tooltip, true, "MOUSEWHEELDOWN", "BetterWardrobe_TooltipScrollDown");
 		end
-	end
-end);
+	end);
 
-addon.tooltip:RegisterEvent("PLAYER_LOGIN");
-addon.tooltip:RegisterEvent("PLAYER_REGEN_DISABLED");
-addon.tooltip:RegisterEvent("PLAYER_REGEN_ENABLED");
+	addon.tooltip:SetScript("OnHide",function(self)
+		if not InCombatLockdown() then
+			ClearOverrideBindings(addon.tooltip);
+		end
+	end);
+
+	addon.tooltip:SetScript("OnEvent", function(self, event, arg1)
+		if event == "PLAYER_REGEN_DISABLED" then
+			ClearOverrideBindings(addon.tooltip);
+		elseif event == "PLAYER_REGEN_ENABLED" then
+			if self:IsForbidden() then return end
+			if self:IsShown() and addon.Profile.TooltipPreview_MouseRotate then
+				SetOverrideBinding(addon.tooltip, true, "MOUSEWHEELUP", "BetterWardrobe_TooltipScrollUp");
+				SetOverrideBinding(addon.tooltip, true, "MOUSEWHEELDOWN", "BetterWardrobe_TooltipScrollDown");
+			end
+		end
+	end);
+
+	addon.tooltip:RegisterEvent("PLAYER_REGEN_DISABLED");
+	addon.tooltip:RegisterEvent("PLAYER_REGEN_ENABLED");
+
+	addon.tooltip.model:SetUnit("player");
+	addon.tooltip.model:SetScript("OnShow", addon.tooltip.model.ResetModel);
+
+	addon.tooltip.check:SetScript("OnUpdate", function(self)
+		if (addon.tooltip.owner and addon.tooltip.owner:IsForbidden()) then return end
+		if (addon.tooltip.owner and not (addon.tooltip.owner:IsShown() and addon.tooltip.owner:GetItem())) or not addon.tooltip.owner then
+			addon.tooltip:Hide();
+			addon.tooltip.item = nil;
+		end
+		self:Hide();
+	end);
+
+	GameTooltip:HookScript("OnTooltipSetItem", function(self)
+		local _, itemLink = self:GetItem();
+		addon.tooltip:ShowTooltip(itemLink);
+	end);
+	GameTooltip:HookScript("OnHide", addon.tooltip.HideItem);
+
+
+	-- hacks for tooltips where GameTooltip:GetItem() returns a broken link
+	hooksecurefunc(GameTooltip, "SetQuestItem", function(self, itemType, index)
+		addon.tooltip:ShowTooltip(GetQuestItemLink(itemType, index));
+		GameTooltip:Show();
+	end);
+
+
+	hooksecurefunc(GameTooltip, "SetQuestLogItem", function(self, itemType, index)
+		addon.tooltip:ShowTooltip(GetQuestLogItemLink(itemType, index));
+		GameTooltip:Show();
+	end);
+
+
+	-- hooksecurefunc(GameTooltip, "SetRecipeResultItem", function(self, recipeID)
+		-- addon.tooltip:ShowTooltip(C_TradeSkillUI.GetRecipeItemLink(recipeID));
+		-- GameTooltip:Show();
+	-- end);
+
+
+	hooksecurefunc(GameTooltip, "SetRecipeReagentItem", function(self, recipeID, reagentIndex)
+		addon.tooltip:ShowTooltip(C_TradeSkillUI.GetRecipeReagentItemLink(recipeID, reagentIndex));
+		GameTooltip:Show();
+	end);
+end
+
+addon.tooltip = CreateFrame("Frame", "BW_ProfileTooltip", UIParent, "TooltipBorderedFrameTemplate");
+addon.tooltip:Hide();
+addon.tooltip:SetClampedToScreen(true);
+addon.tooltip:SetFrameStrata("TOOLTIP");
 
 addon.tooltip.model = CreateFrame("DressUpModel", nil, addon.tooltip);
 addon.tooltip.model:SetPoint("TOPLEFT", addon.tooltip, "TOPLEFT", 5, -5);
@@ -62,20 +98,18 @@ addon.tooltip.model:SetAnimation(0, 0);
 addon.tooltip.model:SetLight(true, false, 0, 0.8, -1, 1, 1, 1, 1, 0.3, 1, 1, 1);
 
 function addon.tooltip.model:ResetModel()
-	local raceID = Profile.TooltipPreview_CustomRace
-	local genderID = Profile.TooltipPreview_CustomGender
-	if Profile.TooltipPreview_CustomModel then
+	local raceID = addon.Profile.TooltipPreview_CustomRace
+	local genderID = addon.Profile.TooltipPreview_CustomGender
+	if addon.Profile.TooltipPreview_CustomModel then
 		local _, _, dirX, dirY, dirZ, _, ambR, ambG, ambB, _, dirR, dirG, dirB = self:GetLight();
-
-		self:SetCustomRace(Profile.TooltipPreview_CustomRace, Profile.TooltipPreview_CustomGender);
+		self:SetCustomRace(addon.Profile.TooltipPreview_CustomRace, addon.Profile.TooltipPreview_CustomGender);
 		self:SetUseTransmogSkin(true)
 	else
 		self:Dress();
-		self:SetUseTransmogSkin(Profile.TooltipPreview_DressingDummy)
+		self:SetUseTransmogSkin(addon.Profile.TooltipPreview_DressingDummy)
 	end
 
-	
-	if not Profile.TooltipPreview_Dress then
+	if not addon.Profile.TooltipPreview_Dress then
 		for i, slotName in ipairs(addon.Globals.slots) do
 			local slot = GetInventorySlotInfo(slotName);
 			local item = GetInventoryItemLink("player", slot);
@@ -88,7 +122,6 @@ function addon.tooltip.model:ResetModel()
 		self:UndressSlot(GetInventorySlotInfo("SecondaryHandSlot"));
 	end
 end
-addon.tooltip.model:SetScript("OnShow", addon.tooltip.model.ResetModel);
 
 
 local function addDoubleLine(tooltip, left_text, right_text)
@@ -170,7 +203,7 @@ function addon.tooltip:ShowTooltip(itemLink)
 			line:SetText("|TInterface\\RaidFrame\\ReadyCheck-Ready:0|t "..text)
 		end
 
-		if Profile.ShowItemIDTooltips and string.find(text, string.lower(ITEM_LEVEL) ) then 
+		if addon.Profile.ShowItemIDTooltips and string.find(text, string.lower(ITEM_LEVEL) ) then 
 			line:SetText(text.."         "..L["Item ID"]..": |cffffffff"..itemID)
 		end
 	end
@@ -180,13 +213,13 @@ function addon.tooltip:ShowTooltip(itemLink)
 	local self = GameTooltip;
 	
 	local tooltip = addon.tooltip;
-	if Profile.TooltipPreview_Show and (not addon.Globals.mods[Profile.TooltipPreview_Modifier] or addon.Globals.mods[Profile.TooltipPreview_Modifier]()) then
+	if addon.Profile.TooltipPreview_Show and (not addon.Globals.mods[addon.Profile.TooltipPreview_Modifier] or addon.Globals.mods[addon.Profile.TooltipPreview_Modifier]()) then
 		if tooltip.item ~= itemLink then
 			tooltip.item = itemLink;
 
 			local slot = select(4, GetItemInfoInstant(itemLink));
-			if (not Profile.TooltipPreview_MogOnly or select(3, C_Transmog.GetItemInfo(itemID))) and addon.Globals.tooltip_slots[slot] and IsDressableItem(itemLink) then
-				tooltip.model:SetFacing(addon.Globals.tooltip_slots[slot]-(Profile.TooltipPreviewRotate and 0.5 or 0));
+			if (not addon.Profile.TooltipPreview_MogOnly or select(3, C_Transmog.GetItemInfo(itemID))) and addon.Globals.tooltip_slots[slot] and IsDressableItem(itemLink) then
+				tooltip.model:SetFacing(addon.Globals.tooltip_slots[slot]-(addon.Profile.TooltipPreviewRotate and 0.5 or 0));
 				tooltip:Show();
 				tooltip.owner = self;
 				tooltip.repos:Show();
@@ -198,7 +231,7 @@ function addon.tooltip:ShowTooltip(itemLink)
 		end
 	end
 
-	if Profile.ShowOwnedItemTooltips and addon.Globals.tooltip_slots[slot] and not learned_dupe then
+	if addon.Profile.ShowOwnedItemTooltips and addon.Globals.tooltip_slots[slot] and not learned_dupe then
 		local sourceID = GetSourceFromItem(itemLink);
 		local hasItem = sourceID and HasItem(sourceID, true);
 		if hasItem then
@@ -211,7 +244,7 @@ function addon.tooltip:ShowTooltip(itemLink)
 	if not sourceID then return end
 	local addHeader = false
 
-	if Profile.ShowCollectionListTooltips and addon.chardb.profile.collectionList["item"][appearanceID] then
+	if addon.Profile.ShowCollectionListTooltips and addon.chardb.profile.collectionList["item"][appearanceID] then
 		if not addHeader then 
 			addHeader = true
 			addLine(self, L["HEADERTEXT"])
@@ -221,7 +254,7 @@ function addon.tooltip:ShowTooltip(itemLink)
 	end
 
 	local setIDs = C_TransmogSets.GetSetsContainingSourceID(sourceID)
-	if Profile.ShowSetTooltips and #setIDs > 0 then 
+	if addon.Profile.ShowSetTooltips and #setIDs > 0 then 
 		if not addHeader then 
 			addHeader = true
 			addLine(self, L["HEADERTEXT"])
@@ -237,11 +270,11 @@ function addon.tooltip:ShowTooltip(itemLink)
 			end
 			addDoubleLine (self," ",L["-%s %s(%d/%d)"]:format(setInfo.name or "", color, collected, total))
 
-			if Profile.ShowDetailedListTooltips then 
+			if addon.Profile.ShowDetailedListTooltips then 
 				local sources = C_TransmogSets.GetSetSources(setID)
 				for sourceID, collected in pairs(sources) do
 					local sourceInfo = C_TransmogCollection.GetSourceInfo(sourceID)
-					if collected and not Profile.ShowMissingDetailedListTooltips then 
+					if collected and not addon.Profile.ShowMissingDetailedListTooltips then 
 						color = GREEN_FONT_COLOR_CODE
 						addDoubleLine (self," ",L["|TInterface\\RaidFrame\\ReadyCheck-Ready:0|t %s%s"]:format(color, sourceInfo.name or ""))
 					elseif not collected then 
@@ -254,7 +287,7 @@ function addon.tooltip:ShowTooltip(itemLink)
 	end
 
 	local setData = addon.IsSetItem(itemLink)
-	if Profile.ShowExtraSetsTooltips and setData then 
+	if addon.Profile.ShowExtraSetsTooltips and setData then 
 		if not addHeader then 
 			addHeader = true
 			addLine(self, L["HEADERTEXT"])
@@ -270,11 +303,11 @@ function addon.tooltip:ShowTooltip(itemLink)
 
 			addDoubleLine (self," ",L["-%s %s(%d/%d)"]:format(data.name or "", color, collected, total))
 
-			if Profile.ShowDetailedListTooltips then 
+			if addon.Profile.ShowDetailedListTooltips then 
 				local sources = addon.GetSetsources(data.setID)
 				for sourceID, collected in pairs(sources) do
 					local sourceInfo = C_TransmogCollection.GetSourceInfo(sourceID)
-					if collected and not Profile.ShowMissingDetailedListTooltips then 
+					if collected and not addon.Profile.ShowMissingDetailedListTooltips then 
 						color = GREEN_FONT_COLOR_CODE
 						addDoubleLine (self," ",L["|TInterface\\RaidFrame\\ReadyCheck-Ready:0|t %s%s"]:format(color, sourceInfo.name or ""))
 					elseif not collected then 
@@ -303,14 +336,6 @@ end
 
 addon.tooltip.check = CreateFrame("Frame");
 addon.tooltip.check:Hide();
-addon.tooltip.check:SetScript("OnUpdate", function(self)
-	if (addon.tooltip.owner and addon.tooltip.owner:IsForbidden()) then return end
-	if (addon.tooltip.owner and not (addon.tooltip.owner:IsShown() and addon.tooltip.owner:GetItem())) or not addon.tooltip.owner then
-		addon.tooltip:Hide();
-		addon.tooltip.item = nil;
-	end
-	self:Hide();
-end);
 
 addon.tooltip.repos = CreateFrame("Frame");
 addon.tooltip.repos:Hide();
@@ -321,7 +346,7 @@ addon.tooltip.repos:SetScript("OnUpdate", function(self)
 	if x and y then
 		addon.tooltip:ClearAllPoints();
 		local anchorpoint, ownerpoint;
-		if Profile.TooltipPreview_Anchor == "vertical" then
+		if addon.Profile.TooltipPreview_Anchor == "vertical" then
 			if y / GetScreenHeight() > 0.5 then
 				anchorpoint = "TOP";
 				ownerpoint = "BOTTOM";
@@ -361,36 +386,4 @@ addon.tooltip.rotate = CreateFrame("Frame",nil,addon.tooltip);
 addon.tooltip.rotate:Hide();
 addon.tooltip.rotate:SetScript("OnUpdate",function(self,elapsed)
 	addon.tooltip.model:SetFacing(addon.tooltip.model:GetFacing() + elapsed);
-end);
-
-
-GameTooltip:HookScript("OnTooltipSetItem", function(self)
-	local _, itemLink = self:GetItem();
-	addon.tooltip:ShowTooltip(itemLink);
-end);
-GameTooltip:HookScript("OnHide", addon.tooltip.HideItem);
-
-
--- hacks for tooltips where GameTooltip:GetItem() returns a broken link
-hooksecurefunc(GameTooltip, "SetQuestItem", function(self, itemType, index)
-	addon.tooltip:ShowTooltip(GetQuestItemLink(itemType, index));
-	GameTooltip:Show();
-end);
-
-
-hooksecurefunc(GameTooltip, "SetQuestLogItem", function(self, itemType, index)
-	addon.tooltip:ShowTooltip(GetQuestLogItemLink(itemType, index));
-	GameTooltip:Show();
-end);
-
-
--- hooksecurefunc(GameTooltip, "SetRecipeResultItem", function(self, recipeID)
-	-- addon.tooltip:ShowTooltip(C_TradeSkillUI.GetRecipeItemLink(recipeID));
-	-- GameTooltip:Show();
--- end);
-
-
-hooksecurefunc(GameTooltip, "SetRecipeReagentItem", function(self, recipeID, reagentIndex)
-	addon.tooltip:ShowTooltip(C_TradeSkillUI.GetRecipeReagentItemLink(recipeID, reagentIndex));
-	GameTooltip:Show();
 end);
