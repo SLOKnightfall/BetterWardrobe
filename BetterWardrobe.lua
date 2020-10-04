@@ -1348,7 +1348,7 @@ function BetterWardrobeSetsCollectionMixin:OnHide()
 	self:UnregisterEvent("TRANSMOG_COLLECTION_ITEM_UPDATE")
 	self:UnregisterEvent("TRANSMOG_COLLECTION_UPDATED")
 	SetsDataProvider:ClearSets()
-	--WardrobeCollectionFrame_ClearSearch(LE_TRANSMOG_SEARCH_TYPE_BASE_SETS
+	WardrobeCollectionFrame_ClearSearch(LE_TRANSMOG_SEARCH_TYPE_BASE_SETS)
 
 end
 
@@ -2497,9 +2497,9 @@ function BW_WardrobeCollectionFrame_OnEvent(self, event, ...)
 		end
 	elseif (event == "TRANSMOG_SEARCH_UPDATED") then
 		local searchType, arg1 = ...
-		--if (searchType == self.activeFrame.searchType) then
-			--self.activeFrame:OnSearchUpdate(arg1)
-		--end
+		if (searchType == self.activeFrame.searchType) then
+			self.activeFrame:OnSearchUpdate(arg1)
+		end
 	end
 end
 
