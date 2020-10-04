@@ -531,11 +531,11 @@ addon.missingSelection = missingSelection
 function addon:InitTables()
 	filterCollected = {true, true}
 
-	for i = 1, 9 do
+	for i = 1, #FILTER_SOURCES do
 		filterSelection[i] = true
 	end
 
-	for i = 1, 8 do
+	for i = 1, #EXPANSIONS do
 		xpacSelection[i] = true
 	end
 end

@@ -108,11 +108,17 @@ do
 						setData.label =L[note] or ""
 					end
 
-					if setData.note == "NOTE_96" then 
+				--places some of the sets that didnt have correct filters
+					if setData.note == "NOTE_4" or setData.note == "NOTE_4" then
+						setData.filter = 4 
+					elseif setData.note == "NOTE_95" then
+						setData.filter = 7	
+					elseif setData.note == "NOTE_96" then 
 						setData.filter = 5
 					elseif setData.note == "NOTE_97" then 
 						setData.filter = 3
 					end
+
 					setData.mod = setData.bonusid
 					setData.uiOrder = id * 100
 					--setData.filter = setData.filter + 1 -- fix for filter startin at 0

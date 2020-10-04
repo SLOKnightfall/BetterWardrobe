@@ -159,5 +159,5 @@ addon.Globals.TAB_EXTRASETS = 3
 addon.Globals.TAB_SAVED_SETS = 4
 addon.Globals.TABS_MAX_WIDTH = 245
 
-addon.Globals.FILTER_SOURCES = {L["MISC"], L["Classic Set"],L["Quest Set"],L["Dunegon Set"],L["Raid Recolor"],L["Raid Lookalike"],L["Garrison"],L["Island Expidetion"], L["Warfronts"]}
+addon.Globals.FILTER_SOURCES = {L["MISC"], L["Classic Set"],L["Quest Set"],L["Dunegon Set"],L["Raid Recolor"],L["Raid Lookalike"],L["PvP"],L["Garrison"],L["Island Expidetion"], L["Warfronts"]}
 addon.Globals.EXPANSIONS = {EXPANSION_NAME0 , EXPANSION_NAME1, EXPANSION_NAME2, EXPANSION_NAME3 , EXPANSION_NAME4, EXPANSION_NAME5, EXPANSION_NAME6, EXPANSION_NAME7, EXPANSION_NAME8}
