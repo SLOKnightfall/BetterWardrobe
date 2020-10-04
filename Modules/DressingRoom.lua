@@ -480,8 +480,6 @@ local HIDDEN_SLOTS = {INVSLOT_TABARD, INVSLOT_BODY, INVSLOT_MAINHAND, INVSLOT_OF
 function DressingRoom:SetHidden()
 	if not initHide then return end
 	 for _, slot in ipairs(HIDDEN_SLOTS) do
-	 	print(slot)
-	 	print(dressupslot)
 			button = DressingRoom:GetInvSlotButton(slot)
 
 		if ((slot == INVSLOT_TABARD and Profile.DR_HideTabard) or
