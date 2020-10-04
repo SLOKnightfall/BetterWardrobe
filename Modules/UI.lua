@@ -521,7 +521,7 @@ addon.missingSelection = missingSelection
 function addon:InitTables()
 	filterCollected = {true, true}
 
-	for i = 1, 8 do
+	for i = 1, 9 do
 		filterSelection[i] = true
 	end
 

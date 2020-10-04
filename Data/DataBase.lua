@@ -38,7 +38,7 @@ local hiddenSet ={
 	["items"] = { 134110, 134112, 168659, 168665, 158329, 143539, 168664 },
 	--["expansionID"] =  9999 ,
 	["expansionID"] =  1,
-	["filter"] =  1,
+	["filter"] =  0,
 	["recolor"] =  false,
 	["minLevel"] =  1,
 	["uiOrder"] = 100,
@@ -107,7 +107,15 @@ do
 
 						setData.label =L[note] or ""
 					end
+
+					if setData.note == "NOTE_96" then 
+						setData.filter = 5
+					elseif setData.note == "NOTE_97" then 
+						setData.filter = 3
+					end
+					setData.mod = setData.bonusid
 					setData.uiOrder = id * 100
+					--setData.filter = setData.filter + 1 -- fix for filter startin at 0
 
 					for _, item in ipairs( setData["items"]) do
 						if setData.sources and setData.sources[item] and setData.sources[item] ~= 0 then 
