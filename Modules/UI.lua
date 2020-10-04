@@ -18,7 +18,6 @@ local TAB_EXTRASETS = addon.Globals.TAB_EXTRASETS
 local TAB_SAVED_SETS = addon.Globals.TAB_SAVED_SETS
 local TABS_MAX_WIDTH = addon.Globals.TABS_MAX_WIDTH
 
-local Wardrobe = WardrobeCollectionFrame.ItemsCollectionFrame
 
 local db, active
 local FileData
@@ -40,7 +39,7 @@ function UI.SortDropdowns_Initialize()
 	if not addon.sortDB then
 		addon.sortDB = CopyTable(defaults)
 	end
-
+	local Wardrobe = WardrobeCollectionFrame.ItemsCollectionFrame
 	db = addon.sortDB
 	
 	--f:RegisterEvent("TRANSMOG_COLLECTION_ITEM_UPDATE")
@@ -203,6 +202,8 @@ end
 
 -- Base Transmog Sets Window Upates
 function UI.ExtendTransmogView()
+	if WardrobeFrame and WardrobeFrame.extended then return end
+
     WardrobeFrame:SetWidth(1170)
     WardrobeTransmogFrame:SetWidth(500)
     WardrobeTransmogFrame.ModelScene:ClearAllPoints()
@@ -225,7 +226,13 @@ function UI.ExtendTransmogView()
     WardrobeTransmogFrame.ModelScene.SecondaryHandEnchantButton:ClearAllPoints()
     WardrobeTransmogFrame.ModelScene.SecondaryHandEnchantButton:SetPoint("BOTTOM", WardrobeTransmogFrame.ModelScene.SecondaryHandButton, "BOTTOM", 0, -20)
 
-    UIPanelWindows["WardrobeFrame"].width = 1170
+    if UIPanelWindows["WardrobeFrame"] then 
+	    UIPanelWindows["WardrobeFrame"].width = 1170
+	else 
+		UIPanelWindows["WardrobeFrame"] ={ area = "left", pushable = 0,	width = 1170 };
+	end
+	UpdateUIPanelPositions()
+    WardrobeFrame.extended = true
 end
 
 
@@ -447,6 +454,7 @@ end
 
 
 local function PositionDropDown()
+	local Wardrobe = WardrobeCollectionFrame.ItemsCollectionFrame
 	if WardrobeFrame_IsAtTransmogrifier() then
 		local _, isWeapon = C_TransmogCollection.GetCategoryInfo(Wardrobe:GetActiveCategory() or -1)
 		BW_SortDropDown:SetPoint("TOPLEFT", Wardrobe.WeaponDropDown, "BOTTOMLEFT", 0, isWeapon and 55 or 32)
@@ -483,7 +491,7 @@ function addon.Init:BuildUI()
 	UI.SortDropdowns_Initialize()
 	UI.LocationDropdowns_Initialize()
 	CreateVisualViewButton()
-	UI.ExtendTransmogView()
+	
 --BW_WardrobeCollectionFrame:GetFrameLevel()
 	WardrobeCollectionFrame.searchBox:SetFrameLevel(BW_WardrobeCollectionFrame:GetFrameLevel()+10)
 	WardrobeCollectionFrame.FilterButton:SetFrameLevel(BW_WardrobeCollectionFrame:GetFrameLevel()+10)
@@ -493,7 +501,9 @@ function addon.Init:BuildUI()
  	UI.BuildLoadQueueButton()
 	UI.DefaultButtons_Update()
 
-	hooksecurefunc(Wardrobe, "UpdateWeaponDropDown", PositionDropDown)
+	UI.ExtendTransmogView()
+--	WardrobeFrame:HookScript("OnShow",  function() print("XXX"); UI.ExtendTransmogView() end)
+	hooksecurefunc(WardrobeCollectionFrame.ItemsCollectionFrame, "UpdateWeaponDropDown", PositionDropDown)
 end
 
 
