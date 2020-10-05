@@ -278,11 +278,13 @@ DressUpFrameOutfitDropDown:Hide()
 		--end, true)
 end
 
+
 function BW_DressingRoomMixin:OnShow()
 	self:RegisterEvent("TRANSMOG_OUTFITS_CHANGED")
 	self:RegisterEvent("TRANSMOGRIFY_UPDATE")
 	--self:SelectOutfit(self:GetLastOutfitID(), true)
 end
+
 
 function BW_DressingRoomMixin:OnHide()
 	self:UnregisterEvent("TRANSMOG_OUTFITS_CHANGED")
@@ -305,6 +307,7 @@ function WardrobeOutfitDropDownMixin:OnEvent(event)
 	-- don't need to do anything for "TRANSMOGRIFY_UPDATE" beyond updating the save button
 	self:UpdateSaveButton()
 end
+
 
 function BW_DressingRoomMixin:LoadOutfit(outfitID)
 	if not outfitID then
@@ -695,7 +698,7 @@ function BW_DressingRoomImportButton_OnClick(self)
 	local name  = addon.QueueList[3]
 	local contextMenuData = {
 		{
-			text = L["Display Options"], isTitle = true, notCheckable = true,
+			text = L["Import/Export Options"], isTitle = true, notCheckable = true,
 		},
 		{
 			text = L["Load Set: %s"]:format( name or L["None Selected"]),
@@ -704,12 +707,10 @@ function BW_DressingRoomImportButton_OnClick(self)
 				local setType = addon.QueueList[1]
 				local setID = addon.QueueList[2]
 				local playerActor = DressUpFrame.ModelScene:GetPlayerActor()
-					if (not playerActor) then
-		return false
-	end
+				if not playerActor or setID then
+					return false
+				end
 
-				if not setID then return end
-				
 				if setType == "set" then
 					sources = C_TransmogSets.GetSetSources(setID)
 				elseif setType == "extraset" then
@@ -723,7 +724,6 @@ function BW_DressingRoomImportButton_OnClick(self)
 				DressUpSources(sources)
 				import = false
 				C_Timer.After(0.2, function() BW_DressingRoomItemDetailsMixin:UpdateButtons(false, true) end)
-
 			end,
 			isNotRadio = true,
 			notCheckable = true,
@@ -761,7 +761,6 @@ function BW_DressingRoomImportButton_OnClick(self)
 			notCheckable = true,
 			isNotRadio = true,
 		},
-		
 	}
 	
 	ContextMenu:SetPoint("TOPLEFT", self, "TOPLEFT", 0, 0)
@@ -773,23 +772,6 @@ function BW_DressingRoomImportButton_OnClick(self)
 end
 
 
-local function GetCreature(unit)
-	local guid = unit
-
-	if UnitExists(unit) then
-		guid = UnitGUID(unit)
-	end
-
-	if guid then
-		local t, _, _, _, _, i = strsplit("-", guid)
-
-		if t == "Creature" or t == "Pet" then
-			return i
-		end
-	end
-end
-
-	local playerActor = DressUpFrame.ModelScene:GetPlayerActor()
 local queued = {}
 function DressingRoom:SetTarget(arg1)
 	local playerActor = DressUpFrame.ModelScene:GetPlayerActor()
@@ -797,119 +779,63 @@ function DressingRoom:SetTarget(arg1)
 		return false
 	end	
 
-	local arg1 =  { button = self, model = model, unit = "target" }
-	--local button = arg1.button
-	--local entry = button.entry
-	local unit = arg1.unit or "target"
-	local model = arg1.model
-	local modelScene = DressUpFrame.ModelScene
-
-	if not UnitExists(unit) or reset then
-		unit = "player" -- fallback to the player
+	local unit = "target"
+	if not UnitExists(unit) then
+		unit = "player"
 	end
 
 	if UnitExists(unit) then
-		local id = GetCreature(unit)
-		if id then
-			if modelScene then
-				--modelScene:GetPlayerActor():SetModelByCreatureDisplayID(id) -- uses display id, the guid has the npc id so it doesnt work
-				--playerActor:SetModelByUnit(unit) -- game crashes
-			else
-				playerActor:SetCreature(id)
-			end
-		else
-			if modelScene then
-				playerActor:SetModelByUnit(unit) 
-			else
-				playerActor:SetUnit(unit)
-			end
-		end
-
-		if UnitIsPlayer(unit) then
-			--entry.race = select(2, UnitRace(unit))
-			--entry.gender = UnitSex(unit)
-		end
-	else
-		--UIErrorsFrame:AddMessage(ERR_GENERIC_NO_TARGET, 1, .1, .1, 1)
+		playerActor:SetModelByUnit(unit) 
 	end
 	C_Timer.After(0.2, function() BW_DressingRoomItemDetailsMixin:UpdateButtons(false, true) end)
-
 end
 BetterWardrobe.SetTarget = DressingRoom.SetTarget
 
 
-	function DressingRoom:INSPECT_READY(guid)
-		local purge = {}
+function DressingRoom:INSPECT_READY(guid)
+	local purge = {}
+	if UnitExists(guid) then
+		guid = UnitGUID(guid)
+	end
+	for i = 1, #queued do
+		local entry = queued[i]
+		if entry.guid == guid then
+			if C_TransmogCollection then
+				local sources = C_TransmogCollection.GetInspectSources()
+				if entry.reset then
+					local playerActor = DressUpFrame.ModelScene:GetPlayerActor()
 
-		if UnitExists(guid) then
-			guid = UnitGUID(guid)
-		end
-		for i = 1, #queued do
-			local entry = queued[i]
-
-			if entry.guid == guid then
-				if entry.modified then
-					local loading = 0
-					for j = 1, 19 do
-						local equipped = GetInventoryItemTexture(entry.unit, j)
-						if equipped then
-							local link = GetInventoryItemLink(entry.unit, j)
-							if link then
-								entry.model:TryOn(link)
-
-							else
-								loading = loading + 1
-							end
-						end
-					end
-					if loading == 0 then
-						table.insert(purge, entry)
-					else
-						C_Timer.After(.5, function() DressingRoom:INSPECT_READY(guid) end)
-					end
-				else
-					if C_TransmogCollection then
-						local sources = C_TransmogCollection.GetInspectSources()
-						if entry.reset then
-							local playerActor = DressUpFrame.ModelScene:GetPlayerActor()
-
-							local guid = GetCreature(UnitGUID("player"))
-							playerActor:SetModelByUnit("Player")
-						end
-						DressUpSources(sources)
-					end
-					table.insert(purge, entry)
+					local guid = GetCreature(UnitGUID("player"))
+					playerActor:SetModelByUnit("Player")
 				end
+				DressUpSources(sources)
 			end
-		end
-
-		while #purge > 0 do
-			local entry = table.remove(purge, 1)
-
-			if entry then
-				for i = 1, #queued do
-					if queued[i] == entry then
-						table.remove(queued, i)
-						if type(entry.callback) == "function" then entry:callback() end
-						break
-					end
-				end
-			end
-		end
-
-		if #queued == 0 then
-			-- ClearInspectPlayer()
-
-			addon:UnregisterEvent("INSPECT_READY")
-			addon:UnregisterEvent("UNIT_INVENTORY_CHANGED")
-
-			C_Timer.After(0.2, function() BW_DressingRoomItemDetailsMixin:UpdateButtons(false, true) end)
+			table.insert(purge, entry)
 		end
 	end
 
+	while #purge > 0 do
+		local entry = table.remove(purge, 1)
+		if entry then
+			for i = 1, #queued do
+				if queued[i] == entry then
+					table.remove(queued, i)
+					if type(entry.callback) == "function" then entry:callback() end
+					break
+				end
+			end
+		end
+	end
+
+	if #queued == 0 then
+		addon:UnregisterEvent("INSPECT_READY")
+		addon:UnregisterEvent("UNIT_INVENTORY_CHANGED")
+		C_Timer.After(0.2, function() BW_DressingRoomItemDetailsMixin:UpdateButtons(false, true) end)
+	end
+end
 
 
-function DressingRoom:SetGear(reset)
+function DressingRoom:SetTargetGear(reset)
 		local arg1 =  { button = self, model = nil, unit = "target" }
 	--local button = arg1.button
 	--local entry = button.entry
@@ -930,18 +856,18 @@ function DressingRoom:SetGear(reset)
 		end
 	end
 end
-BetterWardrobe.SetGear = DressingRoom.SetGear
+BetterWardrobe.SetTargetGear = DressingRoom.SetTargetGear
 
 function BW_DressingRoomTargetButton_OnClick(self)
 	local Profile = addon.Profile
 	local name  = addon.QueueList[3]
 	local contextMenuData = {
 		{
-			text = L["Model Options"], isTitle = true, notCheckable = true,
+			text = L["Target Options"], isTitle = true, notCheckable = true,
 		},
 		{
-			text = L["Target Gear"],
-			func = function() DressingRoom:SetGear()
+			text = L["Use Target Gear"],
+			func = function() DressingRoom:SetTargetGear()
 
 			end,
 			isNotRadio = true,
@@ -950,7 +876,7 @@ function BW_DressingRoomTargetButton_OnClick(self)
 		{
 			text = L["Use Player Model"],
 			func = function()
-			DressingRoom:SetGear(true)
+			DressingRoom:SetTargetGear(true)
 			end,
 			isNotRadio = true,
 			notCheckable = true,
@@ -963,7 +889,6 @@ function BW_DressingRoomTargetButton_OnClick(self)
 			isNotRadio = true,
 			notCheckable = true,
 		},
-		
 	}
 	
 	ContextMenu:SetPoint("TOPLEFT", self, "TOPLEFT", 0, 0)
@@ -975,7 +900,23 @@ function BW_DressingRoomTargetButton_OnClick(self)
 end
 
 
+local function SetTooltip(frame, text)
+	GameTooltip:SetOwner(frame, "ANCHOR_RIGHT");
+	GameTooltip:SetText(text)
+	GameTooltip:Show()
+end
 
+function BW_DressingRoomExportButton_OnEnter(self)
+	SetTooltip(self, L["Import/Export Options"])
+end
+
+function BW_DressingRoomTargetButton_OnEnter(self)
+	SetTooltip(self, L["Target Options"])
+end
+
+function BW_DressingRoomSettingsButton_OnEnter(self)
+	SetTooltip(self, L["General Options"])
+end
 
 ---TODO:  Reset button resets target model if Selected
 --set playuermodel

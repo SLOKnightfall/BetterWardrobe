@@ -102,8 +102,8 @@ function addon.tooltip.model:ResetModel()
 	local genderID = addon.Profile.TooltipPreview_CustomGender
 	if addon.Profile.TooltipPreview_CustomModel then
 		local _, _, dirX, dirY, dirZ, _, ambR, ambG, ambB, _, dirR, dirG, dirB = self:GetLight();
-		self:SetCustomRace(addon.Profile.TooltipPreview_CustomRace, addon.Profile.TooltipPreview_CustomGender);
-		self:SetUseTransmogSkin(true)
+		self:SetCustomRace(addon.Profile.TooltipPreview_CustomRace, addon.Profile.TooltipPreview_CustomGender,true);
+		--self:SetUseTransmogSkin(true)
 	else
 		self:Dress();
 		self:SetUseTransmogSkin(addon.Profile.TooltipPreview_DressingDummy)

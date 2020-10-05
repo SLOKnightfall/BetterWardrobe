@@ -14,7 +14,7 @@
 
 	<Binding name= "BETTERWARDROBE_BINDING_TARGETGEAR" hidden="false"  category="Addons">
 		DressUpFrame_Show(DressUpFrame)
-		BetterWardrobe:SetGear()
+		BetterWardrobe:SetTargetGear()
 	</Binding>
 	<Binding name= "BETTERWARDROBE_BINDING_TARGETMODEL" hidden="false" category="Addons">
 		DressUpFrame_Show(DressUpFrame)
@@ -22,6 +22,6 @@
 	</Binding>
 	<Binding name= "BETTERWARDROBE_BINDING_PLAYERMODEL" hidden="false" category="Addons">
 		DressUpFrame_Show(DressUpFrame)
-		BetterWardrobe:SetGear(true)	
+		BetterWardrobe:SetTargetGear(true)	
 	</Binding>
 </Bindings>

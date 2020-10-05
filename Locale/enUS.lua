@@ -26,6 +26,9 @@ L["Use Target Gear"] =  true
 L["Use Player Model"] =  true
 L["Use Target's Model"] = true
 
+L["Target Options"] = true
+L["Import/Export Options"] = true
+
 _G["BINDING_NAME_BETTERWARDROBE_BINDING_PLAYERMODEL"] = "Use Player Model" 
 _G["BINDING_NAME_BETTERWARDROBE_BINDING_TARGETMODEL"] = "Use Target's Model"
 _G["BINDING_NAME_BETTERWARDROBE_BINDING_TARGETGEAR"] =  "Use Target Gear"

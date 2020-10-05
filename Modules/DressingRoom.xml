@@ -151,6 +151,10 @@
 					<OnClick>
 						DressupSettingsButton_OnClick(self)
 					</OnClick>
+					<OnEnter>
+						BW_DressingRoomSettingsButton_OnEnter(self)
+					</OnEnter>
+					<OnLeave function="GameTooltip_Hide"/>
 				</Scripts>
 			</Button>
 
@@ -173,6 +177,10 @@
 					<OnClick>
 						BW_DressingRoomImportButton_OnClick(self)
 					</OnClick>
+					<OnEnter>
+						BW_DressingRoomExportButton_OnEnter(self)
+					</OnEnter>
+					<OnLeave function="GameTooltip_Hide"/>
 				</Scripts>
 			</Button>
 			<Button parentKey="BW_DressingRoomTargettButton" inherits="BrowserButtonTemplate" >
@@ -194,6 +202,10 @@
 					<OnClick>
 						BW_DressingRoomTargetButton_OnClick(self)
 					</OnClick>
+								<OnEnter>
+				BW_DressingRoomTargetButton_OnEnter(self)
+			</OnEnter>
+			<OnLeave function="GameTooltip_Hide"/>
 				</Scripts>
 			</Button>
 			<Button parentKey="BW_DressingRoomHideArmorButton" inherits="UIPanelButtonTemplate" text="Undress">
@@ -210,7 +222,7 @@
 		</Frames>
 		<Scripts>
 			<OnShow>
-				BW_DressingRoomFrame_OnShow()
+				BW_DressingRoomFrame_OnShow(self)
 			</OnShow>
 			<OnHide>
 				BW_DressingRoomFrame_OnHide()
