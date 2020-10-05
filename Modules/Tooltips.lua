@@ -253,6 +253,7 @@ function addon.tooltip:ShowTooltip(itemLink)
 
 			addDoubleLine (self,"|cff87aaff"..L["-Appearance in Collection List-"], " ")
 		end
+		
 
 		local setIDs = C_TransmogSets.GetSetsContainingSourceID(sourceID)
 		if addon.Profile.ShowSetTooltips and #setIDs > 0 then 

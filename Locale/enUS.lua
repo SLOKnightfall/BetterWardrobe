@@ -13,8 +13,25 @@ local TAB_ITEMS = 1
 local TAB_SETS = 2
 local TAB_EXTRASETS = 3
 
-L.OM_GOLD = "|c00FFD200";
+--_G["BINDING_NAME_" .. name
+_G["BINDING_HEADER_BETTERWARDROBE"] = addonName
+
+
+
+L.OM_GOLD = "|c00FFD200"
 L.ENDCOLOR ="|r"
+
+L["Model Options"] = true
+L["Use Target Gear"] =  true
+L["Use Player Model"] =  true
+L["Use Target's Model"] = true
+
+_G["BINDING_NAME_BETTERWARDROBE_BINDING_PLAYERMODEL"] = "Use Player Model" 
+_G["BINDING_NAME_BETTERWARDROBE_BINDING_TARGETMODEL"] = "Use Target's Model"
+_G["BINDING_NAME_BETTERWARDROBE_BINDING_TARGETGEAR"] =  "Use Target Gear"
+_G["BINDING_NAME_BETTERWARDROBE_BINDING_TOGGLE_DRESSINGROOM"] = "Toggle DressingRoom"
+
+
  L["Sets"] = true
   L["Extra Sets"] = true
 

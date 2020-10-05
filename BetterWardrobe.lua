@@ -22,6 +22,7 @@ addon.usableSourceCache = {}
 addon.Init = {}
 local newTransmogInfo  = {["latestSource"] = NO_TRANSMOG_SOURCE_ID} --{[99999999] = {[58138] = 10}, }
 addon.TRANSMOG_SET_FILTER = {}
+_G[addonName] = {}
 
 local playerInv_DB
 local Profile
