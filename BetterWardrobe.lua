@@ -46,6 +46,12 @@ function optionHandler:Setter(info, value)
 		DressUpFrame:SetWidth(value);
 	elseif info.arg == "DR_Height" then
 		DressUpFrame:SetHeight(value)
+	elseif info.arg == "DR_OptionsEnable" then
+		if not Profile.DR_OptionsEnable then
+			addon:DressingRoom_Disable()
+		else
+			addon:DressingRoom_Enable()
+		end
 
 	elseif info.arg == "ShowAdditionalSourceTooltips" then
 		C_TransmogCollection.SetShowMissingSourceInItemTooltips(value);
@@ -432,12 +438,21 @@ local options = {
 					type = "group",
 					inline = true,
 					order = 5,
+					disabled = function() return not addon.Profile.DR_OptionsEnable end,
 					args={
 						Options_Header_2 = {
 							order = 1,
 							name = L["Dressing Room Options"],
 							type = "header",
 							width = "full",
+						},
+						DR_OptionsEnable = {
+							order = 1.2,
+							name = L["Enable"],
+							type = "toggle",
+							disabled = false, 
+							width = "full",
+							arg = "DR_OptionsEnable"
 						},
 						DR_ShowItemButtons = {
 							order = 2,
@@ -557,6 +572,11 @@ local char_defaults = {
 	}
 }
 
+local savedsets_defaults = {
+		profile = {},
+		global = {["sets"]={}}
+}
+
 ---Updates Profile after changes
 function addon:RefreshConfig()
 	addon.Profile = self.db.profile
@@ -606,6 +626,11 @@ function addon:OnEnable()
 	self.chardb = LibStub("AceDB-3.0"):New("BetterWardrobe_CharacterData", char_defaults)
 	options.args.charprofiles = LibStub("AceDBOptions-3.0"):GetOptionsTable(self.chardb)
 	options.args.charprofiles.name = L["Profiles - Collection Settings"]
+
+	self.setdb = LibStub("AceDB-3.0"):New("BetterWardrobe_SavedSetData", savedsets_defaults)
+	local profile = self.setdb:GetCurrentProfile()
+	--self.setdb.global[profile] = self.setdb.char
+	addon.SelecteSavedList = false
 
 	LibStub("AceConfigRegistry-3.0"):ValidateOptionsTable(options, addonName)
 	LibStub("AceConfig-3.0"):RegisterOptionsTable(addonName, options)
@@ -722,8 +747,9 @@ function addon.GetSetsources(setID)
 	local atTransmogrifier = WardrobeFrame_IsAtTransmogrifier()
 
 	if BW_WardrobeCollectionFrame.selectedTransmogTab == 4 or BW_WardrobeCollectionFrame.selectedCollectionTab == 4 then
-		if setInfo.sources then
+		if setInfo and setInfo.sources then
 			for i, sourceID in ipairs(setInfo.sources) do	
+
 				if sourceID then
 					local sourceInfo = C_TransmogCollection.GetSourceInfo(sourceID)
 
@@ -741,7 +767,7 @@ function addon.GetSetsources(setID)
 			end
 		end
 
-	elseif setInfo.sources then
+	elseif setInfo and setInfo.sources then
 		for itemID, visualID in pairs(setInfo.sources) do
 			local sources =  C_TransmogCollection.GetAppearanceSources(visualID)
 			local sourceID, _
@@ -1732,6 +1758,15 @@ function BetterWardrobeSetsCollectionMixin:OnSearchUpdate()
 	end
 end
 
+function BetterWardrobeSetsCollectionMixin:RefreshScrollList()
+		SetsDataProvider:ClearBaseSets()
+		SetsDataProvider:ClearVariantSets()
+		SetsDataProvider:ClearUsableSets()
+		--SetsDataProvider:FilterSearch(true)
+		self:Refresh()
+
+end
+
 
 function BetterWardrobeSetsCollectionMixin:SelectSetFromButton(setID)
 	CloseDropDownMenus()
@@ -2158,7 +2193,11 @@ BetterWardrobeSetsTransmogMixin = CreateFromMixins(WardrobeSetsTransmogMixin)
 
 function BetterWardrobeSetsTransmogMixin:LoadSet(setID)
 	if BW_WardrobeCollectionFrame.selectedTransmogTab == 4 or BW_WardrobeCollectionFrame.selectedCollectionTab == 4 then
-		BW_WardrobeOutfitDropDown:SelectOutfit(setID - 5000, true)
+		if addon.SelecteSavedList then 
+			BW_WardrobeOutfitDropDown:SelectDBOutfit(setID, true)
+		else
+			BW_WardrobeOutfitDropDown:SelectOutfit(setID - 5000, true)
+		end
 		return
 	end
 
@@ -2283,10 +2322,12 @@ end
 
 
 function BetterWardrobeSetsTransmogMixin:UpdateSets()
-	local usableSets = SetsDataProvider:GetUsableSets()
+	local usableSets
 
 	if BW_WardrobeCollectionFrame.selectedTransmogTab == 4 or BW_WardrobeCollectionFrame.selectedCollectionTab == 4 then
 			usableSets = addon.GetSavedList()
+	else 
+		usableSets = SetsDataProvider:GetUsableSets()
 	end
 
 	self.PagingFrame:SetMaxPages(ceil(#usableSets / self.PAGE_SIZE))
@@ -2304,8 +2345,9 @@ function BetterWardrobeSetsTransmogMixin:UpdateSets()
 			--if (model.setID ~= set.setID) then
 				model:Undress()
 				local sourceData =  SetsDataProvider:GetSetSourceData(set.setID)
+				local tab = WardrobeCollectionFrame.selectedTransmogTab
 				for sourceID in pairs(sourceData.sources) do
-					if (not Profile.HideMissing and (not BW_WardrobeToggle.VisualMode or (Sets.isMogKnown(sourceID) and BW_WardrobeToggle.VisualMode))) or
+					if (tab == 4 and not BW_WardrobeToggle.VisualMode) or (not Profile.HideMissing and (not BW_WardrobeToggle.VisualMode or (Sets.isMogKnown(sourceID) and BW_WardrobeToggle.VisualMode))) or
 						(Profile.HideMissing and (BW_WardrobeToggle.VisualMode or Sets.isMogKnown(sourceID))) then
 						model:TryOn(sourceID)
 					else
@@ -2393,6 +2435,12 @@ function BetterWardrobeSetsTransmogMixin:OnSearchUpdate()
 end
 
 
+function BetterWardrobeSetsTransmogMixin:RefreshSets()
+
+	SetsDataProvider:ClearUsableSets()
+	self:UpdateSets()
+
+end
 local function GetPage(entryIndex, pageSize)
 	return floor((entryIndex-1) / pageSize) + 1
 end
@@ -2552,6 +2600,9 @@ function BW_WardrobeCollectionFrame_OnShow(self)
 		WardrobeCollectionFrame.searchBox:SetWidth(105)
 		BW_WardrobeCollectionFrameTab4:Show()
 	end
+
+	addon.setdb.global.sets[addon.setdb:GetCurrentProfile()] = addon.GetSavedList()
+
 end
 
 

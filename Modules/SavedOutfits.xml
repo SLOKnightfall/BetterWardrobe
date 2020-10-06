@@ -132,7 +132,7 @@
 		</Scripts>
 	</Frame>
 
-	<Frame name="BW_WardrobeOutfitFrame" frameStrata="DIALOG" parent="UIParent" hidden="true" enableMouse="true" mixin="BW_WardrobeOutfitFrameMixin">
+	<Frame name="BW_WardrobeOutfitFrame" frameStrata="DIALOG" parent="WardrobeTransmogFrame" hidden="true" enableMouse="true" mixin="BW_WardrobeOutfitFrameMixin">
 		<Size x="224" y="200"/>
 		<Anchors>
 			<Anchor point="TOPLEFT"/>

@@ -229,8 +229,8 @@ end
 			setsInfo = setsInfo or {}
 			for index, data in ipairs(savedOutfits) do
 				local info = {}
-				info.items = {}
-				info.sources = {}
+				info.items = data.items or {}
+				info.sources = data.sources or {}
 				info.collected = true
 				info.name = data.name
 				info.description = ""
@@ -240,14 +240,14 @@ end
 				info.label = L["Saved Set"]
 				info.limitedTimeSet = false
 				info.patchID = ""
-				info.setID = data.outfitID + 5000
-				info.uiOrder = data.index * 100
+				info.setID = data.setID or (data.outfitID + 5000)
+				info.uiOrder = data.uiOrder or (data.index * 100)
 				info.icon = data.icon
 				info.type = "Saved"
 
 				if data.set == "default" then 
 					info.sources = C_TransmogCollection.GetOutfitSources(data.outfitID)
-				else
+				elseif  #info.sources == 0 then 
 					for i = 1, 16 do
 						info.sources[i] = data[i] or 0
 					end

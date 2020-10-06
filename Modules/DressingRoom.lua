@@ -16,6 +16,7 @@ local useCharacterSources = true
 local Profile
 
 function DressingRoom:SetFrameSize()
+if not DR_OptionsEnable or not DressUpFrame.BW_ResizeFrame then return end
 
 	local maxWidth, maxHeight = DressUpFrame:GetMaxResize();
 	if (addon.Profile.DR_Width > maxWidth or addon.Profile.DR_Height > maxHeight) then
@@ -44,10 +45,32 @@ end
 function addon.Init:DressingRoom()
 	Buttons = BW_DressingRoomFrame.PreviewButtonFrame.Slots
 	Profile = addon.Profile
-
 	BW_DressingRoomFrame:SetScript("OnShow", function() C_Timer.After(0.25, DressingRoom.OnShow) end)
 	BW_DressingRoomFrame:SetScript("OnHide", DressingRoom.OnHide)
-	
+	BW_DressingRoomFrame:Hide()
+	if addon.Profile.DR_OptionsEnable then 
+		addon:DressingRoom_Enable()
+	end
+end
+
+
+
+function addon:DressingRoom_Disable()
+	addon:Unhook("DressUpVisual")
+	addon:Unhook("DressUpSources")
+	addon:Unhook("DressUpFrame_OnDressModel")
+	addon:Unhook(DressUpFrameResetButton,"OnClick")
+	addon:Unhook(DressUpFrame.MaximizeMinimizeFrame.MaximizeButton,"OnClick")
+
+	BW_DressingRoomFrame:Hide()
+	DressUpFrame:SetMovable(false)
+	DressUpFrame:SetScript("OnDragStart", nil)
+	DressUpFrame:SetScript("OnDragStop", nil)
+	--addon.Profile.DR_OptionsEnable
+end
+
+
+function addon:DressingRoom_Enable()
 	addon:SecureHook("DressUpVisual", C_Timer.After(0.25,addon.DressUpVisual))
 	addon:SecureHook("DressUpSources", C_Timer.After(0.25,addon.DressUpSources))
 	addon:SecureHook("DressUpFrame_OnDressModel",function(self) DressingRoom:OnDressModel(self) end)
@@ -61,22 +84,20 @@ function addon.Init:DressingRoom()
 			BW_DressingRoomItemDetailsMixin:UpdateButtons() 
 		end
 		end) end)
-	addon:HookScript(DressUpFrame.MaximizeMinimizeFrame.MaximizeButton,"OnClick", function()  C_Timer.After(0.1, function() DressingRoom:SetFrameSize() end) end)
 
-	DressUpFrame:SetClampedToScreen(true);
-	DressUpFrame:SetMovable(true)
-	DressUpFrame:EnableMouse(true)
-	DressUpFrame:RegisterForDrag("LeftButton")
-	DressUpFrame:SetScript("OnDragStart", DressUpFrame.StartMoving)
-	DressUpFrame:SetScript("OnDragStop", DressUpFrame.StopMovingOrSizing)
+	addon:HookScript(DressUpFrame.MaximizeMinimizeFrame.MaximizeButton,"OnClick", function()  C_Timer.After(0.1, function() DressingRoom:SetFrameSize() end) end)
 	DressUpFrame:SetMinResize(384, 474);
 	DressUpFrame:SetMaxResize(
 		min(GetScreenWidth() - 50, 950),
-		min(GetScreenHeight() - 50, 950)
-	);
-	
-	
+		min(GetScreenHeight() - 50, 950))
 
+	BW_DressingRoomFrame:Show()
+	DressUpFrame:SetClampedToScreen(true);
+	DressUpFrame:SetMovable(true)
+	DressUpFrame:RegisterForDrag("LeftButton")
+	DressUpFrame:SetScript("OnDragStart", DressUpFrame.StartMoving)
+	DressUpFrame:SetScript("OnDragStop", DressUpFrame.StopMovingOrSizing)
+	--addon.Profile.DR_OptionsEnable
 end
 
 
@@ -397,6 +418,8 @@ function BW_DressingRoomOutfitFrameMixin:SaveOutfit(name)
 		self.popupDropDown:SelectOutfit(outfitID)
 		self.popupDropDown:OnOutfitSaved(outfitID)
 	end
+
+	addon.setdb.global.sets[addon.setdb:GetCurrentProfile()] = addon.GetSavedList()
 end
 
 --BW_DressingRoomOutfitFrame:GetLastOutfitID()
