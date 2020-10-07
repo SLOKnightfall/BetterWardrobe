@@ -308,7 +308,7 @@ function BW_WardrobeCollectionFrame_SetTab(tabID)
 
 	UIDropDownMenu_EnableDropDown(BW_SortDropDown)
 	BW_SortDropDown:SetShown(not tab4)
-	UI.DBSetDropdown:SetShown(tab4)
+	BW_DBSavedSetDropdown:SetShown(tab4)
 	BW_SortDropDown:ClearAllPoints()
 
 	if tab1 then
@@ -972,25 +972,27 @@ function UI.CreateBW_SelectSavedSetDropdown()
 ]]
 
 
-
-	   f = L_Create_UIDropDownMenu("NewDropDown",self)
-     UI.DBSetDropdown = f
-     f:SetParent("BW_WardrobeCollectionFrame")
+--local f = CreateFrame("Button", "BW_DBSavedSetDropdown", BW_WardrobeCollectionFrame, "UIDropDownMenuTemplate")
+	--BW_DBSavedSetDropdown = L_Create_UIDropDownMenu("BW_DBSavedSetDropdown",UIParent)
+    --local f = L_Create_UIDropDownMenu("myOwnDropDownMenu", parent)--BW_DBSetDropDown = f
+   -- BW_DBSavedSetDropdown:SetParent("BW_WardrobeCollectionFrame")
 	--f:SetWidth(87)--, 22)
 --	f:SetHeight(22)
-
-	f:ClearAllPoints()
-	f:SetPoint("TOPLEFT", "BW_SortDropDown", "TOPLEFT")
+BW_DBSavedSetDropdown:SetParent("BW_WardrobeCollectionFrame")
+	BW_DBSavedSetDropdown:ClearAllPoints()
+	BW_DBSavedSetDropdown:SetPoint("TOPLEFT", "BW_SortDropDown", "TOPLEFT")
 
 	--ocal dropDown = CreateFrame("Frame", "WPDemoDropDown", UIParent, "UIDropDownMenuTemplate")
 
-L_UIDropDownMenu_SetWidth(f, 165) -- Use in place of dropDown:SetWidth
+L_UIDropDownMenu_SetWidth(BW_DBSavedSetDropdown, 165) -- Use in place of dropDown:SetWidth
 -- Bind an initializer function to the dropdown; see previous sections for initializer function examples.
-L_UIDropDownMenu_Initialize(f, WPDropDownDemo_Menu)
-L_UIDropDownMenu_SetText(f, addon.setdb:GetCurrentProfile())
+L_UIDropDownMenu_Initialize(BW_DBSavedSetDropdown, WPDropDownDemo_Menu)
+L_UIDropDownMenu_SetText(BW_DBSavedSetDropdown, addon.setdb:GetCurrentProfile())
 
 end
 
+BW_DBSavedSetDropdown = L_Create_UIDropDownMenu("BW_DBSavedSetDropdown",UIParent)
+BW_DBSavedSetDropdown:Hide()
 
 local function WPDropDownDemo_OnClick(self, arg1, arg2, checked)
 
@@ -1005,7 +1007,7 @@ local function WPDropDownDemo_OnClick(self, arg1, arg2, checked)
 		end
 		BW_WardrobeCollectionFrame_SetTab(2)
 		BW_WardrobeCollectionFrame_SetTab(4)
-		L_UIDropDownMenu_SetText(UI.DBSetDropdown, arg1)
+		L_UIDropDownMenu_SetText(BW_DBSavedSetDropdown, arg1)
 		addon.savedSetCache = nil
 end
 
