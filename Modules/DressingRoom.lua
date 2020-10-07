@@ -823,14 +823,14 @@ function DressingRoom:INSPECT_READY(guid)
 	if UnitExists(guid) then
 		guid = UnitGUID(guid)
 	end
-	DressingRoom.showTarget = true
+	--DressingRoom.showTarget = true
 	for i = 1, #queued do
 		local entry = queued[i]
 		if entry.guid == guid then
 			if C_TransmogCollection then
 				local sources = C_TransmogCollection.GetInspectSources()
 				if entry.reset then
-					DressingRoom.showTarget = false
+					--DressingRoom.showTarget = false
 					local playerActor = DressUpFrame.ModelScene:GetPlayerActor()
 
 					--local guid = GetCreature(UnitGUID("player"))
@@ -864,13 +864,14 @@ end
 
 
 function DressingRoom:SetTargetGear(reset)
+	
 		local arg1 =  { button = self, model = nil, unit = "target" }
 	--local button = arg1.button
 	--local entry = button.entry
 	local unit = arg1.unit or "target"
 	ClearInspectPlayer()
 	table.wipe(queued)
-
+	DressingRoom.showTarget = false
 	if CanInspect(unit) then
 		local guid = UnitGUID(unit)
 
@@ -895,7 +896,9 @@ function BW_DressingRoomTargetButton_OnClick(self)
 		},
 		{
 			text = L["Use Target Gear"],
-			func = function() DressingRoom:SetTargetGear()
+			func = function() 
+			DressingRoom.showTarget = false
+			DressingRoom:SetTargetGear()
 
 			end,
 			isNotRadio = true,
