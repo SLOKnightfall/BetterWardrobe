@@ -78,10 +78,14 @@ function addon:DressingRoom_Enable()
 	addon:HookScript(DressUpFrameResetButton,"OnClick", function()  C_Timer.After(0.2, function() 
 		initHide = true; 
 		initUndress = true; 
+		print(DressingRoom.showTarget)
 		if DressingRoom.showTarget then 
-
+			DressingRoom:SetTarget()
+			print(1)
+			--BW_DressingRoomItemDetailsMixin:UpdateButtons()
 		else
-			BW_DressingRoomItemDetailsMixin:UpdateButtons() 
+			print(2)
+			BW_DressingRoomItemDetailsMixin:UpdateButtons(true) 
 		end
 		end) end)
 
@@ -241,6 +245,7 @@ end
 function DressingRoom:OnHide()
 	initUndress = addon.Profile.DR_StartUndressed
 	initHide = true
+	DressingRoom.showTarget = false
 end
 
 
@@ -797,11 +802,12 @@ end
 
 local queued = {}
 function DressingRoom:SetTarget(arg1)
+
 	local playerActor = DressUpFrame.ModelScene:GetPlayerActor()
 	if (not playerActor) then
 		return false
 	end	
-
+		DressingRoom.showTarget = true
 	local unit = "target"
 	if not UnitExists(unit) then
 		unit = "player"
@@ -820,15 +826,17 @@ function DressingRoom:INSPECT_READY(guid)
 	if UnitExists(guid) then
 		guid = UnitGUID(guid)
 	end
+	DressingRoom.showTarget = true
 	for i = 1, #queued do
 		local entry = queued[i]
 		if entry.guid == guid then
 			if C_TransmogCollection then
 				local sources = C_TransmogCollection.GetInspectSources()
 				if entry.reset then
+					DressingRoom.showTarget = false
 					local playerActor = DressUpFrame.ModelScene:GetPlayerActor()
 
-					local guid = GetCreature(UnitGUID("player"))
+					--local guid = GetCreature(UnitGUID("player"))
 					playerActor:SetModelByUnit("Player")
 				end
 				DressUpSources(sources)
@@ -899,7 +907,9 @@ function BW_DressingRoomTargetButton_OnClick(self)
 		{
 			text = L["Use Player Model"],
 			func = function()
+			DressingRoom.showTarget = false
 			DressingRoom:SetTargetGear(true)
+			
 			end,
 			isNotRadio = true,
 			notCheckable = true,
@@ -907,7 +917,9 @@ function BW_DressingRoomTargetButton_OnClick(self)
 		{
 			text = L["Use Target Model"],
 			func = function()
+			DressingRoom.showTarget = true
 			DressingRoom:SetTarget()
+			
 			end,
 			isNotRadio = true,
 			notCheckable = true,
