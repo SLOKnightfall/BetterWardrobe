@@ -95,7 +95,9 @@ do
 			local heritageArmor = string.find(setData.name, "Heritage")
 		
 			--if not  setInfo  then 
-				if  (class) 
+				if  (class or 
+						(addon.Profile.IgnoreClassRestrictions and ((setData.filter == 6 or setData.filter == 7) and addon.Profile.IgnoreClassLookalikeRestrictions)) or 
+						(addon.Profile.IgnoreClassRestrictions and not addon.Profile.IgnoreClassLookalikeRestrictions)) 
 					and not factionLocked 
 					and not heritageArmor  then
 

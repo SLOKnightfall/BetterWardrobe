@@ -43,15 +43,20 @@ function optionHandler:Setter(info, value)
 	elseif info.arg == "tooltipHeight" then
 		addon.tooltip:SetHeight(value);
 	elseif info.arg == "DR_Width" then
-		DressUpFrame:SetWidth(value);
+		DressUpFrame:SetWidth(value)
+		DressUpFrame.BW_ResizeFrame = true
 	elseif info.arg == "DR_Height" then
 		DressUpFrame:SetHeight(value)
+		DressUpFrame.BW_ResizeFrame = true
 	elseif info.arg == "DR_OptionsEnable" then
 		if not Profile.DR_OptionsEnable then
 			addon:DressingRoom_Disable()
 		else
 			addon:DressingRoom_Enable()
 		end
+	elseif info.arg == IgnoreClassRestrictions or info.arg == IgnoreClassLookalikeRestrictions then 
+		addon.extraSetsCache = nil
+		addon.Init:BuildDB()
 
 	elseif info.arg == "ShowAdditionalSourceTooltips" then
 		C_TransmogCollection.SetShowMissingSourceInItemTooltips(value);
@@ -122,6 +127,22 @@ local options = {
 							name = L["General Options"],
 							type = "header",
 							width = "full",
+						},
+						
+						IgnoreClassRestrictions = {
+							order = 1.2,
+							name = L["Ignore Class Restriction Filter"],
+							type = "toggle",
+							width = 1.3,
+							arg = "IgnoreClassRestrictions",
+						},
+						IgnoreClassLookalikeRestrictions = {
+							order = 1.3,
+							name = L["Only for Raid Lookalike/Recolor Sets"],
+							type = "toggle",
+							width = 1.4,
+							arg = "IgnoreClassLookalikeRestrictions",
+							disabled = function() return not addon.Profile.IgnoreClassRestrictions end,
 						},
 						ShowCollectionUpdates = {
 							order = 2,
@@ -521,10 +542,12 @@ local options = {
 								type = "execute",
 								order = 112,
 								name = L["Reset"],
-								func = function() DressUpFrame:SetWidth(450)
-								;	DressUpFrame:SetHeight(545) 
-								addon.Profile.DR_Width = 450
-								addon.Profile.DR_Height = 545
+								func = function() 
+									DressUpFrame:SetWidth(450)
+									DressUpFrame:SetHeight(545) 
+									addon.Profile.DR_Width = 450
+									addon.Profile.DR_Height = 545
+									DressUpFrame.BW_ResizeFrame = false
 								end,
 
 

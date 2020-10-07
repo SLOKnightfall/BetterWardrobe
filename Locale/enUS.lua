@@ -17,7 +17,8 @@ local TAB_EXTRASETS = 3
 _G["BINDING_HEADER_BETTERWARDROBE"] = addonName
 
 
-
+L["Ignore Class Restriction Filter"] = true
+L["Only for Raid Lookalike/Recolor Sets"] = true
 L.OM_GOLD = "|c00FFD200"
 L.ENDCOLOR ="|r"
 
