@@ -799,19 +799,26 @@ end
 
 local queued = {}
 function DressingRoom:SetTarget(arg1)
-
 	local playerActor = DressUpFrame.ModelScene:GetPlayerActor()
 	if (not playerActor) then
 		return false
 	end	
 		DressingRoom.showTarget = true
+
 	local unit = "target"
 	if not UnitExists(unit) then
+		DressingRoom.showTarget = false
+		DressingRoom.currentTarget = false
 		unit = "player"
 	end
 
 	if UnitExists(unit) then
-		playerActor:SetModelByUnit(unit) 
+		if not DressingRoom.currentTarget then 
+			playerActor:SetModelByUnit(unit)
+			DressingRoom.currentTarget = playerActor:GetModelUnitGUID() 
+		else
+			playerActor:SetModelByCreatureDisplayID(DressingRoom.currentTarget)
+		end	
 	end
 	C_Timer.After(0.2, function() BW_DressingRoomItemDetailsMixin:UpdateButtons(false, true) end)
 end
@@ -823,16 +830,16 @@ function DressingRoom:INSPECT_READY(guid)
 	if UnitExists(guid) then
 		guid = UnitGUID(guid)
 	end
-	--DressingRoom.showTarget = true
+	DressingRoom.showTarget = true
 	for i = 1, #queued do
 		local entry = queued[i]
 		if entry.guid == guid then
 			if C_TransmogCollection then
 				local sources = C_TransmogCollection.GetInspectSources()
 				if entry.reset then
-					--DressingRoom.showTarget = false
+					DressingRoom.showTarget = false
 					local playerActor = DressUpFrame.ModelScene:GetPlayerActor()
-
+					DressingRoom.currentTarget = nil
 					--local guid = GetCreature(UnitGUID("player"))
 					playerActor:SetModelByUnit("Player")
 				end
@@ -864,16 +871,28 @@ end
 
 
 function DressingRoom:SetTargetGear(reset)
-	
 		local arg1 =  { button = self, model = nil, unit = "target" }
 	--local button = arg1.button
 	--local entry = button.entry
 	local unit = arg1.unit or "target"
 	ClearInspectPlayer()
 	table.wipe(queued)
-	DressingRoom.showTarget = false
+	if 	DressingRoom.currentTarget == "player" then 
+	--DressingRoom.showTarget = false
+	else
+	--DressingRoom.showTarget = true
+	end
 	if CanInspect(unit) then
 		local guid = UnitGUID(unit)
+
+	if 	DressingRoom.currentTarget == "player" then 
+	--DressingRoom.showTarget = false
+	elseif not DressingRoom.currentTarget then 
+
+	else
+	--DressingRoom.showTarget = true
+	--DressingRoom.currentTarget = guid
+	end
 
 		if guid then
 			if undress then model:Undress() end
@@ -897,7 +916,7 @@ function BW_DressingRoomTargetButton_OnClick(self)
 		{
 			text = L["Use Target Gear"],
 			func = function() 
-			DressingRoom.showTarget = false
+			--DressingRoom.showTarget = false
 			DressingRoom:SetTargetGear()
 
 			end,
