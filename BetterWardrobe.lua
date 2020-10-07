@@ -580,6 +580,7 @@ local defaults = {
 		TooltipPreview_CustomRace = 1,
 		TooltipPreview_CustomGender = 0,
 		TooltipPreview_DressingDummy = false, 
+		IgnoreClassRestrictions = false,
 	}
 }
 
@@ -1337,6 +1338,11 @@ function BetterWardrobeSetsTransmogModelMixin:RefreshTooltip()
 			GameTooltip:AddLine(setInfo.label)
 			GameTooltip:Show()
 		end
+		if not setInfo.isClass then
+			GameTooltip:AddLine(setInfo.className)
+			GameTooltip:Show()
+		end
+
 	end
 end
 
@@ -1616,7 +1622,8 @@ function BetterWardrobeSetsCollectionMixin:DisplaySet(setID)
 		self.DetailsFrame.LongName:Hide()
 	end
 
-	self.DetailsFrame.Label:SetText(setInfo.label)
+	self.DetailsFrame.Label:SetText(setInfo.label..((not setInfo.isClass and setInfo.className) and " -"..setInfo.className.."-" or "") )
+
 
 	local newSourceIDs = addon.GetSetNewSources(setID)
 
@@ -2116,7 +2123,7 @@ function BetterWardrobeSetsCollectionScrollFrameMixin:Update()
 
 			--local count, complete = addon.GetSetCompletion(baseSet)
 			button:Show()
-			button.Name:SetText(baseSet.name)
+			button.Name:SetText(baseSet.name..((not baseSet.isClass and baseSet.className) and "-"..baseSet.className.."-" or "") )
 			local topSourcesCollected, topSourcesTotal = SetsDataProvider:GetSetSourceTopCounts(baseSet.setID)
 
 			local setCollected = topSourcesCollected == topSourcesTotal --baseSet.collected -- C_TransmogSets.IsBaseSetCollected(baseSet.setID)
@@ -2136,6 +2143,7 @@ function BetterWardrobeSetsCollectionScrollFrameMixin:Update()
 			button.SelectedTexture:SetShown(baseSet.setID == selectedBaseSetID)
 			button.Favorite:SetShown(isFavorite)
 			button.CollectionListVisual.Hidden.Icon:SetShown(isHidden)
+			button.CollectionListVisual.InvalidTexture:SetShown(not baseSet.isClass)
 			local isInList = addon.chardb.profile.collectionList["extraset"][baseSet.setID]
 			button.CollectionListVisual.Collection.Collection_Icon:SetShown(isInList)
 			button.CollectionListVisual.Collection.Collected_Icon:SetShown(isInList and setCollected)
@@ -2385,6 +2393,9 @@ function BetterWardrobeSetsTransmogMixin:UpdateSets()
 			elseif (set.setID == self.selectedSetID) then
 				transmogStateAtlas = "transmog-set-border-selected"
 				pendingTransmogModelFrame = model
+			elseif not set.isClass then 
+				transmogStateAtlas = "transmog-set-border-unusable"
+				model.TransmogStateTexture:SetPoint("CENTER",0,-2)
 			end
 
 			if (transmogStateAtlas) then
@@ -2412,7 +2423,10 @@ function BetterWardrobeSetsTransmogMixin:UpdateSets()
 			model.CollectionListVisual.Collection.Collected_Icon:SetShown(isInList and model.setCollected)
 			--model.CollectionListVisual.Collection.Collected_Icon:SetShown(false)
 			model.setID = set.setID
-			model.SetInfo.setName:SetText(setInfo["name"].."\n"..(setInfo["description"] or ""))
+			local name = setInfo["name"]
+			local description = (setInfo["description"] and "\n"..setInfo["description"]) or ""
+			local class = (not setInfo.isClass and setInfo.className and "\n-"..setInfo.className.."-") or ""
+			model.SetInfo.setName:SetText(("%s%s%s"):format(name, description,class))
 			if BW_WardrobeCollectionFrame.selectedTransmogTab == 4 or BW_WardrobeCollectionFrame.selectedCollectionTab == 4 then
 				model.SetInfo.progress:Hide()
 			else

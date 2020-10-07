@@ -78,6 +78,7 @@ function addon:DressingRoom_Enable()
 	addon:HookScript(DressUpFrameResetButton,"OnClick", function()  C_Timer.After(0.2, function() 
 		initHide = true; 
 		initUndress = true; 
+		print(DressingRoom.showTarget)
 		if DressingRoom.showTarget then 
 			DressingRoom:SetTarget()
 			--BW_DressingRoomItemDetailsMixin:UpdateButtons()
@@ -803,19 +804,23 @@ function DressingRoom:SetTarget(arg1)
 	if (not playerActor) then
 		return false
 	end	
-		DressingRoom.showTarget = true
+		
 
-	local unit = "target"
-	if not UnitExists(unit) then
+	local unit = arg1 or "target"
+	if not UnitExists(unit)  or DressingRoom.currentTarget then
 		DressingRoom.showTarget = false
 		DressingRoom.currentTarget = false
 		unit = "player"
+	else 
+		DressingRoom.showTarget = true
 	end
 
 	if UnitExists(unit) then
 		if not DressingRoom.currentTarget then 
 			playerActor:SetModelByUnit(unit)
-			DressingRoom.currentTarget = playerActor:GetModelUnitGUID() 
+			if DressingRoom.showTarget then 
+				DressingRoom.currentTarget = playerActor:GetModelUnitGUID() 
+			end 
 		else
 			playerActor:SetModelByCreatureDisplayID(DressingRoom.currentTarget)
 		end	
@@ -877,8 +882,9 @@ function DressingRoom:SetTargetGear(reset)
 	local unit = arg1.unit or "target"
 	ClearInspectPlayer()
 	table.wipe(queued)
-	if 	DressingRoom.currentTarget == "player" then 
-	--DressingRoom.showTarget = false
+	if 	reset then
+		DressingRoom.showTarget = false
+		DressingRoom.currentTarget = nil
 	else
 	--DressingRoom.showTarget = true
 	end

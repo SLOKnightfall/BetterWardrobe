@@ -23,6 +23,9 @@ local CLASS_INFO = {
 	WARRIOR = {1, 1, "PLATE"},
 }
 
+local CLASS_NAMES_LOCALIZED = {}
+FillLocalizedClassList(CLASS_NAMES_LOCALIZED)
+
 local ARMOR_MASK = {
 	CLOTH = 400,
 	LEATHER = 3592,
@@ -42,6 +45,7 @@ local hiddenSet ={
 	["recolor"] =  false,
 	["minLevel"] =  1,
 	["uiOrder"] = 100,
+	["isClass"] = true,
 }
 
 local function GetFactionID(faction)
@@ -86,6 +90,8 @@ do
 			local classInfo = CLASS_INFO[playerClass]
 			local class = (setData.classMask and setData.classMask == classInfo[1]) or not setData.classMask
 
+			local className = (setData.classMask and GetClassInfo(setData.classMask)) or nil
+
 			--local faction = setData[5]
 			local opposingFaction , City = OpposingFaction(faction) -- BFAFaction,
 			
@@ -109,6 +115,10 @@ do
 
 						setData.label =L[note] or ""
 					end
+
+					setData.isClass = class
+					setData.className = className
+
 
 				--places some of the sets that didnt have correct filters
 					if setData.note == "NOTE_4" or setData.note == "NOTE_4" then
@@ -245,6 +255,7 @@ end
 				info.setID = data.setID or (data.outfitID + 5000)
 				info.uiOrder = data.uiOrder or (data.index * 100)
 				info.icon = data.icon
+				info.isClass = true
 				info.type = "Saved"
 
 				if data.set == "default" then 

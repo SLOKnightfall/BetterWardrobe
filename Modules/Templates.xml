@@ -36,7 +36,17 @@
 			<Anchor point="TOPLEFT" x="2" y="-2" relativePoint="TOPLEFT"/>
 			<Anchor point="BOTTOMRIGHT" x="2" y="-2" relativePoint="BOTTOMRIGHT"/>
 		</Anchors>
-				<Frames>
+		<Layers>
+			<Layer level="OVERLAY">
+				<Texture parentKey="InvalidTexture" atlas="transmog-set-border-unusable" hidden="true">
+					<Anchors>
+						<Anchor point="TOPLEFT" x="-11" y = "3"/>
+						<Anchor point="BOTTOMRIGHT" x = "8" y = "-2"/>
+					</Anchors>
+				</Texture>
+			</Layer>
+		</Layers>
+		<Frames>
 			<Frame parentKey="Hidden">
 			<Size x="20" y="20"/>
 				<Anchors>
@@ -71,6 +81,7 @@
 								<Anchor point="CENTER" />
 							</Anchors>
 						</Texture>
+
 					</Layer>
 				</Layers>
 			</Frame>
