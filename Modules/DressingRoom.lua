@@ -81,11 +81,9 @@ function addon:DressingRoom_Enable()
 		print(DressingRoom.showTarget)
 		if DressingRoom.showTarget then 
 			DressingRoom:SetTarget()
-			print(1)
 			--BW_DressingRoomItemDetailsMixin:UpdateButtons()
 		else
-			print(2)
-			BW_DressingRoomItemDetailsMixin:UpdateButtons(true) 
+			BW_DressingRoomItemDetailsMixin:UpdateButtons() 
 		end
 		end) end)
 
