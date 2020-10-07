@@ -82,6 +82,7 @@ end
 addon.GetOutfitName = GetOutfitName
 
 StaticPopupDialogs["BW_NAME_TRANSMOG_OUTFIT"] = {
+	preferredIndex = 3,
 	text = TRANSMOG_OUTFIT_NAME,
 	button1 = SAVE,
 	button2 = CANCEL,
@@ -120,6 +121,7 @@ StaticPopupDialogs["BW_NAME_TRANSMOG_OUTFIT"] = {
 }
 
 StaticPopupDialogs["BW_CONFIRM_DELETE_TRANSMOG_OUTFIT"] = {
+	preferredIndex = 3,
 	text = TRANSMOG_OUTFIT_CONFIRM_DELETE,
 	button1 = YES,
 	button2 = NO,
@@ -131,6 +133,7 @@ StaticPopupDialogs["BW_CONFIRM_DELETE_TRANSMOG_OUTFIT"] = {
 }
 
 StaticPopupDialogs["BW_TRANSMOG_OUTFIT_SOME_INVALID_APPEARANCES"] = {
+	preferredIndex = 3,
 	text = TRANSMOG_OUTFIT_SOME_INVALID_APPEARANCES,
 	button1 = OKAY,
 	button2 = CANCEL,
@@ -150,6 +153,7 @@ StaticPopupDialogs["BW_TRANSMOG_OUTFIT_SOME_INVALID_APPEARANCES"] = {
 }
 
 StaticPopupDialogs["BW_CONFIRM_OVERWRITE_TRANSMOG_OUTFIT"] = {
+	preferredIndex = 3,
 	text = TRANSMOG_OUTFIT_CONFIRM_OVERWRITE,
 	button1 = YES,
 	button2 = NO,

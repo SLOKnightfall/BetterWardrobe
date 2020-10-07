@@ -68,6 +68,7 @@ end
 
 StaticPopupDialogs["BETTER_WARDROBE_IMPORT_SET_POPUP"] = {
 	text = L["Copy and paste a Wowhead Compare URL into the text box below to import"],
+	preferredIndex = 3,
 	button1 = L["Import"],
 	button2 = CANCEL,
 	hasEditBox = true,
@@ -140,6 +141,7 @@ end
 
 StaticPopupDialogs["BETTER_WARDROBE_IMPORT_ITEM_POPUP"] = {
 	text = L["Type the item ID or url in the text box below"],
+	preferredIndex = 3,
 	button1 = ADD,
 	button2 = CANCEL,
 	hasEditBox = true,
