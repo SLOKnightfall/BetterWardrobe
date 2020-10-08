@@ -590,6 +590,11 @@ function UI:FilterDropDown_InitializeItems(level)
 
 		info.text = SOURCES
 		info.value = 1
+		info.isNotRadio = true
+		--info.arg1 = self:GetName().."Check"
+		--info.func = function(dropdownbutton, arg1)
+			--_G[arg1]:Hide()
+		--end,
 		UIDropDownMenu_AddButton(info, level)
 
 		info.text = L["Expansion"]
@@ -598,6 +603,10 @@ function UI:FilterDropDown_InitializeItems(level)
 
 		info.text = "Missing:"
 		info.value = 3
+		UIDropDownMenu_AddButton(info, level)
+
+		info.text = L["Armor Type"]
+		info.value = 4
 		UIDropDownMenu_AddButton(info, level)
 
 	elseif level == 2  and UIDROPDOWNMENU_MENU_VALUE == 1 then
@@ -734,10 +743,32 @@ function UI:FilterDropDown_InitializeItems(level)
 				UIDropDownMenu_AddButton(info, level)
 			end
 		end
+	elseif level == 2  and UIDROPDOWNMENU_MENU_VALUE == 4 then
+		local counter = 1
+		for name in pairs(addon.Globals.ARMOR_MASK) do
+	info.keepShownOnClick = false
+
+			info.text = name
+			info.func = function(info, arg1, _, value)
+
+					addon.selectedArmorType = arg1
+					addon.extraSetsCache = nil
+							BW_WardrobeCollectionFrame_SetTab(2)
+		BW_WardrobeCollectionFrame_SetTab(3)
+					RefreshArmor()
+			end
+			info.arg1 = name
+			info.checked = 	function() return addon.selectedArmorType == name end
+			UIDropDownMenu_AddButton(info, level)
+		end
+
 	end
 --end
 end
 
+function RefreshArmor()
+
+end
 
 function addon.ToggleHidden(model, isHidden)
 	local tabID = addon.GetTab()

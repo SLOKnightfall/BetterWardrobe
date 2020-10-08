@@ -28,6 +28,7 @@ local playerInv_DB
 local Profile
 local playerNme
 local realmName
+local playerClass, classID,_
 
 local L = LibStub("AceLocale-3.0"):GetLocale(addonName)
 
@@ -643,6 +644,8 @@ end
 
 
 function addon:OnEnable()
+	_,playerClass, classID = UnitClass("player")
+
 	self.db = LibStub("AceDB-3.0"):New("BetterWardrobe_Options", defaults, true)
 	options.args.profiles = LibStub("AceDBOptions-3.0"):GetOptionsTable(self.db)
 	options.args.profiles.name = L["Profiles - Options Settings"]
@@ -791,59 +794,89 @@ function addon.GetSetsources(setID)
 			end
 		end
 
-	elseif setInfo and setInfo.sources then
-		for itemID, visualID in pairs(setInfo.sources) do
-			local sources =  C_TransmogCollection.GetAppearanceSources(visualID)
-			local sourceID, _
-
-			if not sources then 
-				_, sourceID = addon.GetItemSource(itemID, setInfo.mod)
-
-				-- Try to generate a source when the item has a
-				if not sourceID then
-					for i = 0, 4 , 1 do
+--[[	elseif setInfo and setInfo.sources then
+				for itemID, visualID in pairs(setInfo.sources) do
+					local sources =  C_TransmogCollection.GetAppearanceSources(visualID)
+					local sourceID, _
+		
+					if not sources then 
 						_, sourceID = addon.GetItemSource(itemID, setInfo.mod)
-
-						if sourceID then 
-							break
+		
+						-- Try to generate a source when the item has a
+						if not sourceID then
+							for i = 0, 4 , 1 do
+								_, sourceID = addon.GetItemSource(itemID, i)
+		
+								if sourceID then 
+									break
+								end
+							end
 						end
+		
+						local sourceInfo = sourceID and C_TransmogCollection.GetSourceInfo(sourceID)
+						sources = sourceInfo and C_TransmogCollection.GetAppearanceSources(sourceInfo.visualID)
 					end
-				end
-
-				local sourceInfo = sourceID and C_TransmogCollection.GetSourceInfo(sourceID)
-				sources = sourceInfo and C_TransmogCollection.GetAppearanceSources(sourceInfo.visualID)
-			end
-
-			if sources then
-				--items[sources.itemID] = true
-				if #sources > 1 then
-					WardrobeCollectionFrame_SortSources(sources)
-				end
-				setSources[sources[1].sourceID] = sources[1].isCollected--and sourceInfo.isCollected
-			elseif sourceID then 
-				setSources[sourceID] = false
-			end
-		end
-
+		
+					if sources then
+						--items[sources.itemID] = true
+						if #sources > 1 then
+							WardrobeCollectionFrame_SortSources(sources)
+						end
+						setSources[sources[1].sourceID] = sources[1].isCollected--and sourceInfo.isCollected
+					elseif sourceID then 
+						setSources[sourceID] = false
+					end
+				end]]
 	else
 		for i, itemID in ipairs(setInfo.items) do
-			local visualID, sourceID = addon.GetItemSource(itemID, setInfo.mod) --C_TransmogCollection.GetItemInfo(itemID)
+			local visualID, sourceID = addon.GetItemSource(itemID, setInfo.mod or 0) --C_TransmogCollection.GetItemInfo(itemID)
 			-- visualID, sourceID = addon.GetItemSource(itemID,setInfo.mod)
-			--local sources = C_TransmogCollection.GetAppearanceSources(sourceInfo.visualID)	
-			if sourceID then
-				local sourceInfo = C_TransmogCollection.GetSourceInfo(sourceID)
+			--local sources = C_TransmogCollection.GetAppearanceSources(sourceInfo.visualID)
 
-				local sources = sourceInfo and C_TransmogCollection.GetAppearanceSources(sourceInfo.visualID)
-				if sources then
-					if #sources > 1 then
-						WardrobeCollectionFrame_SortSources(sources)
+			if not visualID then
+				for i = 0, 4 , 1 do
+					visualID, sourceID = addon.GetItemSource(itemID, i)
+		
+					if visualID then 
+						break
 					end
-
-					setSources[sourceID] = sources[1].isCollected--and sourceInfo.isCollected
-
-				else
-					setSources[sourceID] = false
 				end
+			end
+
+			if 	visualID then 
+				local allSources = C_TransmogCollection.GetAllAppearanceSources(visualID)
+				local list = {}
+				for _, sourceID in ipairs(allSources) do
+	
+					local info = C_TransmogCollection.GetSourceInfo(sourceID)
+					local isCollected = select(5,C_TransmogCollection.GetAppearanceSourceInfo(sourceID))
+					info.isCollected = isCollected
+					tinsert(list, info)
+				end
+
+				if #list > 1 then
+					WardrobeCollectionFrame_SortSources(list)
+				end
+				setSources[list[1].sourceID or sourceID ] = list[1].isCollected or false
+
+
+
+
+
+		--[[	if sourceID then
+								local sourceInfo = C_TransmogCollection.GetSourceInfo(sourceID)
+				
+								local sources = sourceInfo and C_TransmogCollection.GetAppearanceSources(sourceInfo.visualID)
+								if sources then
+									if #sources > 1 then
+										WardrobeCollectionFrame_SortSources(sources)
+									end
+				
+									setSources[sourceID] = sources[1].isCollected--and sourceInfo.isCollected
+				
+								else
+									setSources[sourceID] = false
+								end]]
 			end
 		end
 	end
@@ -895,23 +928,46 @@ end
 
 
 function Sets.isMogKnown(sourceID)
+
+
 	local sourceInfo = C_TransmogCollection.GetSourceInfo(sourceID)
-	
-	if not sourceInfo then return false end
-	
-	local slotSources = C_TransmogCollection.GetAppearanceSources(sourceInfo.visualID)
+	local allSources = C_TransmogCollection.GetAllAppearanceSources(sourceInfo.visualID)
 
-	local slotColected
-	--local slotSources = C_TransmogSets.GetSourcesForSlot(setID, slot)
-	if slotSources then
-		WardrobeCollectionFrame_SortSources(slotSources, sourceInfo.visualID)
-		for i,d in ipairs(slotSources) do
-			if d.isCollected then slotColected = d.sourceID end
+	local list = {}
+		for _, source_ID in ipairs(allSources) do
+		
+			local info = C_TransmogCollection.GetSourceInfo(source_ID)
+			local isCollected = select(5,C_TransmogCollection.GetAppearanceSourceInfo(source_ID))
+			info.isCollected = isCollected
+			tinsert(list, info)
 		end
-	end
 
-	return slotColected
+		if #list > 1 then
+			WardrobeCollectionFrame_SortSources(list)
+		end
+	
+		return  (list[1] and list[1].isCollected and list[1].sourceID) or false
 end
+
+
+
+	--[[local sourceInfo = C_TransmogCollection.GetSourceInfo(sourceID)
+			
+			if not sourceInfo then return false end
+			
+			local slotSources = C_TransmogCollection.GetAppearanceSources(sourceInfo.visualID)
+		
+			local slotColected
+			--local slotSources = C_TransmogSets.GetSourcesForSlot(setID, slot)
+			if slotSources then
+				WardrobeCollectionFrame_SortSources(slotSources, sourceInfo.visualID)
+				for i,d in ipairs(slotSources) do
+					if d.isCollected then slotColected = d.sourceID end
+				end
+			end
+		
+			return slotColected
+		end]]
 
 
 --
@@ -943,39 +999,46 @@ local function CheckMissingLocation(set)
 	if not set.items then
 		local sources = C_TransmogSets.GetSetSources(set.setID)
 		for sourceID in pairs(sources) do
-			local sourceInfo = C_TransmogCollection.GetSourceInfo(sourceID)
-			local sources = sourceInfo and C_TransmogCollection.GetAppearanceSources(sourceInfo.visualID)
-			if sources then
-				if #sources > 1 then
-					WardrobeCollectionFrame_SortSources(sources)
-				end
-			
-				if  addon.missingSelection[sourceInfo.invType] and not sources[1].isCollected then
-
-					return true
-				elseif addon.missingSelection[sourceInfo.invType] then 
-					filtered = true
-				end
+			local isCollected = Sets.isMogKnown(sourceID) 
+			if addon.missingSelection[sourceInfo.invType] and not isCollected then		
+				return true
+			elseif addon.missingSelection[sourceInfo.invType] then 
+				filtered = true
 			end
 		end
+			--[[local sourceInfo = C_TransmogCollection.GetSourceInfo(sourceID)
+									local sources = sourceInfo and C_TransmogCollection.GetAppearanceSources(sourceInfo.visualID)
+									if sources then
+										if #sources > 1 then
+											WardrobeCollectionFrame_SortSources(sources)
+										end
+									
+										if  addon.missingSelection[sourceInfo.invType] and not sources[1].isCollected then
+						
+											return true
+										elseif addon.missingSelection[sourceInfo.invType] then 
+											filtered = true
+										end
+									end
+								end]]
 
 	else
 		for i, itemID in ipairs(set.items) do
 			local visualID, sourceID = addon.GetItemSource(itemID, set.mod)	
 			if sourceID then
+				local isCollected = Sets.isMogKnown(sourceID) 
 				local sourceInfo = C_TransmogCollection.GetSourceInfo(sourceID)
-				local sources = sourceInfo and C_TransmogCollection.GetAppearanceSources(sourceInfo.visualID)
-				if sources then
-					if #sources > 1 then
-						WardrobeCollectionFrame_SortSources(sources)
-					end
-					invType[sourceInfo.invType] = true
+												--[[local sources = sourceInfo and C_TransmogCollection.GetAppearanceSources(sourceInfo.visualID)
+												if sources then
+													if #sources > 1 then
+														WardrobeCollectionFrame_SortSources(sources)
+													end]]
+				invType[sourceInfo.invType] = true
 --print(addon.missingSelection[sourceInfo.invType])
-					if  addon.missingSelection[sourceInfo.invType] and not sources[1].isCollected then
-						return true
-					elseif addon.missingSelection[sourceInfo.invType] then 
-					filtered = true 
-					end
+				if addon.missingSelection[sourceInfo.invType] and not isCollected then
+					return true
+				elseif addon.missingSelection[sourceInfo.invType] then 
+				filtered = true 
 				end
 			end
 		end
@@ -1275,11 +1338,27 @@ function BetterWardrobeSetsTransmogModelMixin:LoadSet(setID)
 	local sources = addon.GetSetsources(setID)
 	for sourceID in pairs(sources) do
 		local sourceInfo = C_TransmogCollection.GetSourceInfo(sourceID)
-		local slot = C_Transmog.GetSlotForInventoryType(sourceInfo.invType)
-		local slotSources = C_TransmogSets.GetSourcesForSlot(setID, slot)
+		local allSources = C_TransmogCollection.GetAllAppearanceSources(visualID)
+		local list = {}
+		for _, sourceID in ipairs(allSources) do
+
+			local info = C_TransmogCollection.GetSourceInfo(sourceID)
+			local isCollected = select(5,C_TransmogCollection.GetAppearanceSourceInfo(sourceID))
+			info.isCollected = isCollected
+			tinsert(list, info)
+		end
+
+		if #list > 1 then
+			WardrobeCollectionFrame_SortSources(list)
+		end
+
+
+		--local slot = C_Transmog.GetSlotForInventoryType(sourceInfo.invType)
+		--local slotSources = C_TransmogSets.GetSourcesForSlot(setID, slot)
 		--WardrobeCollectionFrame_SortSources(slotSources, sourceInfo.visualID)
-		local index = WardrobeCollectionFrame_GetDefaultSourceIndex(slotSources, sourceID)
-		transmogSources[slot] = (slotSources[index] and slotSources[index].sourceID) or sourceID
+		--local index = WardrobeCollectionFrame_GetDefaultSourceIndex(slotSources, sourceID)
+		--transmogSources[slot] = (slotSources[index] and slotSources[index].sourceID) or sourceID
+		transmogSources[slot] = list[1].sourceID
 
 
 		for i, slotSourceInfo in ipairs(slotSources) do
@@ -2378,7 +2457,9 @@ function BetterWardrobeSetsTransmogMixin:UpdateSets()
 				local sourceData =  SetsDataProvider:GetSetSourceData(set.setID)
 				local tab = WardrobeCollectionFrame.selectedTransmogTab
 				for sourceID in pairs(sourceData.sources) do
-					if (tab == 4 and not BW_WardrobeToggle.VisualMode) or (not Profile.HideMissing and (not BW_WardrobeToggle.VisualMode or (Sets.isMogKnown(sourceID) and BW_WardrobeToggle.VisualMode))) or
+					if (tab == 4 and not BW_WardrobeToggle.VisualMode) or
+						(CollectionsJournal:IsShown()) or
+						(not Profile.HideMissing and (not BW_WardrobeToggle.VisualMode or (Sets.isMogKnown(sourceID) and BW_WardrobeToggle.VisualMode))) or
 						(Profile.HideMissing and (BW_WardrobeToggle.VisualMode or Sets.isMogKnown(sourceID))) then
 						model:TryOn(sourceID)
 					else
@@ -2639,7 +2720,7 @@ function BW_WardrobeCollectionFrame_OnShow(self)
 	end
 
 	addon.setdb.global.sets[addon.setdb:GetCurrentProfile()] = addon.GetSavedList()
-
+	addon.selectedArmorType = addon.Globals.CLASS_INFO[playerClass][3]
 end
 
 
@@ -2662,7 +2743,7 @@ function BW_WardrobeCollectionFrame_OnHide(self)
 	addon:InitTables()
 	SetsDataProvider:ClearSets()
 	addon:ClearCache()
-
+	addon.selectedArmorType = addon.Globals.CLASS_INFO[playerClass][3]
 end
 
 

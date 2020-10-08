@@ -3,37 +3,20 @@ local addonName, addon = ...
 addon = LibStub("AceAddon-3.0"):GetAddon(addonName)
 addon.ArmorSets = addon.ArmorSets or {}
 local ItemDB = {}
+local Globals = addon.Globals
 
 local L = LibStub("AceLocale-3.0"):GetLocale(addonName)
 local _, playerClass, classID = UnitClass("player")
 --local role = GetFilteredRole()
 
-local CLASS_INFO = {
-	DEATHKNIGHT = {6,32,"PLATE"},
-	DEMONHUNTER = {12, 2048, "LEATHER"},
-	DRUID = {11, 1024,"LEATHER"},
-	HUNTER = {3, 4, "MAIL"},
-	MAGE = {8, 128, "CLOTH"},
-	MONK = {10, 512, "LEATHER"},
-	PALADIN = {2, 2,"PLATE"},
-	PRIEST = {5, 16, "CLOTH"},
-	ROGUE = {4, 8, "LEATHER"},
-	SHAMAN = {7, 64, "MAIL"},
-	WARLOCK = {9, 256, "CLOTH"},
-	WARRIOR = {1, 1, "PLATE"},
-}
+local CLASS_INFO = Globals.CLASS_INFO
 
 local CLASS_NAMES_LOCALIZED = {}
 FillLocalizedClassList(CLASS_NAMES_LOCALIZED)
 
-local ARMOR_MASK = {
-	CLOTH = 400,
-	LEATHER = 3592,
-	MAIL = 68,
-	PLATE = 35,
-}
+local ARMOR_MASK = Globals.ARMOR_MASK
 
-local EmptyArmor = addon.Globals.EmptyArmor
+local EmptyArmor = Globals.EmptyArmor
 
 local hiddenSet ={
 	["setID"] =  0 ,
@@ -131,7 +114,7 @@ do
 						setData.filter = 3
 					end
 
-					setData.mod = setData.bonusid
+					--setData.mod = setData.bonusid
 					setData.uiOrder = id * 100
 					--setData.filter = setData.filter + 1 -- fix for filter startin at 0
 
@@ -198,10 +181,12 @@ end
 	function addon.Init:BuildDB()
 	--local faction = GetFactionID(UnitFactionGroup("player"))
 		--AllSets()
-		local armorSet = addon.ArmorSets[CLASS_INFO[playerClass][3]]
+		local armorSet = addon.ArmorSets[addon.selectedArmorType] or addon.ArmorSets[CLASS_INFO[playerClass][3]]
 		addon.ArmorSetModCache = addon.ArmorSetModCache or {}
 		addon.extraSetsCache = addon.extraSetsCache or {}
 		setsInfo = setsInfo or {}
+
+
 
 		addArmor(armorSet)
 		addArmor(addon.ArmorSets["COSMETIC"])
