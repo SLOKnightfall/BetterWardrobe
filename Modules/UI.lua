@@ -60,8 +60,8 @@ function UI.SortDropdowns_Initialize()
 			if tabID == 1 then
 				--Wardrobe:OnShow()
 						Wardrobe:RefreshVisualsList()
-		Wardrobe:UpdateItems()
-		Wardrobe:UpdateWeaponDropDown()
+				Wardrobe:UpdateItems()
+				Wardrobe:UpdateWeaponDropDown()
 			elseif tabID == 2 then
 				WardrobeCollectionFrame.SetsCollectionFrame:OnSearchUpdate()
 				WardrobeCollectionFrame.SetsTransmogFrame:OnSearchUpdate()
@@ -522,7 +522,7 @@ local FILTER_SOURCES = addon.Globals.FILTER_SOURCES
 local EXPANSIONS = addon.Globals.EXPANSIONS
 
 
-local filterCollected = {}
+local filterCollected = {true, true}
 local missingSelection = {}
 local filterSelection = {}
 local xpacSelection = {}
@@ -532,8 +532,6 @@ addon.filterSelection = filterSelection
 addon.missingSelection = missingSelection
 
 function addon:InitTables()
-	filterCollected = {true, true}
-
 	for i = 1, #FILTER_SOURCES do
 		filterSelection[i] = true
 	end
@@ -545,10 +543,6 @@ end
 
 addon:InitTables()
 
-addon.filterCollected = filterCollected
-addon.xpacSelection = xpacSelection
-addon.filterSelection = filterSelection
-addon.missingSelection = missingSelection
 function UI:FilterDropDown_InitializeItems(level)
 	if (not WardrobeCollectionFrame.activeFrame) then
 		return
@@ -564,7 +558,7 @@ function UI:FilterDropDown_InitializeItems(level)
 		info.func = function(_, _, _, value)
 						filterCollected[1] = value
 						RefreshLists()
-						UIDropDownMenu_Refresh(BW_WardrobeFilterDropDown, 1, refreshLevel)
+						--UIDropDownMenu_Refresh(BW_WardrobeFilterDropDown)
 					end
 		info.checked = 	function() return filterCollected[1] end
 		info.isNotRadio = true
@@ -574,7 +568,7 @@ function UI:FilterDropDown_InitializeItems(level)
 		info.func = function(_, _, _, value)
 						filterCollected[2] =  value
 						RefreshLists()
-						UIDropDownMenu_Refresh(BW_WardrobeFilterDropDown, 1, refreshLevel)
+						--UIDropDownMenu_Refresh(BW_WardrobeFilterDropDown)
 					end
 		info.checked = 	function() return filterCollected[2] end
 		info.isNotRadio = true
@@ -621,7 +615,7 @@ function UI:FilterDropDown_InitializeItems(level)
 								filterSelection[i] = true
 						end
 						RefreshLists()
-						UIDropDownMenu_Refresh(BW_WardrobeFilterDropDown, 1, refreshLevel)
+						UIDropDownMenu_Refresh(BW_WardrobeFilterDropDown)
 					end
 		UIDropDownMenu_AddButton(info, level)
 
@@ -637,7 +631,7 @@ function UI:FilterDropDown_InitializeItems(level)
 								filterSelection[i] = false
 						end
 						RefreshLists()
-						UIDropDownMenu_Refresh(BW_WardrobeFilterDropDown, 1, refreshLevel)
+						UIDropDownMenu_Refresh(BW_WardrobeFilterDropDown)
 					end
 		UIDropDownMenu_AddButton(info, level)
 		UIDropDownMenu_AddSeparator(level)
@@ -667,7 +661,7 @@ function UI:FilterDropDown_InitializeItems(level)
 							xpacSelection[i] = true
 						end
 						RefreshLists()
-						UIDropDownMenu_Refresh(BW_WardrobeFilterDropDown, 1, refreshLevel)
+						UIDropDownMenu_Refresh(BW_WardrobeFilterDropDown)
 					end
 		UIDropDownMenu_AddButton(info, level)
 
@@ -682,7 +676,7 @@ function UI:FilterDropDown_InitializeItems(level)
 								xpacSelection[i] = false
 						end
 						RefreshLists()
-						UIDropDownMenu_Refresh(BW_WardrobeFilterDropDown, 1, refreshLevel)
+						UIDropDownMenu_Refresh(BW_WardrobeFilterDropDown)
 					end
 		UIDropDownMenu_AddButton(info, level)
 		UIDropDownMenu_AddSeparator(level)
@@ -710,7 +704,7 @@ function UI:FilterDropDown_InitializeItems(level)
 							missingSelection[i] = true
 						end
 						RefreshLists()
-						UIDropDownMenu_Refresh(BW_WardrobeFilterDropDown, 1, refreshLevel)
+						UIDropDownMenu_Refresh(BW_WardrobeFilterDropDown)
 					end
 		UIDropDownMenu_AddButton(info, level)
 
@@ -720,7 +714,7 @@ function UI:FilterDropDown_InitializeItems(level)
 							missingSelection[i] = false
 						end
 						RefreshLists()
-						UIDropDownMenu_Refresh(BW_WardrobeFilterDropDown, 1, refreshLevel)
+						UIDropDownMenu_Refresh(BW_WardrobeFilterDropDown)
 					end
 		UIDropDownMenu_AddButton(info, level)
 		UIDropDownMenu_AddSeparator(level)
@@ -736,7 +730,7 @@ function UI:FilterDropDown_InitializeItems(level)
 								missingSelection[21] = value
 							end
 
-							UIDropDownMenu_Refresh(BW_WardrobeFilterDropDown, 1, refreshLevel)
+							UIDropDownMenu_Refresh(BW_WardrobeFilterDropDown)
 							RefreshLists()
 						end
 				info.checked = function() return missingSelection[index] end
