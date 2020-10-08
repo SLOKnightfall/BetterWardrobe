@@ -189,21 +189,22 @@ function addon.tooltip:ShowTooltip(itemLink)
 	for i = 1, GameTooltip:NumLines() do
 		local line = _G["GameTooltipTextLeft"..i]
 
-		local text = string.lower(line:GetText() or " " )
+		local text = line:GetText() or " "
+		local text_lower = string.lower(line:GetText() or " " )
 		--Check to see if another addon added appearance known text
-		if string.find(text, string.lower(TRANSMOGRIFY_TOOLTIP_APPEARANCE_KNOWN)) or
-			string.find(text, "item id") then 
+		if string.find(text_lower, string.lower(TRANSMOGRIFY_TOOLTIP_APPEARANCE_KNOWN)) or
+			string.find(text_lower, "item id") then 
 			learned_dupe = true
 		end
-		if string.find(text, string.lower(TRANSMOGRIFY_TOOLTIP_APPEARANCE_UNKNOWN)) then 
+		if addon.Profile.ShowOwnedItemTooltips and string.find(text_lower, string.lower(TRANSMOGRIFY_TOOLTIP_APPEARANCE_UNKNOWN)) then 
 			line:SetText("|TInterface\\RaidFrame\\ReadyCheck-NotReady:0|t "..text)
 		end
 		--Adds icon to TRANSMOGRIFY_TOOLTIP_ITEM_UNKNOWN_APPEARANCE_KNOWN if found
-		if string.find(text, string.lower(TRANSMOGRIFY_TOOLTIP_ITEM_UNKNOWN_APPEARANCE_KNOWN) ) then 
+		if addon.Profile.ShowOwnedItemTooltips and string.find(text_lower, string.lower(TRANSMOGRIFY_TOOLTIP_ITEM_UNKNOWN_APPEARANCE_KNOWN) ) then 
 			line:SetText("|TInterface\\RaidFrame\\ReadyCheck-Ready:0|t "..text)
 		end
 
-		if addon.Profile.ShowItemIDTooltips and string.find(text, string.lower(ITEM_LEVEL) ) then 
+		if addon.Profile.ShowItemIDTooltips and string.find(text_lower, string.lower(ITEM_LEVEL) ) then 
 			line:SetText(text.."         "..L["Item ID"]..": |cffffffff"..itemID)
 		end
 	end
