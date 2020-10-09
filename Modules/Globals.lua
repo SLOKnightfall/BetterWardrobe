@@ -28,6 +28,17 @@ Globals.CLASS_INFO = {
   WARRIOR = {1, 1, "PLATE"},
 }
 
+Globals.ARMOR_CLASSES = {}
+for type in pairs(Globals.ARMOR_MASK ) do
+  Globals.ARMOR_CLASSES[type] = {}
+end
+for class, data in pairs(Globals.CLASS_INFO) do
+  local id = data[2]
+  local type = data[3]
+  Globals.ARMOR_CLASSES[type][id] = true
+end
+
+
 Globals.locationDrowpDown = {
   [2] = INVTYPE_HEAD,
   --[2] = 134112, neck

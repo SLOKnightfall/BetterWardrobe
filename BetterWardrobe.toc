@@ -6,7 +6,7 @@
 ## Notes: 
 ## LoadOnDemand: 1
 ## LoadWith: Blizzard_Collections
-## SavedVariables: BetterWardrobe_Options, BetterWardrobe_CharacterData, BetterWardrobe_SavedSetData,
+## SavedVariables: BetterWardrobe_Options, BetterWardrobe_CharacterData, BetterWardrobe_SavedSetData,BetterWardrobe_SubstituteItemData
 
 #Libraries
 Libs\LibStub\LibStub.lua

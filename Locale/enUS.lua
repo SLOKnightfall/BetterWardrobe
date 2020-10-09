@@ -35,6 +35,13 @@ _G["BINDING_NAME_BETTERWARDROBE_BINDING_TARGETMODEL"] = "Use Target's Model"
 _G["BINDING_NAME_BETTERWARDROBE_BINDING_TARGETGEAR"] =  "Use Target Gear"
 _G["BINDING_NAME_BETTERWARDROBE_BINDING_TOGGLE_DRESSINGROOM"] = "Toggle DressingRoom"
 
+L["Remove"] = true
+L["Add"] = true
+
+L["Replacement Item ID"] = true
+L["Item Substitution"] = true
+L["Base Item ID"] = true
+L["Saved Item Substitutes"] = true
 
  L["Sets"] = true
   L["Extra Sets"] = true

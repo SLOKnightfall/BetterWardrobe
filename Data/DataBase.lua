@@ -31,6 +31,9 @@ local hiddenSet ={
 	["isClass"] = true,
 }
 
+
+local setData = {}
+
 local function GetFactionID(faction)
 	if faction == "Horde" then
 		return -- 64
@@ -41,6 +44,8 @@ end
 
 local RepSets ={["Horde"] = {2574,2844,2796,2820}, ["Alliance"] = {[2816] = "mail" ,[2840] = "plate ",[2750] = "cloth",}}
 local AliznceRepSets = {2574,2844,2796,2820}
+
+
 local function OpposingFaction(faction)
 	local faction = UnitFactionGroup("player")
 	if faction == "Horde" then
@@ -103,6 +108,7 @@ do
 					setData.className = className
 
 
+
 				--places some of the sets that didnt have correct filters
 					if setData.note == "NOTE_4" or setData.note == "NOTE_4" then
 						setData.filter = 4 
@@ -118,7 +124,13 @@ do
 					setData.uiOrder = id * 100
 					--setData.filter = setData.filter + 1 -- fix for filter startin at 0
 
-					for _, item in ipairs( setData["items"]) do
+					for index, item in ipairs( setData["items"]) do
+						--if addon.setdb.global.itemSubstitute[item] then 
+						--Swaps items for substitutes
+						if addon.setdb.global.itemSubstitute[item] then 
+							setData["items"][index] = addon.setdb.global.itemSubstitute[item]["subID"]
+						end
+
 						if setData.sources and setData.sources[item] and setData.sources[item] ~= 0 then 
 							local appearanceID = setData.sources[item]
 							ItemDB[appearanceID] = ItemDB[appearanceID] or {}
@@ -136,7 +148,7 @@ do
 	end
 
 function addon.IsSetItem(itemLink)
-if not itemLink then return end
+	if not itemLink then return end
 
 	local appearanceID, sourceID = C_TransmogCollection.GetItemInfo(itemLink)
 	if not ItemDB[appearanceID] then 
@@ -179,6 +191,7 @@ end
 
 
 	function addon.Init:BuildDB()
+		
 	--local faction = GetFactionID(UnitFactionGroup("player"))
 		--AllSets()
 		local armorSet = addon.ArmorSets[addon.selectedArmorType] or addon.ArmorSets[CLASS_INFO[playerClass][3]]
@@ -194,6 +207,9 @@ end
 		--Add Hidden Set
 		setsInfo[0] = hiddenSet
 		tinsert(addon.extraSetsCache, setsInfo[0])
+		--addon.GetAllSets()
+
+		
 		--wipe(addon.ArmorSets)
 	end
 
@@ -316,5 +332,123 @@ end
 	function addon.GetSetInfo(setID)
 		return setsInfo[setID]
 	end
+
+	function addon.SetItemSubstitute(itemID, subID)
+		itemID = tonumber(itemID)
+		subID = tonumber(subID)
+		if type(itemID) ~= "number" or type(subID) ~= "number" then  return false end
+
+		local _, _, _, itemEquipLoc1 = GetItemInfoInstant(itemID) 
+		local _, _, _, itemEquipLoc2 = GetItemInfoInstant(subID) 
+
+		--if not itemEquipLoc1 then 
+			--message(itemID.." not a valid itemID")
+			--return false
+
+		--elseif not itemEquipLoc2 then
+			--message(subID.." not a valid itemID")
+			--return false
+		--end
+		if itemEquipLoc1 ~= itemEquipLoc2 then 
+			return false 
+		else
+
+		local itemName1, link1 = GetItemInfo(tonumber(itemID))
+		local itemName2, link2 = GetItemInfo(tonumber(subID))
+
+		--local appearanceID, sourceID = C_TransmogCollection.GetItemInfo(itemID|itemString [, itemModID])
+
+		addon.itemsubdb.profile.items[itemID] = {["subID"] = subID, ["itemLink"]  =link1, ["subLink"] = link2}
+
+		local item = Item:CreateFromItemID(itemID)
+		item:ContinueOnItemLoad(function()
+			addon.itemsubdb.profile.items[itemID].itemLink = item:GetItemLink()
+			addon.RefreshSubItemData()
+		end)
+
+		local item2 = Item:CreateFromItemID(subID)
+		item2:ContinueOnItemLoad(function()
+			addon.itemsubdb.profile.items[itemID].subLink = item2:GetItemLink()
+			addon.RefreshSubItemData()
+		end)
+
+			addon.RefreshSubItemData()
+	end
+
+
+	function addon.RemovetItemSubstitute(itemID)
+ 
+		if not itemID  then
+			return false
+		end
+		--local appearanceID, sourceID = C_TransmogCollection.GetItemInfo(itemID|itemString [, itemModID])
+		addon.itemsubdb.profile.items[tonumber(itemID)] = nil
+		addon.RefreshSubItemData()
+	end
+
+end
+--[[
+local full={}
+function getallsets()
+
+			local sets = C_TransmogSets.GetAllSets()
+		for i, data in ipairs(sets)do
+				for i,d in pairs(data)do
+					--print(i)
+					if string.find(i, "hidden") then 
+					--print(i)
+					--print(d)
+					end
+				
+				end]]
+
+function addon.GetAllSets()
+	local baseSets = {} --C_TransmogSets.GetBaseSets()
+				local classInfo = CLASS_INFO[playerClass]
+
+
+	local sets = C_TransmogSets.GetAllSets()
+		for i, data in ipairs(sets)do
+				for i,d in pairs(data)do
+					--print(i)
+					setData[data.classMask] = setData.classMask or {}
+					if string.find(i, "hidden") then 
+						if data[i] == true then 
+						if (data.classMask and data.classMask == classInfo[2]) or not data.classMask or data.classMask == 0 then 
+							print(data.name)
+							data.filter = 1
+							data.setID = data.setID *100
+							setsInfo[data.setID] = data
+							tinsert(addon.extraSetsCache, data)
+						end
+					end
+					end
+					--setData[data.classMask][data.setID] = data
+					--print(d).
+				--else 
+					--tinsert(setData[3592], data)
+
+					--end
+				
+				end
+				--print(data.limitedTimeSet)
+				--print(data["hiddenUtilCollected"])
+
+			--end
+			--print(data.hiddenUtilCollected)
+
+		--	sourceInfo = C_TransmogSets.GetSetInfo(1903)
+			--print(sourceInfo["hiddenUtilCollected"])
+			--if data.hiddenUtilCollected then
+				--print(data.name)
+			--	data.filter = 1
+				--data.type = "Blizzard"
+				--local setinfo = 
+			--tinsert(addon.extraSetsCache, data)
+
+			--end
+		end
+return baseSets --setData[3592]
+end
 
 end

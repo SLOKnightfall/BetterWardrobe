@@ -560,6 +560,130 @@ local options = {
 		},
 	},
 }
+local subTextFields={}
+local itemSub_options = {
+	name = "BetterWardrobe",
+	type = 'group',
+	childGroups = "tab",
+	inline = false,
+	args = {
+
+		settings={
+			name = "Items",
+			type = "group",
+			--inline = true,
+			order = 0,
+			inline = false,
+			childGroups = "tab",
+			args={
+				BaseItem = {
+					order = 1,
+					name = L["Base Item ID"],
+					type = "input",
+					width = 1,
+					set = function(info, value) subTextFields[1] = value end,
+					get = function(info) return subTextFields[1] end,
+					validate = function(info, value) 
+						local id = tonumber(value)
+						if not id then return "Not a valid itemID" end
+
+						local itemEquipLoc1 = GetItemInfoInstant(tonumber(value)) 
+
+						if itemEquipLoc1 == nil then 
+						--message(itemID.." not a valid itemID")
+								return "Not a valid itemID"
+						else 
+							return true
+						end
+					end,
+				},	
+				ReplacementItem = {				
+					order = 2,
+					name = L["Replacement Item ID"],
+					type = "input",
+					width = 1,
+					set = function(info, value) subTextFields[2] = value end,
+					get = function(info) return subTextFields[2] end,
+					validate = function(info, value) 
+						local id = tonumber(value)
+						if not id then return "Not a valid itemID" end
+
+						local itemEquipLoc1 = GetItemInfoInstant(tonumber(value)) 
+
+						if itemEquipLoc1 == nil then 
+						--message(itemID.." not a valid itemID")
+								return "Not a valid itemID"
+						else 
+							return true
+						end
+					end,
+				},	
+				AddButton = {				
+							order = 3,
+							name = L["Add"],
+							type = "execute",
+							width = 1,
+							func = function(info) 
+								addon.SetItemSubstitute(subTextFields[1], subTextFields[2])
+							end,
+
+							validate = function(info, value) 
+								local _, _, _, itemEquipLoc1 = GetItemInfoInstant(tonumber(subTextFields[1]) )
+								local _, _, _, itemEquipLoc2 = GetItemInfoInstant(tonumber(subTextFields[2]) )
+
+								--if not itemEquipLoc1 then 
+									--message(itemID.." not a valid itemID")
+									--return false
+
+								--elseif not itemEquipLoc2 then
+									--message(subID.." not a valid itemID")
+									--return false
+								--end
+								if itemEquipLoc1 ~= itemEquipLoc2 then 
+									return "Items are diffrent slots" 
+								else
+									return true
+								end
+							end,
+							},	
+				settings={
+					name = L["Saved Item Substitutes"],
+					type = "group",
+					order = 5,
+					inline = true,
+					args = {},
+					plugins= {},
+				},
+			},
+		},
+	},
+}
+
+
+function addon.RefreshSubItemData()
+	local args = {} 
+	for i, data in pairs(addon.itemsubdb.profile.items) do
+		args["BaseItem"..i] = {
+			order = i,
+			name = function(info)
+				local text = ("item: %d - %s ==> item: %d - %s"):format(data.subID, data.subLink or "", i, data.itemLink or "")
+				return text 
+			end,
+			type = "description",
+			width = 2.5,
+			disabled = false,
+		}
+
+		args["AddButton"..i] = {				
+			order = i+2,
+			name = L["Remove"],
+			type = "execute",
+			width = .5,
+			func = function()  addon.RemovetItemSubstitute(i) end,
+		}	
+	end
+	itemSub_options.args.settings.args.settings.plugins["items"] = args
+end
 
 --ACE Profile Saved Variables Defaults
 local defaults = {
@@ -599,7 +723,11 @@ local char_defaults = {
 
 local savedsets_defaults = {
 		profile = {},
-		global = {["sets"]={}}
+		global = {sets={}, itemsubstitute = {}}
+}
+
+local itemsub_defaults = {
+		profile = {items = {}}
 }
 
 ---Updates Profile after changes
@@ -646,6 +774,7 @@ end
 function addon:OnEnable()
 	_,playerClass, classID = UnitClass("player")
 
+
 	self.db = LibStub("AceDB-3.0"):New("BetterWardrobe_Options", defaults, true)
 	options.args.profiles = LibStub("AceDBOptions-3.0"):GetOptionsTable(self.db)
 	options.args.profiles.name = L["Profiles - Options Settings"]
@@ -655,9 +784,22 @@ function addon:OnEnable()
 	options.args.charprofiles.name = L["Profiles - Collection Settings"]
 
 	self.setdb = LibStub("AceDB-3.0"):New("BetterWardrobe_SavedSetData", savedsets_defaults)
+
+	self.itemsubdb = LibStub("AceDB-3.0"):New("BetterWardrobe_SubstituteItemData", itemsub_defaults, true)
 	local profile = self.setdb:GetCurrentProfile()
+
+
+
+	
+	
 	--self.setdb.global[profile] = self.setdb.char
 	addon.SelecteSavedList = false
+	options.args.subitems = itemSub_options
+	options.args.subitems.name = L["Item Substitution"]
+
+	options.args.subitems.args.profiles = LibStub("AceDBOptions-3.0"):GetOptionsTable(self.itemsubdb)
+
+
 
 	LibStub("AceConfigRegistry-3.0"):ValidateOptionsTable(options, addonName)
 	LibStub("AceConfig-3.0"):RegisterOptionsTable(addonName, options)
@@ -665,7 +807,10 @@ function addon:OnEnable()
 	self.optionsFrame = LibStub("AceConfigDialog-3.0"):AddToBlizOptions("BetterWardrobe", "BetterWardrobe")
 	self.db.RegisterCallback(addon, "OnProfileChanged", "RefreshConfig")
 	self.db.RegisterCallback(addon, "OnProfileCopied", "RefreshConfig")
-	self.db.RegisterCallback(addon, "OnProfileReset", "RefreshConfig")	
+
+	self.itemsubdb.RegisterCallback(addon, "OnProfileReset", "RefreshSubItemData")	
+
+
 	--WardrobeTransmogFrameSpecDropDown_Initialize()
 
 	--BWData = BWData or {}
@@ -676,18 +821,22 @@ function addon:OnEnable()
 		addon.Init:BuildDB()
 		addon.Init:Blizzard_Wardrobe()
 	C_Timer.After(0.2, function()
-		
+		--addon.SetItemSubstitute(1314, 9780)
 		addon.Init:BuildUI()
 		addon.Init:BuildTooltips()
 		addon.Init:DressingRoom()
 		addon.SetSortOrder(false)
-	
-	
+
 	WardrobeFilterDropDown_OnLoad(WardrobeCollectionFrame.FilterDropDown)
 	--WardrobeCollectionFrame.ItemsCollectionFrame:SetActiveSlot
 end )
+
+	C_Timer.After(0.5, function()
+		addon.RefreshSubItemData()
+	end)
 	self:SecureHook(WardrobeCollectionFrame.ItemsCollectionFrame,"SetActiveSlot")
 	self:SecureHook(WardrobeCollectionFrame.ItemsCollectionFrame,"UpdateItems")
+
 	self:Hook(C_TransmogSets,"SetIsFavorite",function()
 		C_Timer.After(0, function()
 			WardrobeCollectionFrame.SetsCollectionFrame.ScrollFrame:Update()
