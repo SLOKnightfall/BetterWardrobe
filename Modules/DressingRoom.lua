@@ -78,7 +78,6 @@ function addon:DressingRoom_Enable()
 	addon:HookScript(DressUpFrameResetButton,"OnClick", function()  C_Timer.After(0.2, function() 
 		initHide = true; 
 		initUndress = true; 
-		print(DressingRoom.showTarget)
 		if DressingRoom.showTarget then 
 			DressingRoom:SetTarget()
 			--BW_DressingRoomItemDetailsMixin:UpdateButtons()

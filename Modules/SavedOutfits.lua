@@ -608,8 +608,7 @@ local function GetDressingRoomSources()
 		itemlink = button.itemLink --GetInventoryItemLink("player", slot)
 		if itemlink then
 			local appearanceID, sourceID = C_TransmogCollection.GetItemInfo(itemlink)
-			
-			tinsert(sources, sourceID)
+			sources[slot] =  sourceID
 			if sourceID and not icon then
 				icon = select(4, C_TransmogCollection.GetAppearanceSourceInfo(sourceID))
 			end
