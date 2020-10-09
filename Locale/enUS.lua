@@ -42,7 +42,8 @@ L["Replacement Item ID"] = true
 L["Item Substitution"] = true
 L["Base Item ID"] = true
 L["Saved Item Substitutes"] = true
-
+L["Not a valid itemID"] = true
+L["Item Locations Don't Match"] = true
  L["Sets"] = true
   L["Extra Sets"] = true
 

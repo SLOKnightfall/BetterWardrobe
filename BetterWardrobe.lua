@@ -585,13 +585,13 @@ local itemSub_options = {
 					get = function(info) return subTextFields[1] end,
 					validate = function(info, value) 
 						local id = tonumber(value)
-						if not id then return "Not a valid itemID" end
+						if not id then return L["Not a valid itemID"] end
 
 						local itemEquipLoc1 = GetItemInfoInstant(tonumber(value)) 
 
 						if itemEquipLoc1 == nil then 
 						--message(itemID.." not a valid itemID")
-								return "Not a valid itemID"
+								return L["Not a valid itemID"]
 						else 
 							return true
 						end
@@ -660,7 +660,13 @@ local itemSub_options = {
 }
 
 
+
+
+
 function addon.RefreshSubItemData()
+	local function RemoveItemSubstitute(itemID)
+	addon:RemoveItemSubstitute(itemID)
+	end
 	local args = {} 
 	for i, data in pairs(addon.itemsubdb.profile.items) do
 		args["BaseItem"..i] = {
@@ -679,7 +685,8 @@ function addon.RefreshSubItemData()
 			name = L["Remove"],
 			type = "execute",
 			width = .5,
-			func = function()  addon.RemovetItemSubstitute(i) end,
+			func = function()   
+					return RemoveItemSubstitute(i) end,
 		}	
 	end
 	itemSub_options.args.settings.args.settings.plugins["items"] = args
@@ -2421,7 +2428,102 @@ function BW_WardrobeSetsDetailsItemMixin:OnEnter()
 end
 
 
-function BW_WardrobeSetsDetailsItemMixin:OnMouseDown()
+local BW_ItemSubDropDownMenu = CreateFrame("Frame", "Omen_TitleDropDownMenu", nil, "UIDropDownMenuTemplate")
+
+BW_ItemSubDropDownMenu:SetFrameLevel(500)
+local clickedItemID = nil
+local BW_ItemSubDropDownMenu_Table = {
+    {
+        text = L["Substitue Item"],
+        func = function(self)    		
+          	BW_WardrobeOutfitFrameMixin:ShowPopup("BETTER_WARDROBE_SUBITEM_POPUP")
+        end,
+        notCheckable = 1,
+    },
+    {
+        text = CLOSE,
+        func = function() CloseDropDownMenus() end,
+        notCheckable = 1,
+    },
+ 
+}
+
+StaticPopupDialogs["BETTER_WARDROBE_SUBITEM_INVALID_POPUP"] = {
+	text = L["Not a valid itemID"],
+	preferredIndex = 3,
+	button1 = "OK",
+	button2 = CANCEL,
+	editBoxWidth = 260,
+	EditBoxOnEnterPressed = function(self)
+		if (self:GetParent().button1:IsEnabled()) then
+			StaticPopup_OnClick(self:GetParent(), 1)
+		end
+	end,
+	OnAccept = function(self)
+		--ImportSet(self.editBox:GetText());
+		 BW_WardrobeOutfitFrameMixin:ShowPopup("BETTER_WARDROBE_SUBITEM_POPUP")
+	end,
+	EditBoxOnEscapePressed = function()BW_WardrobeOutfitFrameMixin:ShowPopup("BETTER_WARDROBE_SUBITEM_POPUP") end,
+	exclusive = true,
+	whileDead = true,
+};
+
+StaticPopupDialogs["BETTER_WARDROBE_SUBITEM_WRONG_LOCATION_POPUP"] = {
+	text = L["Item Locations Don't Match"],
+	preferredIndex = 3,
+	button1 = "OK",
+	button2 = CANCEL,
+	editBoxWidth = 260,
+	EditBoxOnEnterPressed = function(self)
+		if (self:GetParent().button1:IsEnabled()) then
+			StaticPopup_OnClick(self:GetParent(), 1)
+		end
+	end,
+	OnAccept = function(self)
+		--ImportSet(self.editBox:GetText());
+		 BW_WardrobeOutfitFrameMixin:ShowPopup("BETTER_WARDROBE_SUBITEM_POPUP")
+	end,
+	EditBoxOnEscapePressed = function()BW_WardrobeOutfitFrameMixin:ShowPopup("BETTER_WARDROBE_SUBITEM_POPUP") end,
+	exclusive = true,
+	whileDead = true,
+};
+
+StaticPopupDialogs["BETTER_WARDROBE_SUBITEM_POPUP"] = {
+	text = L["Item ID"],
+	preferredIndex = 3,
+	button1 = L["Set Substitution"],
+	button2 = CANCEL,
+	hasEditBox = true,
+	maxLetters = 512,
+	editBoxWidth = 260,
+	OnShow = function(self)
+		if LISTWINDOW then LISTWINDOW:Hide() end
+		self.editBox:SetText("")
+	end,
+	EditBoxOnEnterPressed = function(self)
+		if (self:GetParent().button1:IsEnabled()) then
+			StaticPopup_OnClick(self:GetParent(), 1)
+		end
+	end,
+	OnAccept = function(self)
+		local value = self.editBox:GetText()
+		local id = tonumber(value)
+
+		if id == nil then BW_WardrobeOutfitFrameMixin:ShowPopup("BETTER_WARDROBE_SUBITEM_INVALID_POPUP")  return false end
+
+		local itemEquipLoc1 = GetItemInfoInstant(tonumber(value)) 
+		if not itemEquipLoc1 == nil then BW_WardrobeOutfitFrameMixin:ShowPopup("BETTER_WARDROBE_SUBITEM_INVALID_POPUP") return false end
+
+		addon.SetItemSubstitute(clickedItemID, value)
+		--ImportSet(self.editBox:GetText());
+		clickedItemID = nil
+	end,
+	EditBoxOnEscapePressed = HideParentPanel,
+	exclusive = true,
+	whileDead = true,
+};
+
+function BW_WardrobeSetsDetailsItemMixin:OnMouseDown(button)
 	if (IsModifiedClick("CHATLINK")) then
 		local sourceInfo = C_TransmogCollection.GetSourceInfo(self.sourceID)
 		local slot = C_Transmog.GetSlotForInventoryType(sourceInfo.invType)
@@ -2442,6 +2544,9 @@ function BW_WardrobeSetsDetailsItemMixin:OnMouseDown()
 		end
 	elseif (IsModifiedClick("DRESSUP")) then
 		DressUpVisual(self.sourceID)
+	elseif button == "RightButton"  and BW_WardrobeCollectionFrame.selectedCollectionTab == 3 then 
+			clickedItemID = self.itemID
+			EasyMenu(BW_ItemSubDropDownMenu_Table, BW_ItemSubDropDownMenu, self, 0, 0, "MENU", 10)
 	end
 end
 

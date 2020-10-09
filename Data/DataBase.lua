@@ -17,7 +17,7 @@ FillLocalizedClassList(CLASS_NAMES_LOCALIZED)
 local ARMOR_MASK = Globals.ARMOR_MASK
 
 local EmptyArmor = Globals.EmptyArmor
-
+local subitemlist = {}
 local hiddenSet ={
 	["setID"] =  0 ,
 	["name"] =  "Hidden",
@@ -45,7 +45,10 @@ end
 local RepSets ={["Horde"] = {2574,2844,2796,2820}, ["Alliance"] = {[2816] = "mail" ,[2840] = "plate ",[2750] = "cloth",}}
 local AliznceRepSets = {2574,2844,2796,2820}
 
+--C_TransmogCollection.GetAppearanceSourceInfo(81536)
 
+	--appearanceID, sourceID = C_TransmogCollection.GetItemInfo(138372)
+	--C_TransmogCollection.GetAppearanceSources(81536)
 local function OpposingFaction(faction)
 	local faction = UnitFactionGroup("player")
 	if faction == "Horde" then
@@ -71,8 +74,9 @@ do
 	end
 
 	local function addArmor(armorSet)
-	local list = addon.extraSetsCache or {}	
-		for id, setData in pairs(armorSet) do
+	local tablecopy = CopyTable(armorSet)
+	local list = CopyTable(addon.extraSetsCache) or {}	
+		for id, setData in pairs(tablecopy) do
 			
 			local setInfo = C_TransmogSets.GetSetInfo(id)
 			local classInfo = CLASS_INFO[playerClass]
@@ -127,8 +131,12 @@ do
 					for index, item in ipairs( setData["items"]) do
 						--if addon.setdb.global.itemSubstitute[item] then 
 						--Swaps items for substitutes
-						if addon.setdb.global.itemSubstitute[item] then 
-							setData["items"][index] = addon.setdb.global.itemSubstitute[item]["subID"]
+						if subitemlist[item] then 
+							local appearanceID, sourceID = C_TransmogCollection.GetItemInfo(item)
+							local sources = C_TransmogCollection.GetAppearanceSources(appearanceID)
+							WardrobeCollectionFrame_SortSources(sources)
+							setData["items"][index] = subitemlist[item]
+							setData.sources[item] = appearanceID
 						end
 
 						if setData.sources and setData.sources[item] and setData.sources[item] ~= 0 then 
@@ -190,10 +198,24 @@ end
 					end]]
 
 
+local function buildSetSubstitutions()
+	wipe(subitemlist)
+	if not addon.itemsubdb.profile.items then return end
+		for itemID, sub_data in pairs(addon.itemsubdb.profile.items) do
+			local appearanceID, sourceID = C_TransmogCollection.GetItemInfo(itemID)
+			local sources = C_TransmogCollection.GetAppearanceSources(appearanceID)
+			if sources then 
+				for i, data in ipairs(sources) do
+					subitemlist[data.itemID] = sub_data.subID
+				end
+			end
+		end
+	end 
 	function addon.Init:BuildDB()
 		
 	--local faction = GetFactionID(UnitFactionGroup("player"))
 		--AllSets()
+		buildSetSubstitutions()
 		local armorSet = addon.ArmorSets[addon.selectedArmorType] or addon.ArmorSets[CLASS_INFO[playerClass][3]]
 		addon.ArmorSetModCache = addon.ArmorSetModCache or {}
 		addon.extraSetsCache = addon.extraSetsCache or {}
@@ -218,6 +240,7 @@ end
 		addon.ArmorSetModCache = nil
 		addon.extraSetsCache = nil
 		--setsInfo = nil
+
 	end
 
 
@@ -333,10 +356,18 @@ end
 		return setsInfo[setID]
 	end
 
+
+
+
+
 	function addon.SetItemSubstitute(itemID, subID)
 		itemID = tonumber(itemID)
 		subID = tonumber(subID)
-		if type(itemID) ~= "number" or type(subID) ~= "number" then  return false end
+
+		if type(itemID) ~= "number" or type(subID) ~= "number" then 
+			BW_WardrobeOutfitFrameMixin:ShowPopup("BETTER_WARDROBE_SUBITEM_INVALID_POPUP")
+			return false 
+		end
 
 		local _, _, _, itemEquipLoc1 = GetItemInfoInstant(itemID) 
 		local _, _, _, itemEquipLoc2 = GetItemInfoInstant(subID) 
@@ -350,6 +381,7 @@ end
 			--return false
 		--end
 		if itemEquipLoc1 ~= itemEquipLoc2 then 
+			BW_WardrobeOutfitFrameMixin:ShowPopup("BETTER_WARDROBE_SUBITEM_WRONG_LOCATION_POPUP")
 			return false 
 		else
 
@@ -372,21 +404,20 @@ end
 			addon.RefreshSubItemData()
 		end)
 
-			addon.RefreshSubItemData()
-	end
 
+		addon:ClearCache()
+		addon.ExtraSetsDataProvider:ClearSets()
+		setsInfo = nil
 
-	function addon.RemovetItemSubstitute(itemID)
- 
-		if not itemID  then
-			return false
-		end
-		--local appearanceID, sourceID = C_TransmogCollection.GetItemInfo(itemID|itemString [, itemModID])
-		addon.itemsubdb.profile.items[tonumber(itemID)] = nil
+		addon.Init:BuildDB()
+		addon.GetBaseList()
+		BW_SetsCollectionFrame:Refresh()
+		BW_SetsCollectionFrame:OnSearchUpdate()
 		addon.RefreshSubItemData()
 	end
 
-end
+
+
 --[[
 local full={}
 function getallsets()
@@ -415,7 +446,6 @@ function addon.GetAllSets()
 					if string.find(i, "hidden") then 
 						if data[i] == true then 
 						if (data.classMask and data.classMask == classInfo[2]) or not data.classMask or data.classMask == 0 then 
-							print(data.name)
 							data.filter = 1
 							data.setID = data.setID *100
 							setsInfo[data.setID] = data
@@ -450,5 +480,27 @@ function addon.GetAllSets()
 		end
 return baseSets --setData[3592]
 end
+
+end
+
+	function addon:RemoveItemSubstitute(itemID)
+ 
+		if not itemID  then
+			return false
+		end
+		--local appearanceID, sourceID = C_TransmogCollection.GetItemInfo(itemID|itemString [, itemModID])
+		local appearanceID, sourceID = C_TransmogCollection.GetItemInfo(tonumber(itemID))
+		local sources = C_TransmogCollection.GetAppearanceSources(appearanceID)
+		for i, data in ipairs(sources) do
+			addon.itemsubdb.profile.items[data.itemID] = nil
+		end
+
+		addon:ClearCache()
+		addon.ExtraSetsDataProvider:ClearSets()
+		setsInfo = nil
+		addon.Init:BuildDB()
+		addon.GetBaseList()
+		addon.RefreshSubItemData()
+	end
 
 end
