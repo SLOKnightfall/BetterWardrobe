@@ -96,6 +96,7 @@ do
 				if  (class or 
 						(addon.Profile.IgnoreClassRestrictions and ((setData.filter == 6 or setData.filter == 7) and addon.Profile.IgnoreClassLookalikeRestrictions)) or 
 						(addon.Profile.IgnoreClassRestrictions and not addon.Profile.IgnoreClassLookalikeRestrictions)) 
+					and not (setData.label == 6 or setData.label == 8 or setData.label == 16)
 					and not factionLocked 
 					and not heritageArmor  then
 
@@ -122,6 +123,7 @@ do
 						setData.filter = 5
 					elseif setData.note == "NOTE_97" then 
 						setData.filter = 3
+
 					end
 
 					--setData.mod = setData.bonusid
