@@ -1,4 +1,4 @@
-# Better Wardrobe and Transmog [![](http://cf.way2muchnoise.eu/401253.svg)](https://www.curseforge.com/wow/addons/better-wardrobe-and-transmog)
+# Better Wardrobe and Transmog [![](http://cf.way2muchnoise.eu/401253.svg)](https://www.curseforge.com/wow/addons/better-wardrobe-and-transmog)[![](http://img.shields.io/badge/runs-retail-brightgreen)](https://www.curseforge.com/wow/addons/better-wardrobe-and-transmog)
 
 [![](https://media.forgecdn.net/attachments/76/25/patreon-medium-button.png)](https://www.patreon.com/SLOKnightfall)
 
