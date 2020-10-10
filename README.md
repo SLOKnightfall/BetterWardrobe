@@ -1,5 +1,4 @@
-# Better Wardrobe and Transmog [![](http://cf.way2muchnoise.eu/401253.svg)](https://www.curseforge.com/wow/addons/better-wardrobe-and-transmog)
-
+# Better Wardrobe and Transmog [![](http://cf.way2muchnoise.eu/401253.svg)](https://www.curseforge.com/wow/addons/better-wardrobe-and-transmog)[![](http://img.shields.io/badge/runs-retail-brightgreen)](https://www.curseforge.com/wow/addons/better-wardrobe-and-transmog)
 
 Tired of not being able to Transmog incomplete sets or the many dungeon/leveling sets not found in the default set list?  Better Wardrobe & Transmog was created to solve these issues and to improve the transmog experience without needing a host of additional addons installed.  It adds new features to the Collection Journal, Transmog Vendor, Dressing Room and tooltip pages.
 
@@ -28,7 +27,7 @@ Improved Collection Journal:
 Improved Transmog Vendor:
 
 - Larger Preview Window: More room to see your epic transmog creations
-- Unlimited Saved Outfits: Any sets over the max Blizzard default of 20 will now be automatically saved by the addon. This is integrated into the outfit list so there is nothing needed to be done by the user.
+- Unlimited Saved Outfits: Any sets over the max Blizzard default of 20 will now be automatically saved by the addon. This is integrated into the outfit list so there is nothing needed to be done by the user. 
 - Randomizer: Build a completely random set by clicking on the Randomizer button at the Transmog vendor. Alternatively you can have it randomly select a user saved outfit by <Shift> clicking the button. Currently there is no way to ignore slots or randomize a specific slot, but these features are on the list to add in a future release.
 -Transmog Incomplete Sets: No more missing out on a outfit just because your are missing that one piece that never drops. Just set the max number of missing pieces allowed and any sets that match will be shown when visiting the Transmog vendor, additionally you can select slots to ignore when considering missing pieces. When at the Transmog vendor you can easily toggle between seeing the full set and the actual collected set pieces.
 -"Combine Sets":  When at the transmog vendor you can combine multiple sets to fill in missing appearances. To use first select the initial appearance to use, then hold the <Shift> key and select any new set. The appearances from the second set will be used to fill in any missing pieces from the initial appearance. You can do this for as many sets until all appearance slots have been used. Great if you are missing a few pieces and want to fill them in with a similar appearance from a different raid type or with a lookalike set.
