@@ -1,6 +1,6 @@
-# Better Wardrobe and Transmog [![](http://cf.way2muchnoise.eu/401253.svg)](https://www.curseforge.com/wow/addons/better-wardrobe-and-transmog)[![](http://https://media.forgecdn.net/attachments/76/25/patreon-medium-button.png)](https://www.curseforge.com/wow/addons/better-wardrobe-and-transmog)
+# Better Wardrobe and Transmog [![](http://cf.way2muchnoise.eu/401253.svg)](https://www.curseforge.com/wow/addons/better-wardrobe-and-transmog)
 
-[![](http://cf.way2muchnoise.eu/401253.svg)](https://www.patreon.com/SLOKnightfall)
+[![](https://media.forgecdn.net/attachments/76/25/patreon-medium-button.png)](https://www.patreon.com/SLOKnightfall)
 
 Tired of not being able to Transmog incomplete sets or the many dungeon/leveling sets not found in the default set list?  Better Wardrobe & Transmog was created to solve these issues and to improve the transmog experience without needing a host of additional addons installed.  It adds new features to the Collection Journal, Transmog Vendor, Dressing Room and tooltip pages.
 
