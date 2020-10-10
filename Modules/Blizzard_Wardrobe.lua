@@ -123,6 +123,58 @@ function ItemsCollectionFrame:ResetPage()
 	self:UpdateItems();
 end
 
+
+
+function WardrobeCollectionFrame_GetSortedAppearanceSources(visualID)
+	local slotID = nil
+	if (filterBySlot == true) then
+		local slot = WardrobeCollectionFrame.ItemsCollectionFrame:GetActiveSlot();
+		if (slot) then
+			slotID = GetInventorySlotInfo(slot)
+		end
+	end
+	--local sources = C_TransmogCollection.GetAppearanceSources(visualID);
+	local sources = C_TransmogCollection.GetAllAppearanceSources(visualID)
+	local sortlist = {}
+	for i = 1, #sources do
+		tinsert (sortlist,C_TransmogCollection.GetSourceInfo(sources[i]))
+	end
+
+	return WardrobeCollectionFrame_SortSources(sortlist);
+end
+
+
+local CameraID = {
+  [1]  = 542,
+  [2]  = 543,
+  [3]  = 544,
+  [4]  = 545,
+  [5]  = 546,
+  [6]  = 547,
+  [7]  = 548,
+  [8]  = 549,
+  [9]  = 550,
+  [10] = 551,
+  [11] = 552,
+}
+
+function ItemsCollectionFrame:GetCameraID(visualID, armor)
+	local id = C_TransmogCollection.GetAppearanceCameraID(visualID)
+	if id ~= 0 or not armor then 
+		return id
+	else
+		local sourceID = self:GetAnAppearanceSourceFromVisual(visualID, nil);
+		local sourceInfo = C_TransmogCollection.GetSourceInfo(sourceID)
+		local categoryID = sourceInfo.categoryID
+		if CameraID[categoryID] then 
+			return CameraID[categoryID]
+		else
+			return 0
+		end
+	end
+end
+
+
 function ItemsCollectionFrame:UpdateItems()
 	local isArmor;
 	local cameraID;
@@ -179,7 +231,7 @@ function ItemsCollectionFrame:UpdateItems()
 
 			-- camera
 			if ( self.transmogType == LE_TRANSMOG_TYPE_APPEARANCE ) then
-				cameraID = C_TransmogCollection.GetAppearanceCameraID(visualInfo.visualID);
+				cameraID = self:GetCameraID(visualInfo.visualID, isArmor) 
 			end
 			if ( model.cameraID ~= cameraID ) then
 				Model_ApplyUICamera(model, cameraID);
@@ -331,10 +383,10 @@ function ItemsCollectionFrame:RefreshVisualsList()
 	end
 
 	--Mod to allow visual view of sets from the journal
-	if BW_CollectionListButton.ToggleState then self.visualsList = addon.CollectionList:BuildCollectionList() end
+	if BW_CollectionListButton.ToggleState then self.visualsList = addon.CollectionList:BuildCollectionList(true) end
 
 	self:FilterVisuals()
-	self.filteredVisualsList = addon.Sets:ClearHidden(self.filteredVisualsList, "item")
+	self.filteredVisualsList = addon.Sets:ClearHidden(self.filteredVisualsList, "item")--self.visualsList
 	self:SortVisuals()
 
 	self.PagingFrame:SetMaxPages(ceil(#self.filteredVisualsList / self.PAGE_SIZE))
@@ -419,9 +471,15 @@ function SetsDataProvider:SortSets(sets, reverseUIOrder, ignorePatchID)
 	--addon.Sort["DefaultSortSet"](self, sets, reverseUIOrder, ignorePatchID)
 end
 
+
+
 function SetsDataProvider:GetBaseSets()
+	--getAllSets(type)
 	if (not self.baseSets) then
-		self.baseSets = addon.Sets:ClearHidden(C_TransmogSets.GetBaseSets(), "set")
+		--local all sets = addon.GetAllSets()
+	self.baseSets = addon.Sets:ClearHidden(C_TransmogSets.GetBaseSets(), "set")
+	--self.baseSets = addon.GetAllSets()-- BaseList --addon.Sets:ClearHidden(C_TransmogSets.GetAllSets(), "set")
+
 		local atTransmogrifier = WardrobeFrame_IsAtTransmogrifier()
 
 		local filteredSets = {}
@@ -541,6 +599,61 @@ function SetsDataProvider:GetUsableSets(incVariants)
 	return addon.Sets:ClearHidden(self.usableSets, "set") 
 end
 
+
+--[[function SetsDataProvider:GetVariantSets(baseSetID)
+	if ( not self.variantSets ) then
+		self.variantSets = { };
+	end
+
+	local variantSets = self.variantSets[baseSetID];
+	if ( not variantSets ) then
+		variantSets = C_TransmogSets.GetVariantSets(baseSetID);
+		if type(variantSets) == "number" then 
+							--print(variantSets)
+							local setData = C_TransmogSets.GetSetInfo(variantSets)
+							--print(C_TransmogSets.GetSetInfo(variantSets))
+							--	setData.baseSetID = baseSetID
+							variantSets = {setData}
+						end
+						--print(#variantSets)
+--
+		self.variantSets[baseSetID] = variantSets;
+		if ( #variantSets > 0 ) then
+			-- add base to variants and sort
+			local baseSet = self:GetBaseSetByID(baseSetID);
+			--print(baseSet)
+			if ( baseSet ) then
+				--print(baseSet)
+				tinsert(variantSets, baseSet);
+			end
+			local reverseUIOrder = true;
+			local ignorePatchID = true;
+			self:SortSets(variantSets, reverseUIOrder, ignorePatchID);
+		end
+	end
+	return variantSets;
+end
+
+function WardrobeSetsDataProviderMixin:DetermineFavorites()
+	-- if a variant is favorited, so is the base set
+	-- keep track of which set is favorited
+	local baseSets = self:GetBaseSets();
+	for i = 1, #baseSets do
+		local baseSet = baseSets[i];
+		baseSet.favoriteSetID = nil;
+		if ( baseSet.favorite ) then
+			baseSet.favoriteSetID = baseSet.setID;
+		else
+			local variantSets = self:GetVariantSets(baseSet.setID);
+			for j = 1, #variantSets do
+				if ( variantSets[j].favorite ) then
+					baseSet.favoriteSetID = variantSets[j].setID;
+					break;
+				end
+			end
+		end
+	end
+end]]
 
 function SetsDataProvider:FilterSearch()
 	local baseSets = self:GetUsableSets(true)
@@ -1143,6 +1256,10 @@ function WardrobeFilterDropDown_InitializeBaseSets(self, level)
 		info.value = 3
 		UIDropDownMenu_AddButton(info, level)
 
+--[[		info.text = L["Armor Type"]
+		info.value = 4
+		UIDropDownMenu_AddButton(info, level)]]
+
 
 		--[[elseif level == 2  and UIDROPDOWNMENU_MENU_VALUE == 1 then
 							local refreshLevel = 2
@@ -1278,5 +1395,22 @@ function WardrobeFilterDropDown_InitializeBaseSets(self, level)
 				UIDropDownMenu_AddButton(info, level)
 			end
 		end
-	end
+	--[[elseif level == 2  and UIDROPDOWNMENU_MENU_VALUE == 4 then
+				local counter = 1
+				for name in pairs(addon.Globals.ARMOR_MASK) do
+					info.keepShownOnClick = false
+		
+					info.text = name
+					info.func = function(info, arg1, _, value)
+							addon.selectedArmorType = arg1
+							addon.extraSetsCache = nil
+							BW_WardrobeCollectionFrame_SetTab(3)
+							BW_WardrobeCollectionFrame_SetTab(2)
+							RefreshArmor()
+					end
+					info.arg1 = name
+					info.checked = 	function() return addon.selectedArmorType == name end
+					UIDropDownMenu_AddButton(info, level)
+				end]]
+			end
 end
