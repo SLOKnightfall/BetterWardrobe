@@ -113,53 +113,6 @@
 					<OnClick function="BW_WardrobeCollectionFrame_ClickTab"/>
 				</Scripts>
 			</Button>
-			<Frame parentKey="SetsTabHelpBox" inherits="GlowBoxTemplate" hidden="true" frameLevel="6">
-				<Size x="230" y="65"/>
-				<Anchors>
-					<Anchor point="TOP" relativePoint="BOTTOM" relativeTo="$parentTab2" x="0" y="-20"/>
-				</Anchors>
-				<Layers>
-					<Layer level="ARTWORK">
-						<FontString parentKey="BigText" inherits="GameFontHighlight" justifyH="LEFT">
-							<Size x="186" y="0"/>
-							<Anchors>
-								<Anchor point="TOP" x="-10" y="-12"/>
-							</Anchors>
-						</FontString>
-						<Texture parentKey="ArrowUp" inherits="HelpPlateArrowUP">
-							<Size x="53" y="21"/>
-							<Anchors>
-								<Anchor point="BOTTOM" relativePoint="TOP" x="0" y="-3"/>
-							</Anchors>
-						</Texture>
-					</Layer>
-					<Layer level="BORDER">
-						<Texture parentKey="ArrowGlowUp" inherits="HelpPlateArrow-GlowUP" alphaMode="ADD" alpha="0.5">
-							<Size x="53" y="21"/>
-							<Anchors>
-								<Anchor point="BOTTOM" relativePoint="TOP" x="0" y="-3"/>
-							</Anchors>
-						</Texture>
-					</Layer>
-				</Layers>
-				<Frames>
-					<Button parentKey="CloseButton" inherits="UIPanelCloseButton">
-						<Anchors>
-							<Anchor point="TOPRIGHT" x="6" y="6"/>
-						</Anchors>
-						<Scripts>
-							<OnClick>
-								self:GetParent():Hide();
-								if (WardrobeFrame_IsAtTransmogrifier()) then
-									SetCVarBitfield("closedInfoFrames", LE_FRAME_TUTORIAL_TRANSMOG_SETS_VENDOR_TAB, true);
-								else
-									SetCVarBitfield("closedInfoFrames", LE_FRAME_TUTORIAL_TRANSMOG_SETS_TAB, true);
-								end
-							</OnClick>
-						</Scripts>
-					</Button>
-				</Frames>
-			</Frame>
 			<Button name="$parentTab3" parentKey="ExtraSetsTab" inherits="TabButtonTemplate" text="Extra" id="3" parentArray="Tabs">
 				<KeyValues>
 					<KeyValue key="minWidth" value="57" type="number"/>
@@ -682,6 +635,54 @@
 							</AnimationGroup>
 						</Animations>
 					</Frame>
+										<CheckButton parentKey="RightShoulderCheckbox" mixin="RightShoulderCheckboxMixin" hidden="true">
+						<Size x="30" y="30"/>
+						<Anchors>
+							<Anchor point="BOTTOMLEFT" x="45" y="35"/>
+
+
+
+
+						</Anchors>
+
+						<Layers>
+							<Layer level="ARTWORK">
+								<FontString inherits="GameFontHighlightSmall" justifyH="LEFT" text="TRANSMOGRIFY_RIGHT_SHOULDER">
+									<Size x="180" y="30"/>
+									<Anchors>
+										<Anchor point="LEFT" relativePoint="RIGHT" x="2" y="1"/>
+									</Anchors>
+								</FontString>
+							</Layer>
+						</Layers>
+
+
+
+
+
+
+
+
+
+
+						<Scripts>
+							<OnShow method="OnShow"/>
+							<OnEvent method="OnEvent"/>
+							<OnClick method="OnClick"/>
+
+
+
+
+
+
+
+						</Scripts>
+						<NormalTexture file="Interface\Buttons\UI-CheckBox-Up"/>
+						<PushedTexture file="Interface\Buttons\UI-CheckBox-Down"/>
+						<HighlightTexture file="Interface\Buttons\UI-CheckBox-Highlight" alphaMode="ADD"/>
+						<CheckedTexture file="Interface\Buttons\UI-CheckBox-Check"/>
+						<DisabledCheckedTexture file="Interface\Buttons\UI-CheckBox-Check-Disabled"/>
+					</CheckButton>
 				</Frames>
 				<Scripts>
 					<OnLoad method="OnLoad"/>

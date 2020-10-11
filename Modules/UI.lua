@@ -281,13 +281,17 @@ function BW_WardrobeCollectionFrame_SetTab(tabID)
 	local searchBox_Anchor = ((tab1 or ((tab2 or tab3 or tab4) and atTransmogrifier)) and "TOPRIGHT") or "TOPLEFT"
 
 	WardrobeCollectionFrame.searchBox:ClearAllPoints()
-	WardrobeCollectionFrame.searchBox:SetEnabled(tab1 and WardrobeCollectionFrame.ItemsCollectionFrame.transmogType == LE_TRANSMOG_TYPE_APPEARANCE or tab2 or tab3)
+	local enableSearchAndFilter = WardrobeCollectionFrame.ItemsCollectionFrame.transmogLocation and WardrobeCollectionFrame.ItemsCollectionFrame.transmogLocation:IsAppearance()
+	WardrobeCollectionFrame.searchBox:SetEnabled(enableSearchAndFilter);
+	--WardrobeCollectionFrame.searchBox:SetEnabled(tab1 and WardrobeCollectionFrame.ItemsCollectionFrame.transmogType == LE_TRANSMOG_TYPE_APPEARANCE or tab2 or tab3)
 	WardrobeCollectionFrame.searchBox:SetPoint(searchBox_Anchor, searchBox_X, searchBox_Y)
 	WardrobeCollectionFrame.searchBox:SetWidth(((tab2 or tab3 or tab4) and not atTransmogrifier and 145) or 105)
 	--WardrobeCollectionFrame.searchBox:SetShown(not tab4)
 
 	WardrobeCollectionFrame.FilterButton:SetShown(tab2 and not atTransmogrifier)
-	WardrobeCollectionFrame.FilterButton:SetEnabled(tab1 and WardrobeCollectionFrame.ItemsCollectionFrame.transmogType == LE_TRANSMOG_TYPE_APPEARANCE or tab2)
+	--WardrobeCollectionFrame.FilterButton:SetEnabled(tab1 and WardrobeCollectionFrame.ItemsCollectionFrame.transmogType == LE_TRANSMOG_TYPE_APPEARANCE or tab2)
+	WardrobeCollectionFrame.FilterButton:SetEnabled(enableSearchAndFilter);
+
 	--WardrobeCollectionFrame.progressBar:SetShown(not tab4)
 	BW_CollectionListButton:SetShown(tab1 and not atTransmogrifier)
 

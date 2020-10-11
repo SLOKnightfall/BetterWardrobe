@@ -120,7 +120,9 @@ function BetterWardrobeSetsCollectionListMixin:Toggle(toggleState)
 		CollectionList:GenerateListView()
 	else
 		local atTransmogrifier = WardrobeFrame_IsAtTransmogrifier()
-		WardrobeCollectionFrame.ItemsCollectionFrame:SetActiveSlot("HEADSLOT", LE_TRANSMOG_TYPE_APPEARANCE)
+		local transmogLocation = TransmogUtil.GetTransmogLocation("HEADSLOT", Enum.TransmogType.Appearance, Enum.TransmogModification.None);
+		WardrobeCollectionFrame.ItemsCollectionFrame:SetActiveSlot(transmogLocation);
+		--WardrobeCollectionFrame.ItemsCollectionFrame:SetActiveSlot("HEADSLOT", LE_TRANSMOG_TYPE_APPEARANCE)
 		WardrobeCollectionFrame.ItemsCollectionFrame:RefreshVisualsList()
 		WardrobeCollectionFrame.ItemsCollectionFrame:UpdateItems()
 		WardrobeCollectionFrame.ItemsCollectionFrame.SlotsFrame:SetShown(not toggleState and not atTransmogrifier)

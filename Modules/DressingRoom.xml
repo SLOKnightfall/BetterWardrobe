@@ -133,7 +133,7 @@
 				</Frames>
 			</Frame>
 
-			<Button parentKey="BW_DressingRoomSettingsButton" inherits="BrowserButtonTemplate">
+			<Button parentKey="BW_DressingRoomSettingsButton" inherits="SquareIconButtonTemplate">
 				<Anchors>
 					<Anchor point="BOTTOMLEFT" relativeTo="$parent" relativePoint="BOTTOMLEFT" x="2" y="-2"/>
 				</Anchors>
@@ -154,7 +154,7 @@
 				</Scripts>
 			</Button>
 
-			<Button parentKey="BW_DressingRoomExportButton" inherits="BrowserButtonTemplate" >
+			<Button parentKey="BW_DressingRoomExportButton" inherits="SquareIconButtonTemplate" >
 				<Size x="32" y="32"/>
 				<Anchors>
 					<Anchor point="LEFT" relativeKey="$parent.BW_DressingRoomSettingsButton" relativePoint="RIGHT" x="-5" y="0"/>

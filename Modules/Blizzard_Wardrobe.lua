@@ -31,31 +31,7 @@ end
 local TAB_ITEMS = 1;
 local TAB_SETS = 2;
 
-function WardrobeCollectionFrame_OpenTransmogLink(link, transmogType)
-	if ( not CollectionsJournal:IsVisible() or not WardrobeCollectionFrame:IsVisible() ) then
-		ToggleCollectionsJournal(5);
-	end
 
-	local linkType, id = strsplit(":", link);
-
-	if ( linkType == "transmogappearance" ) then
-		local sourceID = tonumber(id);
-		BW_WardrobeCollectionFrame_SetTab(TAB_ITEMS);
-		WardrobeCollectionFrame.ItemsCollectionFrame:GoToSourceID(sourceID, nil, LE_TRANSMOG_TYPE_APPEARANCE);
-
-	elseif ( linkType == "transmogset") then
-		local setID = tonumber(id);
-		BW_WardrobeCollectionFrame_SetTab(TAB_SETS);
-		BW_WardrobeCollectionFrame.BW_SetsCollectionFrame:SelectSet(setID);
-		--BW_WardrobeCollectionFrame.SetsCollectionFrame:SelectSet(setID);
-
-	elseif ( linkType == "transmogset-extra") then
-		local setID = tonumber(id);
-		BW_WardrobeCollectionFrame_SetTab(3);
-		--WardrobeCollectionFrame.SetsCollectionFrame:SelectSet(setID);
-		BW_WardrobeCollectionFrame.BW_SetsCollectionFrame:SelectSet(setID);
-	end
-end
 
 
 local function GetPage(entryIndex, pageSize)
@@ -131,10 +107,10 @@ function ItemsCollectionFrame:UpdateItems()
 	local changeModel = false;
 	local isAtTransmogrifier = WardrobeFrame_IsAtTransmogrifier();
 
-	if ( self.transmogType == LE_TRANSMOG_TYPE_ILLUSION ) then
+	if ( self.transmogLocation:IsIllusion() ) then
 		-- for enchants we need to get the visual of the item in that slot
 		local appearanceSourceID;
-		appearanceSourceID, appearanceVisualID, appearanceVisualSubclass = WardrobeCollectionFrame_GetWeaponInfoForEnchant(self.activeSlot);
+		appearanceSourceID, appearanceVisualID, appearanceVisualSubclass = WardrobeCollectionFrame_GetWeaponInfoForEnchant(self.transmogLocation);
 		cameraID = C_TransmogCollection.GetAppearanceCameraIDBySource(appearanceSourceID);
 		if ( appearanceVisualID ~= self.illusionWeaponVisualID ) then
 			self.illusionWeaponVisualID = appearanceVisualID;
@@ -146,13 +122,13 @@ function ItemsCollectionFrame:UpdateItems()
 	end
 
 	local tutorialAnchorFrame;
-	local checkTutorialFrame = (self.transmogType == LE_TRANSMOG_TYPE_APPEARANCE) and not WardrobeFrame_IsAtTransmogrifier()
+	local checkTutorialFrame = self.transmogLocation:IsAppearance() and not WardrobeFrame_IsAtTransmogrifier()
 								and not GetCVarBitfield("closedInfoFrames", LE_FRAME_TUTORIAL_TRANSMOG_MODEL_CLICK);
 
-	local baseSourceID, baseVisualID, appliedSourceID, appliedVisualID, pendingSourceID, pendingVisualID, hasPendingUndo;
+	local baseSourceID, baseVisualID, appliedSourceID, appliedVisualID, appliedCategoryID, pendingSourceID, pendingVisualID, pendingCategoryID, hasPendingUndo;
 	local showUndoIcon;
 	if ( isAtTransmogrifier ) then
-		baseSourceID, baseVisualID, appliedSourceID, appliedVisualID, pendingSourceID, pendingVisualID, hasPendingUndo = C_Transmog.GetSlotVisualInfo(GetInventorySlotInfo(self.activeSlot), self.transmogType);
+		baseSourceID, baseVisualID, appliedSourceID, appliedVisualID, appliedCategoryID, pendingSourceID, pendingVisualID, pendingCategoryID, hasPendingUndo = C_Transmog.GetSlotVisualInfo(self.transmogLocation);
 		if ( appliedVisualID ~= NO_TRANSMOG_VISUAL_ID ) then
 			if ( hasPendingUndo ) then
 				pendingVisualID = baseVisualID;
@@ -168,6 +144,8 @@ function ItemsCollectionFrame:UpdateItems()
 		end
 	end
 
+	local cameraVariation = self:GetCameraVariation();
+
 	local pendingTransmogModelFrame = nil;
 	local indexOffset = (self.PagingFrame:GetCurrentPage() - 1) * self.PAGE_SIZE;
 	for i = 1, self.PAGE_SIZE do
@@ -178,8 +156,8 @@ function ItemsCollectionFrame:UpdateItems()
 			model:Show();
 
 			-- camera
-			if ( self.transmogType == LE_TRANSMOG_TYPE_APPEARANCE ) then
-				cameraID = C_TransmogCollection.GetAppearanceCameraID(visualInfo.visualID);
+			if ( self.transmogLocation:IsAppearance() ) then
+				cameraID = C_TransmogCollection.GetAppearanceCameraID(visualInfo.visualID, cameraVariation);
 			end
 			if ( model.cameraID ~= cameraID ) then
 				Model_ApplyUICamera(model, cameraID);
@@ -201,11 +179,11 @@ function ItemsCollectionFrame:UpdateItems()
 
 			-- state at the transmogrifier
 			local transmogStateAtlas;
-			if ( visualInfo.visualID == appliedVisualID ) then
+			if ( visualInfo.visualID == appliedVisualID and appliedCategoryID == self.activeCategory) then
 				transmogStateAtlas = "transmog-wardrobe-border-current-transmogged";
 			elseif ( visualInfo.visualID == baseVisualID ) then
 				transmogStateAtlas = "transmog-wardrobe-border-current";
-			elseif ( visualInfo.visualID == pendingVisualID ) then
+			elseif ( visualInfo.visualID == pendingVisualID and pendingCategoryID == self.activeCategory) then
 				transmogStateAtlas = "transmog-wardrobe-border-selected";
 				pendingTransmogModelFrame = model;
 			end
@@ -292,10 +270,17 @@ function ItemsCollectionFrame:UpdateItems()
 		end
 	end
 	if ( tutorialAnchorFrame ) then
-		self.HelpBox:SetPoint("TOP", tutorialAnchorFrame, "BOTTOM", 0, -22);
-		self.HelpBox:Show();
+		local helpTipInfo = {
+			text = TRANSMOG_MOUSE_CLICK_TUTORIAL,
+			buttonStyle = HelpTip.ButtonStyle.Close,
+			cvarBitfield = "closedInfoFrames",
+			bitfieldFlag = LE_FRAME_TUTORIAL_TRANSMOG_MODEL_CLICK,
+			targetPoint = HelpTip.Point.BottomEdgeCenter,
+		};
+		HelpTip:Show(self, helpTipInfo, tutorialAnchorFrame);
 	else
-		self.HelpBox:Hide();
+
+		HelpTip:Hide(self, TRANSMOG_MOUSE_CLICK_TUTORIAL);
 	end
 end
 
@@ -317,12 +302,12 @@ end
 
 
 function ItemsCollectionFrame:RefreshVisualsList()
-	if ( self.transmogType == LE_TRANSMOG_TYPE_ILLUSION ) then
+	if ( self.transmogLocation:IsIllusion() ) then
 		self.visualsList = C_TransmogCollection.GetIllusions()
 	else
-		if( ItemsCollectionFrame:GetActiveSlot() == "MAINHANDSLOT" ) then
+		if( WardrobeCollectionFrame.ItemsCollectionFrame.transmogLocation:IsMainHand() ) then
 			self.visualsList = C_TransmogCollection.GetCategoryAppearances(self.activeCategory, EXCLUSION_CATEGORY_MAINHAND)
-		elseif (ItemsCollectionFrame:GetActiveSlot() == "SECONDARYHANDSLOT" ) then
+		elseif (WardrobeCollectionFrame.ItemsCollectionFrame.transmogLocation:IsOffHand() ) then
 			self.visualsList = C_TransmogCollection.GetCategoryAppearances(self.activeCategory, EXCLUSION_CATEGORY_OFFHAND)
 		else
 			self.visualsList = C_TransmogCollection.GetCategoryAppearances(self.activeCategory)
@@ -341,45 +326,41 @@ function ItemsCollectionFrame:RefreshVisualsList()
 end
 
 
-function ItemsCollectionFrame:OnShow()
-	self:RegisterEvent("TRANSMOGRIFY_UPDATE")
-	self:RegisterEvent("PLAYER_EQUIPMENT_CHANGED")
-	self:RegisterEvent("TRANSMOGRIFY_SUCCESS")
 
-	local needsUpdate = false	-- we don't need to update if we call WardrobeCollectionFrame_SetActiveSlot as that will do an update
-	if ( self.jumpToLatestCategoryID and self.jumpToLatestCategoryID ~= self.activeCategory and not WardrobeFrame_IsAtTransmogrifier() ) then
-		local slot = WardrobeCollectionFrame_GetSlotFromCategoryID(self.jumpToLatestCategoryID)
-		-- The model got reset from OnShow, which restored all equipment.
-		-- But ChangeModelsSlot tries to be smart and only change the difference from the previous slot to the current slot, so some equipment will remain left on.
-		local ignorePreviousSlot = true
-		self:SetActiveSlot(slot, LE_TRANSMOG_TYPE_APPEARANCE, self.jumpToLatestCategoryID, ignorePreviousSlot)
-		self.jumpToLatestCategoryID = nil
-	elseif ( self.activeSlot ) then
-		-- redo the model for the active slot
-		self:ChangeModelsSlot(nil, self.activeSlot)
-		needsUpdate = true
-	else
-		self:SetActiveSlot("HEADSLOT", LE_TRANSMOG_TYPE_APPEARANCE)
+function WardrobeCollectionFrame_OpenTransmogLink(link)
+	if ( not CollectionsJournal:IsVisible() or not WardrobeCollectionFrame:IsVisible() ) then
+		ToggleCollectionsJournal(5);
 	end
 
-	WardrobeCollectionFrame.progressBar:SetShown(not WardrobeUtils_IsCategoryLegionArtifact(self:GetActiveCategory()))
+	local linkType, id = strsplit(":", link);
 
-	if ( needsUpdate ) then
-		WardrobeCollectionFrame_UpdateUsableAppearances()
-		self:RefreshVisualsList()
-		self:UpdateItems()
-		self:UpdateWeaponDropDown()
+	if ( linkType == "transmogappearance" ) then
+		local sourceID = tonumber(id);
+		BW_WardrobeCollectionFrame_SetTab(TAB_ITEMS);
+
+		-- For links a base appearance is fine
+		local categoryID = C_TransmogCollection.GetAppearanceSourceInfo(sourceID);
+		local slot = WardrobeCollectionFrame_GetSlotFromCategoryID(categoryID);
+		local transmogLocation = TransmogUtil.GetTransmogLocation(slot, Enum.TransmogType.Appearance, Enum.TransmogModification.None);
+		WardrobeCollectionFrame.ItemsCollectionFrame:GoToSourceID(sourceID, transmogLocation);
+
+	elseif ( linkType == "transmogset") then
+		local setID = tonumber(id);
+		BW_WardrobeCollectionFrame_SetTab(TAB_SETS);
+		BW_WardrobeCollectionFrame.BW_SetsCollectionFrame:SelectSet(setID);
+		--BW_WardrobeCollectionFrame.SetsCollectionFrame:SelectSet(setID);
+
+	elseif ( linkType == "transmogset-extra") then
+		local setID = tonumber(id);
+		BW_WardrobeCollectionFrame_SetTab(3);
+		--WardrobeCollectionFrame.SetsCollectionFrame:SelectSet(setID);
+		BW_WardrobeCollectionFrame.BW_SetsCollectionFrame:SelectSet(setID);
 	end
-
-	-- tab tutorial
-	SetCVarBitfield("closedInfoFrames", LE_FRAME_TUTORIAL_TRANSMOG_JOURNAL_TAB, true)
-	self:GetParent().SetsTabHelpBox:SetShown(self:ShouldShowSetsHelpTip())
-	BW_WardrobeCollectionFrame.SetsTabHelpBox:SetShown(self:ShouldShowSetsHelpTip())
-
 end
 
 local SetsDataProvider = CreateFromMixins(WardrobeSetsDataProviderMixin)
 addon.SetsDataProvider = SetsDataProvider
+
 
 function SetsDataProvider:SortSets(sets, reverseUIOrder, ignorePatchID)
 	--local sortedSources = SetsDataProvider:GetSortedSetSources(data.setID)
@@ -611,10 +592,9 @@ function WardrobeCollectionFrame.SetsCollectionFrame:OnShow()
 	self:UpdateProgressBar()
 	self:RefreshCameras()
 
-	if (self:GetParent().SetsTabHelpBox:IsShown()) or BW_WardrobeCollectionFrame.SetsTabHelpBox:IsShown() then
-		self:GetParent().SetsTabHelpBox:Hide()
-		BW_WardrobeCollectionFrame.SetsTabHelpBox:Hide()
-		SetCVarBitfield("closedInfoFrames", LE_FRAME_TUTORIAL_TRANSMOG_SETS_TAB, true)
+	if HelpTip:IsShowing(WardrobeCollectionFrame, TRANSMOG_SETS_TAB_TUTORIAL) then
+		HelpTip:Hide(WardrobeCollectionFrame, TRANSMOG_SETS_TAB_TUTORIAL);
+		SetCVarBitfield("closedInfoFrames", LE_FRAME_TUTORIAL_TRANSMOG_SETS_TAB, true);
 	end
 end
 
@@ -793,7 +773,7 @@ function WardrobeCollectionFrame.SetsTransmogFrame:LoadSet(setID)
 					local emptyappearanceID, emptySourceID = EmptyArmor[slot] and C_TransmogCollection.GetItemInfo(EmptyArmor[slot])
 
 					if appearanceID == emptyappearanceID then
-						C_Transmog.ClearPending(slot, LE_TRANSMOG_TYPE_APPEARANCE)
+					C_Transmog.ClearAllPending();
 						transmogSources[slot] = slotSources[index].sourceID
 					else				
 						transmogSources[slot] = sourceID
@@ -822,7 +802,7 @@ function WardrobeCollectionFrame.SetsTransmogFrame:LoadSet(setID)
 		-- if we don't ignore the event, clearing will momentarily set the page to the one with the set the user currently has transmogged
 		-- if that's a different page from the current one then the models will flicker as we swap the gear to different sets and back
 		self.ignoreTransmogrifyUpdateEvent = true
-		C_Transmog.ClearPending()
+		C_Transmog.ClearAllPending();
 		self.ignoreTransmogrifyUpdateEvent = false
 		C_Transmog.LoadSources(transmogSources, -1, -1)
 
@@ -873,8 +853,8 @@ function WardrobeCollectionFrame.SetsTransmogFrame:OnShow()
 	self:UpdateProgressBar()
 	self.sourceQualityTable = { }
 
-	if (self:GetParent().SetsTabHelpBox:IsShown()) or (BW_WardrobeCollectionFrame.SetsTabHelpBox:IsShown()) then
-		self:GetParent().SetsTabHelpBox:Hide()
+	if HelpTip:IsShowing(WardrobeCollectionFrame, TRANSMOG_SETS_TAB_TUTORIAL) then
+		HelpTip:Hide(WardrobeCollectionFrame, TRANSMOG_SETS_TAB_TUTORIAL);
 		BW_WardrobeCollectionFrame.SetsTabHelpBox:Hide()
 		SetCVarBitfield("closedInfoFrames", LE_FRAME_TUTORIAL_TRANSMOG_SETS_VENDOR_TAB, true)
 	end

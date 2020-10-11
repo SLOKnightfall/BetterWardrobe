@@ -1023,7 +1023,7 @@ function BetterWardrobeSetsTransmogModelMixin:LoadSet(setID)
 		-- if we don't ignore the event, clearing will momentarily set the page to the one with the set the user currently has transmogged
 		-- if that's a different page from the current one then the models will flicker as we swap the gear to different sets and back
 		self.ignoreTransmogrifyUpdateEvent = true
-		C_Transmog.ClearPending()
+		C_Transmog.ClearAllPending();
 		self.ignoreTransmogrifyUpdateEvent = false
 		C_Transmog.LoadSources(transmogSources, -1, -1)
 	end
@@ -1114,10 +1114,10 @@ function BetterWardrobeSetsCollectionMixin:OnShow()
 	self:UpdateProgressBar()
 	self:RefreshCameras()
 
-	if (self:GetParent().SetsTabHelpBox:IsShown()) then
-		self:GetParent().SetsTabHelpBox:Hide()
-		SetCVarBitfield("closedInfoFrames", LE_FRAME_TUTORIAL_TRANSMOG_SETS_TAB, true)
-	end
+	--if (self:GetParent().SetsTabHelpBox:IsShown()) then
+		--self:GetParent().SetsTabHelpBox:Hide()
+		--SetCVarBitfield("closedInfoFrames", LE_FRAME_TUTORIAL_TRANSMOG_SETS_TAB, true)
+	--end
 end
 
 
@@ -1965,7 +1965,7 @@ function BetterWardrobeSetsTransmogMixin:LoadSet(setID)
 						local emptyappearanceID, emptySourceID = EmptyArmor[slot] and C_TransmogCollection.GetItemInfo(EmptyArmor[slot])
 
 						if appearanceID == emptyappearanceID then
-							C_Transmog.ClearPending(slot, LE_TRANSMOG_TYPE_APPEARANCE)
+							C_Transmog.ClearAllPending();
 							transmogSources[slot] = slotSources[index].sourceID
 						else				
 							transmogSources[slot] = sourceID
@@ -1995,7 +1995,7 @@ function BetterWardrobeSetsTransmogMixin:LoadSet(setID)
 		-- if we don't ignore the event, clearing will momentarily set the page to the one with the set the user currently has transmogged
 		-- if that's a different page from the current one then the models will flicker as we swap the gear to different sets and back
 		self.ignoreTransmogrifyUpdateEvent = true
-		C_Transmog.ClearPending()
+		C_Transmog.ClearAllPending();
 		self.ignoreTransmogrifyUpdateEvent = false
 		C_Transmog.LoadSources(transmogSources, -1, -1)
 
@@ -2003,14 +2003,18 @@ function BetterWardrobeSetsTransmogMixin:LoadSet(setID)
 			local clearSlots = Sets:EmptySlots(transmogSources)
 			for i, x in pairs(clearSlots) do
 				local _, source = addon.GetItemSource(x) --C_TransmogCollection.GetItemInfo(x)
-				C_Transmog.SetPending(i, LE_TRANSMOG_TYPE_APPEARANCE,source)
+				--C_Transmog.SetPending(i, LE_TRANSMOG_TYPE_APPEARANCE,source)
+				C_Transmog.SetPending(self.transmogLocation, source, self.activeCategory);
+
 			end
 
 			local emptySlotData = Sets:GetEmptySlots()
 			for i, x in pairs(transmogSources) do
 				if not C_TransmogCollection.PlayerHasTransmogItemModifiedAppearance(x) and i ~= 7 and emptySlotData[i] then
 					local _, source = addon.GetItemSource(emptySlotData[i]) --C_TransmogCollection.GetItemInfo(emptySlotData[i])
-					C_Transmog.SetPending(i, LE_TRANSMOG_TYPE_APPEARANCE, source)
+					--C_Transmog.SetPending(i, LE_TRANSMOG_TYPE_APPEARANCE, source)
+					C_Transmog.SetPending(self.transmogLocation, source, self.activeCategory);
+
 				end
 			end
 		end
@@ -2032,8 +2036,8 @@ function BetterWardrobeSetsTransmogMixin:OnShow()
 	self:UpdateProgressBar()
 	self.sourceQualityTable = {}
 
-	if (self:GetParent().SetsTabHelpBox:IsShown()) then
-		self:GetParent().SetsTabHelpBox:Hide()
+	if HelpTip:IsShowing(WardrobeCollectionFrame, TRANSMOG_SETS_VENDOR_TUTORIAL) then
+		HelpTip:Hide(WardrobeCollectionFrame, TRANSMOG_SETS_VENDOR_TUTORIAL);
 		SetCVarBitfield("closedInfoFrames", LE_FRAME_TUTORIAL_TRANSMOG_SETS_VENDOR_TAB, true)
 	end
 end
