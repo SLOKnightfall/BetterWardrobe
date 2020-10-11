@@ -72,6 +72,7 @@ addon.GetTab = GetTab
 
 local function CheckTab(tab)
 	local tabID
+	local atTransmogrifier = WardrobeFrame_IsAtTransmogrifier()
 
 		if ( atTransmogrifier ) then
 			tabID = WardrobeCollectionFrame.selectedTransmogTab

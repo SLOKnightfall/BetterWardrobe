@@ -18,24 +18,31 @@ function CollectionList:BuildCollectionList(complete)
 	end
 
 	for visualID, _ in pairs(addon.chardb.profile.collectionList["item"]) do
-		local sources = C_TransmogCollection.GetAppearanceSources(visualID)
-		local sourceInfo = C_TransmogCollection.GetSourceInfo(sources[1].sourceID)
-		local isCollected = sourceInfo.isCollected
-		local sourceType = sourceInfo.sourceType
+		local sources = C_TransmogCollection.GetAllAppearanceSources(visualID)
+		--C_TransmogCollection.GetAllAppearanceSources(40907)
 
-		if complete then
-			tinsert(list, sourceInfo)
-		elseif ((not isCollected and filterUncollected)  and (sourceType and not filterSource[sourceType])) or (isCollected and filterCollected)  then
-			if searchString then
-				for i, data in pairs(sources) do
-					local match = string.find(string.lower(data.name or ""), searchString) -- or string.find(baseSet.label, searchString) or string.find(baseSet.description, searchString)
-					if match then
-						tinsert(list, sourceInfo)
-						break
-					end
-				end
-			else
+		if not sources then 
+			--print(visualID)
+		else
+			local sourceInfo = C_TransmogCollection.GetSourceInfo(sources[1])
+			local isCollected = select(5,C_TransmogCollection.GetAppearanceSourceInfo(sources[1])) --sourceInfo.isCollected
+			local sourceType = sourceInfo.sourceType
+
+			if complete then
 				tinsert(list, sourceInfo)
+			elseif ((not isCollected and filterUncollected)  and (sourceType and not filterSource[sourceType])) or (isCollected and filterCollected)  then
+				if searchString then
+					for i, data in pairs(sources) do
+						local source_info = C_TransmogCollection.GetSourceInfo(data)
+						local match = string.find(string.lower(source_info.name or ""), searchString) -- or string.find(baseSet.label, searchString) or string.find(baseSet.description, searchString)
+						if match then
+							tinsert(list, source_info)
+							break
+						end
+					end
+				else
+					tinsert(list, sourceInfo)
+				end
 			end
 		end
 	end
@@ -48,9 +55,10 @@ function CollectionList:BuildShoppingList()
 	local collectionList = self:BuildCollectionList(true)
 	local shoppingList = {}
 	for _, data in ipairs(collectionList) do
-		local sources = C_TransmogCollection.GetAppearanceSources(data.visualID)
+		local sources = C_TransmogCollection.GetAllAppearanceSources(data.visualID)
+		--local sources = C_TransmogCollection.GetAppearanceSources(data.visualID)
 		for _, data in pairs(sources) do
-			local sourceInfo = C_TransmogCollection.GetSourceInfo(data.sourceID)
+			local sourceInfo = C_TransmogCollection.GetSourceInfo(data)
 			tinsert(shoppingList, sourceInfo)
 		end
 	end
@@ -122,7 +130,7 @@ function BetterWardrobeSetsCollectionListMixin:Toggle(toggleState)
 		local atTransmogrifier = WardrobeFrame_IsAtTransmogrifier()
 		local transmogLocation = TransmogUtil.GetTransmogLocation("HEADSLOT", Enum.TransmogType.Appearance, Enum.TransmogModification.None);
 		WardrobeCollectionFrame.ItemsCollectionFrame:SetActiveSlot(transmogLocation);
-		--WardrobeCollectionFrame.ItemsCollectionFrame:SetActiveSlot("HEADSLOT", LE_TRANSMOG_TYPE_APPEARANCE)
+		--WardrobeCollectionFrame.ItemsCollectionFrame:SetActiveSlot("HEADSLOT", Enum.TransmogType.Appearance)
 		WardrobeCollectionFrame.ItemsCollectionFrame:RefreshVisualsList()
 		WardrobeCollectionFrame.ItemsCollectionFrame:UpdateItems()
 		WardrobeCollectionFrame.ItemsCollectionFrame.SlotsFrame:SetShown(not toggleState and not atTransmogrifier)

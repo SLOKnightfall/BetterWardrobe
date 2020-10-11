@@ -2,9 +2,44 @@ local addonName, addon = ...
 addon = LibStub("AceAddon-3.0"):NewAddon(addon, addonName, "AceEvent-3.0", "AceConsole-3.0", "AceHook-3.0")
 local L = LibStub("AceLocale-3.0"):GetLocale(addonName)
 
-addon.Globals = {}
+local Globals = {}
 
-addon.Globals.locationDrowpDown = {
+addon.Globals = Globals
+
+Globals.ARMOR_MASK = {
+  CLOTH = 400,
+  LEATHER = 3592,
+  MAIL = 68,
+  PLATE = 35,
+}
+
+Globals.CLASS_INFO = {
+  DEATHKNIGHT = {6,32,"PLATE"},
+  DEMONHUNTER = {12, 2048, "LEATHER"},
+  DRUID = {11, 1024,"LEATHER"},
+  HUNTER = {3, 4, "MAIL"},
+  MAGE = {8, 128, "CLOTH"},
+  MONK = {10, 512, "LEATHER"},
+  PALADIN = {2, 2,"PLATE"},
+  PRIEST = {5, 16, "CLOTH"},
+  ROGUE = {4, 8, "LEATHER"},
+  SHAMAN = {7, 64, "MAIL"},
+  WARLOCK = {9, 256, "CLOTH"},
+  WARRIOR = {1, 1, "PLATE"},
+}
+
+Globals.ARMOR_CLASSES = {}
+for type in pairs(Globals.ARMOR_MASK ) do
+  Globals.ARMOR_CLASSES[type] = {}
+end
+for class, data in pairs(Globals.CLASS_INFO) do
+  local id = data[2]
+  local type = data[3]
+  Globals.ARMOR_CLASSES[type][id] = true
+end
+
+
+Globals.locationDrowpDown = {
   [2] = INVTYPE_HEAD,
   --[2] = 134112, neck
   [4] = INVTYPE_SHOULDER,
@@ -19,7 +54,7 @@ addon.Globals.locationDrowpDown = {
   [21] = INVTYPE_ROBE,--handr
 }
 
- addon.Globals.INVENTORY_SLOT_NAMES = {
+Globals.INVENTORY_SLOT_NAMES = {
   [1]  = "HEADSLOT",
   [3]  = "SHOULDERSLOT",
   [4]  = "SHIRTSLOT",
@@ -60,51 +95,104 @@ addon.Globals.locationDrowpDown = {
   ["INVTYPE_WRIST"] =           9,
   ["INVTYPE_HAND"] =            10,
   ["INVTYPE_CLOAK"] =           15,
- -- ["INVTYPE_WEAPON"] =          16, 17,
+  ["INVTYPE_WEAPON"] =          16,
   ["INVTYPE_SHIELD"] =          17,
   ["INVTYPE_2HWEAPON"] =        16,
   ["INVTYPE_WEAPONMAINHAND"] =  16,
   ["INVTYPE_WEAPONOFFHAND"] =   17,
   ["INVTYPE_HOLDABLE"] =        17,
-  ["INVTYPE_RANGED"] =          18,
-  ["INVTYPE_THROWN"] =          18,
-  ["INVTYPE_RANGEDRIGHT"] =     18,
-  ["INVTYPE_RELIC"] =           18,
+  ["INVTYPE_RANGED"] =          16,
+  ["INVTYPE_THROWN"] =          16,
+  ["INVTYPE_RANGEDRIGHT"] =     17,
+  ["INVTYPE_RELIC"] =           17,
   ["INVTYPE_TABARD"] =          19,
 }
 
-addon.Globals.BASE_SET_BUTTON_HEIGHT = 46
-addon.Globals.VARIANT_SET_BUTTON_HEIGHT = 20
-addon.Globals.SET_PROGRESS_BAR_MAX_WIDTH = 204
-addon.Globals.IN_PROGRESS_FONT_COLOR = CreateColor(0.251, 0.753, 0.251)
-addon.Globals.IN_PROGRESS_FONT_COLOR_CODE = "|cff40c040"
-addon.Globals.COLLECTION_LIST_WIDTH = 260
 
-addon.Globals.EmptyArmor = {
+Globals.slots = {
+  "HeadSlot",
+  "ShoulderSlot",
+  "BackSlot",
+  "ChestSlot",
+  "ShirtSlot",
+  "TabardSlot",
+  "WristSlot",
+  "HandsSlot",
+  "WaistSlot",
+  "LegsSlot",
+  "FeetSlot",
+  "MainHandSlot",
+  "SecondaryHandSlot",
+};
+
+
+
+Globals.tooltip_slots = {
+  INVTYPE_HEAD = 0,
+  INVTYPE_SHOULDER = 0,
+  INVTYPE_CLOAK = 3.4,
+  INVTYPE_CHEST = 0,
+  INVTYPE_BODY = 0,
+  INVTYPE_ROBE = 0,
+  INVTYPE_SHIRT = 0,
+  INVTYPE_TABARD = 0,
+  INVTYPE_WRIST = 0,
+  INVTYPE_2HWEAPON = 1.6,
+  INVTYPE_WEAPON = 1.6,
+  INVTYPE_WEAPONMAINHAND = 1.6,
+  INVTYPE_WEAPONOFFHAND = -0.7,
+  INVTYPE_SHIELD = -0.7,
+  INVTYPE_HOLDABLE = -0.7,
+  INVTYPE_RANGED = 1.6,
+  INVTYPE_RANGEDRIGHT = 1.6,
+  INVTYPE_THROWN = 1.6,
+  INVTYPE_HAND = 0,
+  INVTYPE_WAIST = 0,
+  INVTYPE_LEGS = 0,
+  INVTYPE_FEET = 0,
+};
+
+Globals.mods = {
+  Shift = IsShiftKeyDown,
+  Ctrl = IsControlKeyDown,
+  Alt = IsAltKeyDown,
+};
+
+
+
+Globals.BASE_SET_BUTTON_HEIGHT = 46
+Globals.VARIANT_SET_BUTTON_HEIGHT = 20
+Globals.SET_PROGRESS_BAR_MAX_WIDTH = 204
+Globals.IN_PROGRESS_FONT_COLOR = CreateColor(0.251, 0.753, 0.251)
+Globals.IN_PROGRESS_FONT_COLOR_CODE = "|cff40c040"
+Globals.COLLECTION_LIST_WIDTH = 260
+
+Globals.EmptyArmor = {
   [1] = 134110,
   --[2] = 134112, neck
   [3] = 134112,
-  --[4] = 168659, shirt
+  --[4] = 168659, --shirt
   [5] = 168659,
   [6] = 143539,
   --[7] = 158329, pants
   [8] = 168664,
   [9] = 168665, --wrist
   [10] = 158329, --handr
+  [15] = 134111, --cloak
 }
 
-addon.Globals.LE_DEFAULT = 1
-addon.Globals.LE_APPEARANCE = 2
-addon.Globals.LE_ALPHABETIC = 3
-addon.Globals.LE_ITEM_SOURCE = 6
-addon.Globals.LE_EXPANSION = 5
-addon.Globals.LE_COLOR = 4
+Globals.LE_DEFAULT = 1
+Globals.LE_APPEARANCE = 2
+Globals.LE_ALPHABETIC = 3
+Globals.LE_ITEM_SOURCE = 6
+Globals.LE_EXPANSION = 5
+Globals.LE_COLOR = 4
 
-addon.Globals.TAB_ITEMS = 1
-addon.Globals.TAB_SETS = 2
-addon.Globals.TAB_EXTRASETS = 3
-addon.Globals.TAB_SAVED_SETS = 4
-addon.Globals.TABS_MAX_WIDTH = 245
+Globals.TAB_ITEMS = 1
+Globals.TAB_SETS = 2
+Globals.TAB_EXTRASETS = 3
+Globals.TAB_SAVED_SETS = 4
+Globals.TABS_MAX_WIDTH = 245
 
-addon.Globals.FILTER_SOURCES = {L["Classic Set"],L["Quest Set"],L["Dunegon Set"],L["Raid Recolor"],L["Raid Lookalike"],L["Garrison"],L["Island Expidetion"], L["Warfronts"]}
-addon.Globals.EXPANSIONS = {EXPANSION_NAME0 , EXPANSION_NAME1, EXPANSION_NAME2, EXPANSION_NAME3 , EXPANSION_NAME4, EXPANSION_NAME5, EXPANSION_NAME6, EXPANSION_NAME7, EXPANSION_NAME8}
+Globals.FILTER_SOURCES = {L["MISC"], L["Classic Set"],L["Quest Set"],L["Dunegon Set"],L["Raid Recolor"],L["Raid Lookalike"],L["PvP"],L["Garrison"],L["Island Expidetion"], L["Warfronts"]}
+Globals.EXPANSIONS = {EXPANSION_NAME0 , EXPANSION_NAME1, EXPANSION_NAME2, EXPANSION_NAME3 , EXPANSION_NAME4, EXPANSION_NAME5, EXPANSION_NAME6, EXPANSION_NAME7, EXPANSION_NAME8}

@@ -22,6 +22,7 @@ function S:BetterWardrobe()
 	local BW_WardrobeCollectionFrame = _G.BW_WardrobeCollectionFrame
 	local SetsCollectionFrame = _G.BW_WardrobeCollectionFrame.BW_SetsCollectionFrame
 	local BW_SortDropDown = _G.BW_SortDropDown
+	local BW_DBSavedSetDropdown = _G.BW_DBSavedSetDropdown
 
 	S:HandleTab(BW_WardrobeCollectionFrame.ItemsTab)
 	S:HandleTab(BW_WardrobeCollectionFrame.SetsTab)
@@ -30,7 +31,22 @@ function S:BetterWardrobe()
 
 	UIDropDownMenu_SetWidth(BW_SortDropDown, 110)
 	S:HandleDropDownBox(BW_SortDropDown)
+
 	BW_SortDropDown:SetScript("OnShow", function() UIDropDownMenu_SetWidth(BW_SortDropDown, 110) end)
+
+	S:HandleButton(L_DropDownList1)
+
+--L_UIDropDownMenu_SetWidth(BW_DBSavedSetDropdown, 155)
+	S:HandleDropDownBox(BW_DBSavedSetDropdown)
+		BW_DBSavedSetDropdown:ClearAllPoints()
+BW_DBSavedSetDropdown:SetPoint("TOPRIGHT", "BW_SortDropDown", "TOPRIGHT", -0 , 0)
+	BW_DBSavedSetDropdown:SetScript("OnShow", function() L_UIDropDownMenu_SetWidth(BW_DBSavedSetDropdown, 155)
+	BW_DBSavedSetDropdown:SetPoint("TOPRIGHT", "BW_SortDropDown", "TOPRIGHT", -0 , 0)
+
+ end)
+
+
+	--BW_DBSavedSetDropdown:SetScript("OnShow", function() L_UIDropDownMenu_SetWidth(BW_DBSavedSetDropdown, 155) end)
 
 	S:HandleButton(BW_WardrobeCollectionFrame.FilterButton)
 
@@ -60,9 +76,12 @@ function S:BetterWardrobe()
 	S:HandleButton(BW_TransmogOptionsButton)
 	--S:HandleButton(BW_WardrobeToggle)
 
-BW_DressingRoomFrame:SetTemplate("Transparent")
+	BW_DressingRoomFrame:SetTemplate("Transparent")
 	BW_DressingRoomOutfitFrame:StripTextures()
 	BW_DressingRoomOutfitFrame:SetTemplate('Transparent')
+
+
+
 
 
 S:HandleScrollBar(BW_DressingRoomOutfitFrameScrollFrameScrollBar)
@@ -74,6 +93,8 @@ S:HandleScrollBar(BW_DressingRoomOutfitFrameScrollFrameScrollBar)
 	S:HandleButton(BW_DressingRoomFrame.BW_DressingRoomSettingsButton)
 	S:HandleButton(BW_DressingRoomFrame.BW_DressingRoomHideArmorButton)
 	S:HandleButton(BW_DressingRoomFrame.BW_DressingRoomExportButton)
+	S:HandleButton(BW_DressingRoomFrame.BW_DressingRoomTargettButton)  --TODO:  Fix the spelling of the frame
+
 for index, button in pairs(BW_DressingRoomFrame.PreviewButtonFrame.Slots) do
 S:HandleItemButton(button)
 	--button.IconBorder:SetColorTexture(1, 1, 1, 0.1)

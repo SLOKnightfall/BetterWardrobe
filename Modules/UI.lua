@@ -18,7 +18,6 @@ local TAB_EXTRASETS = addon.Globals.TAB_EXTRASETS
 local TAB_SAVED_SETS = addon.Globals.TAB_SAVED_SETS
 local TABS_MAX_WIDTH = addon.Globals.TABS_MAX_WIDTH
 
-local Wardrobe = WardrobeCollectionFrame.ItemsCollectionFrame
 
 local db, active
 local FileData
@@ -40,7 +39,7 @@ function UI.SortDropdowns_Initialize()
 	if not addon.sortDB then
 		addon.sortDB = CopyTable(defaults)
 	end
-
+	local Wardrobe = WardrobeCollectionFrame.ItemsCollectionFrame
 	db = addon.sortDB
 	
 	--f:RegisterEvent("TRANSMOG_COLLECTION_ITEM_UPDATE")
@@ -61,8 +60,8 @@ function UI.SortDropdowns_Initialize()
 			if tabID == 1 then
 				--Wardrobe:OnShow()
 						Wardrobe:RefreshVisualsList()
-		Wardrobe:UpdateItems()
-		Wardrobe:UpdateWeaponDropDown()
+				Wardrobe:UpdateItems()
+				Wardrobe:UpdateWeaponDropDown()
 			elseif tabID == 2 then
 				WardrobeCollectionFrame.SetsCollectionFrame:OnSearchUpdate()
 				WardrobeCollectionFrame.SetsTransmogFrame:OnSearchUpdate()
@@ -85,7 +84,7 @@ function UI.SortDropdowns_Initialize()
 	UIDropDownMenu_SetSelectedValue(BW_SortDropDown, db.sortDropdown)
 	UIDropDownMenu_SetText(BW_SortDropDown, COMPACT_UNIT_FRAME_PROFILE_SORTBY.." "..L[db.sortDropdown])
 
-				
+	UI.CreateBW_SelectSavedSetDropdown()
 end
 
 function BW_TransmogOptionsButton_OnEnter(self)
@@ -203,6 +202,8 @@ end
 
 -- Base Transmog Sets Window Upates
 function UI.ExtendTransmogView()
+	if WardrobeFrame and WardrobeFrame.extended then return end
+
     WardrobeFrame:SetWidth(1170)
     WardrobeTransmogFrame:SetWidth(500)
     WardrobeTransmogFrame.ModelScene:ClearAllPoints()
@@ -225,7 +226,13 @@ function UI.ExtendTransmogView()
     WardrobeTransmogFrame.ModelScene.SecondaryHandEnchantButton:ClearAllPoints()
     WardrobeTransmogFrame.ModelScene.SecondaryHandEnchantButton:SetPoint("BOTTOM", WardrobeTransmogFrame.ModelScene.SecondaryHandButton, "BOTTOM", 0, -20)
 
-    UIPanelWindows["WardrobeFrame"].width = 1170
+    if UIPanelWindows["WardrobeFrame"] then 
+	    UIPanelWindows["WardrobeFrame"].width = 1170
+	else 
+		UIPanelWindows["WardrobeFrame"] ={ area = "left", pushable = 0,	width = 1170 };
+	end
+	UpdateUIPanelPositions()
+    WardrobeFrame.extended = true
 end
 
 
@@ -273,7 +280,7 @@ function BW_WardrobeCollectionFrame_SetTab(tabID)
 	BW_WardrobeCollectionFrame.BW_SetsCollectionFrame:SetShown((tab3 or tab4) and not atTransmogrifier)
 	BW_WardrobeCollectionFrame.BW_SetsTransmogFrame:SetShown((tab3 or tab4) and atTransmogrifier)
 
-	BW_WardrobeToggle:SetShown(tab2 or tab3 or (tab4 and not atTransmogrifier))
+	BW_WardrobeToggle:SetShown(tab2 or tab3 or tab4 )
 	BW_WardrobeToggle.VisualMode = false
 
 	local searchBox_X = ((tab1 or ((tab2 or tab3 or tab4) and atTransmogrifier)) and -107) or 19
@@ -281,17 +288,13 @@ function BW_WardrobeCollectionFrame_SetTab(tabID)
 	local searchBox_Anchor = ((tab1 or ((tab2 or tab3 or tab4) and atTransmogrifier)) and "TOPRIGHT") or "TOPLEFT"
 
 	WardrobeCollectionFrame.searchBox:ClearAllPoints()
-	local enableSearchAndFilter = WardrobeCollectionFrame.ItemsCollectionFrame.transmogLocation and WardrobeCollectionFrame.ItemsCollectionFrame.transmogLocation:IsAppearance()
-	WardrobeCollectionFrame.searchBox:SetEnabled(enableSearchAndFilter);
-	--WardrobeCollectionFrame.searchBox:SetEnabled(tab1 and WardrobeCollectionFrame.ItemsCollectionFrame.transmogType == LE_TRANSMOG_TYPE_APPEARANCE or tab2 or tab3)
+	WardrobeCollectionFrame.searchBox:SetEnabled(tab1 and WardrobeCollectionFrame.ItemsCollectionFrame.transmogType == Enum.TransmogType.Appearance or tab2 or tab3)
 	WardrobeCollectionFrame.searchBox:SetPoint(searchBox_Anchor, searchBox_X, searchBox_Y)
 	WardrobeCollectionFrame.searchBox:SetWidth(((tab2 or tab3 or tab4) and not atTransmogrifier and 145) or 105)
 	--WardrobeCollectionFrame.searchBox:SetShown(not tab4)
 
-	WardrobeCollectionFrame.FilterButton:SetShown(tab2 and not atTransmogrifier)
-	--WardrobeCollectionFrame.FilterButton:SetEnabled(tab1 and WardrobeCollectionFrame.ItemsCollectionFrame.transmogType == LE_TRANSMOG_TYPE_APPEARANCE or tab2)
-	WardrobeCollectionFrame.FilterButton:SetEnabled(enableSearchAndFilter);
-
+	WardrobeCollectionFrame.FilterButton:SetShown(tab1 or (tab2 and not atTransmogrifier))
+	WardrobeCollectionFrame.FilterButton:SetEnabled(tab1 and WardrobeCollectionFrame.ItemsCollectionFrame.transmogType == Enum.TransmogType.Appearance or tab2)
 	--WardrobeCollectionFrame.progressBar:SetShown(not tab4)
 	BW_CollectionListButton:SetShown(tab1 and not atTransmogrifier)
 
@@ -304,10 +307,11 @@ function BW_WardrobeCollectionFrame_SetTab(tabID)
 	BW_WardrobeCollectionFrame.TransmogOptionsButton:SetEnabled(addon.Profile.ShowIncomplete)
 
 	UIDropDownMenu_EnableDropDown(BW_SortDropDown)
+	BW_SortDropDown:SetShown(not tab4)
+	BW_DBSavedSetDropdown:SetShown(tab4)
 	BW_SortDropDown:ClearAllPoints()
 
 	if tab1 then
-
 		WardrobeCollectionFrame.activeFrame = WardrobeCollectionFrame.ItemsCollectionFrame
 		BW_WardrobeCollectionFrame.activeFrame = WardrobeCollectionFrame.ItemsCollectionFrame
 
@@ -315,6 +319,7 @@ function BW_WardrobeCollectionFrame_SetTab(tabID)
 		BW_SortDropDown:SetPoint("TOPLEFT", WardrobeCollectionFrame.ItemsCollectionFrame.WeaponDropDown, "BOTTOMLEFT", 0, (atTransmogrifier and (isWeapon and 55 or 32)) or LegionWardrobeY)
 
 	elseif tab2 then
+		WardrobeCollectionFrame.SetsTransmogFrame:UpdateProgressBar()
 		if atTransmogrifier  then
 			WardrobeCollectionFrame.activeFrame = WardrobeCollectionFrame.SetsTransmogFrame
 			BW_WardrobeCollectionFrame.activeFrame = WardrobeCollectionFrame.SetsTransmogFrame
@@ -326,7 +331,7 @@ function BW_WardrobeCollectionFrame_SetTab(tabID)
 		end
 
 	elseif tab3 then
-		
+		BW_WardrobeCollectionFrame.BW_SetsTransmogFrame:UpdateProgressBar()
 		if atTransmogrifier then
 			WardrobeCollectionFrame.activeFrame = BW_WardrobeCollectionFrame.BW_SetsTransmogFrame
 			BW_WardrobeCollectionFrame.activeFrame = BW_WardrobeCollectionFrame.BW_SetsTransmogFrame
@@ -339,6 +344,7 @@ function BW_WardrobeCollectionFrame_SetTab(tabID)
 		
 		WardrobeCollectionFrame.searchBox:Show()
 	elseif tab4 then
+		--BW_WardrobeToggle.VisualMode = true
 		local savedCount = #addon.GetSavedList()
 		WardrobeCollectionFrame_UpdateProgressBar(savedCount, savedCount)
 		--WardrobeCollectionFrame.searchBox:Hide()
@@ -380,7 +386,7 @@ local function CreateVisualViewButton()
 		local atTransmogrifier = WardrobeFrame_IsAtTransmogrifier()
 		if (atTransmogrifier) then
 			local tab = WardrobeCollectionFrame.selectedTransmogTab
-			if tab == 2  or tab == 3 then
+			if tab == 2  or tab == 3  or tab == 4 then 
 				self.VisualMode = not self.VisualMode
 				WardrobeCollectionFrame.SetsTransmogFrame:OnSearchUpdate()
 				BW_SetsTransmogFrame:OnSearchUpdate()
@@ -451,6 +457,7 @@ end
 
 
 local function PositionDropDown()
+	local Wardrobe = WardrobeCollectionFrame.ItemsCollectionFrame
 	if WardrobeFrame_IsAtTransmogrifier() then
 		local _, isWeapon = C_TransmogCollection.GetCategoryInfo(Wardrobe:GetActiveCategory() or -1)
 		BW_SortDropDown:SetPoint("TOPLEFT", Wardrobe.WeaponDropDown, "BOTTOMLEFT", 0, isWeapon and 55 or 32)
@@ -487,7 +494,7 @@ function addon.Init:BuildUI()
 	UI.SortDropdowns_Initialize()
 	UI.LocationDropdowns_Initialize()
 	CreateVisualViewButton()
-	UI.ExtendTransmogView()
+	
 --BW_WardrobeCollectionFrame:GetFrameLevel()
 	WardrobeCollectionFrame.searchBox:SetFrameLevel(BW_WardrobeCollectionFrame:GetFrameLevel()+10)
 	WardrobeCollectionFrame.FilterButton:SetFrameLevel(BW_WardrobeCollectionFrame:GetFrameLevel()+10)
@@ -497,7 +504,9 @@ function addon.Init:BuildUI()
  	UI.BuildLoadQueueButton()
 	UI.DefaultButtons_Update()
 
-	hooksecurefunc(Wardrobe, "UpdateWeaponDropDown", PositionDropDown)
+	UI.ExtendTransmogView()
+--	WardrobeFrame:HookScript("OnShow",  function() print("XXX"); UI.ExtendTransmogView() end)
+	hooksecurefunc(WardrobeCollectionFrame.ItemsCollectionFrame, "UpdateWeaponDropDown", PositionDropDown)
 end
 
 
@@ -513,7 +522,7 @@ local FILTER_SOURCES = addon.Globals.FILTER_SOURCES
 local EXPANSIONS = addon.Globals.EXPANSIONS
 
 
-local filterCollected = {}
+local filterCollected = {true, true}
 local missingSelection = {}
 local filterSelection = {}
 local xpacSelection = {}
@@ -523,23 +532,17 @@ addon.filterSelection = filterSelection
 addon.missingSelection = missingSelection
 
 function addon:InitTables()
-	filterCollected = {true, true}
-
-	for i = 1, 8 do
+	for i = 1, #FILTER_SOURCES do
 		filterSelection[i] = true
 	end
 
-	for i = 1, 8 do
+	for i = 1, #EXPANSIONS do
 		xpacSelection[i] = true
 	end
 end
 
 addon:InitTables()
 
-addon.filterCollected = filterCollected
-addon.xpacSelection = xpacSelection
-addon.filterSelection = filterSelection
-addon.missingSelection = missingSelection
 function UI:FilterDropDown_InitializeItems(level)
 	if (not WardrobeCollectionFrame.activeFrame) then
 		return
@@ -555,7 +558,7 @@ function UI:FilterDropDown_InitializeItems(level)
 		info.func = function(_, _, _, value)
 						filterCollected[1] = value
 						RefreshLists()
-						UIDropDownMenu_Refresh(BW_WardrobeFilterDropDown, 1, refreshLevel)
+						--UIDropDownMenu_Refresh(BW_WardrobeFilterDropDown)
 					end
 		info.checked = 	function() return filterCollected[1] end
 		info.isNotRadio = true
@@ -565,7 +568,7 @@ function UI:FilterDropDown_InitializeItems(level)
 		info.func = function(_, _, _, value)
 						filterCollected[2] =  value
 						RefreshLists()
-						UIDropDownMenu_Refresh(BW_WardrobeFilterDropDown, 1, refreshLevel)
+						--UIDropDownMenu_Refresh(BW_WardrobeFilterDropDown)
 					end
 		info.checked = 	function() return filterCollected[2] end
 		info.isNotRadio = true
@@ -581,6 +584,11 @@ function UI:FilterDropDown_InitializeItems(level)
 
 		info.text = SOURCES
 		info.value = 1
+		info.isNotRadio = true
+		--info.arg1 = self:GetName().."Check"
+		--info.func = function(dropdownbutton, arg1)
+			--_G[arg1]:Hide()
+		--end,
 		UIDropDownMenu_AddButton(info, level)
 
 		info.text = L["Expansion"]
@@ -589,6 +597,10 @@ function UI:FilterDropDown_InitializeItems(level)
 
 		info.text = "Missing:"
 		info.value = 3
+		UIDropDownMenu_AddButton(info, level)
+
+		info.text = L["Armor Type"]
+		info.value = 4
 		UIDropDownMenu_AddButton(info, level)
 
 	elseif level == 2  and UIDROPDOWNMENU_MENU_VALUE == 1 then
@@ -603,7 +615,7 @@ function UI:FilterDropDown_InitializeItems(level)
 								filterSelection[i] = true
 						end
 						RefreshLists()
-						UIDropDownMenu_Refresh(BW_WardrobeFilterDropDown, 1, refreshLevel)
+						UIDropDownMenu_Refresh(BW_WardrobeFilterDropDown)
 					end
 		UIDropDownMenu_AddButton(info, level)
 
@@ -619,7 +631,7 @@ function UI:FilterDropDown_InitializeItems(level)
 								filterSelection[i] = false
 						end
 						RefreshLists()
-						UIDropDownMenu_Refresh(BW_WardrobeFilterDropDown, 1, refreshLevel)
+						UIDropDownMenu_Refresh(BW_WardrobeFilterDropDown)
 					end
 		UIDropDownMenu_AddButton(info, level)
 		UIDropDownMenu_AddSeparator(level)
@@ -649,7 +661,7 @@ function UI:FilterDropDown_InitializeItems(level)
 							xpacSelection[i] = true
 						end
 						RefreshLists()
-						UIDropDownMenu_Refresh(BW_WardrobeFilterDropDown, 1, refreshLevel)
+						UIDropDownMenu_Refresh(BW_WardrobeFilterDropDown)
 					end
 		UIDropDownMenu_AddButton(info, level)
 
@@ -664,7 +676,7 @@ function UI:FilterDropDown_InitializeItems(level)
 								xpacSelection[i] = false
 						end
 						RefreshLists()
-						UIDropDownMenu_Refresh(BW_WardrobeFilterDropDown, 1, refreshLevel)
+						UIDropDownMenu_Refresh(BW_WardrobeFilterDropDown)
 					end
 		UIDropDownMenu_AddButton(info, level)
 		UIDropDownMenu_AddSeparator(level)
@@ -692,7 +704,7 @@ function UI:FilterDropDown_InitializeItems(level)
 							missingSelection[i] = true
 						end
 						RefreshLists()
-						UIDropDownMenu_Refresh(BW_WardrobeFilterDropDown, 1, refreshLevel)
+						UIDropDownMenu_Refresh(BW_WardrobeFilterDropDown)
 					end
 		UIDropDownMenu_AddButton(info, level)
 
@@ -702,7 +714,7 @@ function UI:FilterDropDown_InitializeItems(level)
 							missingSelection[i] = false
 						end
 						RefreshLists()
-						UIDropDownMenu_Refresh(BW_WardrobeFilterDropDown, 1, refreshLevel)
+						UIDropDownMenu_Refresh(BW_WardrobeFilterDropDown)
 					end
 		UIDropDownMenu_AddButton(info, level)
 		UIDropDownMenu_AddSeparator(level)
@@ -718,17 +730,39 @@ function UI:FilterDropDown_InitializeItems(level)
 								missingSelection[21] = value
 							end
 
-							UIDropDownMenu_Refresh(BW_WardrobeFilterDropDown, 1, refreshLevel)
+							UIDropDownMenu_Refresh(BW_WardrobeFilterDropDown)
 							RefreshLists()
 						end
 				info.checked = function() return missingSelection[index] end
 				UIDropDownMenu_AddButton(info, level)
 			end
 		end
+	elseif level == 2  and UIDROPDOWNMENU_MENU_VALUE == 4 then
+		local counter = 1
+		for name in pairs(addon.Globals.ARMOR_MASK) do
+	info.keepShownOnClick = false
+
+			info.text = name
+			info.func = function(info, arg1, _, value)
+
+					addon.selectedArmorType = arg1
+					addon.extraSetsCache = nil
+							BW_WardrobeCollectionFrame_SetTab(2)
+		BW_WardrobeCollectionFrame_SetTab(3)
+					RefreshArmor()
+			end
+			info.arg1 = name
+			info.checked = 	function() return addon.selectedArmorType == name end
+			UIDropDownMenu_AddButton(info, level)
+		end
+
 	end
 --end
 end
 
+function RefreshArmor()
+
+end
 
 function addon.ToggleHidden(model, isHidden)
 	local tabID = addon.GetTab()
@@ -789,7 +823,6 @@ function UI:DefaultDropdown_Update(model, button)
 	if BW_WardrobeCollectionFrame.selectedTransmogTab == 4 or BW_WardrobeCollectionFrame.selectedCollectionTab == 4 then
 		return
 	end
-
 	if button == "RightButton" and model:GetParent().transmogType ~= LE_TRANSMOG_TYPE_ILLUSION then
 		if not DropDownList1:IsShown() then
 			 -- force show dropdown
@@ -813,9 +846,10 @@ function UI:DefaultDropdown_Update(model, button)
 						--addon.QueueForTransmog(type, setID, name)
 						addon.QueueList = {type, setID, name}
 					 end,
-				})
-
-			variantTarget, variantType, match, matchType = addon.Sets:SelectedVariant(setID)
+					})
+			if type == "set" then 
+				variantTarget, variantType, match, matchType = addon.Sets:SelectedVariant(setID)
+			end
 		end
 
 		UIDropDownMenu_AddSeparator()
@@ -881,4 +915,135 @@ function UI.DefaultButtons_Update()
 		end
 
 		--WardrobeCollectionFrame.FilterButton:HookScript("OnMouseDown", function(...) UI:DefaultFilterDropdown_Update(...) end)
+end
+
+
+
+function UI.CreateBW_SelectSavedSetDropdown()
+--[[	local f = L_Create_UIDropDownMenu("BW_SelectSavedSetDropdown", BW_WardrobeCollectionFrame)
+	--local f = CreateFrame("Frame", "BW_SelectSavedSetDropdown", BW_WardrobeCollectionFrame, "UIDropDownMenuTemplate") 
+	f:SetSize(87, 22)
+	f:ClearAllPoints()
+	f:SetPoint("TOPRIGHT",6,-22)
+	L_UIDropDownMenu_SetText(f, addon.SelecteSavedList)
+
+		local contextMenuData = {
+		{
+			text = L["Saved Sets "], isTitle = true, notCheckable = true,
+		},
+	}
+	for name, data in ipairs(addon.setdb:GetProfiles()) do
+		local profile = {
+			text = data,
+			func = function()
+			addon.SelecteSavedList = data
+			--L_UIDropDownMenu_SetText(f, data)
+
+			--addon.setdb:SetProfile(data)
+			addon.savedSetCache = nil
+			--addon.setdb(name)
+			end,
+			isNotRadio = true,
+			notCheckable = true,
+		}
+
+		tinsert(contextMenuData, profile)
+	end]]
+--EasyMenu(contextMenuData, f, f, 0 , 0, "MENU");
+
+	--BW_SelectSavedSetDropdownButton:SetScript("OnMouseDown", function(self) L_EasyMenu(contextMenuData, f, f, 0 , 0, "MENU"); end)
+
+
+
+--[[	local  f = addon.Frame:Create("SimpleGroup")
+	UI.SavedSetDropDownFrame = f
+	f.frame:SetParent("BW_WardrobeCollectionFrame")
+	f:SetWidth(87)--, 22)
+	f:SetHeight(22)
+
+	f:ClearAllPoints()
+	f:SetPoint("TOPLEFT", "BW_SortDropDown", "TOPLEFT")
+	local list = {}
+
+	for name in pairs(addon.setdb.global.sets)do
+		tinsert(list, name)
+	end
+	local dropdown = addon.Frame:Create("Dropdown")
+	dropdown:SetWidth(175)--, 22)
+	--dropdown:SetHeight(22)
+	f:AddChild(dropdown)
+	dropdown:SetList(list)
+		--print(#addon.setdb:GetProfiles())
+	dropdown:SetText(addon.setdb:GetCurrentProfile() or "")
+	dropdown:SetCallback("OnValueChanged", function(widget) 
+
+		local value = widget.list[widget.value]
+		local name = UnitName("player")
+		local realm = GetRealmName()
+
+		if value ~= addon.setdb:GetCurrentProfile() then 
+			addon.SelecteSavedList = widget.list[widget.value]
+		else
+			addon.SelecteSavedList = false
+		end
+		BW_WardrobeCollectionFrame_SetTab(2)
+		--BW_WardrobeToggle.VisualMode = true
+		BW_WardrobeCollectionFrame_SetTab(4)
+		--addon.SetsDataProvider:ClearUsableSets()
+		--BW_SetsCollectionFrame:RefreshScrollList()
+		--BW_SetsTransmogFrame:RefreshSets()
+		addon.savedSetCache = nil
+	end)
+]]
+
+
+--local f = CreateFrame("Button", "BW_DBSavedSetDropdown", BW_WardrobeCollectionFrame, "UIDropDownMenuTemplate")
+	--BW_DBSavedSetDropdown = L_Create_UIDropDownMenu("BW_DBSavedSetDropdown",UIParent)
+    --local f = L_Create_UIDropDownMenu("myOwnDropDownMenu", parent)--BW_DBSetDropDown = f
+   -- BW_DBSavedSetDropdown:SetParent("BW_WardrobeCollectionFrame")
+	--f:SetWidth(87)--, 22)
+--	f:SetHeight(22)
+BW_DBSavedSetDropdown:SetParent("BW_WardrobeCollectionFrame")
+	BW_DBSavedSetDropdown:ClearAllPoints()
+	BW_DBSavedSetDropdown:SetPoint("TOPLEFT", "BW_SortDropDown", "TOPLEFT")
+
+	--ocal dropDown = CreateFrame("Frame", "WPDemoDropDown", UIParent, "UIDropDownMenuTemplate")
+
+L_UIDropDownMenu_SetWidth(BW_DBSavedSetDropdown, 165) -- Use in place of dropDown:SetWidth
+-- Bind an initializer function to the dropdown; see previous sections for initializer function examples.
+L_UIDropDownMenu_Initialize(BW_DBSavedSetDropdown, WPDropDownDemo_Menu)
+L_UIDropDownMenu_SetText(BW_DBSavedSetDropdown, addon.setdb:GetCurrentProfile())
+
+end
+
+BW_DBSavedSetDropdown = L_Create_UIDropDownMenu("BW_DBSavedSetDropdown",UIParent)
+BW_DBSavedSetDropdown:Hide()
+
+local function WPDropDownDemo_OnClick(self, arg1, arg2, checked)
+
+ 		local value = arg1
+		local name = UnitName("player")
+		local realm = GetRealmName()
+
+		if arg1 ~= addon.setdb:GetCurrentProfile() then 
+		addon.SelecteSavedList = arg1
+		else
+			addon.SelecteSavedList = false
+		end
+		BW_WardrobeCollectionFrame_SetTab(2)
+		BW_WardrobeCollectionFrame_SetTab(4)
+		L_UIDropDownMenu_SetText(BW_DBSavedSetDropdown, arg1)
+		addon.savedSetCache = nil
+end
+
+function WPDropDownDemo_Menu(frame, level, menuList)
+	local count = 1
+for name in pairs(addon.setdb.global.sets)do
+	 local info = L_UIDropDownMenu_CreateInfo()
+ info.func = WPDropDownDemo_OnClick
+ info.text, info.arg1 = name, name
+  L_UIDropDownMenu_AddButton(info)
+  count = count +1
+end
+
 end

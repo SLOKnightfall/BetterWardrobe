@@ -1,0 +1,27 @@
+<Bindings>
+	<Binding name="BetterWardrobe_TooltipScrollUp" hidden="true">
+		local BetterWardrobe = LibStub("AceAddon-3.0"):GetAddon("BetterWardrobe")
+		BetterWardrobe.tooltip.model:SetFacing(BetterWardrobe.tooltip.model:GetFacing()+0.3);
+	</Binding>
+	<Binding name="BetterWardrobe_TooltipScrollDown" hidden="true">
+		local BetterWardrobe = LibStub("AceAddon-3.0"):GetAddon("BetterWardrobe")
+		BetterWardrobe.tooltip.model:SetFacing(BetterWardrobe.tooltip.model:GetFacing()-0.3);
+	</Binding>
+
+	<Binding name= "BETTERWARDROBE_BINDING_TOGGLE_DRESSINGROOM" hidden="false" header="BETTERWARDROBE" category="Addons">
+		BetterWardrobe:ToggleDressingRoom()
+	</Binding>
+
+	<Binding name= "BETTERWARDROBE_BINDING_TARGETGEAR" hidden="false"  category="Addons">
+		DressUpFrame_Show(DressUpFrame)
+		BetterWardrobe:SetTargetGear()
+	</Binding>
+	<Binding name= "BETTERWARDROBE_BINDING_TARGETMODEL" hidden="false" category="Addons">
+		DressUpFrame_Show(DressUpFrame)
+		BetterWardrobe:SetTarget()
+	</Binding>
+	<Binding name= "BETTERWARDROBE_BINDING_PLAYERMODEL" hidden="false" category="Addons">
+		DressUpFrame_Show(DressUpFrame)
+		BetterWardrobe:SetTargetGear(true)	
+	</Binding>
+</Bindings>

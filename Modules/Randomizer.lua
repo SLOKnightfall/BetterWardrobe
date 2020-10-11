@@ -29,22 +29,26 @@ function BW_RandomizeButton:BuildAppearanceList()
 	if not update and AppearanceList then return end
 
 	AppearanceList = (AppearanceList and wipe(AppearanceList)) or {}
-	for _, slotInfo in ipairs(TRANSMOG_SLOTS) do
-		local slot = slotInfo.slot
-		local slotID = GetInventorySlotInfo(slot)
+	for i, slotInfo in pairs(TRANSMOG_SLOTS) do
+		local slot = slotInfo.slotID
+		local slotID = slotInfo.location:GetSlotID()
+
+		local transmogLocation = TransmogUtil.GetTransmogLocation(slotID, Enum.TransmogType.Appearance, Enum.TransmogModification.None);
+
 		AppearanceList[slotID] = AppearanceList[slotID] or {}
 
-		local _, _, _, canTransmogrify, cannotTransmogrifyReason, _ = C_Transmog.GetSlotInfo(slotID, LE_TRANSMOG_TYPE_APPEARANCE)
+		local _, _, _, canTransmogrify, cannotTransmogrifyReason, _ = C_Transmog.GetSlotInfo(transmogLocation)
 		if canTransmogrify or cannotTransmogrifyReason == 0 then
-			local sourceID = C_Transmog.GetSlotVisualInfo(slotID, LE_TRANSMOG_TYPE_APPEARANCE)
+			local sourceID = C_Transmog.GetSlotVisualInfo(transmogLocation)
 			local categoryID = slotInfo.armorCategoryID or C_TransmogCollection.GetAppearanceSourceInfo(sourceID)
 			AddSlotAppearances(slotID, categoryID)
 
 			for weaponCategoryID = FIRST_TRANSMOG_COLLECTION_WEAPON_TYPE, LAST_TRANSMOG_COLLECTION_WEAPON_TYPE do
 				local name, isWeapon, _, canMainHand, canOffHand = C_TransmogCollection.GetCategoryInfo(weaponCategoryID)
 				if name and isWeapon and weaponCategoryID ~= categoryID then
-					if (slot == 'MAINHANDSLOT' and canMainHand) or (slot == 'SECONDARYHANDSLOT' and canOffHand) then
-						local equippedItemID = GetInventoryItemID('player', GetInventorySlotInfo(slot))
+					if (slotInfo.location:IsMainHand() and canMainHand) or (slotInfo.location:IsOffHand() and canOffHand) then  --todo either hand
+						print(slotID)
+						local equippedItemID = GetInventoryItemID('player', GetInventorySlotInfo(slotInfo.location:GetSlotName()))
 						if C_TransmogCollection.IsCategoryValidForItem(weaponCategoryID, equippedItemID) then
 							AddSlotAppearances(slotID, weaponCategoryID)
 						end
@@ -67,7 +71,9 @@ local function RandomizeBySlot(slotID)
 		if sourceList then
 			for _, source in pairs(sourceList) do
 				if source.isCollected then
-					C_Transmog.SetPending(slotID, LE_TRANSMOG_TYPE_APPEARANCE, source.sourceID)
+
+					local transmogLocation = TransmogUtil.GetTransmogLocation(slotID, Enum.TransmogType.Appearance, Enum.TransmogModification.None);
+					C_Transmog.SetPending(transmogLocation, source.sourceID, Enum.TransmogType.Appearance)
 					break
 				end
 			end
@@ -118,11 +124,13 @@ function BW_RandomizeButton:Randomize(type)
 	totalTime = 0
 	SpinThrottle = DEFAULT_THROTTLE
 	self.Stop = false
+	print(type)
 	
 	if type == "outfit" then
 			RandomizeOutfit()
 			self.RunRandom = RandomizeOutfit
 	elseif type == "item" then
+		print("item")
 			self.Slot = slotID
 			RandomizeBySlot(slotID)
 			self.RunRandom = RandomizeBySlot(slotID)
