@@ -32,7 +32,9 @@ local hiddenSet ={
 }
 
 
-local setData = {}
+local SET_DATA = {}
+local SET_INDEX = {}
+local ArmorDB = {}
 
 local function GetFactionID(faction)
 	if faction == "Horde" then
@@ -58,10 +60,89 @@ local function OpposingFaction(faction)
 	end
 end
 
+addon.ArmorSetModCache = {}
+do
+	function BuildArmorDB()
+		for armorType, data in pairs(addon.ArmorSets) do
+			ArmorDB[armorType] = {}
+
+			for id, setData in pairs(data) do
+
+							--local faction = setData[5]
+				local opposingFaction , City = OpposingFaction(faction) -- BFAFaction,
+				
+				setData.isFactionLocked = string.find(setData.name, opposingFaction) 
+					--or string.find(setData.name, BFAFaction)
+					or string.find(setData.name, City)
+				setData.isHeritageArmor = string.find(setData.name, "Heritage")
+
+
+				local classInfo = CLASS_INFO[playerClass]
+				local class = (setData.classMask and setData.classMask == classInfo[1]) or not setData.classMask
+				local className = (setData.classMask and GetClassInfo(setData.classMask)) or nil
+
+				setData.isClass = class
+				setData.className = className
+
+
+				setData["name"] = L[setData["name"]]
+
+				if not setData.note then
+					local note = "NOTE_"..(setData.label or 0)
+					setData.note = note
+
+					setData.label =L[note] or ""
+				end
+
+
+			--places some of the sets that didnt have correct filters
+				if setData.note == "NOTE_4" or setData.note == "NOTE_4" then
+					setData.filter = 4 
+				elseif setData.note == "NOTE_95" then
+					setData.filter = 7	
+				elseif setData.note == "NOTE_96" then 
+					setData.filter = 5
+				elseif setData.note == "NOTE_97" then 
+					setData.filter = 3
+
+				end
+
+						--setData.mod = setData.bonusid
+				setData.uiOrder = id * 100
+						--setData.filter = setData.filter + 1 -- fix for filter startin at 0
+
+				for index, item in ipairs( setData["items"]) do
+					if setData.sources and setData.sources[item] and setData.sources[item] ~= 0 then 
+						local appearanceID = setData.sources[item]
+						ItemDB[appearanceID] = ItemDB[appearanceID] or {}
+						ItemDB[appearanceID][id] = setData
+					end
+
+					--[[local setMod =  setData.mod or 0
+																local visualID, sourceID = C_TransmogCollection.GetItemInfo(item, setMod)
+																if sourceID then
+																	addon.ArmorSetModCache[item] = {}
+																	addon.ArmorSetModCache[item][setMod] = {visualID, sourceID}
+																end]]
+
+					
+			
+				end
+
+				ArmorDB[armorType][id] = setData
+			end
+		end
+		addon.ArmorSets = nil
+	end
+
+	function addon.Init:InitDB()
+		BuildArmorDB()
+		addon.Init:BuildDB()
+	end
+end
 
 do
 	--local baseList = {}
-	local setsInfo = {}
 
 	local function sourceLookup(item, modID)
 		C_Timer.After(0, function() 
@@ -73,88 +154,35 @@ do
 		end);
 	end
 
+
 	local function addArmor(armorSet)
-	local tablecopy = CopyTable(armorSet)
-	local list = CopyTable(addon.extraSetsCache) or {}	
-		for id, setData in pairs(tablecopy) do
-			
-			local setInfo = C_TransmogSets.GetSetInfo(id)
-			local classInfo = CLASS_INFO[playerClass]
-			local class = (setData.classMask and setData.classMask == classInfo[1]) or not setData.classMask
+		for id, setData in pairs(armorSet) do
+			if  (setData.isClass or 
+					(addon.Profile.IgnoreClassRestrictions and ((setData.filter == 6 or setData.filter == 7) and addon.Profile.IgnoreClassLookalikeRestrictions)) or 
+					(addon.Profile.IgnoreClassRestrictions and not addon.Profile.IgnoreClassLookalikeRestrictions)) 
+				and not (setData.label == 6 or setData.label == 8 or setData.label == 16)
+				and not setData.isFactionLocked 
+				and not setData.isHeritageArmor  then
 
-			local className = (setData.classMask and GetClassInfo(setData.classMask)) or nil
-
-			--local faction = setData[5]
-			local opposingFaction , City = OpposingFaction(faction) -- BFAFaction,
-			
-			local factionLocked = string.find(setData.name, opposingFaction) 
-				--or string.find(setData.name, BFAFaction)
-				or string.find(setData.name, City)
-			local heritageArmor = string.find(setData.name, "Heritage")
-		
-			--if not  setInfo  then 
-				if  (class or 
-						(addon.Profile.IgnoreClassRestrictions and ((setData.filter == 6 or setData.filter == 7) and addon.Profile.IgnoreClassLookalikeRestrictions)) or 
-						(addon.Profile.IgnoreClassRestrictions and not addon.Profile.IgnoreClassLookalikeRestrictions)) 
-					and not (setData.label == 6 or setData.label == 8 or setData.label == 16)
-					and not factionLocked 
-					and not heritageArmor  then
-
-					setData["name"] = L[setData["name"]]
-
-					if not setData.note then
-						local note = "NOTE_"..(setData.label or 0)
-						setData.note = note
-
-						setData.label =L[note] or ""
+				for index, item in ipairs( setData["items"]) do
+					--if addon.setdb.global.itemSubstitute[item] then 
+					--Swaps items for substitutes
+					if subitemlist[item] then 
+						local appearanceID, sourceID = C_TransmogCollection.GetItemInfo(item)
+						local sources = C_TransmogCollection.GetAppearanceSources(appearanceID)
+						WardrobeCollectionFrame_SortSources(sources)
+						setData["items"][index] = subitemlist[item]
+						setData.sources[item] = appearanceID
 					end
-
-					setData.isClass = class
-					setData.className = className
-
-
-
-				--places some of the sets that didnt have correct filters
-					if setData.note == "NOTE_4" or setData.note == "NOTE_4" then
-						setData.filter = 4 
-					elseif setData.note == "NOTE_95" then
-						setData.filter = 7	
-					elseif setData.note == "NOTE_96" then 
-						setData.filter = 5
-					elseif setData.note == "NOTE_97" then 
-						setData.filter = 3
-
-					end
-
-					--setData.mod = setData.bonusid
-					setData.uiOrder = id * 100
-					--setData.filter = setData.filter + 1 -- fix for filter startin at 0
-
-					for index, item in ipairs( setData["items"]) do
-						--if addon.setdb.global.itemSubstitute[item] then 
-						--Swaps items for substitutes
-						if subitemlist[item] then 
-							local appearanceID, sourceID = C_TransmogCollection.GetItemInfo(item)
-							local sources = C_TransmogCollection.GetAppearanceSources(appearanceID)
-							WardrobeCollectionFrame_SortSources(sources)
-							setData["items"][index] = subitemlist[item]
-							setData.sources[item] = appearanceID
-						end
-
-						if setData.sources and setData.sources[item] and setData.sources[item] ~= 0 then 
-							local appearanceID = setData.sources[item]
-							ItemDB[appearanceID] = ItemDB[appearanceID] or {}
-							ItemDB[appearanceID][id] = setData
-						end
-					end
-
-					setsInfo[id] = setData
-					tinsert(list, setsInfo[id])	
 				end
+
+				SET_INDEX[id] = setData
+				tinsert(SET_DATA, setData)	
+			end
 			--else --print(setInfo)
 			--end
 		end
-		addon.extraSetsCache = list
+
 	end
 
 function addon.IsSetItem(itemLink)
@@ -213,58 +241,44 @@ local function buildSetSubstitutions()
 			end
 		end
 	end 
+
+
+
 	function addon.Init:BuildDB()
-		
-	--local faction = GetFactionID(UnitFactionGroup("player"))
-		--AllSets()
 		buildSetSubstitutions()
-		local armorSet = addon.ArmorSets[addon.selectedArmorType] or addon.ArmorSets[CLASS_INFO[playerClass][3]]
-		addon.ArmorSetModCache = addon.ArmorSetModCache or {}
-		addon.extraSetsCache = addon.extraSetsCache or {}
-		setsInfo = setsInfo or {}
-
-
-
+		local armorSet = ArmorDB[addon.selectedArmorType] or ArmorDB[CLASS_INFO[playerClass][3]]
+		wipe(SET_INDEX)
+		wipe(SET_DATA)
 		addArmor(armorSet)
-		addArmor(addon.ArmorSets["COSMETIC"])
-		--BWSets = addon.modArmor
-		--Add Hidden Set
-		setsInfo[0] = hiddenSet
-		tinsert(addon.extraSetsCache, setsInfo[0])
-		--addon.GetAllSets()
+		addArmor(ArmorDB["COSMETIC"])
 
-		
-		--wipe(addon.ArmorSets)
+		--Add Hidden Set
+		SET_INDEX[0] = hiddenSet
+		tinsert(SET_DATA, hiddenSet)
 	end
+
 
 	function addon:ClearCache()
 		--addon.ArmorSets = nil
 		addon.ArmorSetModCache = nil
 		addon.extraSetsCache = nil
-		--setsInfo = nil
+		wipe(SET_INDEX)
+		wipe(SET_DATA)
 
+		--setsInfo = nil
 	end
 
 
 	function addon.GetBaseList()
-		if not addon.extraSetsCache then 
---[[			local list = {}
-			for _, data in ipairs(baseList) do 
-				tinsert(list, data)
-			end
-			addon.extraSetsCache = list]]
-			addon.Init:BuildDB()
-		end
-
-		return addon.extraSetsCache
+		return SET_DATA
 	end
 
 
 	function addon.GetSavedList()
-		if not addon.savedSetCache then 
+		--if not addon.savedSetCache then 
 			local savedOutfits = addon.GetOutfits()
 			local list = {}
-			setsInfo = setsInfo or {}
+			SET_INDEX = SET_INDEX or {}
 			for index, data in ipairs(savedOutfits) do
 				local info = {}
 				info.items = data.items or {}
@@ -292,12 +306,12 @@ local function buildSetSubstitutions()
 					end
 				end
 
-				setsInfo[info.setID] = info
-				tinsert(list, setsInfo[info.setID])
+				SET_INDEX[info.setID] = info
+				tinsert(list, info)
 			end
 			
 			addon.SavedSetCache = list
-		end
+	--	end
 
 		return addon.SavedSetCache
 	end
@@ -355,7 +369,7 @@ local function buildSetSubstitutions()
 
 
 	function addon.GetSetInfo(setID)
-		return setsInfo[setID]
+		return SET_INDEX[setID]
 	end
 
 
@@ -409,12 +423,13 @@ local function buildSetSubstitutions()
 
 		addon:ClearCache()
 		addon.ExtraSetsDataProvider:ClearSets()
-		setsInfo = nil
 
 		addon.Init:BuildDB()
 		addon.GetBaseList()
-		BW_SetsCollectionFrame:Refresh()
-		BW_SetsCollectionFrame:OnSearchUpdate()
+		if BW_SetsCollectionFrame:IsShown() then 
+			BW_SetsCollectionFrame:Refresh()
+			BW_SetsCollectionFrame:OnSearchUpdate()
+		end
 		addon.RefreshSubItemData()
 	end
 
@@ -499,7 +514,6 @@ end
 
 		addon:ClearCache()
 		addon.ExtraSetsDataProvider:ClearSets()
-		setsInfo = nil
 		addon.Init:BuildDB()
 		addon.GetBaseList()
 		addon.RefreshSubItemData()

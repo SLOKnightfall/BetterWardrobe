@@ -824,9 +824,8 @@ function addon:OnEnable()
 
 	addon.Profile = self.db.profile
 	Profile = addon.Profile
-
-		addon.Init:BuildDB()
-		addon.Init:Blizzard_Wardrobe()
+	addon.Init:InitDB()
+	addon.Init:Blizzard_Wardrobe()
 	C_Timer.After(0.2, function()
 		--addon.SetItemSubstitute(1314, 9780)
 		addon.Init:BuildUI()
@@ -884,9 +883,9 @@ function addon:UpdateItems(self)
 	end
 end
 
-local ArmorSetModCache = {}
+
 function addon.GetItemSource(itemID, itemMod)
-	if ArmorSetModCache[itemID] and ArmorSetModCache[itemID][itemMod] then return ArmorSetModCache[itemID][itemMod][1], ArmorSetModCache[itemID][itemMod][2] end
+	if addon.ArmorSetModCache[itemID] and addon.ArmorSetModCache[itemID][itemMod] then return addon.ArmorSetModCache[itemID][itemMod][1], addon.ArmorSetModCache[itemID][itemMod][2] end
 		local itemSource
 		local visualID, sourceID
 		if itemMod then
@@ -919,17 +918,17 @@ function addon.GetItemSource(itemID, itemMod)
 						addon.modArmor[itemID][itemMod] = sourceID
 					end]]
 		if sourceID and itemMod then 
-			ArmorSetModCache[itemID] = ArmorSetModCache[itemID]  or {}
-			ArmorSetModCache[itemID][itemMod] = {visualID, sourceID}
+			addon.ArmorSetModCache[itemID] = addon.ArmorSetModCache[itemID]  or {}
+			addon.ArmorSetModCache[itemID][itemMod] = {visualID, sourceID}
 		end
 
 		f.model:Hide()
 	return visualID ,sourceID
 end
 
-local SourceDB = {}
+--l--ocal SourceDB = {}
 function addon.GetSetsources(setID)
-	if SourceDB[setID] then return SourceDB[setID] end
+	--if SourceDB[setID] then return SourceDB[setID] end
 
 	local setInfo = addon.GetSetInfo(setID)
 	local setSources = {}
@@ -956,7 +955,7 @@ function addon.GetSetsources(setID)
 			end
 		end
 
---[[	elseif setInfo and setInfo.sources then
+	elseif setInfo and setInfo.sources then
 				for itemID, visualID in pairs(setInfo.sources) do
 					local sources =  C_TransmogCollection.GetAppearanceSources(visualID)
 					local sourceID, _
@@ -988,7 +987,7 @@ function addon.GetSetsources(setID)
 					elseif sourceID then 
 						setSources[sourceID] = false
 					end
-				end]]
+				end
 	else
 		for i, itemID in ipairs(setInfo.items) do
 			local visualID, sourceID = addon.GetItemSource(itemID, setInfo.mod or 0) --C_TransmogCollection.GetItemInfo(itemID)
@@ -1044,7 +1043,7 @@ function addon.GetSetsources(setID)
 		end
 	end
 			--setSources[sourceID] = sourceInfo and sourceInfo.isCollected
-	SourceDB[setID] = setSources
+	--SourceDB[setID] = setSources
 	return setSources
 end
 
@@ -2023,9 +2022,9 @@ end
 
 function BetterWardrobeSetsCollectionMixin:OnSearchUpdate()
 	if (self.init) then
-		SetsDataProvider:ClearBaseSets()
-		SetsDataProvider:ClearVariantSets()
-		SetsDataProvider:ClearUsableSets()
+		--SetsDataProvider:ClearBaseSets()
+		--SetsDataProvider:ClearVariantSets()
+		--SetsDataProvider:ClearUsableSets()
 		SetsDataProvider:FilterSearch(true)
 		self:Refresh()
 	end
@@ -2035,7 +2034,7 @@ function BetterWardrobeSetsCollectionMixin:RefreshScrollList()
 		SetsDataProvider:ClearBaseSets()
 		SetsDataProvider:ClearVariantSets()
 		SetsDataProvider:ClearUsableSets()
-		--SetsDataProvider:FilterSearch(true)
+		SetsDataProvider:FilterSearch(true)
 		self:Refresh()
 
 end

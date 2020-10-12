@@ -708,7 +708,7 @@ function WardrobeCollectionFrame.SetsCollectionFrame:OnShow()
 		end
 		self:ClearLatestSource()
 	end
-
+	addon.Init:BuildDB()
 	WardrobeCollectionFrame.progressBar:Show()
 	self:UpdateProgressBar()
 	self:RefreshCameras()
@@ -1038,6 +1038,7 @@ function WardrobeCollectionFrame.SetsTransmogFrame:OnShow()
 	WardrobeCollectionFrame.progressBar:Show()
 	self:UpdateProgressBar()
 	self.sourceQualityTable = { }
+	addon.Init:BuildDB()
 
 	if HelpTip:IsShowing(WardrobeCollectionFrame, TRANSMOG_SETS_TAB_TUTORIAL) then
 		HelpTip:Hide(WardrobeCollectionFrame, TRANSMOG_SETS_TAB_TUTORIAL);
