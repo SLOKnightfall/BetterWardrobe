@@ -823,7 +823,7 @@ function UI:DefaultDropdown_Update(model, button)
 	if BW_WardrobeCollectionFrame.selectedTransmogTab == 4 or BW_WardrobeCollectionFrame.selectedCollectionTab == 4 then
 		return
 	end
-	if button == "RightButton" and model:GetParent().transmogType ~= LE_TRANSMOG_TYPE_ILLUSION then
+	if button == "RightButton" and model:GetParent().transmogType ~= Enum.TransmogType.Illusion then
 		if not DropDownList1:IsShown() then
 			 -- force show dropdown
 			WardrobeModelRightClickDropDown.activeFrame = model
