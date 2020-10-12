@@ -1572,7 +1572,7 @@ function BetterWardrobeSetsTransmogModelMixin:RefreshTooltip()
 	if (waitingOnQuality) then
 		GameTooltip:SetText(RETRIEVING_ITEM_INFO, RED_FONT_COLOR.r, RED_FONT_COLOR.g, RED_FONT_COLOR.b)
 	else
-		local setQuality = (numTotalSlots > 0 and totalQuality > 0) and Round(totalQuality / numTotalSlots) or LE_ITEM_QUALITY_COMMON
+		local setQuality = (numTotalSlots > 0 and totalQuality > 0) and Round(totalQuality / numTotalSlots) or Enum.ItemQuality.Common
 		local color = ITEM_QUALITY_COLORS[setQuality]
 		local setInfo = addon.GetSetInfo(self.setID)
 		GameTooltip:SetText(setInfo.name, color.r, color.g, color.b)

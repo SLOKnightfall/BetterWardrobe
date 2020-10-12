@@ -269,11 +269,11 @@ function addon:DressingRoom_SetItemFrameQuality(itemFrame)
 	if not itemFrame.itemLink then return end
 	local _, _, quality, _, _, _, _, _, _, texture = GetItemInfo(itemFrame.itemLink)
 		--local quality = C_TransmogCollection.GetSourceInfo(itemFrame.sourceID).quality
-		if ( quality == LE_ITEM_QUALITY_UNCOMMON ) then
+		if ( quality == Enum.ItemQuality.Uncommon ) then
 			itemFrame.IconBorder:SetAtlas("loottab-set-itemborder-green", true)
-		elseif ( quality == LE_ITEM_QUALITY_RARE ) then
+		elseif ( quality == Enum.ItemQuality.Rare ) then
 			itemFrame.IconBorder:SetAtlas("loottab-set-itemborder-blue", true)
-		elseif ( quality == LE_ITEM_QUALITY_EPIC ) then
+		elseif ( quality == Enum.ItemQuality.Epic ) then
 			itemFrame.IconBorder:SetAtlas("loottab-set-itemborder-purple", true)
 		end
 end

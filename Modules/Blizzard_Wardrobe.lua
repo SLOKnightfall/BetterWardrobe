@@ -925,20 +925,17 @@ function WardrobeCollectionFrame.SetsTransmogFrame:LoadSet(setID)
 
 			if combineSources then 
 				local transmogLocation = TransmogUtil.GetTransmogLocation(slot, Enum.TransmogType.Appearance, Enum.TransmogModification.None)
-
 				local _, hasPending = C_Transmog.GetSlotInfo(transmogLocation)
 				if hasPending then 
-					local _,_,_,_,sourceID, appearanceID = C_Transmog.GetSlotVisualInfo(transmogLocation)
-
-					local emptyappearanceID, emptySourceID = EmptyArmor[slot] and C_TransmogCollection.GetItemInfo(EmptyArmor[slot])
-
-					if appearanceID == emptyappearanceID then
-					C_Transmog.ClearAllPending();
-						transmogSources[slot] = slotSources[index].sourceID
-					else				
-						transmogSources[slot] = sourceID
-					end
-
+						local  baseSourceID, baseVisualID, appliedSourceID, appliedVisualID, appliedCategoryID, pendingSourceID, pendingVisualID  = C_Transmog.GetSlotVisualInfo(transmogLocation)
+						--local _,_,_,_, pendingVisualID, pendingSourceID = C_Transmog.GetSlotVisualInfo(transmogLocation)
+						local emptyappearanceID, emptySourceID = EmptyArmor[slot] and C_TransmogCollection.GetItemInfo(EmptyArmor[slot])
+						if pendingVisualID == emptyappearanceID then
+							C_Transmog.ClearPending(transmogLocation)
+							transmogSources[slot] = slotSources[index].sourceID
+						else				
+							transmogSources[slot] = pendingSourceID
+						end
 				else
 					transmogSources[slot] = (slotSources[index] and slotSources[index].sourceID) or sourceID
 				end
@@ -985,7 +982,6 @@ function WardrobeTransmogButton_OnClick(self, button)
 	local isTransmogrified, hasPending, isPendingCollected, canTransmogrify, cannotTransmogrifyReason, hasUndo = C_Transmog.GetSlotInfo(self.transmogLocation);
 	-- save for sound to play on TRANSMOGRIFY_UPDATE event
 	self.hadUndo = hasUndo;
-	print("skikcks")
 	if ( button == "RightButton" ) then
 		if ( hasPending or hasUndo ) then
 			PlaySound(SOUNDKIT.UI_TRANSMOG_REVERTING_GEAR_SLOT);
@@ -993,9 +989,6 @@ function WardrobeTransmogButton_OnClick(self, button)
 			WardrobeTransmogButton_Select(self, true);
 		elseif ( isTransmogrified ) then
 			PlaySound(SOUNDKIT.UI_TRANSMOG_REVERTING_GEAR_SLOT);
-			print(self.transmogLocation)
-			bob = self.transmogLocation
-			print("sslis")
 			C_Transmog.SetPending(self.transmogLocation, 0);
 			WardrobeTransmogButton_Select(self, true);
 		end
