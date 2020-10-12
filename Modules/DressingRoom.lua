@@ -219,7 +219,8 @@ function BetterWardrobe:ToggleDressingRoom()
 end
 
 function DressingRoom:IsSlotHidden(slot_id)
-	local _, _, _, _, _, _, isHideVisual = C_Transmog.GetSlotInfo(slot_id, Enum.TransmogType.Appearance)
+	local transmogLocation = TransmogUtil.GetTransmogLocation(slot_id, Enum.TransmogType.Appearance, Enum.TransmogModification.None);
+	local _, _, _, _, _, _, isHideVisual = C_Transmog.GetSlotInfo(transmogLocation)
 	return isHideVisual
 end
 
@@ -486,9 +487,10 @@ function BW_DressingRoomItemDetailsMixin:UpdateButtons(clear, loadSet)
 				itemlink = GetInventoryItemLink("player", slot)
 			
 				if itemlink then
-					local isTransmogrified, hasPending, _, _, _, hasUndo, isHideVisual = C_Transmog.GetSlotInfo(slot, Enum.TransmogType.Appearance)
+					local transmogLocation = TransmogUtil.GetTransmogLocation(slot, Enum.TransmogType.Appearance, Enum.TransmogModification.None)
+					local isTransmogrified, hasPending, _, _, _, hasUndo, isHideVisual = C_Transmog.GetSlotInfo(transmogLocation)
 							--local appliedSourceID, appliedVisualID, selectedSourceID, selectedVisualID = Addon:GetInfoForSlot(slot, Enum.TransmogType.Appearance)
-					local baseSourceID, baseVisualID, appliedSourceID, appliedVisualID, pendingSourceID, pendingVisualID, hasPendingUndo = C_Transmog.GetSlotVisualInfo(slot, Enum.TransmogType.Appearance)
+					local baseSourceID, baseVisualID, appliedSourceID, appliedVisualID, pendingSourceID, pendingVisualID, hasPendingUndo = C_Transmog.GetSlotVisualInfo(transmogLocation)
 
 					if isTransmogrified and not isHideVisual then
 						itemlink = select(6, C_TransmogCollection.GetAppearanceSourceInfo(appliedSourceID))

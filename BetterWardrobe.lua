@@ -2593,24 +2593,19 @@ function BetterWardrobeSetsTransmogMixin:LoadSet(setID)
 				--WardrobeCollectionFrame_SortSources(slotSources, sourceInfo.visualID)
 
 				if combineSources then
-					local _, hasPending = C_Transmog.GetSlotInfo(slot, Enum.TransmogType.Appearance)
+					local transmogLocation = TransmogUtil.GetTransmogLocation(slot, Enum.TransmogType.Appearance, Enum.TransmogModification.None)
+					local _, hasPending = C_Transmog.GetSlotInfo(transmogLocation)
 					if hasPending then
-						local _,_,_,_,sourceID, appearanceID = C_Transmog.GetSlotVisualInfo(slot, Enum.TransmogType.Appearance)
+						local  baseSourceID, baseVisualID, appliedSourceID, appliedVisualID, appliedCategoryID, pendingSourceID, pendingVisualID  = C_Transmog.GetSlotVisualInfo(transmogLocation)
+						--local _,_,_,_, pendingVisualID, pendingSourceID = C_Transmog.GetSlotVisualInfo(transmogLocation)
 						local emptyappearanceID, emptySourceID = EmptyArmor[slot] and C_TransmogCollection.GetItemInfo(EmptyArmor[slot])
-
-						if appearanceID == emptyappearanceID then
-							C_Transmog.ClearAllPending();
+						if pendingVisualID == emptyappearanceID then
+							C_Transmog.ClearPending(transmogLocation)
 							transmogSources[slot] = slotSources[index].sourceID
 						else				
-							transmogSources[slot] = sourceID
+							transmogSources[slot] = pendingSourceID
 						end
-						--transmogSources[slot] = slotSources[index].sourceID
 					end
-				--else
-
-				--transmogSources[slot] = slotColected
-					--transmogSources[slot] = sourceInfo.sourceID
-					--transmogSources[slot] = slotSources[index].sourceID
 				end
 			end
 

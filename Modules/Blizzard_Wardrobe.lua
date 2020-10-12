@@ -924,9 +924,11 @@ function WardrobeCollectionFrame.SetsTransmogFrame:LoadSet(setID)
 			if knownID then transmogSources[slot] = knownID end
 
 			if combineSources then 
-				local _, hasPending = C_Transmog.GetSlotInfo(slot, Enum.TransmogType.Appearance)
+				local transmogLocation = TransmogUtil.GetTransmogLocation(slot, Enum.TransmogType.Appearance, Enum.TransmogModification.None)
+
+				local _, hasPending = C_Transmog.GetSlotInfo(transmogLocation)
 				if hasPending then 
-					local _,_,_,_,sourceID, appearanceID = C_Transmog.GetSlotVisualInfo(slot, Enum.TransmogType.Appearance)
+					local _,_,_,_,sourceID, appearanceID = C_Transmog.GetSlotVisualInfo(transmogLocation)
 
 					local emptyappearanceID, emptySourceID = EmptyArmor[slot] and C_TransmogCollection.GetItemInfo(EmptyArmor[slot])
 
