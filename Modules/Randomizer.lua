@@ -47,7 +47,6 @@ function BW_RandomizeButton:BuildAppearanceList()
 				local name, isWeapon, _, canMainHand, canOffHand = C_TransmogCollection.GetCategoryInfo(weaponCategoryID)
 				if name and isWeapon and weaponCategoryID ~= categoryID then
 					if (slotInfo.location:IsMainHand() and canMainHand) or (slotInfo.location:IsOffHand() and canOffHand) then  --todo either hand
-						print(slotID)
 						local equippedItemID = GetInventoryItemID('player', GetInventorySlotInfo(slotInfo.location:GetSlotName()))
 						if C_TransmogCollection.IsCategoryValidForItem(weaponCategoryID, equippedItemID) then
 							AddSlotAppearances(slotID, weaponCategoryID)
@@ -124,13 +123,10 @@ function BW_RandomizeButton:Randomize(type)
 	totalTime = 0
 	SpinThrottle = DEFAULT_THROTTLE
 	self.Stop = false
-	print(type)
-	
 	if type == "outfit" then
 			RandomizeOutfit()
 			self.RunRandom = RandomizeOutfit
 	elseif type == "item" then
-		print("item")
 			self.Slot = slotID
 			RandomizeBySlot(slotID)
 			self.RunRandom = RandomizeBySlot(slotID)

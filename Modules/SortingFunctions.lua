@@ -174,8 +174,8 @@ addon.Sort = {
 
 	["SortColor"] = function(sets, reverseUIOrder)
 		local comparison = function(source1, source2)
-			local file1 = addon.ItemAppearance[source1.visualID]
-			local file2 = addon.ItemAppearance[source2.visualID]
+			local file1 = source1.itemAppearance or addon.ItemAppearance[source1.visualID]
+			local file2 = source2.itemAppearance or addon.ItemAppearance[source2.visualID]
 			
 			if file1 and file2 then
 				local index1 = #colors+1
@@ -419,18 +419,18 @@ addon.Sort = {
 		end,
 
 		[LE_APPEARANCE] = function(self, sets, reverseUIOrder, ignorePatchID)
-			for i, data in ipairs(sets) do
+--[[			for i, data in ipairs(sets) do
 				local baseItem = data.items[1]
-				local _, sourceID = addon.GetItemSource(baseItem)
+				local visualID, sourceID = addon.GetItemSource(baseItem)
 				if sourceID then 
 				local sourceInfo = C_TransmogCollection.GetSourceInfo(sourceID)
 				data.visualID = sourceInfo.visualID
 				end
-			end
+			end]]
 
 		sort(sets, function(source1, source2)
-				if addon.ItemAppearance[source1.visualID] and addon.ItemAppearance[source2.visualID] then
-					return SortOrder(addon.ItemAppearance[source1.visualID], addon.ItemAppearance[source2.visualID])
+				if source1.itemAppearance and source2.itemAppearance then
+					return SortOrder(source1.itemAppearance, source2.itemAppearance)
 				else
 					return SortOrder(source1.uiOrder, source2.uiOrder)
 				end
@@ -439,12 +439,12 @@ addon.Sort = {
 		
 		-- sort by the color in filename
 		[LE_COLOR] = function(self, sets, reverseUIOrder, ignorePatchID)
-			for i, data in ipairs(sets) do
-				local baseItem = data.items[1]
-				local _, sourceID = addon.GetItemSource(baseItem)
-				local sourceInfo = sourceID and C_TransmogCollection.GetSourceInfo(sourceID)
-				data.visualID = sourceInfo and sourceInfo.visualID
-			end
+			--[[for i, data in ipairs(sets) do
+			-							local baseItem = data.items[1]
+										local _, sourceID = addon.GetItemSource(baseItem)
+										local sourceInfo = sourceID and C_TransmogCollection.GetSourceInfo(sourceID)
+										data.visualID = sourceInfo and sourceInfo.visualID
+									end]]
 
 			addon.Sort.SortColor(sets)
 		end,

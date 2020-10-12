@@ -151,6 +151,36 @@ function ItemsCollectionFrame:GetCameraID(visualID, armor)
 	end
 end
 
+--[[function WardrobeItemsCollectionMixin:ToggleRightShoulderDisplay(show)
+	local lastButton = nil;
+	for i, button in ipairs(self.SlotsFrame.Buttons) do
+		if not button.isSmallButton then
+			local slotName =  button.transmogLocation:GetSlotName();
+			if slotName == "BACKSLOT" then
+				local xOffset = show and spacingWithSmallButton or spacingNoSmallButton;
+				button:SetPoint("LEFT", lastButton, "RIGHT", xOffset, 0);
+			elseif slotName == "HANDSSLOT" or slotName == "MAINHANDSLOT" then
+				local xOffset = show and shorterSectionSpacing or defaultSectionSpacing;
+				button:SetPoint("LEFT", lastButton, "RIGHT", xOffset, 0);
+			end
+			lastButton = button;
+		end
+	end
+	self.SlotsFrame.rightShoulderButton:SetShown(show);
+
+	if self.transmogLocation then
+		-- if it was selected and got hidden, reset to left shoulder
+		-- otherwise if left selected, update cameras
+		local leftShoulderTransmogLocation = TransmogUtil.GetTransmogLocation("SHOULDERSLOT", Enum.TransmogType.Appearance, Enum.TransmogModification.None);
+		if not show and self.transmogLocation:IsEqual(self.SlotsFrame.rightShoulderButton.transmogLocation) then		
+			self:SetActiveSlot(leftShoulderTransmogLocation);
+		elseif self.transmogLocation:IsEqual(leftShoulderTransmogLocation) then
+			self:UpdateItems();
+		end
+	end
+end
+]]
+
 
 function ItemsCollectionFrame:UpdateItems()
 	local isArmor;

@@ -468,25 +468,25 @@ end
 
 
 function UI.BuildLoadQueueButton()
-	BW_LoadQueueButton:SetScript("OnClick", function(self)
-		local setType = addon.QueueList[1]
-		local setID = addon.QueueList[2]
-		if setType == "set" then
-			WardrobeCollectionFrame.SetsTransmogFrame:LoadSet(setID)
-		elseif setType == "extraset" then
-			BW_SetsTransmogFrame:LoadSet(setID)
-		end
-	end)
-
-	BW_LoadQueueButton:SetScript("OnEnter", function(self)	
-		local name  = addon.QueueList[3]
-		GameTooltip:SetOwner(self, "ANCHOR_RIGHT")
-		if name then 	
-			GameTooltip:SetText(L["Load Set: %s"]:format(name))
-		else
-			GameTooltip:SetText(L["Load Set: %s"]:format(L["None Selected"]))
-		end
-	end)
+	--[[BW_LoadQueueButton:SetScript("OnClick", function(self)
+				local setType = addon.QueueList[1]
+				local setID = addon.QueueList[2]
+				if setType == "set" then
+					WardrobeCollectionFrame.SetsTransmogFrame:LoadSet(setID)
+				elseif setType == "extraset" then
+					BW_SetsTransmogFrame:LoadSet(setID)
+				end
+			end)
+		
+			BW_LoadQueueButton:SetScript("OnEnter", function(self)	
+				local name  = addon.QueueList[3]
+				GameTooltip:SetOwner(self, "ANCHOR_RIGHT")
+				if name then 	
+					GameTooltip:SetText(L["Load Set: %s"]:format(name))
+				else
+					GameTooltip:SetText(L["Load Set: %s"]:format(L["None Selected"]))
+				end
+			end)]]
 end
 
 

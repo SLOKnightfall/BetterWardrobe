@@ -419,6 +419,7 @@ local options = {
 								order = 9,
 								name = L["Use custom model"],
 								width = "full",
+								hidden = true,
 							},
 							TooltipPreview_CustomRace = {
 								type = "select",
@@ -441,6 +442,7 @@ local options = {
 								},
 								disabled = function() return not addon.Profile.TooltipPreview_CustomModel or not addon.Profile.ShowTooltipPreview end,
 								width = 1.2,
+								hidden = true,
 							},
 							TooltipPreview_CustomGender = {
 								type = "select",
@@ -452,6 +454,7 @@ local options = {
 								},
 								disabled = function() return not addon.Profile.TooltipPreview_CustomModel or not addon.Profile.ShowTooltipPreview end,
 								width = 1.2,
+								hidden = true, 
 							},
 						},
 				},
@@ -860,6 +863,8 @@ end )
 						--BW_WardrobeOutfitFrame:Toggle(self:GetParent())
 						--end
 				--	)
+
+				--WardrobeCollectionFrame.ItemsCollectionFrame.RightShoulderCheckbox:Show() 
 end
 
 
@@ -988,7 +993,7 @@ function addon.GetSetsources(setID)
 						setSources[sourceID] = false
 					end
 				end
-	else
+	elseif setInfo and setInfo.items then
 		for i, itemID in ipairs(setInfo.items) do
 			local visualID, sourceID = addon.GetItemSource(itemID, setInfo.mod or 0) --C_TransmogCollection.GetItemInfo(itemID)
 			-- visualID, sourceID = addon.GetItemSource(itemID,setInfo.mod)

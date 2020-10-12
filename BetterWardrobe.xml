@@ -12,10 +12,10 @@
 		</Anchors>
 		<Layers>
 			<Layer level="ARTWORK">
-				<Texture parentKey="Icon" atlas="transmog-icon-checkmark" useAtlasSize="false">
-					<Size x="19" y="19"/>
+				<Texture parentKey="Icon" file="Interface\Buttons\UI-OptionsButton">
+					<Size x="12" y="12"/>
 					<Anchors>
-						<Anchor point="LEFT" x="1"/>
+						<Anchor point="LEFT" x="3"/>
 					</Anchors>
 				</Texture>
 			</Layer>
@@ -23,8 +23,17 @@
 		<HighlightTexture file="Interface\Buttons\UI-Common-MouseHilight" alphaMode="ADD"/>
 		<Scripts>
 			<OnLeave function="GameTooltip_Hide"/>
+			<OnClick>
+				BW_TransmogVendorExportButton_OnClick(self)
+			</OnClick>
+			<OnEnter>
+				BW_DressingRoomExportButton_OnEnter(self)
+			</OnEnter>
 		</Scripts>
 	</Button>
+
+
+
 
 	<Button name="BW_RandomizeButton" parent = "WardrobeTransmogFrame" inherits="UIMenuButtonStretchTemplate" hidden="false">
 		<Size x="20" y="20"/>

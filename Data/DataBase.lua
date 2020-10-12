@@ -94,6 +94,10 @@ do
 					setData.label =L[note] or ""
 				end
 
+				local baseItem = setData.items[1]
+				local visualID, sourceID = addon.GetItemSource(baseItem)
+				setData.itemAppearance = addon.ItemAppearance[visualID]
+
 
 			--places some of the sets that didnt have correct filters
 				if setData.note == "NOTE_4" or setData.note == "NOTE_4" then

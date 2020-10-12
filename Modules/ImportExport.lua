@@ -5,6 +5,8 @@ local L = LibStub("AceLocale-3.0"):GetLocale(addonName)
 local LISTWINDOW
 local AceGUI = LibStub("AceGUI-3.0")
 
+local IE ={}
+
 function Export(itemString, button)
 	if LISTWINDOW then LISTWINDOW:Hide() end
 
@@ -65,7 +67,7 @@ local function ImportSet(importString)
 	end
 end
 
-
+local importFrom = nil
 StaticPopupDialogs["BETTER_WARDROBE_IMPORT_SET_POPUP"] = {
 	text = L["Copy and paste a Wowhead Compare URL into the text box below to import"],
 	preferredIndex = 3,
@@ -84,7 +86,12 @@ StaticPopupDialogs["BETTER_WARDROBE_IMPORT_SET_POPUP"] = {
 		end
 	end,
 	OnAccept = function(self)
-		ImportSet(self.editBox:GetText());
+		if importFrom == "Transmog" then 
+			IE.ImportTransmogVendorSet(self.editBox:GetText())
+		else
+			ImportSet(self.editBox:GetText());
+		end
+		importFrom = nil
 	end,
 	EditBoxOnEscapePressed = HideParentPanel,
 	exclusive = true,
@@ -139,6 +146,30 @@ local function ImportItem(importString)
 end
 
 
+local function ImportItemTransMogVendor(importString)
+	local transmogSources = {}
+	local text = importString
+	if text then
+		local itemID = ToNumberItem(text);
+		if not id then
+			itemID,bonusMod = text:match("item=(%d+)"),text:match("bonus=(%d+)");
+		end
+		if not itemID then
+			itemID = text:match("(%d+).-$");
+			bonusMod = nil;
+		end
+		local link = ToStringItem(tonumber(itemID), tonumber(bonusMod))
+		local appearanceID, sourceID = C_TransmogCollection.GetItemInfo(link)
+		local sourceInfo = C_TransmogCollection.GetSourceInfo(sourceID)
+		if sourceInfo then
+			local slot = C_Transmog.GetSlotForInventoryType(sourceInfo.invType);
+			transmogSources[slot] = sourceID
+			C_Transmog.LoadSources(transmogSources, -1, -1);
+			end
+		end
+end
+
+
 StaticPopupDialogs["BETTER_WARDROBE_IMPORT_ITEM_POPUP"] = {
 	text = L["Type the item ID or url in the text box below"],
 	preferredIndex = 3,
@@ -149,7 +180,12 @@ StaticPopupDialogs["BETTER_WARDROBE_IMPORT_ITEM_POPUP"] = {
 	editBoxWidth = 260,
 	OnShow = function() if LISTWINDOW then LISTWINDOW:Hide() end end,
 	OnAccept = function(self)
-		ImportItem(self.editBox:GetText());
+		if importFrom == "Transmog" then 
+			ImportItemTransMogVendor(self.editBox:GetText())
+		else
+			ImportItem(self.editBox:GetText());
+		end
+		importFrom = nil
 	end,
 	EditBoxOnEnterPressed = function(self)
 		if (self:GetParent().button1:IsEnabled()) then
@@ -182,6 +218,49 @@ function addon:ExportSet()
 	--return str
 end
 
+
+local function ExportTransmogVendorSet()
+	local str;
+	for key, transmogSlot in pairs(TRANSMOG_SLOTS) do
+		if ( transmogSlot.location:IsAppearance() ) then
+			local sourceID = WardrobeOutfitDropDown:GetSlotSourceID(transmogSlot.location)
+			if ( sourceID ) then
+				local sourceInfo = C_TransmogCollection.GetSourceInfo(sourceID)
+				if sourceInfo then 
+					local id = sourceInfo.itemID
+					local bonus = sourceInfo.itemModID
+					str = (str and str..":" or "compare?items=")..id..(bonus and ".0.0.0.0.0.0.0.0.0."..bonus or "")
+				end
+			end
+		end
+	end
+	Export(str,false)
+end
+
+
+function IE.ImportTransmogVendorSet(importString)
+	importString = importString and importString:match("items=([^#]+)")
+	if importString then
+		local transmogSources = {};
+		for item in importString:gmatch("([^:;]+)") do
+			local itemID, bonusMod = item:match("^(%d+)%.%d+%.%d+%.%d+%.%d+%.%d+%.%d+%.%d+%.%d+%.%d+%.(%d+)")
+			itemID = itemID or item:match("^(%d+)");
+			local link = ToStringItem(tonumber(itemID), tonumber(bonusMod))
+			local appearanceID, sourceID = C_TransmogCollection.GetItemInfo(link)
+			if sourceID then 
+			local sourceInfo = C_TransmogCollection.GetSourceInfo(sourceID)
+			if sourceInfo then
+				local slot = C_Transmog.GetSlotForInventoryType(sourceInfo.invType);
+				transmogSources[slot] = sourceID
+			end
+		end
+	end
+		C_Transmog.ClearAllPending();
+		C_Transmog.LoadSources(transmogSources, -1, -1);
+	end
+end
+
+
 local linkText = "f(%d,%d);"
 function addon:CreateChatLink()
 	local string = [[/run local function f(i,b)DressUpItemLink("item:"..i.."::::::::::::9:"..b);end;]]
@@ -200,4 +279,91 @@ function addon:CreateChatLink()
 	end
 	Export(string,false)
 end
+
+
+function addon:CreateChatLinkTransmogVendor()
+	local string = [[/run local function f(i,b)DressUpItemLink("item:"..i.."::::::::::::9:"..b);end;]]
+	for key, transmogSlot in pairs(TRANSMOG_SLOTS) do
+		if ( transmogSlot.location:IsAppearance() ) then
+			local sourceID = WardrobeOutfitDropDown:GetSlotSourceID(transmogSlot.location)
+			if ( sourceID ) then
+				local sourceInfo = C_TransmogCollection.GetSourceInfo(sourceID)
+				if sourceInfo then 
+					local id = sourceInfo.itemID
+					local bonus = sourceInfo.itemModID  or 0
+					string = string..linkText:format(id,bonus)
+				end
+			end
+		end
+	end
+	Export(string,false)
+end
+
+
+function BW_TransmogVendorExportButton_OnClick(self)
+	local Profile = addon.Profile
+	local name  = addon.QueueList[3]
+	local contextMenuData = {
+		{
+			text = L["Import/Export Options"], isTitle = true, notCheckable = true,
+		},
+		{
+			text = L["Load Set: %s"]:format( name or L["None Selected"]),
+			func = function()
+				local setType = addon.QueueList[1]
+				local setID = addon.QueueList[2]
+				if setType == "set" then
+					WardrobeCollectionFrame.SetsTransmogFrame:LoadSet(setID)
+				elseif setType == "extraset" then
+					BW_SetsTransmogFrame:LoadSet(setID)
+				end
+			end,
+			isNotRadio = true,
+			notCheckable = true,
+		},
+		{
+			text = L["Import Item"],
+			func = function()
+				importFrom = "Transmog"
+				BW_WardrobeOutfitFrameMixin:ShowPopup("BETTER_WARDROBE_IMPORT_ITEM_POPUP")
+			end,
+			isNotRadio = true,
+			notCheckable = true,
+		},
+		{
+			text = L["Import Set"],
+			func = function()
+				importFrom = "Transmog"
+				BW_WardrobeOutfitFrameMixin:ShowPopup("BETTER_WARDROBE_IMPORT_SET_POPUP")
+			end,
+			isNotRadio = true,
+			notCheckable = true,
+		},
+		{
+			text = L["Export Set"],
+			func = function()
+				ExportTransmogVendorSet()
+			end,
+			notCheckable = true,
+			isNotRadio = true,
+		},
+				{
+			text = L["Create Dressing Room Command Link"],
+			func = function()
+				addon:CreateChatLinkTransmogVendor()
+			end,
+			notCheckable = true,
+			isNotRadio = true,
+		},
+	}
+	
+	addon.ContextMenu:SetPoint("TOPLEFT", self, "TOPLEFT", 0, 0)
+	EasyMenu(contextMenuData, addon.ContextMenu, "cursor", 0, 0, "MENU")
+	
+	DropDownList1:ClearAllPoints()
+	DropDownList1:SetPoint("BOTTOMLEFT", self, "BOTTOMLEFT", 0, 0)
+	DropDownList1:SetClampedToScreen(true)
+end
+
+
 --/run local function f(i,b)DressUpItemLink("item:"..i.."::::::::::::9:"..b);end;f(27457,0);f(27489,0);f(27539,0);f(27548,0);f(27748,0);f(27790,0);f(27897,0);f(28221,0);

@@ -48,11 +48,11 @@ function addon.Init:DressingRoom()
 	BW_DressingRoomFrame:SetScript("OnShow", function() C_Timer.After(0.25, DressingRoom.OnShow) end)
 	BW_DressingRoomFrame:SetScript("OnHide", DressingRoom.OnHide)
 	BW_DressingRoomFrame:Hide()
+
 	if addon.Profile.DR_OptionsEnable then 
 		addon:DressingRoom_Enable()
 	end
 end
-
 
 
 function addon:DressingRoom_Disable()
@@ -236,6 +236,17 @@ function DressingRoom:OnShow()
 	--DressUpFrame:SetSize(addon.Profile.DR_Width,addon.Profile.DR_Height)
 	if DressUpFrame.MaximizeMinimizeFrame.MinimizeButton:IsShown() then 
 		DressingRoom:SetFrameSize()
+	end
+
+	if not GetCVarBool("transmogShouldersSeparately") then 
+		BW_DressingRoomFrame.PreviewButtonFrame.PreviewButtonRightShoulder:Hide()
+		BW_DressingRoomFrame.PreviewButtonFrame.PreviewButtonBack:ClearAllPoints()
+		BW_DressingRoomFrame.PreviewButtonFrame.PreviewButtonBack:SetPoint("TOPLEFT", BW_DressingRoomFrame.PreviewButtonFrame.PreviewButtonLeftShoulder,"BOTTOMLEFT")
+	else
+		BW_DressingRoomFrame.PreviewButtonFrame.PreviewButtonRightShoulder:Show()
+		BW_DressingRoomFrame.PreviewButtonFrame.PreviewButtonBack:ClearAllPoints()
+		BW_DressingRoomFrame.PreviewButtonFrame.PreviewButtonBack:SetPoint("TOPLEFT", BW_DressingRoomFrame.PreviewButtonFrame.PreviewButtonRightShoulder,"BOTTOMLEFT")
+	
 	end
 end
 
@@ -456,7 +467,7 @@ function BW_DressingRoomItemDetailsMixin:OnLoad()
 	local slot = self:GetID()
 	local invslot = INVENTORY_SLOT_NAMES[slot]
 	SLOT_BUTTON_INDEX[slot] = self
-	local _, slotTexture = GetInventorySlotInfo(invslot)
+	local _, slotTexture = GetInventorySlotInfo("HEADSLOT")
 	
 	self.Background:SetTexture(slotTexture)
 	self:RegisterForClicks("LeftButtonDown", "RightButtonDown")
@@ -464,9 +475,9 @@ function BW_DressingRoomItemDetailsMixin:OnLoad()
 	self.Icon:Hide()
 end
 
-
+--/dump TRANSMOG_SLOTS[301]:GetSlotID()
 function BW_DressingRoomItemDetailsMixin:UpdateButtons(clear, loadSet)
-	print ("ir")
+
 	for index, button in pairs(Buttons) do
 		local itemlink
 		local slot = button:GetID()
@@ -640,6 +651,7 @@ end
 
 
 local ContextMenu = CreateFrame("Frame", addonName .. "ContextMenuFrame", UIParent, "UIDropDownMenuTemplate")
+addon.ContextMenu = ContextMenu
 function DressupSettingsButton_OnClick(self)
 	local Profile = addon.Profile
 	local contextMenuData = {

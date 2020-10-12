@@ -1,7 +1,7 @@
-﻿## Interface: 90020
+﻿## Interface: 90002
 ## Title: BetterWardrobe (@project-version@)
 ## Version: @project-version@
-## Game Version: 9.0
+## Game Version: 9.0.2
 ## Author: SLOKnightfall
 ## Notes: 
 ## LoadOnDemand: 1

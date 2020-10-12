@@ -92,6 +92,7 @@ addon.tooltip:SetClampedToScreen(true);
 addon.tooltip:SetFrameStrata("TOOLTIP");
 
 addon.tooltip.model = CreateFrame("DressUpModel", nil, addon.tooltip);
+--Mixin(addon.tooltip.model, WardrobeSetsDetailsModelMixin)
 addon.tooltip.model:SetPoint("TOPLEFT", addon.tooltip, "TOPLEFT", 5, -5);
 addon.tooltip.model:SetPoint("BOTTOMRIGHT", addon.tooltip, "BOTTOMRIGHT", -5, 5);
 addon.tooltip.model:SetAnimation(0, 0);
@@ -100,15 +101,18 @@ addon.tooltip.model:SetLight(true, false, 0, 0.8, -1, 1, 1, 1, 1, 0.3, 1, 1, 1);
 function addon.tooltip.model:ResetModel()
 	local raceID = addon.Profile.TooltipPreview_CustomRace
 	local genderID = addon.Profile.TooltipPreview_CustomGender
-	if addon.Profile.TooltipPreview_CustomModel then
-		local _, _, dirX, dirY, dirZ, _, ambR, ambG, ambB, _, dirR, dirG, dirB = self:GetLight();
-		print(addon.Profile.TooltipPreview_CustomRace)
-		self:SetCustomRace(addon.Profile.TooltipPreview_CustomRace, 1);
+	--if addon.Profile.TooltipPreview_CustomModel then
+		--local _, _, dirX, dirY, dirZ, _, ambR, ambG, ambB, _, dirR, dirG, dirB = self:GetLight();
+		--print(addon.Profile.TooltipPreview_CustomRace)
+		--self:SetCustomRace("Human", Enum.Unitsex.Female);
+		--local race = "Human"
+		--local sex = UnitSex("player");
+		--self.panAndZoomModelType = race..sex;
 		--self:SetUseTransmogSkin(true)
-	else
+	--else
 		self:Dress();
 		self:SetUseTransmogSkin(addon.Profile.TooltipPreview_DressingDummy)
-	end
+	--end
 
 	if not addon.Profile.TooltipPreview_Dress then
 		for i, slotName in ipairs(addon.Globals.slots) do

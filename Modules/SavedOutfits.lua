@@ -269,6 +269,7 @@ function BW_WardrobeOutfitMixin:LoadDBOutfit(outfitID)
 			end
 		for slot , data in pairs(outfitdata.sources) do
 			if data ~= 0 then 
+				print("???????")
 				C_Transmog.SetPending(slot, Enum.TransmogType.Appearance, data)						
 			end
 		end
@@ -641,17 +642,15 @@ function BW_WardrobeOutfitFrameMixin:SaveOutfit(name)
 		sources, icon  = GetDressingRoomSources()
 	else
 		sources = self.sources
-		
-		for i = 1, #TRANSMOG_SLOTS do
-			if (TRANSMOG_SLOTS[i].transmogType == Enum.TransmogType.Appearance) then
-				local slotID = GetInventorySlotInfo(TRANSMOG_SLOTS[i].slot)
-				local sourceID = sources[slotID]
-				if (sourceID) then
-					icon = select(4, C_TransmogCollection.GetAppearanceSourceInfo(sourceID))
-					if (icon) then
-						break
+		for key, transmogSlot in pairs(TRANSMOG_SLOTS) do
+			if ( transmogSlot.location:IsAppearance() ) then
+				local slotID = transmogSlot.location:GetSlotID();
+				local sourceID = self.sources[slotID];
+				if ( sourceID ) then
+					icon = select(4, C_TransmogCollection.GetAppearanceSourceInfo(sourceID));
+					if ( icon ) then
+						break;
 					end
-					
 				end
 			end
 		end
