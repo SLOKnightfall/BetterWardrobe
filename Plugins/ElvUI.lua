@@ -34,13 +34,13 @@ function S:BetterWardrobe()
 
 	BW_SortDropDown:SetScript("OnShow", function() UIDropDownMenu_SetWidth(BW_SortDropDown, 110) end)
 
-	S:HandleButton(L_DropDownList1)
+	S:HandleButton(DropDownList1)
 
 --L_UIDropDownMenu_SetWidth(BW_DBSavedSetDropdown, 155)
 	S:HandleDropDownBox(BW_DBSavedSetDropdown)
 		BW_DBSavedSetDropdown:ClearAllPoints()
 BW_DBSavedSetDropdown:SetPoint("TOPRIGHT", "BW_SortDropDown", "TOPRIGHT", -0 , 0)
-	BW_DBSavedSetDropdown:SetScript("OnShow", function() L_UIDropDownMenu_SetWidth(BW_DBSavedSetDropdown, 155)
+	BW_DBSavedSetDropdown:SetScript("OnShow", function() UIDropDownMenu_SetWidth(BW_DBSavedSetDropdown, 155)
 	BW_DBSavedSetDropdown:SetPoint("TOPRIGHT", "BW_SortDropDown", "TOPRIGHT", -0 , 0)
 
  end)

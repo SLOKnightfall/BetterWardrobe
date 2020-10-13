@@ -97,9 +97,15 @@ end
 
 
 function WardrobeCollectionFrame_GetSortedAppearanceSources(visualID, categoryID)
-	local sources = C_TransmogCollection.GetAppearanceSources(visualID, categoryID);
-	return WardrobeCollectionFrame_SortSources(sources);
+	if categoryID == 29 then 
+		return {addon.GetArtifactSourceInfo(visualID)}
+	else
+		local sources = C_TransmogCollection.GetAppearanceSources(visualID, categoryID);
+		return WardrobeCollectionFrame_SortSources(sources);
+	end
 end
+
+
 
 
 --[[function WardrobeCollectionFrame_GetSortedAppearanceSources(visualID)
@@ -240,7 +246,11 @@ function ItemsCollectionFrame:UpdateItems()
 
 			-- camera
 			if ( self.transmogLocation:IsAppearance()  ) then
-				cameraID = self:GetCameraID(visualInfo.visualID, isArmor) 
+				if visualInfo.artifact then
+					cameraID = visualInfo.camera
+				else
+					cameraID = self:GetCameraID(visualInfo.visualID, isArmor) 
+				end
 			end
 
 			if ( model.cameraID ~= cameraID ) then
@@ -390,7 +400,12 @@ function ItemsCollectionFrame:RefreshVisualsList()
 		self.visualsList = C_TransmogCollection.GetIllusions()
 	else
 		if( WardrobeCollectionFrame.ItemsCollectionFrame.transmogLocation:IsMainHand() ) then
-			self.visualsList = C_TransmogCollection.GetCategoryAppearances(self.activeCategory, EXCLUSION_CATEGORY_MAINHAND)
+			if self.activeCategory ~= 29 then 
+				self.visualsList = C_TransmogCollection.GetCategoryAppearances(self.activeCategory, EXCLUSION_CATEGORY_MAINHAND)
+			else
+				--Replace the default artifact list with complete visuals
+				self.visualsList = addon.GetClassArtifactAppearanceList() 
+			end
 		elseif (WardrobeCollectionFrame.ItemsCollectionFrame.transmogLocation:IsOffHand() ) then
 			self.visualsList = C_TransmogCollection.GetCategoryAppearances(self.activeCategory, EXCLUSION_CATEGORY_OFFHAND)
 		else
@@ -410,6 +425,20 @@ function ItemsCollectionFrame:RefreshVisualsList()
 end
 
 
+function ItemsCollectionFrame:RefreshAppearanceTooltip()
+	if ( not self.tooltipVisualID ) then
+		return;
+	end
+
+	if self.activeCategory == 29 then 
+		addon.SetArtifactAppearanceTooltip(self)
+ 	else
+	--if self.viaual
+		local sources = WardrobeCollectionFrame_GetSortedAppearanceSources(self.tooltipVisualID, self.activeCategory);
+		local chosenSourceID = self:GetChosenVisualSource(self.tooltipVisualID);
+		WardrobeCollectionFrame_SetAppearanceTooltip(self, sources, chosenSourceID);
+	end
+end
 
 function WardrobeCollectionFrame_OpenTransmogLink(link)
 	if ( not CollectionsJournal:IsVisible() or not WardrobeCollectionFrame:IsVisible() ) then
@@ -472,6 +501,8 @@ local function CheckMissingLocation(set)
 
 	return not filtered
 end
+
+
 
 local SetsDataProvider = CreateFromMixins(WardrobeSetsDataProviderMixin)
 addon.SetsDataProvider = SetsDataProvider
@@ -1064,6 +1095,9 @@ function WardrobeCollectionFrame.SetsTransmogFrame:OnShow()
 	self:UpdateProgressBar()
 	self.sourceQualityTable = { }
 	addon.Init:BuildDB()
+
+	addon.ExtendTransmogView()
+
 
 	if HelpTip:IsShowing(WardrobeCollectionFrame, TRANSMOG_SETS_TAB_TUTORIAL) then
 		HelpTip:Hide(WardrobeCollectionFrame, TRANSMOG_SETS_TAB_TUTORIAL);

@@ -201,40 +201,105 @@ end
 
 
 -- Base Transmog Sets Window Upates
-function UI.ExtendTransmogView()
+function UI.ExtendTransmogView(reset)
 	if WardrobeFrame and WardrobeFrame.extended then return end
+	local scale
 
-    WardrobeFrame:SetWidth(1170)
-    WardrobeTransmogFrame:SetWidth(500)
-    WardrobeTransmogFrame.ModelScene:ClearAllPoints()
-    WardrobeTransmogFrame.ModelScene:SetPoint("TOP", WardrobeTransmogFrame, "TOP", 0, -4)
-    WardrobeTransmogFrame.ModelScene:SetWidth(420)
-    WardrobeTransmogFrame.ModelScene:SetHeight(420)
-    WardrobeTransmogFrame.Inset.BG:SetWidth(494)
+	if addon.Profile.ExtraLargeTransmogArea then
+		WardrobeFrame:SetWidth(1650)
+		WardrobeFrame:SetClampedToScreen(true)
+		WardrobeFrame:SetHeight(UIParent:GetHeight());
 
-    WardrobeTransmogFrame.ModelScene.HeadButton:ClearAllPoints()
-    WardrobeTransmogFrame.ModelScene.HeadButton:SetPoint("TOP", WardrobeTransmogFrame.ModelScene, "TOP", -208, -41)
-    WardrobeTransmogFrame.ModelScene.HandsButton:ClearAllPoints()
-    WardrobeTransmogFrame.ModelScene.HandsButton:SetPoint("TOP", WardrobeTransmogFrame.ModelScene, "TOP", 205, -118)
+		WardrobeTransmogFrame:SetPoint("TOPLEFT", WardrobeFrame, 4, -60)
+		WardrobeTransmogFrame:SetPoint("BOTTOMRIGHT", WardrobeCollectionFrame, "BOTTOMLEFT", 0, WardrobeCollectionFrame:GetHeight() - UIParent:GetHeight() + 35 )
+		WardrobeTransmogFrame.ModelScene:ClearAllPoints()
+		WardrobeTransmogFrame.ModelScene:SetPoint("TOPLEFT", WardrobeTransmogFrame, 25, -20)
+		WardrobeTransmogFrame.ModelScene:SetPoint("BOTTOMRIGHT", WardrobeTransmogFrame, -25, 20)
+		WardrobeTransmogFrame.Inset.BG:SetAllPoints()
 
-    WardrobeTransmogFrame.ModelScene.MainHandButton:ClearAllPoints()
-    WardrobeTransmogFrame.ModelScene.MainHandButton:SetPoint("TOP", WardrobeTransmogFrame.ModelScene, "BOTTOM", -26, -5)
-    WardrobeTransmogFrame.ModelScene.SecondaryHandButton:ClearAllPoints()
-    WardrobeTransmogFrame.ModelScene.SecondaryHandButton:SetPoint("TOP", WardrobeTransmogFrame.ModelScene, "BOTTOM", 27, -5)
-    WardrobeTransmogFrame.ModelScene.MainHandEnchantButton:ClearAllPoints()
-    WardrobeTransmogFrame.ModelScene.MainHandEnchantButton:SetPoint("BOTTOM", WardrobeTransmogFrame.ModelScene.MainHandButton, "BOTTOM", 0, -20)
-    WardrobeTransmogFrame.ModelScene.SecondaryHandEnchantButton:ClearAllPoints()
-    WardrobeTransmogFrame.ModelScene.SecondaryHandEnchantButton:SetPoint("BOTTOM", WardrobeTransmogFrame.ModelScene.SecondaryHandButton, "BOTTOM", 0, -20)
+		WardrobeTransmogFrame.ModelScene.HeadButton:ClearAllPoints()
+		WardrobeTransmogFrame.ModelScene.HeadButton:SetPoint("TOP", WardrobeTransmogFrame.ModelScene, "TOP", -348, -41)
+		WardrobeTransmogFrame.ModelScene.HandsButton:ClearAllPoints()
+		WardrobeTransmogFrame.ModelScene.HandsButton:SetPoint("TOP", WardrobeTransmogFrame.ModelScene, "TOP", 345, -118)
 
-    if UIPanelWindows["WardrobeFrame"] then 
-	    UIPanelWindows["WardrobeFrame"].width = 1170
-	else 
-		UIPanelWindows["WardrobeFrame"] ={ area = "left", pushable = 0,	width = 1170 };
+		WardrobeTransmogFrame.ModelScene.MainHandButton:ClearAllPoints()
+		WardrobeTransmogFrame.ModelScene.MainHandButton:SetPoint("BOTTOM", WardrobeTransmogFrame.ModelScene, "BOTTOM", -26, 15)
+		WardrobeTransmogFrame.ModelScene.SecondaryHandButton:ClearAllPoints()
+		WardrobeTransmogFrame.ModelScene.SecondaryHandButton:SetPoint("BOTTOM", WardrobeTransmogFrame.ModelScene, "BOTTOM", 27, 15)
+		WardrobeTransmogFrame.ModelScene.MainHandEnchantButton:ClearAllPoints()
+		WardrobeTransmogFrame.ModelScene.MainHandEnchantButton:SetPoint("BOTTOM", WardrobeTransmogFrame.ModelScene.MainHandButton, "BOTTOM", 0, -20)
+		WardrobeTransmogFrame.ModelScene.SecondaryHandEnchantButton:ClearAllPoints()
+		WardrobeTransmogFrame.ModelScene.SecondaryHandEnchantButton:SetPoint("BOTTOM", WardrobeTransmogFrame.ModelScene.SecondaryHandButton, "BOTTOM", 0, -20)
+
+		scale = 1.25
+
+
+		WardrobeTransmogFrame.ModelScene.ClearAllPendingButton:SetPoint("TOPRIGHT", WardrobeTransmogFrame, -20, -20)
+		WardrobeTransmogFrame.ModelScene.ControlFrame:SetPoint("TOP", WardrobeTransmogFrame, "TOP", 0, -4)
+		BW_WardrobeOutfitDropDown:ClearAllPoints()
+		BW_WardrobeOutfitDropDown:SetPoint("TOPLEFT", WardrobeTransmogFrame, 35, 28)
+		BW_LoadQueueButton:ClearAllPoints()
+		BW_LoadQueueButton:SetPoint("TOPLEFT", BW_WardrobeOutfitDropDown, "TOPRIGHT", 85, -5)
+
+		if UIPanelWindows["WardrobeFrame"] then 
+			UIPanelWindows["WardrobeFrame"].width = 1280
+		else 
+			UIPanelWindows["WardrobeFrame"] ={ area = "left", pushable = 0,	width = 1280 };
+		end
+	else
+		WardrobeFrame:SetWidth(1170)
+		WardrobeFrame:SetHeight(606)
+		WardrobeTransmogFrame:SetWidth(500)
+		WardrobeTransmogFrame:SetHeight(495)
+		WardrobeTransmogFrame:ClearAllPoints()
+		WardrobeTransmogFrame:SetPoint("TOPLEFT", WardrobeFrame, 4, -60)
+		WardrobeTransmogFrame:SetPoint("BOTTOMRIGHT", WardrobeCollectionFrame, "BOTTOMLEFT", 0,30 )
+
+		WardrobeTransmogFrame.ModelScene:ClearAllPoints()
+		WardrobeTransmogFrame.ModelScene:SetWidth(420)
+		WardrobeTransmogFrame.ModelScene:SetHeight(420)
+		WardrobeTransmogFrame.ModelScene:SetPoint("TOP", WardrobeTransmogFrame, "TOP", 0, -4)
+
+		WardrobeTransmogFrame.Inset:SetWidth(494)
+		WardrobeTransmogFrame.Inset:SetHeight(495)
+		WardrobeTransmogFrame.Inset:ClearAllPoints()
+		WardrobeTransmogFrame.Inset:SetAllPoints()
+		WardrobeTransmogFrame.Inset.BG:ClearAllPoints()
+		WardrobeTransmogFrame.Inset.BG:SetAllPoints()
+
+		WardrobeTransmogFrame.ModelScene.HeadButton:ClearAllPoints()
+		WardrobeTransmogFrame.ModelScene.HeadButton:SetPoint("TOP", WardrobeTransmogFrame.ModelScene, "TOP", -208, -41)
+		WardrobeTransmogFrame.ModelScene.HandsButton:ClearAllPoints()
+		WardrobeTransmogFrame.ModelScene.HandsButton:SetPoint("TOP", WardrobeTransmogFrame.ModelScene, "TOP", 205, -118)
+
+		WardrobeTransmogFrame.ModelScene.MainHandButton:ClearAllPoints()
+		WardrobeTransmogFrame.ModelScene.MainHandButton:SetPoint("TOP", WardrobeTransmogFrame.ModelScene, "BOTTOM", -26, -5)
+		WardrobeTransmogFrame.ModelScene.SecondaryHandButton:ClearAllPoints()
+		WardrobeTransmogFrame.ModelScene.SecondaryHandButton:SetPoint("TOP", WardrobeTransmogFrame.ModelScene, "BOTTOM", 27, -5)
+		WardrobeTransmogFrame.ModelScene.MainHandEnchantButton:ClearAllPoints()
+		WardrobeTransmogFrame.ModelScene.MainHandEnchantButton:SetPoint("BOTTOM", WardrobeTransmogFrame.ModelScene.MainHandButton, "BOTTOM", 0, -20)
+		WardrobeTransmogFrame.ModelScene.SecondaryHandEnchantButton:ClearAllPoints()
+		WardrobeTransmogFrame.ModelScene.SecondaryHandEnchantButton:SetPoint("BOTTOM", WardrobeTransmogFrame.ModelScene.SecondaryHandButton, "BOTTOM", 0, -20)
+		scale = 1
+
+		if UIPanelWindows["WardrobeFrame"] then 
+			UIPanelWindows["WardrobeFrame"].width = 1170
+		else 
+			UIPanelWindows["WardrobeFrame"] ={ area = "left", pushable = 0,	width = 1170 };
+		end
 	end
-	UpdateUIPanelPositions()
-    WardrobeFrame.extended = true
-end
 
+	for i, button in pairs(	WardrobeTransmogFrame.ModelScene.SlotButtons) do
+		button:SetScale(scale);
+
+	end
+			WardrobeTransmogFrame.ModelScene.ControlFrame:SetScale(scale)
+
+
+	UpdateUIPanelPositions()
+	WardrobeFrame.extended = true
+end
+addon.ExtendTransmogView = UI.ExtendTransmogView
 
 --- Functionality to add tabs to window
 function BW_WardrobeCollectionFrame_ClickTab(tab)
@@ -501,7 +566,7 @@ function addon.Init:BuildUI()
 	BW_WardrobeCollectionFrame.FilterButton:SetFrameLevel(BW_WardrobeCollectionFrame:GetFrameLevel()+10)
 	BW_WardrobeCollectionFrame.FilterButton:SetPoint("TOPLEFT", WardrobeCollectionFrame.FilterButton, "TOPLEFT")
 
- 	UI.BuildLoadQueueButton()
+	UI.BuildLoadQueueButton()
 	UI.DefaultButtons_Update()
 
 	UI.ExtendTransmogView()
@@ -746,9 +811,9 @@ function UI:FilterDropDown_InitializeItems(level)
 			info.func = function(info, arg1, _, value)
 
 					addon.selectedArmorType = arg1
-					addon.extraSetsCache = nil
-							BW_WardrobeCollectionFrame_SetTab(2)
-		BW_WardrobeCollectionFrame_SetTab(3)
+					--addon.extraSetsCache = nil
+					BW_WardrobeCollectionFrame_SetTab(2)
+					BW_WardrobeCollectionFrame_SetTab(3)
 					RefreshArmor()
 			end
 			info.arg1 = name
@@ -999,7 +1064,7 @@ function UI.CreateBW_SelectSavedSetDropdown()
 
 --local f = CreateFrame("Button", "BW_DBSavedSetDropdown", BW_WardrobeCollectionFrame, "UIDropDownMenuTemplate")
 	--BW_DBSavedSetDropdown = L_Create_UIDropDownMenu("BW_DBSavedSetDropdown",UIParent)
-    --local f = L_Create_UIDropDownMenu("myOwnDropDownMenu", parent)--BW_DBSetDropDown = f
+	--local f = L_Create_UIDropDownMenu("myOwnDropDownMenu", parent)--BW_DBSetDropDown = f
    -- BW_DBSavedSetDropdown:SetParent("BW_WardrobeCollectionFrame")
 	--f:SetWidth(87)--, 22)
 --	f:SetHeight(22)
@@ -1009,19 +1074,19 @@ BW_DBSavedSetDropdown:SetParent("BW_WardrobeCollectionFrame")
 
 	--ocal dropDown = CreateFrame("Frame", "WPDemoDropDown", UIParent, "UIDropDownMenuTemplate")
 
-L_UIDropDownMenu_SetWidth(BW_DBSavedSetDropdown, 165) -- Use in place of dropDown:SetWidth
+UIDropDownMenu_SetWidth(BW_DBSavedSetDropdown, 165) -- Use in place of dropDown:SetWidth
 -- Bind an initializer function to the dropdown; see previous sections for initializer function examples.
-L_UIDropDownMenu_Initialize(BW_DBSavedSetDropdown, WPDropDownDemo_Menu)
-L_UIDropDownMenu_SetText(BW_DBSavedSetDropdown, addon.setdb:GetCurrentProfile())
+UIDropDownMenu_Initialize(BW_DBSavedSetDropdown, WPDropDownDemo_Menu)
+UIDropDownMenu_SetText(BW_DBSavedSetDropdown, addon.setdb:GetCurrentProfile())
 
 end
 
-BW_DBSavedSetDropdown = L_Create_UIDropDownMenu("BW_DBSavedSetDropdown",UIParent)
+BW_DBSavedSetDropdown =  CreateFrame("Frame", "BW_DBSavedSetDropdown", UIParent, "UIDropDownMenuTemplate") --Create_UIDropDownMenu("BW_DBSavedSetDropdown",UIParent)
 BW_DBSavedSetDropdown:Hide()
 
 local function WPDropDownDemo_OnClick(self, arg1, arg2, checked)
 
- 		local value = arg1
+		local value = arg1
 		local name = UnitName("player")
 		local realm = GetRealmName()
 
@@ -1032,17 +1097,17 @@ local function WPDropDownDemo_OnClick(self, arg1, arg2, checked)
 		end
 		BW_WardrobeCollectionFrame_SetTab(2)
 		BW_WardrobeCollectionFrame_SetTab(4)
-		L_UIDropDownMenu_SetText(BW_DBSavedSetDropdown, arg1)
+		UIDropDownMenu_SetText(BW_DBSavedSetDropdown, arg1)
 		addon.savedSetCache = nil
 end
 
 function WPDropDownDemo_Menu(frame, level, menuList)
 	local count = 1
 for name in pairs(addon.setdb.global.sets)do
-	 local info = L_UIDropDownMenu_CreateInfo()
+	 local info = UIDropDownMenu_CreateInfo()
  info.func = WPDropDownDemo_OnClick
  info.text, info.arg1 = name, name
-  L_UIDropDownMenu_AddButton(info)
+  UIDropDownMenu_AddButton(info)
   count = count +1
 end
 

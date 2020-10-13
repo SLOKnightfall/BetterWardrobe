@@ -1,12 +1,12 @@
-﻿## Interface: 90002
+﻿## Interface: 90001
 ## Title: BetterWardrobe (@project-version@)
 ## Version: @project-version@
-## Game Version: 9.0.2
+## Game Version: 9.0.1
 ## Author: SLOKnightfall
 ## Notes: 
 ## LoadOnDemand: 1
 ## LoadWith: Blizzard_Collections
-## SavedVariables: BetterWardrobe_Options, BetterWardrobe_CharacterData, BetterWardrobe_SavedSetData,BetterWardrobe_SubstituteItemData
+## SavedVariables: BetterWardrobe_Options, BetterWardrobe_CharacterData, BetterWardrobe_SavedSetData,BetterWardrobe_SubstituteItemData, Artifact
 
 #Libraries
 Libs\LibStub\LibStub.lua
@@ -20,7 +20,6 @@ Libs\AceDBOptions-3.0\AceDBOptions-3.0.xml
 Libs\AceEvent-3.0\AceEvent-3.0.xml
 Libs\AceHook-3.0\AceHook-3.0.xml
 Libs\AceLocale-3.0\AceLocale-3.0.xml
-Libs\LibUIDropDownMenu\LibUIDropDownMenu.xml
 #Libs\LibDataBroker-1.1\LibDataBroker-1.1.lua
 #Libs\LibTextDump-1.0\LibTextDump-1.0.lua
 
@@ -43,6 +42,7 @@ Modules\CollectionList.xml
 Modules\UIDropDownMenu.lua
 Modules\Tooltips.lua
 Modules\DressingRoom.xml
+Modules\ArtifactAppearances.lua
 
 #3rd party addon compatability
 Plugins\ElvUI.lua
@@ -50,6 +50,7 @@ Plugins\CanIMogIt.lua
 
 #Data files
 Data\AppearanceData.lua
+Data\ArtifactData.lua
 #Data\SourceData.lua
 Data\CLOTH.lua
 Data\LEATHER.lua

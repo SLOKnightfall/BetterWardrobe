@@ -86,6 +86,7 @@ do
 
 
 				setData["name"] = L[setData["name"]]
+				setData.oldnote = setData.note
 
 				if not setData.note then
 					local note = "NOTE_"..(setData.label or 0)
@@ -164,7 +165,7 @@ do
 			if  (setData.isClass or 
 					(addon.Profile.IgnoreClassRestrictions and ((setData.filter == 6 or setData.filter == 7) and addon.Profile.IgnoreClassLookalikeRestrictions)) or 
 					(addon.Profile.IgnoreClassRestrictions and not addon.Profile.IgnoreClassLookalikeRestrictions)) 
-				and not (setData.label == 6 or setData.label == 8 or setData.label == 16)
+				and not (setData.oldnote == 6 or setData.oldnote == 8 or setData.oldnote == 16)
 				and not setData.isFactionLocked 
 				and not setData.isHeritageArmor  then
 
@@ -264,8 +265,8 @@ local function buildSetSubstitutions()
 
 	function addon:ClearCache()
 		--addon.ArmorSets = nil
-		addon.ArmorSetModCache = nil
-		addon.extraSetsCache = nil
+		wipe(addon.ArmorSetModCache)
+		--addon.extraSetsCache = nil
 		wipe(SET_INDEX)
 		wipe(SET_DATA)
 
@@ -470,7 +471,7 @@ function addon.GetAllSets()
 							data.filter = 1
 							data.setID = data.setID *100
 							setsInfo[data.setID] = data
-							tinsert(addon.extraSetsCache, data)
+							--tinsert(addon.extraSetsCache, data)
 						end
 					end
 					end

@@ -56,11 +56,15 @@ function optionHandler:Setter(info, value)
 			addon:DressingRoom_Enable()
 		end
 	elseif info.arg == IgnoreClassRestrictions or info.arg == IgnoreClassLookalikeRestrictions then 
-		addon.extraSetsCache = nil
+		--addon.extraSetsCache = nil
 		addon.Init:BuildDB()
 
 	elseif info.arg == "ShowAdditionalSourceTooltips" then
 		C_TransmogCollection.SetShowMissingSourceInItemTooltips(value);
+
+	elseif info.arg == "ExtraLargeTransmogArea" then 
+		WardrobeFrame.extended = false
+		addon.ExtendTransmogView()
 	end
 end
 
@@ -196,6 +200,14 @@ local options = {
 							name = L["Transmog Vendor Window"],
 							type = "header",
 							width = "full",
+						},
+						ExtraLargeTransmogArea = {
+							order = 1.1,
+							name = L["Extra Large Transmog Area"],
+							type = "toggle",
+							width = "full",
+							arg = "ExtraLargeTransmogArea",
+
 						},
 						ShowIncomplete = {
 							order = 2,
@@ -419,7 +431,7 @@ local options = {
 								order = 9,
 								name = L["Use custom model"],
 								width = "full",
-								hidden = true,
+								--hidden = true,
 							},
 							TooltipPreview_CustomRace = {
 								type = "select",
@@ -442,7 +454,7 @@ local options = {
 								},
 								disabled = function() return not addon.Profile.TooltipPreview_CustomModel or not addon.Profile.ShowTooltipPreview end,
 								width = 1.2,
-								hidden = true,
+								--hidden = true,
 							},
 							TooltipPreview_CustomGender = {
 								type = "select",
@@ -454,7 +466,7 @@ local options = {
 								},
 								disabled = function() return not addon.Profile.TooltipPreview_CustomModel or not addon.Profile.ShowTooltipPreview end,
 								width = 1.2,
-								hidden = true, 
+								--hidden = true, 
 							},
 						},
 				},
@@ -716,6 +728,7 @@ local defaults = {
 		TooltipPreview_CustomGender = 0,
 		TooltipPreview_DressingDummy = false, 
 		IgnoreClassRestrictions = false,
+		ExtraLargeTransmogArea = false,
 	}
 }
 
@@ -885,6 +898,9 @@ function addon:UpdateItems(self)
 		local isInList = addon.chardb.profile.collectionList["item"][setID]
 		model.CollectionListVisual.Collection.Collection_Icon:SetShown(isInList)
 		model.CollectionListVisual.Collection.Collected_Icon:SetShown(isInList and model.visualInfo and model.visualInfo.isCollected)
+	end
+	if 	#addon.GetBaseList() == 0 then 
+		addon.Init:BuildDB()
 	end
 end
 
@@ -2988,6 +3004,8 @@ function BW_WardrobeCollectionFrame_OnShow(self)
 
 	addon.setdb.global.sets[addon.setdb:GetCurrentProfile()] = addon.GetSavedList()
 	addon.selectedArmorType = addon.Globals.CLASS_INFO[playerClass][3]
+
+	addon.BuildClassArtifactAppearanceList()
 end
 
 

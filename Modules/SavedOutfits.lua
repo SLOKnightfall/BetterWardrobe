@@ -261,16 +261,20 @@ function BW_WardrobeOutfitMixin:LoadDBOutfit(outfitID)
 	if not outfitdata then return end
 
 		local emptySlotData = addon.Sets:GetEmptySlots()
-			for i, x in pairs(outfitdata.sources) do
-				if  i ~= 7 and emptySlotData[i] then
-					local _, source = addon.GetItemSource(emptySlotData[i]) --C_TransmogCollection.GetItemInfo(emptySlotData[i])
-					C_Transmog.SetPending(i, Enum.TransmogType.Appearance, source)
-				end
+		for i, x in pairs(outfitdata.sources) do
+			if  i ~= 7 and emptySlotData[i] then
+				local transmogLocation = TransmogUtil.GetTransmogLocation(i, Enum.TransmogType.Appearance, Enum.TransmogModification.None);
+
+				local _, source = addon.GetItemSource(emptySlotData[i]) --C_TransmogCollection.GetItemInfo(emptySlotData[i])
+				C_Transmog.SetPending(transmogLocation, source, Enum.TransmogType.Appearance)
 			end
+		end
+		
 		for slot , data in pairs(outfitdata.sources) do
 			if data ~= 0 then 
-				print("???????")
-				C_Transmog.SetPending(slot, Enum.TransmogType.Appearance, data)						
+				local transmogLocation = TransmogUtil.GetTransmogLocation(slot, Enum.TransmogType.Appearance, Enum.TransmogModification.None);
+
+				C_Transmog.SetPending(transmogLocation, data, Enum.TransmogType.Appearance )						
 			end
 		end
 	--C_Transmog.SetPending(GetInventorySlotInfo("MAINHANDSLOT"), LE_TRANSMOG_TYPE_ILLUSION, outfit["mainHandEnchant"])
