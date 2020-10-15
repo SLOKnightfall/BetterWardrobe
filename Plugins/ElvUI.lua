@@ -51,7 +51,7 @@ BW_DBSavedSetDropdown:SetPoint("TOPRIGHT", "BW_SortDropDown", "TOPRIGHT", -0 , 0
 	S:HandleButton(BW_WardrobeCollectionFrame.FilterButton)
 
 	BW_SetsTransmogFrame:StripTextures()
-	BW_SetsTransmogFrame:SetTemplate("Transparent")
+	--BW_SetsTransmogFrame:SetTemplate("Transparent")
 
 	S:HandleButton(BW_LoadQueueButton)
 	BW_LoadQueueButton:ClearAllPoints()
@@ -62,7 +62,7 @@ BW_DBSavedSetDropdown:SetPoint("TOPRIGHT", "BW_SortDropDown", "TOPRIGHT", -0 , 0
 	BW_RandomizeButton:Point("TOPLEFT",BW_LoadQueueButton, "TOPRIGHT", 0, 0)
 
 	BW_WardrobeOutfitFrame:StripTextures()
-	BW_WardrobeOutfitFrame:SetTemplate('Transparent')
+	--BW_WardrobeOutfitFrame:SetTemplate('Transparent')
 	S:HandleButton(BW_WardrobeOutfitDropDown.SaveButton)
 
 	S:HandleDropDownBox(BW_WardrobeOutfitDropDown, 221)
@@ -76,10 +76,9 @@ BW_DBSavedSetDropdown:SetPoint("TOPRIGHT", "BW_SortDropDown", "TOPRIGHT", -0 , 0
 	S:HandleButton(BW_TransmogOptionsButton)
 	--S:HandleButton(BW_WardrobeToggle)
 
-	BW_DressingRoomFrame:SetTemplate("Transparent")
-	BW_DressingRoomOutfitFrame:StripTextures()
-	BW_DressingRoomOutfitFrame:SetTemplate('Transparent')
-
+	--BW_DressingRoomFrame:SetTemplate("Transparent")
+	--BW_DressingRoomOutfitFrame:StripTextures()
+	--BW_DressingRoomOutfitFrame:SetTemplate('Transparent')
 
 
 
@@ -91,9 +90,19 @@ S:HandleScrollBar(BW_DressingRoomOutfitFrameScrollFrameScrollBar)
 	BW_DressingRoomOutfitDropDown.SaveButton:ClearAllPoints()
 	BW_DressingRoomOutfitDropDown.SaveButton:SetPoint('TOPLEFT', BW_DressingRoomOutfitDropDown, 'TOPRIGHT', -2, -2)
 	S:HandleButton(BW_DressingRoomFrame.BW_DressingRoomSettingsButton)
+	BW_DressingRoomFrame.BW_DressingRoomSettingsButton:SetSize(25,25)
+	BW_DressingRoomFrame.BW_DressingRoomSettingsButton:SetPoint("BOTTOMLEFT", 2,2)
 	S:HandleButton(BW_DressingRoomFrame.BW_DressingRoomHideArmorButton)
 	S:HandleButton(BW_DressingRoomFrame.BW_DressingRoomExportButton)
-	S:HandleButton(BW_DressingRoomFrame.BW_DressingRoomTargettButton)  --TODO:  Fix the spelling of the frame
+	S:HandleButton(BW_DressingRoomFrame.BW_DressingRoomTargetButton)
+	S:HandleButton(BW_DressingRoomFrame.BW_DressingRoomPlayerButton)
+	S:HandleButton(BW_DressingRoomFrame.BW_DressingRoomGearButton)
+	BW_DressingRoomFrame.BW_DressingRoomExportButton:SetSize(25,25)
+	BW_DressingRoomFrame.BW_DressingRoomTargetButton:SetSize(25,25)
+	BW_DressingRoomFrame.BW_DressingRoomPlayerButton:SetSize(25,25)
+	BW_DressingRoomFrame.BW_DressingRoomGearButton:SetSize(25,25)
+
+
 
 for index, button in pairs(BW_DressingRoomFrame.PreviewButtonFrame.Slots) do
 S:HandleItemButton(button)
@@ -112,7 +121,7 @@ end
 				Model.Border:SetAlpha(0)
 				Model.TransmogStateTexture:SetAlpha(0)
 
-				local bg = CreateFrame("Frame", nil, Model)
+				local bg = CreateFrame("Frame", nil, Model, "BackdropTemplate")
 				bg:SetAllPoints()
 				bg:CreateBackdrop()
 				bg.backdrop:SetOutside(Model, 2, 2)
@@ -152,7 +161,7 @@ end
 
 	--Sets
 	SetsCollectionFrame.RightInset:StripTextures()
-	SetsCollectionFrame:SetTemplate("Transparent")
+	--SetsCollectionFrame:SetTemplate("Transparent")
 	SetsCollectionFrame.LeftInset:StripTextures()
 
 	hooksecurefunc(BW_WardrobeCollectionFrame.BW_SetsCollectionFrame, 'SetItemFrameQuality', function(_, itemFrame)
