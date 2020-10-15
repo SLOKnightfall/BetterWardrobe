@@ -984,13 +984,36 @@ function BW_DressingRoomExportButton_OnEnter(self)
 	SetTooltip(self, L["Import/Export Options"])
 end
 
-function BW_DressingRoomTargetButton_OnEnter(self)
-	SetTooltip(self, L["Target Options"])
-end
+--function BW_DressingRoomTargetButton_OnEnter(self)
+	--SetTooltip(self, L["Target Options"])
+--end
 
 function BW_DressingRoomSettingsButton_OnEnter(self)
 	SetTooltip(self, L["General Options"])
 end
 
+function BW_DressingRoomPlayerButton_OnEnter(self)
+	SetTooltip(self, L["Use Player Model"])
+end
+function BW_DressingRoomTargetButton_OnEnter(self)
+	SetTooltip(self, L["Use Target Model"])
+end
+function BW_DressingRoomGearButton_OnEnter(self)
+	SetTooltip(self, L["Use Target Gear"])
+end
+
+
+
+function BW_DressingRoomPlayerButton_OnClick(self)
+	DressingRoom.showTarget = false
+	DressingRoom:SetTargetGear(true)
+end
+function BW_DressingRoomTargetButton_OnClick(self)
+	DressingRoom.showTarget = true
+	DressingRoom:SetTarget()
+end
+function BW_DressingRoomGearButton_OnClick(self)
+	DressingRoom:SetTargetGear()
+end
 ---TODO:  Reset button resets target model if Selected
 --set playuermodel

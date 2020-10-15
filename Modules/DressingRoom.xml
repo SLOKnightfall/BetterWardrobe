@@ -206,6 +206,7 @@
 				<Scripts>
 					<OnClick>
 						BW_DressingRoomTargetButton_OnClick(self)
+
 					</OnClick>
 								<OnEnter>
 				BW_DressingRoomTargetButton_OnEnter(self)
@@ -213,7 +214,7 @@
 			<OnLeave function="GameTooltip_Hide"/>
 				</Scripts>
 			</Button>
-						<Button parentKey="BW_DressingRoomPlayerButton" inherits="SquareIconButtonTemplate" >
+			<Button parentKey="BW_DressingRoomPlayerButton" inherits="SquareIconButtonTemplate" >
 				<Size x="32" y="32"/>
 				<Anchors>
 					<Anchor point="LEFT" relativeKey="$parent.BW_DressingRoomTargetButton" relativePoint="RIGHT" x="-5" y="0"/>
@@ -230,10 +231,11 @@
 				</Layers>
 				<Scripts>
 					<OnClick>
-						BW_DressingRoomTargetButton_OnClick(self)
+						BW_DressingRoomPlayerButton_OnClick(self)
+
 					</OnClick>
 								<OnEnter>
-				BW_DressingRoomTargetButton_OnEnter(self)
+				BW_DressingRoomPlayerButton_OnEnter(self)
 			</OnEnter>
 			<OnLeave function="GameTooltip_Hide"/>
 				</Scripts>
@@ -255,10 +257,11 @@
 				</Layers>
 				<Scripts>
 					<OnClick>
-						BW_DressingRoomTargetButton_OnClick(self)
+						BW_DressingRoomGearButton_OnClick(self)
+						
 					</OnClick>
 								<OnEnter>
-				BW_DressingRoomTargetButton_OnEnter(self)
+				BW_DressingRoomGearButton_OnEnter(self)
 			</OnEnter>
 			<OnLeave function="GameTooltip_Hide"/>
 				</Scripts>
