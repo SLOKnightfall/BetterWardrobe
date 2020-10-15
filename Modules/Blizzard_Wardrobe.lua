@@ -97,8 +97,10 @@ end
 
 
 function WardrobeCollectionFrame_GetSortedAppearanceSources(visualID, categoryID)
-	if categoryID == 29 then 
-		return {addon.GetArtifactSourceInfo(visualID)}
+	--if categoryID == 29 then
+	local artifactSourceInfo =  addon.GetArtifactSourceInfo(visualID)
+		if artifactSourceInfo then  
+		return {artifactSourceInfo}
 	else
 		local sources = C_TransmogCollection.GetAppearanceSources(visualID, categoryID);
 		return WardrobeCollectionFrame_SortSources(sources);
@@ -459,8 +461,7 @@ function ItemsCollectionFrame:SetAppearanceTooltip(frame)
 	self.tooltipVisualID = frame.visualInfo.visualID;
 
 	if self.activeCategory == 29 then 
-		bob = frame.visualInfo
-		addon.SetArtifactAppearanceTooltip(frame.visualInfo)
+		addon.SetArtifactAppearanceTooltip(self, frame.visualInfo)
  	else
 		self:RefreshAppearanceTooltip();
 	end

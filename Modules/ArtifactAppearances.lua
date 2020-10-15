@@ -88,10 +88,11 @@ local ClassArtifacts = {
 		[128935] = "The Fist of Ra-den",
 		--[128936] = "The Highkeeper's Ward",
 		[128819] = "Doomhammer",
-		[128873] = "Fury of the Stonemother",},
-	WARLOCK ={ 
+		--[128873] = "Fury of the Stonemother",
 		[128911] = "Sharas'dal, Scepter of Tides",
 		--[128934] = "Shield of the Sea Queen",
+	},
+	WARLOCK ={ 
 		[128942] = "Ulthalesh, the Deadwind Harvester",
 		[128943] = "Skull of the Man'ari",
 		--[137246] = "Spine of Thal'kiel",
@@ -277,8 +278,9 @@ function addon.GetArtifactSourceInfo(visualID)
 end
 
 
-function addon.SetArtifactAppearanceTooltip(sourceInfo)
+function addon.SetArtifactAppearanceTooltip(contentFrame, sourceInfo, sourceID)
 	WardrobeCollectionFrame.tooltipContentFrame = contentFrame;
+	WardrobeCollectionFrame.tooltipSourceIndex = 1
 	--local sourceInfo = frame.visualInfo --visualIDIndex[frame.visualInfo.visualID] 
 	--bob = frame.visualInfo
 	if sourceInfo then 
