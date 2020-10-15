@@ -188,6 +188,7 @@ end
 ]]
 
 
+
 function ItemsCollectionFrame:UpdateItems()
 	local isArmor;
 	local cameraID;
@@ -239,6 +240,7 @@ function ItemsCollectionFrame:UpdateItems()
 	local indexOffset = (self.PagingFrame:GetCurrentPage() - 1) * self.PAGE_SIZE;
 	for i = 1, self.PAGE_SIZE do
 		local model = self.Models[i];
+
 		local index = i + indexOffset;
 		local visualInfo = self.filteredVisualsList[index];
 		if ( visualInfo ) then
@@ -257,11 +259,31 @@ function ItemsCollectionFrame:UpdateItems()
 				Model_ApplyUICamera(model, cameraID);
 				model.cameraID = cameraID;
 			end
-
+			model.zoom = nil
 			-- ( visualInfo ~= model.visualInfo or changeModel ) then
 				if ( isArmor ) then
 					local sourceID = self:GetAnAppearanceSourceFromVisual(visualInfo.visualID, nil);
 					model:TryOn(sourceID);
+									--model:ClearModel();
+
+				elseif(visualInfo.shapeshiftID) then 
+					model.cameraID = visualInfo.camera
+					Model_ApplyUICamera(model, visualInfo.camera);
+					model:SetDisplayInfo( visualInfo.shapeshiftID );
+					model:MakeCurrentCameraCustom()
+					
+					if model.cameraID == 1602 then 
+						model.zoom =-.75
+						--model:SetCamera(1)
+						model:SetCameraDistance(-5)
+						model:SetPosition(-13.25,0,-2.447)
+					--[[elseif visualInfo.artifactID == 128821 then 
+																print(model:GetPosition())
+																model:SetPosition(-5,0,0)]]
+					end 
+					model:Show()
+					--model:SetCamera(0)
+
 				elseif ( appearanceVisualID ) then
 					-- appearanceVisualID is only set when looking at enchants
 					model:SetItemAppearance(appearanceVisualID, visualInfo.visualID, appearanceVisualSubclass);
@@ -382,13 +404,20 @@ end
 function ItemsCollectionFrame:SortVisuals()
 		if WardrobeCollectionFrame.selectedCollectionTab == 1 then 
 
-		if self:GetActiveCategory() then
+		if self:GetActiveCategory()  and self:GetActiveCategory() ~= 29 then
 			addon.Sort[1][addon.sortDB.sortDropdown](self)
 			UIDropDownMenu_EnableDropDown(BW_SortDropDown)
+			UIDropDownMenu_SetText(BW_SortDropDown, COMPACT_UNIT_FRAME_PROFILE_SORTBY.." "..L[addon.sortDB.sortDropdown])
+
 			--self:UpdateItems()
+		elseif self:GetActiveCategory()  and self:GetActiveCategory() == 29 then
+			addon.Sort[1][1](self)
+			UIDropDownMenu_DisableDropDown(BW_SortDropDown)
+			UIDropDownMenu_SetText(BW_SortDropDown, COMPACT_UNIT_FRAME_PROFILE_SORTBY.." "..L["Default"])
 		else
 			addon.Sort[1][1](self)
 			UIDropDownMenu_DisableDropDown(BW_SortDropDown)
+			UIDropDownMenu_SetText(BW_SortDropDown, COMPACT_UNIT_FRAME_PROFILE_SORTBY.." "..L["Default"])
 			--self:UpdateItems()
 		end
 	end
@@ -425,7 +454,19 @@ function ItemsCollectionFrame:RefreshVisualsList()
 end
 
 
-function ItemsCollectionFrame:RefreshAppearanceTooltip()
+function ItemsCollectionFrame:SetAppearanceTooltip(frame)
+	GameTooltip:SetOwner(frame, "ANCHOR_RIGHT");
+	self.tooltipVisualID = frame.visualInfo.visualID;
+
+	if self.activeCategory == 29 then 
+		bob = frame.visualInfo
+		addon.SetArtifactAppearanceTooltip(frame.visualInfo)
+ 	else
+		self:RefreshAppearanceTooltip();
+	end
+end
+
+--[[function ItemsCollectionFrame:RefreshAppearanceTooltip()
 	if ( not self.tooltipVisualID ) then
 		return;
 	end
@@ -438,7 +479,7 @@ function ItemsCollectionFrame:RefreshAppearanceTooltip()
 		local chosenSourceID = self:GetChosenVisualSource(self.tooltipVisualID);
 		WardrobeCollectionFrame_SetAppearanceTooltip(self, sources, chosenSourceID);
 	end
-end
+end]]
 
 function WardrobeCollectionFrame_OpenTransmogLink(link)
 	if ( not CollectionsJournal:IsVisible() or not WardrobeCollectionFrame:IsVisible() ) then

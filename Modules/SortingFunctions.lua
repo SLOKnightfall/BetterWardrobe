@@ -98,7 +98,7 @@ end
 local function CacheHeaders()
 	for k in pairs(nameCache) do
 		-- oh my god so much wasted tables
-		local appearances = WardrobeCollectionFrame_GetSortedAppearanceSources(k)[1]
+		local appearances = WardrobeCollectionFrame_GetSortedAppearanceSources(k)[1] or {}
 		if appearances.name then
 			nameVisuals[k] = appearances.name
 			nameCache[k] = nil
@@ -209,8 +209,8 @@ addon.Sort = {
 	end,
 
 	["SortItemByExpansion"] = function(source1, source2)
-		local item1 = WardrobeCollectionFrame_GetSortedAppearanceSources(source1.visualID)[1]
-		local item2 = WardrobeCollectionFrame_GetSortedAppearanceSources(source2.visualID)[1]
+		local item1 = WardrobeCollectionFrame_GetSortedAppearanceSources(source1.visualID)[1] or {}
+		local item2 = WardrobeCollectionFrame_GetSortedAppearanceSources(source2.visualID)[1] or {}
 		item1.itemID = item1.itemID or 0
 		item2.itemID = item2.itemID or 0
 		item1.expansionID = select(15,  GetItemInfo(item1.itemID)) or -1
@@ -279,7 +279,7 @@ addon.Sort = {
 			return SortOrder(source1.sourceID, source2.sourceID)
 		end
 
-		table.sort(self.filteredVisualsList, comparison)
+		return table.sort(self.filteredVisualsList, comparison)
 		end,
 		
 		[LE_APPEARANCE] = function(self)
@@ -294,7 +294,7 @@ addon.Sort = {
 		
 		[LE_ALPHABETIC] = function(self)
 			if catCompleted[self:GetActiveCategory()] then
-				addon.Sort.SortItemAlphabetic()
+				return addon.Sort.SortItemAlphabetic()
 			else
 				for _, v in pairs(self.filteredVisualsList) do
 					nameCache[v.visualID] = true -- queue data to be cached	
@@ -305,15 +305,15 @@ addon.Sort = {
 		
 		[LE_ITEM_SOURCE] = function(self)
 			sort(self.filteredVisualsList, function(source1, source2)
-			local item1 = WardrobeCollectionFrame_GetSortedAppearanceSources(source1.visualID)[1]
-			local item2 = WardrobeCollectionFrame_GetSortedAppearanceSources(source2.visualID)[1]
+			local item1 = WardrobeCollectionFrame_GetSortedAppearanceSources(source1.visualID)[1] or {}
+			local item2 = WardrobeCollectionFrame_GetSortedAppearanceSources(source2.visualID)[1] or {}
 			item1.sourceType = item1.sourceType or 7
 			item2.sourceType = item2.sourceType or 7
 			
 			if item1.sourceType == item2.sourceType then
 				if item1.sourceType == TRANSMOG_SOURCE_BOSS_DROP then
-					local drops1 = C_TransmogCollection.GetAppearanceSourceDrops(item1.sourceID)
-					local drops2 = C_TransmogCollection.GetAppearanceSourceDrops(item2.sourceID)
+					local drops1 = C_TransmogCollection.GetAppearanceSourceDrops(item1.sourceID) or {}
+					local drops2 = C_TransmogCollection.GetAppearanceSourceDrops(item2.sourceID) or {}
 					
 					if #drops1 > 0 and #drops2 > 0 then
 						local instance1, encounter1 = drops1[1].instance, drops1[1].encounter

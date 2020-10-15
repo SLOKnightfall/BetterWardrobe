@@ -106,6 +106,73 @@ local ClassArtifacts = {
 }
 
 
+
+
+
+local function BuildDruidAppearances(artifactID, table)
+
+	local sourceList = {}
+	local index = {9,13,17,21,25,29}
+
+	for i in pairs(index) do
+
+		local artifactData = addon.Globals.ARTIFACT_DATA[artifactID]
+		local _, specName  = GetSpecializationInfoByID(artifactData.specID)
+		local camera
+
+		for _,i in pairs(index) do
+			local data = artifactData.sets[i]
+			local appearanceID, sourceID = C_TransmogCollection.GetItemInfo(artifactID, i)
+			--local sources = WardrobeCollectionFrame_GetSortedAppearanceSources(appearanceID)
+
+			local appearance_camera = C_TransmogCollection.GetAppearanceCameraID(appearanceID)
+			if appearance_camera == 0 then
+				for i=9, 32 do
+					local appearanceID, sourceID = C_TransmogCollection.GetItemInfo(artifactID, i) -- 128861
+					local camera = C_TransmogCollection.GetAppearanceCameraID(appearanceID)	
+
+					if camera ~= 0 then 
+						appearance_camera = camera
+						break
+					end
+				end
+			end
+
+			local sourceInfo = C_TransmogCollection.GetSourceInfo(sourceID)
+			if sourceInfo then
+				if not appearance_camera or appearance_camera == 0 then 
+					sourceInfo.camera = camera
+				else
+					sourceInfo.camera = appearance_camera
+				end
+				
+				--local sources = WardrobeCollectionFrame_GetSortedAppearanceSources(28656); 28656
+
+				sourceInfo.sourceID = sourceID
+				sourceInfo.specID = artifactData.specID
+				sourceInfo.specName = specName
+				sourceInfo.sources = {}
+				sourceInfo.expansionID = 6
+				sourceInfo.itemLink = itemLink
+				sourceInfo.isUsable = true
+				sourceInfo.artifact = true
+				sourceInfo.mod = i
+				sourceInfo.artifactID = itemID
+				if 	addon.Globals.UNLOCK_DATA[data.unlock] then 
+					sourceInfo.unlock = addon.Globals.UNLOCK_DATA[data.unlock].unlock
+					sourceInfo.unlockAch = addon.Globals.UNLOCK_DATA[data.unlock].ach
+				end
+				--visualIDIndex[sourceInfo.visualID] = sourceInfo
+				tinsert(table, sourceInfo)
+			end
+		end
+	end
+
+	return table
+end
+
+
+
 local visualIDIndex = {}
 local sourcelist = {}
 function addon.BuildClassArtifactAppearanceList() 
@@ -113,8 +180,11 @@ function addon.BuildClassArtifactAppearanceList()
 	wipe(sourcelist)
 	local _, playerClass, classID = UnitClass("player")
 	local artifactList = ClassArtifacts[playerClass]
+	local uiOrderBase = 0
 	for itemID in pairs(artifactList) do 
+		uiOrderBase = uiOrderBase + 100
 		local artifactData = addon.Globals.ARTIFACT_DATA[itemID]
+		local _, specName  = GetSpecializationInfoByID(artifactData.specID)
 		local camera
 		for index, data in pairs(artifactData.sets) do
 		--for i = 9, 32 do
@@ -145,8 +215,27 @@ function addon.BuildClassArtifactAppearanceList()
 				else
 					sourceInfo.camera = appearance_camera
 				end
-
+				
+				--local sources = WardrobeCollectionFrame_GetSortedAppearanceSources(28656); 28656
+				if itemID == 128860 or itemID == 128821 then 
+					sourceInfo.visualID = sourceInfo.visualID
+				else
 				sourceInfo.name = data.name
+
+				end
+
+				if data.shapeshiftID then 
+					sourceInfo.shapeshiftID = data.shapeshiftID
+					sourceInfo.camera = data.cameraID or 48
+				end
+
+
+				sourceInfo.uiOrder = uiOrderBase+index
+				sourceInfo.sourceID = sourceID
+				sourceInfo.specID = artifactData.specID
+				sourceInfo.specName = specName
+				sourceInfo.sources = {}
+				sourceInfo.expansionID = 6
 				sourceInfo.itemLink = itemLink
 				sourceInfo.isUsable = true
 				sourceInfo.artifact = true
@@ -163,6 +252,11 @@ function addon.BuildClassArtifactAppearanceList()
 			end
 		end
 	end
+
+--sourcelist = BuildDruidAppearances(128821, sourcelist)
+
+		--print(#sourcelist)
+
 	return sourcelist
 end
 
@@ -183,9 +277,10 @@ function addon.GetArtifactSourceInfo(visualID)
 end
 
 
-function addon.SetArtifactAppearanceTooltip(self)
+function addon.SetArtifactAppearanceTooltip(sourceInfo)
 	WardrobeCollectionFrame.tooltipContentFrame = contentFrame;
-	local sourceInfo = visualIDIndex[self.tooltipVisualID] 
+	--local sourceInfo = frame.visualInfo --visualIDIndex[frame.visualInfo.visualID] 
+	--bob = frame.visualInfo
 	if sourceInfo then 
 
 	local name, nameColor, sourceText, sourceColor = WardrobeCollectionFrameModel_GetSourceTooltipInfo(sourceInfo);
@@ -207,7 +302,8 @@ function addon.SetArtifactAppearanceTooltip(self)
 				else
 					GameTooltip:AddLine(L["Mage Tower Appearance"])
 				end]]
-
+	
+		GameTooltip:AddLine(sourceInfo.specName)
 		if not sourceInfo.isCollected then
 
 			if sourceInfo.mod >= 25 and sourceInfo.mod <= 28 and not sourceInfo.unlock then 
@@ -222,3 +318,25 @@ function addon.SetArtifactAppearanceTooltip(self)
 		--print (self.tooltipVisualID)
 	end
 end
+
+
+--[[
+	local Model = CreateFrame( "PlayerModel" );
+	--- @return Model path for DisplayID.
+		Model:SetDisplayInfo( 74269 );
+		Model:Show()
+		Model:SetPoint("CENTER")
+		Model:SetSize(250, 250)
+		--Model:SetFacing(math.pi/5)
+		Model_ApplyUICamera(Model, 1612)
+
+				local counter =1600
+				function bb()
+					Model_ApplyUICamera(Model, counter)
+					print(counter)
+					counter = counter +1
+					if counter < 1613 then 
+					C_Timer.After(.5, function() bb() end)
+
+					end
+end]]

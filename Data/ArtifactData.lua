@@ -5,6 +5,7 @@ addon.Globals.ARTIFACT_DATA = {
 	[120978] = {
 		["name"] = "Ashbringer",
 		["childID"] = 0,
+		["specID"] = 3,
 		["sets"] = {
 			[9] = { ["name"] = "Ashbringer", ["unlock"] = 37718},
 			[10] = { ["name"] = "Ashbringer", ["unlock"] = 88084},
@@ -35,6 +36,7 @@ addon.Globals.ARTIFACT_DATA = {
 	[127829] = {
 		["name"] = "Twinblades of the Deceiver",
 		["childID"] = 127830,
+		["specID"] = 1,
 		["sets"] = {
 			[9] = { ["name"] = "Twinblades of the Deceiver", ["unlock"] = 37718},
 			[10] = { ["name"] = "Twinblades of the Deceiver", ["unlock"] = 88117},
@@ -65,6 +67,7 @@ addon.Globals.ARTIFACT_DATA = {
 	[127857] = {
 		["name"] = "Aluneth, Greatstaff of the Magna",
 		["childID"] = 0,
+		["specID"] = 1,
 		["sets"] = {
 			[9] = { ["name"] = "Aluneth", ["unlock"] = 88082},
 			[10] = { ["name"] = "Aluneth", ["unlock"] = 37719},
@@ -95,6 +98,7 @@ addon.Globals.ARTIFACT_DATA = {
 	[128289] = {
 		["name"] = "Scale of the Earth-Warder",
 		["childID"] = 128288,
+		["specID"] = 3,
 		["sets"] = {
 			[9] = { ["name"] = "Scale of the Earth-Warder", ["unlock"] = 37719},
 			[10] = { ["name"] = "Scale of the Earth-Warder", ["unlock"] = 37718},
@@ -125,6 +129,7 @@ addon.Globals.ARTIFACT_DATA = {
 	[128292] = {
 		["name"] = "Blades of the Fallen Prince",
 		["childID"] = 128293,
+		["specID"] = 2,
 		["sets"] = {
 			[9] = { ["name"] = "Blades of the Fallen Prince", ["unlock"] = 88085},
 			[10] = { ["name"] = "Blades of the Fallen Prince", ["unlock"] = 37718},
@@ -155,6 +160,7 @@ addon.Globals.ARTIFACT_DATA = {
 	[128306] = {
 		["name"] = "G'Hanir, the Mother Tree",
 		["childID"] = 0,
+		["specID"] = 4,
 		["sets"] = {
 			[9] = { ["name"] = "G'Hanir, the Mother Tree", ["unlock"] = 88086},
 			[10] = { ["name"] = "G'Hanir, the Mother Tree", ["unlock"] = 37718},
@@ -185,6 +191,7 @@ addon.Globals.ARTIFACT_DATA = {
 	[128402] = {
 		["name"] = "Maw of the Damned",
 		["childID"] = 0,
+		["specID"] = 1,
 		["sets"] = {
 			[9] = { ["name"] = "Maw of the Damned", ["unlock"] = 88090},
 			[10] = { ["name"] = "Maw of the Damned", ["unlock"] = 37718},
@@ -215,6 +222,7 @@ addon.Globals.ARTIFACT_DATA = {
 	[128403] = {
 		["name"] = "Apocalypse",
 		["childID"] = 0,
+		["specID"] = 3,
 		["sets"] = {
 			[9] = { ["name"] = "Apocalypse", ["unlock"] = 88091},
 			[10] = { ["name"] = "Apocalypse", ["unlock"] = 37718},
@@ -245,6 +253,7 @@ addon.Globals.ARTIFACT_DATA = {
 	[128476] = {
 		["name"] = "Fangs of the Devourer",
 		["childID"] = 128479,
+		["specID"] = 3,
 		["sets"] = {
 			[9] = { ["name"] = "Fangs of the Devourer", ["unlock"] = 88102},
 			[10] = { ["name"] = "Fangs of the Devourer", ["unlock"] = 37718},
@@ -275,6 +284,7 @@ addon.Globals.ARTIFACT_DATA = {
 	[128808] = {
 		["name"] = "Talonclaw, Spear of the Wild Gods",
 		["childID"] = 0,
+		["specID"] = 3,
 		["sets"] = {
 			[9] = { ["name"] = "Talonclaw", ["unlock"] = 88112},
 			[10] = { ["name"] = "Talonclaw", ["unlock"] = 37718},
@@ -305,6 +315,7 @@ addon.Globals.ARTIFACT_DATA = {
 	[128908] = {
 		["name"] = "Warswords of the Valarjar",
 		["childID"] = 134553,
+		["specID"] = 2,
 		["sets"] = {
 			[9] = { ["name"] = "Warswords of the Valarjar", ["unlock"] = 88095},
 			[10] = { ["name"] = "Warswords of the Valarjar", ["unlock"] = 37718},
@@ -335,6 +346,7 @@ addon.Globals.ARTIFACT_DATA = {
 	[128910] = {
 		["name"] = "Strom'kar, the Warbreaker",
 		["childID"] = 0,
+		["specID"] = 1,
 		["sets"] = {
 			[9] = { ["name"] = "Stromkar, the Warbreaker", ["unlock"] = 88094},
 			[10] = { ["name"] = "Stromkar, the Warbreaker", ["unlock"] = 37718},
@@ -365,6 +377,7 @@ addon.Globals.ARTIFACT_DATA = {
 	[128943] = {
 		["name"] = "Skull of the Man'ari",
 		["childID"] = 137246,
+		["specID"] = 2,
 		["sets"] = {
 			[9] = { ["name"] = "Skull of the Man'ari", ["unlock"] = 37718},
 			[10] = { ["name"] = "Skull of the Man'ari", ["unlock"] = 88109},
@@ -395,6 +408,7 @@ addon.Globals.ARTIFACT_DATA = {
 	[128941] = {
 		["name"] = "Scepter of Sargeras",
 		["childID"] = 0,
+		["specID"] = 3,
 		["sets"] = {
 			[9] = { ["name"] = "Scepter of Sargeras", ["unlock"] = 88107},
 			[10] = { ["name"] = "Scepter of Sargeras", ["unlock"] = 37718},
@@ -425,6 +439,7 @@ addon.Globals.ARTIFACT_DATA = {
 	[128942] = {
 		["name"] = "Ulthalesh, the Deadwind Harvester",
 		["childID"] = 0,
+		["specID"] = 1,
 		["sets"] = {
 			[9] = { ["name"] = "Deadwind Harvester", ["unlock"] = 88108},
 			[10] = { ["name"] = "Deadwind Harvester", ["unlock"] = 37718},
@@ -455,6 +470,7 @@ addon.Globals.ARTIFACT_DATA = {
 	[128935] = {
 		["name"] = "The Fist of Ra-den",
 		["childID"] = 128936,
+		["specID"] = 1,
 		["sets"] = {
 			[9] = { ["name"] = "The Fist of Ra-den", ["unlock"] = 88100},
 			[10] = { ["name"] = "The Fist of Ra-den", ["unlock"] = 37718},
@@ -485,6 +501,7 @@ addon.Globals.ARTIFACT_DATA = {
 	[128819] = {
 		["name"] = "Doomhammer",
 		["childID"] = 128873,
+		["specID"] = 2,
 		["sets"] = {
 			[9] = { ["name"] = "Doomhammer", ["unlock"] = 88098},
 			[10] = { ["name"] = "Doomhammer", ["unlock"] = 37718},
@@ -515,6 +532,7 @@ addon.Globals.ARTIFACT_DATA = {
 	[128911] = {
 		["name"] = "Sharas'dal, Scepter of Tides",
 		["childID"] = 128934,
+		["specID"] = 3,
 		["sets"] = {
 			[9] = { ["name"] = "Sharas'dal, Scepter of Tides", ["unlock"] = 88099},
 			[10] = { ["name"] = "Sharas'dal, Scepter of Tides", ["unlock"] = 37718},
@@ -545,6 +563,7 @@ addon.Globals.ARTIFACT_DATA = {
 	[128870] = {
 		["name"] = "The Kingslayers",
 		["childID"] = 128869,
+		["specID"] = 1,
 		["sets"] = {
 			[9] = { ["name"] = "The Kingslayers", ["unlock"] = 37718},
 			[10] = { ["name"] = "The Kingslayers", ["unlock"] = 88103},
@@ -575,6 +594,7 @@ addon.Globals.ARTIFACT_DATA = {
 	[128872] = {
 		["name"] = "The Dreadblades",
 		["childID"] = 134552,
+		["specID"] = 2,
 		["sets"] = {
 			[9] = { ["name"] = "The Dreadblades", ["unlock"] = 88101},
 			[10] = { ["name"] = "The Dreadblades", ["unlock"] = 37718},
@@ -605,6 +625,7 @@ addon.Globals.ARTIFACT_DATA = {
 	[128825] = {
 		["name"] = "T'uure, Beacon of the Naaru",
 		["childID"] = 0,
+		["specID"] = 2,
 		["sets"] = {
 			[9] = { ["name"] = "T'uure, Beacon of the Naaru", ["unlock"] = 88104},
 			[10] = { ["name"] = "T'uure, Beacon of the Naaru", ["unlock"] = 37718},
@@ -635,6 +656,7 @@ addon.Globals.ARTIFACT_DATA = {
 	[128868] = {
 		["name"] = "Light's Wrath",
 		["childID"] = 0,
+		["specID"] = 1,
 		["sets"] = {
 			[9] = { ["name"] = "Light's Wrath", ["unlock"] = 88105},
 			[10] = { ["name"] = "Light's Wrath", ["unlock"] = 37718},
@@ -665,6 +687,7 @@ addon.Globals.ARTIFACT_DATA = {
 	[128827] = {
 		["name"] = "Xal'atath, Blade of the Black Empire",
 		["childID"] = 133958,
+		["specID"] = 3,
 		["sets"] = {
 			[9] = { ["name"] = "Blade of the Black Empire", ["unlock"] = 88106},
 			[10] = { ["name"] = "Blade of the Black Empire", ["unlock"] = 37718},
@@ -695,6 +718,7 @@ addon.Globals.ARTIFACT_DATA = {
 	[128823] = {
 		["name"] = "The Silver Hand",
 		["childID"] = 0,
+		["specID"] = 1,
 		["sets"] = {
 			[9] = { ["name"] = "The Silver Hand", ["unlock"] = 88093},
 			[10] = { ["name"] = "The Silver Hand", ["unlock"] = 37718},
@@ -725,6 +749,7 @@ addon.Globals.ARTIFACT_DATA = {
 	[128866] = {
 		["name"] = "Truthguard",
 		["childID"] = 128867,
+		["specID"] = 2,
 		["sets"] = {
 			[9] = { ["name"] = "Truthguard", ["unlock"] = 88092},
 			[10] = { ["name"] = "Truthguard", ["unlock"] = 37718},
@@ -755,6 +780,7 @@ addon.Globals.ARTIFACT_DATA = {
 	[128940] = {
 		["name"] = "Fists of the Heavens",
 		["childID"] = 133948,
+		["specID"] = 3,
 		["sets"] = {
 			[9] = { ["name"] = "Fists of the Heavens", ["unlock"] = 88114},
 			[10] = { ["name"] = "Fists of the Heavens", ["unlock"] = 37718},
@@ -785,6 +811,7 @@ addon.Globals.ARTIFACT_DATA = {
 	[128937] = {
 		["name"] = "Sheilun, Staff of the Mists",
 		["childID"] = 0,
+		["specID"] = 2,
 		["sets"] = {
 			[9] = { ["name"] = "Sheilun, Staff of the Mists", ["unlock"] = 88113},
 			[10] = { ["name"] = "Sheilun, Staff of the Mists", ["unlock"] = 37718},
@@ -815,6 +842,7 @@ addon.Globals.ARTIFACT_DATA = {
 	[128938] = {
 		["name"] = "Fu Zan, the Wanderer's Companion",
 		["childID"] = 0,
+		["specID"] = 1,
 		["sets"] = {
 			[9] = { ["name"] = "Fu Zan, the Wanderer's Companion", ["unlock"] = 88115},
 			[10] = { ["name"] = "Fu Zan, the Wanderer's Companion", ["unlock"] = 37718},
@@ -845,6 +873,7 @@ addon.Globals.ARTIFACT_DATA = {
 	[128862] = {
 		["name"] = "Ebonchill, Greatstaff of Alodi",
 		["childID"] = 0,
+		["specID"] = 3,
 		["sets"] = {
 			[9] = { ["name"] = "Ebonchill", ["unlock"] = 88097},
 			[10] = { ["name"] = "Ebonchill", ["unlock"] = 37718},
@@ -875,6 +904,7 @@ addon.Globals.ARTIFACT_DATA = {
 	[128820] = {
 		["name"] = "Felo'melorn",
 		["childID"] = 133959,
+		["specID"] = 2,
 		["sets"] = {
 			[9] = { ["name"] = "Felo'melorn", ["unlock"] = 88096},
 			[10] = { ["name"] = "Felo'melorn", ["unlock"] = 37718},
@@ -905,6 +935,7 @@ addon.Globals.ARTIFACT_DATA = {
 	[128826] = {
 		["name"] = "Thas'dorah, Legacy of the Windrunners",
 		["childID"] = 0,
+		["specID"] = 2,
 		["sets"] = {
 			[9] = { ["name"] = "Thas'dorah, Legacy of the Windrunners", ["unlock"] = 88110},
 			[10] = { ["name"] = "Thas'dorah, Legacy of the Windrunners", ["unlock"] = 37718},
@@ -935,6 +966,7 @@ addon.Globals.ARTIFACT_DATA = {
 	[128861] = {
 		["name"] = "Titanstrike",
 		["childID"] = 0,
+		["specID"] = 1,
 		["sets"] = {
 			[9] = { ["name"] = "Titanstrike", ["unlock"] = 88111},
 			[10] = { ["name"] = "Titanstrike", ["unlock"] = 37718},
@@ -965,66 +997,69 @@ addon.Globals.ARTIFACT_DATA = {
 	[128821] = {
 		["name"] = "Claws of Ursoc",
 		["childID"] = 128822,
+		["specID"] = 3,
 		["sets"] = {
-			[9] = { ["name"] = "Claws of Ursoc", ["unlock"] = 37270},
-			[10] = { ["name"] = "Claws of Ursoc", ["unlock"] = 37719},
-			[11] = { ["name"] = "Claws of Ursoc", ["unlock"] = 37718},
-			[12] = { ["name"] = "Claws of Ursoc", ["unlock"] = 37720},
-			[13] = { ["name"] = "Stonepaw", ["unlock"] = 37721},
-			[14] = { ["name"] = "Stonepaw", ["unlock"] = 37722},
-			[15] = { ["name"] = "Stonepaw", ["unlock"] = 37723},
-			[16] = { ["name"] = "Stonepaw", ["unlock"] = 37724},
-			[17] = { ["name"] = "Avatar of Ursol", ["unlock"] = 37725},
-			[18] = { ["name"] = "Avatar of Ursol", ["unlock"] = 37731},
-			[19] = { ["name"] = "Avatar of Ursol", ["unlock"] = 37732},
-			[20] = { ["name"] = "Avatar of Ursol", ["unlock"] = 37733},
-			[21] = { ["name"] = "Fallen to Nightmare", ["unlock"] = 37726},
-			[22] = { ["name"] = "Fallen to Nightmare", ["unlock"] = 37728},
-			[23] = { ["name"] = "Fallen to Nightmare", ["unlock"] = 37729},
-			[24] = { ["name"] = "Fallen to Nightmare", ["unlock"] = 37730},
-			[25] = { ["name"] = "Might of the Grizzlemaw", ["unlock"] = 44682},
-			[26] = { ["name"] = "Might of the Grizzlemaw", ["unlock"] = 52481},
-			[27] = { ["name"] = "Might of the Grizzlemaw", ["unlock"] = 52622},
-			[28] = { ["name"] = "Might of the Grizzlemaw", ["unlock"] = 52655},
-			[29] = { ["name"] = "Guardian of the Glade", ["unlock"] = 42274},
-			[30] = { ["name"] = "Guardian of the Glade", ["unlock"] = 39784},
-			[31] = { ["name"] = "Guardian of the Glade", ["unlock"] = 39785},
-			[32] = { ["name"] = "Guardian of the Glade", ["unlock"] = 39786},
+			[9] = { ["name"] = "Claws of Ursoc", ["unlock"] = 37270, ["shapeshiftID"] = 66686,},  --need to fix depends on race
+			[10] = { ["name"] = "Claws of Ursoc", ["unlock"] = 37719, ["shapeshiftID"] = 66687},
+			[11] = { ["name"] = "Claws of Ursoc", ["unlock"] = 37718, ["shapeshiftID"] = 66688},
+			[12] = { ["name"] = "Claws of Ursoc", ["unlock"] = 37720, ["shapeshiftID"] = 66682},
+			[13] = { ["name"] = "Stonepaw", ["unlock"] = 37721, ["shapeshiftID"] = 66697},
+			[14] = { ["name"] = "Stonepaw", ["unlock"] = 37722, ["shapeshiftID"] = 66696},
+			[15] = { ["name"] = "Stonepaw", ["unlock"] = 37723, ["shapeshiftID"] = 66698},
+			[16] = { ["name"] = "Stonepaw", ["unlock"] = 37724, ["shapeshiftID"] = 66699},
+			[17] = { ["name"] = "Avatar of Ursol", ["unlock"] = 37725, ["shapeshiftID"] = 66705},
+			[18] = { ["name"] = "Avatar of Ursol", ["unlock"] = 37731, ["shapeshiftID"] = 66704},
+			[19] = { ["name"] = "Avatar of Ursol", ["unlock"] = 37732, ["shapeshiftID"] = 66706},
+			[20] = { ["name"] = "Avatar of Ursol", ["unlock"] = 37733, ["shapeshiftID"] = 66707},
+			[21] = { ["name"] = "Fallen to Nightmare", ["unlock"] = 37726, ["shapeshiftID"] = 66719},
+			[22] = { ["name"] = "Fallen to Nightmare", ["unlock"] = 37728, ["shapeshiftID"] = 66718},
+			[23] = { ["name"] = "Fallen to Nightmare", ["unlock"] = 37729, ["shapeshiftID"] = 66717},
+			[24] = { ["name"] = "Fallen to Nightmare", ["unlock"] = 37730, ["shapeshiftID"] = 66716},
+			[25] = { ["name"] = "Might of the Grizzlemaw", ["unlock"] = 44682, ["shapeshiftID"] = 74269, cameraID = 1602},
+			[26] = { ["name"] = "Might of the Grizzlemaw", ["unlock"] = 52481, ["shapeshiftID"] = 74270, cameraID = 1602},
+			[27] = { ["name"] = "Might of the Grizzlemaw", ["unlock"] = 52622, ["shapeshiftID"] = 74271, cameraID = 1602},
+			[28] = { ["name"] = "Might of the Grizzlemaw", ["unlock"] = 52655, ["shapeshiftID"] = 74272, cameraID = 1602},
+			[29] = { ["name"] = "Guardian of the Glade", ["unlock"] = 42274, ["shapeshiftID"] = 66721},
+			[30] = { ["name"] = "Guardian of the Glade", ["unlock"] = 39784, ["shapeshiftID"] = 66720},
+			[31] = { ["name"] = "Guardian of the Glade", ["unlock"] = 39785, ["shapeshiftID"] = 66722},
+			[32] = { ["name"] = "Guardian of the Glade", ["unlock"] = 39786, ["shapeshiftID"] = 66723},
 		},
 	},
 	[128860] = {
 		["name"] = "Fangs of Ashamane",
 		["childID"] = 128859,
+		["specID"] = 2,
 		["sets"] = {
-			[9] = { ["name"] = "Fangs of Ashamane", ["unlock"] = 38419},
-			[10] = { ["name"] = "Fangs of Ashamane", ["unlock"] = 37718},
-			[11] = { ["name"] = "Fangs of Ashamane", ["unlock"] = 37719},
-			[12] = { ["name"] = "Fangs of Ashamane", ["unlock"] = 37720},
-			[13] = { ["name"] = "Nature's Fury", ["unlock"] = 37721},
-			[14] = { ["name"] = "Nature's Fury", ["unlock"] = 37722},
-			[15] = { ["name"] = "Nature's Fury", ["unlock"] = 37723},
-			[16] = { ["name"] = "Nature's Fury", ["unlock"] = 37724},
-			[17] = { ["name"] = "Primal Stalker", ["unlock"] = 37725},
-			[18] = { ["name"] = "Primal Stalker", ["unlock"] = 37731},
-			[19] = { ["name"] = "Primal Stalker", ["unlock"] = 37732},
-			[20] = { ["name"] = "Primal Stalker", ["unlock"] = 37733},
-			[21] = { ["name"] = "Incarnation of Nightmare", ["unlock"] = 37726},
-			[22] = { ["name"] = "Incarnation of Nightmare", ["unlock"] = 37728},
-			[23] = { ["name"] = "Incarnation of Nightmare", ["unlock"] = 37729},
-			[24] = { ["name"] = "Incarnation of Nightmare", ["unlock"] = 37730},
-			[25] = { ["name"] = "Ghost of the Pridemother", ["unlock"] = 44681},
-			[26] = { ["name"] = "Ghost of the Pridemother", ["unlock"] = 52480},
-			[27] = { ["name"] = "Ghost of the Pridemother", ["unlock"] = 52621},
-			[28] = { ["name"] = "Ghost of the Pridemother", ["unlock"] = 52654},
-			[29] = { ["name"] = "Moonspirit", ["unlock"] = 42273},
-			[30] = { ["name"] = "Moonspirit", ["unlock"] = 39784},
-			[31] = { ["name"] = "Moonspirit", ["unlock"] = 39785},
-			[32] = { ["name"] = "Moonspirit", ["unlock"] = 39786},
+			[9] = { ["name"] = "Fangs of Ashamane", ["unlock"] = 38419, ["shapeshiftID"] = 66686,},
+			[10] = { ["name"] = "Fangs of Ashamane", ["unlock"] = 37718, ["shapeshiftID"] = 66775,},
+			[11] = { ["name"] = "Fangs of Ashamane", ["unlock"] = 37719, ["shapeshiftID"] = 66776,},
+			[12] = { ["name"] = "Fangs of Ashamane", ["unlock"] = 37720, ["shapeshiftID"] = 66781,},
+			[13] = { ["name"] = "Nature's Fury", ["unlock"] = 37721, ["shapeshiftID"] = 66787,},
+			[14] = { ["name"] = "Nature's Fury", ["unlock"] = 37722, ["shapeshiftID"] = 66786,},
+			[15] = { ["name"] = "Nature's Fury", ["unlock"] = 37723, ["shapeshiftID"] = 66788,},
+			[16] = { ["name"] = "Nature's Fury", ["unlock"] = 37724, ["shapeshiftID"] = 66789,},
+			[17] = { ["name"] = "Primal Stalker", ["unlock"] = 37725, ["shapeshiftID"] = 66790,},
+			[18] = { ["name"] = "Primal Stalker", ["unlock"] = 37731, ["shapeshiftID"] = 66791,},
+			[19] = { ["name"] = "Primal Stalker", ["unlock"] = 37732, ["shapeshiftID"] = 66792,},
+			[20] = { ["name"] = "Primal Stalker", ["unlock"] = 37733, ["shapeshiftID"] = 66793,},
+			[21] = { ["name"] = "Incarnation of Nightmare", ["unlock"] = 37726, ["shapeshiftID"] = 66794,},
+			[22] = { ["name"] = "Incarnation of Nightmare", ["unlock"] = 37728, ["shapeshiftID"] = 66795,},
+			[23] = { ["name"] = "Incarnation of Nightmare", ["unlock"] = 37729, ["shapeshiftID"] = 66796,},
+			[24] = { ["name"] = "Incarnation of Nightmare", ["unlock"] = 37730, ["shapeshiftID"] = 66797,},
+			[25] = { ["name"] = "Ghost of the Pridemother", ["unlock"] = 44681, ["shapeshiftID"] = 66782,},
+			[26] = { ["name"] = "Ghost of the Pridemother", ["unlock"] = 52480, ["shapeshiftID"] = 66783,},
+			[27] = { ["name"] = "Ghost of the Pridemother", ["unlock"] = 52621, ["shapeshiftID"] = 66784,},
+			[28] = { ["name"] = "Ghost of the Pridemother", ["unlock"] = 52654, ["shapeshiftID"] = 66785,},
+			[29] = { ["name"] = "Moonspirit", ["unlock"] = 42273, ["shapeshiftID"] = 67552,},
+			[30] = { ["name"] = "Moonspirit", ["unlock"] = 39784, ["shapeshiftID"] = 68338,},
+			[31] = { ["name"] = "Moonspirit", ["unlock"] = 39785, ["shapeshiftID"] = 67551,},
+			[32] = { ["name"] = "Moonspirit", ["unlock"] = 39786, ["shapeshiftID"] = 67550,},
 		},
 	},
 	[128858] = {
 		["name"] = "Scythe of Elune",
 		["childID"] = 0,
+		["specID"] = 1,
 		["sets"] = {
 			[9] = { ["name"] = "Scythe of Elune", ["unlock"] = 88089},
 			[10] = { ["name"] = "Scythe of Elune", ["unlock"] = 37718},
@@ -1055,6 +1090,7 @@ addon.Globals.ARTIFACT_DATA = {
 	[128832] = {
 		["name"] = "The Aldrachi Warblades",
 		["childID"] = 128831,
+		["specID"] = 2,
 		["sets"] = {
 			[9] = { ["name"] = "Aldrachi Warblades", ["unlock"] = 88116},
 			[10] = { ["name"] = "Aldrachi Warblades", ["unlock"] = 37718},
