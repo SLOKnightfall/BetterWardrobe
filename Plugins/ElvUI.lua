@@ -223,6 +223,8 @@ end
 	local DetailsFrame = BW_SetsCollectionFrame.DetailsFrame
 	DetailsFrame.Name:FontTemplate(nil, 16)
 	DetailsFrame.LongName:FontTemplate(nil, 16)
+
+	addon.ExtendTransmogView()
 end
 
 S:AddCallbackForAddon('BetterWardrobe')
