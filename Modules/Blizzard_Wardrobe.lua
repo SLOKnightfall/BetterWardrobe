@@ -99,7 +99,7 @@ end
 function WardrobeCollectionFrame_GetSortedAppearanceSources(visualID, categoryID)
 	--if categoryID == 29 then
 	local artifactSourceInfo =  addon.GetArtifactSourceInfo(visualID)
-		if artifactSourceInfo then  
+		if artifactSourceInfo and not WardrobeFrame_IsAtTransmogrifier() then  
 		return {artifactSourceInfo}
 	else
 		local sources = C_TransmogCollection.GetAppearanceSources(visualID, categoryID);
@@ -431,11 +431,11 @@ function ItemsCollectionFrame:RefreshVisualsList()
 		self.visualsList = C_TransmogCollection.GetIllusions()
 	else
 		if( WardrobeCollectionFrame.ItemsCollectionFrame.transmogLocation:IsMainHand() ) then
-			if self.activeCategory ~= 29 then 
-				self.visualsList = C_TransmogCollection.GetCategoryAppearances(self.activeCategory, EXCLUSION_CATEGORY_MAINHAND)
-			else
+			if self.activeCategory == 29 and not WardrobeFrame_IsAtTransmogrifier() then 
 				--Replace the default artifact list with complete visuals
 				self.visualsList = addon.GetClassArtifactAppearanceList() 
+			else 
+				self.visualsList = C_TransmogCollection.GetCategoryAppearances(self.activeCategory, EXCLUSION_CATEGORY_MAINHAND)
 			end
 		elseif (WardrobeCollectionFrame.ItemsCollectionFrame.transmogLocation:IsOffHand() ) then
 			self.visualsList = C_TransmogCollection.GetCategoryAppearances(self.activeCategory, EXCLUSION_CATEGORY_OFFHAND)
@@ -460,7 +460,10 @@ function ItemsCollectionFrame:SetAppearanceTooltip(frame)
 	GameTooltip:SetOwner(frame, "ANCHOR_RIGHT");
 	self.tooltipVisualID = frame.visualInfo.visualID;
 
-	if self.activeCategory == 29 then 
+	if self.activeCategory == 29 and not WardrobeFrame_IsAtTransmogrifier() then 
+		if ( not self.tooltipVisualID ) then
+			return;
+		end
 		addon.SetArtifactAppearanceTooltip(self, frame.visualInfo)
  	else
 		self:RefreshAppearanceTooltip();
