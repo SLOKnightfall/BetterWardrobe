@@ -10,12 +10,11 @@ local _, playerClass, classID = UnitClass("player")
 --local role = GetFilteredRole()
 
 local CLASS_INFO = Globals.CLASS_INFO
-
 local CLASS_NAMES_LOCALIZED = {}
+
 FillLocalizedClassList(CLASS_NAMES_LOCALIZED)
 
 local ARMOR_MASK = Globals.ARMOR_MASK
-
 local EmptyArmor = Globals.EmptyArmor
 local subitemlist = {}
 local hiddenSet ={
@@ -35,6 +34,7 @@ local hiddenSet ={
 local SET_DATA = {}
 local SET_INDEX = {}
 local ArmorDB = {}
+
 
 local function GetFactionID(faction)
 	if faction == "Horde" then
@@ -147,19 +147,6 @@ do
 end
 
 do
-	--local baseList = {}
-
-	local function sourceLookup(item, modID)
-		C_Timer.After(0, function() 
-				local _, source = C_TransmogCollection.GetItemInfo(item, modID)
-					if source and modID then 
-						addon.ArmorSetModCache[item] = addon.ArmorSetModCache[item] or {}
-						addon.ArmorSetModCache[item][modID] = source 
-					end
-		end);
-	end
-
-
 	local function addArmor(armorSet)
 		for id, setData in pairs(armorSet) do
 			if  (setData.isClass or 

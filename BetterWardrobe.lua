@@ -1742,12 +1742,14 @@ function BetterWardrobeSetsCollectionMixin:OnEvent(event, ...)
 			for setID, setInfo in pairs(setItem) do 
 			--local sourceInfo = C_TransmogCollection.GetSourceInfo(sourceID)
 				--local setInfo = C_TransmogSets.GetSetInfo(setID)
-				local setInfo = addon.GetSetInfo(setID)
-				newTransmogInfo["latestSource"] = setID
-				newTransmogInfo[setID] = newTransmogInfo[setID] or {}
-				newTransmogInfo[setID][itemID] = inventoryTypes[itemEquipLoc]
+				--local setInfo = addon.GetSetInfo(setID)
+				if setInfo then 
+					newTransmogInfo["latestSource"] = setID
+					newTransmogInfo[setID] = newTransmogInfo[setID] or {}
+					newTransmogInfo[setID][itemID] = inventoryTypes[itemEquipLoc]
 
-				print((YELLOW_FONT_COLOR_CODE..L["Added missing appearances of: \124cffff7fff\124H%s:%s\124h[%s]\124h\124r"]):format("transmogset-extra", setID, setInfo.name))
+					print((YELLOW_FONT_COLOR_CODE..L["Added missing appearances of: \124cffff7fff\124H%s:%s\124h[%s]\124h\124r"]):format("transmogset-extra", setID, setInfo.name))
+				end
 				return
 			end
 		end
