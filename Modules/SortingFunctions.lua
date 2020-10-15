@@ -85,11 +85,13 @@ addon.CheckTab = CheckTab
 
 
 local function SortNormal(a, b)
+	if not a or not b then return end
 	return a > b
 end
 
 
 local function SortReverse(a, b)
+	if not a or not b then return end
 	return a < b
 end
 
@@ -256,6 +258,8 @@ addon.Sort = {
 
 	[TAB_ITEMS] = {
 		[LE_DEFAULT] = function(self)
+		if not self then return end
+
 			local comparison = function(source1, source2)
 			if (source1.isCollected ~= source2.isCollected) then
 				return source1.isCollected
@@ -279,7 +283,7 @@ addon.Sort = {
 			return SortOrder(source1.sourceID, source2.sourceID)
 		end
 
-		return table.sort(self.filteredVisualsList, comparison)
+		table.sort(self.filteredVisualsList, comparison)
 		end,
 		
 		[LE_APPEARANCE] = function(self)
@@ -294,7 +298,7 @@ addon.Sort = {
 		
 		[LE_ALPHABETIC] = function(self)
 			if catCompleted[self:GetActiveCategory()] then
-				return addon.Sort.SortItemAlphabetic()
+				addon.Sort.SortItemAlphabetic()
 			else
 				for _, v in pairs(self.filteredVisualsList) do
 					nameCache[v.visualID] = true -- queue data to be cached	
