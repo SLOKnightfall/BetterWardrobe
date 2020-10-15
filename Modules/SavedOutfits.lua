@@ -292,14 +292,18 @@ function BW_WardrobeOutfitMixin:LoadOutfit(outfitID)
 		local outfit = addon.chardb.profile.outfits[LookupIndexFromID(outfitID)]
 		for slot , data in pairs(outfit) do
 			if type(slot) == "number" then 
+			local transmogLocation = TransmogUtil.GetTransmogLocation(slot, Enum.TransmogType.Appearance, Enum.TransmogModification.None);
 			--C_Transmog.SetPending(slot, Enum.TransmogType.Appearance, data)
-			C_Transmog.SetPending(self.transmogLocation, data, self.activeCategory);
+			C_Transmog.SetPending(transmogLocation, data, Enum.TransmogType.Appearance);
 
 			end
 		end
-	C_Transmog.SetPending(self.transmogLocation, outfit["mainHandEnchant"], self.activeCategory);
 
-	C_Transmog.SetPending(self.transmogLocation, outfit["offHandEnchant"], self.activeCategory);
+	local transmogLocation = TransmogUtil.GetTransmogLocation(GetInventorySlotInfo("MAINHANDSLOT"), Enum.TransmogType.Illusion, Enum.TransmogModification.None);
+	C_Transmog.SetPending(transmogLocation, outfit["mainHandEnchant"], Enum.TransmogType.Illusion);
+
+	transmogLocation = TransmogUtil.GetTransmogLocation(GetInventorySlotInfo("SECONDARYHANDSLOT"), Enum.TransmogType.Illusion, Enum.TransmogModification.None);
+	C_Transmog.SetPending(transmogLocation, outfit["offHandEnchant"], Enum.TransmogType.Illusion);
 
 		--C_Transmog.SetPending(GetInventorySlotInfo("MAINHANDSLOT"), LE_TRANSMOG_TYPE_ILLUSION, outfit["mainHandEnchant"])
 		--C_Transmog.SetPending(GetInventorySlotInfo("SECONDARYHANDSLOT"), LE_TRANSMOG_TYPE_ILLUSION, outfit["offHandEnchant"])
