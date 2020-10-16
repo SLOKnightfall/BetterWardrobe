@@ -15,12 +15,16 @@ function Export(itemString, button)
 	end
 
 	local f = AceGUI:Create("Window")
+	
+	--f:SetBackdrop(	BACKDROP_DIALOG_32_32 )
 	f:SetCallback("OnClose",function(widget) AceGUI:Release(widget) end)
 	f:SetTitle("Wardrobe Export")
 	f:SetLayout("Fill")
 	--f:SetAutoAdjustHeight(true)
 	f:EnableResize(false)
 	_G["BetterWardrobeExportWindow"] = f.frame
+	--Mixin(f.frame, BackdropTemplateMixin )
+	--f.UISpecialFrames:SetBackdrop(	BACKDROP_DIALOG_32_32 )
 	LISTWINDOW = f
 	tinsert(UISpecialFrames, "BetterWardrobeExportWindow")
 
@@ -66,6 +70,7 @@ local function ImportSet(importString)
 		DressUpSources(tbl)
 	end
 end
+
 
 local importFrom = nil
 StaticPopupDialogs["BETTER_WARDROBE_IMPORT_SET_POPUP"] = {
@@ -154,10 +159,12 @@ local function ImportItemTransMogVendor(importString)
 		if not id then
 			itemID,bonusMod = text:match("item=(%d+)"),text:match("bonus=(%d+)");
 		end
+
 		if not itemID then
 			itemID = text:match("(%d+).-$");
 			bonusMod = nil;
 		end
+
 		local link = ToStringItem(tonumber(itemID), tonumber(bonusMod))
 		local appearanceID, sourceID = C_TransmogCollection.GetItemInfo(link)
 		local sourceInfo = C_TransmogCollection.GetSourceInfo(sourceID)
@@ -165,8 +172,8 @@ local function ImportItemTransMogVendor(importString)
 			local slot = C_Transmog.GetSlotForInventoryType(sourceInfo.invType);
 			transmogSources[slot] = sourceID
 			C_Transmog.LoadSources(transmogSources, -1, -1);
-			end
 		end
+	end
 end
 
 

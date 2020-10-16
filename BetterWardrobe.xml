@@ -5,7 +5,7 @@
 	<Script file="Modules\Blizzard_Wardrobe.lua"/>
 	<Script file="Modules\UI.lua"/>
 
-	<Button name ="BW_LoadQueueButton" parent = "WardrobeFrame" parentKey="LoadQueue" inherits="UIMenuButtonStretchTemplate" hidden="false">
+	<Button name ="BW_LoadQueueButton" parent = "WardrobeTransmogFrame" parentKey="LoadQueue" inherits="UIMenuButtonStretchTemplate" hidden="false">
 		<Size x="20" y="20"/>
 		<Anchors>
 			<Anchor point="TOPLEFT" relativeto="WardrobeOutfitDropDown" relativePoint="TOPRIGHT" x="80" y="-5"/>
@@ -15,7 +15,7 @@
 				<Texture parentKey="Icon" file="Interface\Buttons\UI-OptionsButton">
 					<Size x="12" y="12"/>
 					<Anchors>
-						<Anchor point="LEFT" x="3"/>
+						<Anchor point="CENTER"/>
 					</Anchors>
 				</Texture>
 			</Layer>
@@ -32,9 +32,6 @@
 		</Scripts>
 	</Button>
 
-
-
-
 	<Button name="BW_RandomizeButton" parent = "WardrobeTransmogFrame" inherits="UIMenuButtonStretchTemplate" hidden="false">
 		<Size x="20" y="20"/>
 		<Anchors>
@@ -43,9 +40,9 @@
 		<Layers>
 			<Layer level="ARTWORK">
 				<Texture file="Interface\Buttons\UI-GroupLoot-Dice-Up" useAtlasSize="false">
-					<Size x="15" y="15"/>
+					<Size x="14" y="14"/>
 					<Anchors>
-						<Anchor point="LEFT" x="1"/>
+						<Anchor point="CENTER" y ="-1"/>
 					</Anchors>
 				</Texture>
 			</Layer>

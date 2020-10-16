@@ -62,7 +62,7 @@ function optionHandler:Setter(info, value)
 	elseif info.arg == "ShowAdditionalSourceTooltips" then
 		C_TransmogCollection.SetShowMissingSourceInItemTooltips(value);
 
-	elseif info.arg == "ExtraLargeTransmogArea" then 
+	elseif info.arg == "ExtraLargeTransmogArea" or info.arg == "LargeTransmogArea" then 
 		WardrobeFrame.extended = false
 		addon.ExtendTransmogView()
 	end
@@ -201,13 +201,19 @@ local options = {
 							type = "header",
 							width = "full",
 						},
-						ExtraLargeTransmogArea = {
+							LargeTransmogArea = {
 							order = 1.1,
+							name = L["Larger Transmog Area"],
+							type = "toggle",
+							width = 1.6,
+							arg = "LargeTransmogArea",
+						},
+						ExtraLargeTransmogArea = {
+							order = 1.2,
 							name = L["Extra Large Transmog Area"],
 							type = "toggle",
-							width = "full",
+							width = 1.4,
 							arg = "ExtraLargeTransmogArea",
-
 						},
 						ShowIncomplete = {
 							order = 2,
