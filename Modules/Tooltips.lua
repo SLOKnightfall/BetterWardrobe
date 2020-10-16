@@ -182,11 +182,14 @@ function addon.tooltip:ShowTooltip(itemLink)
 	addon.tooltip.owner = GameTooltip;
 	if not itemLink or self.ShowTooltips then return end
 
+
+
 	local itemID, _, _, slot = GetItemInfoInstant(itemLink);
 	if not itemID then return end
 	local self = GameTooltip;
 
 	local learned_dupe = false
+	local found_tooltipinfo = false
 	for i = 1, GameTooltip:NumLines() do
 		local line = _G["GameTooltipTextLeft"..i]
 
@@ -197,6 +200,11 @@ function addon.tooltip:ShowTooltip(itemLink)
 			string.find(text_lower, "item id") then 
 			learned_dupe = true
 		end
+
+		if string.find(text_lower, string.lower(L["HEADERTEXT"])) then 
+			found_tooltipinfo = true
+		end
+
 		if addon.Profile.ShowOwnedItemTooltips and string.find(text_lower, string.lower(TRANSMOGRIFY_TOOLTIP_APPEARANCE_UNKNOWN)) then 
 			line:SetText("|TInterface\\RaidFrame\\ReadyCheck-NotReady:0|t "..text)
 		end
@@ -242,7 +250,7 @@ function addon.tooltip:ShowTooltip(itemLink)
 		end
 	end
 
-	if addon.Profile.ShowTooltips then 
+	if addon.Profile.ShowTooltips and not found_tooltipinfo then 
 		local appearanceID, sourceID = C_TransmogCollection.GetItemInfo(itemLink)
 		if not sourceID then return end
 		local addHeader = false
@@ -327,17 +335,17 @@ function addon.tooltip:ShowTooltip(itemLink)
 			addLine(self, L["HEADERTEXT"])
 		end
 	end
-self.ShowTooltips = true
+	self.ShowTooltips = true
 	--/relself:Show()
 end
 
 
 function addon.tooltip.HideItem(self)
-	addon.tooltip.owner = nil;
-	addon.tooltip.repos:Hide();
-	addon.tooltip.check:Show();
+	self.ShowTooltips = nil
+	addon.tooltip.owner = nil
+	addon.tooltip.repos:Hide()
+	addon.tooltip.check:Show()
 end
-
 
 addon.tooltip.check = CreateFrame("Frame");
 addon.tooltip.check:Hide();
