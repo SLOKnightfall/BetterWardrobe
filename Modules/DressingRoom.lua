@@ -230,6 +230,15 @@ function DressingRoom:OnShow()
 	--if DressUpModel and not  addon:IsHooked(DressUpModel, "TryOn") then
 		--addon:SecureHook(DressUpModel, "TryOn", function(self,...) local itemSource, previewSlot, enchantID = ...; C_Timer.After(0.2, function(...) DressingRoom:TryOn(itemSource, previewSlot, enchantID)  end) end)
 	--end
+	if DressUpFrame.MaximizeMinimizeFrame:IsMinimized() then
+		--DressUpFrame.ResetButton:SetWidth(44)
+			--	BW_DressingRoomFrame.BW_DressingRoomHideArmorButton:SetWidth(60)
+
+	else
+	--	DressUpFrame.ResetButton:SetWidth(88)
+	--	BW_DressingRoomFrame.BW_DressingRoomHideArmorButton:SetWidth(90)
+	end
+
 	BW_DressingRoomFrame.PreviewButtonFrame:SetShown(addon.Profile.DR_ShowItemButtons)
 	DressingRoom:ToggleControlPanel(addon.Profile.DR_ShowControls)
 	DressingRoom:UpdateBackground()	
@@ -450,7 +459,7 @@ function BW_DressingRoomOutfitButtonMixin:OnClick()
 end
 
 
-function BW_DressingRoomHideArmorButton_OnClick()
+local function BW_DressingRoomHideArmorButton_OnClick()
 	dressuplink = nil
 	local playerActor = DressUpFrame.ModelScene:GetPlayerActor()
 		if (not playerActor) then
@@ -652,7 +661,7 @@ end
 
 local ContextMenu = CreateFrame("Frame", addonName .. "ContextMenuFrame", UIParent, "UIDropDownMenuTemplate")
 addon.ContextMenu = ContextMenu
-function DressupSettingsButton_OnClick(self)
+local function DressupSettingsButton_OnClick(self)
 	local Profile = addon.Profile
 	local contextMenuData = {
 		{
@@ -733,7 +742,7 @@ end
 
 
 
-function BW_DressingRoomImportButton_OnClick(self)
+local function BW_DressingRoomImportButton_OnClick(self)
 	local Profile = addon.Profile
 	local name  = addon.QueueList[3]
 	local contextMenuData = {
@@ -821,13 +830,18 @@ function DressingRoom:SetTarget(arg1)
 		
 
 	local unit = arg1 or "target"
-	if not UnitExists(unit)  or DressingRoom.currentTarget then
+
+	if not UnitIsPlayer(unit) or not CanInspect(unit, false) then return false end
+
+	if not UnitExists(unit)  or DressingRoom.currentTarget then 
 		DressingRoom.showTarget = false
 		DressingRoom.currentTarget = false
 		unit = "player"
 	else 
 		DressingRoom.showTarget = true
 	end
+
+	local sheatheWeapons = playerActor:GetSheathed() or false;
 
 	if UnitExists(unit) then
 		if not DressingRoom.currentTarget then 
@@ -836,7 +850,8 @@ function DressingRoom:SetTarget(arg1)
 				DressingRoom.currentTarget = playerActor:GetModelUnitGUID() 
 			end 
 		else
-			playerActor:SetModelByCreatureDisplayID(DressingRoom.currentTarget)
+			--playerActor:SetModelByCreatureDisplayID(DressingRoom.currentTarget)
+			playerActor:SetModelByUnit(unit, sheatheWeapons, true);
 		end	
 	end
 	C_Timer.After(0.2, function() BW_DressingRoomItemDetailsMixin:UpdateButtons(false, true) end)
@@ -980,40 +995,47 @@ local function SetTooltip(frame, text)
 	GameTooltip:Show()
 end
 
-function BW_DressingRoomExportButton_OnEnter(self)
-	SetTooltip(self, L["Import/Export Options"])
+
+function BW_DressingRoomButton_OnEnter(self, button)
+	local text
+	if not button then return end
+	if button == "Settings" then 
+	text =  L["General Options"]
+	elseif button == "Import" then 
+		text =  L["Import/Export Options"]
+	elseif button == "Player" then 
+		text =  L["Use Player Model"]
+	elseif button == "Target" then 
+		text =  L["Use Target Model"]
+	elseif button == "Gear" then 
+		text =  L["Use Target Gear"]
+	elseif button == "Reset" then 
+		text =  RESET
+	elseif button == "Undress" then 
+		text = L["Undress"]
+	end
+
+	SetTooltip(self, text)
 end
 
---function BW_DressingRoomTargetButton_OnEnter(self)
-	--SetTooltip(self, L["Target Options"])
---end
 
-function BW_DressingRoomSettingsButton_OnEnter(self)
-	SetTooltip(self, L["General Options"])
+function BW_DressingRoomButton_OnClick(self, button)
+	if not button then return end
+	if button == "Settings" then 
+		DressupSettingsButton_OnClick(self)
+	elseif button == "Import" then 
+		BW_DressingRoomImportButton_OnClick(self)
+	elseif button == "Player" then 
+		DressingRoom.showTarget = false
+		DressingRoom:SetTargetGear(true)
+	elseif button == "Target" then 
+		DressingRoom.showTarget = true
+		DressingRoom:SetTarget()
+	elseif button == "Gear" then 
+		DressingRoom:SetTargetGear()
+	elseif button == "Reset" then 
+		text =  RESET
+	elseif button == "Undress" then 
+		BW_DressingRoomHideArmorButton_OnClick(self)
+	end
 end
-
-function BW_DressingRoomPlayerButton_OnEnter(self)
-	SetTooltip(self, L["Use Player Model"])
-end
-function BW_DressingRoomTargetButton_OnEnter(self)
-	SetTooltip(self, L["Use Target Model"])
-end
-function BW_DressingRoomGearButton_OnEnter(self)
-	SetTooltip(self, L["Use Target Gear"])
-end
-
-
-
-function BW_DressingRoomPlayerButton_OnClick(self)
-	DressingRoom.showTarget = false
-	DressingRoom:SetTargetGear(true)
-end
-function BW_DressingRoomTargetButton_OnClick(self)
-	DressingRoom.showTarget = true
-	DressingRoom:SetTarget()
-end
-function BW_DressingRoomGearButton_OnClick(self)
-	DressingRoom:SetTargetGear()
-end
----TODO:  Reset button resets target model if Selected
---set playuermodel

@@ -154,10 +154,10 @@
 				</Layers>
 				<Scripts>
 					<OnClick>
-						DressupSettingsButton_OnClick(self)
+						BW_DressingRoomButton_OnClick(self, "Settings")
 					</OnClick>
 					<OnEnter>
-						BW_DressingRoomSettingsButton_OnEnter(self)
+						BW_DressingRoomButton_OnEnter(self, "Settings")
 					</OnEnter>
 					<OnLeave function="GameTooltip_Hide"/>
 				</Scripts>
@@ -180,10 +180,10 @@
 				</Layers>
 				<Scripts>
 					<OnClick>
-						BW_DressingRoomImportButton_OnClick(self)
+						BW_DressingRoomButton_OnClick(self, "Import")
 					</OnClick>
 					<OnEnter>
-						BW_DressingRoomExportButton_OnEnter(self)
+						BW_DressingRoomButton_OnEnter(self, "Import")
 					</OnEnter>
 					<OnLeave function="GameTooltip_Hide"/>
 				</Scripts>
@@ -205,11 +205,11 @@
 				</Layers>
 				<Scripts>
 					<OnClick>
-						BW_DressingRoomTargetButton_OnClick(self)
+						BW_DressingRoomButton_OnClick(self, "Target")
 
 					</OnClick>
 								<OnEnter>
-				BW_DressingRoomTargetButton_OnEnter(self)
+				BW_DressingRoomButton_OnEnter(self, "Target")
 			</OnEnter>
 			<OnLeave function="GameTooltip_Hide"/>
 				</Scripts>
@@ -231,11 +231,11 @@
 				</Layers>
 				<Scripts>
 					<OnClick>
-						BW_DressingRoomPlayerButton_OnClick(self)
+						BW_DressingRoomButton_OnClick(self, "Player")
 
 					</OnClick>
 								<OnEnter>
-				BW_DressingRoomPlayerButton_OnEnter(self)
+				BW_DressingRoomButton_OnEnter(self, "Player")
 			</OnEnter>
 			<OnLeave function="GameTooltip_Hide"/>
 				</Scripts>
@@ -257,17 +257,44 @@
 				</Layers>
 				<Scripts>
 					<OnClick>
-						BW_DressingRoomGearButton_OnClick(self)
+						BW_DressingRoomButton_OnClick(self, "Gear")
 						
 					</OnClick>
 								<OnEnter>
-				BW_DressingRoomGearButton_OnEnter(self)
+				BW_DressingRoomButton_OnEnter(self, "Gear")
+			</OnEnter>
+			<OnLeave function="GameTooltip_Hide"/>
+				</Scripts>
+			</Button>
+
+			<Button parentKey="BW_DressingRoomUndressButton" inherits="SquareIconButtonTemplate" >
+				<Size x="32" y="32"/>
+				<Anchors>
+					<Anchor point="LEFT" relativeKey="$parent.BW_DressingRoomGearButton" relativePoint="RIGHT" x="-5" y="0"/>
+				</Anchors>					
+				<Layers>
+					<Layer level="ARTWORK" textureSubLevel="5">
+						<Texture parentKey="Icon" file="Interface\RAIDFRAME\Raid-Icon-Rez">
+							<Size x="16" y="16"/>
+							<Anchors>
+								<Anchor point="CENTER" />
+							</Anchors>
+						</Texture>
+					</Layer>
+				</Layers>
+				<Scripts>
+					<OnClick>
+						BW_DressingRoomButton_OnClick(self, "Undress")
+						
+					</OnClick>
+								<OnEnter>
+				BW_DressingRoomButton_OnEnter(self, "Undress")
 			</OnEnter>
 			<OnLeave function="GameTooltip_Hide"/>
 				</Scripts>
 			</Button>
 			
-			<Button parentKey="BW_DressingRoomHideArmorButton" inherits="UIPanelButtonTemplate" text="Undress">
+			<Button parentKey="BW_DressingRoomHideArmorButton" inherits="UIPanelButtonTemplate" text="Undress" hidden="true">
 				<Size x="90" y="24"/>
 				<Anchors>
 					<Anchor point="LEFT" relativePoint="RIGHT" relativeKey="$parent.BW_DressingRoomGearButton" x="-2" y="0"/>
@@ -278,6 +305,35 @@
 					</OnClick>
 				</Scripts>
 			</Button>
+
+			<Button parentKey="BW_DressingRoomResetButton" inherits="SquareIconButtonTemplate" hidden = "true" >
+				<Size x="32" y="32"/>
+				<Anchors>
+					<Anchor point="LEFT" relativeKey="$parent.BW_DressingRoomUndressButton" relativePoint="RIGHT" x="-5" y="0"/>
+				</Anchors>					
+				<Layers>
+					<Layer level="ARTWORK" textureSubLevel="5">
+						<Texture parentKey="Icon" atlas="transmog-icon-revert" useAtlasSize="false" hidden="false">
+
+							<Size x="16" y="16"/>
+							<Anchors>
+								<Anchor point="CENTER"/>
+							</Anchors>
+						</Texture>
+					</Layer>
+				</Layers>
+				<Scripts>
+					<OnClick>
+						BW_DressingRoomButton_OnClick(self, "Reset")
+						
+					</OnClick>
+								<OnEnter>
+				BW_DressingRoomButton_OnEnter(self, "Reset")
+			</OnEnter>
+			<OnLeave function="GameTooltip_Hide"/>
+				</Scripts>
+			</Button>
+			
 		</Frames>
 		<Scripts>
 			<OnShow>
