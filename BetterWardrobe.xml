@@ -27,7 +27,7 @@
 				BW_TransmogVendorExportButton_OnClick(self)
 			</OnClick>
 			<OnEnter>
-				BW_DressingRoomExportButton_OnEnter(self)
+				BW_DressingRoomButton_OnEnter(self, "Import")
 			</OnEnter>
 		</Scripts>
 	</Button>
