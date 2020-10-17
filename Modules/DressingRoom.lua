@@ -459,7 +459,7 @@ function BW_DressingRoomOutfitButtonMixin:OnClick()
 end
 
 
-local function BW_DressingRoomHideArmorButton_OnClick()
+function BW_DressingRoomHideArmorButton_OnClick()
 	dressuplink = nil
 	local playerActor = DressUpFrame.ModelScene:GetPlayerActor()
 		if (not playerActor) then

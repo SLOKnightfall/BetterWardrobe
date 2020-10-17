@@ -702,15 +702,14 @@ function BW_WardrobeOutfitFrameMixin:DeleteOutfit(outfitID)
 	if GetCVarBool("transmogCurrentSpecOnly") then
 		local specIndex = GetSpecialization()
 		local value = addon.chardb.profile.lastTransmogOutfitIDSpec[specIndex]
-		if value ~= "" and value > 0 then  addon.chardb.profile.lastTransmogOutfitIDSpec[specIndex] = value - 1 end
+		if type(value) == number and value > 0 then  addon.chardb.profile.lastTransmogOutfitIDSpec[specIndex] = value - 1 end
 
 		--SetCVar("lastTransmogOutfitIDSpec"..specIndex, value)
 	else
 		for specIndex = 1, GetNumSpecializations() do
 			--SetCVar("lastTransmogOutfitIDSpec"..specIndex, value)
 		local value = addon.chardb.profile.lastTransmogOutfitIDSpec[specIndex]
-		if value ~= "" and value > 0  then  addon.chardb.profile.lastTransmogOutfitIDSpec[specIndex] = value - 1 end
-
+		if type(value) == number and value > 0  then  addon.chardb.profile.lastTransmogOutfitIDSpec[specIndex] = value - 1 end
 		end
 	end
 	addon.setdb.global.sets[addon.setdb:GetCurrentProfile()] = addon.GetSavedList()

@@ -1121,6 +1121,8 @@ function Sets.isMogKnown(sourceID)
 
 
 	local sourceInfo = C_TransmogCollection.GetSourceInfo(sourceID)
+	
+	if not sourceInfo then return false end
 	local allSources = C_TransmogCollection.GetAllAppearanceSources(sourceInfo.visualID)
 
 	local list = {}
