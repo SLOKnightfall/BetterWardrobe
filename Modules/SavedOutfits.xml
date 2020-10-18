@@ -2,7 +2,7 @@
 ..\FrameXML\UI.xsd">
 	<Script file="SavedOutfits.lua"/>
 
-	<Frame name="BW_WardrobeOutfitDropDown" parent = "WardrobeTransmogFrame" parentKey="BW_OutfitDropDown"  inherits="WardrobeOutfitDropDownTemplate" mixin="BW_WardrobeOutfitMixin" hidden = "false">
+	<Frame name="BW_WardrobeOutfitDropDownTemplate" parent = "WardrobeTransmogFrame" parentKey="BW_OutfitDropDown"  inherits="WardrobeOutfitDropDownTemplate" mixin="BW_WardrobeOutfitMixin" hidden = "false" virtual = "true" >
 		<KeyValues>
 			<KeyValue key="width" value="188" type="number"/>
 			<KeyValue key="minMenuStringWidth" value="152" type="number"/>
@@ -156,4 +156,4 @@
 		</Scripts>
 	</Frame>
 
-	</Ui>
+</Ui>

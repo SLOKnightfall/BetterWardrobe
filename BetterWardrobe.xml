@@ -2,76 +2,13 @@
 ..\FrameXML\UI.xsd">
 	<Script file="BetterWardrobe.lua"/>
 	<Script file="Data\DataBase.lua"/>
+	<Script file="Modules\SortingFunctions.lua"/>
 	<Script file="Modules\Blizzard_Wardrobe.lua"/>
 	<Script file="Modules\UI.lua"/>
+	<Script file="Modules\CollectionJournal.lua"/>
+	<Script file="Modules\TransmogVendor.lua"/>
 
-	<Button name ="BW_LoadQueueButton" parent = "WardrobeTransmogFrame" parentKey="LoadQueue" inherits="UIMenuButtonStretchTemplate" hidden="false">
-		<Size x="20" y="20"/>
-		<Anchors>
-			<Anchor point="TOPLEFT" relativeto="WardrobeOutfitDropDown" relativePoint="TOPRIGHT" x="80" y="-5"/>
-		</Anchors>
-		<Layers>
-			<Layer level="ARTWORK">
-				<Texture parentKey="Icon" file="Interface\Buttons\UI-OptionsButton">
-					<Size x="12" y="12"/>
-					<Anchors>
-						<Anchor point="CENTER"/>
-					</Anchors>
-				</Texture>
-			</Layer>
-		</Layers>
-		<HighlightTexture file="Interface\Buttons\UI-Common-MouseHilight" alphaMode="ADD"/>
-		<Scripts>
-			<OnLeave function="GameTooltip_Hide"/>
-			<OnClick>
-				BW_TransmogVendorExportButton_OnClick(self)
-			</OnClick>
-			<OnEnter>
-				BW_DressingRoomButton_OnEnter(self, "Import")
-			</OnEnter>
-		</Scripts>
-	</Button>
 
-	<Button name="BW_RandomizeButton" parent = "WardrobeTransmogFrame" inherits="UIMenuButtonStretchTemplate" hidden="false">
-		<Size x="20" y="20"/>
-		<Anchors>
-			<Anchor point="TOPLEFT" relativeTo="BW_LoadQueueButton" relativePoint="TOPRIGHT" x="0" y="0"/>
-		</Anchors>
-		<Layers>
-			<Layer level="ARTWORK">
-				<Texture file="Interface\Buttons\UI-GroupLoot-Dice-Up" useAtlasSize="false">
-					<Size x="14" y="14"/>
-					<Anchors>
-						<Anchor point="CENTER" y ="-1"/>
-					</Anchors>
-				</Texture>
-			</Layer>
-		</Layers>
-		<HighlightTexture file="Interface\Buttons\UI-Common-MouseHilight" alphaMode="ADD"/>
-		<Scripts>
-			<OnLoad>
-				--LoadMicroButtonTextures(self, "MainMenu");
-			</OnLoad>
-			<OnShow>
-				 --self:OnShow()
-			</OnShow> 
-			<OnMouseDown>
-				if IsModifierKeyDown() then
-				self:Randomize("outfit")
-				else
-				self:BuildAppearanceList()
-				self:Randomize()
-				end
-			</OnMouseDown>
-			<OnMouseUp>
-				self.Stop = true
-			</OnMouseUp>
-			<OnEnter>
-				self:OnEnter()
-			</OnEnter>
-			<OnLeave function="GameTooltip_Hide"/>
-		</Scripts>
-	</Button>
 
 	<Frame name="BW_WardrobeCollectionFrame" parent="WardrobeCollectionFrame" setAllPoints="true" hidden="false">
 		<Frames>
@@ -185,15 +122,6 @@
 					<OnClick function="BW_WardrobeCollectionFrame_ClickTab"/>
 				</Scripts>
 			</Button>
-			<Frame parentKey="BW_SortDropDown" name="BW_SortDropDown" inherits="UIDropDownMenuTemplate" enableMouse="true" hidden="false">
-				<Size x="87" y="22"/>
-				<Anchors>
-					<Anchor point="TOPRIGHT" x="-6" y="-22"/>
-				</Anchors>
-				<Scripts>
-				</Scripts>
-			</Frame>
-
 			<Frame parentKey="TransmogOptionsButtonCover" hidden="false" enableMouse="true">
 				<Size x="93" y="50"/>
 				<Anchors>
@@ -204,8 +132,8 @@
 						BW_TransmogOptionsButton_OnEnter(self)
 					</OnEnter>
 					<OnShow>
-							local level = BW_WardrobeCollectionFrame.TransmogOptionsButton:GetFrameLevel()
-								BW_WardrobeCollectionFrame.TransmogOptionsButtonCover:SetFrameLevel(level+5)
+						local level = BW_WardrobeCollectionFrame.TransmogOptionsButton:GetFrameLevel()
+						BW_WardrobeCollectionFrame.TransmogOptionsButtonCover:SetFrameLevel(level+5)
 
 					</OnShow>
 					<OnLeave function="GameTooltip_Hide"/>
@@ -231,7 +159,7 @@
 						UIMenuButtonStretchMixin.OnMouseDown(self, button);
 						if self:IsEnabled() then
 							PlaySound(SOUNDKIT.IG_MAINMENU_OPTION_CHECKBOX_ON);
-							ToggleDropDownMenu(1, nil, BW_LocationFilterDropDown, self, 74, 15);
+							ToggleDropDownMenu(1, nil, BW_TransmogOptionsDropDown, self, 74, 15);
 						end
 					</OnMouseDown>
 					<OnEnable>
@@ -245,9 +173,9 @@
 			</DropDownToggleButton>
 
 
-			<Frame name="BW_LocationFilterDropDown" parentKey="LocationFilterDropDown" inherits="UIDropDownMenuTemplate">
+			<Frame name="BW_TransmogOptionsDropDown" parentKey="OptionsDropDown" inherits="UIDropDownMenuTemplate">
 				<Scripts>
-					<OnLoad function="BW_WardrobeFilterLocationDropDown_OnLoad"/>
+					<OnLoad function="BW_WardrobeTransmogVendorOptionsDropDown_OnLoad"/>
 				</Scripts>
 			</Frame>
 

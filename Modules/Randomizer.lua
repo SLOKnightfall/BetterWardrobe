@@ -6,12 +6,28 @@ local L = LibStub("AceLocale-3.0"):GetLocale(addonName)
 local IgnoredSlots = {}
 local AppearanceList
 
+BW_RandomizeButtonMixin = {}
 
-function BW_RandomizeButton:OnEnter()
+function BW_RandomizeButtonMixin:OnEnter()
 	GameTooltip:ClearAllPoints()
 	GameTooltip:SetPoint("BOTTOM", self, "TOP", 0, 0)
 	GameTooltip:SetOwner(self, "ANCHOR_PRESERVE")
 	GameTooltip:SetText(L["Click: Randomize Items"].."\n"..L["Shift Click:Randomize Outfit"])
+end
+
+
+function BW_RandomizeButtonMixin:OnMouseDown()
+	if IsModifierKeyDown() then
+		self:Randomize("outfit")
+	else
+		self:BuildAppearanceList()
+		self:Randomize()
+	end
+end
+
+
+function BW_RandomizeButtonMixin:OnMouseUp()
+	self.Stop = true
 end
 
 
@@ -25,7 +41,7 @@ end
 
 
 local update = false
-function BW_RandomizeButton:BuildAppearanceList()
+function BW_RandomizeButtonMixin:BuildAppearanceList()
 	if not update and AppearanceList then return end
 
 	AppearanceList = (AppearanceList and wipe(AppearanceList)) or {}
@@ -119,7 +135,7 @@ local function RandomizeOnUpdate(self, elapsed)
 end
 
 
-function BW_RandomizeButton:Randomize(type)
+function BW_RandomizeButtonMixin:Randomize(type)
 	totalTime = 0
 	SpinThrottle = DEFAULT_THROTTLE
 	self.Stop = false

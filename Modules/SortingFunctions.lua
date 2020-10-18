@@ -7,7 +7,7 @@ addon = LibStub("AceAddon-3.0"):GetAddon(addonName)
 local f = addon.frame
 local Wardrobe = WardrobeCollectionFrame.ItemsCollectionFrame
 
-local SortOrder
+
 
 local nameVisuals, nameCache = {}, {}
 local catCompleted, itemLevels = {}, {}
@@ -115,7 +115,8 @@ local function CacheHeaders()
 end
 
 
-addon.Sort = {
+local SortOrder = SortNormal
+local Sort = {
 	["SortDefault"] = function(sets,  ignorePatchID)
 		local comparison = function(set1, set2)	
 			local groupFavorite1 = (addon.chardb.profile.favorite[set1.setID] or set1.favoriteSetID) and true
@@ -479,6 +480,8 @@ addon.Sort = {
 		end,
 	},
 }
+addon.Sort = Sort
+
 
 function addon.SetSortOrder()
 	SortOrder = addon.sortDB.reverse and SortReverse or SortNormal
@@ -507,15 +510,3 @@ function addon.SortSet(sets, reverseUIOrder, ignorePatchID)
 
 	end
 end
-	--===
-	-- sort and update
-	--hooksecurefunc(WardrobeCollectionFrame.ItemsCollectionFrame, "SortVisuals", function()
-		-- exclude enchants/illusions by checking for category
-		--if WardrobeCollectionFrame.ItemsCollectionFrame:GetActiveCategory() then
-			--addon.SortCollection(WardrobeCollectionFrame.ItemsCollectionFrame)
-			
-			--UIDropDownMenu_EnableDropDown(BW_SortDropDown)
-		--else
-			--UIDropDownMenu_DisableDropDown(BW_SortDropDown)
-		--end
-	--end)

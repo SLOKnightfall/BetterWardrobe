@@ -4,13 +4,13 @@ addon = LibStub("AceAddon-3.0"):GetAddon(addonName)
 local L = LibStub("AceLocale-3.0"):GetLocale(addonName)
 
 local MAX_DEFAULT_OUTFITS = C_TransmogCollection.GetNumMaxOutfits()
-local FullList = {}
+
 
 local function GetOutfits(character)
 		local name = UnitName("player")
 		local realm = GetRealmName()
 		local profile = addon.SelecteSavedList 
-		local list = {}
+		local FullList = {}
 		local savedOutfits
 		if addon.SelecteSavedList and not character then 
 			FullList = addon.setdb.global.sets[addon.SelecteSavedList]
@@ -27,7 +27,6 @@ local function GetOutfits(character)
 			end
 
 			for i, data in ipairs(addon.chardb.profile.outfits) do
-
 				data.outfitID = MAX_DEFAULT_OUTFITS + i
 				data.set = "extra"
 				data.index = i

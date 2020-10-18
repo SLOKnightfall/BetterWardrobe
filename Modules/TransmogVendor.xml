@@ -1,0 +1,23 @@
+<Ui xmlns="http://www.blizzard.com/wow/ui/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.blizzard.com/wow/ui/
+..\FrameXML\UI.xsd">
+	<Script file="Randomizer.lua"/>
+
+	<Button name ="BetterWardrobeButtonTemplate" inherits="UIMenuButtonStretchTemplate" virtual="true" hidden="false">
+		<Size x="20" y="20"/>
+		<Layers>
+			<Layer level="ARTWORK">
+				<Texture parentKey="Icon" file="Interface\Buttons\UI-OptionsButton">
+					<Size x="12" y="12"/>
+					<Anchors>
+						<Anchor point="CENTER"/>
+					</Anchors>
+				</Texture>
+			</Layer>
+		</Layers>
+		<HighlightTexture file="Interface\Buttons\UI-Common-MouseHilight" alphaMode="ADD"/>
+		<Scripts>
+			<OnLeave function="GameTooltip_Hide"/>
+		</Scripts>
+	</Button>
+
+</Ui>

@@ -408,18 +408,24 @@ function ItemsCollectionFrame:SortVisuals()
 
 		if self:GetActiveCategory()  and self:GetActiveCategory() ~= 29 then
 			addon.Sort[1][addon.sortDB.sortDropdown](self)
-			UIDropDownMenu_EnableDropDown(BW_SortDropDown)
-			UIDropDownMenu_SetText(BW_SortDropDown, COMPACT_UNIT_FRAME_PROFILE_SORTBY.." "..L[addon.sortDB.sortDropdown])
+			BW_SortDropDown.dropdown:SetDisabled(false)
+			BW_SortDropDown.dropdown:SetText(COMPACT_UNIT_FRAME_PROFILE_SORTBY.." "..L[addon.sortDB.sortDropdown])
+--			UIDropDownMenu_EnableDropDown(BW_SortDropDown)
+			--UIDropDownMenu_SetText(BW_SortDropDown, COMPACT_UNIT_FRAME_PROFILE_SORTBY.." "..L[addon.sortDB.sortDropdown])
 
 			--self:UpdateItems()
 		elseif self:GetActiveCategory()  and self:GetActiveCategory() == 29 then
 			addon.Sort[1][1](self)
-			UIDropDownMenu_DisableDropDown(BW_SortDropDown)
-			UIDropDownMenu_SetText(BW_SortDropDown, COMPACT_UNIT_FRAME_PROFILE_SORTBY.." "..L["Default"])
+			BW_SortDropDown.dropdown:SetDisabled(true)
+			BW_SortDropDown.dropdown:SetText(COMPACT_UNIT_FRAME_PROFILE_SORTBY.." "..L["Default"])
+		--	UIDropDownMenu_DisableDropDown(BW_SortDropDown)
+			--UIDropDownMenu_SetText(BW_SortDropDown, COMPACT_UNIT_FRAME_PROFILE_SORTBY.." "..L["Default"])
 		else
 			addon.Sort[1][1](self)
-			UIDropDownMenu_DisableDropDown(BW_SortDropDown)
-			UIDropDownMenu_SetText(BW_SortDropDown, COMPACT_UNIT_FRAME_PROFILE_SORTBY.." "..L["Default"])
+			BW_SortDropDown.dropdown:SetDisabled(true)
+			BW_SortDropDown.dropdown:SetText(COMPACT_UNIT_FRAME_PROFILE_SORTBY.." "..L["Default"])
+		--	UIDropDownMenu_DisableDropDown(BW_SortDropDown)
+		--	UIDropDownMenu_SetText(BW_SortDropDown, COMPACT_UNIT_FRAME_PROFILE_SORTBY.." "..L["Default"])
 			--self:UpdateItems()
 		end
 	end

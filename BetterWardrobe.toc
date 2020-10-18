@@ -22,23 +22,29 @@ Libs\AceHook-3.0\AceHook-3.0.xml
 Libs\AceLocale-3.0\AceLocale-3.0.xml
 #Libs\LibDataBroker-1.1\LibDataBroker-1.1.lua
 #Libs\LibTextDump-1.0\LibTextDump-1.0.lua
+#Libs\LibUIDropDownMenu\LibUIDropDownMenu.xml
+#Libs\LibDropdown-1.0\lib.xml
+
 
 #Locale
 Locale\enUS.lua
 
 #Core files
 #Modules\Inspect.lua
-Modules\Globals.lua
+Data\Globals.lua
 Modules\Templates.xml
+Core.lua
 BetterWardrobe.xml
 
 
 #Modules
+Modules\TransmogVendor.xml
 Modules\ImportExport.lua
-Modules\SortingFunctions.lua
-Modules\Randomizer.lua
+
+#Modules\Randomizer.lua
 Modules\SavedOutfits.xml
 Modules\CollectionList.xml
+
 Modules\UIDropDownMenu.lua
 Modules\Tooltips.lua
 Modules\DressingRoom.xml

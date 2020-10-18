@@ -660,6 +660,13 @@ end
 
 
 local ContextMenu = CreateFrame("Frame", addonName .. "ContextMenuFrame", UIParent, "UIDropDownMenuTemplate")
+--local ContextMenu = L_Create_UIDropDownMenu(addonName .. "ContextMenuFrame", UIParent)
+
+
+
+
+
+
 addon.ContextMenu = ContextMenu
 local function DressupSettingsButton_OnClick(self)
 	local Profile = addon.Profile
@@ -732,13 +739,16 @@ local function DressupSettingsButton_OnClick(self)
 		},
 	}
 	
-	ContextMenu:SetPoint("TOPLEFT", self, "TOPLEFT", 0, 0)
-	EasyMenu(contextMenuData, ContextMenu, "cursor", 0, 0, "MENU")
+	UIDropDownMenu_SetAnchor(ContextMenu, 0, 0, "BOTTOMLEFT", self, "BOTTOMLEFT")
 
-	DropDownList1:ClearAllPoints()
-	DropDownList1:SetPoint("BOTTOMLEFT", self, "BOTTOMLEFT", 0, 0)
-	DropDownList1:SetClampedToScreen(true)
+	--ContextMenu:SetPoint("BOTTOMLEFT", self, "BOTTOMLEFT", 0, 0)
+	EasyMenu(contextMenuData, ContextMenu, ContextMenu, 0, 0, "MENU",5)
+
+	--DropDownList1:ClearAllPoints()
+	--DropDownList1:SetPoint("BOTTOMLEFT", self, "BOTTOMLEFT", 0, 0)
+	--DropDownList1:SetClampedToScreen(true)
 end
+
 
 
 
@@ -811,13 +821,8 @@ local function BW_DressingRoomImportButton_OnClick(self)
 			isNotRadio = true,
 		},
 	}
+	L_EasyMenu(contextMenuData, ContextMenu, self, 0, 0, "MENU")
 	
-	ContextMenu:SetPoint("TOPLEFT", self, "TOPLEFT", 0, 0)
-	EasyMenu(contextMenuData, ContextMenu, "cursor", 0, 0, "MENU")
-	
-	DropDownList1:ClearAllPoints()
-	DropDownList1:SetPoint("BOTTOMLEFT", self, "BOTTOMLEFT", 0, 0)
-	DropDownList1:SetClampedToScreen(true)
 end
 
 
