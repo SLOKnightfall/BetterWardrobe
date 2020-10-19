@@ -146,10 +146,13 @@ function addon:DressUpSources(appearanceSources, mainHandEnchant, offHandEnchant
 
 	initUndress = false
 --BW_DressingRoomItemDetailsMixin:UpdateButtons(true)
-	for i = 1, #appearanceSources do
-		if ( i ~= mainHandSlotID and i ~= secondaryHandSlotID ) then
-			if ( appearanceSources[i] and appearanceSources[i] ~= NO_TRANSMOG_SOURCE_ID ) then
-				DressingRoom:TryOn(appearanceSources[i])
+	--for i = 1, #appearanceSources do
+	for key, transmogSlot in pairs(TRANSMOG_SLOTS) do
+	local slotID = transmogSlot.location:GetSlotID();
+
+		if ( slotID ~= mainHandSlotID and slotID ~= secondaryHandSlotID ) then
+			if ( appearanceSources[slotID] and appearanceSources[slotID] ~= NO_TRANSMOG_SOURCE_ID ) then
+				DressingRoom:TryOn(appearanceSources[slotID])
 			end
 		end
 	end
@@ -168,7 +171,6 @@ function DressingRoom:TryOn(itemSource, previewSlot, enchantID)
 	local itemLink
 	if type(itemSource) == "number" then
 		itemLink = select(6, C_TransmogCollection.GetAppearanceSourceInfo(itemSource))
-
 			if not itemLink then
 				local sourceInfo = C_TransmogCollection.GetSourceInfo(itemSource)
 				itemLink = itemlinkbase:format(sourceInfo.itemID, sourceInfo.itemModID or 0)
@@ -187,7 +189,7 @@ function DressingRoom:TryOn(itemSource, previewSlot, enchantID)
 			targetSlotID = itemEquipLoc
 		end
 		dressuplink = itemLink
-dressupslot = targetSlotID
+		dressupslot = targetSlotID
 		if not targetSlotID then return end
 		local button = DressingRoom:GetInvSlotButton(targetSlotID)
 
@@ -197,7 +199,7 @@ dressupslot = targetSlotID
 				--(targetSlotID == INVSLOT_BODY and Profile.DR_HideShirt) or
 				--((targetSlotID == INVSLOT_MAINHAND or targetSlotID == INVSLOT_OFFHAND) and Profile.DR_HideWeapons ) then
 					--C_Timer.After(0.2, function() button:Update(nil) end)	
-		--else
+		else
 			C_Timer.After(0.2, function() button:Update(itemLink) end)
 		end
 	end
@@ -371,11 +373,15 @@ function BW_DressingRoomMixin:LoadOutfit(outfitID)
 		DressUpSources(C_TransmogCollection.GetOutfitSources(outfitID))
 	else
 		local outfit = addon.chardb.profile.outfits[LookupIndexFromID(outfitID)]
-		DressUpSources(outfit, outfit["mainHandEnchant"], outfit["offHandEnchant"])
+		local outfit_sources = {}
+		--need to itterate a full table as the DressUpSources uses the table size 
+		for i=1, 19  do
+			outfit_sources[i] = outfit[i] or NO_TRANSMOG_SOURCE_ID
+		end
+		DressUpSources(outfit_sources, outfit["mainHandEnchant"], outfit["offHandEnchant"])
 	end
 	import = false
 	--DressingRoom:ResetItemButtons(false , true)
-
 	--BW_DressingRoomOutfitDropDown:OnOutfitApplied(outfitID)BW_DressingRoomItemDetailsMixin:UpdateButtons()
 	C_Timer.After(0.2, function() BW_DressingRoomItemDetailsMixin:UpdateButtons(false, true) end)
 	--
@@ -661,12 +667,6 @@ end
 
 local ContextMenu = CreateFrame("Frame", addonName .. "ContextMenuFrame", UIParent, "UIDropDownMenuTemplate")
 --local ContextMenu = L_Create_UIDropDownMenu(addonName .. "ContextMenuFrame", UIParent)
-
-
-
-
-
-
 addon.ContextMenu = ContextMenu
 local function DressupSettingsButton_OnClick(self)
 	local Profile = addon.Profile
@@ -821,7 +821,7 @@ local function BW_DressingRoomImportButton_OnClick(self)
 			isNotRadio = true,
 		},
 	}
-	L_EasyMenu(contextMenuData, ContextMenu, self, 0, 0, "MENU")
+	EasyMenu(contextMenuData, ContextMenu, self, 0, 0, "MENU")
 	
 end
 
