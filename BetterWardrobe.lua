@@ -1257,6 +1257,7 @@ end
 function BetterWardrobeSetsCollectionMixin:SelectSet(setID)
 	if BW_WardrobeCollectionFrame.selectedCollectionTab == 4 then
 		self:SelectSavedSet(setID)
+		self.selectedSavedSetID = setID
 	else
 		self.selectedSetID = setID
 	end
@@ -2199,13 +2200,26 @@ function BW_WardrobeCollectionFrame_OnHide(self)
 	addon.selectedArmorType = addon.Globals.CLASS_INFO[playerClass][3]
 end
 
-
 function BetterWardrobeSetsCollectionMixin:HandleKey(key)
-	if (not self:GetSelectedSetID()) then
-		return false
+	if BW_WardrobeCollectionFrame.selectedCollectionTab == 4 then
+		if (not self:GetSelectedSavedSetID()) then
+			return false
+		end
+	else
+		if (not self:GetSelectedSetID()) then
+			return false
+		end
 	end
 
-	local selectedSetID = self:GetSelectedSetID()
+	local selectedSetID
+
+	if BW_WardrobeCollectionFrame.selectedCollectionTab == 4 then
+		selectedSetID = self:GetSelectedSavedSetID()
+	else
+		selectedSetID = self:GetSelectedSetID()
+	end
+
+
 	local _, index = SetsDataProvider:GetBaseSetByID(selectedSetID)
 	if (not index) then
 		return

@@ -638,7 +638,7 @@ function SetsDataProvider:GetBaseSets()
 	return self.baseSets
 end
 
-function WardrobeSetsDataProviderMixin:GetBaseSetByID(baseSetID)
+function SetsDataProvider:GetBaseSetByID(baseSetID)
 	local baseSets = self:GetBaseSets();
 	for i = 1, #baseSets do
 		if ( baseSets[i].setID == baseSetID ) then
