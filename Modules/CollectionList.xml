@@ -2,11 +2,11 @@
 ..\FrameXML\UI.xsd">
 <Script file="CollectionList.lua"/>
 
-	<Frame parent = "WardrobeCollectionFrame"  hidden="false" setAllPoints="true" mixin="BetterWardrobeSetsCollectionListMixin">
+	<Frame name = "BW_ColectionListFrame" parent = "WardrobeCollectionFrame"  hidden="false" setAllPoints="true" mixin="BetterWardrobeSetsCollectionListMixin">
 		<Frames>
 			<Frame name = "BW_CollectionListTitle" parentKey="CollectionListTitle" hidden="true" enableMouse="false" >
 				<Anchors>
-					<Anchor point="TOPLEFT" relativePoint="TOPLEFT" y="-60" x="4"/>
+					<Anchor point="TOPLEFT" relativePoint="TOPLEFT" y="-35" x="4"/>
 					<Anchor point="BOTTOMRIGHT" relativePoint="BOTTOMRIGHT" x="-6" y="5"/>
 				</Anchors>
 				<Layers>
@@ -24,7 +24,12 @@
 					</Layer>
 				</Layers>
 			</Frame>
-
+			<Frame parentKey="SlotsFrame" hidden = "true">
+				<Size x="10" y="10"/>
+				<Anchors>
+					<Anchor point="TOPLEFT" x="18" y="-100"/>
+				</Anchors>
+			</Frame>
 			<Button name = "BW_CollectionListButton" parentKey="CollectionListButton" inherits="UIMenuButtonStretchTemplate" hidden="false">
 				<Size x="50" y="50"/>
 				<Anchors>
@@ -68,6 +73,7 @@
 		<Scripts>
 			<OnLoad>
 				self:SetTitle()
+				self:CreateSlotButtons()
 			</OnLoad>
 			<OnShow>
 				self.CollectionListButton:SetShown(not WardrobeFrame_IsAtTransmogrifier())

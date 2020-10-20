@@ -103,6 +103,14 @@ function WardrobeCollectionFrame_GetSortedAppearanceSources(visualID, categoryID
 		return {artifactSourceInfo}
 	else
 		local sources = C_TransmogCollection.GetAppearanceSources(visualID, categoryID);
+		if not sources then 
+			local AllSources = C_TransmogCollection.GetAllAppearanceSources(visualID)
+			sources = {}
+			for i = 1, #AllSources do
+				tinsert (sources,C_TransmogCollection.GetSourceInfo(AllSources[i]))
+			end
+		end
+
 		return WardrobeCollectionFrame_SortSources(sources);
 	end
 end
@@ -145,16 +153,29 @@ local CameraID = {
 
 function ItemsCollectionFrame:GetCameraID(visualID, armor)
 	local id = C_TransmogCollection.GetAppearanceCameraID(visualID)
-	if id ~= 0 or not armor then 
+	if id ~= 0 then
 		return id
 	else
 		local sourceID = self:GetAnAppearanceSourceFromVisual(visualID, nil);
 		local sourceInfo = C_TransmogCollection.GetSourceInfo(sourceID)
-		local categoryID = sourceInfo.categoryID
-		if CameraID[categoryID] then 
-			return CameraID[categoryID]
-		else
-			return 0
+		local _, _, _, _, _, itemClassID, itemSubClassID = GetItemInfoInstant(sourceInfo.itemID)
+
+		if not armor then 
+		local appearance_camera
+		local _, _, _, _, _, itemClassID, itemSubClassID = GetItemInfoInstant(sourceInfo.itemID)
+				if (itemClassID == 2 or itemClassID == 4) and addon.Globals.CAMERS[itemClassID][itemSubClassID] then 
+					appearance_camera = addon.Globals.CAMERS[itemClassID][itemSubClassID] or 0
+				else 
+
+				end
+				return appearance_camera
+		elseif armor then 
+			local categoryID = sourceInfo.categoryID
+			if CameraID[categoryID] then 
+				return CameraID[categoryID]
+			else
+				return 0
+			end
 		end
 	end
 end
@@ -189,7 +210,20 @@ end
 end
 ]]
 
-
+local WARDROBE_MODEL_SETUP_GEAR = {
+	["CHESTSLOT"] = 78420,
+	["LEGSSLOT"] = 78425,
+	["FEETSLOT"] = 78427,
+	["HANDSSLOT"] = 78426,
+	["HEADSLOT"] = 78416,
+}
+local function resetModel(model)
+	model:SetUnit("player")
+	for slot, ID in pairs(WARDROBE_MODEL_SETUP_GEAR) do 
+		model:TryOn(ID);
+	end
+	model.needsReset = false
+end
 
 function ItemsCollectionFrame:UpdateItems()
 	local isArmor;
@@ -210,7 +244,7 @@ function ItemsCollectionFrame:UpdateItems()
 		end
 	else
 		local _, isWeapon = C_TransmogCollection.GetCategoryInfo(self.activeCategory);
-		isArmor = not isWeapon;
+		isArmor = not isWeapon and not addon:IsWeaponCat();
 	end
 
 	local tutorialAnchorFrame;
@@ -248,12 +282,21 @@ function ItemsCollectionFrame:UpdateItems()
 		if ( visualInfo ) then
 			model:Show();
 
+			if model.needsReset then 
+				resetModel(model)
+			end
+
+			local isWeapon
+			if visualInfo.categoryID and visualInfo.categoryID > 11 then 
+				isWeapon = true
+			end
+
 			-- camera
 			if ( self.transmogLocation:IsAppearance()  ) then
 				if visualInfo.artifact then
 					cameraID = visualInfo.camera
 				else
-					cameraID = self:GetCameraID(visualInfo.visualID, isArmor) 
+					cameraID = self:GetCameraID(visualInfo.visualID, isArmor and not isWeapon) 
 				end
 			end
 
@@ -262,11 +305,13 @@ function ItemsCollectionFrame:UpdateItems()
 				model.cameraID = cameraID;
 			end
 			model.zoom = nil
-			-- ( visualInfo ~= model.visualInfo or changeModel ) then
-				if ( isArmor ) then
+
+
+			--if ( visualInfo ~= model.visualInfo or changeModel ) then
+				if ( isArmor and not isWeapon) then
 					local sourceID = self:GetAnAppearanceSourceFromVisual(visualInfo.visualID, nil);
 					model:TryOn(sourceID);
-									--model:ClearModel();
+					model:Show()
 
 				elseif(visualInfo.shapeshiftID) then 
 					model.cameraID = visualInfo.camera
@@ -276,21 +321,19 @@ function ItemsCollectionFrame:UpdateItems()
 					
 					if model.cameraID == 1602 then 
 						model.zoom =-.75
-						--model:SetCamera(1)
 						model:SetCameraDistance(-5)
 						model:SetPosition(-13.25,0,-2.447)
-					--[[elseif visualInfo.artifactID == 128821 then 
-																print(model:GetPosition())
-																model:SetPosition(-5,0,0)]]
 					end 
 					model:Show()
-					--model:SetCamera(0)
-
+					
 				elseif ( appearanceVisualID ) then
 					-- appearanceVisualID is only set when looking at enchants
 					model:SetItemAppearance(appearanceVisualID, visualInfo.visualID, appearanceVisualSubclass);
 				else
 					model:SetItemAppearance(visualInfo.visualID);
+					if isWeapon then 
+						model.needsReset = true
+					end
 				end
 			--end
 			model.visualInfo = visualInfo;
@@ -452,7 +495,7 @@ function ItemsCollectionFrame:RefreshVisualsList()
 	end
 
 	--Mod to allow visual view of sets from the journal
-	if BW_CollectionListButton.ToggleState then self.visualsList = addon.CollectionList:BuildCollectionList(true) end
+	if BW_CollectionListButton.ToggleState then self.visualsList = addon.CollectionList:BuildCollectionList() end
 
 	self:FilterVisuals()
 	self.filteredVisualsList = addon.Sets:ClearHidden(self.filteredVisualsList, "item")--self.visualsList

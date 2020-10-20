@@ -31,7 +31,6 @@ local defaults = {
 	reverse = false,
 }
 
-local LegionWardrobeY = IsAddOnLoaded("LegionWardrobe") and 55 or 5
 
 function addon.Init:BuildUI()
 	UI.DefaultButtons_Update()
@@ -138,13 +137,14 @@ function UI:DefaultDropdown_Update(model, button)
 
 		local collected = (model.visualInfo and model.visualInfo.isCollected) or C_TransmogSets.IsBaseSetCollected(setID) or model.setCollected
 		--Collection List Right Click options
-		local isInList = match or addon.chardb.profile.collectionList[type][setID]
+		local collectionList = addon.CollectionList:CurrentList()
+		local isInList = match or addon.CollectionList:IsInList(setID, type)
 
-		if  type  == "set" or ((isInList and collected) or not collected)then --(type == "item" and not (model.visualInfo and model.visualInfo.isCollected)) or type == "set" or type == "extraset" then
+		--if  type  == "set" or ((isInList and collected) or not collected)then --(type == "item" and not (model.visualInfo and model.visualInfo.isCollected)) or type == "set" or type == "extraset" then
 			local targetSet = match or variantTarget or setID
 			local targetText = match and " - "..matchType or variantTarget and " - "..variantType or ""
 			UIDropDownMenu_AddSeparator()
-			local isInList = addon.chardb.profile.collectionList[type][targetSet]
+			local isInList = collectionList[type][targetSet]
 			UIDropDownMenu_AddButton({
 				notCheckable = true,
 				text = isInList and L["Remove to Collection List"]..targetText or L["Add to Collection List"]..targetText,
@@ -152,7 +152,7 @@ function UI:DefaultDropdown_Update(model, button)
 							addon.CollectionList:UpdateList(type, targetSet, not isInList)
 					end,
 			})
-		end
+		--end
 	end
 end
 
@@ -187,3 +187,26 @@ function UI.DefaultButtons_Update()
 
 		--WardrobeCollectionFrame.FilterButton:HookScript("OnMouseDown", function(...) UI:DefaultFilterDropdown_Update(...) end)
 end
+
+
+--[[function WardrobeCollectionFrameModelDropDown_SetFavorite(visualID, value, confirmed)
+	local set = (value == 1);
+	if ( set and not confirmed ) then
+		local allSourcesConditional = true;
+		local sources = C_TransmogCollection.GetAppearanceSources(visualID);
+		for i, sourceInfo in ipairs(sources) do
+			local info = C_TransmogCollection.GetAppearanceInfoBySource(sourceInfo.sourceID);
+			if ( info.sourceIsCollectedPermanent ) then
+				allSourcesConditional = false;
+				break;
+			end
+		end
+		--if ( allSourcesConditional ) then
+		--	StaticPopup_Show("TRANSMOG_FAVORITE_WARNING", nil, nil, visualID);
+			--return;
+		--end
+	end
+	C_TransmogCollection.SetIsAppearanceFavorite(visualID, set);
+	SetCVarBitfield("closedInfoFrames", LE_FRAME_TUTORIAL_TRANSMOG_MODEL_CLICK, true);
+	HelpTip:Hide(WardrobeCollectionFrame.ItemsCollectionFrame, TRANSMOG_MOUSE_CLICK_TUTORIAL);
+end]]

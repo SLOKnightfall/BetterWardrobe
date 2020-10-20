@@ -21,7 +21,8 @@ L["Ignore Class Restriction Filter"] = true
 L["Only for Raid Lookalike/Recolor Sets"] = true
 L.OM_GOLD = "|c00FFD200"
 L.ENDCOLOR ="|r"
-
+L["List Name"] = true
+L["-Appearance in %d Collection List-"] = true
 L["Model Options"] = true
 L["Use Target Gear"] =  true
 L["Use Player Model"] =  true

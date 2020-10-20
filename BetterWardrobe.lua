@@ -54,7 +54,7 @@ function addon:UpdateItems(self)
 		local setID = (model.visualInfo and model.visualInfo.visualID) or model.setID
 		local isHidden = addon.chardb.profile.item[setID]
 		model.CollectionListVisual.Hidden.Icon:SetShown(isHidden)
-		local isInList = addon.chardb.profile.collectionList["item"][setID]
+		local isInList = addon.CollectionList:IsInList(setID, "item")
 		model.CollectionListVisual.Collection.Collection_Icon:SetShown(isInList)
 		model.CollectionListVisual.Collection.Collected_Icon:SetShown(isInList and model.visualInfo and model.visualInfo.isCollected)
 	end
@@ -890,7 +890,8 @@ function BetterWardrobeSetsCollectionMixin:OnEvent(event, ...)
 			end
 		end
 
-		if addon.Profile.ShowCollectionListCollectionUpdates and addon.chardb.profile.collectionList["item"][visualID] then  
+		local isInList = addon.CollectionList:IsInList(visualID, "item")
+		if addon.Profile.ShowCollectionListCollectionUpdates and isInList then  
 			print((YELLOW_FONT_COLOR_CODE..L["Added appearance in Collection List"]))
 		end
 
@@ -1562,6 +1563,7 @@ function BetterWardrobeSetsCollectionScrollFrameMixin:Update()
 				color = GRAY_FONT_COLOR
 			end
 
+
 			button.setCollected = setCollected
 			button.Name:SetTextColor(color.r, color.g, color.b)
 			button.Label:SetText(baseSet.label) --(L["NOTE_"..(baseSet.label or 0)] and L["NOTE_"..(baseSet.label or 0)]) or "")--((L["NOTE_"..baseSet.label] or "X"))
@@ -1571,7 +1573,7 @@ function BetterWardrobeSetsCollectionScrollFrameMixin:Update()
 			button.Favorite:SetShown(isFavorite)
 			button.CollectionListVisual.Hidden.Icon:SetShown(isHidden)
 			button.CollectionListVisual.InvalidTexture:SetShown(not baseSet.isClass)
-			local isInList = addon.chardb.profile.collectionList["extraset"][baseSet.setID]
+			local isInList = addon.CollectionList:IsInList(baseSet.setID, "extraset")
 			button.CollectionListVisual.Collection.Collection_Icon:SetShown(isInList)
 			button.CollectionListVisual.Collection.Collected_Icon:SetShown(isInList and setCollected)
 			--button.CollectionListVisual.Collection.Collected_Icon:SetShown(false
@@ -1946,7 +1948,8 @@ function BetterWardrobeSetsTransmogMixin:UpdateSets()
 			model.setCollected = topSourcesCollected == topSourcesTotal
 			model.Favorite.Icon:SetShown(isFavorite)
 			model.CollectionListVisual.Hidden.Icon:SetShown(isHidden)
-			local isInList = addon.chardb.profile.collectionList["extraset"][set.setID]
+			
+			local isInList = addon.CollectionList:IsInList(set.setID, "extraset")
 			model.CollectionListVisual.Collection.Collection_Icon:SetShown(isInList)
 			model.CollectionListVisual.Collection.Collected_Icon:SetShown(isInList and model.setCollected)
 			--model.CollectionListVisual.Collection.Collected_Icon:SetShown(false)

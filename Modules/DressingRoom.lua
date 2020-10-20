@@ -666,6 +666,8 @@ end
 
 
 local ContextMenu = CreateFrame("Frame", addonName .. "ContextMenuFrame", UIParent, "UIDropDownMenuTemplate")
+addon.ContextMenu =  ContextMenu
+
 --local ContextMenu = L_Create_UIDropDownMenu(addonName .. "ContextMenuFrame", UIParent)
 addon.ContextMenu = ContextMenu
 local function DressupSettingsButton_OnClick(self)

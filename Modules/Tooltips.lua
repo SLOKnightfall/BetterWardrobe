@@ -254,14 +254,15 @@ function addon.tooltip:ShowTooltip(itemLink)
 		local appearanceID, sourceID = C_TransmogCollection.GetItemInfo(itemLink)
 		if not sourceID then return end
 		local addHeader = false
+		local inList, count = addon.CollectionList:IsInList(appearanceID, "item", true)
 
-		if addon.Profile.ShowCollectionListTooltips and addon.chardb.profile.collectionList["item"][appearanceID] then
+		if addon.Profile.ShowCollectionListTooltips and inList then
 			if not addHeader then 
 				addHeader = true
 				addLine(self, L["HEADERTEXT"])
 			end
 
-			addDoubleLine (self,"|cff87aaff"..L["-Appearance in Collection List-"], " ")
+			addDoubleLine (self,"|cff87aaff"..L["-Appearance in %d Collection List-"]:format(count), " ")
 		end
 		
 

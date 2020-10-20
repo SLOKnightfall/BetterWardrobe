@@ -748,13 +748,16 @@ local char_defaults = {
 		favorite = {},
 		outfits = {},
 		lastTransmogOutfitIDSpec = {},
-		collectionList = {item = {}, set = {}, extraset = {},},
+		collectionList = {item = {}, set = {}, extraset = {}, name = "CollectionList"},
+		selectedCollectionList = 1,
+		lists = {},
+		listUpdate = false,
 	}
 }
 
 local savedsets_defaults = {
 		profile = {},
-		global = {sets={}, itemsubstitute = {}}
+		global = {sets={}, itemsubstitute = {}, outfits = {}, updates = {},},
 }
 
 local itemsub_defaults = {
@@ -818,7 +821,6 @@ function addon:OnEnable()
 	options.args.subitems.args.profiles = LibStub("AceDBOptions-3.0"):GetOptionsTable(self.itemsubdb)
 
 
-
 	LibStub("AceConfigRegistry-3.0"):ValidateOptionsTable(options, addonName)
 	LibStub("AceConfig-3.0"):RegisterOptionsTable(addonName, options)
 
@@ -843,6 +845,7 @@ function addon:OnEnable()
 		addon.Init:BuildTooltips()
 		addon.Init:DressingRoom()
 		--addon.SetSortOrder(false)
+		addon.Init:BuildCollectionList()
 		addon.Init:BuildTransmogVendorUI()
 		addon.Init:BuildCollectionJournalUI()
 

@@ -157,6 +157,7 @@ end
 
 
 
+local LegionWardrobeY = IsAddOnLoaded("LegionWardrobe") and 55 or 5
 
 --Repositions sort dropown if Legion Wardrobe is loaded
 function UI.RepositionSortDropDown()
@@ -178,14 +179,15 @@ function UI.SortDropDown_Initialize()
 	db = addon.sortDB
 
 	local  f = addon.Frame:Create("SimpleGroup")
-		BW_SortDropDown = f
+	BW_SortDropDown = f
 	--UI.SavedSetDropDownFrame = f
 	f.frame:SetParent("BW_WardrobeCollectionFrame")
-	f:SetWidth(87)--, 22)
+	f:SetWidth(157)--, 22)
 	f:SetHeight(22)
 
 	f:ClearAllPoints()
-	f:SetPoint("TOPRIGHT", -6, -22)
+	--f:SetPoint("TOPRIGHT", 600, -22)
+	f:SetLayout("Fill")
 
 	--f:SetPoint("TOPLEFT", "BW_SortDropDown", "TOPLEFT")
 	local list = {}
@@ -197,7 +199,8 @@ function UI.SortDropDown_Initialize()
 	local dropdown = addon.Frame:Create("Dropdown")
 
 	BW_SortDropDown.dropdown = dropdown
-	dropdown:SetWidth(175)--, 22)
+	dropdown:SetWidth(157)
+	
 	--dropdown:SetHeight(22)
 	f:AddChild(dropdown)
 	dropdown:SetList(list)
@@ -223,7 +226,6 @@ function UI.SortDropDown_Initialize()
 			end
 			dropdown:SetText(COMPACT_UNIT_FRAME_PROFILE_SORTBY.." "..L[db.sortDropdown])
 	end)
-
 end
 
 
@@ -568,6 +570,8 @@ function BW_WardrobeCollectionFrame_SetTab(tabID)
 	BW_WardrobeCollectionFrame.BW_SetsCollectionFrame:SetShown((tab3 or tab4) and not atTransmogrifier)
 	BW_WardrobeCollectionFrame.BW_SetsTransmogFrame:SetShown((tab3 or tab4) and atTransmogrifier)
 
+	BW_ColectionListFrame.dropdownFrame:SetShown(tab1 and not atTransmogrifier)
+
 	BW_WardrobeToggle:SetShown(tab2 or tab3 or tab4 )
 	BW_WardrobeToggle.VisualMode = false
 
@@ -604,14 +608,15 @@ function BW_WardrobeCollectionFrame_SetTab(tabID)
 		BW_WardrobeCollectionFrame.activeFrame = WardrobeCollectionFrame.ItemsCollectionFrame
 
 		local _, isWeapon = C_TransmogCollection.GetCategoryInfo(WardrobeCollectionFrame.ItemsCollectionFrame:GetActiveCategory() or -1)
-		BW_SortDropDown:SetPoint("TOPLEFT", WardrobeCollectionFrame.ItemsCollectionFrame.WeaponDropDown, "BOTTOMLEFT", 0, (atTransmogrifier and (isWeapon and 55 or 32)) or LegionWardrobeY)
+		local yOffset = (atTransmogrifier and (isWeapon and 55 or 32)) or LegionWardrobeY
+		BW_SortDropDown:SetPoint("TOPLEFT", WardrobeCollectionFrame.ItemsCollectionFrame.WeaponDropDown, "BOTTOMLEFT", 15, yOffset)
 
 	elseif tab2 then
 		WardrobeCollectionFrame.SetsTransmogFrame:UpdateProgressBar()
 		if atTransmogrifier  then
 			WardrobeCollectionFrame.activeFrame = WardrobeCollectionFrame.SetsTransmogFrame
 			BW_WardrobeCollectionFrame.activeFrame = WardrobeCollectionFrame.SetsTransmogFrame
-			BW_SortDropDown:SetPoint("TOPRIGHT", WardrobeCollectionFrame.ItemsCollectionFrame, "TOPRIGHT", -137, -10)
+			BW_SortDropDown:SetPoint("TOPRIGHT", WardrobeCollectionFrame.ItemsCollectionFrame, "TOPRIGHT", -47, -10)
 		else
 			WardrobeCollectionFrame.activeFrame = WardrobeCollectionFrame.SetsCollectionFrame
 			BW_WardrobeCollectionFrame.activeFrame = WardrobeCollectionFrame.SetsCollectionFrame
@@ -623,7 +628,7 @@ function BW_WardrobeCollectionFrame_SetTab(tabID)
 		if atTransmogrifier then
 			WardrobeCollectionFrame.activeFrame = BW_WardrobeCollectionFrame.BW_SetsTransmogFrame
 			BW_WardrobeCollectionFrame.activeFrame = BW_WardrobeCollectionFrame.BW_SetsTransmogFrame
-			BW_SortDropDown:SetPoint("TOPRIGHT", WardrobeCollectionFrame.ItemsCollectionFrame, "TOPRIGHT",-137, -10)
+			BW_SortDropDown:SetPoint("TOPRIGHT", WardrobeCollectionFrame.ItemsCollectionFrame, "TOPRIGHT",-47, -10)
 		else
 			WardrobeCollectionFrame.activeFrame = BW_WardrobeCollectionFrame.BW_SetsCollectionFrame
 			BW_WardrobeCollectionFrame.activeFrame = BW_WardrobeCollectionFrame.BW_SetsCollectionFrame
@@ -641,7 +646,7 @@ function BW_WardrobeCollectionFrame_SetTab(tabID)
 		if atTransmogrifier then
 			WardrobeCollectionFrame.activeFrame = BW_WardrobeCollectionFrame.BW_SetsTransmogFrame
 			BW_WardrobeCollectionFrame.activeFrame = BW_WardrobeCollectionFrame.BW_SetsTransmogFrame
-			BW_SortDropDown:SetPoint("TOPRIGHT", WardrobeCollectionFrame.ItemsCollectionFrame, "TOPRIGHT",-137, -10)
+			BW_SortDropDown:SetPoint("TOPRIGHT", WardrobeCollectionFrame.ItemsCollectionFrame, "TOPRIGHT",-65, -10)
 		else
 			WardrobeCollectionFrame.activeFrame = BW_WardrobeCollectionFrame.BW_SetsCollectionFrame
 			BW_WardrobeCollectionFrame.activeFrame = BW_WardrobeCollectionFrame.BW_SetsCollectionFrame

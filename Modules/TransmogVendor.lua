@@ -2,11 +2,7 @@ local addonName, addon = ...
 addon = LibStub("AceAddon-3.0"):GetAddon(addonName)
 
 local L = LibStub("AceLocale-3.0"):GetLocale(addonName)
-
 local UI = {}
- print ("TMV")
-
-
 
 function addon.Init:BuildTransmogVendorUI()
 	UI:CreateButtons()
@@ -17,8 +13,8 @@ end
 
 
 function UI:CreateDropDown()
-		--Frame Mixin functionaly in SavedOutfits.lua file
-		BW_WardrobeOutfitDropDown = CreateFrame("Frame", "BW_WardrobeOutfitDropDown", WardrobeTransmogFrame, "BW_WardrobeOutfitDropDownTemplate")
+	--Frame Mixin functionaly in SavedOutfits.lua file
+	BW_WardrobeOutfitDropDown = CreateFrame("Frame", "BW_WardrobeOutfitDropDown", WardrobeTransmogFrame, "BW_WardrobeOutfitDropDownTemplate")
 end
 
 
@@ -53,7 +49,7 @@ local menu = {
     }
 }
 
-function click()
+local function click()
 local menuFrame = CreateFrame("Frame", "ExampleMenuFrame", UIParent, "UIDropDownMenuTemplate")
 
 -- Make the menu appear at the cursor: 
@@ -118,7 +114,6 @@ function BW_TransmogOptionsButton_OnEnter(self)
 end
 
 function BW_WardrobeTransmogVendorOptionsDropDown_OnLoad(self)
-	print("on")
 	UIDropDownMenu_Initialize(self, UI.OptionsDropDown_Initialize, "MENU")
 end
 
