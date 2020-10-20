@@ -1285,5 +1285,3 @@ addon.Globals.UNLOCK_DATA = {
 	[52633] = {["unlock"] = "Win 10 rated battlegrounds after unlocking a challenge artifact appearance.\nComplete the quest line, 'The Black Rook Threat.'", ["ach"] = {11661, 0, 0, 0, } },
 	[52641] = {["unlock"] = "Win 10 rated battlegrounds after unlocking a challenge artifact appearance. \nComplete the quest line, 'The Black Rook Threat.", ["ach"] = {11663, 0, 0, 0, } },
 }
-
-addon.Globals.CAMERS = {[2]={243,251,252,244,245,247,238,239,624,246,248,241,253,253,240,[0] = 242}, [4] = {[0] = 250, [6]=249}}

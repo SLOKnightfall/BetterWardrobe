@@ -161,14 +161,14 @@ function ItemsCollectionFrame:GetCameraID(visualID, armor)
 		local _, _, _, _, _, itemClassID, itemSubClassID = GetItemInfoInstant(sourceInfo.itemID)
 
 		if not armor then 
-		local appearance_camera
-		local _, _, _, _, _, itemClassID, itemSubClassID = GetItemInfoInstant(sourceInfo.itemID)
-				if (itemClassID == 2 or itemClassID == 4) and addon.Globals.CAMERS[itemClassID][itemSubClassID] then 
-					appearance_camera = addon.Globals.CAMERS[itemClassID][itemSubClassID] or 0
-				else 
+			local appearance_camera
+			local _, _, _, _, _, itemClassID, itemSubClassID = GetItemInfoInstant(sourceInfo.itemID)
+			if (itemClassID == 2 or itemClassID == 4) and addon.Globals.CAMERAS[itemClassID][itemSubClassID] then 
+				appearance_camera = addon.Globals.CAMERAS[itemClassID][itemSubClassID] or 0
+			else 
 
-				end
-				return appearance_camera
+			end
+			return appearance_camera
 		elseif armor then 
 			local categoryID = sourceInfo.categoryID
 			if CameraID[categoryID] then 
@@ -299,7 +299,7 @@ function ItemsCollectionFrame:UpdateItems()
 					cameraID = self:GetCameraID(visualInfo.visualID, isArmor and not isWeapon) 
 				end
 			end
-
+print(cameraID or "nope")
 			if ( model.cameraID ~= cameraID ) then
 				Model_ApplyUICamera(model, cameraID);
 				model.cameraID = cameraID;
