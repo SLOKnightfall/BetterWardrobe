@@ -6,6 +6,42 @@ local L = LibStub("AceLocale-3.0"):GetLocale(addonName)
 local MAX_DEFAULT_OUTFITS = C_TransmogCollection.GetNumMaxOutfits()
 
 
+--Function to update character to reflect DB changes
+function addon.Init.SavedOutfitDBUpdate(force) 
+	--V9.0.1 Moves over saved set data from fixed DB vs a profile
+	local character = addon.setdb:GetCurrentProfile()
+	if addon.setdb.global.updates[character]["9.0.1"] and not force then return end
+
+	local table = addon.setdb.global.outfits[character] or {}
+	for i, data in ipairs(addon.chardb.profile.outfits) do
+		tinsert(table, data)
+	end
+
+	addon.setdb.global.updates[character]["9.0.1"] = true
+
+	--clean out the old DB if no other profiles ues it
+	local shared = false
+	local currentProfile = BetterWardrobe_CharacterData.profileKeys[character]
+		for profile_character, profile in pairs(BetterWardrobe_CharacterData.profileKeys) do
+			--compare characters and see if any profiles are shared
+			if character ~= profile_character and currentProfile == profile then
+				--See if profile character has already been upgraded
+				if 	addon.setdb.global.updates[profile_character]["9.0.1"] then 
+				else
+					shared = true
+					return false
+				end
+			end
+		end
+
+	--No other characters share this profile so safe to clear
+	if not shared then 
+		addon.chardb.profile.outfits = {}
+	end
+end
+BW_SavedOutfitDBUpdate = addon.Init.SavedOutfitDBUpdate
+
+
 local function GetOutfits(character)
 		local name = UnitName("player")
 		local realm = GetRealmName()
@@ -180,6 +216,86 @@ StaticPopupDialogs["BW_CONFIRM_OVERWRITE_TRANSMOG_OUTFIT"] = {
 --===================================================================================================================================
 BW_WardrobeOutfitMixin = CreateFromMixins(WardrobeOutfitMixin)
 
+
+function BW_WardrobeOutfitMixin:OnOutfitApplied(outfitID)
+	local value = outfitID or ""
+	if GetCVarBool("transmogCurrentSpecOnly") then
+		local specIndex = GetSpecialization()
+		addon.chardb.profile.lastTransmogOutfitIDSpec[specIndex] = value
+		--SetCVar("lastTransmogOutfitIDSpec"..specIndex, value)
+	else
+		for specIndex = 1, GetNumSpecializations() do
+			--SetCVar("lastTransmogOutfitIDSpec"..specIndex, value)
+			addon.chardb.profile.lastTransmogOutfitIDSpec[specIndex] = value
+		end
+	end
+end
+
+
+function BW_WardrobeOutfitMixin:LoadOutfit(outfitID)
+	if (not outfitID) then
+		return
+	end
+
+	if IsDefaultSet(outfitID) then 
+		C_Transmog.LoadOutfit(outfitID)
+	else
+		local outfit = addon.chardb.profile.outfits[LookupIndexFromID(outfitID)]
+		--for slot , data in pairs(outfit) do
+		for key, transmogSlot in pairs(TRANSMOG_SLOTS) do
+			local slotID = transmogSlot.location:GetSlotID();
+			local data = outfit[slotID]
+			if data and data ~= NO_TRANSMOG_SOURCE_ID then 
+			--if type(slot) == "number" then 
+			local transmogLocation = TransmogUtil.GetTransmogLocation(slotID, Enum.TransmogType.Appearance, Enum.TransmogModification.None);
+			--C_Transmog.SetPending(slot, Enum.TransmogType.Appearance, data)
+			C_Transmog.SetPending(transmogLocation, data, Enum.TransmogType.Appearance);
+		end
+	end
+
+	local transmogLocation = TransmogUtil.GetTransmogLocation(GetInventorySlotInfo("MAINHANDSLOT"), Enum.TransmogType.Illusion, Enum.TransmogModification.None);
+	C_Transmog.SetPending(transmogLocation, outfit["mainHandEnchant"], Enum.TransmogType.Illusion);
+
+	transmogLocation = TransmogUtil.GetTransmogLocation(GetInventorySlotInfo("SECONDARYHANDSLOT"), Enum.TransmogType.Illusion, Enum.TransmogModification.None);
+	C_Transmog.SetPending(transmogLocation, outfit["offHandEnchant"], Enum.TransmogType.Illusion);
+
+		--C_Transmog.SetPending(GetInventorySlotInfo("MAINHANDSLOT"), LE_TRANSMOG_TYPE_ILLUSION, outfit["mainHandEnchant"])
+		--C_Transmog.SetPending(GetInventorySlotInfo("SECONDARYHANDSLOT"), LE_TRANSMOG_TYPE_ILLUSION, outfit["offHandEnchant"])
+	end
+end
+
+--[[
+function BW_WardrobeOutfitMixin:GetSlotSourceID(transmogLocation)
+	local isTransmogrified, hasPending, isPendingCollected, canTransmogrify, cannotTransmogrifyReason, hasUndo = C_Transmog.GetSlotInfo(transmogLocation);
+
+	if (not canTransmogrify and not hasUndo) then
+		return NO_TRANSMOG_SOURCE_ID
+	end
+
+	local _, _, sourceID = TransmogUtil.GetInfoForEquippedSlot(transmogLocation);
+	return sourceID
+end
+
+
+function BW_WardrobeOutfitMixin:OnOutfitSaved(outfitID)
+	local cost, numChanges = C_Transmog.GetCost()
+	if numChanges == 0 then
+		self:OnOutfitApplied(outfitID)
+	end
+end
+]]
+function BW_WardrobeOutfitMixin:OnSelectOutfit(outfitID)
+	-- outfitID can be 0, so use empty string for none
+	local value = outfitID or ""
+	for specIndex = 1, GetNumSpecializations() do
+		if not addon.chardb.profile.lastTransmogOutfitIDSpec[specIndex] then
+			--SetCVar("lastTransmogOutfitIDSpec"..specIndex, value)
+			addon.chardb.profile.lastTransmogOutfitIDSpec[specIndex] = value
+		end
+	end
+end
+
+
 function BW_WardrobeOutfitMixin:OnLoad()
 	local button = _G[self:GetName().."Button"]
 	button:SetScript("OnMouseDown", function(self)
@@ -198,7 +314,6 @@ function BW_WardrobeOutfitMixin:OnLoad()
 				WardrobeTransmogFrame.BW_OutfitDropDown:OnOutfitApplied(BW_WardrobeOutfitDropDown.selectedOutfitID)
 			end
 		end, true)
-
 end
 
 
@@ -228,19 +343,6 @@ function BW_WardrobeOutfitMixin:OnEvent(event)
 end
 
 
-function BW_WardrobeOutfitMixin:OnOutfitApplied(outfitID)
-	local value = outfitID or ""
-	if GetCVarBool("transmogCurrentSpecOnly") then
-		local specIndex = GetSpecialization()
-		addon.chardb.profile.lastTransmogOutfitIDSpec[specIndex] = value
-		--SetCVar("lastTransmogOutfitIDSpec"..specIndex, value)
-	else
-		for specIndex = 1, GetNumSpecializations() do
-			--SetCVar("lastTransmogOutfitIDSpec"..specIndex, value)
-			addon.chardb.profile.lastTransmogOutfitIDSpec[specIndex] = value
-		end
-	end
-end
 
 
 function BW_WardrobeOutfitMixin:LoadDBOutfit(outfitID)
@@ -280,61 +382,12 @@ function BW_WardrobeOutfitMixin:LoadDBOutfit(outfitID)
 		--C_Transmog.SetPending(GetInventorySlotInfo("SECONDARYHANDSLOT"), LE_TRANSMOG_TYPE_ILLUSION, outfit["offHandEnchant"])
 end
 
-function BW_WardrobeOutfitMixin:LoadOutfit(outfitID)
-	if (not outfitID) then
-		return
-	end
-
-	if IsDefaultSet(outfitID) then 
-		C_Transmog.LoadOutfit(outfitID)
-	else
-		local outfit = addon.chardb.profile.outfits[LookupIndexFromID(outfitID)]
-		for slot , data in pairs(outfit) do
-			if type(slot) == "number" then 
-			local transmogLocation = TransmogUtil.GetTransmogLocation(slot, Enum.TransmogType.Appearance, Enum.TransmogModification.None);
-			--C_Transmog.SetPending(slot, Enum.TransmogType.Appearance, data)
-			C_Transmog.SetPending(transmogLocation, data, Enum.TransmogType.Appearance);
-
-			end
-		end
-
-	local transmogLocation = TransmogUtil.GetTransmogLocation(GetInventorySlotInfo("MAINHANDSLOT"), Enum.TransmogType.Illusion, Enum.TransmogModification.None);
-	C_Transmog.SetPending(transmogLocation, outfit["mainHandEnchant"], Enum.TransmogType.Illusion);
-
-	transmogLocation = TransmogUtil.GetTransmogLocation(GetInventorySlotInfo("SECONDARYHANDSLOT"), Enum.TransmogType.Illusion, Enum.TransmogModification.None);
-	C_Transmog.SetPending(transmogLocation, outfit["offHandEnchant"], Enum.TransmogType.Illusion);
-
-		--C_Transmog.SetPending(GetInventorySlotInfo("MAINHANDSLOT"), LE_TRANSMOG_TYPE_ILLUSION, outfit["mainHandEnchant"])
-		--C_Transmog.SetPending(GetInventorySlotInfo("SECONDARYHANDSLOT"), LE_TRANSMOG_TYPE_ILLUSION, outfit["offHandEnchant"])
-	end
-end
-
-
-function WardrobeOutfitMixin:GetSlotSourceID(transmogLocation)
-	local isTransmogrified, hasPending, isPendingCollected, canTransmogrify, cannotTransmogrifyReason, hasUndo = C_Transmog.GetSlotInfo(transmogLocation);
-
-	if (not canTransmogrify and not hasUndo) then
-		return NO_TRANSMOG_SOURCE_ID
-	end
-
-	local _, _, sourceID = TransmogUtil.GetInfoForEquippedSlot(transmogLocation);
-	return sourceID
-end
-
 
 function BW_WardrobeOutfitMixin:UpdateSaveButton()
 	if (self.selectedOutfitID) then
 		self.SaveButton:SetEnabled(not self:IsOutfitDressed())
 	else
 		self.SaveButton:SetEnabled(false)
-	end
-end
-
-
-function BW_WardrobeOutfitMixin:OnOutfitSaved(outfitID)
-	local cost, numChanges = C_Transmog.GetCost()
-	if numChanges == 0 then
-		self:OnOutfitApplied(outfitID)
 	end
 end
 
@@ -348,6 +401,7 @@ function BW_WardrobeOutfitMixin:SelectDBOutfit(outfitID, loadOutfit)
 	--self:UpdateSaveButton()
 	--self:OnSelectOutfit(outfitID)
 end
+
 
 function BW_WardrobeOutfitMixin:SelectOutfit(outfitID, loadOutfit)
 	local name
@@ -607,7 +661,6 @@ function BW_WardrobeOutfitFrameMixin:Update()
 	for i = #outfits + 2 , #buttons do
 		buttons[i]:Hide()
 	end
-
 
 	stringWidth = max(stringWidth, minStringWidth)
 	stringWidth = min(stringWidth, maxStringWidth)

@@ -839,7 +839,7 @@ function addon:OnEnable()
 	Profile = addon.Profile
 	addon.Init:InitDB()
 	addon.Init:Blizzard_Wardrobe()
-	C_Timer.After(0.2, function()
+	--C_Timer.After(0.2, function()
 		--addon.SetItemSubstitute(1314, 9780)
 		addon.Init:BuildUI()
 		addon.Init:BuildTooltips()
@@ -848,10 +848,11 @@ function addon:OnEnable()
 		addon.Init:BuildCollectionList()
 		addon.Init:BuildTransmogVendorUI()
 		addon.Init:BuildCollectionJournalUI()
+		addon.Init:ElvUIInit()
 
 	WardrobeFilterDropDown_OnLoad(WardrobeCollectionFrame.FilterDropDown)
 	--WardrobeCollectionFrame.ItemsCollectionFrame:SetActiveSlot
-end )
+--end )
 
 	C_Timer.After(0.5, function()
 		addon.RefreshSubItemData()

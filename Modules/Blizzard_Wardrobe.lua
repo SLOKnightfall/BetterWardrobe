@@ -299,12 +299,17 @@ function ItemsCollectionFrame:UpdateItems()
 					cameraID = self:GetCameraID(visualInfo.visualID, isArmor and not isWeapon) 
 				end
 			end
-print(cameraID or "nope")
+
 			if ( model.cameraID ~= cameraID ) then
 				Model_ApplyUICamera(model, cameraID);
 				model.cameraID = cameraID;
 			end
 			model.zoom = nil
+
+			--Dont really care about useable status for colelction list
+			if BW_CollectionListButton.ToggleState then 
+				visualInfo.isUsable = true
+			end
 
 
 			--if ( visualInfo ~= model.visualInfo or changeModel ) then

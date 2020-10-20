@@ -69,7 +69,6 @@ function CollectionList:BuildCollectionList(complete)
 
 			local catType = sourceInfo.categoryID
 			local invTypeMatch = false
-
 			if CollectionList.showAll then
 				invTypeMatch = true
 			elseif (CollectionList.Category == 117  and catType == 19)  then 
@@ -319,6 +318,7 @@ function CollectionList:CreateDropdown()
 	--BW_SortDropDown = f
 	--UI.SavedSetDropDownFrame = f
 	f.frame:SetParent(dropdownFrame)
+	BW_ColectionListFrame.dropdownFrame.group = f
 	f:SetWidth(157)--, 22)
 	f:SetHeight(22)
 
@@ -340,8 +340,8 @@ function CollectionList:CreateDropdown()
 		
 	end)
 
-	--BW_CollectionListOptionsButton
-	local button = CreateFrame("Button", nil, dropdownFrame, "SquareIconButtonTemplate")
+	--"BW_CollectionListOptionsButton"
+	local button = CreateFrame("Button", "BW_CollectionListOptionsButton", dropdownFrame, "SquareIconButtonTemplate")
 	button:SetSize(30,30)
 		button:SetPoint("LEFT", f.frame, "RIGHT", 1, -2)
 		button.Icon:SetTexture("Interface\\Buttons\\UI-OptionsButton")

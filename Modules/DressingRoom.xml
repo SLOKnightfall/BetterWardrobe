@@ -294,7 +294,7 @@
 				</Scripts>
 			</Button>
 			
-			<Button parentKey="BW_DressingRoomHideArmorButton" inherits="UIPanelButtonTemplate" text="Undress" hidden="true">
+			<Button parentKey="BW_DressingRoomHideArmorButton" inherits="SquareIconButtonTemplate" text="Undress" hidden="true">
 				<Size x="90" y="24"/>
 				<Anchors>
 					<Anchor point="LEFT" relativePoint="RIGHT" relativeKey="$parent.BW_DressingRoomGearButton" x="-2" y="0"/>

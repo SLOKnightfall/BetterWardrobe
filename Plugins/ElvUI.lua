@@ -23,10 +23,21 @@ local C_TransmogCollection_GetSourceInfo = C_TransmogCollection.GetSourceInfo
 local MyPlugin = E:NewModule('addonName', 'AceHook-3.0', 'AceEvent-3.0', 'AceTimer-3.0') --Create a plugin within ElvUI and adopt AceHook-3.0, AceEvent-3.0 and AceTimer-3.0. We can make use of these later.
 local EP = LibStub("LibElvUIPlugin-1.0") --We can use this to automatically insert our GUI tables when ElvUI_Config is loaded.
 
+
+function addon.Init:ElvUIInit()
+	EP:RegisterPlugin(addonName, MyPlugin.InsertOptions)
+	S:BetterWardrobe()
+
+	S:AddCallbackForAddon('BetterWardrobe')
+E:RegisterModule(MyPlugin:GetName()) --Register the module with ElvUI. ElvUI will now call MyPlugin:Initialize() when ElvUI is ready to load our plugin.
+end
+
+
 function MyPlugin:Initialize()
 	--Register plugin so options are properly inserted when config is loaded
-	EP:RegisterPlugin(addonName, MyPlugin.InsertOptions)
+	--EP:RegisterPlugin(addonName, MyPlugin.InsertOptions)
 end
+
 
 function S:BetterWardrobe()
 	if not (E.private.skins.blizzard.enable and E.private.skins.blizzard.collections) then return end
@@ -39,8 +50,11 @@ function S:BetterWardrobe()
 	S:HandleTab(WardrobeCollectionFrame.SavedSetsTab)
 
 	--Items
-	S:HandleDropDownBox(BW_SortDropDown)
-	BW_SortDropDown:SetScript("OnShow", function() UIDropDownMenu_SetWidth(BW_SortDropDown, 110) end)
+	--S:HandleDropDownBox(BW_SortDropDown.dropdown)
+	--BW_SortDropDown.frame:SetScript("OnShow", function() UIDropDownMenu_SetWidth(BW_SortDropDown, 110) end)
+	BW_SortDropDown.dropdown.frame:SetScript("OnShow", function() BW_SortDropDown.dropdown:SetWidth(50) end)
+BW_SortDropDown.frame.backdrop:Hide()
+	
 	S:HandleButton(WardrobeCollectionFrame.FilterButton)
 
 	for _, Frame in ipairs(BW_WardrobeCollectionFrame.ContentFrames) do
@@ -80,7 +94,7 @@ function S:BetterWardrobe()
 		end
 
 		if Frame.PendingTransmogFrame then
-			Frame.PendingTransmogFrame.Glowframe:SetAtlas(nil)
+			--Frame.PendingTransmogFrame.Glowframe:SetAtlas(nil)
 			Frame.PendingTransmogFrame.Glowframe:CreateBackdrop()
 			Frame.PendingTransmogFrame.Glowframe.backdrop:SetOutside()
 			Frame.PendingTransmogFrame.Glowframe.backdrop:SetBackdropColor(0, 0, 0, 0)
@@ -141,24 +155,43 @@ function S:BetterWardrobe()
 	end)
 
 	--SavedSets
-	S:HandleDropDownBox(BW_DBSavedSetDropdown)
-	BW_DBSavedSetDropdown:ClearAllPoints()
-	BW_DBSavedSetDropdown:SetPoint("TOPRIGHT", "BW_SortDropDown", "TOPRIGHT", -0 , 0)
-	BW_DBSavedSetDropdown:SetScript("OnShow", function() UIDropDownMenu_SetWidth(BW_DBSavedSetDropdown, 155) end)
+	addon.SavedSetDropDownFrame.frame.backdrop:Hide()
+	--S:HandleDropDownBox(BW_DBSavedSetDropdown)
+	--BW_DBSavedSetDropdown:ClearAllPoints()
+	--BW_DBSavedSetDropdown:SetPoint("TOPRIGHT", "BW_SortDropDown", "TOPRIGHT", -0 , 0)
+	--BW_DBSavedSetDropdown:SetScript("OnShow", function() UIDropDownMenu_SetWidth(BW_DBSavedSetDropdown, 155) end)
 
 
 
 	--CollectionList
+	BW_ColectionListFrame.dropdownFrame.group.frame.backdrop:Hide()
+	S:HandleButton(BW_CollectionListOptionsButton)
+	BW_CollectionListOptionsButton:SetSize(25,25)
+	--BW_CollectionListOptionsButton:SetPoint("BOTTOMLEFT", 2,2)
 
 -- Transmogrify NPC
 	local WardrobeFrame = _G.WardrobeFrame
 
 	S:HandleButton(BW_WardrobeOutfitDropDown.SaveButton)
-	S:HandleDropDownBox(_G.BW_WardrobeOutfitDropDown, 221)
-	_G.BW_WardrobeOutfitDropDown:Height(34)
-	_G.BW_WardrobeOutfitDropDown.SaveButton:ClearAllPoints()
-	_G.BW_WardrobeOutfitDropDown.SaveButton:Point('TOPLEFT', _G.WardrobeOutfitDropDown, 'TOPRIGHT', -2, -2)
-	S:HandleScrollBar(BW_WardrobeOutfitFrameScrollFrameScrollBar)
+	--S:HandleDropDownBox(_G.BW_WardrobeOutfitDropDown, 221)
+
+	--BW_WardrobeOutfitDropDown:Show()
+	--BW_WardrobeOutfitDropDown:
+	--_G.BW_WardrobeOutfitDropDown:Height(34)
+	--_G.BW_WardrobeOutfitDropDown.SaveButton:ClearAllPoints()
+	--_G.BW_WardrobeOutfitDropDown.SaveButton:Point('TOPLEFT', _G.WardrobeOutfitDropDown, 'TOPRIGHT', -2, -2)
+	--S:HandleScrollBar(BW_WardrobeOutfitFrameScrollFrameScrollBar)
+
+	BW_WardrobeOutfitDropDown:StripTextures()
+	BW_WardrobeOutfitDropDown:CreateBackdrop()
+	--BW_WardrobeOutfitDropDown:Set
+	S:HandleNextPrevButton(BW_WardrobeOutfitDropDownButton)
+	BW_WardrobeOutfitDropDownButton:ClearAllPoints()
+	BW_WardrobeOutfitDropDownButton:SetPoint("RIGHT")
+	BW_WardrobeOutfitDropDown.SaveButton:ClearAllPoints()
+	BW_WardrobeOutfitDropDown.SaveButton:SetPoint("LEFT",BW_WardrobeOutfitDropDown, "RIGHT", 3, 0)
+
+	--S:HandleButton(BW_WardrobeOutfitDropDownButton)
 
 	BW_WardrobeOutfitFrame:StripTextures()
 	BW_WardrobeOutfitFrame:CreateBackdrop('Transparent')
@@ -188,29 +221,49 @@ function S:BetterWardrobe()
 	BW_DressingRoomOutfitFrame:CreateBackdrop('Transparent')
 	S:HandleScrollBar(BW_DressingRoomOutfitFrameScrollFrameScrollBar)
 
-	S:HandleDropDownBox(BW_DressingRoomOutfitDropDown, 221)
-	BW_DressingRoomOutfitDropDown:SetHeight(34)
+
+	BW_DressingRoomOutfitDropDown:StripTextures()
+	BW_DressingRoomOutfitDropDown:CreateBackdrop()
+	--BW_WardrobeOutfitDropDown:Set
+	S:HandleNextPrevButton(BW_DressingRoomOutfitDropDownButton)
+	BW_DressingRoomOutfitDropDownButton:ClearAllPoints()
+	BW_DressingRoomOutfitDropDownButton:SetPoint("RIGHT")
+	--BW_WardrobeOutfitDropDown.SaveButton:ClearAllPoints()
+	--BW_WardrobeOutfitDropDown.SaveButton:SetPoint("LEFT",BW_WardrobeOutfitDropDown, "RIGHT", 3, 0)
+
+
+	--S:HandleDropDownBox(BW_DressingRoomOutfitDropDown, 221)
+	--BW_DressingRoomOutfitDropDown:SetHeight(34)
 
 	S:HandleButton(BW_DressingRoomOutfitDropDown.SaveButton)
 	BW_DressingRoomOutfitDropDown.SaveButton:ClearAllPoints()
-	BW_DressingRoomOutfitDropDown.SaveButton:SetPoint('TOPLEFT', BW_DressingRoomOutfitDropDown, 'TOPRIGHT', -2, -2)
+	BW_DressingRoomOutfitDropDown.SaveButton:SetPoint("LEFT", BW_DressingRoomOutfitDropDown, "RIGHT", 3, 0)
 	
 	S:HandleButton(BW_DressingRoomFrame.BW_DressingRoomSettingsButton)
 	BW_DressingRoomFrame.BW_DressingRoomSettingsButton:SetSize(25,25)
 	BW_DressingRoomFrame.BW_DressingRoomSettingsButton:SetPoint("BOTTOMLEFT", 2,2)
 
-	S:HandleButton(BW_DressingRoomFrame.BW_DressingRoomHideArmorButton)
 	S:HandleButton(BW_DressingRoomFrame.BW_DressingRoomExportButton)
 	BW_DressingRoomFrame.BW_DressingRoomExportButton:SetSize(25,25)
+		BW_DressingRoomFrame.BW_DressingRoomExportButton:SetPoint("LEFT", BW_DressingRoomFrame.BW_DressingRoomSettingsButton, "RIGHT" )
+
 
 	S:HandleButton(BW_DressingRoomFrame.BW_DressingRoomTargetButton)
 	BW_DressingRoomFrame.BW_DressingRoomTargetButton:SetSize(25,25)
 
+		BW_DressingRoomFrame.BW_DressingRoomTargetButton:SetPoint("LEFT", BW_DressingRoomFrame.BW_DressingRoomExportButton, "RIGHT" )
+
 	S:HandleButton(BW_DressingRoomFrame.BW_DressingRoomPlayerButton)
 	BW_DressingRoomFrame.BW_DressingRoomPlayerButton:SetSize(25,25)
+		BW_DressingRoomFrame.BW_DressingRoomPlayerButton:SetPoint("LEFT", BW_DressingRoomFrame.BW_DressingRoomTargetButton, "RIGHT" )
 
 	S:HandleButton(BW_DressingRoomFrame.BW_DressingRoomGearButton)
 	BW_DressingRoomFrame.BW_DressingRoomGearButton:SetSize(25,25)
+		BW_DressingRoomFrame.BW_DressingRoomGearButton:SetPoint("LEFT", BW_DressingRoomFrame.BW_DressingRoomPlayerButton, "RIGHT" )
+
+	S:HandleButton(BW_DressingRoomFrame.BW_DressingRoomUndressButton)
+	BW_DressingRoomFrame.BW_DressingRoomUndressButton:SetSize(25,25)
+		BW_DressingRoomFrame.BW_DressingRoomUndressButton:SetPoint("LEFT", BW_DressingRoomFrame.BW_DressingRoomGearButton, "RIGHT" )
 
 	for index, button in pairs(BW_DressingRoomFrame.PreviewButtonFrame.Slots) do
 		S:HandleItemButton(button)
@@ -251,5 +304,3 @@ function S:BetterWardrobe()
 	S:HandleButton(WardrobeOutfitEditFrame.DeleteButton)
 end
 
-S:AddCallbackForAddon('BetterWardrobe')
-E:RegisterModule(MyPlugin:GetName()) --Register the module with ElvUI. ElvUI will now call MyPlugin:Initialize() when ElvUI is ready to load our plugin.

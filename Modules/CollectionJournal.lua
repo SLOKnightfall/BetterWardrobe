@@ -180,7 +180,6 @@ function UI.SortDropDown_Initialize()
 
 	local  f = addon.Frame:Create("SimpleGroup")
 	BW_SortDropDown = f
-	--UI.SavedSetDropDownFrame = f
 	f.frame:SetParent("BW_WardrobeCollectionFrame")
 	f:SetWidth(157)--, 22)
 	f:SetHeight(22)
@@ -489,7 +488,7 @@ end
 --AceDropdownmenu for the selection of other character's saved sets -Shouldn't cause taint
 function UI.SavedSetsDropDown_Initialize(self)
 	local  f = addon.Frame:Create("SimpleGroup")
-	UI.SavedSetDropDownFrame = f
+	addon.SavedSetDropDownFrame = f
 	f.frame:SetParent("BW_WardrobeCollectionFrame")
 	f:SetWidth(87)--, 22)
 	f:SetHeight(22)
@@ -556,10 +555,10 @@ function BW_WardrobeCollectionFrame_SetTab(tabID)
 	local tab3 = (tabID == TAB_EXTRASETS)
 	local tab4 = (tabID == TAB_SAVED_SETS)
 
-	if UI.SavedSetDropDownFrame and (tab1 or tab2 or tab3 )then 
-		UI.SavedSetDropDownFrame.frame:Hide()
+	if addon.SavedSetDropDownFrame and (tab1 or tab2 or tab3 )then 
+		addon.SavedSetDropDownFrame.frame:Hide()
 	else
-		UI.SavedSetDropDownFrame.frame:Show()
+		addon.SavedSetDropDownFrame.frame:Show()
 	end
 
 	WardrobeCollectionFrame.ItemsCollectionFrame:SetShown(tab1)
