@@ -23,19 +23,9 @@ local C_TransmogCollection_GetSourceInfo = C_TransmogCollection.GetSourceInfo
 local MyPlugin = E:NewModule('addonName', 'AceHook-3.0', 'AceEvent-3.0', 'AceTimer-3.0') --Create a plugin within ElvUI and adopt AceHook-3.0, AceEvent-3.0 and AceTimer-3.0. We can make use of these later.
 local EP = LibStub("LibElvUIPlugin-1.0") --We can use this to automatically insert our GUI tables when ElvUI_Config is loaded.
 
-
-function addon.Init:ElvUIInit()
-	EP:RegisterPlugin(addonName, MyPlugin.InsertOptions)
-	S:BetterWardrobe()
-
-	S:AddCallbackForAddon('BetterWardrobe')
-E:RegisterModule(MyPlugin:GetName()) --Register the module with ElvUI. ElvUI will now call MyPlugin:Initialize() when ElvUI is ready to load our plugin.
-end
-
-
 function MyPlugin:Initialize()
 	--Register plugin so options are properly inserted when config is loaded
-	--EP:RegisterPlugin(addonName, MyPlugin.InsertOptions)
+	EP:RegisterPlugin(addonName, MyPlugin.InsertOptions)
 end
 
 
@@ -304,3 +294,5 @@ BW_SortDropDown.frame.backdrop:Hide()
 	S:HandleButton(WardrobeOutfitEditFrame.DeleteButton)
 end
 
+S:AddCallbackForAddon('BetterWardrobe') 
+E:RegisterModule(MyPlugin:GetName())  --Register the module with ElvUI. ElvUI will now call MyPlugin:Initialize() when ElvUI is ready to load our plugin.

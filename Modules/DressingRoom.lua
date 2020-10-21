@@ -16,7 +16,7 @@ local useCharacterSources = true
 local Profile
 
 function DressingRoom:SetFrameSize()
-if not DR_OptionsEnable or not DressUpFrame.BW_ResizeFrame then return end
+	if not addon.Profile.DR_OptionsEnable or (addon.Profile.DR_Width == 450 and addon.Profile.DR_Height == 545) then return end
 
 	local maxWidth, maxHeight = DressUpFrame:GetMaxResize();
 	if (addon.Profile.DR_Width > maxWidth or addon.Profile.DR_Height > maxHeight) then

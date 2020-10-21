@@ -848,8 +848,7 @@ function addon:OnEnable()
 		addon.Init:BuildCollectionList()
 		addon.Init:BuildTransmogVendorUI()
 		addon.Init:BuildCollectionJournalUI()
-		addon.Init:ElvUIInit()
-
+		
 	WardrobeFilterDropDown_OnLoad(WardrobeCollectionFrame.FilterDropDown)
 	--WardrobeCollectionFrame.ItemsCollectionFrame:SetActiveSlot
 --end )
