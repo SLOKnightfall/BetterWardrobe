@@ -484,7 +484,22 @@ function UI:FilterMenu_InitializeItems(level)
 --end
 end
 
+local outfitDropdown
+function addon.RefreshSaveOutfitDropdown()
+	local list = {}
 
+	for name in pairs(addon.setdb.global.sets)do
+		tinsert(list, name)
+	end
+	outfitDropdown:SetList(list)
+
+	for i, name in ipairs(list) do
+		if name == addon.setdb:GetCurrentProfile() then
+			outfitDropdown:SetValue(i)
+			break
+		end
+	end
+end
 --AceDropdownmenu for the selection of other character's saved sets -Shouldn't cause taint
 function UI.SavedSetsDropDown_Initialize(self)
 	local  f = addon.Frame:Create("SimpleGroup")
@@ -495,24 +510,17 @@ function UI.SavedSetsDropDown_Initialize(self)
 
 	f:ClearAllPoints()
 	f:SetPoint("TOPLEFT", BW_SortDropDown.frame, "TOPLEFT")
-	local list = {}
 
-	for name in pairs(addon.setdb.global.sets)do
-		tinsert(list, name)
-	end
 
 	local dropdown = addon.Frame:Create("Dropdown")
 	dropdown:SetWidth(175)--, 22)
 	--dropdown:SetHeight(22)
 	f:AddChild(dropdown)
-	dropdown:SetList(list)
+	outfitDropdown = dropdown
+	addon.RefreshSaveOutfitDropdown(dropdown)
 
-	for i, name in ipairs(list) do
-		if name == addon.setdb:GetCurrentProfile() then
-			dropdown:SetValue(i)
-			break
-		end
-	end
+
+
 	
 	dropdown:SetCallback("OnValueChanged", function(widget) 
 		local value = widget.list[widget.value]

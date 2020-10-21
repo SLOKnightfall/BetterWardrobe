@@ -774,6 +774,51 @@ function addon.RefreshSubItemData()
 	itemSub_options.args.settings.args.settings.plugins["items"] = args
 end
 
+
+local savedOutfits_options = {
+	name = "BetterWardrobe",
+	type = 'group',
+	childGroups = "tab",
+	inline = false,
+	args = {
+	},
+}
+
+
+function addon.RefreshOutfitData()
+	local function RemoveCharacterData(name)
+	addon.setdb.global.sets[name] = nil
+
+	addon.RefreshOutfitData()
+	addon.RefreshSaveOutfitDropdown()
+	end
+	local args = {} 
+	local i = 1
+	for name, data in pairs(addon.setdb.global.sets) do
+		args["BaseItem"..i] = {
+			order = i,
+			name = function(info)
+				return name 
+			end,
+			type = "description",
+			width = 2.5,
+			disabled = false,
+		}
+
+		args["AddButton"..i] = {				
+			order = i + .2,
+			name = L["Remove"],
+			type = "execute",
+			width = .5,
+			func = function()   
+					return RemoveCharacterData(name) end,
+		}	
+
+		i = i + 1
+	end
+	savedOutfits_options.args = args
+end
+
 --ACE Profile Saved Variables Defaults
 local defaults = {
 	profile = {
@@ -825,6 +870,10 @@ local itemsub_defaults = {
 		profile = {items = {}}
 }
 
+local charSavedOutfits_defaults = {
+		global = {}
+}
+
 ---Updates Profile after changes
 function addon:RefreshConfig()
 	addon.Profile = self.db.profile
@@ -872,6 +921,10 @@ function addon:OnEnable()
 	self.setdb = LibStub("AceDB-3.0"):New("BetterWardrobe_SavedSetData", savedsets_defaults)
 
 	self.itemsubdb = LibStub("AceDB-3.0"):New("BetterWardrobe_SubstituteItemData", itemsub_defaults, true)
+
+	self.char_savedOutfits = LibStub("AceDB-3.0"):New("BetterWardrobe_SavedOutfitData", charSavedOutfits_defaults, true) 
+
+
 	local profile = self.setdb:GetCurrentProfile()
 
 	--self.setdb.global[profile] = self.setdb.char
@@ -879,7 +932,11 @@ function addon:OnEnable()
 	options.args.subitems = itemSub_options
 	options.args.subitems.name = L["Item Substitution"]
 
+	options.args.char_savedOutfits = savedOutfits_options
+	options.args.char_savedOutfits.name = L["Saved Outfits"]
+
 	options.args.subitems.args.profiles = LibStub("AceDBOptions-3.0"):GetOptionsTable(self.itemsubdb)
+	--options.args.char_savedOutfits.args.profiles = LibStub("AceDBOptions-3.0"):GetOptionsTable(self.char_savedOutfits)
 
 
 	LibStub("AceConfigRegistry-3.0"):ValidateOptionsTable(options, addonName)
@@ -916,6 +973,7 @@ function addon:OnEnable()
 
 	C_Timer.After(0.5, function()
 		addon.RefreshSubItemData()
+		addon.RefreshOutfitData()
 	end)
 	self:SecureHook(WardrobeCollectionFrame.ItemsCollectionFrame,"SetActiveSlot")
 	self:SecureHook(WardrobeCollectionFrame.ItemsCollectionFrame,"UpdateItems")
