@@ -823,6 +823,7 @@ local function BW_DressingRoomImportButton_OnClick(self)
 			isNotRadio = true,
 		},
 	}
+	UIDropDownMenu_SetAnchor(ContextMenu, 0, 0, "BOTTOMLEFT", self, "BOTTOMLEFT")
 	EasyMenu(contextMenuData, ContextMenu, self, 0, 0, "MENU")
 	
 end
@@ -987,7 +988,8 @@ function BW_DressingRoomTargetButton_OnClick(self)
 		},
 	}
 	
-	ContextMenu:SetPoint("TOPLEFT", self, "TOPLEFT", 0, 0)
+	--ContextMenu:SetPoint("TOPLEFT", self, "TOPLEFT", 0, 0)
+	UIDropDownMenu_SetAnchor(ContextMenu, 0, 0, "BOTTOMLEFT", self, "BOTTOMLEFT")
 	EasyMenu(contextMenuData, ContextMenu, "cursor", 0, 0, "MENU")
 	
 	DropDownList1:ClearAllPoints()

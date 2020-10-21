@@ -386,59 +386,24 @@ function CollectionList:OptionButton_OnClick(button)
 			isNotRadio = true,
 			notCheckable = true,
 		},
+		{
+			text = L["Add by Item ID"],
+			func = function()
+				BW_WardrobeOutfitFrameMixin:ShowPopup("BETTER_WARDROBE_COLLECTIONLIST_ITEM_POPUP")
+				dropdown.pullout:Close()
+			end,
+			isNotRadio = true,
+			notCheckable = true,
+		},
 	}
 
 	UIDropDownMenu_SetAnchor(ContextMenu, 0, 0, "BOTTOMLEFT", button, "BOTTOMLEFT")
-
 	EasyMenu(contextMenuData, ContextMenu, ContextMenu, 0, 0, "MENU")	
 end
 
 
 
-StaticPopupDialogs["BW_NAME_COLLECTION"] = {
-	preferredIndex = 3,
-	text = L["List Name"],
-	button1 = SAVE,
-	button2 = CANCEL,
-	OnAccept = function(self)
-		local name = self.editBox:GetText()
-		if action == "add" then 
-			CollectionList:AddList(name)
-		elseif action == "rename" then 
-			CollectionList:RenameList(name)
-		end
-		action = nil
-	end,
-	timeout = 0,
-	whileDead = 1,
-	hideOnEscape = 1,
-	hasEditBox = 1,
-	maxLetters = 31,
-	OnShow = function(self)
-		self.button1:Disable()
-		self.button2:Enable()
-		self.editBox:SetFocus()
-	end,
-	OnHide = function(self)
-		self.editBox:SetText("")
-	end,
-	EditBoxOnEnterPressed = function(self)
-		if (self:GetParent().button1:IsEnabled()) then
-			StaticPopup_OnClick(self:GetParent(), 1)
-		end
-	end,
-	EditBoxOnTextChanged = function (self)
-		local parent = self:GetParent()
-		if (parent.editBox:GetText() ~= "") then
-			parent.button1:Enable()
-		else
-			parent.button1:Disable()
-		end
-	end,
-	EditBoxOnEscapePressed = function(self)
-		self:GetParent():Hide()
-	end
-}
+
 
 
 function CollectionList:AddList(name)
@@ -694,3 +659,77 @@ function BW_CollectionListDropDownMixin:OnLoad()
 	local button = _G[self:GetName().."Button"]
 	button:Hide()
 end
+
+
+StaticPopupDialogs["BETTER_WARDROBE_COLLECTIONLIST_ITEM_POPUP"] = {
+	text = L["Type the item ID in the text box below"],
+	preferredIndex = 3,
+	button1 = ADD,
+	button2 = CANCEL,
+	hasEditBox = true,
+	maxLetters = 512,
+	editBoxWidth = 260,
+	OnShow = function() if LISTWINDOW then LISTWINDOW:Hide() end end,
+	OnAccept = function(self)
+
+		local itemID = self.editBox:GetText()
+		if not itemID then  return false end
+		local appearanceID, sourceID = C_TransmogCollection.GetItemInfo(tonumber(itemID))
+		if not appearanceID then return false end
+
+		CollectionList:UpdateList("item", appearanceID, true)
+		end,
+	EditBoxOnEnterPressed = function(self)
+		if (self:GetParent().button1:IsEnabled()) then
+			StaticPopup_OnClick(self:GetParent(), 1)
+		end
+	end,
+	EditBoxOnEscapePressed = HideParentPanel;
+	exclusive = true,
+	whileDead = true,
+};
+
+StaticPopupDialogs["BW_NAME_COLLECTION"] = {
+	preferredIndex = 3,
+	text = L["List Name"],
+	button1 = SAVE,
+	button2 = CANCEL,
+	OnAccept = function(self)
+		local name = self.editBox:GetText()
+		if action == "add" then 
+			CollectionList:AddList(name)
+		elseif action == "rename" then 
+			CollectionList:RenameList(name)
+		end
+		action = nil
+	end,
+	timeout = 0,
+	whileDead = 1,
+	hideOnEscape = 1,
+	hasEditBox = 1,
+	maxLetters = 31,
+	OnShow = function(self)
+		self.button1:Disable()
+		self.button2:Enable()
+		self.editBox:SetFocus()
+	end,
+	OnHide = function(self)
+		self.editBox:SetText("")
+	end,
+	EditBoxOnEnterPressed = function(self)
+		if (self:GetParent().button1:IsEnabled()) then
+			StaticPopup_OnClick(self:GetParent(), 1)
+		end
+	end,
+	EditBoxOnTextChanged = function (self)
+		local parent = self:GetParent()
+		if (parent.editBox:GetText() ~= "") then
+			parent.button1:Enable()
+		else
+			parent.button1:Disable()
+		end
+	end,
+	EditBoxOnEscapePressed = function(self)
+		self:GetParent():Hide()
+	end
+}

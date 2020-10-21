@@ -55,6 +55,7 @@ Plugins\ElvUI.lua
 Plugins\CanIMogIt.lua
 
 #Data files
+Data\CameraData.lua
 Data\AppearanceData.lua
 Data\ArtifactData.lua
 #Data\SourceData.lua
@@ -63,3 +64,4 @@ Data\LEATHER.lua
 Data\MAIL.lua
 Data\PLATE.lua
 Data\COSMETIC.lua
+
