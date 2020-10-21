@@ -172,6 +172,8 @@ function UI.DefaultButtons_Update()
 			end
 		end
 
+
+
 		for _, buttons in ipairs(ScrollFrames) do
 			for i = 1, #buttons do
 				local button = buttons[i]
@@ -186,27 +188,130 @@ function UI.DefaultButtons_Update()
 		end
 
 		--WardrobeCollectionFrame.FilterButton:HookScript("OnMouseDown", function(...) UI:DefaultFilterDropdown_Update(...) end)
+	UIDropDownMenu_Initialize(WardrobeCollectionFrame.ItemsCollectionFrame.RightClickDropDown, nil, "MENU");
+	WardrobeCollectionFrame.ItemsCollectionFrame.RightClickDropDown.initialize = aWardrobeCollectionFrameRightClickDropDown_Init
 end
 
 
---[[function WardrobeCollectionFrameModelDropDown_SetFavorite(visualID, value, confirmed)
+function addon:SetFavoriteItem(visualID, set)
+	if addon.chardb.profile.favorite_items[visualID] then
+		addon.chardb.profile.favorite_items[visualID] = nil
+	else
+		addon.chardb.profile.favorite_items[visualID] = true
+	end
+
+	WardrobeCollectionFrame.ItemsCollectionFrame:RefreshVisualsList()
+	WardrobeCollectionFrame.ItemsCollectionFrame:UpdateItems()
+end
+
+
+function addon:IsFavoriteItem(visualID)
+	return addon.chardb.profile.favorite_items[visualID]
+end
+
+--Modified to allow favoriteing unlearned items
+function aWardrobeCollectionFrameRightClickDropDown_Init(self)
+	local appearanceID = self.activeFrame.visualInfo.visualID;
+	local info = UIDropDownMenu_CreateInfo();
+	local favItem = addon:IsFavoriteItem(appearanceID)
+
+	-- Set Favorite
+	if ( favItem or C_TransmogCollection.GetIsAppearanceFavorite(appearanceID) ) then
+		info.text = BATTLE_PET_UNFAVORITE;
+		info.arg1 = appearanceID;
+		info.arg2 = 0;
+	else
+		info.text = BATTLE_PET_FAVORITE;
+		info.arg1 = appearanceID;
+		info.arg2 = 1;
+		if ( not C_TransmogCollection.CanSetFavoriteInCategory(WardrobeCollectionFrame.ItemsCollectionFrame:GetActiveCategory()) ) then
+			info.tooltipWhileDisabled = 1
+			info.tooltipTitle = BATTLE_PET_FAVORITE;
+			info.tooltipText = TRANSMOG_CATEGORY_FAVORITE_LIMIT;
+			info.tooltipOnButton = 1;
+			info.disabled = 1;
+		end
+	end
+	info.notCheckable = true;
+	info.func = function(_, visualID, value) WardrobeCollectionFrameModelDropDown_SetFavorite(visualID, value); end;
+	UIDropDownMenu_AddButton(info);
+	-- Cancel
+	info = UIDropDownMenu_CreateInfo();
+	info.notCheckable = true;
+	info.text = CANCEL;
+	UIDropDownMenu_AddButton(info);
+
+	local headerInserted = false;
+	local sources = WardrobeCollectionFrame_GetSortedAppearanceSources(appearanceID);
+	local chosenSourceID = WardrobeCollectionFrame.ItemsCollectionFrame:GetChosenVisualSource(appearanceID);
+	info.func = WardrobeCollectionFrameModelDropDown_SetSource;
+	for i = 1, #sources do
+		if ( sources[i].isCollected and not sources[i].useError ) then
+			if ( not headerInserted ) then
+				headerInserted = true;
+				-- space
+				info.text = " ";
+				info.disabled = true;
+				UIDropDownMenu_AddButton(info);
+				info.disabled = nil;
+				-- header
+				info.text = WARDROBE_TRANSMOGRIFY_AS;
+				info.isTitle = true;
+				info.colorCode = NORMAL_FONT_COLOR_CODE;
+				UIDropDownMenu_AddButton(info);
+				info.isTitle = nil;
+				-- turn off notCheckable
+				info.notCheckable = nil;
+			end
+			if ( sources[i].name ) then
+				info.text = sources[i].name;
+				info.colorCode = ITEM_QUALITY_COLORS[sources[i].quality].hex;
+			else
+				info.text = RETRIEVING_ITEM_INFO;
+				info.colorCode = RED_FONT_COLOR_CODE;
+			end
+			info.disabled = nil;
+			info.arg1 = appearanceID;
+			info.arg2 = sources[i].sourceID;
+			-- choose the 1st valid source if one isn't explicitly chosen
+			if ( chosenSourceID == NO_TRANSMOG_SOURCE_ID ) then
+				chosenSourceID = sources[i].sourceID;
+			end
+			info.checked = (chosenSourceID == sources[i].sourceID);
+			UIDropDownMenu_AddButton(info);
+		end
+	end
+end
+
+
+function WardrobeCollectionFrameModelDropDown_SetFavorite(visualID, value, confirmed)
 	local set = (value == 1);
 	if ( set and not confirmed ) then
 		local allSourcesConditional = true;
+		local collected = false
 		local sources = C_TransmogCollection.GetAppearanceSources(visualID);
 		for i, sourceInfo in ipairs(sources) do
 			local info = C_TransmogCollection.GetAppearanceInfoBySource(sourceInfo.sourceID);
+
 			if ( info.sourceIsCollectedPermanent ) then
 				allSourcesConditional = false;
+				collected = info.appearanceIsCollected
 				break;
 			end
 		end
-		--if ( allSourcesConditional ) then
-		--	StaticPopup_Show("TRANSMOG_FAVORITE_WARNING", nil, nil, visualID);
-			--return;
-		--end
+		if ( allSourcesConditional and collected ) then
+			StaticPopup_Show("TRANSMOG_FAVORITE_WARNING", nil, nil, visualID);
+			return;
+		elseif ( allSourcesConditional and not collected ) then 
+			addon:SetFavoriteItem(visualID, set)
+			return 
+		end
 	end
-	C_TransmogCollection.SetIsAppearanceFavorite(visualID, set);
-	SetCVarBitfield("closedInfoFrames", LE_FRAME_TUTORIAL_TRANSMOG_MODEL_CLICK, true);
-	HelpTip:Hide(WardrobeCollectionFrame.ItemsCollectionFrame, TRANSMOG_MOUSE_CLICK_TUTORIAL);
-end]]
+	if addon:IsFavoriteItem(visualID) then 
+		addon:SetFavoriteItem(visualID, set)
+	else
+		C_TransmogCollection.SetIsAppearanceFavorite(visualID, set);
+		SetCVarBitfield("closedInfoFrames", LE_FRAME_TUTORIAL_TRANSMOG_MODEL_CLICK, true);
+		HelpTip:Hide(WardrobeCollectionFrame.ItemsCollectionFrame, TRANSMOG_MOUSE_CLICK_TUTORIAL);
+	end
+end

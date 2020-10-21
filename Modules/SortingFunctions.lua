@@ -271,6 +271,9 @@ local Sort = {
 			if (source1.isFavorite ~= source2.isFavorite) then
 				return source1.isFavorite
 			end
+			if (addon:IsFavoriteItem(source1.visualID) ~= addon:IsFavoriteItem(source2.visualID)) then
+				return addon:IsFavoriteItem(source1.visualID)
+			end
 			if (source1.isHideVisual ~= source2.isHideVisual) then
 				return source1.isHideVisual
 			end

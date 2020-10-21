@@ -746,6 +746,7 @@ local char_defaults = {
 		set = {},
 		extraset = {},
 		favorite = {},
+		favorite_items = {},
 		outfits = {},
 		lastTransmogOutfitIDSpec = {},
 		collectionList = {item = {}, set = {}, extraset = {}, name = "CollectionList"},

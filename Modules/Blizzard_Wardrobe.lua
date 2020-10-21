@@ -377,7 +377,7 @@ function ItemsCollectionFrame:UpdateItems()
 				model.NewGlow:Hide();
 			end
 			-- favorite
-			model.Favorite.Icon:SetShown(visualInfo.isFavorite);
+			model.Favorite.Icon:SetShown(addon:IsFavoriteItem(visualInfo.visualID) or visualInfo.isFavorite);
 			-- hide visual option
 			model.HideVisual.Icon:SetShown(isAtTransmogrifier and visualInfo.isHideVisual);
 
