@@ -146,6 +146,7 @@ do
 	end
 end
 
+
 do
 	local function addArmor(armorSet)
 		for id, setData in pairs(armorSet) do
@@ -160,11 +161,13 @@ do
 					--if addon.setdb.global.itemSubstitute[item] then 
 					--Swaps items for substitutes
 					if subitemlist[item] then 
-						local appearanceID, sourceID = C_TransmogCollection.GetItemInfo(item)
+						local replacementID = subitemlist[item]
+						local appearanceID, sourceID = C_TransmogCollection.GetItemInfo(replacementID)
 						local sources = C_TransmogCollection.GetAppearanceSources(appearanceID)
 						WardrobeCollectionFrame_SortSources(sources)
-						setData["items"][index] = subitemlist[item]
-						setData.sources[item] = appearanceID
+						setData["items"][index] = replacementID
+						setData.sources[item] = nil
+						setData.sources[replacementID] = appearanceID
 					end
 				end
 
@@ -442,53 +445,53 @@ function getallsets()
 				
 				end]]
 
-function addon.GetAllSets()
-	local baseSets = {} --C_TransmogSets.GetBaseSets()
-				local classInfo = CLASS_INFO[playerClass]
+	function addon.GetAllSets()
+		local baseSets = {} --C_TransmogSets.GetBaseSets()
+					local classInfo = CLASS_INFO[playerClass]
 
 
-	local sets = C_TransmogSets.GetAllSets()
-		for i, data in ipairs(sets)do
-				for i,d in pairs(data)do
-					--print(i)
-					setData[data.classMask] = setData.classMask or {}
-					if string.find(i, "hidden") then 
-						if data[i] == true then 
-						if (data.classMask and data.classMask == classInfo[2]) or not data.classMask or data.classMask == 0 then 
-							data.filter = 1
-							data.setID = data.setID *100
-							setsInfo[data.setID] = data
-							--tinsert(addon.extraSetsCache, data)
+		local sets = C_TransmogSets.GetAllSets()
+			for i, data in ipairs(sets)do
+					for i,d in pairs(data)do
+						--print(i)
+						setData[data.classMask] = setData.classMask or {}
+						if string.find(i, "hidden") then 
+							if data[i] == true then 
+								if (data.classMask and data.classMask == classInfo[2]) or not data.classMask or data.classMask == 0 then 
+									data.filter = 1
+									data.setID = data.setID *100
+									setsInfo[data.setID] = data
+									--tinsert(addon.extraSetsCache, data)
+								end
+							end
 						end
+						--setData[data.classMask][data.setID] = data
+						--print(d).
+					--else 
+						--tinsert(setData[3592], data)
+
+						--end
+					
 					end
-					end
-					--setData[data.classMask][data.setID] = data
-					--print(d).
-				--else 
-					--tinsert(setData[3592], data)
+					--print(data.limitedTimeSet)
+					--print(data["hiddenUtilCollected"])
 
-					--end
-				
-				end
-				--print(data.limitedTimeSet)
-				--print(data["hiddenUtilCollected"])
+				--end
+				--print(data.hiddenUtilCollected)
 
-			--end
-			--print(data.hiddenUtilCollected)
+			--	sourceInfo = C_TransmogSets.GetSetInfo(1903)
+				--print(sourceInfo["hiddenUtilCollected"])
+				--if data.hiddenUtilCollected then
+					--print(data.name)
+				--	data.filter = 1
+					--data.type = "Blizzard"
+					--local setinfo = 
+				--tinsert(addon.extraSetsCache, data)
 
-		--	sourceInfo = C_TransmogSets.GetSetInfo(1903)
-			--print(sourceInfo["hiddenUtilCollected"])
-			--if data.hiddenUtilCollected then
-				--print(data.name)
-			--	data.filter = 1
-				--data.type = "Blizzard"
-				--local setinfo = 
-			--tinsert(addon.extraSetsCache, data)
-
-			--end
-		end
-return baseSets --setData[3592]
-end
+				--end
+			end
+		return baseSets --setData[3592]
+	end
 
 end
 
@@ -499,9 +502,12 @@ end
 		end
 		--local appearanceID, sourceID = C_TransmogCollection.GetItemInfo(itemID|itemString [, itemModID])
 		local appearanceID, sourceID = C_TransmogCollection.GetItemInfo(tonumber(itemID))
-		local sources = C_TransmogCollection.GetAppearanceSources(appearanceID)
-		for i, data in ipairs(sources) do
-			addon.itemsubdb.profile.items[data.itemID] = nil
+		local sources = C_TransmogCollection.GetAllAppearanceSources(appearanceID)
+		--local sources = C_TransmogCollection.GetAppearanceSources(appearanceID)
+
+		for i, source_ID in ipairs(sources) do
+			local info = C_TransmogCollection.GetSourceInfo(source_ID)
+			addon.itemsubdb.profile.items[info.itemID] = nil
 		end
 
 		addon:ClearCache()
