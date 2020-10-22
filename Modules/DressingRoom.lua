@@ -40,8 +40,8 @@ function DressingRoom:SetFrameSize(frame)
 
 		CharacterFrame:Show()
 	end
-	UIPanelWindows["DressUpFrame"].width = addon.Profile.DR_Width
-	UpdateUIPanelPositions();
+	--UIPanelWindows["DressUpFrame"].width = addon.Profile.DR_Width
+	--UpdateUIPanelPositions();
 
 end
 

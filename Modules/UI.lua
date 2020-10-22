@@ -101,8 +101,8 @@ function UI:DefaultDropdown_Update(model, button)
 	if button == "RightButton" and model:GetParent().transmogType ~= Enum.TransmogType.Illusion then
 		if not DropDownList1:IsShown() then
 			 -- force show dropdown
-			WardrobeModelRightClickDropDown.activeFrame = model
-			ToggleDropDownMenu(1, nil, WardrobeModelRightClickDropDown, model, -6, -3)
+			--WardrobeModelRightClickDropDown.activeFrame = model
+			--ToggleDropDownMenu(1, nil, WardrobeModelRightClickDropDown, model, -6, -3)
 		end
 
 		local setID = (model.visualInfo and model.visualInfo.visualID) or model.setID

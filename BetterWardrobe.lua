@@ -1050,7 +1050,7 @@ function BetterWardrobeSetsCollectionMixin:DisplaySet(setID)
 		self.DetailsFrame.LongName:Hide()
 	end
 
-	self.DetailsFrame.Label:SetText(setInfo.label..((not setInfo.isClass and setInfo.className) and " -"..setInfo.className.."-" or "") )
+	self.DetailsFrame.Label:SetText((setInfo.label or "")..((not setInfo.isClass and setInfo.className) and " -"..setInfo.className.."-" or "") )
 
 
 	local newSourceIDs = addon.GetSetNewSources(setID)

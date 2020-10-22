@@ -55,7 +55,7 @@ Modules\ArtifactAppearances.lua
 #3rd party addon compatability
 Plugins\ElvUI.lua
 Plugins\CanIMogIt.lua
-
+Plugins\MogIt.lua
 #Data files
 Data\CameraData.lua
 Data\AppearanceData.lua
