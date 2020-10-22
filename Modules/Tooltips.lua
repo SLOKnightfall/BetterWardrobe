@@ -23,6 +23,9 @@ tooltip:Hide()
 tooltip:SetClampedToScreen(true)
 tooltip:SetFrameStrata("TOOLTIP")
 
+GameTooltip:SetClampedToScreen( true )
+
+
 function addon.Init:BuildTooltips()
 	Models.normal:SetUnit("player")
 	Models.modelZoomed:SetUnit("player")
@@ -197,6 +200,7 @@ local function HasItem(sourceID, includeAlternate)
 	return found
 end
 
+
 local itemSourceID = {}
 local function GetSourceFromItem(item)
 	if not itemSourceID[item] then
@@ -218,12 +222,18 @@ local function GetSourceFromItem(item)
 	return itemSourceID[item]
 end
 
+local split = true
+
 function tooltip:ShowTooltip(itemLink)
 	tooltip.owner = GameTooltip
 	if not itemLink or self.ShowTooltips then return end
 
 	local itemID, _, _, slot = GetItemInfoInstant(itemLink)
-	if not itemID then return end
+	local dressable = IsDressableItem(itemID)
+	local token = LAT:ItemIsToken(itemID)
+
+	--No need to update tooltips if item is not token or a mog
+	if not itemID or (not token and not dressable) then return end
 	local self = GameTooltip
 
 	local learned_dupe = false
@@ -257,39 +267,37 @@ function tooltip:ShowTooltip(itemLink)
 		end
 	end
 	
-	local itemID, _, _, slot = GetItemInfoInstant(itemLink)
-	if not itemID then return end
 	local self = GameTooltip
-
-	local token = addon.Profile.ShowTokenTooltips and LAT:ItemIsToken(itemID)
-	local maybelink, _
+	token = addon.Profile.ShowTokenTooltips and token
+	local item_link, _
 	if token then
-		-- It's a set token! Replace the id.
-		local found
+		local isToken
 		for _, itemid in LAT:IterateItemsForTokenAndClass(itemID, class) do
-			_, maybelink = GetItemInfo(itemid)
-			if maybelink then
+			_, item_link = GetItemInfo(itemid)
+			if item_link then
 				itemID = itemid
-				itemLink = maybelink
-				found = true
+				itemLink = item_link
+				isToken = true
 				break
 			end
 		end
-		if not found then
+
+		if not isToken then
 			for _, tokenclass in LAT:IterateClassesForToken(itemID) do
 				for _, itemid in LAT:IterateItemsForTokenAndClass(itemID, tokenclass) do
-					_, maybelink = GetItemInfo(itemid)
-					if maybelink then
+					_, item_link = GetItemInfo(itemid)
+					if item_link then
 						itemID = itemid
-						itemLink = maybelink
-						found = true
+						itemLink = item_link
+						isToken = true
 						break
 					end
 				end
 				break
 			end
 		end
-		if found then
+
+		if isToken then
 			addDoubleLine (self,ITEM_PURCHASED_COLON, itemLink)
 		end
 	end
@@ -398,9 +406,10 @@ function tooltip:ShowTooltip(itemLink)
 		if addHeader then
 			addLine(self, L["HEADERTEXT"])
 		end
+		self:Show()
 	end
 	self.ShowTooltips = true
-	--/relself:Show()
+	
 end
 
 function tooltip:ShowPreview(itemLink)
@@ -409,8 +418,6 @@ function tooltip:ShowPreview(itemLink)
 	local itemID, _, _, slot = GetItemInfoInstant(itemLink)
 	if self.item ~= itemLink then
 		self.item = itemLink
-
-		local token = addon.Profile.ShowTokenTooltips and LAT:ItemIsToken(itemID)
 
 		local slot = select(9, GetItemInfo(itemID))
 		if (not addon.Profile.TooltipPreview_MogOnly or select(3, C_Transmog.GetItemInfo(itemID))) and addon.Globals.tooltip_slots[slot] and IsDressableItem(itemLink) then
