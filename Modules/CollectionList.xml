@@ -24,6 +24,26 @@
 					</Layer>
 				</Layers>
 			</Frame>
+			<Frame  parentKey="CollectionListHelpText" hidden="true" enableMouse="false" >
+				<Anchors>
+					<Anchor point="TOPLEFT" relativePoint="TOPLEFT"/>
+					<Anchor point="BOTTOMRIGHT" relativePoint="BOTTOMRIGHT" />
+				</Anchors>
+				<Layers>
+					<Layer level="ARTWORK">
+						<FontString parentKey="Name" inherits="Fancy24Font" maxLines="5" text="--">
+							<Anchors>
+								<Anchor point="CENTER"/>
+							</Anchors>
+							<Color r="1" g="0.82" b="0"/>
+							<Shadow>
+								<Offset x="1" y="-1" />
+								<Color r="0" g="0" b="0"/>
+							</Shadow>
+						</FontString>
+					</Layer>
+				</Layers>
+			</Frame>
 			<Frame parentKey="SlotsFrame" hidden = "true">
 				<Size x="10" y="10"/>
 				<Anchors>

@@ -190,6 +190,8 @@ function BetterWardrobeSetsCollectionListMixin:Toggle(toggleState)
 		WardrobeCollectionFrame.ItemsCollectionFrame.SlotsFrame:SetShown(not toggleState and not atTransmogrifier)
 		--WardrobeCollectionFrameWeaponDropDown:SetShown(not toggleState)
 		self.CollectionListTitle:SetShown(toggleState)
+		local listcount = CollectionList:ListCount("item")
+		self.CollectionListHelpText:SetShown(toggleState and listcount == 0)
 		self.SlotsFrame:SetShown(toggleState)
 	end
 end
@@ -197,6 +199,7 @@ end
 
 function BetterWardrobeSetsCollectionListMixin:SetTitle()
 	self.CollectionListTitle.Name:SetText(L["Collection List"])
+	self.CollectionListHelpText.Name:SetText(L["COLLECTION_LIST_HELP"])
 end
 
 
@@ -475,6 +478,14 @@ end
 			return data and data[arg] or nil
 		end
 ]]
+function CollectionList:ListCount(type)
+	local counter = 0
+	local list = addon.chardb.profile.lists[addon.chardb.profile.selectedCollectionList][type]
+	for i in pairs(list) do
+		counter = counter +1
+	end
+	return counter
+end
 
 
 function CollectionList:CurrentList()
