@@ -15,7 +15,10 @@ local import = false
 local useCharacterSources = true
 local Profile
 
-function DressingRoom:SetFrameSize()
+function DressingRoom:SetFrameSize(frame)
+	if GetCVarBool("miniDressupFrame") then return end
+
+
 	if not addon.Profile.DR_OptionsEnable or (addon.Profile.DR_Width == 450 and addon.Profile.DR_Height == 545) then return end
 
 	local maxWidth, maxHeight = DressUpFrame:GetMaxResize();
@@ -66,6 +69,13 @@ function addon:DressingRoom_Disable()
 	DressUpFrame:SetMovable(false)
 	DressUpFrame:SetScript("OnDragStart", nil)
 	DressUpFrame:SetScript("OnDragStop", nil)
+			
+	local function OnMaximize(frame)
+		DressUpFrame:SetSize(450, 545);
+		--UpdateUIPanelPositions(frame);
+	end
+						
+	DressUpFrame.MaximizeMinimizeFrame:SetOnMaximizedCallback(OnMaximize)
 	--addon.Profile.DR_OptionsEnable
 end
 
@@ -74,6 +84,13 @@ function addon:DressingRoom_Enable()
 	addon:SecureHook("DressUpVisual", C_Timer.After(0.25,addon.DressUpVisual))
 	addon:SecureHook("DressUpSources", C_Timer.After(0.25,addon.DressUpSources))
 	addon:SecureHook("DressUpFrame_OnDressModel",function(self) DressingRoom:OnDressModel(self) end)
+
+
+		
+		--UpdateUIPanelPositions(frame);
+	
+						
+	DressUpFrame.MaximizeMinimizeFrame:SetOnMaximizedCallback(DressingRoom.SetFrameSize)
 
 	addon:HookScript(DressUpFrameResetButton,"OnClick", function()  C_Timer.After(0.2, function() 
 		initHide = true; 
@@ -86,7 +103,7 @@ function addon:DressingRoom_Enable()
 		end
 		end) end)
 
-	addon:HookScript(DressUpFrame.MaximizeMinimizeFrame.MaximizeButton,"OnClick", function()  C_Timer.After(0.1, function() DressingRoom:SetFrameSize() end) end)
+	addon:HookScript(DressUpFrame.MaximizeMinimizeFrame.MaximizeButton,"OnClick", function()  C_Timer.After(0, function() DressingRoom:SetFrameSize() end) end)
 	DressUpFrame:SetMinResize(384, 474);
 	DressUpFrame:SetMaxResize(
 		min(GetScreenWidth() - 50, 950),
@@ -98,6 +115,9 @@ function addon:DressingRoom_Enable()
 	DressUpFrame:RegisterForDrag("LeftButton")
 	DressUpFrame:SetScript("OnDragStart", DressUpFrame.StartMoving)
 	DressUpFrame:SetScript("OnDragStop", DressUpFrame.StopMovingOrSizing)
+	DressingRoom:SetFrameSize()
+
+
 	--addon.Profile.DR_OptionsEnable
 end
 
@@ -232,6 +252,7 @@ function DressingRoom:OnShow()
 	--if DressUpModel and not  addon:IsHooked(DressUpModel, "TryOn") then
 		--addon:SecureHook(DressUpModel, "TryOn", function(self,...) local itemSource, previewSlot, enchantID = ...; C_Timer.After(0.2, function(...) DressingRoom:TryOn(itemSource, previewSlot, enchantID)  end) end)
 	--end
+DressingRoom:SetFrameSize()
 	if DressUpFrame.MaximizeMinimizeFrame:IsMinimized() then
 		--DressUpFrame.ResetButton:SetWidth(44)
 			--	BW_DressingRoomFrame.BW_DressingRoomHideArmorButton:SetWidth(60)
@@ -245,9 +266,7 @@ function DressingRoom:OnShow()
 	DressingRoom:ToggleControlPanel(addon.Profile.DR_ShowControls)
 	DressingRoom:UpdateBackground()	
 	--DressUpFrame:SetSize(addon.Profile.DR_Width,addon.Profile.DR_Height)
-	if DressUpFrame.MaximizeMinimizeFrame.MinimizeButton:IsShown() then 
-		DressingRoom:SetFrameSize()
-	end
+
 
 	if not GetCVarBool("transmogShouldersSeparately") then 
 		BW_DressingRoomFrame.PreviewButtonFrame.PreviewButtonRightShoulder:Hide()
