@@ -26,9 +26,24 @@ function BW_RandomizeButtonMixin:OnMouseDown()
 end
 
 
+local finalselection = {}
+--Updates the model after all items has been selected so model and pending looks match
+local function finalUpdate()
+	for slotID, mog in pairs(finalselection)do
+		local transmogLocation = TransmogUtil.GetTransmogLocation(slotID, Enum.TransmogType.Appearance, Enum.TransmogModification.None);
+		C_Transmog.SetPending(transmogLocation, mog, Enum.TransmogType.Appearance)
+		finalselection[slotID] = nil
+	end
+end
+
+
 function BW_RandomizeButtonMixin:OnMouseUp()
 	self.Stop = true
+	
+	C_Timer.After(1.8, function() finalUpdate() end)
 end
+
+
 
 
 local function AddSlotAppearances(slotID, categoryID)
@@ -75,6 +90,7 @@ function BW_RandomizeButtonMixin:BuildAppearanceList()
 end
 
 
+
 local function RandomizeBySlot(slotID)
 	local slotVisualList = AppearanceList[slotID]
 	if not slotVisualList then return end
@@ -89,6 +105,7 @@ local function RandomizeBySlot(slotID)
 
 					local transmogLocation = TransmogUtil.GetTransmogLocation(slotID, Enum.TransmogType.Appearance, Enum.TransmogModification.None);
 					C_Transmog.SetPending(transmogLocation, source.sourceID, Enum.TransmogType.Appearance)
+					finalselection[slotID] = source.sourceID
 					break
 				end
 			end
@@ -102,6 +119,7 @@ local function RandomizeAllSlots()
 		if not IgnoredSlots[slotID] then
 			RandomizeBySlot(slotID)
 		end
+
 	end
 end
 
