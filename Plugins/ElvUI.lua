@@ -43,7 +43,7 @@ function S:BetterWardrobe()
 	--S:HandleDropDownBox(BW_SortDropDown.dropdown)
 	--BW_SortDropDown.frame:SetScript("OnShow", function() UIDropDownMenu_SetWidth(BW_SortDropDown, 110) end)
 	BW_SortDropDown.dropdown.frame:SetScript("OnShow", function() BW_SortDropDown.dropdown:SetWidth(50) end)
-BW_SortDropDown.frame.backdrop:Hide()
+	BW_SortDropDown.frame.backdrop:Hide()
 	
 	S:HandleButton(WardrobeCollectionFrame.FilterButton)
 
@@ -175,6 +175,9 @@ BW_SortDropDown.frame.backdrop:Hide()
 	BW_WardrobeOutfitDropDown:StripTextures()
 	BW_WardrobeOutfitDropDown:CreateBackdrop()
 	--BW_WardrobeOutfitDropDown:Set
+	BW_WardrobeOutfitDropDown:SetWidth(150)
+	BW_WardrobeOutfitDropDown:ClearAllPoints()
+	BW_WardrobeOutfitDropDown:SetPoint("TOPLEFT", WardrobeTransmogFrame, 20, 28)
 	S:HandleNextPrevButton(BW_WardrobeOutfitDropDownButton)
 	BW_WardrobeOutfitDropDownButton:ClearAllPoints()
 	BW_WardrobeOutfitDropDownButton:SetPoint("RIGHT")
