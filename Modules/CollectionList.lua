@@ -156,10 +156,10 @@ function CollectionList:UpdateList(type, typeID, add)
 			local visualID = C_TransmogCollection.GetItemInfo(sourceInfo.itemID, itemModID)--(type == "set" and sourceInfo.visualID) or addon.GetItemSource(sourceID, setInfo.mod)
 
 			if add and visualID then
-				collectionList[type][typeID][visualID] = (add and not isCollected and add)
+				collectionList[type][typeID][visualID] = add
 			end
 
-			addSet = self:UpdateList("item", visualID, (add and not isCollected) or nil)	
+			addSet = self:UpdateList("item", visualID, add or nil)	
 		end
 
 		if type == "set" then

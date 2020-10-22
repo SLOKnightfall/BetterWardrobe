@@ -1027,7 +1027,8 @@ function WardrobeCollectionFrame.SetsTransmogFrame:UpdateSets()
 			local isHidden = addon.chardb.profile.set[set.setID]
 			model.CollectionListVisual.Hidden.Icon:SetShown(isHidden)
 
-			local isInList = addon.chardb.profile.collectionList["set"][set.setID] 
+
+			local isInList = addon.CollectionList:IsInList(set.setID, "set")
 			model.CollectionListVisual.Collection.Collection_Icon:SetShown(isInList)
 			model.CollectionListVisual.Collection.Collected_Icon:SetShown(isInList and C_TransmogSets.IsBaseSetCollected(set.setID))
 
@@ -1306,12 +1307,12 @@ function WardrobeCollectionFrame.SetsCollectionFrame.ScrollFrame:Update()
 			local variantSets = SetsDataProvider:GetVariantSets(baseSet.setID)
 			local variantSelected
 			for i, data in ipairs(variantSets) do
-				if addon.chardb.profile.collectionList["set"][data.setID] then 
+				if addon.CollectionList:IsInList(data.setID, "set") then 
 					variantSelected = data.setID
 				end
 			end
 
-			local isInList = addon.chardb.profile.collectionList["set"][variantSelected and variantSelected or baseSet.setID] 
+			local isInList = addon.CollectionList:IsInList(variantSelected and variantSelected or baseSet.setID, "set")
 			button.CollectionListVisual.Collection.Collection_Icon:SetShown(isInList)
 			button.CollectionListVisual.Collection.Collected_Icon:SetShown(isInList and C_TransmogSets.IsBaseSetCollected(baseSet.setID))
 			button.New:SetShown(SetsDataProvider:IsBaseSetNew(baseSet.setID))

@@ -2292,7 +2292,7 @@ function addon.Sets:SelectedVariant(setID)
 	local match = false
 
 	for i, data in ipairs(variantSets) do
-		if addon.chardb.profile.collectionList["set"][data.setID] then
+		if addon.CollectionList:IsInList (data.setID, "set") then
 			match = data.setID
 		end
 	end
