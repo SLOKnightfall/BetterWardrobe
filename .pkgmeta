@@ -17,13 +17,16 @@ externals:
     Libs/AceHook-3.0: https://repos.wowace.com/wow/ace3/trunk/AceHook-3.0
     Libs/AceLocale-3.0: https://repos.wowace.com/wow/ace3/trunk/AceLocale-3.0
     Libs/LibUIDropDownMenu: https://repos.wowace.com/wow/libuidropdownmenu/trunk/LibUIDropDownMenu
+    Libs/LibArmorToken-1.0: https://repos.curseforge.com/wow/libarmortoken-1-0
+    Libs/LibAppropriateitems-1.0: https://repos.curseforge.com/wow/libappropriateitems-1-0
     
 enable-nolib-creation: no
 
 ignore:
     - README.md
     - Libs/test.txt
-
+    - Libs/LibArmorToken-1.0/LibArmorToken-1.0.toc
+    - Libs/LibArmorToken-1.0/LibStub.lua
 
 move-folders:
    BetterWardrobe/BetterWardrobe_Tooltips: BetterWardrobe_Tooltips

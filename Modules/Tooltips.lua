@@ -5,6 +5,9 @@ local addonName, addon = ...
 addon = LibStub("AceAddon-3.0"):GetAddon(addonName)
 local L = LibStub("AceLocale-3.0"):GetLocale(addonName)
 
+local LAT = LibStub("LibArmorToken-1.0")
+local LAI = LibStub("LibAppropriateItems-1.0")
+
 local IsDressableItem = IsDressableItem
 local GetScreenWidth = GetScreenWidth
 local GetScreenHeight = GetScreenHeight
@@ -215,7 +218,6 @@ local function GetSourceFromItem(item)
 	return itemSourceID[item]
 end
 
-
 function tooltip:ShowTooltip(itemLink)
 	tooltip.owner = GameTooltip
 	if not itemLink or self.ShowTooltips then return end
@@ -247,6 +249,7 @@ function tooltip:ShowTooltip(itemLink)
 		--Adds icon to TRANSMOGRIFY_TOOLTIP_ITEM_UNKNOWN_APPEARANCE_KNOWN if found
 		if addon.Profile.ShowOwnedItemTooltips and string.find(text_lower, string.lower(TRANSMOGRIFY_TOOLTIP_ITEM_UNKNOWN_APPEARANCE_KNOWN) ) then
 			line:SetText("|TInterface\\RaidFrame\\ReadyCheck-Ready:0|t "..text)
+
 		end
 
 		if addon.Profile.ShowItemIDTooltips and string.find(text_lower, string.lower(ITEM_LEVEL) ) then
@@ -257,11 +260,43 @@ function tooltip:ShowTooltip(itemLink)
 	local itemID, _, _, slot = GetItemInfoInstant(itemLink)
 	if not itemID then return end
 	local self = GameTooltip
+
+	local token = addon.Profile.ShowTokenTooltips and LAT:ItemIsToken(itemID)
+	local maybelink, _
+	if token then
+		-- It's a set token! Replace the id.
+		local found
+		for _, itemid in LAT:IterateItemsForTokenAndClass(itemID, class) do
+			_, maybelink = GetItemInfo(itemid)
+			if maybelink then
+				itemID = itemid
+				itemLink = maybelink
+				found = true
+				break
+			end
+		end
+		if not found then
+			for _, tokenclass in LAT:IterateClassesForToken(itemID) do
+				for _, itemid in LAT:IterateItemsForTokenAndClass(itemID, tokenclass) do
+					_, maybelink = GetItemInfo(itemid)
+					if maybelink then
+						itemID = itemid
+						itemLink = maybelink
+						found = true
+						break
+					end
+				end
+				break
+			end
+		end
+		if found then
+			addDoubleLine (self,ITEM_PURCHASED_COLON, itemLink)
+		end
+	end
 	
 	local tooltip = tooltip
 	if addon.Profile.TooltipPreview_Show and (not addon.Globals.mods[addon.Profile.TooltipPreview_Modifier] or addon.Globals.mods[addon.Profile.TooltipPreview_Modifier]()) then
 		tooltip:ShowPreview(itemLink)
-
 	end
 
 	if addon.Profile.ShowOwnedItemTooltips and addon.Globals.tooltip_slots[slot] and not learned_dupe then
@@ -271,6 +306,11 @@ function tooltip:ShowTooltip(itemLink)
 			addLine(self, " ")
 			addLine(self, "|TInterface\\RaidFrame\\ReadyCheck-Ready:0|t "..TRANSMOGRIFY_TOOLTIP_APPEARANCE_KNOWN)
 		end
+	end
+
+	local appropriateItem = LAI:IsAppropriate(itemID)
+	if not appropriateItem and addon.Profile.ShowWarningTooltips then 
+		addLine(self, RED_FONT_COLOR_CODE..L["Class can't use item for transmog"])
 	end
 
 	if addon.Profile.ShowTooltips and not found_tooltipinfo then
@@ -370,19 +410,19 @@ function tooltip:ShowPreview(itemLink)
 	if self.item ~= itemLink then
 		self.item = itemLink
 
+		local token = addon.Profile.ShowTokenTooltips and LAT:ItemIsToken(itemID)
+
+		local slot = select(9, GetItemInfo(itemID))
 		if (not addon.Profile.TooltipPreview_MogOnly or select(3, C_Transmog.GetItemInfo(itemID))) and addon.Globals.tooltip_slots[slot] and IsDressableItem(itemLink) then
-			local model
 			local cameraID, itemCamera
 			if addon.Profile.TooltipPreview_ZoomItem or addon.Profile.TooltipPreview_ZoomWeapon then
 				cameraID, itemCamera = addon.Camera:GetCameraID(itemLink, addon.Profile.TooltipPreview_CustomModel and addon.Profile.TooltipPreview_CustomRace, addon.Profile.TooltipPreview_CustomModel and addon.Profile.TooltipPreview_CustomGender)
 			end
-
 			Models.normal:Hide()
 			Models.modelZoomed:Hide()
 			Models.modelWeapon:Hide()
 
 			local shouldZoom = (addon.Profile.TooltipPreview_ZoomWeapon and cameraID and itemCamera) or (addon.Profile.TooltipPreview_ZoomItem and cameraID and not itemCamera)
-
 			if shouldZoom then
 				if itemCamera then
 					self.model = Models.modelWeapon
@@ -405,7 +445,6 @@ function tooltip:ShowPreview(itemLink)
 				Models:Reset(self.model)
 			end
 
-			--tooltip.activeModel = model
 			self.model:Show()
 			self:Show()
 			self.repos:Show()
@@ -414,9 +453,7 @@ function tooltip:ShowPreview(itemLink)
 				self.model:SetFacing(addon.Camera.slot_facings[slot] - (addon.Profile.TooltipPreviewRotate and 0.5 or 0))
 			end
 
-			--Models:Reset(self.model)
 			self.model:TryOn(itemLink)
-
 		else
 			self:Hide()
 		end

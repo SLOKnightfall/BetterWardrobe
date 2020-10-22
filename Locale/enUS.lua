@@ -51,10 +51,14 @@ L["Only List Missing Pieces"] =  true
 L["Show Item ID"] =  true
 L["Show if appearance is known"] = true 
 L["Show if additional sources are available"] = true
+L["Show Token Information"] = true
 
+L["Class can't use item for transmog"] = true
+L["Show unable to uses as transmog warning"] = true
 L["Item Preview Options"] = true
 L["Appearance Preview"] = true
 L["Only transmogrification items"] = true
+L["Try to preview armor tokens"] = true
 L["Only show if modifier is pressed"]= true
 L["Prevent Comparrison Overlap"] = true
 L["TooltipPreview_Overlap_Tooltip"] = "If the comparison tooltip is shown where the preview would want to be, show next to it"

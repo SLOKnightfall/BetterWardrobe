@@ -335,6 +335,20 @@ local options = {
 							width = 1.6,
 							arg = "ShowAdditionalSourceTooltips"
 						},
+						ShowTokenTooltips = {
+							order = 10,
+							name = L["Show Token Information"],
+							type = "toggle",
+							width = 1.6,
+							disabled = function() return not addon.Profile.ShowTooltips end,
+						},
+						ShowWarningTooltips = {
+							order = 10,
+							name = L["Show unable to uses as transmog warning"],
+							type = "toggle",
+							width = 1.6,
+							disabled = function() return not addon.Profile.ShowTooltips end,
+						},
 					},
 				},				
 				preview_settings={
@@ -356,16 +370,11 @@ local options = {
 								type = "toggle",
 								width = "full",
 								disabled = false,
-							},
-							TooltipPreview_MogOnly = {
-								type = "toggle",
-								order = 2,
-								name = L["Only transmogrification items"],
 								width = 1.875,
 							},
 							TooltipPreview_Modifier = {
 								type = "select",
-								order = 3,
+								order = 2,
 								name = L["Only show if modifier is pressed"],
 								values = function()
 											local tbl = {
@@ -378,6 +387,19 @@ local options = {
 										end,
 								width = 1.2,
 							},
+							TooltipPreview_MogOnly = {
+								type = "toggle",
+								order = 2,
+								name = L["Only transmogrification items"],
+								width = 1.2,
+							},
+							TooltipPreview_Tokens = {
+								type = "toggle",
+								order = 2,
+								name = L["Try to preview armor tokens"],
+								width = 1.875,
+							},
+
 							TooltipPreview_Overlap = {
 								order = 4,
 								name = L["Prevent Comparrison Overlap"],
@@ -833,7 +855,7 @@ local defaults = {
 		DR_Height = 545,
 		ShowItemIDTooltips = false,
 		TooltipPreview_Show = false,
-		TooltipPreview_Anchor = "vertical",
+		TooltipPreview_Anchor = "horizontal",
 		TooltipPreviewRotate = false,
 		TooltipPreview_Modifier = "None",
 		TooltipPreview_ZoomItemModifier = "None",
