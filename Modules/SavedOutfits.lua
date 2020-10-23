@@ -284,16 +284,7 @@ function BW_WardrobeOutfitMixin:OnOutfitSaved(outfitID)
 	end
 end
 ]]
-function BW_WardrobeOutfitMixin:OnSelectOutfit(outfitID)
-	-- outfitID can be 0, so use empty string for none
-	local value = outfitID or ""
-	for specIndex = 1, GetNumSpecializations() do
-		if not addon.chardb.profile.lastTransmogOutfitIDSpec[specIndex] then
-			--SetCVar("lastTransmogOutfitIDSpec"..specIndex, value)
-			addon.chardb.profile.lastTransmogOutfitIDSpec[specIndex] = value
-		end
-	end
-end
+
 
 
 function BW_WardrobeOutfitMixin:OnLoad()
@@ -310,10 +301,19 @@ function BW_WardrobeOutfitMixin:OnLoad()
 	WardrobeOutfitDropDown:Hide()
 
 	addon:SecureHook(nil, "WardrobeTransmogFrame_OnTransmogApplied", function()
+	C_Timer.After(.5, function()
 			if BW_WardrobeOutfitDropDown.selectedOutfitID and BW_WardrobeOutfitDropDown:IsOutfitDressed() then
-				WardrobeTransmogFrame.BW_OutfitDropDown:OnOutfitApplied(BW_WardrobeOutfitDropDown.selectedOutfitID)
+				BW_WardrobeOutfitDropDown:OnOutfitApplied(BW_WardrobeOutfitDropDown.selectedOutfitID)
 			end
+		end)
 		end, true)
+end
+
+
+function BW_WardrobeOutfitMixin:OnShow()
+	self:RegisterEvent("TRANSMOG_OUTFITS_CHANGED");
+	self:RegisterEvent("TRANSMOGRIFY_UPDATE");
+	self:SelectOutfit(self:GetLastOutfitID(), true);
 end
 
 
@@ -341,8 +341,6 @@ function BW_WardrobeOutfitMixin:OnEvent(event)
 	self:UpdateSaveButton()
 	end
 end
-
-
 
 
 function BW_WardrobeOutfitMixin:LoadDBOutfit(outfitID)
@@ -430,7 +428,7 @@ function BW_WardrobeOutfitMixin:OnSelectOutfit(outfitID)
 	-- outfitID can be 0, so use empty string for none
 	local value = outfitID or ""
 	for specIndex = 1, GetNumSpecializations() do
-		if not addon.chardb.profile.lastTransmogOutfitIDSpec[specIndex] then
+		if addon.chardb.profile.lastTransmogOutfitIDSpec[specIndex] == "" then
 			--SetCVar("lastTransmogOutfitIDSpec"..specIndex, value)
 			addon.chardb.profile.lastTransmogOutfitIDSpec[specIndex] = value
 		end
@@ -463,7 +461,7 @@ function BW_WardrobeOutfitMixin:IsOutfitDressed()
 
 	local appearanceSources, mainHandEnchant, offHandEnchant
 	if IsDefaultSet(self.selectedOutfitID) then 
-		appearanceSources, mainHandEnchant, offHandEnchant = C_TransmogCollection.GetOutfitSources(self.selectedOutfitID)
+		return WardrobeOutfitDropDown:IsOutfitDressed()
 	else
 		local outfit = addon.chardb.profile.outfits[LookupIndexFromID(self.selectedOutfitID)]
 		appearanceSources = outfit

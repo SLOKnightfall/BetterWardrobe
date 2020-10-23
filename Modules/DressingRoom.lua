@@ -335,7 +335,7 @@ end
 function BW_DressingRoomMixin:OnShow()
 	self:RegisterEvent("TRANSMOG_OUTFITS_CHANGED")
 	self:RegisterEvent("TRANSMOGRIFY_UPDATE")
-	--self:SelectOutfit(self:GetLastOutfitID(), true)
+	self:SelectOutfit(BW_WardrobeOutfitDropDown:GetLastOutfitID(), true)
 end
 
 
