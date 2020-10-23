@@ -12,7 +12,7 @@ function MogIt.GetMogitWishlist() return {["extraset"] = {},["name"] = "MogIt Wi
 if not IsAddOnLoaded("MogIt") then return end
 local  mog = _G["MogIt"]
 local L = LibStub("AceLocale-3.0"):GetLocale(addonName)
-
+MogIt.MogitSets = {}
 --Hooks into the extra sets scroll frame buttons to allow ctrl-right clicking on the button to generate a mogit preview
 local orig_OnMouseUp = BW_WardrobeCollectionFrame.BW_SetsCollectionFrame.ScrollFrame.buttons[1]:GetScript("OnMouseUp")
 for i, button in ipairs(BW_WardrobeCollectionFrame.BW_SetsCollectionFrame.ScrollFrame.buttons) do
@@ -30,7 +30,7 @@ for i, button in ipairs(BW_WardrobeCollectionFrame.BW_SetsCollectionFrame.Scroll
 end
 
 
-MogIt.MogitSets = {}
+
 local Wishlist = mog:GetModule("Wishlist")
 function MogIt.GetMogitOutfits() 
 	local sets = Wishlist:GetSets(nil, true)

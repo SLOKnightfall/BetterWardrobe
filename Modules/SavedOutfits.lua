@@ -120,7 +120,7 @@ end
 
 local function GetOutfitName(outfitID)
 	local index = LookupIndexFromID(outfitID)
-	return C_TransmogCollection.GetOutfitName(outfitID) or (index and addon.MogIt.MogitSets[index] and addon.MogIt.MogitSets[index].name  ) or (index and addon.chardb.profile.outfits[index].name)
+	return C_TransmogCollection.GetOutfitName(outfitID) or (index and addon.MogIt.MogitSets and addon.MogIt.MogitSets[index].name  ) or (index and addon.chardb.profile.outfits[index].name)
 end
 addon.GetOutfitName = GetOutfitName
 
@@ -477,7 +477,7 @@ function BW_WardrobeOutfitMixin:IsOutfitDressed()
 
 	local appearanceSources, mainHandEnchant, offHandEnchant
 	if IsDefaultSet(self.selectedOutfitID) then 
-		return WardrobeOutfitDropDown:IsOutfitDressed()
+		appearanceSources, mainHandEnchant, offHandEnchant = C_TransmogCollection.GetOutfitSources(self.selectedOutfitID);
 	else
 		local outfit
 		if self.selectedOutfitID > 5000 then
