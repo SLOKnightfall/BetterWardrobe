@@ -1827,13 +1827,22 @@ function BetterWardrobeSetsTransmogMixin:LoadSet(setID)
 
 			local emptySlotData = Sets:GetEmptySlots()
 			for i, x in pairs(transmogSources) do
-				if not C_TransmogCollection.PlayerHasTransmogItemModifiedAppearance(x) and i ~= 7 and emptySlotData[i] then
+				if not C_TransmogCollection.PlayerHasTransmogItemModifiedAppearance(x) and (i ~= 7 or i ~= 4 or i ~= 19) and emptySlotData[i] then
 					local _, source = addon.GetItemSource(emptySlotData[i]) --C_TransmogCollection.GetItemInfo(emptySlotData[i])
 					--C_Transmog.SetPending(i, Enum.TransmogType.Appearance, source)		
 				local transmogLocation = TransmogUtil.GetTransmogLocation(i, Enum.TransmogType.Appearance, Enum.TransmogModification.None);
 				C_Transmog.SetPending(transmogLocation, source, Enum.TransmogType.Appearance)
+				end
+			end
 
-
+			--hide any slots marked as alwayws hide
+			local alwaysHideSlots = addon.setdb.profile.autoHideSlot
+			for key, transmogSlot in pairs(TRANSMOG_SLOTS) do
+				local slotID = transmogSlot.location:GetSlotID();
+				if alwaysHideSlots[slotID] then 
+					local transmogLocation = TransmogUtil.GetTransmogLocation(slotID, Enum.TransmogType.Appearance, Enum.TransmogModification.None);
+					local _, source = addon.GetItemSource(emptySlotData[slotID]) -- C_TransmogCollection.GetItemInfo(emptySlotData[i])
+					C_Transmog.SetPending(transmogLocation, source, Enum.TransmogType.Appearance)	
 				end
 			end
 		end

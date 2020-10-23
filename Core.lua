@@ -884,7 +884,7 @@ local char_defaults = {
 }
 
 local savedsets_defaults = {
-		profile = {},
+		profile = {autoHideSlot = {},},
 		global = {sets={}, itemsubstitute = {}, outfits = {}, updates = {},},
 }
 

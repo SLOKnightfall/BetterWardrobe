@@ -35,6 +35,46 @@ function UI:CreateButtons()
 	BW_RandomizeButton:SetScript("OnMouseUp", BW_RandomizeButton.OnMouseUp)
 	BW_RandomizeButton:SetScript("OnMouseDown", BW_RandomizeButton.OnMouseDown)
 	BW_RandomizeButton:SetScript("OnEnter", BW_RandomizeButton.OnEnter)
+
+	local BW_SlotHideButton = CreateFrame("Button", "BW_SlotHideButton", WardrobeTransmogFrame, "BetterWardrobeButtonTemplate")
+	BW_SlotHideButton.Icon:SetTexture("Interface\\PvPRankBadges\\PvPRank12")
+	--Mixin(BW_SlotHideButton, BW_SlotHideButtonMixin)
+	BW_SlotHideButton:SetPoint("TOPLEFT", BW_RandomizeButton, "TOPRIGHT" , 0, 0)
+	BW_SlotHideButton:SetScript("OnClick", function(self) UI:HideSlotMenu_OnClick(self) end)
+
+	--BW_SlotHideButton:SetScript("OnMouseUp", BW_SlotHideButton.OnMouseUp)
+	--BW_SlotHideButton:SetScript("OnMouseDown", BW_SlotHideButton.OnMouseDown)
+	--BW_SlotHideButton:SetScript("OnEnter", BW_SlotHideButton.OnEnter)
+end
+
+
+function UI:HideSlotMenu_OnClick(parent)
+	local Profile = addon.Profile
+	local armor = addon.Globals.EmptyArmor
+	local name  = addon.QueueList[3]
+	local contextMenuData = {{ text = L["Select Slot to Hide"], isTitle = true, notCheckable = true},}
+	local profile = addon.setdb.profile.autoHideSlot
+	for i = 1, 19 do 
+		if armor[i] then 
+			local menu = {
+				text = _G[addon.Globals.INVENTORY_SLOT_NAMES[i]],
+				func = function (self, arg1, arg2, value)
+					profile[i] = not profile[i]
+				end,
+				isNotRadio = true,
+				notCheckable = false,
+				checked = function() return profile[i] end,
+				keepShownOnClick = true, 
+			}
+			tinsert (contextMenuData, menu)
+
+		end
+	end
+
+	--table.sort(contextMenuData, function(a,b) return a.index<b.index end)
+
+	addon.ContextMenu:SetPoint("TOPLEFT", parent, "TOPLEFT", 0, 0)
+	EasyMenu(contextMenuData, addon.ContextMenu, "cursor", 0, 0, "MENU")
 end
 
 

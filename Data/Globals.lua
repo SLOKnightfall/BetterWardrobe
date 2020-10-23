@@ -171,7 +171,7 @@ Globals.EmptyArmor = {
   [1] = 134110,
   --[2] = 134112, neck
   [3] = 134112,
-  --[4] = 168659, --shirt
+  [4] = 142503, --shirt
   [5] = 168659,
   [6] = 143539,
   --[7] = 158329, pants
@@ -179,6 +179,7 @@ Globals.EmptyArmor = {
   [9] = 168665, --wrist
   [10] = 158329, --handr
   [15] = 134111, --cloak
+  [19] = 142504, --tabgaard
 }
 
 Globals.LE_DEFAULT = 1

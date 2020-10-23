@@ -83,7 +83,7 @@ L["CUSTOM_MODEL_WARNING"] = "*Custom models are set to the transmog dressing mod
 L["Model race"] = true
 L["Model gender"] = true
 
-
+L["Select Slot to Hide"] = true
 L["Dressing Room Options"] = true
 L["Enable"] = true
 L["Show Item Buttons"] = true

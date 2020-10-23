@@ -1076,9 +1076,9 @@ function WardrobeCollectionFrame.SetsTransmogFrame:LoadSet(setID)
 
 	for sourceID in pairs(sources) do
 		local sourceInfo = C_TransmogCollection.GetSourceInfo(sourceID)
-			local slot = C_Transmog.GetSlotForInventoryType(sourceInfo.invType)
-			local slotSources = C_TransmogSets.GetSourcesForSlot(setID, slot)
-	if slotSources then 
+		local slot = C_Transmog.GetSlotForInventoryType(sourceInfo.invType)
+		local slotSources = C_TransmogSets.GetSourcesForSlot(setID, slot)
+		if slotSources then 
 			WardrobeCollectionFrame_SortSources(slotSources, sourceInfo.visualID)
 			local index = WardrobeCollectionFrame_GetDefaultSourceIndex(slotSources, sourceID)
 			local knownID = Sets.isMogKnown(sourceID)
@@ -1123,11 +1123,11 @@ function WardrobeCollectionFrame.SetsTransmogFrame:LoadSet(setID)
 		C_Transmog.ClearAllPending();
 		self.ignoreTransmogrifyUpdateEvent = false
 		C_Transmog.LoadSources(transmogSources, -1, -1)
+		local emptySlotData = addon.Sets:GetEmptySlots()
 
 		if Profile.HiddenMog then				
-			local emptySlotData = addon.Sets:GetEmptySlots()
 			for i, x in pairs(transmogSources) do
-				if not C_TransmogCollection.PlayerHasTransmogItemModifiedAppearance(x) and i ~= 7 and emptySlotData[i] then
+				if not C_TransmogCollection.PlayerHasTransmogItemModifiedAppearance(x) and (i ~= 7 or i ~= 4 or i ~= 19) and emptySlotData[i] then
 					local transmogLocation = TransmogUtil.GetTransmogLocation(i, Enum.TransmogType.Appearance, Enum.TransmogModification.None);
 
 					local _, source = addon.GetItemSource(emptySlotData[i]) -- C_TransmogCollection.GetItemInfo(emptySlotData[i])
@@ -1135,6 +1135,18 @@ function WardrobeCollectionFrame.SetsTransmogFrame:LoadSet(setID)
 				end
 			end
 		end
+
+		--hide any slots marked as alwayws hide
+		local alwaysHideSlots = addon.setdb.profile.autoHideSlot
+		for key, transmogSlot in pairs(TRANSMOG_SLOTS) do
+			local slotID = transmogSlot.location:GetSlotID();
+			if alwaysHideSlots[slotID] then 
+				local transmogLocation = TransmogUtil.GetTransmogLocation(slotID, Enum.TransmogType.Appearance, Enum.TransmogModification.None);
+				local _, source = addon.GetItemSource(emptySlotData[slotID]) -- C_TransmogCollection.GetItemInfo(emptySlotData[i])
+				C_Transmog.SetPending(transmogLocation, source, Enum.TransmogType.Appearance)	
+			end
+		end
+
 	end
 end
 
