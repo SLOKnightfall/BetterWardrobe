@@ -147,7 +147,7 @@ function UI:DefaultDropdown_Update(model, button)
 			local isInList = collectionList[type][targetSet]
 			UIDropDownMenu_AddButton({
 				notCheckable = true,
-				text = isInList and L["Remove to Collection List"]..targetText or L["Add to Collection List"]..targetText,
+				text = isInList and L["Remove from Collection List"]..targetText or L["Add to Collection List"]..targetText,
 				func = function()
 							addon.CollectionList:UpdateList(type, targetSet, not isInList)
 					end,

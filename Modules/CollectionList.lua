@@ -7,6 +7,7 @@ local CollectionList = {}
 addon.CollectionList = CollectionList
 CollectionList.showAll = true
 
+local MogItLoaded = false
 
 --Updates collection list data from single list to multiple lists
 function CollectionList:UpdateDB()
@@ -22,7 +23,6 @@ function CollectionList:UpdateDB()
 	profile.lists[1].name = "Collection List"
 	profile.collectionList = nil
 	profile.listUpdate = 1
-
 end
 
 function CollectionList:BuildCollectionList(complete)
@@ -120,11 +120,16 @@ end
 
 
 --Needs to to take account of variant
-function CollectionList:UpdateList(type, typeID, add)
+function CollectionList:UpdateList(type, typeID, add, sourceID)
 	typeID = tonumber(typeID)
 	if not typeID then return end
 	local addSet = false
 	local setName, setInfo, itemModID
+	local selectedList = CollectionList:SelectedCollectionList()
+	if selectedList == "MOGIT" then
+		return addon.MogIt.UpdateWishlistItem(type, typeID, add, sourceID )
+	end
+
 	local collectionList = addon.CollectionList:CurrentList()
 
 	if type == "item" then --TypeID is visualID
@@ -205,6 +210,7 @@ end
 
 function addon.Init:BuildCollectionList()
 	CollectionList:UpdateDB()
+	CollectionList:AddMogItData()
 	CollectionList:CreateDropdown()
 end
 
@@ -298,17 +304,21 @@ function BetterWardrobeSetsCollectionListMixin:CreateSlotButtons()
 end
 
 local dropdown
-
 local  function RefreshDropdown()
 	local list = addon.chardb.profile.lists
 	local key = {}
 	for i, data in pairs(list) do
 		key[i] = data.name
 	end
+
+	if MogItLoaded then 
+		key["MOGIT"] = "MogIt Wishlist"
+	end
 	dropdown.pullout:Close()
 	dropdown:SetList(key)
-	dropdown:SetValue(addon.chardb.profile.selectedCollectionList)
+	dropdown:SetValue(CollectionList:SelectedCollectionList())
 end
+
 
 function CollectionList:CreateDropdown()
 	local dropdownFrame = CreateFrame("Frame", nil, BW_ColectionListFrame)
@@ -336,7 +346,7 @@ function CollectionList:CreateDropdown()
 	RefreshDropdown()
 	--dropdown:SetCallback("OnLeave", function() print("XX") end)
 	dropdown:SetCallback("OnValueChanged", function(widget) 
-		addon.chardb.profile.selectedCollectionList = widget.value
+		CollectionList:SelectedCollectionList(widget.value)
 		RefreshDropdown()
 		WardrobeCollectionFrame.ItemsCollectionFrame:RefreshVisualsList()
 		WardrobeCollectionFrame.ItemsCollectionFrame:UpdateItems()
@@ -359,6 +369,7 @@ function CollectionList:OptionButton_OnClick(button)
 	local  ContextMenu = addon.ContextMenu
 	local Profile = addon.Profile
 	local name  = addon.QueueList[3]
+	local disable = CollectionList:SelectedCollectionList() == "MOGIT"
 	local contextMenuData = {
 		{
 			text =  L["Add List"],
@@ -379,6 +390,7 @@ function CollectionList:OptionButton_OnClick(button)
 			end,
 			isNotRadio = true,
 			notCheckable = true,
+			disabled = disable,
 		},
 		{
 			text = L["Delete"],
@@ -388,6 +400,7 @@ function CollectionList:OptionButton_OnClick(button)
 			end,
 			isNotRadio = true,
 			notCheckable = true,
+			disabled = disable,
 		},
 		{
 			text = L["Add by Item ID"],
@@ -397,6 +410,7 @@ function CollectionList:OptionButton_OnClick(button)
 			end,
 			isNotRadio = true,
 			notCheckable = true,
+			disabled = disable,
 		},
 	}
 
@@ -405,8 +419,12 @@ function CollectionList:OptionButton_OnClick(button)
 end
 
 
-
-
+function CollectionList:AddMogItData()
+	MogItLoaded = IsAddOnLoaded("MogIt")
+	 if not MogItLoaded and CollectionList:SelectedCollectionList() == "MOGIT" then 
+	 	CollectionList:SelectedCollectionList(1)
+	 end
+end
 
 
 function CollectionList:AddList(name)
@@ -464,7 +482,7 @@ function CollectionList:IsInList(itemID, itemType, full)
 		return count ~= 0, count
 	else
 		local collectionList = addon.CollectionList:CurrentList()
-		local isInList = collectionList[itemType][itemID]
+		local isInList = collectionList[itemType][itemID] or false
 		return isInList	
 	end
 end
@@ -479,8 +497,8 @@ end
 		end
 ]]
 function CollectionList:ListCount(type)
+	local list = CollectionList:CurrentList()[type]
 	local counter = 0
-	local list = addon.chardb.profile.lists[addon.chardb.profile.selectedCollectionList][type]
 	for i in pairs(list) do
 		counter = counter +1
 	end
@@ -489,7 +507,21 @@ end
 
 
 function CollectionList:CurrentList()
-	return addon.chardb.profile.lists[addon.chardb.profile.selectedCollectionList]
+	local selectedList = CollectionList:SelectedCollectionList()
+	if selectedList == "MOGIT" then 
+		return addon.MogIt.GetMogitWishlist()
+	else
+		return addon.chardb.profile.lists[selectedList]
+	end
+end
+
+
+--Returns selected list if no value, or sets list if value is included
+function CollectionList:SelectedCollectionList(value)
+	if value then addon.chardb.profile.selectedCollectionList = value
+	else
+		return addon.chardb.profile.selectedCollectionList
+	end
 end
 
 
@@ -592,12 +624,11 @@ function CollectionList:GenerateListView()
 			CheckBox:SetImageSize(20,20)
 			CheckBox:SetFullWidth(true)
 
-						if i == 1 or list[i-1].visualID ~= data.visualID then
-							local Heading = AceGUI:Create("Heading")
-							Heading:SetFullWidth(true)
-							--Checkbox2:SetRelativeWidth(.02)
-							scroll:AddChild(Heading)
-						end
+			if i == 1 or list[i-1].visualID ~= data.visualID then
+				local Heading = AceGUI:Create("Heading")
+				Heading:SetFullWidth(true)
+				scroll:AddChild(Heading)
+			end
 			CheckBox:SetCallback("OnClick", function()
 				if ( IsModifiedClick("CHATLINK") ) then
 						if ( itemLink ) then
@@ -610,8 +641,10 @@ function CollectionList:GenerateListView()
 
 			CheckBox:SetCallback("OnEnter", function()
 				GameTooltip:SetOwner(UIParent, "ANCHOR_CURSOR", 0, 0)
+				if (itemLink) then 
 				GameTooltip:SetHyperlink(itemLink)
 				GameTooltip:Show()
+			end
 			end)
 			
 			CheckBox:SetCallback("OnLeave", function()

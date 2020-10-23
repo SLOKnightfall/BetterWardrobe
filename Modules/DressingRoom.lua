@@ -372,6 +372,10 @@ function BW_DressingRoomMixin:LoadOutfit(outfitID)
 		if (not playerActor) then
 		return false
 	end
+
+	local MogItOutfit = false
+	if outfitID > 1000 then MogItOutfit = true end
+
 	playerActor:Undress()
 	--DressingRoom:ResetItemButtons(DressingRoom:ResetItemButtons(not addon.Profile.DR_StartUndressed) , true)
 	--
@@ -379,7 +383,13 @@ function BW_DressingRoomMixin:LoadOutfit(outfitID)
 	if self:IsDefaultSet(outfitID) then
 		DressUpSources(C_TransmogCollection.GetOutfitSources(outfitID))
 	else
-		local outfit = addon.chardb.profile.outfits[LookupIndexFromID(outfitID)]
+		local outfit 
+		if outfitID > 1000 then
+			outfit = addon.MogIt.MogitSets[outfitID]
+		else
+			outfit = addon.chardb.profile.outfits[LookupIndexFromID(outfitID)]
+		end
+
 		local outfit_sources = {}
 		--need to itterate a full table as the DressUpSources uses the table size 
 		for i=1, 19  do

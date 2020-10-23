@@ -221,6 +221,7 @@ local function GetSourceFromItem(item)
 	end
 	return itemSourceID[item]
 end
+addon.GetSourceFromItem = GetSourceFromItem
 
 local split = true
 

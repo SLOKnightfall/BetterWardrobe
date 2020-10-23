@@ -72,6 +72,14 @@ local function GetOutfits(character)
 				--data.set = "default"
 			end
 		end
+
+		local mogit_Outfits = addon.MogIt.GetMogitOutfits()
+
+		for i, data in ipairs(mogit_Outfits) do
+			--local index = #FullList
+			tinsert(FullList, data)
+		end
+
 		return FullList
 end
 addon.GetOutfits = GetOutfits
@@ -112,7 +120,7 @@ end
 
 local function GetOutfitName(outfitID)
 	local index = LookupIndexFromID(outfitID)
-	return C_TransmogCollection.GetOutfitName(outfitID) or (index and addon.chardb.profile.outfits[index].name )
+	return C_TransmogCollection.GetOutfitName(outfitID) or (index and addon.MogIt.MogitSets[index] and addon.MogIt.MogitSets[index].name  ) or (index and addon.chardb.profile.outfits[index].name)
 end
 addon.GetOutfitName = GetOutfitName
 
@@ -236,11 +244,19 @@ function BW_WardrobeOutfitMixin:LoadOutfit(outfitID)
 	if (not outfitID) then
 		return
 	end
+local MogItOutfit = false
+if outfitID > 1000 then MogItOutfit = true end
+
 
 	if IsDefaultSet(outfitID) then 
 		C_Transmog.LoadOutfit(outfitID)
 	else
-		local outfit = addon.chardb.profile.outfits[LookupIndexFromID(outfitID)]
+		local outfit 
+		if outfitID > 1000 then
+			outfit = addon.MogIt.MogitSets[outfitID]
+		else
+			outfit = addon.chardb.profile.outfits[LookupIndexFromID(outfitID)]
+		end
 		--for slot , data in pairs(outfit) do
 		for key, transmogSlot in pairs(TRANSMOG_SLOTS) do
 			local slotID = transmogSlot.location:GetSlotID();
@@ -250,8 +266,8 @@ function BW_WardrobeOutfitMixin:LoadOutfit(outfitID)
 			local transmogLocation = TransmogUtil.GetTransmogLocation(slotID, Enum.TransmogType.Appearance, Enum.TransmogModification.None);
 			--C_Transmog.SetPending(slot, Enum.TransmogType.Appearance, data)
 			C_Transmog.SetPending(transmogLocation, data, Enum.TransmogType.Appearance);
+			end
 		end
-	end
 
 	local transmogLocation = TransmogUtil.GetTransmogLocation(GetInventorySlotInfo("MAINHANDSLOT"), Enum.TransmogType.Illusion, Enum.TransmogModification.None);
 	C_Transmog.SetPending(transmogLocation, outfit["mainHandEnchant"], Enum.TransmogType.Illusion);
@@ -463,7 +479,12 @@ function BW_WardrobeOutfitMixin:IsOutfitDressed()
 	if IsDefaultSet(self.selectedOutfitID) then 
 		return WardrobeOutfitDropDown:IsOutfitDressed()
 	else
-		local outfit = addon.chardb.profile.outfits[LookupIndexFromID(self.selectedOutfitID)]
+		local outfit
+		if self.selectedOutfitID > 5000 then
+			return true
+		else
+			 outfit = addon.chardb.profile.outfits[LookupIndexFromID(self.selectedOutfitID)]
+		end
 		appearanceSources = outfit
 		mainHandEnchant = outfit["mainHandEnchant"]
 		offHandEnchant = outfit["offHandEnchant"]
@@ -599,19 +620,9 @@ function BW_WardrobeOutfitFrameMixin:Toggle(dropDown)
 	end
 end
 
-
-function BW_WardrobeOutfitFrameMixin:Update()
-	local outfits = GetOutfits(true)
+local function GetButton(self, index)
 	local buttons = self.Buttons
-	local numButtons = 0
-	local stringWidth = 0
-	local minStringWidth = self.dropDown.minMenuStringWidth or OUTFIT_FRAME_MIN_STRING_WIDTH
-	local maxStringWidth = self.dropDown.maxMenuStringWidth or OUTFIT_FRAME_MAX_STRING_WIDTH
-	self:SetWidth(maxStringWidth + OUTFIT_FRAME_ADDED_PIXELS)
-	for i = 1, #outfits + 1 do
-		local newOutfitButton = (i == (#outfits + 1))
-		if (outfits[i] or newOutfitButton) then
-			local button = buttons[i]
+	local button = buttons[index]
 			if (not button) then
 				button = CreateFrame("BUTTON", nil, self.Content, self:GetName().."ButtonTemplate")
 				button.EditButton:SetScript("OnClick", function(self)
@@ -619,29 +630,46 @@ function BW_WardrobeOutfitFrameMixin:Update()
 					BW_WardrobeOutfitEditFrame:ShowForOutfit(self:GetParent().outfitID)
 				end)
 
-				button:SetPoint("TOPLEFT", buttons[i-1], "BOTTOMLEFT", 0, 0)
-				button:SetPoint("TOPRIGHT", buttons[i-1], "BOTTOMRIGHT", 0, 0)
+				button:SetPoint("TOPLEFT", buttons[index-1], "BOTTOMLEFT", 0, 0)
+				button:SetPoint("TOPRIGHT", buttons[index-1], "BOTTOMRIGHT", 0, 0)
 			end
-			button:Show()
+		return button 
 
-			if (newOutfitButton) then
-				button:SetText(GREEN_FONT_COLOR_CODE..TRANSMOG_OUTFIT_NEW..FONT_COLOR_CODE_CLOSE)
-				button.Icon:SetTexture("Interface\\PaperDollInfoFrame\\Character-Plus")
-				button.outfitID = nil
-				button.Check:Hide()
-				button.Selection:Hide()
+
+end
+
+function BW_WardrobeOutfitFrameMixin:Update()
+	local outfits = GetOutfits(true)
+	--local mogit_Outfits = addon.GetMogitOutfits()
+	local buttons = self.Buttons
+	local numButtons = 0
+	local stringWidth = 0
+	local minStringWidth = self.dropDown.minMenuStringWidth or OUTFIT_FRAME_MIN_STRING_WIDTH
+	local maxStringWidth = self.dropDown.maxMenuStringWidth or OUTFIT_FRAME_MAX_STRING_WIDTH
+	self:SetWidth(maxStringWidth + OUTFIT_FRAME_ADDED_PIXELS)
+	for i = 1, #outfits do
+		local outfit = outfits[i]
+		if outfit then
+			local button = GetButton(self, i + 1)
+			button:Show()
+			if (outfit.outfitID == self.dropDown.selectedOutfitID) then
+				button.Check:Show()
+				button.Selection:Show()
 			else
-				if (outfits[i].outfitID == self.dropDown.selectedOutfitID) then
-					button.Check:Show()
-					button.Selection:Show()
-				else
-					button.Selection:Hide()
-					button.Check:Hide()
-				end
-				button.Text:SetWidth(0)
-				button:SetText(NORMAL_FONT_COLOR_CODE..outfits[i].name..FONT_COLOR_CODE_CLOSE)
-				button.Icon:SetTexture(outfits[i].icon)
-				button.outfitID = outfits[i].outfitID
+				button.Selection:Hide()
+				button.Check:Hide()
+			end
+			button.Text:SetWidth(0)
+			button:SetText(NORMAL_FONT_COLOR_CODE..outfits[i].name..FONT_COLOR_CODE_CLOSE)
+			button.Icon:SetTexture(outfit.icon)
+			button.outfitID = outfit.outfitID
+
+			if outfit.set == "mogit" then 
+				button.EditButton:Disable()
+				button.EditButton.texture:Hide()
+			else
+				button.EditButton:Enable()
+				button.EditButton.texture:Show()
 			end
 
 			stringWidth = max(stringWidth, button.Text:GetStringWidth())
@@ -650,13 +678,13 @@ function BW_WardrobeOutfitFrameMixin:Update()
 			end
 			numButtons = numButtons + 1
 		else
-			if (buttons[i]) then
-				buttons[i]:Hide()
+			if (buttons[i + 1]) then
+				buttons[i + 1]:Hide()
 			end
 		end
 	end
 
-	for i = #outfits + 2 , #buttons do
+	for i = #outfits  + 2 , #buttons do
 		buttons[i]:Hide()
 	end
 
@@ -911,9 +939,16 @@ function BW_WardrobeOutfitFrameMixin:CreateScrollFrame()
 		PlaySound(SOUNDKIT.IG_MAINMENU_OPTION_CHECKBOX_ON)
 		BW_WardrobeOutfitEditFrame:ShowForOutfit(self:GetParent().outfitID)
 	end)
+	button.EditButton:Hide()
 
 	button:SetPoint("TOPLEFT", self.Content, "TOPLEFT")
 	button:SetPoint("TOPRIGHT", self.Content, "TOPRIGHT", -20, 0)
+
+	button:SetText(GREEN_FONT_COLOR_CODE..TRANSMOG_OUTFIT_NEW..FONT_COLOR_CODE_CLOSE)
+	button.Icon:SetTexture("Interface\\PaperDollInfoFrame\\Character-Plus")
+	button.outfitID = nil
+	button.Check:Hide()
+	button.Selection:Hide()
 
 	function self.moduleoptions:StartHideCountDown()
 		return BW_WardrobeOutfitFrame:StartHideCountDown()

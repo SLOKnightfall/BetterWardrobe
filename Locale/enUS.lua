@@ -157,7 +157,7 @@ L["Queue Transmog"] = true
 L["Load Set: %s"] = true
 L["None Selected"] = true
 L["Add to CollectionList"] = true
-L["Remove to CollectionList"] = true
+L["Remove from CollectionList"] = true
 
 L["%s: Uncollected items added"] = true
 L["No new appearces needed."] = true

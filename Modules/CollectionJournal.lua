@@ -500,6 +500,7 @@ function addon.RefreshSaveOutfitDropdown()
 		end
 	end
 end
+
 --AceDropdownmenu for the selection of other character's saved sets -Shouldn't cause taint
 function UI.SavedSetsDropDown_Initialize(self)
 	local  f = addon.Frame:Create("SimpleGroup")
