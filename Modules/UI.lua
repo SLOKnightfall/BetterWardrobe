@@ -98,11 +98,11 @@ function UI:DefaultDropdown_Update(model, button)
 	if BW_WardrobeCollectionFrame.selectedTransmogTab == 4 or BW_WardrobeCollectionFrame.selectedCollectionTab == 4 then
 		return
 	end
-	if button == "RightButton" and model:GetParent().transmogType ~= Enum.TransmogType.Illusion then
+	if button == "RightButton" and model:GetParent().transmogType ~= Enum.TransmogType.Illusion and not IsModifierKeyDown() then
 		if not DropDownList1:IsShown() then
 			 -- force show dropdown
-			--WardrobeModelRightClickDropDown.activeFrame = model
-			--ToggleDropDownMenu(1, nil, WardrobeModelRightClickDropDown, model, -6, -3)
+			WardrobeModelRightClickDropDown.activeFrame = model
+			ToggleDropDownMenu(1, nil, WardrobeModelRightClickDropDown, model, -6, -3)
 		end
 
 		local setID = (model.visualInfo and model.visualInfo.visualID) or model.setID
