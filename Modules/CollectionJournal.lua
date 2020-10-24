@@ -548,6 +548,7 @@ function BW_WardrobeCollectionFrame_ClickTab(tab)
 end
 
 function BW_WardrobeCollectionFrame_SetTab(tabID)
+	local ElvUI = IsAddOnLoaded("ElvUI")
 	PanelTemplates_SetTab(BW_WardrobeCollectionFrame, tabID)
 	local atTransmogrifier = WardrobeFrame_IsAtTransmogrifier()
 	if atTransmogrifier then
@@ -619,7 +620,21 @@ function BW_WardrobeCollectionFrame_SetTab(tabID)
 
 		local _, isWeapon = C_TransmogCollection.GetCategoryInfo(WardrobeCollectionFrame.ItemsCollectionFrame:GetActiveCategory() or -1)
 		local yOffset = (atTransmogrifier and (isWeapon and 55 or 32)) or LegionWardrobeY
-		BW_SortDropDown:SetPoint("TOPLEFT", WardrobeCollectionFrame.ItemsCollectionFrame.WeaponDropDown, "BOTTOMLEFT", 15, yOffset)
+		if atTransmogrifier  then
+			if ElvUI then 
+				WardrobeCollectionFrame.ItemsCollectionFrame.WeaponDropDown:SetPoint("TOPRIGHT", -42, -37);
+			else 
+				WardrobeCollectionFrame.ItemsCollectionFrame.WeaponDropDown:SetPoint("TOPRIGHT", -30, -37);
+			end
+			BW_SortDropDown:SetPoint("TOPRIGHT", WardrobeCollectionFrame.ItemsCollectionFrame, "TOPRIGHT", -47, -8)
+		else
+			WardrobeCollectionFrame.ItemsCollectionFrame.WeaponDropDown:SetPoint("TOPRIGHT", -32, -25);
+			if ElvUI then 
+			BW_SortDropDown:SetPoint("TOPLEFT", WardrobeCollectionFrameWeaponDropDown, "BOTTOMLEFT", -5, yOffset)
+			else 
+			BW_SortDropDown:SetPoint("TOPLEFT", WardrobeCollectionFrame.ItemsCollectionFrame.WeaponDropDown, "BOTTOMLEFT", 15, yOffset)
+			end
+		end
 
 	elseif tab2 then
 		WardrobeCollectionFrame.SetsTransmogFrame:UpdateProgressBar()
