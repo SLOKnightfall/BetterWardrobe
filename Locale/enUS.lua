@@ -192,6 +192,7 @@ L[LE_ITEM_SOURCE] = SOURCE:gsub("[:：]", "")
 L[LE_COLOR] = COLOR
 L[LE_EXPANSION] = "Expansion"
 
+L["Hide Armor Slots"] = true
 
 L["COLLECTION_LIST_HELP"] = "Add items to the list by right clicking on an item or set,\n then select 'Add to Collection List'"
 

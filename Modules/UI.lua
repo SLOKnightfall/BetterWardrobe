@@ -34,7 +34,11 @@ local defaults = {
 
 function addon.Init:BuildUI()
 	UI.DefaultButtons_Update()
---	WardrobeFrame:HookScript("OnShow",  function() print("XXX"); UI.ExtendTransmogView() end)
+	BW_WardrobeCollectionFrame.BW_SetsHideSlotButton:SetScript("OnClick", function(self) UI:JournalHideSlotMenu_OnClick(BW_WardrobeCollectionFrame.BW_SetsHideSlotButton) end)
+	--.BW_SetsHideSlotButton:
+	local level = BW_SetsCollectionFrame.Model:GetFrameLevel()
+	BW_WardrobeCollectionFrame.BW_SetsHideSlotButton:SetFrameLevel(level + 5)
+	--	WardrobeFrame:HookScript("OnShow",  function() print("XXX"); UI.ExtendTransmogView() end)
 --	hooksecurefunc(WardrobeCollectionFrame.ItemsCollectionFrame, "UpdateWeaponDropDown", PositionDropDown)
 end
 
@@ -314,4 +318,57 @@ function WardrobeCollectionFrameModelDropDown_SetFavorite(visualID, value, confi
 		SetCVarBitfield("closedInfoFrames", LE_FRAME_TUTORIAL_TRANSMOG_MODEL_CLICK, true);
 		HelpTip:Hide(WardrobeCollectionFrame.ItemsCollectionFrame, TRANSMOG_MOUSE_CLICK_TUTORIAL);
 	end
+end
+
+
+function UI:JournalHideSlotMenu_OnClick(parent)
+	local Profile = addon.Profile
+	local armor = addon.Globals.EmptyArmor
+	local name  = addon.QueueList[3]
+	local profile = addon.setdb.profile.autoHideSlot
+	local function resetModel()
+			local tab = BW_WardrobeCollectionFrame.selectedCollectionTab
+			if tab ==2 then
+				local set = WardrobeCollectionFrame.SetsCollectionFrame:GetSelectedSetID()
+				WardrobeCollectionFrame.SetsCollectionFrame:DisplaySet(set)
+			else
+				local set = BW_SetsCollectionFrame:GetSelectedSetID()
+				BW_SetsCollectionFrame:DisplaySet(set)
+			end
+		end
+
+	local contextMenuData = {
+		{
+				text = L["Toggle Hidden View"],
+				func = function (self, arg1, arg2, value)
+					addon.setdb.profile.autoHideSlot.toggle = not addon.setdb.profile.autoHideSlot.toggle
+					resetModel()
+				end,
+				isNotRadio = true,
+				notCheckable = false,
+				checked = function() return addon.setdb.profile.autoHideSlot.toggle end,
+				keepShownOnClick = true, 
+		},
+		{ text = L["Select Slot to Hide"], isTitle = true, notCheckable = true},
+	}
+
+	for i = 1, 19 do 
+		if armor[i] then 
+			local menu = {
+				text = _G[addon.Globals.INVENTORY_SLOT_NAMES[i]],
+				func = function (self, arg1, arg2, value)
+					profile[i] = not profile[i]
+					resetModel()
+				end,
+				isNotRadio = true,
+				notCheckable = false,
+				checked = function() return profile[i] end,
+				keepShownOnClick = true, 
+			}
+			tinsert (contextMenuData, menu)
+
+		end
+	end
+	addon.ContextMenu:SetPoint("TOPLEFT", parent, "TOPLEFT", 0, 0)
+	EasyMenu(contextMenuData, addon.ContextMenu, "cursor", 0, 0, "MENU")
 end

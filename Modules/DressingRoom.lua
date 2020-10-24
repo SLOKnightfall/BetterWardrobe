@@ -1039,6 +1039,8 @@ function BW_DressingRoomButton_OnEnter(self, button)
 		text =  RESET
 	elseif button == "Undress" then 
 		text = L["Undress"]
+	elseif button == "HideSlot" then 
+		text = L["Hide Armor Slots"]
 	end
 
 	SetTooltip(self, text)

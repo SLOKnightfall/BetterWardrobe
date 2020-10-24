@@ -37,6 +37,10 @@ function UI:CreateButtons()
 	BW_RandomizeButton:SetScript("OnEnter", BW_RandomizeButton.OnEnter)
 
 	local BW_SlotHideButton = CreateFrame("Button", "BW_SlotHideButton", WardrobeTransmogFrame, "BetterWardrobeButtonTemplate")
+	BW_SlotHideButton:SetScript("OnEnter", function(self) BW_DressingRoomButton_OnEnter(self, "HideSlot") end)
+
+
+
 	BW_SlotHideButton.Icon:SetTexture("Interface\\PvPRankBadges\\PvPRank12")
 	--Mixin(BW_SlotHideButton, BW_SlotHideButtonMixin)
 	BW_SlotHideButton:SetPoint("TOPLEFT", BW_RandomizeButton, "TOPRIGHT" , 0, 0)

@@ -605,6 +605,8 @@ function BW_WardrobeCollectionFrame_SetTab(tabID)
 	BW_WardrobeCollectionFrame.TransmogOptionsButtonCover:SetShown(not addon.Profile.ShowIncomplete and atTransmogrifier and (tab2 or tab3))
 	BW_WardrobeCollectionFrame.TransmogOptionsButton:SetEnabled(addon.Profile.ShowIncomplete)
 
+	BW_WardrobeCollectionFrame.BW_SetsHideSlotButton:SetShown((tab2 or tab3) and not atTransmogrifier)
+
 --	UIDropDownMenu_EnableDropDown(BW_SortDropDown)
 	BW_SortDropDown.frame:Show()
 	--BW_DBSavedSetDropdown:SetShown(tab4)

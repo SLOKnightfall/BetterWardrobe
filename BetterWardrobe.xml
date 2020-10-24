@@ -171,7 +171,28 @@
 
 				</Scripts>
 			</DropDownToggleButton>
-
+			<Button parentKey="BW_SetsHideSlotButton" inherits="SquareIconButtonTemplate" >
+				<Size x="32" y="32"/>
+				<Anchors>
+					<Anchor point="BOTTOM" relativeKey="$parent" relativePoint="BOTTOM" x="-35" y="15"/>
+				</Anchors>					
+				<Layers>
+					<Layer level="ARTWORK" textureSubLevel="5">
+						<Texture parentKey="Icon" file="Interface\PvPRankBadges\PvPRank12">
+							<Size x="16" y="16"/>
+							<Anchors>
+								<Anchor point="CENTER" />
+							</Anchors>
+						</Texture>
+					</Layer>
+				</Layers>
+				<Scripts>
+					<OnEnter>
+						BW_DressingRoomButton_OnEnter(self, "HideSlot")
+					</OnEnter>
+					<OnLeave function="GameTooltip_Hide"/>
+				</Scripts>
+			</Button>
 
 			<Frame name="BW_TransmogOptionsDropDown" parentKey="OptionsDropDown" inherits="UIDropDownMenuTemplate">
 				<Scripts>
@@ -570,16 +591,11 @@
 							</AnimationGroup>
 						</Animations>
 					</Frame>
-										<CheckButton parentKey="RightShoulderCheckbox" mixin="RightShoulderCheckboxMixin" hidden="true">
+					<CheckButton parentKey="RightShoulderCheckbox" mixin="RightShoulderCheckboxMixin" hidden="true">
 						<Size x="30" y="30"/>
 						<Anchors>
 							<Anchor point="BOTTOMLEFT" x="45" y="35"/>
-
-
-
-
 						</Anchors>
-
 						<Layers>
 							<Layer level="ARTWORK">
 								<FontString inherits="GameFontHighlightSmall" justifyH="LEFT" text="TRANSMOGRIFY_RIGHT_SHOULDER">
@@ -590,27 +606,10 @@
 								</FontString>
 							</Layer>
 						</Layers>
-
-
-
-
-
-
-
-
-
-
 						<Scripts>
 							<OnShow method="OnShow"/>
 							<OnEvent method="OnEvent"/>
 							<OnClick method="OnClick"/>
-
-
-
-
-
-
-
 						</Scripts>
 						<NormalTexture file="Interface\Buttons\UI-CheckBox-Up"/>
 						<PushedTexture file="Interface\Buttons\UI-CheckBox-Down"/>

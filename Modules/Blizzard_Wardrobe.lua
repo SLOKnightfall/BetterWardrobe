@@ -879,6 +879,84 @@ function WardrobeCollectionFrame.SetsCollectionFrame:OnShow()
 	end
 end
 
+function WardrobeCollectionFrame.SetsCollectionFrame:DisplaySet(setID)
+	local setInfo = (setID and C_TransmogSets.GetSetInfo(setID)) or nil;
+	if ( not setInfo ) then
+		self.DetailsFrame:Hide();
+		self.Model:Hide();
+		return;
+	else
+		self.DetailsFrame:Show();
+		self.Model:Show();
+	end
+
+	self.DetailsFrame.Name:SetText(setInfo.name);
+	if ( self.DetailsFrame.Name:IsTruncated() ) then
+		self.DetailsFrame.Name:Hide();
+		self.DetailsFrame.LongName:SetText(setInfo.name);
+		self.DetailsFrame.LongName:Show();
+	else
+		self.DetailsFrame.Name:Show();
+		self.DetailsFrame.LongName:Hide();
+	end
+	self.DetailsFrame.Label:SetText(setInfo.label);
+	self.DetailsFrame.LimitedSet:SetShown(setInfo.limitedTimeSet);
+
+	local newSourceIDs = C_TransmogSets.GetSetNewSources(setID);
+
+	self.DetailsFrame.itemFramesPool:ReleaseAll();
+	self.Model:Undress();
+	local BUTTON_SPACE = 37;	-- button width + spacing between 2 buttons
+	local sortedSources = SetsDataProvider:GetSortedSetSources(setID);
+	local xOffset = -floor((#sortedSources - 1) * BUTTON_SPACE / 2);
+	for i = 1, #sortedSources do
+		local itemFrame = self.DetailsFrame.itemFramesPool:Acquire();
+		itemFrame.sourceID = sortedSources[i].sourceID;
+		itemFrame.itemID = sortedSources[i].itemID;
+		itemFrame.collected = sortedSources[i].collected;
+		itemFrame.invType = sortedSources[i].invType;
+		local texture = C_TransmogCollection.GetSourceIcon(sortedSources[i].sourceID);
+		itemFrame.Icon:SetTexture(texture);
+		if ( sortedSources[i].collected ) then
+			itemFrame.Icon:SetDesaturated(false);
+			itemFrame.Icon:SetAlpha(1);
+			itemFrame.IconBorder:SetDesaturation(0);
+			itemFrame.IconBorder:SetAlpha(1);
+
+			local transmogSlot = C_Transmog.GetSlotForInventoryType(itemFrame.invType);
+			if ( C_TransmogSets.SetHasNewSourcesForSlot(setID, transmogSlot) ) then
+				itemFrame.New:Show();
+				itemFrame.New.Anim:Play();
+			else
+				itemFrame.New:Hide();
+				itemFrame.New.Anim:Stop();
+			end
+		else
+			itemFrame.Icon:SetDesaturated(true);
+			itemFrame.Icon:SetAlpha(0.3);
+			itemFrame.IconBorder:SetDesaturation(1);
+			itemFrame.IconBorder:SetAlpha(0.3);
+			itemFrame.New:Hide();
+		end
+		self:SetItemFrameQuality(itemFrame);
+		itemFrame:SetPoint("TOP", self.DetailsFrame, "TOP", xOffset + (i - 1) * BUTTON_SPACE, -94);
+		itemFrame:Show();
+		if not addon.setdb.profile.autoHideSlot.toggle or( addon.setdb.profile.autoHideSlot.toggle and not addon.setdb.profile.autoHideSlot[sortedSources[i].invType -1]) then
+			self.Model:TryOn(sortedSources[i].sourceID)
+		end
+	end
+
+	-- variant sets
+	local baseSetID = C_TransmogSets.GetBaseSetID(setID);
+	local variantSets = SetsDataProvider:GetVariantSets(baseSetID);
+	if ( #variantSets == 0 )  then
+		self.DetailsFrame.VariantSetsButton:Hide();
+	else
+		self.DetailsFrame.VariantSetsButton:Show();
+		self.DetailsFrame.VariantSetsButton:SetText(setInfo.description);
+	end
+end
+
 
 function WardrobeCollectionFrame.SetsCollectionFrame:GetDefaultSetIDForBaseSet(baseSetID)
 	if ( SetsDataProvider:IsBaseSetNew(baseSetID) ) then
