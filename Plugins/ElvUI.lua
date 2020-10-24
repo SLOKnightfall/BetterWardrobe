@@ -182,6 +182,8 @@ function S:BetterWardrobe()
 	BW_WardrobeOutfitDropDownButton:ClearAllPoints()
 	BW_WardrobeOutfitDropDownButton:SetPoint("RIGHT")
 	BW_WardrobeOutfitDropDown.SaveButton:ClearAllPoints()
+		BW_WardrobeOutfitDropDown.SaveButton:SetWidth(75)
+
 	BW_WardrobeOutfitDropDown.SaveButton:SetPoint("LEFT",BW_WardrobeOutfitDropDown, "RIGHT", 3, 0)
 
 	--S:HandleButton(BW_WardrobeOutfitDropDownButton)
@@ -193,12 +195,19 @@ function S:BetterWardrobe()
 
 	S:HandleButton(BW_LoadQueueButton)
 	BW_LoadQueueButton:ClearAllPoints()
-	BW_LoadQueueButton:Point("TOPLEFT",BW_WardrobeOutfitDropDown, "TOPRIGHT", 90, -2)
+	BW_LoadQueueButton:Point("TOPLEFT",BW_WardrobeOutfitDropDown, "TOPRIGHT", 80, -2)
 
 	S:HandleButton(BW_RandomizeButton)
 	BW_RandomizeButton:ClearAllPoints()
 	BW_RandomizeButton:Point("TOPLEFT",BW_LoadQueueButton, "TOPRIGHT", 0, 0)
+	
+	S:HandleButton(BW_SlotHideButton)
+	BW_SlotHideButton:ClearAllPoints()
+	BW_SlotHideButton:Point("TOPLEFT",BW_RandomizeButton, "TOPRIGHT", 0, 0)
 
+	S:HandleButton(WardrobeCollectionFrame.BW_SetsHideSlotButton)
+	--BW_SlotHideButton:ClearAllPoints()
+	--:Point("TOPLEFT",BW_RandomizeButton, "TOPRIGHT", 0, 0)
 
 --Transmogrify NPC Sets tab
 	local WardrobeTransmogFrame = _G.BW_SetsTransmogFrame
