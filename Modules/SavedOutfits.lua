@@ -74,10 +74,11 @@ local function GetOutfits(character)
 		end
 
 		local mogit_Outfits = addon.MogIt.GetMogitOutfits()
-
-		for i, data in ipairs(mogit_Outfits) do
-			--local index = #FullList
-			tinsert(FullList, data)
+		if mogit_Outfits then 
+			for i, data in ipairs(mogit_Outfits) do
+				--local index = #FullList
+				tinsert(FullList, data)
+			end
 		end
 
 		return FullList
@@ -120,7 +121,7 @@ end
 
 local function GetOutfitName(outfitID)
 	local index = LookupIndexFromID(outfitID)
-	return C_TransmogCollection.GetOutfitName(outfitID) or (index and addon.MogIt.MogitSets and addon.MogIt.MogitSets[index].name  ) or (index and addon.chardb.profile.outfits[index].name)
+	return C_TransmogCollection.GetOutfitName(outfitID) or (index and addon.MogIt.MogitSets[index] and addon.MogIt.MogitSets[index].name) or (index and addon.chardb.profile.outfits[index].name)
 end
 addon.GetOutfitName = GetOutfitName
 
