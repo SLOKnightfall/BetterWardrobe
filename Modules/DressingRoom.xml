@@ -47,16 +47,6 @@
 				<Anchor point="BOTTOMRIGHT"/>
 			</Anchors>
 		<Frames>
-			<Frame  name="BW_DressingRoomOutfitDropDown" parent="DressUpFrame" parentKey="BW_OutfitDropDown"  inherits="WardrobeOutfitDropDownTemplate" mixin="BW_DressingRoomMixin" hidden = "false">
-				<KeyValues>
-					<KeyValue key="width" value="163" type="number"/>
-					<KeyValue key="minMenuStringWidth" value="127" type="number"/>
-					<KeyValue key="maxMenuStringWidth" value="190" type="number"/>
-				</KeyValues>
-				<Anchors>
-					<Anchor point="TOP" x="-23" y="-28"/>
-				</Anchors>
-			</Frame>
 			<Frame parentKey="PreviewButtonFrame" hidden="false" >
 				<Anchors>
 					<Anchor point="TOPLEFT" relativeKey="$parent" relativePoint="LEFT" x="12" y="134"/>/>

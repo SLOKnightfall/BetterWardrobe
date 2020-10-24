@@ -225,7 +225,6 @@ StaticPopupDialogs["BW_CONFIRM_OVERWRITE_TRANSMOG_OUTFIT"] = {
 --===================================================================================================================================
 BW_WardrobeOutfitMixin = CreateFromMixins(WardrobeOutfitMixin)
 
-
 function BW_WardrobeOutfitMixin:OnOutfitApplied(outfitID)
 	local value = outfitID or ""
 	if GetCVarBool("transmogCurrentSpecOnly") then
@@ -311,9 +310,9 @@ function BW_WardrobeOutfitMixin:OnLoad()
 						BW_WardrobeOutfitFrame:Toggle(BW_WardrobeOutfitDropDown)--self:GetParent())
 						end
 					)
-	UIDropDownMenu_JustifyText(self, "LEFT")
+	L_UIDropDownMenu_JustifyText(self, "LEFT")
 	if (self.width) then
-		UIDropDownMenu_SetWidth(self, self.width)
+		L_UIDropDownMenu_SetWidth(self, self.width)
 	end
 	WardrobeOutfitDropDown:Hide()
 
@@ -426,10 +425,10 @@ function BW_WardrobeOutfitMixin:SelectOutfit(outfitID, loadOutfit)
 	end
 
 	if (name) then
-		UIDropDownMenu_SetText(self, name)
+		L_UIDropDownMenu_SetText(self, name)
 	else
 		outfitID = nil
-		UIDropDownMenu_SetText(self, GRAY_FONT_COLOR_CODE..TRANSMOG_OUTFIT_NONE..FONT_COLOR_CODE_CLOSE)
+		L_UIDropDownMenu_SetText(self, GRAY_FONT_COLOR_CODE..TRANSMOG_OUTFIT_NONE..FONT_COLOR_CODE_CLOSE)
 	end
 
 	self.selectedOutfitID = outfitID

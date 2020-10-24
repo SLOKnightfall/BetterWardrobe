@@ -14,7 +14,33 @@ end
 
 function UI:CreateDropDown()
 	--Frame Mixin functionaly in SavedOutfits.lua file
-	BW_WardrobeOutfitDropDown = CreateFrame("Frame", "BW_WardrobeOutfitDropDown", WardrobeTransmogFrame, "BW_WardrobeOutfitDropDownTemplate")
+	--BW_WardrobeOutfitDropDown = CreateFrame("Frame", "BW_WardrobeOutfitDropDown", WardrobeTransmogFrame, "BW_WardrobeOutfitDropDownTemplate")
+	local f = L_Create_UIDropDownMenu("BW_WardrobeOutfitDropDown", WardrobeTransmogFrame)
+--f:SetPoint("CENTER")
+--f:SetSize(100,22)
+	f.width = 163
+	f.minMenuStringWidth = 127
+	f.maxMenuStringWidth = 190
+
+	f:SetPoint("TOPLEFT", -14, -28)
+	Mixin(f, WardrobeOutfitDropDownMixin)
+	Mixin(f, BW_WardrobeOutfitMixin)
+	f.SaveButton = CreateFrame("Button", nil, f, "UIPanelButtonTemplate")
+	f.SaveButton:SetSize(88, 22)
+	local button = _G[f:GetName().."Button"]
+	f.SaveButton:SetPoint("LEFT", button, "RIGHT", 3, 0)
+	f.SaveButton:SetScript("OnClick", function(self)
+					PlaySound(SOUNDKIT.IG_MAINMENU_OPTION_CHECKBOX_ON);
+					local dropDown = self:GetParent();
+					dropDown:CheckOutfitForSave(UIDropDownMenu_GetText(dropDown));
+				end)
+	f.SaveButton:SetText(SAVE)
+	f:SetScript("OnLoad", f.OnLoad)
+	f:OnLoad()
+	f:SetScript("OnEvent", f.OnEvent)
+	f:SetScript("OnShow", f.OnShow)
+	f:SetScript("OnHide", f.OnHide)
+	BW_WardrobeOutfitDropDown = f
 end
 
 

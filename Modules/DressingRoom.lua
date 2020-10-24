@@ -34,6 +34,7 @@ function DressingRoom:SetFrameSize(frame)
 end
 
 function addon.Init:DressingRoom()
+	DressingRoom:CreateDropDown()
 	Buttons = BW_DressingRoomFrame.PreviewButtonFrame.Slots
 	Profile = addon.Profile
 	BW_DressingRoomFrame:SetScript("OnShow", function() C_Timer.After(0.25, DressingRoom.OnShow) end)
@@ -43,6 +44,36 @@ function addon.Init:DressingRoom()
 	if addon.Profile.DR_OptionsEnable then 
 		addon:DressingRoom_Enable()
 	end
+end
+
+--Creates the Dressing Room Outfit Dropdown using the menu library
+function DressingRoom:CreateDropDown()
+	local f = L_Create_UIDropDownMenu("BW_DressingRoomOutfitDropDown", DressUpFrame)
+	f.width = 163
+	f.minMenuStringWidth = 127
+	f.maxMenuStringWidth = 190
+
+	f:SetPoint("TOP", -23, -28)
+	Mixin(f, WardrobeOutfitDropDownMixin)
+	Mixin(f, BW_DressingRoomMixin)
+	f.SaveButton = CreateFrame("Button", nil, f, "UIPanelButtonTemplate")
+	f.SaveButton:SetSize(88, 22)
+	local button = _G[f:GetName().."Button"]
+	f.SaveButton:SetPoint("LEFT", button, "RIGHT", 3, 0)
+	f.SaveButton:SetScript("OnClick", function(self)
+					PlaySound(SOUNDKIT.IG_MAINMENU_OPTION_CHECKBOX_ON);
+					local dropDown = self:GetParent();
+					dropDown:CheckOutfitForSave(UIDropDownMenu_GetText(dropDown));
+				end)
+	f.SaveButton:SetText(SAVE)
+	f:SetScript("OnLoad", f.OnLoad)
+	f:OnLoad()
+	f:SetScript("OnEvent", f.OnEvent)
+	f:SetScript("OnShow", f.OnShow)
+	f:SetScript("OnHide", f.OnHide)
+	DressUpFrame.BW_OutfitDropDown = f
+	BW_DressingRoomOutfitDropDown = f
+	f:SetFrameLevel(500)
 end
 
 
@@ -318,9 +349,9 @@ DressUpFrameOutfitDropDown:Hide()
 						BW_DressingRoomOutfitFrame:Toggle(self:GetParent())
 						end
 					)
-	UIDropDownMenu_JustifyText(self, "LEFT")
+	L_UIDropDownMenu_JustifyText(self, "LEFT")
 	if self.width then
-		UIDropDownMenu_SetWidth(self, self.width)
+		L_UIDropDownMenu_SetWidth(self, self.width)
 	end
 	WardrobeOutfitDropDown:Hide()
 
@@ -682,11 +713,10 @@ do
 end
 
 
-local ContextMenu = CreateFrame("Frame", addonName .. "ContextMenuFrame", UIParent, "UIDropDownMenuTemplate")
-addon.ContextMenu =  ContextMenu
-
---local ContextMenu = L_Create_UIDropDownMenu(addonName .. "ContextMenuFrame", UIParent)
+--local ContextMenu = CreateFrame("Frame", addonName .. "ContextMenuFrame", UIParent, "UIDropDownMenuTemplate")
+local ContextMenu = L_Create_UIDropDownMenu(addonName .. "ContextMenuFrame", UIParent)
 addon.ContextMenu = ContextMenu
+
 local function DressupSettingsButton_OnClick(self)
 	local Profile = addon.Profile
 	local contextMenuData = {
@@ -758,10 +788,10 @@ local function DressupSettingsButton_OnClick(self)
 		},
 	}
 	
-	UIDropDownMenu_SetAnchor(ContextMenu, 0, 0, "BOTTOMLEFT", self, "BOTTOMLEFT")
+	L_UIDropDownMenu_SetAnchor(ContextMenu, 0, 0, "BOTTOMLEFT", self, "BOTTOMLEFT")
 
 	--ContextMenu:SetPoint("BOTTOMLEFT", self, "BOTTOMLEFT", 0, 0)
-	EasyMenu(contextMenuData, ContextMenu, ContextMenu, 0, 0, "MENU",5)
+	L_EasyMenu(contextMenuData, ContextMenu, ContextMenu, 0, 0, "MENU",5)
 
 	--DropDownList1:ClearAllPoints()
 	--DropDownList1:SetPoint("BOTTOMLEFT", self, "BOTTOMLEFT", 0, 0)
@@ -840,8 +870,8 @@ local function BW_DressingRoomImportButton_OnClick(self)
 			isNotRadio = true,
 		},
 	}
-	UIDropDownMenu_SetAnchor(ContextMenu, 0, 0, "BOTTOMLEFT", self, "BOTTOMLEFT")
-	EasyMenu(contextMenuData, ContextMenu, self, 0, 0, "MENU")
+	L_UIDropDownMenu_SetAnchor(ContextMenu, 0, 0, "BOTTOMLEFT", self, "BOTTOMLEFT")
+	L_EasyMenu(contextMenuData, ContextMenu, self, 0, 0, "MENU")
 	
 end
 
@@ -1006,12 +1036,8 @@ function BW_DressingRoomTargetButton_OnClick(self)
 	}
 	
 	--ContextMenu:SetPoint("TOPLEFT", self, "TOPLEFT", 0, 0)
-	UIDropDownMenu_SetAnchor(ContextMenu, 0, 0, "BOTTOMLEFT", self, "BOTTOMLEFT")
-	EasyMenu(contextMenuData, ContextMenu, "cursor", 0, 0, "MENU")
-	
-	DropDownList1:ClearAllPoints()
-	DropDownList1:SetPoint("BOTTOMLEFT", self, "BOTTOMLEFT", 0, 0)
-	DropDownList1:SetClampedToScreen(true)
+	L_UIDropDownMenu_SetAnchor(ContextMenu, 0, 0, "BOTTOMLEFT", self, "BOTTOMLEFT")
+	L_EasyMenu(contextMenuData, ContextMenu, "cursor", 0, 0, "MENU")
 end
 
 
