@@ -40,11 +40,8 @@ function S:BetterWardrobe()
 	S:HandleTab(WardrobeCollectionFrame.SavedSetsTab)
 
 	--Items
-	--S:HandleDropDownBox(BW_SortDropDown.dropdown)
-	--BW_SortDropDown.frame:SetScript("OnShow", function() UIDropDownMenu_SetWidth(BW_SortDropDown, 110) end)
-	BW_SortDropDown.dropdown.frame:SetScript("OnShow", function() BW_SortDropDown.dropdown:SetWidth(50) end)
-	BW_SortDropDown.frame.backdrop:Hide()
-	
+	S:HandleDropDownBox(BW_SortDropDown)
+
 	S:HandleButton(WardrobeCollectionFrame.FilterButton)
 
 	for _, Frame in ipairs(BW_WardrobeCollectionFrame.ContentFrames) do
@@ -145,16 +142,20 @@ function S:BetterWardrobe()
 	end)
 
 	--SavedSets
-	addon.SavedSetDropDownFrame.frame.backdrop:Hide()
-	--S:HandleDropDownBox(BW_DBSavedSetDropdown)
+	--addon.SavedSetDropDownFrame.frame.backdrop:Hide()
+	S:HandleDropDownBox(BW_DBSavedSetDropdown)
+	S:HandleButton(L_DropDownList1)
+
 	--BW_DBSavedSetDropdown:ClearAllPoints()
 	--BW_DBSavedSetDropdown:SetPoint("TOPRIGHT", "BW_SortDropDown", "TOPRIGHT", -0 , 0)
 	--BW_DBSavedSetDropdown:SetScript("OnShow", function() UIDropDownMenu_SetWidth(BW_DBSavedSetDropdown, 155) end)
 
-
-
 	--CollectionList
-	BW_ColectionListFrame.dropdownFrame.group.frame.backdrop:Hide()
+	--BW_ColectionListFrame.dropdownFrame.group.frame.backdrop:Hide()
+	S:HandleDropDownBox(BW_ColectionListFrame.dropdownFrame)
+	BW_ColectionListFrame.dropdownFrame:ClearAllPoints()
+	BW_ColectionListFrame.dropdownFrame:SetPoint("BOTTOM", -25, 15)
+
 	S:HandleButton(BW_CollectionListOptionsButton)
 	BW_CollectionListOptionsButton:SetSize(25,25)
 	--BW_CollectionListOptionsButton:SetPoint("BOTTOMLEFT", 2,2)

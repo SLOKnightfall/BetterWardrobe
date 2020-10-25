@@ -179,42 +179,22 @@ function UI.SortDropDown_Initialize()
 	local Wardrobe = WardrobeCollectionFrame.ItemsCollectionFrame
 	db = addon.sortDB
 
-	local  f = addon.Frame:Create("SimpleGroup")
-	BW_SortDropDown = f
-	f.frame:SetParent("BW_WardrobeCollectionFrame")
-	f:SetWidth(157)--, 22)
-	f:SetHeight(22)
+	BW_SortDropDown = L_Create_UIDropDownMenu("BW_SortDropDown", BW_WardrobeCollectionFrame)
+	L_UIDropDownMenu_SetWidth(BW_SortDropDown, 140)
+	L_UIDropDownMenu_Initialize(BW_SortDropDown, function(self)
+		local info = L_UIDropDownMenu_CreateInfo()
+		local selectedValue = L_UIDropDownMenu_GetSelectedValue(self)
 
-	f:ClearAllPoints()
-	--f:SetPoint("TOPRIGHT", 600, -22)
-	f:SetLayout("Fill")
-
-	--f:SetPoint("TOPLEFT", "BW_SortDropDown", "TOPLEFT")
-	local list = {}
-
-	for _, name in ipairs(dropdownOrder)do
-		tinsert(list,L[name])
-	end
-
-	local dropdown = addon.Frame:Create("Dropdown")
-
-	BW_SortDropDown.dropdown = dropdown
-	dropdown:SetWidth(157)
-	
-	--dropdown:SetHeight(22)
-	f:AddChild(dropdown)
-	dropdown:SetList(list)
-	dropdown:SetValue(db.sortDropdown)
-	dropdown:SetText(COMPACT_UNIT_FRAME_PROFILE_SORTBY.." "..L[db.sortDropdown])
-
-	dropdown:SetCallback("OnValueChanged", function(widget) 
-			db.sortDropdown = widget.value
+		info.func = function(self)
+			db.sortDropdown = self.value
+			L_UIDropDownMenu_SetSelectedValue(BW_SortDropDown, self.value)
+			L_UIDropDownMenu_SetText(BW_SortDropDown, COMPACT_UNIT_FRAME_PROFILE_SORTBY.." "..L[self.value])
 			db.reverse = IsModifierKeyDown()
 			addon.SetSortOrder(db.reverse)
 			local tabID = addon.GetTab()
 			if tabID == 1 then
 				--Wardrobe:OnShow()
-				Wardrobe:RefreshVisualsList()
+						Wardrobe:RefreshVisualsList()
 				Wardrobe:UpdateItems()
 				Wardrobe:UpdateWeaponDropDown()
 			elseif tabID == 2 then
@@ -224,8 +204,20 @@ function UI.SortDropDown_Initialize()
 				BW_SetsCollectionFrame:OnSearchUpdate()
 				BW_SetsTransmogFrame:OnSearchUpdate()
 			end
-			dropdown:SetText(COMPACT_UNIT_FRAME_PROFILE_SORTBY.." "..L[db.sortDropdown])
+		end
+
+		for _, id in pairs(dropdownOrder) do
+			if id == LE_ITEM_SOURCE and (tabID == 2 or tabID == 3) then
+			else
+				info.value, info.text = id, L[id]
+				info.checked = (id == selectedValue)
+				L_UIDropDownMenu_AddButton(info)
+			end
+		end
 	end)
+
+	L_UIDropDownMenu_SetSelectedValue(BW_SortDropDown, db.sortDropdown)
+	L_UIDropDownMenu_SetText(BW_SortDropDown, COMPACT_UNIT_FRAME_PROFILE_SORTBY.." "..L[db.sortDropdown])
 end
 
 
@@ -503,9 +495,53 @@ function addon.RefreshSaveOutfitDropdown()
 	end
 end
 
---AceDropdownmenu for the selection of other character's saved sets -Shouldn't cause taint
+
+local function SavedOutfitDB_Dropdown_OnClick(self, arg1, arg2, checked)
+		local value = arg1
+		local name = UnitName("player")
+		local realm = GetRealmName()
+
+		if arg1 ~= addon.setdb:GetCurrentProfile() then 
+		addon.SelecteSavedList = arg1
+		else
+			addon.SelecteSavedList = false
+		end
+
+		BW_WardrobeCollectionFrame_SetTab(2)
+		BW_WardrobeCollectionFrame_SetTab(4)
+			L_UIDropDownMenu_SetSelectedValue(BW_DBSavedSetDropdown, arg1)
+		--L_UIDropDownMenu_SetText(BW_DBSavedSetDropdown, arg1)
+		addon.savedSetCache = nil
+end
+function SavedOutfitDB_Dropdown_Menu(frame, level, menuList)
+	local count = 1
+	for name in pairs(addon.setdb.global.sets)do
+		 local info = L_UIDropDownMenu_CreateInfo()
+		 info.func = SavedOutfitDB_Dropdown_OnClick
+		 info.text, info.arg1 = name, name
+		  L_UIDropDownMenu_AddButton(info)
+		if name == addon.setdb:GetCurrentProfile() then
+			L_UIDropDownMenu_SetSelectedValue(BW_DBSavedSetDropdown, name)
+		end
+		  count = count +1
+	end
+end
+
+--Dropdownmenu for the selection of other character's saved sets
 function UI.SavedSetsDropDown_Initialize(self)
-	local  f = addon.Frame:Create("SimpleGroup")
+	--local f = L_Create_UIDropDownMenu("BW_DBSavedSetDropdown", BW_WardrobeCollectionFrame)
+	BW_DBSavedSetDropdown = L_Create_UIDropDownMenu("BW_DBSavedSetDropdown", BW_WardrobeCollectionFrame)
+	--BW_DBSavedSetDropdown:SetParent("BW_WardrobeCollectionFrame")
+	--BW_DBSavedSetDropdown:ClearAllPoints()
+	BW_DBSavedSetDropdown:SetPoint("TOPLEFT", "BW_SortDropDown", "TOPLEFT")
+	L_UIDropDownMenu_SetWidth(BW_DBSavedSetDropdown, 165) -- Use in place of dropDown:SetWidth
+-- Bind an initializer function to the dropdown; see previous sections for initializer function examples.
+	L_UIDropDownMenu_Initialize(BW_DBSavedSetDropdown, SavedOutfitDB_Dropdown_Menu)
+	L_UIDropDownMenu_SetSelectedValue(BW_DBSavedSetDropdown, addon.setdb:GetCurrentProfile())
+
+
+
+--[[	local  f = addon.Frame:Create("SimpleGroup")
 	addon.SavedSetDropDownFrame = f
 	f.frame:SetParent("BW_WardrobeCollectionFrame")
 	f:SetWidth(87)--, 22)
@@ -538,8 +574,11 @@ function UI.SavedSetsDropDown_Initialize(self)
 		BW_WardrobeCollectionFrame_SetTab(2)
 		BW_WardrobeCollectionFrame_SetTab(4)
 		addon.savedSetCache = nil
-	end)
+	end)]]
+
+
 end
+
 
 
 --- Functionality to add tabs to window
@@ -568,9 +607,9 @@ function BW_WardrobeCollectionFrame_SetTab(tabID)
 	local tab4 = (tabID == TAB_SAVED_SETS)
 
 	if addon.SavedSetDropDownFrame and (tab1 or tab2 or tab3 )then 
-		addon.SavedSetDropDownFrame.frame:Hide()
+		--addon.SavedSetDropDownFrame.frame:Hide()
 	else
-		addon.SavedSetDropDownFrame.frame:Show()
+		--addon.SavedSetDropDownFrame.frame:Show()
 	end
 
 	WardrobeCollectionFrame.ItemsCollectionFrame:SetShown(tab1)
@@ -610,9 +649,9 @@ function BW_WardrobeCollectionFrame_SetTab(tabID)
 
 	BW_WardrobeCollectionFrame.BW_SetsHideSlotButton:SetShown((tab2 or tab3) and not atTransmogrifier)
 
---	UIDropDownMenu_EnableDropDown(BW_SortDropDown)
-	BW_SortDropDown.frame:Show()
-	--BW_DBSavedSetDropdown:SetShown(tab4)
+	L_UIDropDownMenu_EnableDropDown(BW_SortDropDown)
+	BW_SortDropDown:Show()
+	BW_DBSavedSetDropdown:SetShown(tab4)
 
 	BW_SortDropDown:ClearAllPoints()
 
@@ -628,13 +667,13 @@ function BW_WardrobeCollectionFrame_SetTab(tabID)
 			else 
 				WardrobeCollectionFrame.ItemsCollectionFrame.WeaponDropDown:SetPoint("TOPRIGHT", -30, -37);
 			end
-			BW_SortDropDown:SetPoint("TOPRIGHT", WardrobeCollectionFrame.ItemsCollectionFrame, "TOPRIGHT", -47, -8)
+			BW_SortDropDown:SetPoint("TOPRIGHT", WardrobeCollectionFrame.ItemsCollectionFrame, "TOPRIGHT", -30, -8)
 		else
 			WardrobeCollectionFrame.ItemsCollectionFrame.WeaponDropDown:SetPoint("TOPRIGHT", -32, -25);
 			if ElvUI then 
-			BW_SortDropDown:SetPoint("TOPLEFT", WardrobeCollectionFrameWeaponDropDown, "BOTTOMLEFT", -5, yOffset)
+				BW_SortDropDown:SetPoint("TOPLEFT", WardrobeCollectionFrameWeaponDropDown, "BOTTOMLEFT", -5, yOffset)
 			else 
-			BW_SortDropDown:SetPoint("TOPLEFT", WardrobeCollectionFrame.ItemsCollectionFrame.WeaponDropDown, "BOTTOMLEFT", 15, yOffset)
+				BW_SortDropDown:SetPoint("TOPLEFT", WardrobeCollectionFrame.ItemsCollectionFrame.WeaponDropDown, "BOTTOMLEFT", 0, yOffset)
 			end
 		end
 
@@ -643,7 +682,7 @@ function BW_WardrobeCollectionFrame_SetTab(tabID)
 		if atTransmogrifier  then
 			WardrobeCollectionFrame.activeFrame = WardrobeCollectionFrame.SetsTransmogFrame
 			BW_WardrobeCollectionFrame.activeFrame = WardrobeCollectionFrame.SetsTransmogFrame
-			BW_SortDropDown:SetPoint("TOPRIGHT", WardrobeCollectionFrame.ItemsCollectionFrame, "TOPRIGHT", -47, -10)
+			BW_SortDropDown:SetPoint("TOPRIGHT", WardrobeCollectionFrame.ItemsCollectionFrame, "TOPRIGHT", -30, -10)
 		else
 			WardrobeCollectionFrame.activeFrame = WardrobeCollectionFrame.SetsCollectionFrame
 			BW_WardrobeCollectionFrame.activeFrame = WardrobeCollectionFrame.SetsCollectionFrame
@@ -655,7 +694,7 @@ function BW_WardrobeCollectionFrame_SetTab(tabID)
 		if atTransmogrifier then
 			WardrobeCollectionFrame.activeFrame = BW_WardrobeCollectionFrame.BW_SetsTransmogFrame
 			BW_WardrobeCollectionFrame.activeFrame = BW_WardrobeCollectionFrame.BW_SetsTransmogFrame
-			BW_SortDropDown:SetPoint("TOPRIGHT", WardrobeCollectionFrame.ItemsCollectionFrame, "TOPRIGHT",-47, -10)
+			BW_SortDropDown:SetPoint("TOPRIGHT", WardrobeCollectionFrame.ItemsCollectionFrame, "TOPRIGHT",-30, -10)
 		else
 			WardrobeCollectionFrame.activeFrame = BW_WardrobeCollectionFrame.BW_SetsCollectionFrame
 			BW_WardrobeCollectionFrame.activeFrame = BW_WardrobeCollectionFrame.BW_SetsCollectionFrame
@@ -664,16 +703,16 @@ function BW_WardrobeCollectionFrame_SetTab(tabID)
 		
 		WardrobeCollectionFrame.searchBox:Show()
 	elseif tab4 then
-		BW_SortDropDown.frame:Hide()
+		BW_SortDropDown:Hide()
 		--BW_WardrobeToggle.VisualMode = true
 		local savedCount = #addon.GetSavedList()
 		WardrobeCollectionFrame_UpdateProgressBar(savedCount, savedCount)
 		--WardrobeCollectionFrame.searchBox:Hide()
---		UIDropDownMenu_DisableDropDown(BW_SortDropDown)
+		--L_UIDropDownMenu_DisableDropDown(BW_SortDropDown)
 		if atTransmogrifier then
 			WardrobeCollectionFrame.activeFrame = BW_WardrobeCollectionFrame.BW_SetsTransmogFrame
 			BW_WardrobeCollectionFrame.activeFrame = BW_WardrobeCollectionFrame.BW_SetsTransmogFrame
-			BW_SortDropDown:SetPoint("TOPRIGHT", WardrobeCollectionFrame.ItemsCollectionFrame, "TOPRIGHT",-65, -10)
+			BW_SortDropDown:SetPoint("TOPRIGHT", WardrobeCollectionFrame.ItemsCollectionFrame, "TOPRIGHT",-55, -10)
 		else
 			WardrobeCollectionFrame.activeFrame = BW_WardrobeCollectionFrame.BW_SetsCollectionFrame
 			BW_WardrobeCollectionFrame.activeFrame = BW_WardrobeCollectionFrame.BW_SetsCollectionFrame

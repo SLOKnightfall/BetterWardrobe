@@ -121,13 +121,14 @@ function Models:Build()
 	model:SetPoint("BOTTOMRIGHT", tooltip, "BOTTOMRIGHT", -5, 5)
 	model:SetKeepModelOnHide(true)
 	model:SetScript("OnModelLoaded", function(self, ...)
+	model:SetUseTransmogSkin(false)
 		-- Makes sure the zoomed camera is correct, if the model isn't loaded right away
 		if self.cameraID then
 			Model_ApplyUICamera(self, self.cameraID)
 		end
 	end)
 	-- Use the blacked-out model:
-	-- model:SetUseTransmogSkin(true)
+
 	-- Display in combat pose:
 	-- model:FreezeAnimation(1)
 	return model

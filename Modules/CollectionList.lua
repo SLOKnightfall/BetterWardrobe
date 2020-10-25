@@ -321,49 +321,63 @@ local  function RefreshDropdown()
 end
 
 
-function CollectionList:CreateDropdown()
-	local dropdownFrame = CreateFrame("Frame", nil, BW_ColectionListFrame)
-	dropdownFrame:SetWidth(157)--, 22)
-	dropdownFrame:SetHeight(22)
-	dropdownFrame:SetPoint("BOTTOM", -5, 22)
-	BW_ColectionListFrame.dropdownFrame = dropdownFrame
-
-	local  f = addon.Frame:Create("SimpleGroup")
-	--BW_SortDropDown = f
-	--UI.SavedSetDropDownFrame = f
-	f.frame:SetParent(dropdownFrame)
-	BW_ColectionListFrame.dropdownFrame.group = f
-	f:SetWidth(157)--, 22)
-	f:SetHeight(22)
-
-	f:ClearAllPoints()
-	f:SetPoint("TOPLEFT")
-	f:SetLayout("Fill")
-
-	dropdown = addon.Frame:Create("Dropdown")
-	dropdown:SetWidth(157)
-	dropdown.pullout:SetHideOnLeave(true)
-	f:AddChild(dropdown)
-	RefreshDropdown()
-	--dropdown:SetCallback("OnLeave", function() print("XX") end)
-	dropdown:SetCallback("OnValueChanged", function(widget) 
-		CollectionList:SelectedCollectionList(widget.value)
-		RefreshDropdown()
+function CollectionList:Dropdown_OnClick(arg1, arg2, checked)
+		CollectionList:SelectedCollectionList(arg1)
+		L_UIDropDownMenu_SetSelectedID(BW_CollectionList_Dropdown, arg1)
 		WardrobeCollectionFrame.ItemsCollectionFrame:RefreshVisualsList()
 		WardrobeCollectionFrame.ItemsCollectionFrame:UpdateItems()
-		
-	end)
+end
+
+
+function CollectionList:Dropdown_Initialize(frame, level, menuList)
+	local list = addon.chardb.profile.lists
+	local info = L_UIDropDownMenu_CreateInfo()
+
+	for i, data in pairs(list) do
+		 info.func = CollectionList.Dropdown_OnClick
+		 info.text, info.arg1 = data.name, i
+		 info.value = i
+		 info.checked = false
+		  L_UIDropDownMenu_AddButton(info)
+		if i == CollectionList:SelectedCollectionList() then
+			--L_UIDropDownMenu_SetSelectedValue(self, data.name)
+		end
+	end
+
+	if MogItLoaded then 
+		key["MOGIT"] = "MogIt Wishlist"
+		--local info = L_UIDropDownMenu_CreateInfo()
+		info.func = CollectionList.Dropdown_OnClick
+		info.text, info.arg1 = "MogIt Wishlist", #list + 1
+		info.checked = false
+
+		L_UIDropDownMenu_AddButton(info)
+	end
+end
+
+
+--Dropdownmenu for the Collection List
+function CollectionList:CreateDropdown()
+	BW_CollectionList_Dropdown = L_Create_UIDropDownMenu("BW_CollectionList_Dropdown", BW_ColectionListFrame)
+	BW_CollectionList_Dropdown:SetPoint("BOTTOM", -80, 15)
+	BW_CollectionList_Dropdown:SetFrameLevel(500)
+	--L_UIDropDownMenu_SetWidth(BW_CollectionList_Dropdown, 157) -- Use in place of dropDown:SetWidth
+-- Bind an initializer function to the dropdown; see previous sections for initializer function examples.
+	L_UIDropDownMenu_Initialize(BW_CollectionList_Dropdown, CollectionList.Dropdown_Initialize)
+	L_UIDropDownMenu_SetSelectedID(BW_CollectionList_Dropdown, CollectionList:SelectedCollectionList())
+	BW_ColectionListFrame.dropdownFrame = BW_CollectionList_Dropdown
 
 	--"BW_CollectionListOptionsButton"
-	local button = CreateFrame("Button", "BW_CollectionListOptionsButton", dropdownFrame, "SquareIconButtonTemplate")
+	local button = CreateFrame("Button", "BW_CollectionListOptionsButton", BW_CollectionList_Dropdown, "SquareIconButtonTemplate")
 	button:SetSize(30,30)
-		button:SetPoint("LEFT", f.frame, "RIGHT", 1, -2)
+		button:SetPoint("LEFT", "BW_CollectionList_DropdownButton", "RIGHT", 1, -2)
 		button.Icon:SetTexture("Interface\\Buttons\\UI-OptionsButton")
 		button.Icon:SetSize(15,15)
 		button:SetScript("OnClick", function(button) CollectionList:OptionButton_OnClick(button) end)
 					--	BW_DressingRoomButton_OnEnter(self, "Settings")
 					--</OnEnter>
 end
+
 
 local action
 function CollectionList:OptionButton_OnClick(button)
