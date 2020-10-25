@@ -345,7 +345,7 @@ function CollectionList:Dropdown_Initialize(frame, level, menuList)
 	end
 
 	if MogItLoaded then 
-		key["MOGIT"] = "MogIt Wishlist"
+		--key["MOGIT"] = "MogIt Wishlist"
 		--local info = L_UIDropDownMenu_CreateInfo()
 		info.func = CollectionList.Dropdown_OnClick
 		info.text, info.arg1 = "MogIt Wishlist", #list + 1

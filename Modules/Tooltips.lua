@@ -150,6 +150,7 @@ function Models:Reset(model)
 		model:SetUseTransmogSkin(true)
 	else
 		model:Dress()
+		model:SetUseTransmogSkin(false)
 		model:SetUseTransmogSkin(addon.Profile.TooltipPreview_DressingDummy)
 	end
 
