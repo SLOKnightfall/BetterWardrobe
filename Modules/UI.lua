@@ -38,6 +38,8 @@ function addon.Init:BuildUI()
 	--.BW_SetsHideSlotButton:
 	local level = BW_SetsCollectionFrame.Model:GetFrameLevel()
 	BW_WardrobeCollectionFrame.BW_SetsHideSlotButton:SetFrameLevel(level + 5)
+	UI.CreateOptionsDropdown()
+	addon.Init:CreateRightClickDropDown()
 	--	WardrobeFrame:HookScript("OnShow",  function() print("XXX"); UI.ExtendTransmogView() end)
 --	hooksecurefunc(WardrobeCollectionFrame.ItemsCollectionFrame, "UpdateWeaponDropDown", PositionDropDown)
 end
@@ -166,9 +168,12 @@ function UI.DefaultButtons_Update()
 		local Wardrobe = {WardrobeCollectionFrame.ItemsCollectionFrame, WardrobeCollectionFrame.SetsTransmogFrame, BW_SetsTransmogFrame}
 		local ScrollFrames = {WardrobeCollectionFrameScrollFrame.buttons, BW_SetsCollectionFrameScrollFrame.buttons}
 		-- hook all models
-		for _, frame in ipairs(Wardrobe) do
+		for index , frame in ipairs(Wardrobe) do
 			for _, model in pairs(frame.Models) do
+				if index ~=3 then 
+
 				model:HookScript("OnMouseDown", function(...) UI:DefaultDropdown_Update(...) end)
+			end
 
 				local f = CreateFrame("frame", nil, model, "BetterWardrobeIconsTemplate")
 				f = CreateFrame("frame", nil, model, "BetterWardrobeSetInfoTemplate")
@@ -176,12 +181,22 @@ function UI.DefaultButtons_Update()
 			end
 		end
 
-
-
-		for _, buttons in ipairs(ScrollFrames) do
+		for index, buttons in ipairs(ScrollFrames) do
 			for i = 1, #buttons do
 				local button = buttons[i]
-				button:HookScript("OnMouseUp", function(...) UI:DefaultDropdown_Update(...) end)
+					--button:HookScript("OnMouseUp", function(...) UI:DefaultDropdown_Update(...) end)
+					button:SetScript("OnMouseUp", function(...) 
+						local self, button = ...
+						if ( button == "LeftButton" ) then
+							PlaySound(SOUNDKIT.IG_MAINMENU_OPTION_CHECKBOX_ON);
+							self:GetParent():GetParent():GetParent():SelectSetFromButton(self.setID);
+						elseif ( button == "RightButton" ) then
+							local dropDown = self:GetParent():GetParent().FavoriteDropDown;
+							dropDown.baseSetID = self.setID;
+							L_ToggleDropDownMenu(1, nil, dropDown, self, 0, 0);
+							PlaySound(SOUNDKIT.IG_MAINMENU_OPTION_CHECKBOX_ON);
+						end
+					end)
 
 				local f = CreateFrame("frame", nil, button, "BetterWardrobeIconsTemplate")
 				f.Hidden:ClearAllPoints()
@@ -369,6 +384,17 @@ function UI:JournalHideSlotMenu_OnClick(parent)
 
 		end
 	end
-	addon.ContextMenu:SetPoint("TOPLEFT", parent, "TOPLEFT", 0, 0)
-	EasyMenu(contextMenuData, addon.ContextMenu, "cursor", 0, 0, "MENU")
+	L_UIDropDownMenu_SetAnchor(addon.ContextMenu, 0, 0, "BOTTOMLEFT", parent, "BOTTOMLEFT")
+	L_EasyMenu(contextMenuData, addon.ContextMenu, addon.ContextMenu, 0, 0, "MENU")
 end
+
+
+function 	UI.CreateOptionsDropdown()
+local f = L_Create_UIDropDownMenu("BW_TransmogOptionsDropDown", BW_WardrobeCollectionFrame)
+BW_TransmogOptionsDropDown = f
+
+
+BW_WardrobeCollectionFrame.OptionsDropDown = f
+BW_WardrobeTransmogVendorOptionsDropDown_OnLoad(f)
+end
+

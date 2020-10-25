@@ -771,6 +771,22 @@ function BetterWardrobeSetsTransmogModelMixin:RefreshTooltip()
 	end
 end
 
+
+function BetterWardrobeSetsTransmogModelMixin:OnMouseDown(button)
+	if ( button == "LeftButton" ) then
+		self:GetParent():SelectSet(self.setID);
+		PlaySound(SOUNDKIT.UI_TRANSMOG_ITEM_CLICK);
+	elseif ( button == "RightButton" ) then
+		local dropDown = self:GetParent().RightClickDropDown;
+		if ( dropDown.activeFrame ~= self ) then
+			L_CloseDropDownMenus();
+		end
+		dropDown.activeFrame = self;
+		L_ToggleDropDownMenu(1, nil, dropDown, self, -6, -3);
+		PlaySound(SOUNDKIT.IG_MAINMENU_OPTION_CHECKBOX_ON);
+	end
+end
+
 --==
 
 --=======--
@@ -1229,7 +1245,7 @@ end
 
 
 function BetterWardrobeSetsCollectionMixin:SelectSetFromButton(setID)
-	CloseDropDownMenus()
+	L_CloseDropDownMenus()
 	--self:SelectSet(self:GetDefaultSetIDForBaseSet(setID))
 	self:SelectSet(setID)
 end
@@ -1477,6 +1493,7 @@ function BetterWardrobeSetsCollectionMixin:RefreshAppearanceTooltip()
 end
 
 BetterWardrobeSetsCollectionScrollFrameMixin = CreateFromMixins(WardrobeSetsCollectionScrollFrameMixin)
+local tabType = {"item", "set", "extraset"}
 
 local function BW_WardrobeSetsCollectionScrollFrame_FavoriteDropDownInit(self)
 	if (not self.baseSetID) then
@@ -1487,7 +1504,7 @@ local function BW_WardrobeSetsCollectionScrollFrame_FavoriteDropDownInit(self)
 	--local variantSets = SetsDataProvider:GetVariantSets(self.baseSetID)
 	local useDescription = false
 
-	local info = UIDropDownMenu_CreateInfo()
+	local info = L_UIDropDownMenu_CreateInfo()
 	info.notCheckable = true
 	info.disabled = nil
 	local isFavorite = addon.chardb.profile.favorite[self.baseSetID]
@@ -1509,12 +1526,63 @@ local function BW_WardrobeSetsCollectionScrollFrame_FavoriteDropDownInit(self)
 		end
 	end
 
-	UIDropDownMenu_AddButton(info, level)
+	L_UIDropDownMenu_AddButton(info, level)
 	info.disabled = nil
 
 	info.text = CANCEL
 	info.func = nil
-	UIDropDownMenu_AddButton(info, level)
+	L_UIDropDownMenu_AddButton(info, level)
+
+local tab = addon.GetTab()
+if tab ~=4 then 
+	--new
+		local type = tabType[addon.GetTab()]
+		local variantTarget, match, matchType
+		local variantType = ""
+		if type == "set" or type =="extraset" then
+			L_UIDropDownMenu_AddSeparator()
+			L_UIDropDownMenu_AddButton({
+					notCheckable = true,
+					text = L["Queue Transmog"],
+					func = function()
+
+						local setInfo = addon.GetSetInfo(self.baseSetID) or C_TransmogSets.GetSetInfo(self.baseSetID)
+						local name = setInfo["name"]
+						--addon.QueueForTransmog(type, setID, name)
+						addon.QueueList = {type, self.baseSetID, name}
+					 end,
+					})
+						if type == "set" then 
+				variantTarget, variantType, match, matchType = addon.Sets:SelectedVariant(self.baseSetID)
+			end
+		end
+
+		L_UIDropDownMenu_AddSeparator()
+		local isHidden = addon.chardb.profile[type][self.baseSetID]
+		L_UIDropDownMenu_AddButton({
+			notCheckable = true,
+			text = isHidden and SHOW or HIDE,
+			func = function() addon.ToggleHidden(self, isHidden) end,
+		})
+
+		local collected = self.setCollected
+		--Collection List Right Click options
+		local collectionList = addon.CollectionList:CurrentList()
+		local isInList = match or addon.CollectionList:IsInList(self.baseSetID, type)
+
+		--if  type  == "set" or ((isInList and collected) or not collected)then --(type == "item" and not (model.visualInfo and model.visualInfo.isCollected)) or type == "set" or type == "extraset" then
+			local targetSet = match or variantTarget or self.baseSetID
+			local targetText = match and " - "..matchType or variantTarget and " - "..variantType or ""
+			L_UIDropDownMenu_AddSeparator()
+			local isInList = collectionList[type][targetSet]
+			L_UIDropDownMenu_AddButton({
+				notCheckable = true,
+				text = isInList and L["Remove from Collection List"]..targetText or L["Add to Collection List"]..targetText,
+				func = function()
+							addon.CollectionList:UpdateList(type, targetSet, not isInList)
+					end,
+			})
+		end
 end
 
 
@@ -1524,7 +1592,13 @@ function BetterWardrobeSetsCollectionScrollFrameMixin:OnLoad()
 	self.scrollBar.doNotHide = true
 	self.update = self.Update
 	HybridScrollFrame_CreateButtons(self, "WardrobeSetsScrollFrameButtonTemplate", 44, 0)
-	UIDropDownMenu_Initialize(self.FavoriteDropDown, BW_WardrobeSetsCollectionScrollFrame_FavoriteDropDownInit, "MENU")
+
+
+	--BW_WardrobeSetsFavoriteDropDown = CreateFrame("Frame", "BW_WardrobeSetsFavoriteDropDown", self, "UIDropDownMenuTemplate")
+	BW_WardrobeSetsFavoriteDropDown = L_Create_UIDropDownMenu("BW_WardrobeSetsFavoriteDropDown", self)
+	self.FavoriteDropDown = BW_WardrobeSetsFavoriteDropDown
+	WardrobeCollectionFrameScrollFrame.FavoriteDropDown = BW_WardrobeSetsFavoriteDropDown
+	L_UIDropDownMenu_Initialize(self.FavoriteDropDown, BW_WardrobeSetsCollectionScrollFrame_FavoriteDropDownInit, "MENU")
 end
 
 
@@ -1625,7 +1699,8 @@ function BW_WardrobeSetsDetailsItemMixin:OnEnter()
 end
 
 
-local BW_ItemSubDropDownMenu = CreateFrame("Frame", "Omen_TitleDropDownMenu", nil, "UIDropDownMenuTemplate")
+--local BW_ItemSubDropDownMenu = CreateFrame("Frame", "Omen_TitleDropDownMenu", nil, "UIDropDownMenuTemplate")
+local BW_ItemSubDropDownMenu = L_Create_UIDropDownMenu("BW_ItemSubDropDownMenu", UIParent)
 
 BW_ItemSubDropDownMenu:SetFrameLevel(500)
 local clickedItemID = nil
@@ -1639,7 +1714,7 @@ local BW_ItemSubDropDownMenu_Table = {
     },
     {
         text = CLOSE,
-        func = function() CloseDropDownMenus() end,
+        func = function() L_CloseDropDownMenus() end,
         notCheckable = 1,
     },
  
@@ -1743,7 +1818,7 @@ function BW_WardrobeSetsDetailsItemMixin:OnMouseDown(button)
 		DressUpVisual(self.sourceID)
 	elseif button == "RightButton"  and BW_WardrobeCollectionFrame.selectedCollectionTab == 3 then 
 			clickedItemID = self.itemID
-			EasyMenu(BW_ItemSubDropDownMenu_Table, BW_ItemSubDropDownMenu, self, 0, 0, "MENU", 10)
+			L_EasyMenu(BW_ItemSubDropDownMenu_Table, BW_ItemSubDropDownMenu, self, 0, 0, "MENU", 10)
 	end
 end
 
@@ -2044,14 +2119,12 @@ function BetterWardrobeSetsTransmogMixin:ResetPage()
 	self:UpdateSets()
 end
 
-
 function BetterWardrobeSetsTransmogMixin:OpenRightClickDropDown()
 	if (not self.RightClickDropDown.activeFrame) then
 		return
 	end
-
 	local setID = self.RightClickDropDown.activeFrame.setID
-	local info = UIDropDownMenu_CreateInfo()
+	local info = L_UIDropDownMenu_CreateInfo()
 	local isFavorite = addon.chardb.profile.favorite[setID]
 	if (isFavorite) then
 		info.text = BATTLE_PET_UNFAVORITE
@@ -2069,12 +2142,64 @@ function BetterWardrobeSetsTransmogMixin:OpenRightClickDropDown()
 		end
 	end
 	info.notCheckable = true
-	UIDropDownMenu_AddButton(info)
+	L_UIDropDownMenu_AddButton(info)
 	-- Cancel
-	info = UIDropDownMenu_CreateInfo()
+	info = L_UIDropDownMenu_CreateInfo()
 	info.notCheckable = true
 	info.text = CANCEL
-	UIDropDownMenu_AddButton(info)
+	L_UIDropDownMenu_AddButton(info)
+
+
+	local tab = addon.GetTab()
+	local type = tabType[addon.GetTab()]
+	if tab ~= 4 then 
+		local variantTarget, match, matchType
+		local variantType = ""
+		if type == "set" or type =="extraset" then
+			L_UIDropDownMenu_AddSeparator()
+			L_UIDropDownMenu_AddButton({
+					notCheckable = true,
+					text = L["Queue Transmog"],
+					func = function()
+
+						local setInfo = addon.GetSetInfo(setID) or C_TransmogSets.GetSetInfo(setID)
+						local name = setInfo["name"]
+						--addon.QueueForTransmog(type, setID, name)
+						addon.QueueList = {type, setID, name}
+					 end,
+					})
+			if type == "set" then 
+				variantTarget, variantType, match, matchType = addon.Sets:SelectedVariant(setID)
+			end
+		end
+
+		L_UIDropDownMenu_AddSeparator()
+		local isHidden = addon.chardb.profile[type][setID]
+		L_UIDropDownMenu_AddButton({
+			notCheckable = true,
+			text = isHidden and SHOW or HIDE,
+			func = function() addon.ToggleHidden(self, isHidden) end,
+		})
+
+		local collected = (self.visualInfo and self.visualInfo.isCollected)
+		--Collection List Right Click options
+		local collectionList = addon.CollectionList:CurrentList()
+		local isInList = match or addon.CollectionList:IsInList(setID, type)
+
+		--if  type  == "set" or ((isInList and collected) or not collected)then --(type == "item" and not (model.visualInfo and model.visualInfo.isCollected)) or type == "set" or type == "extraset" then
+			local targetSet = match or variantTarget or setID
+			local targetText = match and " - "..matchType or variantTarget and " - "..variantType or ""
+			L_UIDropDownMenu_AddSeparator()
+			local isInList = collectionList[type][targetSet]
+			L_UIDropDownMenu_AddButton({
+				notCheckable = true,
+				text = isInList and L["Remove from Collection List"]..targetText or L["Add to Collection List"]..targetText,
+				func = function()
+							addon.CollectionList:UpdateList(type, targetSet, not isInList)
+					end,
+			})
+			--end
+	end
 end
 
 
@@ -2084,9 +2209,14 @@ do
 	end
 
 
-	function BW_WardrobeSetsTransmogModelRightClickDropDown_OnLoad(self)
-		UIDropDownMenu_Initialize(self, OpenRightClickDropDown, "MENU")
-	end
+
+function addon.Init:CreateRightClickDropDown()
+	BW_WardrobeSetsTransmogModelRightClickDropDown = L_Create_UIDropDownMenu("BW_WardrobeSetsTransmogModelRightClickDropDown", BW_SetsTransmogFrame)
+	BW_SetsTransmogFrame.RightClickDropDown = BW_WardrobeSetsTransmogModelRightClickDropDown
+	L_UIDropDownMenu_Initialize(BW_WardrobeSetsTransmogModelRightClickDropDown, OpenRightClickDropDown, "MENU")
+end
+
+
 end
 
 local TAB_ITEMS = addon.Globals.TAB_ITEMS

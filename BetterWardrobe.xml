@@ -159,7 +159,7 @@
 						UIMenuButtonStretchMixin.OnMouseDown(self, button);
 						if self:IsEnabled() then
 							PlaySound(SOUNDKIT.IG_MAINMENU_OPTION_CHECKBOX_ON);
-							ToggleDropDownMenu(1, nil, BW_TransmogOptionsDropDown, self, 74, 15);
+							L_ToggleDropDownMenu(1, nil, BW_TransmogOptionsDropDown, self, 74, 15);
 						end
 					</OnMouseDown>
 					<OnEnable>
@@ -193,13 +193,6 @@
 					<OnLeave function="GameTooltip_Hide"/>
 				</Scripts>
 			</Button>
-
-			<Frame name="BW_TransmogOptionsDropDown" parentKey="OptionsDropDown" inherits="UIDropDownMenuTemplate">
-				<Scripts>
-					<OnLoad function="BW_WardrobeTransmogVendorOptionsDropDown_OnLoad"/>
-				</Scripts>
-			</Frame>
-
 			<DropDownToggleButton parentKey="FilterButton" inherits="UIMenuButtonStretchTemplate" text="FILTER" hidden="true">
 				<Size x="93" y="22"/>
 				<Anchors>
@@ -220,7 +213,7 @@
 						UIMenuButtonStretchMixin.OnMouseDown(self, button);
 						if self:IsEnabled() then
 							PlaySound(SOUNDKIT.IG_MAINMENU_OPTION_CHECKBOX_ON);
-							ToggleDropDownMenu(1, nil, BW_WardrobeFilterDropDown, self, 74, 15);
+							L_ToggleDropDownMenu(1, nil, BW_WardrobeFilterDropDown, self, 74, 15);
 						end
 					</OnMouseDown>
 					<OnEnable>
@@ -231,12 +224,6 @@
 					</OnDisable>
 				</Scripts>
 			</DropDownToggleButton>
-			<Frame name="BW_WardrobeFilterDropDown" parentKey="FilterDropDown" inherits="UIDropDownMenuTemplate">
-				<Scripts>
-					<OnLoad function="BW_WardrobeFilterDropDown_OnLoad"/>
-				</Scripts>
-			</Frame>
-
 			<Frame name ="BW_SetsCollectionFrame" parentKey="BW_SetsCollectionFrame"  parentArray="ContentFrames" mixin="BetterWardrobeSetsCollectionMixin" hidden="true" useParentLevel="true">
 
 				<KeyValues>
@@ -272,7 +259,6 @@
 									<Anchor point="BOTTOMLEFT" relativePoint="BOTTOMRIGHT" x="4" y="8"/>
 								</Anchors>
 							</Slider>
-							<Frame name="BW_WardrobeSetsFavoriteDropDown" parentKey="FavoriteDropDown" inherits="UIDropDownMenuTemplate" enableMouse="true"/>
 						</Frames>
 						<Scripts>
 							<OnLoad method="OnLoad"/>
@@ -374,11 +360,7 @@
 					</Layer>
 				</Layers>
 				<Frames>
-					<Frame name="BW_WardrobeSetsTransmogModelRightClickDropDown" parentKey="RightClickDropDown" inherits="UIDropDownMenuTemplate" hidden="false">
-						<Scripts>
-							<OnLoad function="BW_WardrobeSetsTransmogModelRightClickDropDown_OnLoad"/>
-						</Scripts>
-					</Frame>
+
 					<Frame parentKey="PagingFrame" inherits="CollectionsPagingFrameTemplate">
 						<Anchors>
 							<Anchor point="BOTTOM" x="22" y="38"/>

@@ -364,12 +364,12 @@ function BW_TransmogVendorExportButton_OnClick(self)
 		},
 	}
 	
-	addon.ContextMenu:SetPoint("TOPLEFT", self, "TOPLEFT", 0, 0)
-	EasyMenu(contextMenuData, addon.ContextMenu, "cursor", 0, 0, "MENU")
+	L_UIDropDownMenu_SetAnchor(addon.ContextMenu, 0, 0, "TOPLEFT", self, "TOPLEFT")
+	L_EasyMenu(contextMenuData, addon.ContextMenu, addon.ContextMenu, 0, 0, "MENU")
 	
-	DropDownList1:ClearAllPoints()
-	DropDownList1:SetPoint("BOTTOMLEFT", self, "BOTTOMLEFT", 0, 0)
-	DropDownList1:SetClampedToScreen(true)
+	--DropDownList1:ClearAllPoints()
+	--DropDownList1:SetPoint("BOTTOMLEFT", self, "BOTTOMLEFT", 0, 0)
+	--DropDownList1:SetClampedToScreen(true)
 end
 
 

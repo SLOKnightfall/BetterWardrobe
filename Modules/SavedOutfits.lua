@@ -612,6 +612,7 @@ function BW_WardrobeOutfitFrameMixin:Toggle(dropDown)
 		BW_WardrobeOutfitFrame:Hide()
 	else
 		CloseDropDownMenus()
+		L_CloseDropDownMenus()
 		self.dropDown = dropDown
 
 		self:Show()

@@ -63,7 +63,7 @@ function DressingRoom:CreateDropDown()
 	f.SaveButton:SetScript("OnClick", function(self)
 					PlaySound(SOUNDKIT.IG_MAINMENU_OPTION_CHECKBOX_ON);
 					local dropDown = self:GetParent();
-					dropDown:CheckOutfitForSave(UIDropDownMenu_GetText(dropDown));
+					dropDown:CheckOutfitForSave(L_UIDropDownMenu_GetText(dropDown));
 				end)
 	f.SaveButton:SetText(SAVE)
 	f:SetScript("OnLoad", f.OnLoad)
@@ -443,6 +443,7 @@ function BW_DressingRoomOutfitFrameMixin:Toggle(dropDown)
 		self:Hide()
 	else
 		CloseDropDownMenus()
+		L_CloseDropDownMenus()
 		self.dropDown = dropDown
 		self:Show()
 		self:SetPoint("TOPLEFT", self.dropDown, "BOTTOMLEFT", 8, -3)

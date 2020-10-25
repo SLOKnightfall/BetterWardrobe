@@ -252,6 +252,7 @@ local function slotOnClick(self, transmogLocation)
 	end
 
 	CloseDropDownMenus()
+	L_CloseDropDownMenus()
 	PlaySound(SOUNDKIT.UI_TRANSMOG_GEAR_SLOT_CLICK);
 	WardrobeCollectionFrame.ItemsCollectionFrame:RefreshVisualsList()
 	WardrobeCollectionFrame.ItemsCollectionFrame:UpdateItems()
@@ -414,8 +415,8 @@ function CollectionList:OptionButton_OnClick(button)
 		},
 	}
 
-	UIDropDownMenu_SetAnchor(ContextMenu, 0, 0, "BOTTOMLEFT", button, "BOTTOMLEFT")
-	EasyMenu(contextMenuData, ContextMenu, ContextMenu, 0, 0, "MENU")	
+	L_UIDropDownMenu_SetAnchor(ContextMenu, 0, 0, "BOTTOMLEFT", button, "BOTTOMLEFT")
+	L_EasyMenu(contextMenuData, ContextMenu, ContextMenu, 0, 0, "MENU")	
 end
 
 

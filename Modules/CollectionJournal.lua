@@ -40,6 +40,7 @@ function addon.Init:BuildCollectionJournalUI()
 	UI.RepositionSortDropDown()
 	--UI.LocationDropDown_Initialize()
 	UI.SavedSetsDropDown_Initialize()
+	UI.CreateFilterMenu()
 
  --UI.CreateFilterMenu()
 	CreateVisualViewButton()
@@ -228,11 +229,6 @@ function UI.SortDropDown_Initialize()
 end
 
 
-function BW_WardrobeFilterDropDown_OnLoad(self)
-	UIDropDownMenu_Initialize(self, UI.FilterMenu_InitializeItems, "MENU")
-end
-
-
 local FILTER_SOURCES = addon.Globals.FILTER_SOURCES
 local EXPANSIONS = addon.Globals.EXPANSIONS
 local filterCollected = {true, true}
@@ -269,13 +265,19 @@ local function RefreshLists()
 end
 
 
---Dropdown for the CollectionJournal Filter Menu  -possible Taint Source
-function UI:FilterMenu_InitializeItems(level)
+function UI.CreateFilterMenu()
+	BW_WardrobeFilterDropDown = L_Create_UIDropDownMenu("BW_WardrobeFilterDropDown", BW_WardrobeCollectionFrame)
+	BW_WardrobeCollectionFrame.FilterDropDown = BW_WardrobeFilterDropDown
+	L_UIDropDownMenu_Initialize(BW_WardrobeFilterDropDown, UI.FilterMenu_InitializeItems, "MENU")
+end
+
+	--Dropdown for the CollectionJournal Filter Menu  -possible Taint Source
+function UI:FilterMenu_InitializeItems( level)
 	if (not WardrobeCollectionFrame.activeFrame) then
 		return
 	end
 
-	local info = UIDropDownMenu_CreateInfo()
+	local info = L_UIDropDownMenu_CreateInfo()
 	info.keepShownOnClick = true
 	local atTransmogrifier = WardrobeFrame_IsAtTransmogrifier()
 
@@ -289,7 +291,7 @@ function UI:FilterMenu_InitializeItems(level)
 					end
 		info.checked = 	function() return filterCollected[1] end
 		info.isNotRadio = true
-		UIDropDownMenu_AddButton(info, level)
+		L_UIDropDownMenu_AddButton(info, level)
 
 		info.text = NOT_COLLECTED
 		info.func = function(_, _, _, value)
@@ -300,8 +302,8 @@ function UI:FilterMenu_InitializeItems(level)
 		info.checked = 	function() return filterCollected[2] end
 		info.isNotRadio = true
 
-		UIDropDownMenu_AddButton(info, level)
-		UIDropDownMenu_AddSeparator()
+		L_UIDropDownMenu_AddButton(info, level)
+		L_UIDropDownMenu_AddSeparator()
 
 		info.checked = 	nil
 		info.isNotRadio = nil
@@ -316,21 +318,21 @@ function UI:FilterMenu_InitializeItems(level)
 		--info.func = function(dropdownbutton, arg1)
 			--_G[arg1]:Hide()
 		--end,
-		UIDropDownMenu_AddButton(info, level)
+		L_UIDropDownMenu_AddButton(info, level)
 
 		info.text = L["Expansion"]
 		info.value = 2
-		UIDropDownMenu_AddButton(info, level)
+		L_UIDropDownMenu_AddButton(info, level)
 
 		info.text = L["Missing:"]
 		info.value = 3
-		UIDropDownMenu_AddButton(info, level)
+		L_UIDropDownMenu_AddButton(info, level)
 
 		info.text = L["Armor Type"]
 		info.value = 4
-		UIDropDownMenu_AddButton(info, level)
+		L_UIDropDownMenu_AddButton(info, level)
 
-	elseif level == 2  and UIDROPDOWNMENU_MENU_VALUE == 1 then
+	elseif level == 2  and L_UIDROPDOWNMENU_MENU_VALUE == 1 then
 		local refreshLevel = 2
 		info.hasArrow = false
 		info.isNotRadio = true
@@ -342,9 +344,9 @@ function UI:FilterMenu_InitializeItems(level)
 								filterSelection[i] = true
 						end
 						RefreshLists()
-						UIDropDownMenu_Refresh(BW_WardrobeFilterDropDown)
+						L_UIDropDownMenu_Refresh(BW_WardrobeFilterDropDown)
 					end
-		UIDropDownMenu_AddButton(info, level)
+		L_UIDropDownMenu_AddButton(info, level)
 
 		local refreshLevel = 2
 		info.hasArrow = false
@@ -358,10 +360,10 @@ function UI:FilterMenu_InitializeItems(level)
 								filterSelection[i] = false
 						end
 						RefreshLists()
-						UIDropDownMenu_Refresh(BW_WardrobeFilterDropDown)
+						L_UIDropDownMenu_Refresh(BW_WardrobeFilterDropDown)
 					end
-		UIDropDownMenu_AddButton(info, level)
-		UIDropDownMenu_AddSeparator(level)
+		L_UIDropDownMenu_AddButton(info, level)
+		L_UIDropDownMenu_AddSeparator(level)
 
 		info.notCheckable = false
 
@@ -374,10 +376,10 @@ function UI:FilterMenu_InitializeItems(level)
 					RefreshLists()
 				end
 				info.checked = 	function() return filterSelection[i] end
-			UIDropDownMenu_AddButton(info, level)
+			L_UIDropDownMenu_AddButton(info, level)
 		end
 
-	elseif level == 2  and UIDROPDOWNMENU_MENU_VALUE == 2 then
+	elseif level == 2  and L_UIDROPDOWNMENU_MENU_VALUE == 2 then
 		local refreshLevel = 2
 		info.hasArrow = false
 		info.isNotRadio = true
@@ -388,9 +390,9 @@ function UI:FilterMenu_InitializeItems(level)
 							xpacSelection[i] = true
 						end
 						RefreshLists()
-						UIDropDownMenu_Refresh(BW_WardrobeFilterDropDown)
+						L_UIDropDownMenu_Refresh(BW_WardrobeFilterDropDown)
 					end
-		UIDropDownMenu_AddButton(info, level)
+		L_UIDropDownMenu_AddButton(info, level)
 
 		local refreshLevel = 2
 		info.hasArrow = false
@@ -403,10 +405,10 @@ function UI:FilterMenu_InitializeItems(level)
 								xpacSelection[i] = false
 						end
 						RefreshLists()
-						UIDropDownMenu_Refresh(BW_WardrobeFilterDropDown)
+						L_UIDropDownMenu_Refresh(BW_WardrobeFilterDropDown)
 					end
-		UIDropDownMenu_AddButton(info, level)
-		UIDropDownMenu_AddSeparator(level)
+		L_UIDropDownMenu_AddButton(info, level)
+		L_UIDropDownMenu_AddSeparator(level)
 
 		info.notCheckable = false
 		for i = 1, #EXPANSIONS do
@@ -416,10 +418,10 @@ function UI:FilterMenu_InitializeItems(level)
 					RefreshLists()
 				end
 				info.checked = 	function() return xpacSelection[i] end
-			UIDropDownMenu_AddButton(info, level)
+			L_UIDropDownMenu_AddButton(info, level)
 		end
 
-	elseif level == 2  and UIDROPDOWNMENU_MENU_VALUE == 3 then
+	elseif level == 2  and L_UIDROPDOWNMENU_MENU_VALUE == 3 then
 		info.hasArrow = false
 		info.isNotRadio = true
 		info.notCheckable = true
@@ -431,9 +433,9 @@ function UI:FilterMenu_InitializeItems(level)
 							missingSelection[i] = true
 						end
 						RefreshLists()
-						UIDropDownMenu_Refresh(BW_WardrobeFilterDropDown)
+						L_UIDropDownMenu_Refresh(BW_WardrobeFilterDropDown)
 					end
-		UIDropDownMenu_AddButton(info, level)
+		L_UIDropDownMenu_AddButton(info, level)
 
 		info.text = UNCHECK_ALL
 		info.func = function()
@@ -441,10 +443,10 @@ function UI:FilterMenu_InitializeItems(level)
 							missingSelection[i] = false
 						end
 						RefreshLists()
-						UIDropDownMenu_Refresh(BW_WardrobeFilterDropDown)
+						L_UIDropDownMenu_Refresh(BW_WardrobeFilterDropDown)
 					end
-		UIDropDownMenu_AddButton(info, level)
-		UIDropDownMenu_AddSeparator(level)
+		L_UIDropDownMenu_AddButton(info, level)
+		L_UIDropDownMenu_AddSeparator(level)
 
 		for index, id in pairs(locationDrowpDown) do
 			if index ~= 21 then --Skip "robe" type
@@ -457,14 +459,14 @@ function UI:FilterMenu_InitializeItems(level)
 								missingSelection[21] = value
 							end
 
-							UIDropDownMenu_Refresh(BW_WardrobeFilterDropDown)
+							L_UIDropDownMenu_Refresh(BW_WardrobeFilterDropDown)
 							RefreshLists()
 						end
 				info.checked = function() return missingSelection[index] end
-				UIDropDownMenu_AddButton(info, level)
+				L_UIDropDownMenu_AddButton(info, level)
 			end
 		end
-	elseif level == 2  and UIDROPDOWNMENU_MENU_VALUE == 4 then
+	elseif level == 2  and L_UIDROPDOWNMENU_MENU_VALUE == 4 then
 		local counter = 1
 		for name in pairs(addon.Globals.ARMOR_MASK) do
 			info.keepShownOnClick = false
@@ -477,7 +479,7 @@ function UI:FilterMenu_InitializeItems(level)
 			end
 			info.arg1 = name
 			info.checked = 	function() return addon.selectedArmorType == name end
-			UIDropDownMenu_AddButton(info, level)
+			L_UIDropDownMenu_AddButton(info, level)
 		end
 
 	end
