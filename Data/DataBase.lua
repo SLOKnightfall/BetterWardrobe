@@ -234,6 +234,7 @@ local function buildSetSubstitutions()
 					subitemlist[data.itemID] = sub_data.subID
 				end
 			end
+			subitemlist[itemID] = sub_data.subID
 		end
 	end 
 
