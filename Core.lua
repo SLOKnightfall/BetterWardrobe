@@ -455,7 +455,6 @@ local options = {
 								width = 1.6,
 								desc = L["TooltipPreview_DressingDummy"],
 							},
-
 							TooltipPreviewRotate = {
 								order = 11,
 								name = L["Auto Rotate"],

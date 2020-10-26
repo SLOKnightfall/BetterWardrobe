@@ -1501,28 +1501,40 @@ local function BW_WardrobeSetsCollectionScrollFrame_FavoriteDropDownInit(self)
 	end
 
 	local baseSet = SetsDataProvider:GetBaseSetByID(self.baseSetID)
+	local type = tabType[addon.GetTab()]
 	--local variantSets = SetsDataProvider:GetVariantSets(self.baseSetID)
 	local useDescription = false
 
 	local info = L_UIDropDownMenu_CreateInfo()
 	info.notCheckable = true
 	info.disabled = nil
-	local isFavorite = addon.chardb.profile.favorite[self.baseSetID]
-
+	local isFavorite = (type == "set" and C_TransmogSets.GetIsFavorite(self.baseSetID)) or addon.chardb.profile.favorite[self.baseSetID]
+	print(isFavorite)
 	if (isFavorite) then
-		info.text = BATTLE_PET_UNFAVORITE
-		info.func = function()
-			addon.chardb.profile.favorite[self.baseSetID] = nil
-			BW_SetsCollectionFrame:Refresh()
-			BW_SetsCollectionFrame:OnSearchUpdate()
+		info.text = BATTLE_PET_UNFAVORITE;
+
+		if type == "set"  then
+			info.func = function() WardrobeCollectionFrame.SetsTransmogFrame:SetFavorite(self.baseSetID, false); end
+
+		elseif type == "extraset"  then
+			info.func = function()
+				addon.chardb.profile.favorite[self.baseSetID] = nil
+				BW_SetsCollectionFrame:Refresh()
+				BW_SetsCollectionFrame:OnSearchUpdate()
+			end
 		end
 	else
-		--local targetSetID = WardrobeCollectionFrame.SetsCollectionFrame:GetDefaultSetIDForBaseSet(self.baseSetID)
 		info.text = BATTLE_PET_FAVORITE
-		info.func = function()
-			addon.chardb.profile.favorite[self.baseSetID] = true
-			BW_SetsCollectionFrame:Refresh()
-			BW_SetsCollectionFrame:OnSearchUpdate()
+		if type == "set"  then
+			info.func = function() WardrobeCollectionFrame.SetsTransmogFrame:SetFavorite(self.baseSetID, true); end
+
+		elseif type == "extraset"  then
+			--local targetSetID = WardrobeCollectionFrame.SetsCollectionFrame:GetDefaultSetIDForBaseSet(self.baseSetID)
+			info.func = function()
+				addon.chardb.profile.favorite[self.baseSetID] = true
+				BW_SetsCollectionFrame:Refresh()
+				BW_SetsCollectionFrame:OnSearchUpdate()
+			end
 		end
 	end
 
@@ -1536,7 +1548,6 @@ local function BW_WardrobeSetsCollectionScrollFrame_FavoriteDropDownInit(self)
 local tab = addon.GetTab()
 if tab ~=4 then 
 	--new
-		local type = tabType[addon.GetTab()]
 		local variantTarget, match, matchType
 		local variantType = ""
 		if type == "set" or type =="extraset" then
@@ -1559,10 +1570,11 @@ if tab ~=4 then
 
 		L_UIDropDownMenu_AddSeparator()
 		local isHidden = addon.chardb.profile[type][self.baseSetID]
+		
 		L_UIDropDownMenu_AddButton({
 			notCheckable = true,
 			text = isHidden and SHOW or HIDE,
-			func = function() addon.ToggleHidden(self, isHidden) end,
+			func = function() self.setID = self.baseSetID; addon.ToggleHidden(self, isHidden) end,
 		})
 
 		local collected = self.setCollected
