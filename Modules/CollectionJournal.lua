@@ -251,7 +251,8 @@ local function RefreshLists()
 		WardrobeCollectionFrame.SetsCollectionFrame:OnSearchUpdate()
 		--WardrobeCollectionFrame.SetsTransmogFrame:OnSearchUpdate()
 	elseif tabID == 3 then
-		BW_SetsCollectionFrame:OnSearchUpdate()
+		--BW_SetsCollectionFrame:OnSearchUpdate()
+				BW_SetsCollectionFrame:RefreshScrollList()
 	--	BW_SetsTransmogFrame:OnSearchUpdate()
 	end
 end
@@ -296,6 +297,17 @@ function UI:FilterMenu_InitializeItems( level)
 
 		L_UIDropDownMenu_AddButton(info, level)
 		L_UIDropDownMenu_AddSeparator()
+
+		info.text = L["Class Sets Only"]
+		info.func = function(_, _, _, value)
+						addon.Profile.IgnoreClassRestrictions = not addon.Profile.IgnoreClassRestrictions
+						addon.Init:BuildDB()
+						BW_WardrobeCollectionFrame.BW_SetsTransmogFrame:UpdateProgressBar()
+						RefreshLists()
+					end
+		info.checked = 	function() return not addon.Profile.IgnoreClassRestrictions end
+		info.isNotRadio = true
+		L_UIDropDownMenu_AddButton(info, level)
 
 		info.checked = 	nil
 		info.isNotRadio = nil
