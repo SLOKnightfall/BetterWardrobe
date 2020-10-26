@@ -1018,4 +1018,7 @@ function addon:OnEnable()
 				--	)
 
 				--WardrobeCollectionFrame.ItemsCollectionFrame.RightShoulderCheckbox:Show() 
+	--temp fix to get libray menus to close when clicking outside of tehm
+	hooksecurefunc("UIDropDownMenu_HandleGlobalMouseEvent", function(button, event)  L_UIDropDownMenu_HandleGlobalMouseEvent( button, event) end)
+
 end
