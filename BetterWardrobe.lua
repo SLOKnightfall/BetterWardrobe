@@ -1509,7 +1509,6 @@ local function BW_WardrobeSetsCollectionScrollFrame_FavoriteDropDownInit(self)
 	info.notCheckable = true
 	info.disabled = nil
 	local isFavorite = (type == "set" and C_TransmogSets.GetIsFavorite(self.baseSetID)) or addon.chardb.profile.favorite[self.baseSetID]
-	print(isFavorite)
 	if (isFavorite) then
 		info.text = BATTLE_PET_UNFAVORITE;
 
@@ -2190,7 +2189,7 @@ function BetterWardrobeSetsTransmogMixin:OpenRightClickDropDown()
 		L_UIDropDownMenu_AddButton({
 			notCheckable = true,
 			text = isHidden and SHOW or HIDE,
-			func = function() addon.ToggleHidden(self, isHidden) end,
+			func = function() self.setID = setID; addon.ToggleHidden(self, isHidden) end,
 		})
 
 		local collected = (self.visualInfo and self.visualInfo.isCollected)
