@@ -47,6 +47,18 @@
 			</Layer>
 		</Layers>
 		<Frames>
+			<Frame parentKey="Unavailable">
+			<Size x="17" y="17"/>
+				<Anchors>
+					<Anchor point="TOPRIGHT" x="5" y="10	"/>
+				</Anchors>
+				<Layers>
+					<Layer level="ARTWORK">
+						<Texture parentKey="Icon" file="Interface\Minimap\Minimap_skull_normal" setAllPoints="true" hidden="true">
+						</Texture>
+					</Layer>
+				</Layers>
+			</Frame>
 			<Frame parentKey="Hidden">
 			<Size x="20" y="20"/>
 				<Anchors>

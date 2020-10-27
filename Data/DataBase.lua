@@ -62,7 +62,7 @@ end
 
 addon.ArmorSetModCache = {}
 do
-	function BuildArmorDB()
+	local function BuildArmorDB()
 		for armorType, data in pairs(addon.ArmorSets) do
 			ArmorDB[armorType] = {}
 
@@ -115,8 +115,47 @@ do
 						--setData.mod = setData.bonusid
 				setData.uiOrder = id * 100
 						--setData.filter = setData.filter + 1 -- fix for filter startin at 0
-
+				setData.numCollected = 0
+				setData.numTotal = 0
+				setData.setSources = {}
 				for index, item in ipairs( setData["items"]) do
+					setData.numTotal = setData.numTotal + 1
+					local mod = setData.mod or 0
+					local appearanceID, sourceID = C_TransmogCollection.GetItemInfo(item, mod)
+					if not appearanceID then
+						for i = 0, 10 do
+							appearanceID, sourceID = C_TransmogCollection.GetItemInfo(item, i)
+							if appearanceID then
+								break
+							end
+						end
+					end
+
+					if appearanceID then 
+						local sources = C_TransmogCollection.GetAppearanceSources(appearanceID) or {} --Can return nil if no longer in game
+						local baseSource 
+						if (#sources == 0) then
+							-- can happen if a slot only has HiddenUntilCollected sources
+							
+							sources = {C_TransmogCollection.GetSourceInfo(sourceID)}
+							if not sources[1].sourceType then 
+								setData.unavailable = true
+							end
+
+						else
+							WardrobeCollectionFrame_SortSources(sources)
+						end
+							local _, _, canEnchant, _, isCollected  = C_TransmogCollection.GetAppearanceSourceInfo(sourceID)
+							if sources[1].isCollected then 
+								setData.setSources[sourceID] = true
+								setData.numCollected = setData.numCollected + 1
+							else
+								setData.setSources[sourceID] = false
+							end
+					else
+						--end
+					end
+
 					if setData.sources and setData.sources[item] and setData.sources[item] ~= 0 then 
 						local appearanceID = setData.sources[item]
 						ItemDB[appearanceID] = ItemDB[appearanceID] or {}
@@ -140,14 +179,7 @@ do
 		addon.ArmorSets = nil
 	end
 
-	function addon.Init:InitDB()
-		BuildArmorDB()
-		addon.Init:BuildDB()
-	end
-end
 
-
-do
 	local function addArmor(armorSet)
 		for id, setData in pairs(armorSet) do
 			if  (setData.isClass or 
@@ -238,7 +270,10 @@ local function buildSetSubstitutions()
 		end
 	end 
 
-
+	function addon.Init:InitDB()
+		BuildArmorDB()
+		addon.Init:BuildDB()
+	end
 
 	function addon.Init:BuildDB()
 		buildSetSubstitutions()
@@ -250,7 +285,7 @@ local function buildSetSubstitutions()
 
 		--Add Hidden Set
 		SET_INDEX[0] = hiddenSet
-		tinsert(SET_DATA, hiddenSet)
+		--tinsert(SET_DATA, hiddenSet)
 	end
 
 
@@ -260,7 +295,8 @@ local function buildSetSubstitutions()
 		--addon.extraSetsCache = nil
 		wipe(SET_INDEX)
 		wipe(SET_DATA)
-
+		addon.ClearArtifactData()
+		wipe(addon.SavedSetCache)
 		--setsInfo = nil
 	end
 
@@ -384,14 +420,6 @@ local function buildSetSubstitutions()
 		local _, _, _, itemEquipLoc1 = GetItemInfoInstant(itemID) 
 		local _, _, _, itemEquipLoc2 = GetItemInfoInstant(subID) 
 
-		--if not itemEquipLoc1 then 
-			--message(itemID.." not a valid itemID")
-			--return false
-
-		--elseif not itemEquipLoc2 then
-			--message(subID.." not a valid itemID")
-			--return false
-		--end
 		if itemEquipLoc1 ~= itemEquipLoc2 then 
 			BW_WardrobeOutfitFrameMixin:ShowPopup("BETTER_WARDROBE_SUBITEM_WRONG_LOCATION_POPUP")
 			return false 

@@ -570,12 +570,12 @@ function WardrobeCollectionFrame_OpenTransmogLink(link)
 	end
 end
 
-local function CheckMissingLocation(set)
+local function CheckMissingLocation(setInfo)
 --function addon.Sets:GetLocationBasedCount(set)
 	local filtered = false
 	local invType = {}
 
-		local sources = C_TransmogSets.GetSetSources(set.setID)
+		local sources = C_TransmogSets.GetSetSources(setInfo.setID)
 		for sourceID in pairs(sources) do
 			local sourceInfo = C_TransmogCollection.GetSourceInfo(sourceID)
 			local sources = sourceInfo and C_TransmogCollection.GetAppearanceSources(sourceInfo.visualID)

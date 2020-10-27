@@ -865,35 +865,54 @@ local defaults = {
 		ExtraLargeTransmogArea = false,
 	}
 }
+local DB_Defaults = {
+	char_defaults = {
+		profile = {
+			item = {},
+			set = {},
+			extraset = {},
+	favorite = {},
+	favorite_items = {},
+			outfits = {},
+			lastTransmogOutfitIDSpec = {},
+	collectionList = {item = {}, set = {}, extraset = {}, name = "CollectionList"},
+	selectedCollectionList = 1,
+	lists = {},
+			listUpdate = false,
+		}
+	},
 
-local char_defaults = {
-	profile = {
-		item = {},
-		set = {},
-		extraset = {},
-		favorite = {},
-		favorite_items = {},
-		outfits = {},
-		lastTransmogOutfitIDSpec = {},
-		collectionList = {item = {}, set = {}, extraset = {}, name = "CollectionList"},
-		selectedCollectionList = 1,
-		lists = {},
-		listUpdate = false,
-	}
-}
-
-local savedsets_defaults = {
+	savedsets_defaults = {
 		profile = {autoHideSlot = {},},
 		global = {sets={}, itemsubstitute = {}, outfits = {}, updates = {},},
-}
+	},
 
-local itemsub_defaults = {
+	collectionList_defaults = {	
+		profile = {
+			collectionList = {item = {}, set = {}, extraset = {}, name = "CollectionList"},
+			selectedCollectionList = 1,
+			lists = {},
+		},
+	},
+
+	favoriteList_defaults = {
+		profile = {item = {}, set = {}, extraset = {}, },
+	},
+
+ 	itemsub_defaults = {
 		profile = {items = {}}
+	},
+
+	charSavedOutfits_defaults = {
+		global = {}
+	},
 }
 
-local charSavedOutfits_defaults = {
-		global = {}
-}
+
+
+
+
+
 
 ---Updates Profile after changes
 function addon:RefreshConfig()
@@ -927,23 +946,31 @@ function addon:OnInitialize()
 end
 
 
+
+
 function addon:OnEnable()
 	_,playerClass, classID = UnitClass("player")
+	local DB_Defaults = DB_Defaults
+	BetterWardrobe_ListData = BetterWardrobe_ListData or {}
+	local listDB = BetterWardrobe_ListData
+	listDB.favoriteListDB = listDB.favoriteListDB or {}
+	listDB.collectionListDB = listDB.collectionListDB or {}
 
-
+--Create all the profiled DB
 	self.db = LibStub("AceDB-3.0"):New("BetterWardrobe_Options", defaults, true)
 	options.args.profiles = LibStub("AceDBOptions-3.0"):GetOptionsTable(self.db)
 	options.args.profiles.name = L["Profiles - Options Settings"]
 
-	self.chardb = LibStub("AceDB-3.0"):New("BetterWardrobe_CharacterData", char_defaults)
+	self.chardb = LibStub("AceDB-3.0"):New("BetterWardrobe_CharacterData", DB_Defaults.char_defaults)
 	options.args.charprofiles = LibStub("AceDBOptions-3.0"):GetOptionsTable(self.chardb)
 	options.args.charprofiles.name = L["Profiles - Collection Settings"]
 
-	self.setdb = LibStub("AceDB-3.0"):New("BetterWardrobe_SavedSetData", savedsets_defaults)
+	self.setdb = LibStub("AceDB-3.0"):New("BetterWardrobe_SavedSetData", DB_Defaults.savedsets_defaults)
+	self.itemsubdb = LibStub("AceDB-3.0"):New("BetterWardrobe_SubstituteItemData", DB_Defaults.itemsub_defaults, true)
+	self.char_savedOutfits = LibStub("AceDB-3.0"):New("BetterWardrobe_SavedOutfitData", DB_Defaults.charSavedOutfits_defaults, true) 
 
-	self.itemsubdb = LibStub("AceDB-3.0"):New("BetterWardrobe_SubstituteItemData", itemsub_defaults, true)
-
-	self.char_savedOutfits = LibStub("AceDB-3.0"):New("BetterWardrobe_SavedOutfitData", charSavedOutfits_defaults, true) 
+	self.favoriteListDB =  LibStub("AceDB-3.0"):New(listDB.favoriteListDB, DB_Defaults.favoriteList_defaults) 
+	self.collectionListDB =  LibStub("AceDB-3.0"):New(listDB.collectionListDB, DB_Defaults.collectionList_defaults) 
 
 
 	local profile = self.setdb:GetCurrentProfile()
@@ -979,7 +1006,6 @@ function addon:OnEnable()
 	addon.Init:InitDB()
 	addon.Init:Blizzard_Wardrobe()
 	--C_Timer.After(0.2, function()
-		--addon.SetItemSubstitute(1314, 9780)
 		addon.Init:BuildUI()
 		addon.Init:BuildTooltips()
 		addon.Init:DressingRoom()

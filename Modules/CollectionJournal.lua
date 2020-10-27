@@ -525,6 +525,8 @@ local function SavedOutfitDB_Dropdown_OnClick(self, arg1, arg2, checked)
 		--L_UIDropDownMenu_SetText(BW_DBSavedSetDropdown, arg1)
 		addon.savedSetCache = nil
 end
+
+
 function SavedOutfitDB_Dropdown_Menu(frame, level, menuList)
 	local count = 1
 	for name in pairs(addon.setdb.global.sets)do
@@ -538,6 +540,7 @@ function SavedOutfitDB_Dropdown_Menu(frame, level, menuList)
 		  count = count +1
 	end
 end
+
 
 --Dropdownmenu for the selection of other character's saved sets
 function UI.SavedSetsDropDown_Initialize(self)
@@ -641,11 +644,16 @@ function BW_WardrobeCollectionFrame_SetTab(tabID)
 	local searchBox_Y = ((tab1 or ((tab2 or tab3 or tab4) and atTransmogrifier)) and -35) or -69
 	local searchBox_Anchor = ((tab1 or ((tab2 or tab3 or tab4) and atTransmogrifier)) and "TOPRIGHT") or "TOPLEFT"
 
+----Moving the search box is a cause of lag?
+
 	WardrobeCollectionFrame.searchBox:ClearAllPoints()
-	WardrobeCollectionFrame.searchBox:SetEnabled((tab1 and  WardrobeCollectionFrame.ItemsCollectionFrame:GetActiveCategory()) or tab2 or tab3)
-	WardrobeCollectionFrame.searchBox:SetPoint(searchBox_Anchor, searchBox_X, searchBox_Y)
+	--WardrobeCollectionFrame.searchBox:SetEnabled((tab1 and  WardrobeCollectionFrame.ItemsCollectionFrame:GetActiveCategory()) or tab2 or tab3)
+	--WardrobeCollectionFrame.searchBox:SetPoint(searchBox_Anchor, searchBox_X, searchBox_Y)
 	WardrobeCollectionFrame.searchBox:SetWidth(((tab2 or tab3 or tab4) and not atTransmogrifier and 145) or 105)
-	--WardrobeCollectionFrame.searchBox:SetShown(not tab4)
+	--WardrobeCollectionFrame.searchBox:SetShown(tab1 or tab2)
+
+	--BW_WardrobeCollectionFrame.searchBox:SetShown(tab3)
+	--WardrobeCollectionFrame.searchBox:Hide()
 
 	WardrobeCollectionFrame.FilterButton:SetShown(tab1 or (tab2 and not atTransmogrifier))
 	WardrobeCollectionFrame.FilterButton:SetEnabled((tab1 and  WardrobeCollectionFrame.ItemsCollectionFrame:GetActiveCategory()) or tab2)
@@ -688,7 +696,10 @@ function BW_WardrobeCollectionFrame_SetTab(tabID)
 				BW_SortDropDown:SetPoint("TOPLEFT", WardrobeCollectionFrame.ItemsCollectionFrame.WeaponDropDown, "BOTTOMLEFT", 0, yOffset)
 			end
 		end
-
+		WardrobeCollectionFrame.searchBox:ClearAllPoints()
+		WardrobeCollectionFrame.searchBox:SetPoint(searchBox_Anchor, searchBox_X, searchBox_Y)
+		BW_WardrobeCollectionFrame.searchBox:Hide()
+		WardrobeCollectionFrame.searchBox:Show()
 	elseif tab2 then
 		WardrobeCollectionFrame.SetsTransmogFrame:UpdateProgressBar()
 		if atTransmogrifier  then
@@ -700,7 +711,10 @@ function BW_WardrobeCollectionFrame_SetTab(tabID)
 			BW_WardrobeCollectionFrame.activeFrame = WardrobeCollectionFrame.SetsCollectionFrame
 			BW_SortDropDown:SetPoint("TOPLEFT", BW_WardrobeToggle, "TOPRIGHT")
 		end
-
+		WardrobeCollectionFrame.searchBox:ClearAllPoints()
+		WardrobeCollectionFrame.searchBox:SetPoint(searchBox_Anchor, searchBox_X, searchBox_Y)
+		BW_WardrobeCollectionFrame.searchBox:Hide()
+		WardrobeCollectionFrame.searchBox:Show()
 	elseif tab3 then
 		BW_WardrobeCollectionFrame.BW_SetsTransmogFrame:UpdateProgressBar()
 		if atTransmogrifier then
@@ -712,8 +726,8 @@ function BW_WardrobeCollectionFrame_SetTab(tabID)
 			BW_WardrobeCollectionFrame.activeFrame = BW_WardrobeCollectionFrame.BW_SetsCollectionFrame
 			BW_SortDropDown:SetPoint("TOPLEFT", BW_WardrobeToggle, "TOPRIGHT")
 		end
-		
-		WardrobeCollectionFrame.searchBox:Show()
+		BW_WardrobeCollectionFrame.searchBox:Show()
+		WardrobeCollectionFrame.searchBox:Hide()
 	elseif tab4 then
 		BW_SortDropDown:Hide()
 		--BW_WardrobeToggle.VisualMode = true

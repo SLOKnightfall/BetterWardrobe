@@ -272,8 +272,6 @@ end
 
 
 function Sets.isMogKnown(sourceID)
-
-
 	local sourceInfo = C_TransmogCollection.GetSourceInfo(sourceID)
 	
 	if not sourceInfo then return false end
@@ -337,13 +335,21 @@ function SetsDataProvider:ClearSets()
 end
 
 
-local function CheckMissingLocation(set)
---function addon.Sets:GetLocationBasedCount(set)
+local function CheckMissingLocation(setInfo)
+--function addon.Sets:GetLocationBasedCount(setInfo)
 	local filtered = false
+	for type, value in pairs(addon.missingSelection) do
+		if value then
+			filtered = true
+			break
+		end
+	end
+	--no need to filter if nothing is selected
+	if not filtered then return true end
+	
 	local invType = {}
-
-	if not set.items then
-		local sources = C_TransmogSets.GetSetSources(set.setID)
+	if not setInfo.items then
+		local sources = C_TransmogSets.GetSetSources(setInfo.setID)
 		for sourceID in pairs(sources) do
 			local isCollected = Sets.isMogKnown(sourceID) 
 			if addon.missingSelection[sourceInfo.invType] and not isCollected then		
@@ -352,40 +358,13 @@ local function CheckMissingLocation(set)
 				filtered = true
 			end
 		end
-			--[[local sourceInfo = C_TransmogCollection.GetSourceInfo(sourceID)
-									local sources = sourceInfo and C_TransmogCollection.GetAppearanceSources(sourceInfo.visualID)
-									if sources then
-										if #sources > 1 then
-											WardrobeCollectionFrame_SortSources(sources)
-										end
-									
-										if  addon.missingSelection[sourceInfo.invType] and not sources[1].isCollected then
-						
-											return true
-										elseif addon.missingSelection[sourceInfo.invType] then 
-											filtered = true
-										end
-									end
-								end]]
-
 	else
-		for i, itemID in ipairs(set.items) do
-			local visualID, sourceID = addon.GetItemSource(itemID, set.mod)	
-			if sourceID then
-				local isCollected = Sets.isMogKnown(sourceID) 
-				local sourceInfo = C_TransmogCollection.GetSourceInfo(sourceID)
-												--[[local sources = sourceInfo and C_TransmogCollection.GetAppearanceSources(sourceInfo.visualID)
-												if sources then
-													if #sources > 1 then
-														WardrobeCollectionFrame_SortSources(sources)
-													end]]
-				invType[sourceInfo.invType] = true
---print(addon.missingSelection[sourceInfo.invType])
-				if addon.missingSelection[sourceInfo.invType] and not isCollected then
-					return true
-				elseif addon.missingSelection[sourceInfo.invType] then 
+		for sourceID, isCollected in pairs(setInfo.setSources) do
+			local sourceInfo = C_TransmogCollection.GetSourceInfo(sourceID)
+			if addon.missingSelection[sourceInfo.invType] and not isCollected then
+				return true
+			elseif addon.missingSelection[sourceInfo.invType] then 
 				filtered = true 
-				end
 			end
 		end
 	end
@@ -404,40 +383,42 @@ local setsByExpansion = {}
 local setsByFilter = {}
 function SetsDataProvider:FilterSearch(useBaseSet)
 	local baseSets
+	local filteredSets = {}
+	local searchString
+
 	if useBaseSet then
 		baseSets = SetsDataProvider:GetBaseSets()
+		self.baseSets = filteredSets
 	else
 		baseSets = SetsDataProvider:GetUsableSets()
+		self.usableSets = filteredSets
+		self.baseSets = baseSets
 	end
 
 	if 	BW_WardrobeCollectionFrame.selectedTransmogTab == 4 or BW_WardrobeCollectionFrame.selectedCollectionTab == 4 then
 		self.baseSets = baseSets
 		return
+	elseif BW_WardrobeCollectionFrame.selectedTransmogTab == 3 or BW_WardrobeCollectionFrame.selectedCollectionTab == 3 then
+		searchString = string.lower(BW_WardrobeCollectionFrameSearchBox:GetText())
+	else
+		searchString = string.lower(WardrobeCollectionFrameSearchBox:GetText())
 	end
 
-	local filteredSets = {}
-		local searchString = string.lower(WardrobeCollectionFrameSearchBox:GetText())
 
-		for i, data in ipairs(baseSets) do
+	for i, data in ipairs(baseSets) do
 
-			local count , total = SetsDataProvider:GetSetSourceCounts(data.setID)
-			local collected = count == total
-			if ((addon.filterCollected[1] and collected) or
-				(addon.filterCollected[2] and not collected)) and
-				CheckMissingLocation(data) and
-		 		addon.xpacSelection[data.expansionID] and
-				addon.filterSelection[data.filter] and
-				(searchString and string.find(string.lower(data.name), searchString)) then -- or string.find(baseSet.label, searchString) or string.find(baseSet.description, searchString)then
-				tinsert(filteredSets, data)
-		end
+		local count , total =0,0 --SetsDataProvider:GetSetSourceCounts(data.setID)
+		local collected = count == total
+		if ((addon.filterCollected[1] and collected) or
+			(addon.filterCollected[2] and not collected)) and
+			CheckMissingLocation(data) and
+	 		addon.xpacSelection[data.expansionID] and
+			addon.filterSelection[data.filter] and
+			(searchString and string.find(string.lower(data.name), searchString)) then -- or string.find(baseSet.label, searchString) or string.find(baseSet.description, searchString)then
+			tinsert(filteredSets, data)
+	end
 
-		self:SortSets(filteredSets)
-		if useBaseSet then
-				self.baseSets = filteredSets
-		else
-				self.usableSets = filteredSets
-				self.baseSets = baseSets
-		end
+	self:SortSets(filteredSets)
 	
 	--else
 		--self.baseSets = baseSets
@@ -474,13 +455,13 @@ end
 end
 
 
-function addon.Sets:GetLocationBasedCount(set)
+function addon.Sets:GetLocationBasedCount(setInfo)
 	local collectedCount = 0
 	local totalCount = 0
 	local items = {}
 
-	if not set.items then
-		local sources = C_TransmogSets.GetSetSources(set.setID)
+	if not setInfo.items then
+		local sources = C_TransmogSets.GetSetSources(setInfo.setID)
 		for sourceID in pairs(sources) do
 			local sourceInfo = C_TransmogCollection.GetSourceInfo(sourceID)
 			local sources = sourceInfo and C_TransmogCollection.GetAppearanceSources(sourceInfo.visualID)
@@ -500,8 +481,8 @@ function addon.Sets:GetLocationBasedCount(set)
 		end
 
 	else
-		for i, itemID in ipairs(set.items) do
-			local visualID, sourceID = addon.GetItemSource(itemID, set.mod)	
+		for i, itemID in ipairs(setInfo.items) do
+			local visualID, sourceID = addon.GetItemSource(itemID, setInfo.mod)	
 			if sourceID then
 				local sourceInfo = C_TransmogCollection.GetSourceInfo(sourceID)
 				local sources = sourceInfo and C_TransmogCollection.GetAppearanceSources(sourceInfo.visualID)
@@ -579,21 +560,27 @@ function SetsDataProvider:GetSetSourceData(setID)
 		self.sourceData = {}
 	end
 
-	local sourceData = self.sourceData[setID]
-	if (not sourceData) then
-		local sources = addon.GetSetsources(setID)
-		local numCollected = 0
-		local numTotal = 0
-		if sources then
-			for sourceID, collected in pairs(sources) do
-				if (collected) then
-					numCollected = numCollected + 1
+	local info = addon.GetSetInfo(setID)
+	local sourceData
+ 	if info and not info.type == "saved" then 
+		sourceData = {numCollected =  info.numCollected , numTotal = info.numTotal , sources = info.setSources}
+	else
+		sourceData = self.sourceData[setID]
+		if (not sourceData) then
+			local sources = addon.GetSetsources(setID)
+			local numCollected = 0
+			local numTotal = 0
+			if sources then
+				for sourceID, collected in pairs(sources) do
+					if (collected) then
+						numCollected = numCollected + 1
+					end
+					numTotal = numTotal + 1
 				end
-				numTotal = numTotal + 1
-			end
 
-			sourceData = {numCollected = numCollected, numTotal = numTotal, sources = sources }
-			self.sourceData[setID] = sourceData
+				sourceData = {numCollected = numCollected, numTotal = numTotal, sources = sources }
+				self.sourceData[setID] = sourceData
+			end
 		end
 	end
 	return sourceData
@@ -637,7 +624,7 @@ function SetsDataProvider:GetSortedSetSources(setID)
 
 		if (sourceInfo) then
 			local sortOrder = EJ_GetInvTypeSortOrder(sourceInfo.invType)
-			tinsert(returnTable, {sourceID = sourceID, collected = collected, sortOrder = sortOrder, itemID = sourceInfo.itemID, invType = sourceInfo.invType })
+			tinsert(returnTable, {sourceID = sourceID, collected = collected, sortOrder = sortOrder, itemID = sourceInfo.itemID, invType = sourceInfo.invType, visualID = sourceInfo.visualID  })
 		end
 	end
 
@@ -801,6 +788,8 @@ function BetterWardrobeSetsCollectionMixin:OnLoad()
 	self.DetailsFrame.itemFramesPool = CreateFramePool("FRAME", self.DetailsFrame, "BW_WardrobeSetsDetailsItemFrameTemplate")
 
 	self.selectedVariantSets = {}
+
+
 end
 
 
@@ -1035,13 +1024,27 @@ end
 
 
 function BetterWardrobeSetsCollectionMixin:UpdateProgressBar()
-	WardrobeCollectionFrame_UpdateProgressBar(GetSetCounts())
+	--WardrobeCollectionFrame_UpdateProgressBar(GetSetCounts())
 end
 
 
 function BetterWardrobeSetsCollectionMixin:ClearLatestSource()
 	newTransmogInfo["latestSource"] = NO_TRANSMOG_SOURCE_ID
 	BW_WardrobeCollectionFrame_UpdateTabButtons();
+end
+
+
+function isAvailableItem(sourceID)
+	local _, visualID = C_TransmogCollection.GetAppearanceSourceInfo(sourceID)		
+	local sources = C_TransmogCollection.GetAppearanceSources(visualID) or {} --Can return nil if no longer in game
+
+	if (#sources == 0) then
+		local setinfo = C_TransmogCollection.GetSourceInfo(sourceID)
+		if not setinfo.sourceType then 
+			return false
+		end
+	end
+	return true
 end
 
 
@@ -1083,7 +1086,16 @@ function BetterWardrobeSetsCollectionMixin:DisplaySet(setID)
 		itemFrame.itemID = sortedSources[i].itemID
 		itemFrame.collected = sortedSources[i].collected
 		itemFrame.invType = sortedSources[i].invType
+		itemFrame.visualID = sortedSources[i].visualID
 		local texture = C_TransmogCollection.GetSourceIcon(sortedSources[i].sourceID)
+		if not itemFrame.unavailable then 
+			--itemFrame.unavailable = CreateFrame("Frame", nil, itemFrame, "BackdropTemplate")
+			--itemFrame.unavailable:SetAllPoints()
+			itemFrame.unavailable = itemFrame:CreateTexture(nil, "ARTWORK")
+			itemFrame.unavailable:SetAllPoints()
+			itemFrame.unavailable:SetColorTexture(1,0,0,.1)
+		end
+
 		itemFrame.Icon:SetTexture(texture)
 		if (sortedSources[i].collected) then
 			itemFrame.Icon:SetDesaturated(false)
@@ -1105,6 +1117,14 @@ function BetterWardrobeSetsCollectionMixin:DisplaySet(setID)
 			itemFrame.IconBorder:SetDesaturation(1)
 			itemFrame.IconBorder:SetAlpha(0.3)
 			itemFrame.New:Hide()
+		end
+		if isAvailableItem(itemFrame.sourceID) then  
+			itemFrame.unavailable:Hide()
+			--itemFrame.Icon:SetColorTexture(1,0,0,.5)
+		else 
+		itemFrame.unavailable:Show()
+
+			--itemFrame.Icon:SetColorTexture(0,0,0,.5)
 		end
 
 		self:SetItemFrameQuality(itemFrame)
@@ -1660,6 +1680,8 @@ function BetterWardrobeSetsCollectionScrollFrameMixin:Update()
 			button.SelectedTexture:SetShown(baseSet.setID == selectedBaseSetID)
 			button.Favorite:SetShown(isFavorite)
 			button.CollectionListVisual.Hidden.Icon:SetShown(isHidden)
+			button.CollectionListVisual.Unavailable.Icon:SetShown(baseSet.unavailable)
+
 			button.CollectionListVisual.InvalidTexture:SetShown(not baseSet.isClass)
 			local isInList = addon.CollectionList:IsInList(baseSet.setID, "extraset")
 			button.CollectionListVisual.Collection.Collection_Icon:SetShown(isInList)
@@ -1974,7 +1996,7 @@ end
 
 
 function BetterWardrobeSetsTransmogMixin:UpdateProgressBar()
-	WardrobeCollectionFrame_UpdateProgressBar(GetSetCounts())
+	--WardrobeCollectionFrame_UpdateProgressBar(GetSetCounts())
 end
 
 
@@ -2189,7 +2211,7 @@ function BetterWardrobeSetsTransmogMixin:OpenRightClickDropDown()
 		L_UIDropDownMenu_AddButton({
 			notCheckable = true,
 			text = isHidden and SHOW or HIDE,
-			func = function() self.setID = setID; addon.ToggleHidden(self, isHidden) end,
+			func = function()self.setID = setID; addon.ToggleHidden(self, isHidden) end,
 		})
 
 		local collected = (self.visualInfo and self.visualInfo.isCollected)
@@ -2325,7 +2347,7 @@ function BW_WardrobeCollectionFrame_OnShow(self)
 
 	addon.setdb.global.sets[addon.setdb:GetCurrentProfile()] = addon.GetSavedList()
 	addon.selectedArmorType = addon.Globals.CLASS_INFO[playerClass][3]
-
+SetsDataProvider:GetBaseSets()
 	addon.BuildClassArtifactAppearanceList()
 end
 
@@ -2351,6 +2373,7 @@ function BW_WardrobeCollectionFrame_OnHide(self)
 	addon:ClearCache()
 	addon.selectedArmorType = addon.Globals.CLASS_INFO[playerClass][3]
 end
+
 
 function BetterWardrobeSetsCollectionMixin:HandleKey(key)
 	if BW_WardrobeCollectionFrame.selectedCollectionTab == 4 then

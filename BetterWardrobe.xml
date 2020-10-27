@@ -122,6 +122,174 @@
 					<OnClick function="BW_WardrobeCollectionFrame_ClickTab"/>
 				</Scripts>
 			</Button>
+			<EditBox name="$parentSearchBox" parentKey="searchBox" inherits="SearchBoxTemplate" letters="40">
+				<Size x="115" y="20"/>
+				<Anchors>
+					<Anchor point="TOPLEFT" x="19" y="-69"/>
+				</Anchors>
+				<Scripts>
+					<OnLoad function="WardrobeCollectionFrameSearchBox_OnLoad"/>
+					<OnHide function="WardrobeCollectionFrameSearchBox_OnHide"/>
+					<OnKeyDown function="WardrobeCollectionFrameSearchBox_OnKeyDown"/>
+					<OnTextChanged function="WardrobeCollectionFrameSearchBox_OnTextChanged"/>
+					<OnEnter>
+						if ( not self:IsEnabled() ) then
+							GameTooltip:ClearAllPoints();
+							GameTooltip:SetPoint("BOTTOM", self, "TOP", 0, 0);
+							GameTooltip:SetOwner(self, "ANCHOR_PRESERVE");
+							GameTooltip:SetText(WARDROBE_NO_SEARCH);
+						end
+					</OnEnter>
+					<OnLeave function="GameTooltip_Hide"/>
+				</Scripts>
+			</EditBox>
+			<Frame parentKey="searchProgressFrame" hidden="true">
+				<Size x="0" y="24"/>
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeKey="$parent.searchBox" relativePoint="BOTTOMLEFT" x="-7"/>
+					<Anchor point="TOPRIGHT" relativeKey="$parent.searchBox" relativePoint="BOTTOMRIGHT" x="3"/>
+				</Anchors>
+				<Layers>
+					<Layer level="BACKGROUND">
+						<Texture parentKey="background" atlas="_search-rowbg">
+							<Anchors>
+								<Anchor point="TOPLEFT"/>
+								<Anchor point="BOTTOMRIGHT"/>
+							</Anchors>
+						</Texture>
+					</Layer>
+					<Layer level="ARTWORK">
+						<Texture parentKey="botLeftCorner" inherits="UI-Frame-BotCornerLeft">
+							<Anchors>
+								<Anchor point="LEFT" x="-7" y="0"/>
+								<Anchor point="BOTTOM" x="0" y="-5"/>
+							</Anchors>
+						</Texture>
+						<Texture parentKey="botRightCorner" inherits="UI-Frame-BotCornerRight">
+							<Anchors>
+								<Anchor point="BOTTOM" x="0" y="-5"/>
+								<Anchor point="RIGHT" x="4" y="0"/>
+							</Anchors>
+						</Texture>
+						<Texture parentKey="bottomBorder" inherits="_UI-Frame-Bot">
+							<Anchors>
+								<Anchor point="BOTTOMLEFT" relativeKey="$parent.botLeftCorner" relativePoint="BOTTOMRIGHT" y="0"/>
+								<Anchor point="BOTTOMRIGHT" relativeKey="$parent.botRightCorner" relativePoint="BOTTOMLEFT" y="0"/>
+							</Anchors>
+						</Texture>
+						<Texture parentKey="leftBorder" inherits="!UI-Frame-LeftTile">
+							<Anchors>
+								<Anchor point="TOP" x="0" y="1" />
+								<Anchor point="BOTTOMLEFT" relativeKey="$parent.botLeftCorner" relativePoint="TOPLEFT"/>
+							</Anchors>
+						</Texture>
+						<Texture parentKey="rightBorder" inherits="!UI-Frame-RightTile">
+							<Anchors>
+								<Anchor point="TOP" x="0" y="1" />
+								<Anchor point="BOTTOMRIGHT" relativeKey="$parent.botRightCorner" relativePoint="TOPRIGHT" x="1" y="0"/>
+							</Anchors>
+						</Texture>
+						<Texture parentKey="topBorder" inherits="_UI-Frame-Bot">
+							<Anchors>
+								<Anchor point="TOPLEFT" relativePoint="TOPLEFT" x="-2" y="3"/>
+								<Anchor point="BOTTOMRIGHT" relativePoint="TOPRIGHT" x="2" y="-3"/>
+							</Anchors>
+						</Texture>
+					</Layer>
+				</Layers>
+				<Frames>
+					<Frame parentKey="loading">
+						<Anchors>
+							<Anchor point="TOPLEFT" relativePoint="TOPLEFT"/>
+							<Anchor point="BOTTOMRIGHT" relativePoint="BOTTOMRIGHT"/>
+						</Anchors>
+						<Layers>
+							<Layer level="OVERLAY">
+								<FontString name="$parentText" inherits="GameFontHighlight" justifyH="CENTER" parentKey="text" text="SEARCH_LOADING_TEXT" hidden="false">
+									<Size x="0" y="0"/>
+									<Anchors>
+										<Anchor point="CENTER" x="14" y="1"/>
+									</Anchors>
+								</FontString>
+							</Layer>
+						</Layers>
+						<Frames>
+							<Frame parentKey="spinner" inherits="LoadingSpinnerTemplate" hidden="false">
+								<Size x="38" y="38"/>
+								<Anchors>
+									<Anchor point="RIGHT" relativeKey="$parent.text" relativePoint="LEFT" x="4"/>
+								</Anchors>
+								<Scripts>
+									<OnLoad>
+										self.Anim:Play();
+									</OnLoad>
+								</Scripts>
+							</Frame>
+						</Frames>
+					</Frame>
+					<StatusBar parentKey="searchProgressBar" hidden="false">
+						<Anchors>
+							<Anchor point="TOPLEFT" relativePoint="TOPLEFT" x="4" y="-4"/>
+							<Anchor point="BOTTOMRIGHT" relativePoint="BOTTOMRIGHT" x="-4" y="6"/>
+						</Anchors>
+						<Layers>
+							<Layer level="BACKGROUND">
+								<Texture parentKey="barBackground">
+									<Anchors>
+										<Anchor point="TOPLEFT"/>
+										<Anchor point="BOTTOMRIGHT"/>
+									</Anchors>
+									<Color r="0" g="0" b="0" a=".4"/>
+								</Texture>
+							</Layer>
+							<Layer level="OVERLAY">
+								<FontString parentKey="text" inherits="GameFontHighlightSmall" text="SEARCH_PROGRESS_BAR_TEXT" justifyV="TOP">
+									<Size x="0" y="0"/>
+									<Anchors>
+										<Anchor point="CENTER" x="0" y="0"/>
+									</Anchors>
+								</FontString>
+							</Layer>
+							<Layer level="ARTWORK">
+								<Texture parentKey="barBorderLeft" file="Interface\AchievementFrame\UI-Achievement-ProgressBar-Border">
+									<Size x="16" y="0"/>
+									<Anchors>
+										<Anchor point="TOPLEFT" x="-6" y="5"/>
+										<Anchor point="BOTTOMLEFT" x="-6" y="-5"/>
+									</Anchors>
+									<TexCoords left="0" right="0.0625" top="0" bottom="0.75"/>
+								</Texture>
+								<Texture parentKey="barBorderRight" file="Interface\AchievementFrame\UI-Achievement-ProgressBar-Border">
+									<Size x="16" y="0"/>
+									<Anchors>
+										<Anchor point="TOPRIGHT" x="6" y="5"/>
+										<Anchor point="BOTTOMRIGHT" x="6" y="-5"/>
+									</Anchors>
+									<TexCoords left="0.812" right="0.8745" top="0" bottom="0.75"/>
+								</Texture>
+								<Texture parentKey="barBorderCenter" file="Interface\AchievementFrame\UI-Achievement-ProgressBar-Border">
+									<Size x="16"/>
+									<Anchors>
+										<Anchor point="TOPLEFT" relativeKey="$parent.barBorderLeft" relativePoint="TOPRIGHT"/>
+										<Anchor point="BOTTOMRIGHT" relativeKey="$parent.barBorderRight" relativePoint="BOTTOMLEFT"/>
+									</Anchors>
+									<TexCoords left="0.0625" right="0.812" top="0" bottom="0.75"/>
+								</Texture>
+							</Layer>
+						</Layers>
+						<Scripts>
+							<OnLoad function="WardrobeCollectionFrameSearchProgressBar_OnLoad"/>
+							<OnHide function="WardrobeCollectionFrameSearchProgressBar_OnHide"/>
+						</Scripts>
+						<BarTexture file="Interface\TargetingFrame\UI-StatusBar"/>
+					</StatusBar>
+				</Frames>
+				<Scripts>
+					<OnLoad>
+						self:SetFrameLevel(self:GetParent():GetFrameLevel() + 15);
+					</OnLoad>
+				</Scripts>
+			</Frame>
 			<Frame parentKey="TransmogOptionsButtonCover" hidden="false" enableMouse="true">
 				<Size x="93" y="50"/>
 				<Anchors>

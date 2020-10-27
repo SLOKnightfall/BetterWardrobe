@@ -203,6 +203,8 @@ function UI.DefaultButtons_Update()
 				f.Hidden:SetPoint("CENTER", button.Icon, "CENTER", 0, 0)
 				f.Collection:ClearAllPoints()
 				f.Collection:SetPoint("BOTTOMRIGHT", button.Icon, "BOTTOMRIGHT", 2, -3)
+				f.Unavailable:ClearAllPoints()
+				f.Unavailable:SetPoint("TOPRIGHT", button.Icon, "TOPRIGHT", 5, 3)
 			end
 		end
 
