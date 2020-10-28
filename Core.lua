@@ -21,7 +21,7 @@ addon.validSetCache = {}
 addon.usableSourceCache = {}
 addon.UI = {}
 addon.Init = {}
-local newTransmogInfo  = {["latestSource"] = NO_TRANSMOG_SOURCE_ID} --{[99999999] = {[58138] = 10}, }
+local newTransmogInfo = {["latestSource"] = NO_TRANSMOG_SOURCE_ID} --{[99999999] = {[58138] = 10}, }
 addon.TRANSMOG_SET_FILTER = {}
 _G[addonName] = {}
 
@@ -40,7 +40,7 @@ function optionHandler:Setter(info, value)
 	Profile[info[#info]] = value
 
 	if info.arg == "tooltipRotate" then
-		addon.tooltip.rotate:SetShown(value);	
+		addon.tooltip.rotate:SetShown(value);
 	elseif info.arg == "tooltipWidth" then
 		addon.tooltip:SetWidth(value);
 	elseif info.arg == "tooltipHeight" then
@@ -57,14 +57,14 @@ function optionHandler:Setter(info, value)
 		else
 			addon:DressingRoom_Enable()
 		end
-	elseif info.arg == IgnoreClassRestrictions or info.arg == IgnoreClassLookalikeRestrictions then 
+	elseif info.arg == IgnoreClassRestrictions or info.arg == IgnoreClassLookalikeRestrictions then
 		--addon.extraSetsCache = nil
 		addon.Init:BuildDB()
 
 	elseif info.arg == "ShowAdditionalSourceTooltips" then
 		C_TransmogCollection.SetShowMissingSourceInItemTooltips(value);
 
-	elseif info.arg == "ExtraLargeTransmogArea" or info.arg == "LargeTransmogArea" then 
+	elseif info.arg == "ExtraLargeTransmogArea" or info.arg == "LargeTransmogArea" then
 		WardrobeFrame.extended = false
 		addon.ExtendTransmogView()
 	end
@@ -118,7 +118,7 @@ local options = {
 	inline = true,
 	args = {
 		settings={
-			name = "Options",
+			name = L["Options"],
 			type = "group",
 			--inline = true,
 			order = 0,
@@ -222,6 +222,7 @@ local options = {
 						ShowIncomplete = {
 							order = 2,
 							name = L["Show Incomplete Sets"],
+							width = 1.2,
 							type = "toggle",
 						},
 						ShowHidden = {
@@ -259,6 +260,7 @@ local options = {
 						ShowSetCount = {
 							order = 8,
 							name = L["Show Collected Count"],
+							width = 1.5,
 							type = "toggle",
 						},
 					},
@@ -306,51 +308,50 @@ local options = {
 							order = 6,
 							name = L["Show Set Collection Details"],
 							type = "toggle",
-							width = "full",
+							width = 1.4,
 							disabled = function() return not addon.Profile.ShowTooltips end,
 						},
 						ShowMissingDetailedListTooltips = {
 							order = 6.1,
 							name = L["Only List Missing Pieces"],
 							type = "toggle",
-							width = 1.6,
-							disabled = function() return not addon.Profile.ShowTooltips or not addon.Profile.ShowDetailedListTooltips  end,
+							width = 1.4,
+							disabled = function() return not addon.Profile.ShowTooltips or not addon.Profile.ShowDetailedListTooltips end,
 						},
 						ShowItemIDTooltips = {
 							order = 7,
 							name = L["Show Item ID"],
 							type = "toggle",
-							width = "full",
-						},
-						ShowOwnedItemTooltips = {
-							order = 8,
-							name = L["Show if appearance is known"],
-							type = "toggle",
-							width = 1.2,
-						},
-						ShowAdditionalSourceTooltips = {
-							order = 9,
-							name = L["Show if additional sources are available"],
-							type = "toggle",
-							width = 1.6,
-							arg = "ShowAdditionalSourceTooltips"
+							width = 1.4,
 						},
 						ShowTokenTooltips = {
-							order = 10,
+							order = 8,
 							name = L["Show Token Information"],
 							type = "toggle",
-							width = 1.6,
 							disabled = function() return not addon.Profile.ShowTooltips end,
 						},
-						ShowWarningTooltips = {
+						ShowOwnedItemTooltips = {
+							order = 9,
+							name = L["Show if appearance is known"],
+							type = "toggle",
+							width = 1.4,
+						},
+						ShowAdditionalSourceTooltips = {
 							order = 10,
+							name = L["Show if additional sources are available"],
+							type = "toggle",
+							width = 1.7,
+							arg = "ShowAdditionalSourceTooltips"
+						},
+						ShowWarningTooltips = {
+							order = 11,
 							name = L["Show unable to uses as transmog warning"],
 							type = "toggle",
-							width = 1.6,
+							width = "full",
 							disabled = function() return not addon.Profile.ShowTooltips end,
 						},
 					},
-				},				
+				},
 				preview_settings={
 						name = " ",
 						type = "group",
@@ -378,7 +379,7 @@ local options = {
 								name = L["Only show if modifier is pressed"],
 								values = function()
 											local tbl = {
-												None = "None",
+												None = L["None"],
 											};
 											for k,v in pairs(addon.Globals.mods) do
 												tbl[k] = k;
@@ -389,50 +390,50 @@ local options = {
 							},
 							TooltipPreview_MogOnly = {
 								type = "toggle",
-								order = 2,
+								order = 3,
 								name = L["Only transmogrification items"],
-								width = 1.2,
+								width = "full",
 							},
 							TooltipPreview_Tokens = {
 								type = "toggle",
-								order = 2,
+								order = 4,
 								name = L["Try to preview armor tokens"],
-								width = 1.875,
+								width = "full",
 							},
 
 							TooltipPreview_Overlap = {
-								order = 4,
-								name = L["Prevent Comparrison Overlap"],
+								order = 5,
+								name = L["Prevent Comparison Overlap"],
 								type = "toggle",
 								width = "full",
 								desc = L["TooltipPreview_Overlap_Tooltip"],
 							},
 							TooltipPreview_Zoom = {
-								order = 5,
+								order = 6,
 								name = L["Zoom:"],
 								type = "description",
 								width = .4,
 								fontSize = "medium",
 							},
 							TooltipPreview_ZoomWeapon = {
-								order = 6,
+								order = 7,
 								name = L["On Weapons"],
 								type = "toggle",
 								width = .8,
 							},
 							TooltipPreview_ZoomItem = {
-								order = 7,
+								order = 8,
 								name = L["On Clothes"],
 								type = "toggle",
 								width = .675,
 							},
 							TooltipPreview_ZoomModifier = {
 								type = "select",
-								order = 8,
+								order = 9,
 								name = L["Only show if modifier is pressed"],
 								values = function()
 											local tbl = {
-												None = "None",
+												None = L["None"],
 											};
 											for k,v in pairs(addon.Globals.mods) do
 												tbl[k] = k;
@@ -442,21 +443,21 @@ local options = {
 								width = 1.2,
 							},
 							TooltipPreview_Dress = {
-								order = 9,
+								order = 10,
 								name = L["Dress Preview Model"],
 								type = "toggle",
 								width = 1.2,
 								desc = L["TooltipPreview_Dress_Tooltip"],
 							},
 							TooltipPreview_DressingDummy = {
-								order = 10,
+								order = 11,
 								name = L["Use Dressing Dummy Model"],
 								type = "toggle",
 								width = 1.6,
 								desc = L["TooltipPreview_DressingDummy"],
 							},
 							TooltipPreviewRotate = {
-								order = 11,
+								order = 12,
 								name = L["Auto Rotate"],
 								type = "toggle",
 								width = 1.2,
@@ -465,7 +466,7 @@ local options = {
 							},
 							TooltipPreview_MouseRotate = {
 								type = "toggle",
-								order = 12,
+								order = 13,
 								name = L["Rotate with mouse wheel"],
 								width = 1.6,
 								desc = L["TooltipPreview_MouseRotate_Tooltip"],
@@ -473,17 +474,17 @@ local options = {
 							TooltipPreview_Anchor = {
 								width = 1.2,
 								type = "select",
-								order = 13,
+								order = 14,
 								name = L["Anchor point"],
 								values = {
-									vertical = "Top/bottom",
-									horizontal = "Left/right",
+									vertical = L["Top/bottom"],
+									horizontal = L["Left/right"],
 								},
 								width = 1.2,
 								desc = L["TooltipPreview_Anchor_Tooltip"],
 							},
 							TooltipPreview_Spacer1 = {
-								order = 13.1,
+								order = 14.1,
 								name = " ",
 								type = "description",
 								width = .4,
@@ -492,7 +493,7 @@ local options = {
 							},
 							TooltipPreview_Width = {
 								type = "range",
-								order = 14,
+								order = 15,
 								name = L["Width"],
 								step = 1,
 								min = 100,
@@ -502,7 +503,7 @@ local options = {
 							},
 							TooltipPreview_Height = {
 								type = "range",
-								order = 15,
+								order = 16,
 								name = L["Height"],
 								step = 1,
 								min = 100,
@@ -512,9 +513,9 @@ local options = {
 							},
 							TooltipPreview_Reset = {
 								type = "execute",
-								order = 15.1,
+								order = 16.1,
 								name = L["Reset"],
-								func = function() 
+								func = function()
 									addon.tooltip:SetWidth(280)
 									addon.tooltip:SetHeight(380)
 									addon.Profile.TooltipPreview_Width = 280
@@ -523,13 +524,13 @@ local options = {
 							},
 							TooltipPreview_CustomModel = {
 								type = "toggle",
-								order = 16,
+								order = 17,
 								name = L["Use custom model"],
-								width = 1,
+								width = "full",
 								--hidden = true,
 							},
 							TooltipPreview_CustomWarning = {
-								order = 16.1,
+								order = 17.1,
 								name = L["CUSTOM_MODEL_WARNING"],
 								type = "description",
 								width = 2,
@@ -537,10 +538,10 @@ local options = {
 							},
 							TooltipPreview_CustomRace = {
 								type = "select",
-								order = 17,
+								order = 18,
 								name = L["Model race"],
 								values = {
-									[1] =  C_CreatureInfo.GetRaceInfo(1).raceName, --LBR["Human"],
+									[1] = C_CreatureInfo.GetRaceInfo(1).raceName, --LBR["Human"],
 									[3] = C_CreatureInfo.GetRaceInfo(3).raceName,--["Dwarf"],
 									[4] = C_CreatureInfo.GetRaceInfo(4).raceName,--["Night Elf"],
 									[7] = C_CreatureInfo.GetRaceInfo(7).raceName,--["Gnome"],
@@ -560,7 +561,7 @@ local options = {
 							},
 							TooltipPreview_CustomGender = {
 								type = "select",
-								order = 18,
+								order = 19,
 								name = L["Model gender"],
 								values = {
 									[0] = MALE,
@@ -589,7 +590,7 @@ local options = {
 							order = 1.2,
 							name = L["Enable"],
 							type = "toggle",
-							disabled = false, 
+							disabled = false,
 							width = "full",
 							arg = "DR_OptionsEnable"
 						},
@@ -597,7 +598,7 @@ local options = {
 							order = 2,
 							name = L["Show Item Buttons"],
 							type = "toggle",
-
+							width = 1.5,
 						},
 						DR_ShowControls = {
 							order = 3,
@@ -609,10 +610,11 @@ local options = {
 							order = 4,
 							name = L["Dim Backround Image"],
 							type = "toggle",
+							width = 1.5,
 						},
 						DR_HideBackground = {
 							order = 5,
-							name = L["Hide  Backround Image"],
+							name = L["Hide Backround Image"],
 							type = "toggle",
 							width = 1.5,
 						},
@@ -683,7 +685,7 @@ local itemSub_options = {
 	args = {
 
 		settings={
-			name = "Items",
+			name = L["Items"],
 			type = "group",
 			--inline = true,
 			order = 0,
@@ -697,13 +699,13 @@ local itemSub_options = {
 					width = 1,
 					set = function(info, value) subTextFields[1] = value end,
 					get = function(info) return subTextFields[1] end,
-					validate = function(info, value) 
+					validate = function(info, value)
 						local id = tonumber(value)
 						if not id then return L["Not a valid itemID"] end
 
-						local itemEquipLoc1 = GetItemInfoInstant(tonumber(value)) 
+						local itemEquipLoc1 = GetItemInfoInstant(tonumber(value))
 
-						if itemEquipLoc1 == nil then 
+						if itemEquipLoc1 == nil then
 						--message(itemID.." not a valid itemID")
 								return L["Not a valid itemID"]
 						else 
@@ -711,20 +713,20 @@ local itemSub_options = {
 						end
 					end,
 				},	
-				ReplacementItem = {				
+				ReplacementItem = {
 					order = 2,
 					name = L["Replacement Item ID"],
 					type = "input",
 					width = 1,
 					set = function(info, value) subTextFields[2] = value end,
 					get = function(info) return subTextFields[2] end,
-					validate = function(info, value) 
+					validate = function(info, value)
 						local id = tonumber(value)
 						if not id then return L["Not a valid itemID"] end
 
-						local itemEquipLoc1 = GetItemInfoInstant(tonumber(value)) 
+						local itemEquipLoc1 = GetItemInfoInstant(tonumber(value))
 
-						if itemEquipLoc1 == nil then 
+						if itemEquipLoc1 == nil then
 						--message(itemID.." not a valid itemID")
 								return L["Not a valid itemID"]
 						else 
@@ -732,21 +734,21 @@ local itemSub_options = {
 						end
 					end,
 				},	
-				AddButton = {				
+				AddButton = {
 							order = 3,
 							name = L["Add"],
 							type = "execute",
 							width = 1,
-							func = function(info) 
+							func = function(info)
 								addon.SetItemSubstitute(subTextFields[1], subTextFields[2])
 							end,
 
-							validate = function(info, value) 
+							validate = function(info, value)
 								local _, _, _, itemEquipLoc1 = GetItemInfoInstant(tonumber(subTextFields[1]) )
 								local _, _, _, itemEquipLoc2 = GetItemInfoInstant(tonumber(subTextFields[2]) )
 
-								if itemEquipLoc1 ~= itemEquipLoc2 then 
-									return L["Item Locations Don't Match"] 
+								if itemEquipLoc1 ~= itemEquipLoc2 then
+									return L["Item Locations Don't Match"]
 								else
 									return true
 								end
@@ -775,7 +777,7 @@ function addon.RefreshSubItemData()
 		args["BaseItem"..i] = {
 			order = i,
 			name = function(info)
-				local text = ("item: %d - %s ==> item: %d - %s"):format(data.subID, data.subLink or "", i, data.itemLink or "")
+				local text = (L["item: %d - %s \n==>\nitem: %d - %s"]):format(data.subID, data.subLink or "", i, data.itemLink or "")
 				return text 
 			end,
 			type = "description",
@@ -783,12 +785,12 @@ function addon.RefreshSubItemData()
 			disabled = false,
 		}
 
-		args["AddButton"..i] = {				
+		args["AddButton"..i] = {
 			order = i+2,
 			name = L["Remove"],
 			type = "execute",
-			width = .5,
-			func = function()   
+			width = .6,
+			func = function()
 					return RemoveItemSubstitute(i) end,
 		}	
 	end
@@ -826,12 +828,12 @@ function addon.RefreshOutfitData()
 			disabled = false,
 		}
 
-		args["AddButton"..i] = {				
+		args["AddButton"..i] = {
 			order = i + .2,
 			name = L["Remove"],
 			type = "execute",
-			width = .5,
-			func = function()   
+			width = .6,
+			func = function()
 					return RemoveCharacterData(name) end,
 		}	
 
@@ -856,11 +858,11 @@ local defaults = {
 		TooltipPreview_Show = false,
 		TooltipPreview_Anchor = "horizontal",
 		TooltipPreviewRotate = false,
-		TooltipPreview_Modifier = "None",
-		TooltipPreview_ZoomItemModifier = "None",
+		TooltipPreview_Modifier = L["None"],
+		TooltipPreview_ZoomItemModifier = L["None"],
 		TooltipPreview_CustomRace = 1,
 		TooltipPreview_CustomGender = 0,
-		TooltipPreview_DressingDummy = false, 
+		TooltipPreview_DressingDummy = false,
 		IgnoreClassRestrictions = false,
 		ExtraLargeTransmogArea = false,
 	}
@@ -987,7 +989,7 @@ function addon:OnEnable()
 		addon.Init:BuildCollectionList()
 		addon.Init:BuildTransmogVendorUI()
 		addon.Init:BuildCollectionJournalUI()
-		
+
 	WardrobeFilterDropDown_OnLoad(WardrobeCollectionFrame.FilterDropDown)
 	--WardrobeCollectionFrame.ItemsCollectionFrame:SetActiveSlot
 --end )
@@ -1008,7 +1010,7 @@ function addon:OnEnable()
 
 	f:RegisterEvent("TRANSMOG_COLLECTION_SOURCE_ADDED")
 	f:RegisterEvent("TRANSMOG_COLLECTION_SOURCE_REMOVED")
-	f:SetScript("OnEvent", function (self,  ...)BetterWardrobeSetsCollectionMixin:OnEvent(...) end)
+	f:SetScript("OnEvent", function (self, ...)BetterWardrobeSetsCollectionMixin:OnEvent(...) end)
 	--self:SecureHook(WardrobeOutfitDropDown,"OnUpdate")
 
 		--WardrobeOutfi--tDropDownButton:SetScript("OnMouseDown", function(self)
@@ -1019,6 +1021,6 @@ function addon:OnEnable()
 
 				--WardrobeCollectionFrame.ItemsCollectionFrame.RightShoulderCheckbox:Show() 
 	--temp fix to get libray menus to close when clicking outside of tehm
-	hooksecurefunc("UIDropDownMenu_HandleGlobalMouseEvent", function(button, event)  L_UIDropDownMenu_HandleGlobalMouseEvent( button, event) end)
+	hooksecurefunc("UIDropDownMenu_HandleGlobalMouseEvent", function(button, event) L_UIDropDownMenu_HandleGlobalMouseEvent( button, event) end)
 
 end

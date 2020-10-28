@@ -1510,7 +1510,7 @@ function WardrobeFilterDropDown_InitializeBaseSets(self, level)
 		info.value = 2
 		UIDropDownMenu_AddButton(info, level)
 
-		info.text = "Missing:"
+		info.text = L["Missing:"]
 		info.value = 3
 		UIDropDownMenu_AddButton(info, level)
 
