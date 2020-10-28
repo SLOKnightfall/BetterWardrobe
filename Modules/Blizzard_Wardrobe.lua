@@ -1102,7 +1102,7 @@ function WardrobeCollectionFrame.SetsTransmogFrame:UpdateSets()
 			model.Favorite.Icon:SetShown(C_TransmogSets.GetIsFavorite(set.setID))
 			model.setID = set.setID
 
-			local isHidden = addon.chardb.profile.set[set.setID]
+			local isHidden = addon.HiddenAppearanceDB.profile.set[set.setID]
 			model.CollectionListVisual.Hidden.Icon:SetShown(isHidden)
 
 
@@ -1391,7 +1391,7 @@ function WardrobeCollectionFrame.SetsCollectionFrame.ScrollFrame:Update()
 			button.Icon:SetDesaturation((topSourcesCollected == 0) and 1 or 0)
 			button.SelectedTexture:SetShown(baseSet.setID == selectedBaseSetID)
 			button.Favorite:SetShown(baseSet.favoriteSetID and true)
-			local isHidden = addon.chardb.profile.set[baseSet.setID]
+			local isHidden = addon.HiddenAppearanceDB.profile.set[baseSet.setID]
 			button.CollectionListVisual.Hidden.Icon:SetShown(isHidden)
 
 			local variantSets = SetsDataProvider:GetVariantSets(baseSet.setID)

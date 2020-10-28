@@ -418,7 +418,7 @@ function BW_DressingRoomMixin:LoadOutfit(outfitID)
 		if outfitID > 1000 then
 			outfit = addon.MogIt.MogitSets[outfitID]
 		else
-			outfit = addon.chardb.profile.outfits[LookupIndexFromID(outfitID)]
+			outfit = addon.OutfitDB.char.outfits[LookupIndexFromID(outfitID)]
 		end
 
 		local outfit_sources = {}
@@ -477,11 +477,11 @@ function BW_DressingRoomOutfitFrameMixin:SaveOutfit(name)
 		outfitID = C_TransmogCollection.SaveOutfit(name, sources, 0, 0, icon)
 	else
 		if outfitID then
-			addon.chardb.profile.outfits[LookupIndexFromID(outfitID)] = sources
-			outfit = addon.chardb.profile.outfits[LookupIndexFromID(outfitID)]
+			addon.OutfitDB.char.outfits[LookupIndexFromID(outfitID)] = sources
+			outfit = addon.OutfitDB.char.outfits[LookupIndexFromID(outfitID)]
 		else
-			tinsert(addon.chardb.profile.outfits, sources)
-			outfit = addon.chardb.profile.outfits[#addon.chardb.profile.outfits]
+			tinsert(addon.OutfitDB.char.outfits, sources)
+			outfit = addon.OutfitDB.char.outfits[#addon.OutfitDB.char.outfits]
 		end
 
 		outfit["name"] = name

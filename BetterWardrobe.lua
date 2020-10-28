@@ -52,7 +52,7 @@ function addon:UpdateItems(self)
 	for i = 1, self.PAGE_SIZE do
 		local model = self.Models[i]
 		local setID = (model.visualInfo and model.visualInfo.visualID) or model.setID
-		local isHidden = addon.chardb.profile.item[setID]
+		local isHidden = addon.HiddenAppearanceDB.profile.item[setID]
 		model.CollectionListVisual.Hidden.Icon:SetShown(isHidden)
 		local isInList = addon.CollectionList:IsInList(setID, "item")
 		model.CollectionListVisual.Collection.Collection_Icon:SetShown(isInList)
@@ -1024,7 +1024,7 @@ end
 
 
 function BetterWardrobeSetsCollectionMixin:UpdateProgressBar()
-	--WardrobeCollectionFrame_UpdateProgressBar(GetSetCounts())
+	WardrobeCollectionFrame_UpdateProgressBar(GetSetCounts())
 end
 
 
@@ -1528,7 +1528,7 @@ local function BW_WardrobeSetsCollectionScrollFrame_FavoriteDropDownInit(self)
 	local info = L_UIDropDownMenu_CreateInfo()
 	info.notCheckable = true
 	info.disabled = nil
-	local isFavorite = (type == "set" and C_TransmogSets.GetIsFavorite(self.baseSetID)) or addon.chardb.profile.favorite[self.baseSetID]
+	local isFavorite = (type == "set" and C_TransmogSets.GetIsFavorite(self.baseSetID)) or addon.favoritesDB.profile.extraset[self.baseSetID]
 	if (isFavorite) then
 		info.text = BATTLE_PET_UNFAVORITE;
 
@@ -1537,7 +1537,7 @@ local function BW_WardrobeSetsCollectionScrollFrame_FavoriteDropDownInit(self)
 
 		elseif type == "extraset"  then
 			info.func = function()
-				addon.chardb.profile.favorite[self.baseSetID] = nil
+				addon.favoritesDB.profile.extraset[self.baseSetID] = nil
 				BW_SetsCollectionFrame:Refresh()
 				BW_SetsCollectionFrame:OnSearchUpdate()
 			end
@@ -1550,7 +1550,7 @@ local function BW_WardrobeSetsCollectionScrollFrame_FavoriteDropDownInit(self)
 		elseif type == "extraset"  then
 			--local targetSetID = WardrobeCollectionFrame.SetsCollectionFrame:GetDefaultSetIDForBaseSet(self.baseSetID)
 			info.func = function()
-				addon.chardb.profile.favorite[self.baseSetID] = true
+				addon.favoritesDB.profile.extraset[self.baseSetID] = true
 				BW_SetsCollectionFrame:Refresh()
 				BW_SetsCollectionFrame:OnSearchUpdate()
 			end
@@ -1654,8 +1654,8 @@ function BetterWardrobeSetsCollectionScrollFrameMixin:Update()
 		if (setIndex <= #baseSets) then
 			local baseSet = baseSets[setIndex]
 
-			local isFavorite = addon.chardb.profile.favorite[baseSet.setID]
-			local isHidden = addon.chardb.profile.extraset[baseSet.setID]
+			local isFavorite = addon.favoritesDB.profile.extraset[baseSet.setID]
+			local isHidden = addon.HiddenAppearanceDB.profile.extraset[baseSet.setID]
 
 			--local count, complete = addon.GetSetCompletion(baseSet)
 			button:Show()
@@ -1996,7 +1996,7 @@ end
 
 
 function BetterWardrobeSetsTransmogMixin:UpdateProgressBar()
-	--WardrobeCollectionFrame_UpdateProgressBar(GetSetCounts())
+	WardrobeCollectionFrame_UpdateProgressBar(GetSetCounts())
 end
 
 
@@ -2063,8 +2063,8 @@ function BetterWardrobeSetsTransmogMixin:UpdateSets()
 			end
 
 			local setInfo = addon.GetSetInfo(set.setID)
-			local isFavorite = addon.chardb.profile.favorite[set.setID]
-			local isHidden = addon.chardb.profile.extraset[set.setID]
+			local isFavorite = addon.favoritesDB.profile.extraset[set.setID]
+			local isHidden = addon.HiddenAppearanceDB.profile.extraset[set.setID]
 			model.setCollected = topSourcesCollected == topSourcesTotal
 			model.Favorite.Icon:SetShown(isFavorite)
 			model.CollectionListVisual.Hidden.Icon:SetShown(isHidden)
@@ -2158,18 +2158,18 @@ function BetterWardrobeSetsTransmogMixin:OpenRightClickDropDown()
 	end
 	local setID = self.RightClickDropDown.activeFrame.setID
 	local info = L_UIDropDownMenu_CreateInfo()
-	local isFavorite = addon.chardb.profile.favorite[setID]
+	local isFavorite = addon.favoritesDB.profile.extraset[setID]
 	if (isFavorite) then
 		info.text = BATTLE_PET_UNFAVORITE
 		info.func = function()
-			addon.chardb.profile.favorite[setID] = nil
+			addon.favoritesDB.profile.extraset[setID] = nil
 			BW_SetsTransmogFrame:Refresh()
 			BW_SetsTransmogFrame:OnSearchUpdate()
 		 end
 	else
 		info.text = BATTLE_PET_FAVORITE
 		info.func = function()
-			addon.chardb.profile.favorite[setID] = true
+			addon.favoritesDB.profile.extraset[setID] = true
 			BW_SetsTransmogFrame:Refresh()
 			BW_SetsTransmogFrame:OnSearchUpdate()
 		end

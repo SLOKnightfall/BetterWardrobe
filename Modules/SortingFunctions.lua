@@ -119,8 +119,8 @@ local SortOrder = SortNormal
 local Sort = {
 	["SortDefault"] = function(sets,  ignorePatchID)
 		local comparison = function(set1, set2)	
-			local groupFavorite1 = (addon.chardb.profile.favorite[set1.setID] or set1.favoriteSetID) and true
-			local groupFavorite2 = (addon.chardb.profile.favorite[set2.setID] or set2.favoriteSetID) and true
+			local groupFavorite1 = (addon.favoritesDB.profile.extraset[set1.setID] or set1.favoriteSetID) and true
+			local groupFavorite2 = (addon.favoritesDB.profile.extraset[set2.setID] or set2.favoriteSetID) and true
 			if ( groupFavorite1 ~= groupFavorite2 ) then
 				return groupFavorite1
 			end
@@ -470,8 +470,8 @@ local Sort = {
 		[LE_DEFAULT] = function(self, sets, reverseUIOrder, ignorePatchID)
 			local comparison = function(set1, set2)
 
-				local groupFavorite1 = (addon.chardb.profile.favorite[set1.setID] or set1.favoriteSetID) and true
-				local groupFavorite2 = (addon.chardb.profile.favorite[set2.setID] or set2.favoriteSetID) and true
+				local groupFavorite1 = (addon.favoritesDB.profile.extraset[set1.setID] or set1.favoriteSetID) and true
+				local groupFavorite2 = (addon.favoritesDB.profile.extraset[set2.setID] or set2.favoriteSetID) and true
 				if ( groupFavorite1 ~= groupFavorite2 ) then
 					return groupFavorite1
 				end

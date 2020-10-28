@@ -51,7 +51,7 @@ function addon.ToggleHidden(model, isHidden)
 		local visualID = model.visualInfo.visualID
 		local source = WardrobeCollectionFrame_GetSortedAppearanceSources(visualID)[1]
 		local name, link = GetItemInfo(source.itemID)
-		addon.chardb.profile.item[visualID] = not isHidden and name
+		addon.HiddenAppearanceDB.profile.item[visualID] = not isHidden and name
 		--self:UpdateWardrobe()
 		print(format("%s "..link.." from the Appearances Tab", isHidden and "Unhiding" or "Hiding"))
 		WardrobeCollectionFrame.ItemsCollectionFrame:RefreshVisualsList()
@@ -62,22 +62,22 @@ function addon.ToggleHidden(model, isHidden)
 		local name = setInfo["name"]
 
 		local baseSetID = C_TransmogSets.GetBaseSetID(model.setID)
-		addon.chardb.profile.set[baseSetID] = not isHidden and name or nil
+		addon.HiddenAppearanceDB.profile.set[baseSetID] = not isHidden and name or nil
 
 		local sourceinfo = C_TransmogSets.GetSetSources(baseSetID)
 		for i,data in pairs(sourceinfo) do
 			local info = C_TransmogCollection.GetSourceInfo(i)
-				addon.chardb.profile.item[info.visualID] = not isHidden and info.name or nil
+				addon.HiddenAppearanceDB.profile.item[info.visualID] = not isHidden and info.name or nil
 		end
 
 		local variantSets = C_TransmogSets.GetVariantSets(baseSetID)
 			for i, data in ipairs(variantSets) do
-				addon.chardb.profile.set[data.setID] = not isHidden and data.name or nil
+				addon.HiddenAppearanceDB.profile.set[data.setID] = not isHidden and data.name or nil
 
 				local sourceinfo = C_TransmogSets.GetSetSources(data.setID)
 				for i,data in pairs(sourceinfo) do
 					local info = C_TransmogCollection.GetSourceInfo(i)
-						addon.chardb.profile.item[info.visualID] = not isHidden and info.name or nil
+						addon.HiddenAppearanceDB.profile.item[info.visualID] = not isHidden and info.name or nil
 				end
 		end	
 
@@ -88,7 +88,7 @@ function addon.ToggleHidden(model, isHidden)
 	else
 		local setInfo = addon.GetSetInfo(model.setID)
 		local name = setInfo["name"]
-		addon.chardb.profile.extraset[model.setID] = not isHidden and name or nil
+		addon.HiddenAppearanceDB.profile.extraset[model.setID] = not isHidden and name or nil
 		print(format("%s "..name, isHidden and "Unhiding" or "Hiding"))
 		BW_SetsCollectionFrame:OnSearchUpdate()
 		BW_SetsTransmogFrame:OnSearchUpdate()
@@ -215,10 +215,10 @@ end
 
 
 function addon:SetFavoriteItem(visualID, set)
-	if addon.chardb.profile.favorite_items[visualID] then
-		addon.chardb.profile.favorite_items[visualID] = nil
+	if addon.favoritesDB.profile.item[visualID] then
+		addon.favoritesDB.profile.item[visualID] = nil
 	else
-		addon.chardb.profile.favorite_items[visualID] = true
+		addon.favoritesDB.profile.item[visualID] = true
 	end
 
 	WardrobeCollectionFrame.ItemsCollectionFrame:RefreshVisualsList()
@@ -227,7 +227,7 @@ end
 
 
 function addon:IsFavoriteItem(visualID)
-	return addon.chardb.profile.favorite_items[visualID]
+	return addon.favoritesDB.profile.item[visualID]
 end
 
 --Modified to allow favoriteing unlearned items

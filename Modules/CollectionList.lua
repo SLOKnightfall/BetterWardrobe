@@ -209,7 +209,7 @@ end
 
 
 function addon.Init:BuildCollectionList()
-	CollectionList:UpdateDB()
+	--CollectionList:UpdateDB()
 	CollectionList:AddMogItData()
 	CollectionList:CreateDropdown()
 end
@@ -306,7 +306,7 @@ end
 
 local dropdown
 local  function RefreshDropdown()
-	local list = addon.chardb.profile.lists
+	local list = addon.collectionListDB.profile.lists
 	local key = {}
 	for i, data in pairs(list) do
 		key[i] = data.name
@@ -330,7 +330,7 @@ end
 
 
 function CollectionList:Dropdown_Initialize(frame, level, menuList)
-	local list = addon.chardb.profile.lists
+	local list = addon.collectionListDB.profile.lists
 	local info = L_UIDropDownMenu_CreateInfo()
 
 	for i, data in pairs(list) do
@@ -364,7 +364,10 @@ function CollectionList:CreateDropdown()
 	--L_UIDropDownMenu_SetWidth(BW_CollectionList_Dropdown, 157) -- Use in place of dropDown:SetWidth
 -- Bind an initializer function to the dropdown; see previous sections for initializer function examples.
 	L_UIDropDownMenu_Initialize(BW_CollectionList_Dropdown, CollectionList.Dropdown_Initialize)
+	L_UIDropDownMenu_SetText(BW_CollectionList_Dropdown, "")
+
 	L_UIDropDownMenu_SetSelectedID(BW_CollectionList_Dropdown, CollectionList:SelectedCollectionList())
+
 	BW_ColectionListFrame.dropdownFrame = BW_CollectionList_Dropdown
 
 	--"BW_CollectionListOptionsButton"
@@ -445,7 +448,7 @@ end
 function CollectionList:AddList(name)
 	if not name then return false end
 
-	local profile = addon.chardb.profile
+	local profile = addon.collectionListDB.profile
 	local default = {item = {}, set = {}, extraset = {}, name = name}
 	tinsert(profile.lists, default)
 	profile.selectedCollectionList = #profile.lists
@@ -459,7 +462,7 @@ end
 function CollectionList:RenameList(name)
 	if not name then return false end
 
-	local profile = addon.chardb.profile
+	local profile = addon.collectionListDB.profile
 	local list = CollectionList:CurrentList()
 	list.name = name
 	RefreshDropdown()
@@ -468,7 +471,7 @@ end
 
 
 function CollectionList:DeleteList()
-	local profile = addon.chardb.profile
+	local profile = addon.collectionListDB.profile
 	if #profile.lists == 1 then 
 		--Error cant delete last list
 		return false 
@@ -486,7 +489,7 @@ end
 function CollectionList:IsInList(itemID, itemType, full)
 	itemType = itemType or "item"
 	if full then
-		local profile = addon.chardb.profile.lists
+		local profile = addon.collectionListDB.profile.lists
 		local count = 0
 
 		for i, data in ipairs(profile) do
@@ -526,16 +529,16 @@ function CollectionList:CurrentList()
 	if selectedList == "MOGIT" then 
 		return addon.MogIt.GetMogitWishlist()
 	else
-		return addon.chardb.profile.lists[selectedList]
+		return addon.collectionListDB.profile.lists[selectedList]
 	end
 end
 
 
 --Returns selected list if no value, or sets list if value is included
 function CollectionList:SelectedCollectionList(value)
-	if value then addon.chardb.profile.selectedCollectionList = value
+	if value then addon.collectionListDB.profile.selectedCollectionList = value
 	else
-		return addon.chardb.profile.selectedCollectionList
+		return addon.collectionListDB.profile.selectedCollectionList
 	end
 end
 

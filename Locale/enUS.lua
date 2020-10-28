@@ -105,8 +105,15 @@ L["Item Substitution"] = true
 L["Item Locations Don't Match"] = true
 L["Saved Item Substitutes"] = true
 
-L["Profiles - Options Settings"] = true
+ L["Options Profiles"] = true
+ L["Hidden Items & Sets"] = true
 L["Profiles - Collection Settings"] = true
+ L["Favorite Items & Sets"] = true
+L["Saved Outfits"] = true
+L["List Profiles"] = true
+ L["Settings"] = true
+L["Options"] = true
+
 
 L["MISC"] = true
 L["Raid Lookalike"] = true
@@ -124,6 +131,11 @@ L["Set Substitution"] = true
 L["Copy and paste a Wowhead Compare URL into the text box below to import"] = true
 L["Import"] = true
 L["Export"] = true
+
+
+
+
+
 
 
 L.OM_GOLD = "|c00FFD200"
