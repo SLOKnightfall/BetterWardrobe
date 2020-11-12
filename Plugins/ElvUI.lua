@@ -144,7 +144,7 @@ function S:BetterWardrobe()
 	--SavedSets
 	--addon.SavedSetDropDownFrame.frame.backdrop:Hide()
 	S:HandleDropDownBox(BW_DBSavedSetDropdown)
-	S:HandleButton(L_DropDownList1)
+	S:HandleButton(BW_DropDownList1)
 
 	--BW_DBSavedSetDropdown:ClearAllPoints()
 	--BW_DBSavedSetDropdown:SetPoint("TOPRIGHT", "BW_SortDropDown", "TOPRIGHT", -0 , 0)

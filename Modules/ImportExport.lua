@@ -5,6 +5,7 @@ local L = LibStub("AceLocale-3.0"):GetLocale(addonName)
 local LISTWINDOW
 local AceGUI = LibStub("AceGUI-3.0")
 
+
 local IE ={}
 
 function Export(itemString, button)
@@ -364,8 +365,8 @@ function BW_TransmogVendorExportButton_OnClick(self)
 		},
 	}
 	
-	L_UIDropDownMenu_SetAnchor(addon.ContextMenu, 0, 0, "TOPLEFT", self, "TOPLEFT")
-	L_EasyMenu(contextMenuData, addon.ContextMenu, addon.ContextMenu, 0, 0, "MENU")
+	BW_UIDropDownMenu_SetAnchor(addon.ContextMenu, 0, 0, "TOPLEFT", self, "TOPLEFT")
+	BW_EasyMenu(contextMenuData, addon.ContextMenu, addon.ContextMenu, 0, 0, "MENU")
 	
 	--DropDownList1:ClearAllPoints()
 	--DropDownList1:SetPoint("BOTTOMLEFT", self, "BOTTOMLEFT", 0, 0)

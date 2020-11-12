@@ -3,6 +3,7 @@ addon = LibStub("AceAddon-3.0"):GetAddon(addonName)
 
 local L = LibStub("AceLocale-3.0"):GetLocale(addonName)
 
+
 local MAX_DEFAULT_OUTFITS = C_TransmogCollection.GetNumMaxOutfits()
 
 
@@ -310,9 +311,9 @@ function BW_WardrobeOutfitMixin:OnLoad()
 						BW_WardrobeOutfitFrame:Toggle(BW_WardrobeOutfitDropDown)--self:GetParent())
 						end
 					)
-	L_UIDropDownMenu_JustifyText(self, "LEFT")
+	BW_UIDropDownMenu_JustifyText(self, "LEFT")
 	if (self.width) then
-		L_UIDropDownMenu_SetWidth(self, self.width)
+		BW_UIDropDownMenu_SetWidth(self, self.width)
 	end
 	WardrobeOutfitDropDown:Hide()
 
@@ -425,10 +426,10 @@ function BW_WardrobeOutfitMixin:SelectOutfit(outfitID, loadOutfit)
 	end
 
 	if (name) then
-		L_UIDropDownMenu_SetText(self, name)
+		BW_UIDropDownMenu_SetText(self, name)
 	else
 		outfitID = nil
-		L_UIDropDownMenu_SetText(self, GRAY_FONT_COLOR_CODE..TRANSMOG_OUTFIT_NONE..FONT_COLOR_CODE_CLOSE)
+		BW_UIDropDownMenu_SetText(self, GRAY_FONT_COLOR_CODE..TRANSMOG_OUTFIT_NONE..FONT_COLOR_CODE_CLOSE)
 	end
 
 	self.selectedOutfitID = outfitID
@@ -612,7 +613,7 @@ function BW_WardrobeOutfitFrameMixin:Toggle(dropDown)
 		BW_WardrobeOutfitFrame:Hide()
 	else
 		CloseDropDownMenus()
-		L_CloseDropDownMenus()
+		BW_CloseDropDownMenus()
 		self.dropDown = dropDown
 
 		self:Show()

@@ -123,7 +123,7 @@
 				</Scripts>
 			</Button>
 			<EditBox name="$parentSearchBox" parentKey="searchBox" inherits="SearchBoxTemplate" letters="40">
-				<Size x="115" y="20"/>
+				<Size x="145" y="20"/>
 				<Anchors>
 					<Anchor point="TOPLEFT" x="19" y="-69"/>
 				</Anchors>
@@ -327,7 +327,7 @@
 						UIMenuButtonStretchMixin.OnMouseDown(self, button);
 						if self:IsEnabled() then
 							PlaySound(SOUNDKIT.IG_MAINMENU_OPTION_CHECKBOX_ON);
-							L_ToggleDropDownMenu(1, nil, BW_TransmogOptionsDropDown, self, 74, 15);
+							BW_ToggleDropDownMenu(1, nil, BW_TransmogOptionsDropDown, self, 74, 15);
 						end
 					</OnMouseDown>
 					<OnEnable>
@@ -364,7 +364,8 @@
 			<DropDownToggleButton parentKey="FilterButton" inherits="UIMenuButtonStretchTemplate" text="FILTER" hidden="true">
 				<Size x="93" y="22"/>
 				<Anchors>
-					<Anchor point="TOPLEFT" x="2" y="-1"/>
+					<Anchor point="LEFT" relativeKey="$parent.searchBox" relativePoint="RIGHT" x="2" y="-1"/>
+
 				</Anchors>
 				<Layers>
 					<Layer level="ARTWORK">
@@ -381,7 +382,7 @@
 						UIMenuButtonStretchMixin.OnMouseDown(self, button);
 						if self:IsEnabled() then
 							PlaySound(SOUNDKIT.IG_MAINMENU_OPTION_CHECKBOX_ON);
-							L_ToggleDropDownMenu(1, nil, BW_WardrobeFilterDropDown, self, 74, 15);
+							BW_ToggleDropDownMenu(1, nil, BW_WardrobeFilterDropDown, self, 74, 15);
 						end
 					</OnMouseDown>
 					<OnEnable>

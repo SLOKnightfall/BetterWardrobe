@@ -95,6 +95,57 @@ function ItemsCollectionFrame:ResetPage()
 	self:UpdateItems();
 end
 
+function BetterWardrobeItemsModelMixin_OnMouseDown(self, button)
+
+	local itemsCollectionFrame = self:GetParent();
+	if ( IsModifiedClick("CHATLINK") ) then
+		local link;
+		if ( itemsCollectionFrame.transmogLocation:IsIllusion() ) then
+			link = select(3, C_TransmogCollection.GetIllusionSourceInfo(self.visualInfo.sourceID));
+		else
+			local sources = WardrobeCollectionFrame_GetSortedAppearanceSources(self.visualInfo.visualID, self.activeCategory);
+			if ( WardrobeCollectionFrame.tooltipSourceIndex ) then
+				local index = WardrobeUtils_GetValidIndexForNumSources(WardrobeCollectionFrame.tooltipSourceIndex, #sources);
+				link = select(6, C_TransmogCollection.GetAppearanceSourceInfo(sources[index].sourceID));
+			end
+		end
+		if ( link ) then
+			HandleModifiedItemClick(link);
+		end
+		return;
+	elseif ( IsModifiedClick("DRESSUP") ) then
+		local slot = itemsCollectionFrame:GetActiveSlot();
+		if ( itemsCollectionFrame.transmogLocation:IsAppearance() ) then
+			local sourceID = itemsCollectionFrame:GetAnAppearanceSourceFromVisual(self.visualInfo.visualID, nil);
+			-- don't specify a slot for ranged weapons
+			if ( WardrobeUtils_IsCategoryRanged(itemsCollectionFrame:GetActiveCategory()) or  WardrobeUtils_IsCategoryLegionArtifact(itemsCollectionFrame:GetActiveCategory()) ) then
+				slot = nil;
+			end
+			DressUpVisual(sourceID, slot);
+		elseif ( itemsCollectionFrame.transmogLocation:IsIllusion() ) then
+			local weaponSourceID = WardrobeCollectionFrame_GetWeaponInfoForEnchant(itemsCollectionFrame.transmogLocation);
+			DressUpVisual(weaponSourceID, slot, self.visualInfo.sourceID);
+		end
+		return;
+	end
+
+	if ( button == "LeftButton" ) then
+		BW_CloseDropDownMenus();
+		self:GetParent():SelectVisual(self.visualInfo.visualID);
+	elseif ( button == "RightButton" and not itemsCollectionFrame.transmogLocation:IsIllusion() and not IsModifierKeyDown() ) then
+		local dropDown = self:GetParent().RightClickDropDown;
+		if ( dropDown.activeFrame ~= self ) then
+			BW_CloseDropDownMenus();
+		end
+		--if ( not self.visualInfo.isCollected or self.visualInfo.isHideVisual or itemsCollectionFrame.transmogLocation:IsIllusion() ) then
+			--return;
+		--end
+		dropDown.activeFrame = self;
+		BW_ToggleDropDownMenu(1, nil, dropDown, self, -6, -3);
+		PlaySound(SOUNDKIT.IG_MAINMENU_OPTION_CHECKBOX_ON);
+	end
+end
+
 
 function WardrobeCollectionFrame_GetSortedAppearanceSources(visualID, categoryID)
 	--if categoryID == 29 then

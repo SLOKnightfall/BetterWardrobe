@@ -3,6 +3,7 @@ addon = LibStub("AceAddon-3.0"):GetAddon(addonName)
 
 local L = LibStub("AceLocale-3.0"):GetLocale(addonName)
 
+
 local CollectionList = {}
 addon.CollectionList = CollectionList
 CollectionList.showAll = true
@@ -252,7 +253,7 @@ local function slotOnClick(self, transmogLocation)
 	end
 
 	CloseDropDownMenus()
-	L_CloseDropDownMenus()
+	BW_CloseDropDownMenus()
 	PlaySound(SOUNDKIT.UI_TRANSMOG_GEAR_SLOT_CLICK);
 	WardrobeCollectionFrame.ItemsCollectionFrame:RefreshVisualsList()
 	WardrobeCollectionFrame.ItemsCollectionFrame:UpdateItems()
@@ -323,7 +324,7 @@ end
 
 function CollectionList:Dropdown_OnClick(arg1, arg2, checked)
 		CollectionList:SelectedCollectionList(arg1)
-		L_UIDropDownMenu_SetSelectedID(BW_CollectionList_Dropdown, arg1)
+		BW_UIDropDownMenu_SetSelectedID(BW_CollectionList_Dropdown, arg1)
 		WardrobeCollectionFrame.ItemsCollectionFrame:RefreshVisualsList()
 		WardrobeCollectionFrame.ItemsCollectionFrame:UpdateItems()
 end
@@ -331,42 +332,44 @@ end
 
 function CollectionList:Dropdown_Initialize(frame, level, menuList)
 	local list = addon.collectionListDB.profile.lists
-	local info = L_UIDropDownMenu_CreateInfo()
+	local info = BW_UIDropDownMenu_CreateInfo()
 
 	for i, data in pairs(list) do
 		 info.func = CollectionList.Dropdown_OnClick
 		 info.text, info.arg1 = data.name, i
 		 info.value = i
 		 info.checked = false
-		  L_UIDropDownMenu_AddButton(info)
+		  BW_UIDropDownMenu_AddButton(info)
 		if i == CollectionList:SelectedCollectionList() then
-			--L_UIDropDownMenu_SetSelectedValue(self, data.name)
+			--BW_UIDropDownMenu_SetSelectedValue(self, data.name)
 		end
 	end
 
 	if MogItLoaded then 
 		--key["MOGIT"] = "MogIt Wishlist"
-		--local info = L_UIDropDownMenu_CreateInfo()
+		--local info = BW_UIDropDownMenu_CreateInfo()
 		info.func = CollectionList.Dropdown_OnClick
 		info.text, info.arg1 = "MogIt Wishlist", #list + 1
 		info.checked = false
 
-		L_UIDropDownMenu_AddButton(info)
+		BW_UIDropDownMenu_AddButton(info)
 	end
 end
 
 
 --Dropdownmenu for the Collection List
 function CollectionList:CreateDropdown()
-	BW_CollectionList_Dropdown = L_Create_UIDropDownMenu("BW_CollectionList_Dropdown", BW_ColectionListFrame)
+	BW_CollectionList_Dropdown = CreateFrame("Frame", "BW_CollectionList_Dropdown", BW_ColectionListFrame, "BW_UIDropDownMenuTemplate")
+
+	--BW_CollectionList_Dropdown = BW_UIDropDownMenu_Create("BW_CollectionList_Dropdown", BW_ColectionListFrame)
 	BW_CollectionList_Dropdown:SetPoint("BOTTOM", -80, 15)
 	BW_CollectionList_Dropdown:SetFrameLevel(500)
-	--L_UIDropDownMenu_SetWidth(BW_CollectionList_Dropdown, 157) -- Use in place of dropDown:SetWidth
+	--BW_UIDropDownMenu_SetWidth(BW_CollectionList_Dropdown, 157) -- Use in place of dropDown:SetWidth
 -- Bind an initializer function to the dropdown; see previous sections for initializer function examples.
-	L_UIDropDownMenu_Initialize(BW_CollectionList_Dropdown, CollectionList.Dropdown_Initialize)
-	L_UIDropDownMenu_SetText(BW_CollectionList_Dropdown, "")
+	BW_UIDropDownMenu_Initialize(BW_CollectionList_Dropdown, CollectionList.Dropdown_Initialize)
+	BW_UIDropDownMenu_SetText(BW_CollectionList_Dropdown, "")
 
-	L_UIDropDownMenu_SetSelectedID(BW_CollectionList_Dropdown, CollectionList:SelectedCollectionList())
+	BW_UIDropDownMenu_SetSelectedID(BW_CollectionList_Dropdown, CollectionList:SelectedCollectionList())
 
 	BW_ColectionListFrame.dropdownFrame = BW_CollectionList_Dropdown
 
@@ -432,8 +435,8 @@ function CollectionList:OptionButton_OnClick(button)
 		},
 	}
 
-	L_UIDropDownMenu_SetAnchor(ContextMenu, 0, 0, "BOTTOMLEFT", button, "BOTTOMLEFT")
-	L_EasyMenu(contextMenuData, ContextMenu, ContextMenu, 0, 0, "MENU")	
+	BW_UIDropDownMenu_SetAnchor(ContextMenu, 0, 0, "BOTTOMLEFT", button, "BOTTOMLEFT")
+	BW_EasyMenu(contextMenuData, ContextMenu, ContextMenu, 0, 0, "MENU")	
 end
 
 

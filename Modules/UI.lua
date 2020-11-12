@@ -3,6 +3,7 @@ addon = LibStub("AceAddon-3.0"):GetAddon(addonName)
 
 local L = LibStub("AceLocale-3.0"):GetLocale(addonName)
 
+
 local UI = {}
 
 local LE_DEFAULT = addon.Globals.LE_DEFAULT
@@ -170,9 +171,13 @@ function UI.DefaultButtons_Update()
 		-- hook all models
 		for index , frame in ipairs(Wardrobe) do
 			for _, model in pairs(frame.Models) do
-				if index ~=3 then 
+				if index == 1 then
+					--Sets right click to use library dropdown 
+					model:SetScript("OnMouseDown", function(...) BetterWardrobeItemsModelMixin_OnMouseDown(...) end)
 
-				model:HookScript("OnMouseDown", function(...) UI:DefaultDropdown_Update(...) end)
+				elseif index ~=3 then
+								model:HookScript("OnMouseDown", function(...) UI:DefaultDropdown_Update(...) end)
+
 			end
 
 				local f = CreateFrame("frame", nil, model, "BetterWardrobeIconsTemplate")
@@ -193,7 +198,7 @@ function UI.DefaultButtons_Update()
 						elseif ( button == "RightButton" ) then
 							local dropDown = self:GetParent():GetParent().FavoriteDropDown;
 							dropDown.baseSetID = self.setID;
-							L_ToggleDropDownMenu(1, nil, dropDown, self, 0, 0);
+							BW_ToggleDropDownMenu(1, nil, dropDown, self, 0, 0);
 							PlaySound(SOUNDKIT.IG_MAINMENU_OPTION_CHECKBOX_ON);
 						end
 					end)
@@ -209,9 +214,14 @@ function UI.DefaultButtons_Update()
 		end
 
 		--WardrobeCollectionFrame.FilterButton:HookScript("OnMouseDown", function(...) UI:DefaultFilterDropdown_Update(...) end)
-	UIDropDownMenu_Initialize(WardrobeCollectionFrame.ItemsCollectionFrame.RightClickDropDown, nil, "MENU");
+	BW_WardrobeModelRightClickDropDown = CreateFrame("frame", "BW_WardrobeModelRightClickDropDown", WardrobeCollectionFrame.ItemsCollectionFrame, "BW_UIDropDownMenuTemplate")
+	BW_WardrobeModelRightClickDropDown:Hide()
+	WardrobeCollectionFrame.ItemsCollectionFrame.RightClickDropDown = BW_WardrobeModelRightClickDropDown
+	BW_UIDropDownMenu_Initialize(WardrobeCollectionFrame.ItemsCollectionFrame.RightClickDropDown, nil, "MENU");
 	WardrobeCollectionFrame.ItemsCollectionFrame.RightClickDropDown.initialize = aWardrobeCollectionFrameRightClickDropDown_Init
 end
+
+
 
 
 function addon:SetFavoriteItem(visualID, set)
@@ -233,7 +243,7 @@ end
 --Modified to allow favoriteing unlearned items
 function aWardrobeCollectionFrameRightClickDropDown_Init(self)
 	local appearanceID = self.activeFrame.visualInfo.visualID;
-	local info = UIDropDownMenu_CreateInfo();
+	local info = BW_UIDropDownMenu_CreateInfo();
 	local favItem = addon:IsFavoriteItem(appearanceID)
 
 	-- Set Favorite
@@ -255,12 +265,42 @@ function aWardrobeCollectionFrameRightClickDropDown_Init(self)
 	end
 	info.notCheckable = true;
 	info.func = function(_, visualID, value) WardrobeCollectionFrameModelDropDown_SetFavorite(visualID, value); end;
-	UIDropDownMenu_AddButton(info);
+	BW_UIDropDownMenu_AddButton(info);
+
+	BW_UIDropDownMenu_AddSeparator()
+	local isHidden = addon.HiddenAppearanceDB.profile.item[self.activeFrame.visualInfo.visualID]
+	BW_UIDropDownMenu_AddButton({
+		notCheckable = true,
+		text = isHidden and SHOW or HIDE,
+		func = function() addon.ToggleHidden(self.activeFrame, isHidden) end,
+	})
+
+	local collected = self.activeFrame.visualInfo.isCollected
+	--Collection List Right Click options
+	local collectionList = addon.CollectionList:CurrentList()
+	local isInList = match or addon.CollectionList:IsInList(self.activeFrame.visualInfo.visualID, "item")
+
+	--if  type  == "set" or ((isInList and collected) or not collected)then --(type == "item" and not (model.visualInfo and model.visualInfo.isCollected)) or type == "set" or type == "extraset" then
+		local targetSet = match or variantTarget or self.activeFrame.visualInfo.visualID
+		local targetText = match and " - "..matchType or variantTarget and " - "..variantType or ""
+		BW_UIDropDownMenu_AddSeparator()
+		local isInList = collectionList["item"][targetSet]
+		BW_UIDropDownMenu_AddButton({
+			notCheckable = true,
+			text = isInList and L["Remove from Collection List"]..targetText or L["Add to Collection List"]..targetText,
+			func = function()
+						addon.CollectionList:UpdateList("item", targetSet, not isInList)
+				end,
+		})
+
+
 	-- Cancel
-	info = UIDropDownMenu_CreateInfo();
+
+	info = BW_UIDropDownMenu_CreateInfo();
 	info.notCheckable = true;
 	info.text = CANCEL;
-	UIDropDownMenu_AddButton(info);
+	BW_UIDropDownMenu_AddSeparator()
+	BW_UIDropDownMenu_AddButton(info);
 
 	local headerInserted = false;
 	local sources = WardrobeCollectionFrame_GetSortedAppearanceSources(appearanceID);
@@ -273,13 +313,13 @@ function aWardrobeCollectionFrameRightClickDropDown_Init(self)
 				-- space
 				info.text = " ";
 				info.disabled = true;
-				UIDropDownMenu_AddButton(info);
+				BW_UIDropDownMenu_AddButton(info);
 				info.disabled = nil;
 				-- header
 				info.text = WARDROBE_TRANSMOGRIFY_AS;
 				info.isTitle = true;
 				info.colorCode = NORMAL_FONT_COLOR_CODE;
-				UIDropDownMenu_AddButton(info);
+				BW_UIDropDownMenu_AddButton(info);
 				info.isTitle = nil;
 				-- turn off notCheckable
 				info.notCheckable = nil;
@@ -299,7 +339,7 @@ function aWardrobeCollectionFrameRightClickDropDown_Init(self)
 				chosenSourceID = sources[i].sourceID;
 			end
 			info.checked = (chosenSourceID == sources[i].sourceID);
-			UIDropDownMenu_AddButton(info);
+			BW_UIDropDownMenu_AddButton(info);
 		end
 	end
 end
@@ -386,13 +426,15 @@ function UI:JournalHideSlotMenu_OnClick(parent)
 
 		end
 	end
-	L_UIDropDownMenu_SetAnchor(addon.ContextMenu, 0, 0, "BOTTOMLEFT", parent, "BOTTOMLEFT")
-	L_EasyMenu(contextMenuData, addon.ContextMenu, addon.ContextMenu, 0, 0, "MENU")
+	BW_UIDropDownMenu_SetAnchor(addon.ContextMenu, 0, 0, "BOTTOMLEFT", parent, "BOTTOMLEFT")
+	BW_EasyMenu(contextMenuData, addon.ContextMenu, addon.ContextMenu, 0, 0, "MENU")
 end
 
 
 function 	UI.CreateOptionsDropdown()
-local f = L_Create_UIDropDownMenu("BW_TransmogOptionsDropDown", BW_WardrobeCollectionFrame)
+--local f = BW_UIDropDownMenu_Create("BW_TransmogOptionsDropDown", BW_WardrobeCollectionFrame)
+local f = CreateFrame("Frame", "BW_TransmogOptionsDropDown", BW_WardrobeCollectionFrame, "BW_UIDropDownMenuTemplate")
+
 BW_TransmogOptionsDropDown = f
 
 

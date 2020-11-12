@@ -34,6 +34,7 @@ local playerClass, classID,_
 
 local L = LibStub("AceLocale-3.0"):GetLocale(addonName)
 
+
 --ACE3 Option Handlers
 local optionHandler = {}
 function optionHandler:Setter(info, value)
@@ -820,7 +821,7 @@ end
 
 
 function addon.RefreshCollectionListData()
-	L_UIDropDownMenu_SetSelectedID(BW_CollectionList_Dropdown, addon.CollectionList:SelectedCollectionList())
+	BW_UIDropDownMenu_SetSelectedID(BW_CollectionList_Dropdown, addon.CollectionList:SelectedCollectionList())
 end
 
 
@@ -1201,7 +1202,5 @@ function addon:OnEnable()
 				--	)
 
 				--WardrobeCollectionFrame.ItemsCollectionFrame.RightShoulderCheckbox:Show() 
-	--temp fix to get libray menus to close when clicking outside of tehm
-	hooksecurefunc("UIDropDownMenu_HandleGlobalMouseEvent", function(button, event)  L_UIDropDownMenu_HandleGlobalMouseEvent( button, event) end)
 
 end

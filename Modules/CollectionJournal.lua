@@ -3,6 +3,7 @@ addon = LibStub("AceAddon-3.0"):GetAddon(addonName)
 local Profile
 local L = LibStub("AceLocale-3.0"):GetLocale(addonName)
 
+
 local UI = {}
 
 local LE_DEFAULT = addon.Globals.LE_DEFAULT
@@ -45,16 +46,11 @@ function addon.Init:BuildCollectionJournalUI()
  --UI.CreateFilterMenu()
 	CreateVisualViewButton()
 
-	WardrobeCollectionFrame.searchBox:SetFrameLevel(BW_WardrobeCollectionFrame:GetFrameLevel()+10)
-	WardrobeCollectionFrame.FilterButton:SetFrameLevel(BW_WardrobeCollectionFrame:GetFrameLevel()+10)
-	BW_WardrobeCollectionFrame.FilterButton:SetFrameLevel(BW_WardrobeCollectionFrame:GetFrameLevel()+10)
-	BW_WardrobeCollectionFrame.FilterButton:SetPoint("TOPLEFT", WardrobeCollectionFrame.FilterButton, "TOPLEFT")
-	
 	BW_WardrobeCollectionFrame:GetFrameLevel()
 	WardrobeCollectionFrame.searchBox:SetFrameLevel(BW_WardrobeCollectionFrame:GetFrameLevel()+10)
 	WardrobeCollectionFrame.FilterButton:SetFrameLevel(BW_WardrobeCollectionFrame:GetFrameLevel()+10)
 	BW_WardrobeCollectionFrame.FilterButton:SetFrameLevel(BW_WardrobeCollectionFrame:GetFrameLevel()+10)
-	BW_WardrobeCollectionFrame.FilterButton:SetPoint("TOPLEFT", WardrobeCollectionFrame.FilterButton, "TOPLEFT")
+	--BW_WardrobeCollectionFrame.FilterButton:SetPoint("TOPLEFT", WardrobeCollectionFrame.FilterButton, "TOPLEFT")
 
 	--UI.BuildLoadQueueButton()
 	--UI.DefaultButtons_Update()
@@ -179,16 +175,18 @@ function UI.SortDropDown_Initialize()
 	local Wardrobe = WardrobeCollectionFrame.ItemsCollectionFrame
 	db = addon.sortDB
 
-	BW_SortDropDown = L_Create_UIDropDownMenu("BW_SortDropDown", BW_WardrobeCollectionFrame)
-	L_UIDropDownMenu_SetWidth(BW_SortDropDown, 140)
-	L_UIDropDownMenu_Initialize(BW_SortDropDown, function(self)
-		local info = L_UIDropDownMenu_CreateInfo()
-		local selectedValue = L_UIDropDownMenu_GetSelectedValue(self)
+	BW_SortDropDown = CreateFrame("Frame", "BW_SortDropDown", BW_WardrobeCollectionFrame, "BW_UIDropDownMenuTemplate")
+
+	--BW_SortDropDown = BW_UIDropDownMenu_Create("BW_SortDropDown", BW_WardrobeCollectionFrame)
+	BW_UIDropDownMenu_SetWidth(BW_SortDropDown, 140)
+	BW_UIDropDownMenu_Initialize(BW_SortDropDown, function(self)
+		local info = BW_UIDropDownMenu_CreateInfo()
+		local selectedValue = BW_UIDropDownMenu_GetSelectedValue(self)
 
 		info.func = function(self)
 			db.sortDropdown = self.value
-			L_UIDropDownMenu_SetSelectedValue(BW_SortDropDown, self.value)
-			L_UIDropDownMenu_SetText(BW_SortDropDown, COMPACT_UNIT_FRAME_PROFILE_SORTBY.." "..L[self.value])
+			BW_UIDropDownMenu_SetSelectedValue(BW_SortDropDown, self.value)
+			BW_UIDropDownMenu_SetText(BW_SortDropDown, COMPACT_UNIT_FRAME_PROFILE_SORTBY.." "..L[self.value])
 			db.reverse = IsModifierKeyDown()
 			addon.SetSortOrder(db.reverse)
 			local tabID = addon.GetTab()
@@ -211,13 +209,13 @@ function UI.SortDropDown_Initialize()
 			else
 				info.value, info.text = id, L[id]
 				info.checked = (id == selectedValue)
-				L_UIDropDownMenu_AddButton(info)
+				BW_UIDropDownMenu_AddButton(info)
 			end
 		end
 	end)
 
-	L_UIDropDownMenu_SetSelectedValue(BW_SortDropDown, db.sortDropdown)
-	L_UIDropDownMenu_SetText(BW_SortDropDown, COMPACT_UNIT_FRAME_PROFILE_SORTBY.." "..L[db.sortDropdown])
+	BW_UIDropDownMenu_SetSelectedValue(BW_SortDropDown, db.sortDropdown)
+	BW_UIDropDownMenu_SetText(BW_SortDropDown, COMPACT_UNIT_FRAME_PROFILE_SORTBY.." "..L[db.sortDropdown])
 end
 
 
@@ -259,9 +257,11 @@ end
 
 
 function UI.CreateFilterMenu()
-	BW_WardrobeFilterDropDown = L_Create_UIDropDownMenu("BW_WardrobeFilterDropDown", BW_WardrobeCollectionFrame)
+	BW_WardrobeFilterDropDown = CreateFrame("Frame", "BW_WardrobeFilterDropDown", BW_WardrobeCollectionFrame, "BW_UIDropDownMenuTemplate")
+
+	--BW_WardrobeFilterDropDown = BW_UIDropDownMenu_Create("BW_WardrobeFilterDropDown", BW_WardrobeCollectionFrame)
 	BW_WardrobeCollectionFrame.FilterDropDown = BW_WardrobeFilterDropDown
-	L_UIDropDownMenu_Initialize(BW_WardrobeFilterDropDown, UI.FilterMenu_InitializeItems, "MENU")
+	BW_UIDropDownMenu_Initialize(BW_WardrobeFilterDropDown, UI.FilterMenu_InitializeItems, "MENU")
 end
 
 	--Dropdown for the CollectionJournal Filter Menu  -possible Taint Source
@@ -270,7 +270,7 @@ function UI:FilterMenu_InitializeItems( level)
 		return
 	end
 
-	local info = L_UIDropDownMenu_CreateInfo()
+	local info = BW_UIDropDownMenu_CreateInfo()
 	info.keepShownOnClick = true
 	local atTransmogrifier = WardrobeFrame_IsAtTransmogrifier()
 
@@ -284,7 +284,7 @@ function UI:FilterMenu_InitializeItems( level)
 					end
 		info.checked = 	function() return filterCollected[1] end
 		info.isNotRadio = true
-		L_UIDropDownMenu_AddButton(info, level)
+		BW_UIDropDownMenu_AddButton(info, level)
 
 		info.text = NOT_COLLECTED
 		info.func = function(_, _, _, value)
@@ -295,8 +295,8 @@ function UI:FilterMenu_InitializeItems( level)
 		info.checked = 	function() return filterCollected[2] end
 		info.isNotRadio = true
 
-		L_UIDropDownMenu_AddButton(info, level)
-		L_UIDropDownMenu_AddSeparator()
+		BW_UIDropDownMenu_AddButton(info, level)
+		BW_UIDropDownMenu_AddSeparator()
 
 		info.text = L["Class Sets Only"]
 		info.func = function(_, _, _, value)
@@ -307,7 +307,7 @@ function UI:FilterMenu_InitializeItems( level)
 					end
 		info.checked = 	function() return not addon.Profile.IgnoreClassRestrictions end
 		info.isNotRadio = true
-		L_UIDropDownMenu_AddButton(info, level)
+		BW_UIDropDownMenu_AddButton(info, level)
 
 		info.checked = 	nil
 		info.isNotRadio = nil
@@ -322,21 +322,21 @@ function UI:FilterMenu_InitializeItems( level)
 		--info.func = function(dropdownbutton, arg1)
 			--_G[arg1]:Hide()
 		--end,
-		L_UIDropDownMenu_AddButton(info, level)
+		BW_UIDropDownMenu_AddButton(info, level)
 
 		info.text = L["Expansion"]
 		info.value = 2
-		L_UIDropDownMenu_AddButton(info, level)
+		BW_UIDropDownMenu_AddButton(info, level)
 
 		info.text = L["Missing:"]
 		info.value = 3
-		L_UIDropDownMenu_AddButton(info, level)
+		BW_UIDropDownMenu_AddButton(info, level)
 
 		info.text = L["Armor Type"]
 		info.value = 4
-		L_UIDropDownMenu_AddButton(info, level)
+		BW_UIDropDownMenu_AddButton(info, level)
 
-	elseif level == 2  and L_UIDROPDOWNMENU_MENU_VALUE == 1 then
+	elseif level == 2  and BW_UIDROPDOWNMENU_MENU_VALUE == 1 then
 		local refreshLevel = 2
 		info.hasArrow = false
 		info.isNotRadio = true
@@ -348,9 +348,9 @@ function UI:FilterMenu_InitializeItems( level)
 								filterSelection[i] = true
 						end
 						RefreshLists()
-						L_UIDropDownMenu_Refresh(BW_WardrobeFilterDropDown)
+						BW_UIDropDownMenu_Refresh(BW_WardrobeFilterDropDown)
 					end
-		L_UIDropDownMenu_AddButton(info, level)
+		BW_UIDropDownMenu_AddButton(info, level)
 
 		local refreshLevel = 2
 		info.hasArrow = false
@@ -364,10 +364,10 @@ function UI:FilterMenu_InitializeItems( level)
 								filterSelection[i] = false
 						end
 						RefreshLists()
-						L_UIDropDownMenu_Refresh(BW_WardrobeFilterDropDown)
+						BW_UIDropDownMenu_Refresh(BW_WardrobeFilterDropDown)
 					end
-		L_UIDropDownMenu_AddButton(info, level)
-		L_UIDropDownMenu_AddSeparator(level)
+		BW_UIDropDownMenu_AddButton(info, level)
+		BW_UIDropDownMenu_AddSeparator(level)
 
 		info.notCheckable = false
 
@@ -380,10 +380,10 @@ function UI:FilterMenu_InitializeItems( level)
 					RefreshLists()
 				end
 				info.checked = 	function() return filterSelection[i] end
-			L_UIDropDownMenu_AddButton(info, level)
+			BW_UIDropDownMenu_AddButton(info, level)
 		end
 
-	elseif level == 2  and L_UIDROPDOWNMENU_MENU_VALUE == 2 then
+	elseif level == 2  and BW_UIDROPDOWNMENU_MENU_VALUE == 2 then
 		local refreshLevel = 2
 		info.hasArrow = false
 		info.isNotRadio = true
@@ -394,9 +394,9 @@ function UI:FilterMenu_InitializeItems( level)
 							xpacSelection[i] = true
 						end
 						RefreshLists()
-						L_UIDropDownMenu_Refresh(BW_WardrobeFilterDropDown)
+						BW_UIDropDownMenu_Refresh(BW_WardrobeFilterDropDown)
 					end
-		L_UIDropDownMenu_AddButton(info, level)
+		BW_UIDropDownMenu_AddButton(info, level)
 
 		local refreshLevel = 2
 		info.hasArrow = false
@@ -409,10 +409,10 @@ function UI:FilterMenu_InitializeItems( level)
 								xpacSelection[i] = false
 						end
 						RefreshLists()
-						L_UIDropDownMenu_Refresh(BW_WardrobeFilterDropDown)
+						BW_UIDropDownMenu_Refresh(BW_WardrobeFilterDropDown)
 					end
-		L_UIDropDownMenu_AddButton(info, level)
-		L_UIDropDownMenu_AddSeparator(level)
+		BW_UIDropDownMenu_AddButton(info, level)
+		BW_UIDropDownMenu_AddSeparator(level)
 
 		info.notCheckable = false
 		for i = 1, #EXPANSIONS do
@@ -422,10 +422,10 @@ function UI:FilterMenu_InitializeItems( level)
 					RefreshLists()
 				end
 				info.checked = 	function() return xpacSelection[i] end
-			L_UIDropDownMenu_AddButton(info, level)
+			BW_UIDropDownMenu_AddButton(info, level)
 		end
 
-	elseif level == 2  and L_UIDROPDOWNMENU_MENU_VALUE == 3 then
+	elseif level == 2  and BW_UIDROPDOWNMENU_MENU_VALUE == 3 then
 		info.hasArrow = false
 		info.isNotRadio = true
 		info.notCheckable = true
@@ -437,9 +437,9 @@ function UI:FilterMenu_InitializeItems( level)
 							missingSelection[i] = true
 						end
 						RefreshLists()
-						L_UIDropDownMenu_Refresh(BW_WardrobeFilterDropDown)
+						BW_UIDropDownMenu_Refresh(BW_WardrobeFilterDropDown)
 					end
-		L_UIDropDownMenu_AddButton(info, level)
+		BW_UIDropDownMenu_AddButton(info, level)
 
 		info.text = UNCHECK_ALL
 		info.func = function()
@@ -447,10 +447,10 @@ function UI:FilterMenu_InitializeItems( level)
 							missingSelection[i] = false
 						end
 						RefreshLists()
-						L_UIDropDownMenu_Refresh(BW_WardrobeFilterDropDown)
+						BW_UIDropDownMenu_Refresh(BW_WardrobeFilterDropDown)
 					end
-		L_UIDropDownMenu_AddButton(info, level)
-		L_UIDropDownMenu_AddSeparator(level)
+		BW_UIDropDownMenu_AddButton(info, level)
+		BW_UIDropDownMenu_AddSeparator(level)
 
 		for index, id in pairs(locationDrowpDown) do
 			if index ~= 21 then --Skip "robe" type
@@ -463,14 +463,14 @@ function UI:FilterMenu_InitializeItems( level)
 								missingSelection[21] = value
 							end
 
-							L_UIDropDownMenu_Refresh(BW_WardrobeFilterDropDown)
+							BW_UIDropDownMenu_Refresh(BW_WardrobeFilterDropDown)
 							RefreshLists()
 						end
 				info.checked = function() return missingSelection[index] end
-				L_UIDropDownMenu_AddButton(info, level)
+				BW_UIDropDownMenu_AddButton(info, level)
 			end
 		end
-	elseif level == 2  and L_UIDROPDOWNMENU_MENU_VALUE == 4 then
+	elseif level == 2  and BW_UIDROPDOWNMENU_MENU_VALUE == 4 then
 		local counter = 1
 		for name in pairs(addon.Globals.ARMOR_MASK) do
 			info.keepShownOnClick = false
@@ -483,7 +483,7 @@ function UI:FilterMenu_InitializeItems( level)
 			end
 			info.arg1 = name
 			info.checked = 	function() return addon.selectedArmorType == name end
-			L_UIDropDownMenu_AddButton(info, level)
+			BW_UIDropDownMenu_AddButton(info, level)
 		end
 
 	end
@@ -521,8 +521,8 @@ local function SavedOutfitDB_Dropdown_OnClick(self, arg1, arg2, checked)
 
 		BW_WardrobeCollectionFrame_SetTab(2)
 		BW_WardrobeCollectionFrame_SetTab(4)
-			L_UIDropDownMenu_SetSelectedValue(BW_DBSavedSetDropdown, arg1)
-		--L_UIDropDownMenu_SetText(BW_DBSavedSetDropdown, arg1)
+			BW_UIDropDownMenu_SetSelectedValue(BW_DBSavedSetDropdown, arg1)
+		--BW_UIDropDownMenu_SetText(BW_DBSavedSetDropdown, arg1)
 		addon.savedSetCache = nil
 end
 
@@ -530,12 +530,12 @@ end
 function SavedOutfitDB_Dropdown_Menu(frame, level, menuList)
 	local count = 1
 	for name in pairs(addon.setdb.global.sets)do
-		 local info = L_UIDropDownMenu_CreateInfo()
+		 local info = BW_UIDropDownMenu_CreateInfo()
 		 info.func = SavedOutfitDB_Dropdown_OnClick
 		 info.text, info.arg1 = name, name
-		  L_UIDropDownMenu_AddButton(info)
+		  BW_UIDropDownMenu_AddButton(info)
 		if name == addon.setdb:GetCurrentProfile() then
-			L_UIDropDownMenu_SetSelectedValue(BW_DBSavedSetDropdown, name)
+			BW_UIDropDownMenu_SetSelectedValue(BW_DBSavedSetDropdown, name)
 		end
 		  count = count +1
 	end
@@ -544,15 +544,17 @@ end
 
 --Dropdownmenu for the selection of other character's saved sets
 function UI.SavedSetsDropDown_Initialize(self)
-	--local f = L_Create_UIDropDownMenu("BW_DBSavedSetDropdown", BW_WardrobeCollectionFrame)
-	BW_DBSavedSetDropdown = L_Create_UIDropDownMenu("BW_DBSavedSetDropdown", BW_WardrobeCollectionFrame)
+	--local f = BW_UIDropDownMenu_Create("BW_DBSavedSetDropdown", BW_WardrobeCollectionFrame)
+	BW_DBSavedSetDropdown = CreateFrame("Frame", "BW_DBSavedSetDropdown", BW_WardrobeCollectionFrame, "BW_UIDropDownMenuTemplate")
+
+	--BW_DBSavedSetDropdown = BW_UIDropDownMenu_Create("BW_DBSavedSetDropdown", BW_WardrobeCollectionFrame)
 	--BW_DBSavedSetDropdown:SetParent("BW_WardrobeCollectionFrame")
 	--BW_DBSavedSetDropdown:ClearAllPoints()
 	BW_DBSavedSetDropdown:SetPoint("TOPLEFT", "BW_SortDropDown", "TOPLEFT")
-	L_UIDropDownMenu_SetWidth(BW_DBSavedSetDropdown, 165) -- Use in place of dropDown:SetWidth
+	BW_UIDropDownMenu_SetWidth(BW_DBSavedSetDropdown, 165) -- Use in place of dropDown:SetWidth
 -- Bind an initializer function to the dropdown; see previous sections for initializer function examples.
-	L_UIDropDownMenu_Initialize(BW_DBSavedSetDropdown, SavedOutfitDB_Dropdown_Menu)
-	L_UIDropDownMenu_SetSelectedValue(BW_DBSavedSetDropdown, addon.setdb:GetCurrentProfile())
+	BW_UIDropDownMenu_Initialize(BW_DBSavedSetDropdown, SavedOutfitDB_Dropdown_Menu)
+	BW_UIDropDownMenu_SetSelectedValue(BW_DBSavedSetDropdown, addon.setdb:GetCurrentProfile())
 
 
 
@@ -599,14 +601,13 @@ end
 --- Functionality to add tabs to window
 function BW_WardrobeCollectionFrame_ClickTab(tab)
 	BW_WardrobeCollectionFrame_SetTab(tab:GetID())
-	PanelTemplates_ResizeTabsToFit(WardrobeCollectionFrame, TABS_MAX_WIDTH)
+	PanelTemplates_ResizeTabsToFit(BW_WardrobeCollectionFrame, TABS_MAX_WIDTH)
 	PlaySound(SOUNDKIT.IG_MAINMENU_OPTION_CHECKBOX_ON)
 end
 
 function BW_WardrobeCollectionFrame_SetTab(tabID)
-	local ElvUI = IsAddOnLoaded("ElvUI")
-	PanelTemplates_SetTab(BW_WardrobeCollectionFrame, tabID)
-	local atTransmogrifier = WardrobeFrame_IsAtTransmogrifier()
+	PanelTemplates_SetTab(BW_WardrobeCollectionFrame, tabID);
+	local atTransmogrifier = WardrobeFrame_IsAtTransmogrifier();
 	if atTransmogrifier then
 		WardrobeCollectionFrame.selectedTransmogTab = tabID
 		BW_WardrobeCollectionFrame.selectedTransmogTab = tabID
@@ -615,50 +616,16 @@ function BW_WardrobeCollectionFrame_SetTab(tabID)
 		BW_WardrobeCollectionFrame.selectedCollectionTab = tabID
 		addon:InitTables()
 	end
+	local ElvUI = IsAddOnLoaded("ElvUI")
 
 	local tab1 = (tabID == TAB_ITEMS)
 	local tab2 = (tabID == TAB_SETS)
 	local tab3 = (tabID == TAB_EXTRASETS)
 	local tab4 = (tabID == TAB_SAVED_SETS)
-
-	if addon.SavedSetDropDownFrame and (tab1 or tab2 or tab3 )then 
-		--addon.SavedSetDropDownFrame.frame:Hide()
-	else
-		--addon.SavedSetDropDownFrame.frame:Show()
-	end
-
-	WardrobeCollectionFrame.ItemsCollectionFrame:SetShown(tab1)
-	WardrobeCollectionFrame.SetsCollectionFrame:SetShown(tab2 and not atTransmogrifier)
-	WardrobeCollectionFrame.SetsTransmogFrame:SetShown(tab2 and atTransmogrifier)
-	BW_WardrobeCollectionFrame.BW_SetsCollectionFrame:Hide()
-	BW_WardrobeCollectionFrame.BW_SetsTransmogFrame:Hide()
-	BW_WardrobeCollectionFrame.BW_SetsCollectionFrame:SetShown((tab3 or tab4) and not atTransmogrifier)
-	BW_WardrobeCollectionFrame.BW_SetsTransmogFrame:SetShown((tab3 or tab4) and atTransmogrifier)
-
 	BW_ColectionListFrame.dropdownFrame:SetShown(tab1 and not atTransmogrifier)
 
 	BW_WardrobeToggle:SetShown(tab2 or tab3 or tab4 )
 	BW_WardrobeToggle.VisualMode = false
-
-	local searchBox_X = ((tab1 or ((tab2 or tab3 or tab4) and atTransmogrifier)) and -107) or 19
-	local searchBox_Y = ((tab1 or ((tab2 or tab3 or tab4) and atTransmogrifier)) and -35) or -69
-	local searchBox_Anchor = ((tab1 or ((tab2 or tab3 or tab4) and atTransmogrifier)) and "TOPRIGHT") or "TOPLEFT"
-
-----Moving the search box is a cause of lag?
-
-	WardrobeCollectionFrame.searchBox:ClearAllPoints()
-	--WardrobeCollectionFrame.searchBox:SetEnabled((tab1 and  WardrobeCollectionFrame.ItemsCollectionFrame:GetActiveCategory()) or tab2 or tab3)
-	--WardrobeCollectionFrame.searchBox:SetPoint(searchBox_Anchor, searchBox_X, searchBox_Y)
-	WardrobeCollectionFrame.searchBox:SetWidth(((tab2 or tab3 or tab4) and not atTransmogrifier and 145) or 105)
-	--WardrobeCollectionFrame.searchBox:SetShown(tab1 or tab2)
-
-	--BW_WardrobeCollectionFrame.searchBox:SetShown(tab3)
-	--WardrobeCollectionFrame.searchBox:Hide()
-
-	WardrobeCollectionFrame.FilterButton:SetShown(tab1 or (tab2 and not atTransmogrifier))
-	WardrobeCollectionFrame.FilterButton:SetEnabled((tab1 and  WardrobeCollectionFrame.ItemsCollectionFrame:GetActiveCategory()) or tab2)
-	--WardrobeCollectionFrame.progressBar:SetShown(not tab4)
-	BW_CollectionListButton:SetShown(tab1 and not atTransmogrifier)
 
 	BW_WardrobeCollectionFrame.FilterButton:SetShown((tab3 or tab4 ) and not atTransmogrifier)
 	BW_WardrobeCollectionFrame.FilterButton:SetEnabled(tab3)
@@ -669,15 +636,31 @@ function BW_WardrobeCollectionFrame_SetTab(tabID)
 
 	BW_WardrobeCollectionFrame.BW_SetsHideSlotButton:SetShown((tab2 or tab3) and not atTransmogrifier)
 
-	L_UIDropDownMenu_EnableDropDown(BW_SortDropDown)
+	BW_UIDropDownMenu_EnableDropDown(BW_SortDropDown)
 	BW_SortDropDown:Show()
 	BW_DBSavedSetDropdown:SetShown(tab4)
 
-	BW_SortDropDown:ClearAllPoints()
+	WardrobeCollectionFrame.searchBox:Show()
+	BW_WardrobeCollectionFrame.searchBox:Hide()
 
-	if tab1 then
+
+	if ( tabID == TAB_ITEMS ) then
 		WardrobeCollectionFrame.activeFrame = WardrobeCollectionFrame.ItemsCollectionFrame
 		BW_WardrobeCollectionFrame.activeFrame = WardrobeCollectionFrame.ItemsCollectionFrame
+
+		WardrobeCollectionFrame.ItemsCollectionFrame:Show();
+		WardrobeCollectionFrame.SetsCollectionFrame:Hide();
+		WardrobeCollectionFrame.SetsTransmogFrame:Hide();
+		WardrobeCollectionFrame.searchBox:ClearAllPoints();
+		WardrobeCollectionFrame.searchBox:SetPoint("TOPRIGHT", -107, -35);
+		WardrobeCollectionFrame.searchBox:SetWidth(115);
+		local enableSearchAndFilter = WardrobeCollectionFrame.ItemsCollectionFrame.transmogLocation and WardrobeCollectionFrame.ItemsCollectionFrame.transmogLocation:IsAppearance()
+		WardrobeCollectionFrame.searchBox:SetEnabled(enableSearchAndFilter);
+		WardrobeCollectionFrame.FilterButton:Show();
+		WardrobeCollectionFrame.FilterButton:SetEnabled(enableSearchAndFilter);
+
+		BW_WardrobeCollectionFrame.BW_SetsCollectionFrame:Hide()
+		BW_WardrobeCollectionFrame.BW_SetsTransmogFrame:Hide()
 
 		local _, isWeapon = C_TransmogCollection.GetCategoryInfo(WardrobeCollectionFrame.ItemsCollectionFrame:GetActiveCategory() or -1)
 		local yOffset = (atTransmogrifier and (isWeapon and 55 or 32)) or LegionWardrobeY
@@ -696,54 +679,94 @@ function BW_WardrobeCollectionFrame_SetTab(tabID)
 				BW_SortDropDown:SetPoint("TOPLEFT", WardrobeCollectionFrame.ItemsCollectionFrame.WeaponDropDown, "BOTTOMLEFT", 0, yOffset)
 			end
 		end
-		WardrobeCollectionFrame.searchBox:ClearAllPoints()
-		WardrobeCollectionFrame.searchBox:SetPoint(searchBox_Anchor, searchBox_X, searchBox_Y)
-		BW_WardrobeCollectionFrame.searchBox:Hide()
-		WardrobeCollectionFrame.searchBox:Show()
-	elseif tab2 then
+
+	elseif ( tabID == TAB_SETS ) then
 		WardrobeCollectionFrame.SetsTransmogFrame:UpdateProgressBar()
-		if atTransmogrifier  then
+		WardrobeCollectionFrame.ItemsCollectionFrame:Hide();
+		WardrobeCollectionFrame.searchBox:ClearAllPoints();
+		if ( atTransmogrifier )  then
 			WardrobeCollectionFrame.activeFrame = WardrobeCollectionFrame.SetsTransmogFrame
 			BW_WardrobeCollectionFrame.activeFrame = WardrobeCollectionFrame.SetsTransmogFrame
-			BW_SortDropDown:SetPoint("TOPRIGHT", WardrobeCollectionFrame.ItemsCollectionFrame, "TOPRIGHT", -30, -10)
+			WardrobeCollectionFrame.searchBox:SetPoint("TOPRIGHT", -107, -35);
+			WardrobeCollectionFrame.searchBox:SetWidth(115);
+			WardrobeCollectionFrame.FilterButton:Hide();
+			BW_SortDropDown:SetPoint("TOPRIGHT", WardrobeCollectionFrame.ItemsCollectionFrame, "TOPRIGHT",-30, -10)
 		else
 			WardrobeCollectionFrame.activeFrame = WardrobeCollectionFrame.SetsCollectionFrame
 			BW_WardrobeCollectionFrame.activeFrame = WardrobeCollectionFrame.SetsCollectionFrame
+			WardrobeCollectionFrame.searchBox:SetPoint("TOPLEFT", 19, -69);
+			WardrobeCollectionFrame.searchBox:SetWidth(145);
+			WardrobeCollectionFrame.FilterButton:Show();
+			WardrobeCollectionFrame.FilterButton:SetEnabled(true);
 			BW_SortDropDown:SetPoint("TOPLEFT", BW_WardrobeToggle, "TOPRIGHT")
 		end
-		WardrobeCollectionFrame.searchBox:ClearAllPoints()
-		WardrobeCollectionFrame.searchBox:SetPoint(searchBox_Anchor, searchBox_X, searchBox_Y)
-		BW_WardrobeCollectionFrame.searchBox:Hide()
-		WardrobeCollectionFrame.searchBox:Show()
-	elseif tab3 then
+		WardrobeCollectionFrame.searchBox:SetEnabled(true);
+		WardrobeCollectionFrame.SetsCollectionFrame:SetShown(not atTransmogrifier);
+		WardrobeCollectionFrame.SetsTransmogFrame:SetShown(atTransmogrifier);
+
+		BW_WardrobeCollectionFrame.BW_SetsCollectionFrame:Hide()
+		BW_WardrobeCollectionFrame.BW_SetsTransmogFrame:Hide()
+
+	elseif ( tabID == TAB_EXTRASETS ) then
 		BW_WardrobeCollectionFrame.BW_SetsTransmogFrame:UpdateProgressBar()
-		if atTransmogrifier then
+		WardrobeCollectionFrame.ItemsCollectionFrame:Hide();
+		WardrobeCollectionFrame.searchBox:ClearAllPoints();
+		WardrobeCollectionFrame.FilterButton:Hide();
+		if ( atTransmogrifier )  then
 			WardrobeCollectionFrame.activeFrame = BW_WardrobeCollectionFrame.BW_SetsTransmogFrame
 			BW_WardrobeCollectionFrame.activeFrame = BW_WardrobeCollectionFrame.BW_SetsTransmogFrame
+			WardrobeCollectionFrame.searchBox:SetPoint("TOPRIGHT",WardrobeCollectionFrame, "TOPRIGHT",-107, -35);
+			--WardrobeCollectionFrame.searchBox:SetWidth(115);
 			BW_SortDropDown:SetPoint("TOPRIGHT", WardrobeCollectionFrame.ItemsCollectionFrame, "TOPRIGHT",-30, -10)
 		else
 			WardrobeCollectionFrame.activeFrame = BW_WardrobeCollectionFrame.BW_SetsCollectionFrame
 			BW_WardrobeCollectionFrame.activeFrame = BW_WardrobeCollectionFrame.BW_SetsCollectionFrame
+			--WardrobeCollectionFrame.searchBox:SetPoint("TOPLEFT", 19, -69);
+			--WardrobeCollectionFrame.searchBox:SetWidth(145);
 			BW_SortDropDown:SetPoint("TOPLEFT", BW_WardrobeToggle, "TOPRIGHT")
 		end
-		BW_WardrobeCollectionFrame.searchBox:Show()
-		WardrobeCollectionFrame.searchBox:Hide()
-	elseif tab4 then
+		WardrobeCollectionFrame.searchBox:SetEnabled(true);
+		WardrobeCollectionFrame.SetsCollectionFrame:Hide()
+		WardrobeCollectionFrame.SetsTransmogFrame:Hide()
+
+		BW_WardrobeCollectionFrame.BW_SetsCollectionFrame:SetShown(not atTransmogrifier);
+		BW_WardrobeCollectionFrame.BW_SetsTransmogFrame:SetShown(atTransmogrifier);
+
+			WardrobeCollectionFrame.searchBox:Hide()
+	BW_WardrobeCollectionFrame.searchBox:Show()
+	
+	elseif ( tabID == TAB_SAVED_SETS ) then
 		BW_SortDropDown:Hide()
 		--BW_WardrobeToggle.VisualMode = true
 		local savedCount = #addon.GetSavedList()
 		WardrobeCollectionFrame_UpdateProgressBar(savedCount, savedCount)
-		--WardrobeCollectionFrame.searchBox:Hide()
-		--L_UIDropDownMenu_DisableDropDown(BW_SortDropDown)
-		if atTransmogrifier then
+
+		WardrobeCollectionFrame.ItemsCollectionFrame:Hide();
+		WardrobeCollectionFrame.searchBox:ClearAllPoints();
+				WardrobeCollectionFrame.FilterButton:Hide();
+
+		if ( atTransmogrifier )  then
 			WardrobeCollectionFrame.activeFrame = BW_WardrobeCollectionFrame.BW_SetsTransmogFrame
 			BW_WardrobeCollectionFrame.activeFrame = BW_WardrobeCollectionFrame.BW_SetsTransmogFrame
-			BW_SortDropDown:SetPoint("TOPRIGHT", WardrobeCollectionFrame.ItemsCollectionFrame, "TOPRIGHT",-55, -10)
+			WardrobeCollectionFrame.searchBox:SetPoint("TOPRIGHT", -107, -35);
+			WardrobeCollectionFrame.searchBox:SetWidth(115);
+			BW_SortDropDown:SetPoint("TOPRIGHT", WardrobeCollectionFrame.ItemsCollectionFrame, "TOPRIGHT",-30, -10)
+
 		else
 			WardrobeCollectionFrame.activeFrame = BW_WardrobeCollectionFrame.BW_SetsCollectionFrame
 			BW_WardrobeCollectionFrame.activeFrame = BW_WardrobeCollectionFrame.BW_SetsCollectionFrame
+
+			WardrobeCollectionFrame.searchBox:SetPoint("TOPLEFT", 19, -69);
+			WardrobeCollectionFrame.searchBox:SetWidth(145);
 			BW_SortDropDown:SetPoint("TOPLEFT", BW_WardrobeToggle, "TOPRIGHT")
+
+
 		end
+		WardrobeCollectionFrame.searchBox:SetEnabled(false);
+		WardrobeCollectionFrame.SetsCollectionFrame:Hide()
+		WardrobeCollectionFrame.SetsTransmogFrame:Hide()
+		BW_WardrobeCollectionFrame.BW_SetsCollectionFrame:SetShown(not atTransmogrifier);
+		BW_WardrobeCollectionFrame.BW_SetsTransmogFrame:SetShown(atTransmogrifier);
 	end
 end
 

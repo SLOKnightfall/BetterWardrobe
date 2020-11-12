@@ -24,9 +24,7 @@ Libs\LibArmorToken-1.0\lib.xml
 Libs\LibAppropriateitems-1.0\lib.xml
 #Libs\LibDataBroker-1.1\LibDataBroker-1.1.lua
 #Libs\LibTextDump-1.0\LibTextDump-1.0.lua
-Libs\LibUIDropDownMenu\LibUIDropDownMenu.xml
-#Libs\LibDropdown-1.0\lib.xml
-
+Libs\UIDropDownMenu\UIDropDownMenu.xml
 
 #Locale
 Locale\enUS.lua
