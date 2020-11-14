@@ -63,14 +63,16 @@ local function GetOutfits(character)
 				data.index = i
 			end
 
-			for i, data in ipairs(addon.OutfitDB.char.outfits) do
-				data.outfitID = MAX_DEFAULT_OUTFITS + i
-				data.set = "extra"
-				data.index = i
-				data.name = addon.OutfitDB.char.outfits[i].name
-				tinsert(FullList, data)
-				--FullList[#FullList].outfitID = MAX_DEFAULT_OUTFITS + i
-				--data.set = "default"
+			if addon.OutfitDB.char.outfits then 
+				for i, data in ipairs(addon.OutfitDB.char.outfits) do
+					data.outfitID = MAX_DEFAULT_OUTFITS + i
+					data.set = "extra"
+					data.index = i
+					data.name = addon.OutfitDB.char.outfits[i].name
+					tinsert(FullList, data)
+					--FullList[#FullList].outfitID = MAX_DEFAULT_OUTFITS + i
+					--data.set = "default"
+				end
 			end
 		end
 

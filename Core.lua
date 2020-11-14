@@ -1172,7 +1172,7 @@ function addon:OnEnable()
 		addon.Init:BuildTransmogVendorUI()
 		addon.Init:BuildCollectionJournalUI()
 		
-	WardrobeFilterDropDown_OnLoad(WardrobeCollectionFrame.FilterDropDown)
+	--WardrobeFilterDropDown_OnLoad(WardrobeCollectionFrame.FilterDropDown)
 	--WardrobeCollectionFrame.ItemsCollectionFrame:SetActiveSlot
 --end )
 
