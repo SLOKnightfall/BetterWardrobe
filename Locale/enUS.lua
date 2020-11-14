@@ -337,6 +337,7 @@ L["NOTE_74"] = "Demon Invasion Event Set"
 L["NOTE_91"] = "Island Expeditions Event Set"
 L["NOTE_60"] = "Scourge Invasion Event Set"
 L["NOTE_69"] = "Garrison Set"
+L["NOTE_1001"] = "Shadowlands Invasion Event Set"
 
 L["Malfurion's Battlegear (Lookalike)"] = true
 L["Sunstrider's Regalia (Lookalike)"] = true

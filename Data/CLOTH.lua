@@ -2,6 +2,28 @@ local addonName, addon = ...
 addon = LibStub("AceAddon-3.0"):GetAddon(addonName)
 
 addon.ArmorSets["CLOTH"] ={
+	[50001]={
+		["armorType"] =  1 ,
+		["label"] =  1001 ,
+		["setID"] =  50001 ,
+		["expansionID"] =  9 ,
+		["maxLevel"] =  80 ,
+		["filter"] =  1 ,
+		["minLevel"] =  80 ,
+		["name"] =  "Argent Conscript Cloth (Horde)" ,
+		["items"] = { 183535,183541,183539,183538,183577,183576,183575,183574, },
+	},
+	[50002]={
+		["armorType"] =  1 ,
+		["label"] =  1001 ,
+		["setID"] =  50002 ,
+		["expansionID"] =  9 ,
+		["maxLevel"] =  80 ,
+		["filter"] =  1,
+		["minLevel"] =  80 ,
+		["name"] =  "Argent Conscript Cloth (Alliance)" ,
+		["items"] = { 183525,183546,183545,183527,183529,183547,183548,183532, },
+	},
 	[3]={
 		["armorType"] =  1 ,
 		["label"] =  44 ,

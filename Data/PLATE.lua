@@ -2,6 +2,28 @@ local addonName, addon = ...
 addon = LibStub("AceAddon-3.0"):GetAddon(addonName)
 
 addon.ArmorSets["PLATE"] ={
+	[50007]={
+		["armorType"] =  4 ,
+		["label"] =  1001 ,
+		["setID"] =  50007 ,
+		["expansionID"] =  9 ,
+		["maxLevel"] =  80 ,
+		["filter"] =  1 ,
+		["minLevel"] =  80 ,
+		["name"] =  "Argent Conscript Plate (Horde)" ,
+		["items"] = { 183591,183589,183593,183595,183542,183590,183594,183592, },
+	},
+	[50008]={
+		["armorType"] =  4 ,
+		["label"] =  1001 ,
+		["setID"] =  50008 ,
+		["expansionID"] =  9 ,
+		["maxLevel"] =  80 ,
+		["filter"] =  1,
+		["minLevel"] =  80 ,
+		["name"] =  "Argent Conscript Plate (Alliance)" ,
+		["items"] = { 183569,183567,183571,183572,183568,183573,183570,183566, },
+	},
 	[2037]={
 		["armorType"] =  4 ,
 		["label"] =  71 ,

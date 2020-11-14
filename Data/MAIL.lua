@@ -2,6 +2,28 @@ local addonName, addon = ...
 addon = LibStub("AceAddon-3.0"):GetAddon(addonName)
 
 addon.ArmorSets["MAIL"] ={
+	[50005]={
+		["armorType"] =  3 ,
+		["label"] =  1001 ,
+		["setID"] =  50005 ,
+		["expansionID"] =  9 ,
+		["maxLevel"] =  80 ,
+		["filter"] =  1 ,
+		["minLevel"] =  80 ,
+		["name"] =  "Argent Conscript Mail (Horde)" ,
+		["items"] = { 183536,183585,183583,183588,183586,183543,183587,183584, },
+	},
+	[50006]={
+		["armorType"] =  3 ,
+		["label"] =  1001 ,
+		["setID"] =  50006 ,
+		["expansionID"] =  9 ,
+		["maxLevel"] =  80 ,
+		["filter"] =  1 ,
+		["minLevel"] =  80 ,
+		["name"] =  "Argent Conscript Mail (Alliance)" ,
+		["items"] = { 183565,183563,183564,183562,183586,183561,183530,183560, },
+	},
 	[1013]={
 		["armorType"] =  3 ,
 		["label"] =  27 ,

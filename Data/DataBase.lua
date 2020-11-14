@@ -118,6 +118,8 @@ do
 				setData.numCollected = 0
 				setData.numTotal = 0
 				setData.setSources = {}
+				setData.sources = setData.sources or {}
+
 				for index, item in ipairs( setData["items"]) do
 					setData.numTotal = setData.numTotal + 1
 					local mod = setData.mod or 0
@@ -132,6 +134,7 @@ do
 					end
 
 					if appearanceID then 
+						setData.sources[item] = appearanceID
 						local sources = C_TransmogCollection.GetAppearanceSources(appearanceID) or {} --Can return nil if no longer in game
 						local baseSource 
 						if (#sources == 0) then
@@ -145,13 +148,14 @@ do
 						else
 							WardrobeCollectionFrame_SortSources(sources)
 						end
-							local _, _, canEnchant, _, isCollected  = C_TransmogCollection.GetAppearanceSourceInfo(sourceID)
-							if sources[1].isCollected then 
-								setData.setSources[sourceID] = true
-								setData.numCollected = setData.numCollected + 1
-							else
-								setData.setSources[sourceID] = false
-							end
+
+						local _, _, canEnchant, _, isCollected  = C_TransmogCollection.GetAppearanceSourceInfo(sourceID)
+						if sources[1].isCollected then 
+							setData.setSources[sourceID] = true
+							setData.numCollected = setData.numCollected + 1
+						else
+							setData.setSources[sourceID] = false
+						end
 					else
 						--end
 					end
@@ -296,7 +300,9 @@ local function buildSetSubstitutions()
 		wipe(SET_INDEX)
 		wipe(SET_DATA)
 		addon.ClearArtifactData()
-		wipe(addon.SavedSetCache)
+		--wipe(addon.SavedSetCache)
+		addon.SavedSetCache =  nil
+
 		--setsInfo = nil
 	end
 
