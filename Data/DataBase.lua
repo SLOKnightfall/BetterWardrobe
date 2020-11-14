@@ -141,7 +141,7 @@ do
 							-- can happen if a slot only has HiddenUntilCollected sources
 							
 							sources = {C_TransmogCollection.GetSourceInfo(sourceID)}
-							if not sources[1].sourceType then 
+							if not sources[1].sourceType and not setData.sourceType then 
 								setData.unavailable = true
 							end
 
