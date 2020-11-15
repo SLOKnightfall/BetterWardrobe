@@ -305,26 +305,11 @@ function BetterWardrobeSetsCollectionListMixin:CreateSlotButtons()
 	end
 end
 
-local dropdown
-local  function RefreshDropdown()
-	local list = addon.collectionListDB.profile.lists
-	local key = {}
-	for i, data in pairs(list) do
-		key[i] = data.name
-	end
-
-	if MogItLoaded then 
-		key["MOGIT"] = "MogIt Wishlist"
-	end
-	dropdown.pullout:Close()
-	dropdown:SetList(key)
-	dropdown:SetValue(CollectionList:SelectedCollectionList())
-end
 
 
 function CollectionList:Dropdown_OnClick(arg1, arg2, checked)
 		CollectionList:SelectedCollectionList(arg1)
-		BW_UIDropDownMenu_SetSelectedID(BW_CollectionList_Dropdown, arg1)
+		--BW_UIDropDownMenu_SetSelectedID(BW_CollectionList_Dropdown, arg1)
 		WardrobeCollectionFrame.ItemsCollectionFrame:RefreshVisualsList()
 		WardrobeCollectionFrame.ItemsCollectionFrame:UpdateItems()
 end
@@ -397,7 +382,6 @@ function CollectionList:OptionButton_OnClick(button)
 			func = function()
 				action = "add"
 				BW_WardrobeOutfitFrameMixin:ShowPopup("BW_NAME_COLLECTION")
-				dropdown.pullout:Close()
 			end,
 			isNotRadio = true,
 			notCheckable = true,
@@ -407,7 +391,6 @@ function CollectionList:OptionButton_OnClick(button)
 			func = function() 
 				action = "rename"
 				BW_WardrobeOutfitFrameMixin:ShowPopup("BW_NAME_COLLECTION")
-				dropdown.pullout:Close()
 			end,
 			isNotRadio = true,
 			notCheckable = true,
@@ -417,7 +400,6 @@ function CollectionList:OptionButton_OnClick(button)
 			text = L["Delete"],
 			func = function()
 				CollectionList:DeleteList()
-				dropdown.pullout:Close()
 			end,
 			isNotRadio = true,
 			notCheckable = true,
@@ -427,7 +409,6 @@ function CollectionList:OptionButton_OnClick(button)
 			text = L["Add by Item ID"],
 			func = function()
 				BW_WardrobeOutfitFrameMixin:ShowPopup("BETTER_WARDROBE_COLLECTIONLIST_ITEM_POPUP")
-				dropdown.pullout:Close()
 			end,
 			isNotRadio = true,
 			notCheckable = true,
@@ -454,10 +435,10 @@ function CollectionList:AddList(name)
 	local profile = addon.collectionListDB.profile
 	local default = {item = {}, set = {}, extraset = {}, name = name}
 	tinsert(profile.lists, default)
-	profile.selectedCollectionList = #profile.lists
-	RefreshDropdown()
+	local list = CollectionList:SelectedCollectionList(#profile.lists)
 	WardrobeCollectionFrame.ItemsCollectionFrame:RefreshVisualsList()
 	WardrobeCollectionFrame.ItemsCollectionFrame:UpdateItems()
+
 	return true
 end
 
@@ -468,7 +449,7 @@ function CollectionList:RenameList(name)
 	local profile = addon.collectionListDB.profile
 	local list = CollectionList:CurrentList()
 	list.name = name
-	RefreshDropdown()
+	BW_CollectionList_DropdownText:SetText(list.name)
 	return true
 end
 
@@ -479,10 +460,8 @@ function CollectionList:DeleteList()
 		--Error cant delete last list
 		return false 
 	end
-
-	tremove(profile.lists, profile.selectedCollectionList)
-	profile.selectedCollectionList = 1
-	RefreshDropdown()
+	tremove(profile.lists, CollectionList:SelectedCollectionList())
+	CollectionList:SelectedCollectionList(1)
 	WardrobeCollectionFrame.ItemsCollectionFrame:RefreshVisualsList()
 	WardrobeCollectionFrame.ItemsCollectionFrame:UpdateItems()
 	return true
@@ -537,12 +516,17 @@ function CollectionList:CurrentList()
 end
 
 
---Returns selected list if no value, or sets list if value is included
+--Returns selected list and  sets list if value is included
 function CollectionList:SelectedCollectionList(value)
-	if value then addon.collectionListDB.profile.selectedCollectionList = value
-	else
-		return addon.collectionListDB.profile.selectedCollectionList
+	if value then 
+		addon.collectionListDB.profile.selectedCollectionList = value
+		BW_UIDropDownMenu_SetSelectedID(BW_CollectionList_Dropdown, value)
+		local list = CollectionList:CurrentList()
+		BW_CollectionList_DropdownText:SetText(list.name)
+
 	end
+
+	return addon.collectionListDB.profile.selectedCollectionList
 end
 
 

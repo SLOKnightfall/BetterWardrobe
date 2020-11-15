@@ -41,11 +41,8 @@ BetterWardrobe.xml
 Modules\TransmogVendor.xml
 Modules\ImportExport.lua
 
-#Modules\Randomizer.lua
 Modules\SavedOutfits.xml
 Modules\CollectionList.xml
-
-Modules\UIDropDownMenu.lua
 Modules\Tooltips.lua
 Modules\DressingRoom.xml
 Modules\ArtifactAppearances.lua
