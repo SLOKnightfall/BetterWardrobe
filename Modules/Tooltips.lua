@@ -416,8 +416,10 @@ function tooltip:ShowTooltip(itemLink)
 end
 
 function tooltip:ShowPreview(itemLink)
-   if not itemLink then return end
-
+   if not itemLink or not  IsDressableItem(itemLink) then 
+			self:Hide()
+			return 
+		end
 	local itemID, _, _, slot = GetItemInfoInstant(itemLink)
 	if self.item ~= itemLink then
 		self.item = itemLink
@@ -466,6 +468,9 @@ function tooltip:ShowPreview(itemLink)
 			self.model:TryOn(itemLink)
 		else
 			self:Hide()
+			Models.normal:Hide()
+			Models.modelZoomed:Hide()
+			Models.modelWeapon:Hide()
 		end
 	end
 end
@@ -476,6 +481,7 @@ function tooltip.HideItem(self)
 	tooltip.owner = nil
 	tooltip.repos:Hide()
 	tooltip.check:Show()
+	tooltip:Hide()
 end
 
 tooltip.check = CreateFrame("Frame")
