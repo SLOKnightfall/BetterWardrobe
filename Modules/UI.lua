@@ -175,10 +175,14 @@ function UI.DefaultButtons_Update()
 					--Sets right click to use library dropdown 
 					model:SetScript("OnMouseDown", function(...) BetterWardrobeItemsModelMixin_OnMouseDown(...) end)
 
-				elseif index ~=3 then
-								model:HookScript("OnMouseDown", function(...) UI:DefaultDropdown_Update(...) end)
+				elseif index == 2 then
 
-			end
+					model:SetScript("OnMouseDown", function(model,...) BetterWardrobeSetsTransmogModelMixin.OnMouseDown(model,...) end)
+
+				elseif index ~=3 then
+								--model:HookScript("OnMouseDown", function(...) UI:DefaultDropdown_Update(...) end)
+
+				end
 
 				local f = CreateFrame("frame", nil, model, "BetterWardrobeIconsTemplate")
 				f = CreateFrame("frame", nil, model, "BetterWardrobeSetInfoTemplate")

@@ -10,22 +10,6 @@ CollectionList.showAll = true
 
 local MogItLoaded = false
 
---Updates collection list data from single list to multiple lists
-function CollectionList:UpdateDB()
-	local profile = addon.chardb.profile
-	if profile.listUpdate == 1 then return end
-
-
-	--Adds current collection list to the new list DB if its empty
-	profile.lists = profile.lists or {}
-	if #profile.lists == 0 then
-		tinsert(profile.lists, profile.collectionList)
-	end
-	profile.lists[1].name = "Collection List"
-	profile.collectionList = nil
-	profile.listUpdate = 1
-end
-
 function CollectionList:BuildCollectionList(complete)
 	local list = {}
 	local searchString = string.lower(WardrobeCollectionFrameSearchBox:GetText())
@@ -210,7 +194,6 @@ end
 
 
 function addon.Init:BuildCollectionList()
-	--CollectionList:UpdateDB()
 	CollectionList:AddMogItData()
 	CollectionList:CreateDropdown()
 end

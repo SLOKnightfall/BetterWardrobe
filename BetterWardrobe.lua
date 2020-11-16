@@ -263,7 +263,7 @@ function Sets:ClearHidden(setList, type)
 	for i, setInfo in ipairs(setList) do
 		local itemID = setInfo.setID or setInfo.visualID
 
-		if not addon.chardb.profile[type][itemID] then
+		if not addon.HiddenAppearanceDB.profile[type][itemID] then
 			tinsert(newSet, setInfo)
 		else
 			--print("setInfo.name")
@@ -2158,35 +2158,54 @@ function BetterWardrobeSetsTransmogMixin:OpenRightClickDropDown()
 	if (not self.RightClickDropDown.activeFrame) then
 		return
 	end
-	local setID = self.RightClickDropDown.activeFrame.setID
-	local info = BW_UIDropDownMenu_CreateInfo()
-	local isFavorite = addon.favoritesDB.profile.extraset[setID]
-	if (isFavorite) then
-		info.text = BATTLE_PET_UNFAVORITE
-		info.func = function()
-			addon.favoritesDB.profile.extraset[setID] = nil
-			BW_SetsTransmogFrame:Refresh()
-			BW_SetsTransmogFrame:OnSearchUpdate()
-		 end
-	else
-		info.text = BATTLE_PET_FAVORITE
-		info.func = function()
-			addon.favoritesDB.profile.extraset[setID] = true
-			BW_SetsTransmogFrame:Refresh()
-			BW_SetsTransmogFrame:OnSearchUpdate()
-		end
-	end
-	info.notCheckable = true
-	BW_UIDropDownMenu_AddButton(info)
-	-- Cancel
-	info = BW_UIDropDownMenu_CreateInfo()
-	info.notCheckable = true
-	info.text = CANCEL
-	BW_UIDropDownMenu_AddButton(info)
-
-
 	local tab = addon.GetTab()
 	local type = tabType[addon.GetTab()]
+	local setID = self.RightClickDropDown.activeFrame.setID
+	local info = BW_UIDropDownMenu_CreateInfo()
+
+	if tab == 2 then
+		if ( C_TransmogSets.GetIsFavorite(setID) ) then
+			info.text = BATTLE_PET_UNFAVORITE;
+			info.func = function() self:SetFavorite(setID, false); end
+		else
+			info.text = BATTLE_PET_FAVORITE;
+			info.func = function() self:SetFavorite(setID, true); end
+		end
+		info.notCheckable = true;
+		BW_UIDropDownMenu_AddButton(info);
+		-- Cancel
+		info = BW_UIDropDownMenu_CreateInfo();
+		info.notCheckable = true;
+		info.text = CANCEL;
+		BW_UIDropDownMenu_AddButton(info);
+	else
+
+		local isFavorite = addon.favoritesDB.profile.extraset[setID]
+		if (isFavorite) then
+			info.text = BATTLE_PET_UNFAVORITE
+			info.func = function()
+				addon.favoritesDB.profile.extraset[setID] = nil
+				BW_SetsTransmogFrame:Refresh()
+				BW_SetsTransmogFrame:OnSearchUpdate()
+			 end
+		else
+			info.text = BATTLE_PET_FAVORITE
+			info.func = function()
+				addon.favoritesDB.profile.extraset[setID] = true
+				BW_SetsTransmogFrame:Refresh()
+				BW_SetsTransmogFrame:OnSearchUpdate()
+			end
+		end
+		info.notCheckable = true
+		BW_UIDropDownMenu_AddButton(info)
+		-- Cancel
+		info = BW_UIDropDownMenu_CreateInfo()
+		info.notCheckable = true
+		info.text = CANCEL
+		BW_UIDropDownMenu_AddButton(info)
+	end
+
+
 	if tab ~= 4 then 
 		local variantTarget, match, matchType
 		local variantType = ""
@@ -2209,7 +2228,7 @@ function BetterWardrobeSetsTransmogMixin:OpenRightClickDropDown()
 		end
 
 		BW_UIDropDownMenu_AddSeparator()
-		local isHidden = addon.chardb.profile[type][setID]
+		local isHidden = addon.HiddenAppearanceDB.profile[type][setID]
 		BW_UIDropDownMenu_AddButton({
 			notCheckable = true,
 			text = isHidden and SHOW or HIDE,
@@ -2250,6 +2269,8 @@ function addon.Init:CreateRightClickDropDown()
 
 	--BW_WardrobeSetsTransmogModelRightClickDropDown = BW_UIDropDownMenu_Create("BW_WardrobeSetsTransmogModelRightClickDropDown", BW_SetsTransmogFrame)
 	BW_SetsTransmogFrame.RightClickDropDown = BW_WardrobeSetsTransmogModelRightClickDropDown
+	WardrobeCollectionFrame.SetsTransmogFrame.RightClickDropDown = BW_WardrobeSetsTransmogModelRightClickDropDown
+	WardrobeCollectionFrame.SetsTransmogFrame.OpenRightClickDropDown = BetterWardrobeSetsTransmogMixin.OpenRightClickDropDown
 	BW_UIDropDownMenu_Initialize(BW_WardrobeSetsTransmogModelRightClickDropDown, OpenRightClickDropDown, "MENU")
 end
 
@@ -2307,10 +2328,10 @@ function BW_WardrobeCollectionFrame_UpdateTabButtons()
 end
 
 
-	addon.TRANSMOG_SET_FILTER[LE_TRANSMOG_SET_FILTER_COLLECTED] = C_TransmogSets.GetBaseSetsFilter(LE_TRANSMOG_SET_FILTER_COLLECTED)
-	addon.TRANSMOG_SET_FILTER[LE_TRANSMOG_SET_FILTER_UNCOLLECTED] = C_TransmogSets.GetBaseSetsFilter(LE_TRANSMOG_SET_FILTER_UNCOLLECTED)
-	addon.TRANSMOG_SET_FILTER[LE_TRANSMOG_SET_FILTER_PVP] = C_TransmogSets.GetBaseSetsFilter(LE_TRANSMOG_SET_FILTER_PVP)
-	addon.TRANSMOG_SET_FILTER[LE_TRANSMOG_SET_FILTER_PVE] = C_TransmogSets.GetBaseSetsFilter(LE_TRANSMOG_SET_FILTER_PVE)
+addon.TRANSMOG_SET_FILTER[LE_TRANSMOG_SET_FILTER_COLLECTED] = C_TransmogSets.GetBaseSetsFilter(LE_TRANSMOG_SET_FILTER_COLLECTED)
+addon.TRANSMOG_SET_FILTER[LE_TRANSMOG_SET_FILTER_UNCOLLECTED] = C_TransmogSets.GetBaseSetsFilter(LE_TRANSMOG_SET_FILTER_UNCOLLECTED)
+addon.TRANSMOG_SET_FILTER[LE_TRANSMOG_SET_FILTER_PVP] = C_TransmogSets.GetBaseSetsFilter(LE_TRANSMOG_SET_FILTER_PVP)
+addon.TRANSMOG_SET_FILTER[LE_TRANSMOG_SET_FILTER_PVE] = C_TransmogSets.GetBaseSetsFilter(LE_TRANSMOG_SET_FILTER_PVE)
 
 function BW_WardrobeCollectionFrame_OnShow(self)
 	_,playerClass, classID = UnitClass("player")
