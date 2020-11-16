@@ -17,19 +17,31 @@ local import = false
 local useCharacterSources = true
 local Profile
 
+local defaultWidth, defaultHeight = 450, 545
+
 function DressingRoom:SetFrameSize(frame)
-	local maxWidth, maxHeight = DressUpFrame:GetMaxResize();
-	if (addon.Profile.DR_Width > maxWidth or addon.Profile.DR_Height > maxHeight) then
-		DressUpFrame:SetSize(maxWidth, maxHeight);
-	
-		local width, height = DressUpFrame:GetSize();
-		addon.Profile.DR_Width = width;
-		addon.Profile.DR_Height = height;
-	else
-		DressUpFrame:SetSize(addon.Profile.DR_Width, addon.Profile.DR_Height);
+	if not addon.Profile.DR_ResizeWindow then 
+		if DressUpFrame.BW_Resize then
+				DressUpFrame:SetSize(defaultWidth, defaultHeight)
+				DressUpFrame.BW_Resize = false
+				UpdateUIPanelPositions(DressUpFrame)
+		end
+
+		return
 	end
 
-	UpdateUIPanelPositions(DressUpFrame);
+	local maxWidth, maxHeight = DressUpFrame:GetMaxResize()
+	if (addon.Profile.DR_Width > maxWidth or addon.Profile.DR_Height > maxHeight) then
+		DressUpFrame:SetSize(maxWidth, maxHeight)
+	
+		local width, height = DressUpFrame:GetSize()
+		addon.Profile.DR_Width = width
+		addon.Profile.DR_Height = height
+	else
+		DressUpFrame:SetSize(addon.Profile.DR_Width, addon.Profile.DR_Height)
+	end
+	DressUpFrame.BW_Resize = true
+	UpdateUIPanelPositions(DressUpFrame)
 
 	--UIPanelWindows["DressUpFrame"].width = addon.Profile.DR_Width
 	--UpdateUIPanelPositions();

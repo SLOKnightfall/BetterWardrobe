@@ -378,7 +378,7 @@ local options = {
 								type = "toggle",
 								width = "full",
 								disabled = false,
-								width = 1.875,
+								width = 1.2,
 							},
 							TooltipPreview_Modifier = {
 								type = "select",
@@ -448,6 +448,13 @@ local options = {
 											return tbl;
 										end,
 								width = 1.2,
+								hidden = true,
+							},
+							TooltipPreview_Spacer1 = {
+								order = 8.1,
+								name = " ",
+								type = "description",
+								width = 2,
 							},
 							TooltipPreview_Dress = {
 								order = 9,
@@ -490,7 +497,7 @@ local options = {
 								width = 1.2,
 								desc = L["TooltipPreview_Anchor_Tooltip"],
 							},
-							TooltipPreview_Spacer1 = {
+							TooltipPreview_Spacer2 = {
 								order = 13.1,
 								name = " ",
 								type = "description",
@@ -645,6 +652,12 @@ local options = {
 							name = L["Hide Tabard"],
 							type = "toggle",
 						},
+						DR_ResizeWindow = {
+							order = 9,
+							name = L["Resize Window"],
+							type = "toggle",
+							width = "full",
+						},
 						DR_Width = {
 							type = "range",
 							order = 10,
@@ -653,6 +666,7 @@ local options = {
 							min = 300,
 							max = 1000,
 							arg = "DR_Width",
+							disabled = function() return not addon.Profile.DR_ResizeWindow end,
 						},
 						DR_Height = {
 							type = "range",
@@ -662,19 +676,21 @@ local options = {
 							min = 300,
 							max = 1000,
 							arg = "DR_Height",
-
+							disabled = function() return not addon.Profile.DR_ResizeWindow end,
 						},
 						DR_ScaleReset = {
 							type = "execute",
-							order = 112,
+							order = 12,
 							name = L["Reset"],
 							func = function() 
-								DressUpFrame:SetWidth(450)
-								DressUpFrame:SetHeight(545) 
-								addon.Profile.DR_Width = 450
-								addon.Profile.DR_Height = 545
+								local defaultWidth, defaultHeight = 450, 545;  
+								DressUpFrame:SetWidth(defaultWidth)
+								DressUpFrame:SetHeight(defaultHeight) 
+								addon.Profile.DR_Width = defaultWidth
+								addon.Profile.DR_Height = defaultHeight
 								DressUpFrame.BW_ResizeFrame = false
 							end,
+							disabled = function() return not addon.Profile.DR_ResizeWindow end,
 						},
 					},
 				},
