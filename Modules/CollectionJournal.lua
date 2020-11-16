@@ -923,10 +923,12 @@ function BW_WardrobeCollectionFrame_SetTab(tabID)
 
 			WardrobeCollectionFrame.searchBox:Hide()
 	BW_WardrobeCollectionFrame.searchBox:Show()
+	BW_SetsCollectionFrame:OnSearchUpdate()
 	
 	elseif ( tabID == TAB_SAVED_SETS ) then
 		BW_SortDropDown:Hide()
 		--BW_WardrobeToggle.VisualMode = true
+		BW_SetsCollectionFrame:OnSearchUpdate()
 		local savedCount = #addon.GetSavedList()
 		WardrobeCollectionFrame_UpdateProgressBar(savedCount, savedCount)
 

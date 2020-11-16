@@ -589,37 +589,44 @@ end
 		WardrobeCollectionFrame_SetAppearanceTooltip(self, sources, chosenSourceID);
 	end
 end]]
+do
+local tempLink 
+	hooksecurefunc("WardrobeCollectionFrame_OpenTransmogLink",  function(link) 
 
-function WardrobeCollectionFrame_OpenTransmogLink(link)
-	if ( not CollectionsJournal:IsVisible() or not WardrobeCollectionFrame:IsVisible() ) then
-		ToggleCollectionsJournal(5);
-	end
+		--if InCombatLockdown() then return end
+		if ( not CollectionsJournal:IsVisible() or not WardrobeCollectionFrame:IsVisible() ) then
+			--securecall(function() ToggleCollectionsJournal(5) end)
+		end
+			tempLink = link
 
-	local linkType, id = strsplit(":", link);
+				local linkType, id = strsplit(":", tempLink);
 
-	if ( linkType == "transmogappearance" ) then
-		local sourceID = tonumber(id);
-		BW_WardrobeCollectionFrame_SetTab(TAB_ITEMS);
+				if ( linkType == "transmogappearance" ) then
+					--local sourceID = tonumber(id);
+					BW_WardrobeCollectionFrame_SetTab(TAB_ITEMS);
 
-		-- For links a base appearance is fine
-		local categoryID = C_TransmogCollection.GetAppearanceSourceInfo(sourceID);
-		local slot = WardrobeCollectionFrame_GetSlotFromCategoryID(categoryID);
-		local transmogLocation = TransmogUtil.GetTransmogLocation(slot, Enum.TransmogType.Appearance, Enum.TransmogModification.None);
-		WardrobeCollectionFrame.ItemsCollectionFrame:GoToSourceID(sourceID, transmogLocation);
+					-- For links a base appearance is fine
+					--local categoryID = C_TransmogCollection.GetAppearanceSourceInfo(sourceID);
+					--local slot = WardrobeCollectionFrame_GetSlotFromCategoryID(categoryID);
+					--local transmogLocation = TransmogUtil.GetTransmogLocation(slot, Enum.TransmogType.Appearance, Enum.TransmogModification.None);
+					--WardrobeCollectionFrame.ItemsCollectionFrame:GoToSourceID(sourceID, transmogLocation);
 
-	elseif ( linkType == "transmogset") then
-		local setID = tonumber(id);
-		BW_WardrobeCollectionFrame_SetTab(TAB_SETS);
-		BW_WardrobeCollectionFrame.BW_SetsCollectionFrame:SelectSet(setID);
-		--BW_WardrobeCollectionFrame.SetsCollectionFrame:SelectSet(setID);
+				elseif ( linkType == "transmogset") then
+					--local setID = tonumber(id);
+					BW_WardrobeCollectionFrame_SetTab(TAB_SETS);
+					--BW_WardrobeCollectionFrame.BW_SetsCollectionFrame:SelectSet(setID);
+					--BW_WardrobeCollectionFrame.SetsCollectionFrame:SelectSet(setID);
 
-	elseif ( linkType == "transmogset-extra") then
-		local setID = tonumber(id);
-		BW_WardrobeCollectionFrame_SetTab(3);
-		--WardrobeCollectionFrame.SetsCollectionFrame:SelectSet(setID);
-		BW_WardrobeCollectionFrame.BW_SetsCollectionFrame:SelectSet(setID);
-	end
+				elseif ( linkType == "transmogset-extra") then
+					local setID = tonumber(id);
+					BW_WardrobeCollectionFrame_SetTab(3);
+					--WardrobeCollectionFrame.SetsCollectionFrame:SelectSet(setID);
+					BW_WardrobeCollectionFrame.BW_SetsCollectionFrame:SelectSet(setID);
+				end
+		
+	end)
 end
+
 
 local function CheckMissingLocation(setInfo)
 --function addon.Sets:GetLocationBasedCount(set)
