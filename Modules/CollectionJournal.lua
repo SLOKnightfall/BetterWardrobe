@@ -832,6 +832,9 @@ function BW_WardrobeCollectionFrame_SetTab(tabID)
 	WardrobeCollectionFrame.searchBox:Show()
 	BW_WardrobeCollectionFrame.searchBox:Hide()
 
+		BW_WardrobeCollectionFrame.BW_SetsCollectionFrame:Hide()
+	BW_WardrobeCollectionFrame.BW_SetsTransmogFrame:Hide()
+
 
 	if ( tabID == TAB_ITEMS ) then
 		WardrobeCollectionFrame.activeFrame = WardrobeCollectionFrame.ItemsCollectionFrame
@@ -921,14 +924,12 @@ function BW_WardrobeCollectionFrame_SetTab(tabID)
 		BW_WardrobeCollectionFrame.BW_SetsCollectionFrame:SetShown(not atTransmogrifier);
 		BW_WardrobeCollectionFrame.BW_SetsTransmogFrame:SetShown(atTransmogrifier);
 
-			WardrobeCollectionFrame.searchBox:Hide()
+			--WardrobeCollectionFrame.searchBox:Hide()
 	BW_WardrobeCollectionFrame.searchBox:Show()
-	BW_SetsCollectionFrame:OnSearchUpdate()
 	
 	elseif ( tabID == TAB_SAVED_SETS ) then
 		BW_SortDropDown:Hide()
 		--BW_WardrobeToggle.VisualMode = true
-		BW_SetsCollectionFrame:OnSearchUpdate()
 		local savedCount = #addon.GetSavedList()
 		WardrobeCollectionFrame_UpdateProgressBar(savedCount, savedCount)
 
