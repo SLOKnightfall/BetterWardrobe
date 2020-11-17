@@ -100,70 +100,6 @@ end
 
 
 local tabType = {"item", "set", "extraset"}
----==== Hide Buttons
-function UI:DefaultDropdown_Update(model, button)
-	if BW_WardrobeCollectionFrame.selectedTransmogTab == 4 or BW_WardrobeCollectionFrame.selectedCollectionTab == 4 then
-		return
-	end
-	if button == "RightButton" and model:GetParent().transmogType ~= Enum.TransmogType.Illusion and not IsModifierKeyDown() then
-		if not DropDownList1:IsShown() then
-			 -- force show dropdown
-			WardrobeModelRightClickDropDown.activeFrame = model
-			ToggleDropDownMenu(1, nil, WardrobeModelRightClickDropDown, model, -6, -3)
-		end
-
-		local setID = (model.visualInfo and model.visualInfo.visualID) or model.setID
-		local type = tabType[addon.GetTab()]
-		local variantTarget, match, matchType
-		local variantType = ""
-		if type == "set" or type =="extraset" then
-			UIDropDownMenu_AddSeparator()
-			UIDropDownMenu_AddButton({
-					notCheckable = true,
-					text = L["Queue Transmog"],
-					func = function()
-
-						local setInfo = addon.GetSetInfo(setID) or C_TransmogSets.GetSetInfo(setID)
-						local name = setInfo["name"]
-						--addon.QueueForTransmog(type, setID, name)
-						addon.QueueList = {type, setID, name}
-					 end,
-					})
-			if type == "set" then 
-				variantTarget, variantType, match, matchType = addon.Sets:SelectedVariant(setID)
-			end
-		end
-
-		UIDropDownMenu_AddSeparator()
-		local isHidden = addon.chardb.profile[type][setID]
-		UIDropDownMenu_AddButton({
-			notCheckable = true,
-			text = isHidden and SHOW or HIDE,
-			func = function() addon.ToggleHidden(model, isHidden) end,
-		})
-
-		local collected = (model.visualInfo and model.visualInfo.isCollected) or C_TransmogSets.IsBaseSetCollected(setID) or model.setCollected
-		--Collection List Right Click options
-		local collectionList = addon.CollectionList:CurrentList()
-		local isInList = match or addon.CollectionList:IsInList(setID, type)
-
-		--if  type  == "set" or ((isInList and collected) or not collected)then --(type == "item" and not (model.visualInfo and model.visualInfo.isCollected)) or type == "set" or type == "extraset" then
-			local targetSet = match or variantTarget or setID
-			local targetText = match and " - "..matchType or variantTarget and " - "..variantType or ""
-			UIDropDownMenu_AddSeparator()
-			local isInList = collectionList[type][targetSet]
-			UIDropDownMenu_AddButton({
-				notCheckable = true,
-				text = isInList and L["Remove from Collection List"]..targetText or L["Add to Collection List"]..targetText,
-				func = function()
-							addon.CollectionList:UpdateList(type, targetSet, not isInList)
-					end,
-			})
-		--end
-	end
-end
-
-
 --Adds icons and added right click menu options to the various frames
 function UI.DefaultButtons_Update()
 		local Wardrobe = {WardrobeCollectionFrame.ItemsCollectionFrame, WardrobeCollectionFrame.SetsTransmogFrame, BW_SetsTransmogFrame}
@@ -176,11 +112,9 @@ function UI.DefaultButtons_Update()
 					model:SetScript("OnMouseDown", function(...) BetterWardrobeItemsModelMixin_OnMouseDown(...) end)
 
 				elseif index == 2 then
-
 					model:SetScript("OnMouseDown", function(model,...) BetterWardrobeSetsTransmogModelMixin.OnMouseDown(model,...) end)
 
 				elseif index ~=3 then
-								--model:HookScript("OnMouseDown", function(...) UI:DefaultDropdown_Update(...) end)
 
 				end
 

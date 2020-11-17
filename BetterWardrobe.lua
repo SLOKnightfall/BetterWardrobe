@@ -1590,7 +1590,7 @@ if tab ~=4 then
 		end
 
 		BW_UIDropDownMenu_AddSeparator()
-		local isHidden = addon.chardb.profile[type][self.baseSetID]
+		local isHidden = addon.addon.HiddenAppearanceDB[type][self.baseSetID]
 		
 		BW_UIDropDownMenu_AddButton({
 			notCheckable = true,
@@ -2397,6 +2397,10 @@ function BW_WardrobeCollectionFrame_OnHide(self)
 	SetsDataProvider:ClearSets()
 	addon:ClearCache()
 	addon.selectedArmorType = addon.Globals.CLASS_INFO[playerClass][3]
+
+		addon.sortDB.sortDropdown = 1
+		BW_UIDropDownMenu_SetSelectedValue(BW_SortDropDown, 1)
+ 		BW_UIDropDownMenu_SetText(BW_SortDropDown, COMPACT_UNIT_FRAME_PROFILE_SORTBY.." "..L[1])
 end
 
 
