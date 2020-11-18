@@ -29,6 +29,7 @@ Libs\LibUIDropDownMenu\LibUIDropDownMenu.xml
 
 
 #Locale
+Locale\deDE.lua
 Locale\enUS.lua
 
 #Core files
