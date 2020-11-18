@@ -70,10 +70,7 @@
 					</HighlightTexture>
 				<Scripts>
 					<OnEnter>
-						GameTooltip:SetOwner(self, "ANCHOR_RIGHT")
-						GameTooltip:SetText("Click: Show Collection List")
-						GameTooltip:AddLine("Shift Click: Show Detail List")
-						GameTooltip:Show()
+						CollectionListTooltip_OnEnter(self)
 					</OnEnter>
 					<OnLeave function="GameTooltip_Hide"/>
 					<OnClick>

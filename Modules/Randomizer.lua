@@ -12,7 +12,7 @@ function BW_RandomizeButtonMixin:OnEnter()
 	GameTooltip:ClearAllPoints()
 	GameTooltip:SetPoint("BOTTOM", self, "TOP", 0, 0)
 	GameTooltip:SetOwner(self, "ANCHOR_PRESERVE")
-	GameTooltip:SetText(L["Click: Randomize Items"].."\n"..L["Shift Click:Randomize Outfit"])
+	GameTooltip:SetText(L["Click: Randomize Items"].."\n"..L["Shift Click: Randomize Outfit"])
 end
 
 

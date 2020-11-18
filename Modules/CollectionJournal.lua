@@ -143,7 +143,7 @@ function CreateVisualViewButton()
 
 	b:SetScript("OnEnter", function(self)
 			GameTooltip:SetOwner(self, "ANCHOR_RIGHT")
-			GameTooltip:SetText("Visual View")
+			GameTooltip:SetText(L["Visual View"])
 			GameTooltip:Show()
 		end)
 
@@ -663,7 +663,7 @@ function UI:FilterMenu_InitializeItems( level)
 			local counter = 1
 			for name in pairs(addon.Globals.ARMOR_MASK) do
 				info.keepShownOnClick = false
-				info.text = name
+				info.text = L[name]
 				info.func = function(info, arg1, _, value)
 						addon.selectedArmorType = arg1
 						--addon.extraSetsCache = nil

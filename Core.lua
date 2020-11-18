@@ -386,7 +386,7 @@ local options = {
 								name = L["Only show if modifier is pressed"],
 								values = function()
 											local tbl = {
-												None = "None",
+												None = L["None"],
 											};
 											for k,v in pairs(addon.Globals.mods) do
 												tbl[k] = k;
@@ -491,8 +491,8 @@ local options = {
 								order = 13,
 								name = L["Anchor point"],
 								values = {
-									vertical = "Top/bottom",
-									horizontal = "Left/right",
+									vertical = L["Top/bottom"],
+									horizontal = L["Left/right"],
 								},
 								width = 1.2,
 								desc = L["TooltipPreview_Anchor_Tooltip"],
@@ -723,7 +723,7 @@ local itemSub_options = {
 	args = {
 
 		settings={
-			name = "Items",
+			name = L["Items"],
 			type = "group",
 			--inline = true,
 			order = 0,
@@ -815,7 +815,7 @@ function addon.RefreshSubItemData()
 		args["BaseItem"..i] = {
 			order = i,
 			name = function(info)
-				local text = ("item: %d - %s ==> item: %d - %s"):format(data.subID, data.subLink or "", i, data.itemLink or "")
+				local text = (L["item: %d - %s \n==>\nitem: %d - %s"]):format(data.subID, data.subLink or "", i, data.itemLink or "")
 				return text 
 			end,
 			type = "description",
@@ -901,8 +901,8 @@ local defaults = {
 		TooltipPreview_Show = false,
 		TooltipPreview_Anchor = "horizontal",
 		TooltipPreviewRotate = false,
-		TooltipPreview_Modifier = "None",
-		TooltipPreview_ZoomItemModifier = "None",
+		TooltipPreview_Modifier = L["None"],
+		TooltipPreview_ZoomItemModifier = L["None"],
 		TooltipPreview_CustomRace = 1,
 		TooltipPreview_CustomGender = 0,
 		TooltipPreview_DressingDummy = false, 

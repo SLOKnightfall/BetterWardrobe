@@ -54,7 +54,7 @@ function addon.ToggleHidden(model, isHidden)
 		local name, link = GetItemInfo(source.itemID)
 		addon.HiddenAppearanceDB.profile.item[visualID] = not isHidden and name
 		--self:UpdateWardrobe()
-		print(format("%s "..link.." from the Appearances Tab", isHidden and "Unhiding" or "Hiding"))
+		print(string.format("%s "..link.." %s", isHidden and L["unhiding_item"] or L["hiding_item"], isHidden and L["inhiding_item_end"] or L["hiding_item_end"] ))
 		WardrobeCollectionFrame.ItemsCollectionFrame:RefreshVisualsList()
 		WardrobeCollectionFrame.ItemsCollectionFrame:UpdateItems()
 
@@ -84,14 +84,13 @@ function addon.ToggleHidden(model, isHidden)
 
 		WardrobeCollectionFrame.SetsCollectionFrame:OnSearchUpdate()
 		WardrobeCollectionFrame.SetsTransmogFrame:OnSearchUpdate()
-		print(format("%s "..name, isHidden and "Unhiding" or "Hiding"))
-
+ 		print(format("%s "..name.." %s", isHidden and L["unhiding_set"] or L["hiding_set"], isHidden and L["unhiding_set_end"] or L["hiding_set_end"]))
 	else
 		local setInfo = addon.GetSetInfo(model.setID)
 		local name = setInfo["name"]
 		addon.HiddenAppearanceDB.profile.extraset[model.setID] = not isHidden and name or nil
-		print(format("%s "..name, isHidden and "Unhiding" or "Hiding"))
-		BW_SetsCollectionFrame:OnSearchUpdate()
+ 		print(format("%s "..name.." %s", isHidden and L["unhiding_set"] or L["hiding_set"], isHidden and L["unhiding_set_end"] or L["hiding_set_end"]))
+ 		BW_SetsCollectionFrame:OnSearchUpdate()
 		BW_SetsTransmogFrame:OnSearchUpdate()
 
 	end

@@ -682,6 +682,12 @@ function CollectionList:TSMGroupExport()
 	CheckBox:SetText(itemString)
 end
 
+function CollectionListTooltip_OnEnter(self)
+						GameTooltip:SetOwner(self, "ANCHOR_RIGHT")
+						GameTooltip:SetText("Click: Show Collection List")
+						GameTooltip:AddLine("Shift Click: Show Detail List")
+						GameTooltip:Show()
+					end
 
 BW_CollectionListDropDownMixin = {}
 

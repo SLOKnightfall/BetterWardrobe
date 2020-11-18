@@ -28,6 +28,7 @@ Libs\UIDropDownMenu\UIDropDownMenu.xml
 
 #Locale
 Locale\enUS.lua
+Locale\deDE.lua
 
 #Core files
 #Modules\Inspect.lua
