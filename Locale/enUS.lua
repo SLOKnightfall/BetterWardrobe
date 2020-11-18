@@ -15,9 +15,9 @@ local TAB_EXTRASETS = 3
 
 --_G["BINDING_NAME_" .. name
 _G["BINDING_HEADER_BETTERWARDROBE"] = addonName
-_G["BINDING_NAME_BETTERWARDROBE_BINDING_PLAYERMODEL"] = "Use Player Model"
-_G["BINDING_NAME_BETTERWARDROBE_BINDING_TARGETMODEL"] = "Use Target Model"
-_G["BINDING_NAME_BETTERWARDROBE_BINDING_TARGETGEAR"] = "Use Target Gear"
+_G["BINDING_NAME_BETTERWARDROBE_BINDING_PLAYERMODEL"] = "Use Player Model" 
+_G["BINDING_NAME_BETTERWARDROBE_BINDING_TARGETMODEL"] = "Use Target's Model"
+_G["BINDING_NAME_BETTERWARDROBE_BINDING_TARGETGEAR"] =  "Use Target Gear"
 _G["BINDING_NAME_BETTERWARDROBE_BINDING_TOGGLE_DRESSINGROOM"] = "Toggle DressingRoom"
 
 
@@ -25,11 +25,11 @@ _G["BINDING_NAME_BETTERWARDROBE_BINDING_TOGGLE_DRESSINGROOM"] = "Toggle Dressing
 --Options Menu
 L["General Options"] = true
 L["Ignore Class Restriction Filter"] = true
-L["Only for Raid Lookalike/Recolor Sets"] = true
-L["Print Set Collection alerts to chat:"] = true
+L["Only for RaidLookalike/Recolor Sets"] = true
+L["Print Set Collection alerts to chat"] = true
 L["Sets"] = true
 L["Extra Sets"] = true
-L["Collection List"] = true
+L["CollectionList"] = true
 L["TSM Source to Use"] = true
 L["Transmog Vendor Window"] = true
 L["Larger Transmog Area"] = true
@@ -37,19 +37,19 @@ L["Extra Large Transmog Area"] = true
 L["LargeTransmogArea_Tooltip"] = "Increases the Transmog Vendor Window"
 L["ExtraLargeTransmogArea_Tooltip"] = "Increase the Transmog Vendor Window to fill width of screen"
 L["Show Incomplete Sets"] = true
-L["Show Items set to Hidden"] = true
+L["Show Items set to Hidden"] =  true
 L["Hide Missing Set Pieces at Transmog Vendor"] = true
 L["Use Hidden Transmog for Missing Set Pieces"] = true
 L["Required pieces"] = true
 L["Show Set Names"] = true
 L["Show Collected Count"] = true
 
-L["Tooltip Options"] = true
+L["Tooltip Options"] =  true
 L["Show Set Info in Tooltips"] = true
-L["Show Set Collection Details"] = true
-L["Only List Missing Pieces"] = true
-L["Show Item ID"] = true
-L["Show if appearance is known"] = true
+L["Show Set Collection Details"] =  true
+L["Only List Missing Pieces"] =  true
+L["Show Item ID"] =  true
+L["Show if appearance is known"] = true 
 L["Show if additional sources are available"] = true
 L["Show Token Information"] = true
 
@@ -59,27 +59,24 @@ L["Item Preview Options"] = true
 L["Appearance Preview"] = true
 L["Only transmogrification items"] = true
 L["Try to preview armor tokens"] = true
-L["Only show if modifier is pressed"] = true
-L["None"] = true
-L["Prevent Comparison Overlap"] = true
+L["Only show if modifier is pressed"]= true
+L["Prevent Comparrison Overlap"] = true
 L["TooltipPreview_Overlap_Tooltip"] = "If the comparison tooltip is shown where the preview would want to be, show next to it"
 L["Zoom:"] = true
 L["On Weapons"] = true
 L["On Clothes"] = true
 L["Dress Preview Model"] = true
 L["TooltipPreview_Dress_Tooltip"] = "Show the model wearing your current outfit, apart from the previewed item"
-L["Use Dressing Dummy Model"] = true
+L["Use Dressing Dummy Model"] =  true
 L["TooltipPreview_DressingDummy"] = "Hide the details of your player model while you're zoomed (like the transmog wardrobe does)"
 L["Auto Rotate"] = true
 L["TooltipPreviewRotate_Tooltip"] = "Constantly spin the model while it's displayed"
 L["Rotate with mouse wheel"] = true
 L["TooltipPreview_MouseRotate_Tooltip"] = "Use the mousewheel to rotate the model in the tooltip"
 L["Anchor point"] = true
-L["Top/bottom"] = true
-L["Left/right"] = true
-L["TooltipPreview_Anchor_Tooltip"] = "Side of the tooltip to attach to, depending on where on the screen it's showing"
-L["Height"] = true
-L["Width"] = true
+L["TooltipPreview_Anchor_Tooltip"]  ="Side of the tooltip to attach to, depending on where on the screen it's showing"
+L["Height"]= true
+L["Width"]= true
 L["Reset"] = true
 L["Use custom model"] = true
 L["CUSTOM_MODEL_WARNING"] = "*Custom models are set to the transmog dressing model, and might not display correctly"
@@ -92,7 +89,7 @@ L["Enable"] = true
 L["Show Item Buttons"] = true
 L["Show DressingRoom Controls"] = true
 L["Dim Backround Image"] = true
-L["Hide Backround Image"] = true
+L["Hide  Backround Image"] = true
 L["Start Undressed"] = true
 L["Hide Weapons"] = true
 L["Hide Shirt"] = true
@@ -104,18 +101,20 @@ L["Not a valid itemID"] = true
 L["Replacement Item ID"] = true
 L["Remove"] = true
 L["Add"] = true
+L["Item Substitution"] = true
 L["Item Locations Don't Match"] = true
 L["Saved Item Substitutes"] = true
 
-L["Item Substitution"] = true
-L["Options"] = true
-L["Saved Outfits"] = true
 L["Profiles - Options Settings"] = true
 L["Profiles - Collection Settings"] = true
 
-L["Add List"] = true
-L["Rename"] = true
-L["Delete"] = true
+L["MISC"] = true
+L["Raid Lookalike"] = true
+L["PvP"] = true
+L["Only for Raid Lookalike/Recolor Sets"] = true
+L["Print Set Collection alerts to chat:"] = true
+
+L["Collection List"] = true
 L["Add by Item ID"] = true
 
 L["Substitue Item"] = true
@@ -128,22 +127,21 @@ L["Export"] = true
 
 
 L.OM_GOLD = "|c00FFD200"
-L.ENDCOLOR = "|r"
+L.ENDCOLOR ="|r"
 L["List Name"] = true
 L["-Appearance in %d CollectionList-"] = true
-L["Undress"] = true
 L["Model Options"] = true
-L["Use Target Gear"] = true
-L["Use Player Model"] = true
-L["Use Target Model"] = true
+L["Use Target Gear"] =  true
+L["Use Player Model"] =  true
+L["Use Target's Model"] = true
 L["Target Options"] = true
 L["Import/Export Options"] = true
-L["Character Options"] = true
+ L["Character Options"] = true
 L["Display Options"] = true
 
-L["-%s%s"] = true
-L["|TInterface\\RaidFrame\\ReadyCheck-NotReady:0|t %s%s"] = true
-L["|TInterface\\RaidFrame\\ReadyCheck-Ready:0|t %s%s"] = true
+L["-%s%s"] =  true
+L["|TInterface\\RaidFrame\\ReadyCheck-NotReady:0|t %s%s"] =  true
+L["|TInterface\\RaidFrame\\ReadyCheck-Ready:0|t %s%s"] =  true
 L["Type the item ID or url in the text box below"] = true
 L["Import Item"] = true
 L["Added missing appearances of: \124cffff7fff\124H%s:%s\124h[%s]\124h\124r"] = true
@@ -158,8 +156,8 @@ L["Transmog Window"] = true
 L["Queue Transmog"] = true
 L["Load Set: %s"] = true
 L["None Selected"] = true
-L["Add to Collection List"] = true
-L["Remove from Collection List"] = true
+L["Add to CollectionList"] = true
+L["Remove from CollectionList"] = true
 
 L["%s: Uncollected items added"] = true
 L["No new appearces needed."] = true
@@ -168,34 +166,14 @@ L["Appearance removed."] = true
 
 
 
-L["unhiding_item"] = "Unhiding"
-L["unhiding_item_end"] = "from the Appearances Tab"
-L["hiding_item"] = "Hiding"
-L["hiding_item_end"] = "from the Appearances Tab"
-
-L["unhiding_set"] = "Unhiding"
-L["unhiding_set_end"] = "" -- used for german
-L["hiding_set"] = "Hiding"
-L["hiding_set_end"] = "" -- used for german
-
-
-L["Visual View"] = true
-
-L["Default"] = true
 L["Expansion"] = true
-L["Missing:"] = true
-L["Armor Type"] = true
-
-L["Class Sets Only"] = true
-L["MISC"] = "Sonstiges"
-L["Classic Set"] = true
+L["Classic Set"]= true
 L["Quest Set"] = true
-L["Dungeon Set"] = true
+L["Dunegon Set"] = true
 L["Raid Recolor"] = true
-L["Raid Lookalike"] = true
-L["PvP"] = true
+L["RaidLookalike"] = true
 L["Garrison"] = true
-L["Island Expedition"] = true
+L["Island Expidetion"]= true
 L["Warfronts"] = true
 
 

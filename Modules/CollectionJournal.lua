@@ -147,7 +147,7 @@ function CreateVisualViewButton()
 
 	b:SetScript("OnEnter", function(self)
 			GameTooltip:SetOwner(self, "ANCHOR_RIGHT")
-			GameTooltip:SetText(L["Visual View"])
+			GameTooltip:SetText("Visual View")
 			GameTooltip:Show()
 		end)
 
