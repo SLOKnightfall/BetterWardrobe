@@ -20,7 +20,7 @@ function CollectionList:UpdateDB()
 	if #profile.lists == 0 then
 		tinsert(profile.lists, profile.collectionList)
 	end
-	profile.lists[1].name = L["Collection List"]
+	profile.lists[1].name = "Collection List"
 	profile.collectionList = nil
 	profile.listUpdate = 1
 end

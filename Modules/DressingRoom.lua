@@ -752,7 +752,7 @@ local function DressupSettingsButton_OnClick(self)
 			isNotRadio = true,
 		},
 		{
-			text = L["Hide Backround Image"],
+			text = L["Hide  Backround Image"],
 			func = function()
 				Profile.DR_HideBackground = not Profile.DR_HideBackground
 				DressingRoom:UpdateBackground()
