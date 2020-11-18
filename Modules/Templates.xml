@@ -1,6 +1,8 @@
 <Ui xmlns="http://www.blizzard.com/wow/ui/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.blizzard.com/wow/ui/
 ..\FrameXML\UI.xsd">
 
+	<Script file="Templates.lua"/>
+
 	<Frame name="BetterWardrobeSetInfoTemplate" parentKey="SetInfo" virtual="true" setAllPoints="true">
 		<Anchors>
 			<Anchor point="TOPLEFT" x="2" y="-2" relativePoint="TOPLEFT"/>
@@ -31,7 +33,7 @@
 		</Layers>
 	</Frame>
 
-	<Frame name="BetterWardrobeIconsTemplate" parentKey="CollectionListVisual" virtual="true" setAllPoints="true">
+	<Frame name="BetterWardrobeIconsTemplate" parentKey="CollectionListVisual" virtual="true" setAllPoints="true" mixin="BW_SetIconMixin">
 		<Anchors>
 			<Anchor point="TOPLEFT" x="2" y="-2" relativePoint="TOPLEFT"/>
 			<Anchor point="BOTTOMRIGHT" x="2" y="-2" relativePoint="BOTTOMRIGHT"/>
@@ -47,7 +49,7 @@
 			</Layer>
 		</Layers>
 		<Frames>
-			<Frame parentKey="Unavailable">
+			<Frame parentKey="Unavailable"  mixin="BW_SetIconMixin">
 			<Size x="17" y="17"/>
 				<Anchors>
 					<Anchor point="TOPRIGHT" x="5" y="10	"/>
@@ -58,6 +60,10 @@
 						</Texture>
 					</Layer>
 				</Layers>
+				<Scripts>
+					<OnEnter method="OnEnter" /> 
+					<OnLeave function="GameTooltip_Hide"/>
+				</Scripts>
 			</Frame>
 			<Frame parentKey="Hidden">
 			<Size x="20" y="20"/>

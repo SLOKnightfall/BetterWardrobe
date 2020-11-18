@@ -12,7 +12,7 @@ local IsDressableItem = IsDressableItem
 local GetScreenWidth = GetScreenWidth
 local GetScreenHeight = GetScreenHeight
 
-local class = L.classBits[select(2, UnitClass("PLAYER"))]
+local class = addon.Globals.CLASS_INFO[select(2, UnitClass("PLAYER"))][2]
 
 local tooltip = {}
 local Models = {}

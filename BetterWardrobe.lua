@@ -1590,7 +1590,7 @@ if tab ~=4 then
 		end
 
 		BW_UIDropDownMenu_AddSeparator()
-		local isHidden = addon.addon.HiddenAppearanceDB[type][self.baseSetID]
+		local isHidden = addon.HiddenAppearanceDB.profile[type][self.baseSetID]
 		
 		BW_UIDropDownMenu_AddButton({
 			notCheckable = true,

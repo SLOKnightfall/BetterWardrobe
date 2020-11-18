@@ -684,8 +684,8 @@ end
 
 function CollectionListTooltip_OnEnter(self)
 						GameTooltip:SetOwner(self, "ANCHOR_RIGHT")
-						GameTooltip:SetText("Click: Show Collection List")
-						GameTooltip:AddLine("Shift Click: Show Detail List")
+						GameTooltip:SetText(L["Click: Show Collection List"])
+						GameTooltip:AddLine(L["Shift Click: Show Detail List"])
 						GameTooltip:Show()
 					end
 
@@ -771,3 +771,4 @@ StaticPopupDialogs["BW_NAME_COLLECTION"] = {
 		self:GetParent():Hide()
 	end
 }
+

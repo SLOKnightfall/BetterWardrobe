@@ -292,7 +292,7 @@ function addon.SetArtifactAppearanceTooltip(contentFrame, sourceInfo, sourceID)
 				if sourceInfo.mod <= 12 then 
 					GameTooltip:AddLine(L["Base Appearance"])
 				elseif sourceInfo.mod <= 16 then
-					GameTooltip:AddLine(L["Clas Hall Appearance"])
+					GameTooltip:AddLine(L["Class Hall Appearance"])
 				elseif sourceInfo.mod <= 20 then
 					GameTooltip:AddLine(L["Mythic Dungeon Quests Appearance"])
 				elseif sourceInfo.mod <=24 then

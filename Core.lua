@@ -410,7 +410,7 @@ local options = {
 
 							TooltipPreview_Overlap = {
 								order = 4,
-								name = L["Prevent Comparrison Overlap"],
+								name = L["Prevent Comparison Overlap"],
 								type = "toggle",
 								width = "full",
 								desc = L["TooltipPreview_Overlap_Tooltip"],
@@ -627,7 +627,7 @@ local options = {
 						},
 						DR_HideBackground = {
 							order = 5,
-							name = L["Hide  Backround Image"],
+							name = L["Hide Backround Image"],
 							type = "toggle",
 							width = 1.5,
 						},
