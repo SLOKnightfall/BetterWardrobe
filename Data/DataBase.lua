@@ -54,9 +54,9 @@ local AliznceRepSets = {2574,2844,2796,2820}
 local function OpposingFaction(faction)
 	local faction = UnitFactionGroup("player")
 	if faction == "Horde" then
-		return "Alliance", "Stormwind" -- "Kul Tiras",
+		return "Alliance", "Stormwind", 1 -- "Kul Tiras",
 	elseif faction == "Alliance" then
-		return "Horde", "Orgrimmar" -- "Zandalar",
+		return "Horde", "Orgrimmar", 2 -- "Zandalar",
 	end
 end
 
@@ -69,11 +69,12 @@ do
 			for id, setData in pairs(data) do
 
 							--local faction = setData[5]
-				local opposingFaction , City = OpposingFaction(faction) -- BFAFaction,
+				local opposingFaction , City, side = OpposingFaction(faction) -- BFAFaction,
 				
 				setData.isFactionLocked = string.find(setData.name, opposingFaction) 
 					--or string.find(setData.name, BFAFaction)
 					or string.find(setData.name, City)
+					or setData.side and setData.side == side
 				setData.isHeritageArmor = string.find(setData.name, "Heritage")
 
 
