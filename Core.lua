@@ -985,7 +985,7 @@ function addon:OnInitialize()
 
 end
 
-
+local firstRun = false
 function UpdateDB()
 	local characterDB = BetterWardrobe_CharacterData
 	local listDB = BetterWardrobe_ListData
@@ -997,7 +997,7 @@ function UpdateDB()
 	--local collectionDB = self.collectionListDB
 
 	--Check to see if it is a new install
-	if not characterDB.profiles then return end
+	if not characterDB or (characterDB and not characterDB.profiles) then firstRun = true; return end
 	--Update 1. splt favorites and collection tables from characterDB. Update collections to allow multiple lists  10/27/20
 
 	if listDB.lastUpdte ~= 1 then 
@@ -1170,7 +1170,9 @@ function addon:OnEnable()
 
 	self.itemsubdb.RegisterCallback(addon, "OnProfileReset", "RefreshSubItemData")	
 
-
+	if firstRun then
+		listDB.lastUpdte = 1
+	end
 	--WardrobeTransmogFrameSpecDropDown_Initialize()
 
 	--BWData = BWData or {}
