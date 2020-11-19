@@ -23,9 +23,95 @@ local C_TransmogCollection_GetSourceInfo = C_TransmogCollection.GetSourceInfo
 local MyPlugin = E:NewModule('addonName', 'AceHook-3.0', 'AceEvent-3.0', 'AceTimer-3.0') --Create a plugin within ElvUI and adopt AceHook-3.0, AceEvent-3.0 and AceTimer-3.0. We can make use of these later.
 local EP = LibStub("LibElvUIPlugin-1.0") --We can use this to automatically insert our GUI tables when ElvUI_Config is loaded.
 
+
+local function LoadSkin_ElvUI()
+--DropDownMenu
+	hooksecurefunc('BW_UIDropDownMenu_CreateFrames', function(level, index)
+		local listFrame = _G['BW_DropDownList'..level];
+
+		local listFrameName = listFrame:GetName();
+		local expandArrow = _G[listFrameName..'Button'..index..'ExpandArrow'];
+		if expandArrow then
+			local normTex = expandArrow:GetNormalTexture()
+			expandArrow:SetNormalTexture(E.Media.Textures.ArrowUp)
+			normTex:SetVertexColor(unpack(E.media.rgbvaluecolor))
+			normTex:SetRotation(S.ArrowRotation.right)
+			expandArrow:Size(12, 12)
+		end
+
+		local Backdrop = _G[listFrameName..'Backdrop']
+		if not Backdrop.template then Backdrop:StripTextures() end
+		Backdrop:CreateBackdrop('Transparent')
+
+		local menuBackdrop = _G[listFrameName..'MenuBackdrop']
+		if not menuBackdrop.template then menuBackdrop:StripTextures() end
+		menuBackdrop:CreateBackdrop('Transparent')
+	end)
+
+	hooksecurefunc('BW_UIDropDownMenu_SetIconImage', function(icon, texture)
+		if texture:find('Divider') then
+			local r, g, b = unpack(E.media.rgbvaluecolor)
+			icon:SetColorTexture(r, g, b, 0.45)
+			icon:Height(1)
+		end
+	end)
+
+	hooksecurefunc('BW_ToggleDropDownMenu', function(level)
+		if not level then
+			level = 1;
+		end
+
+		local r, g, b = unpack(E.media.rgbvaluecolor)
+
+		for i = 1, _G.BW_UIDROPDOWNMENU_MAXBUTTONS do
+			local button = _G['BW_DropDownList'..level..'Button'..i]
+			local check = _G['BW_DropDownList'..level..'Button'..i..'Check']
+			local uncheck = _G['BW_DropDownList'..level..'Button'..i..'UnCheck']
+			local highlight = _G['BW_DropDownList'..level..'Button'..i..'Highlight']
+
+			highlight:SetTexture(E.Media.Textures.Highlight)
+			highlight:SetBlendMode('BLEND')
+			highlight:SetDrawLayer('BACKGROUND')
+			highlight:SetVertexColor(r, g, b)
+
+			if not button.backdrop then
+				button:CreateBackdrop()
+			end
+
+			button.backdrop:Hide()
+
+			if not button.notCheckable then
+				uncheck:SetTexture()
+				local _, co = check:GetTexCoord()
+				if co == 0 then
+					check:SetTexture([[Interface\Buttons\UI-CheckBox-Check]])
+					check:SetVertexColor(r, g, b, 1)
+					check:Size(20, 20)
+					check:SetDesaturated(true)
+					button.backdrop:SetInside(check, 4, 4)
+				else
+					check:SetTexture(E.media.normTex)
+					check:SetVertexColor(r, g, b, 1)
+					check:Size(10, 10)
+					check:SetDesaturated(false)
+					button.backdrop:SetOutside(check)
+				end
+
+				button.backdrop:Show()
+				check:SetTexCoord(0, 1, 0, 1)
+			else
+				check:Size(16, 16)
+			end
+		end
+	end)
+
+end
+
+
 function MyPlugin:Initialize()
 	--Register plugin so options are properly inserted when config is loaded
 	EP:RegisterPlugin(addonName, MyPlugin.InsertOptions)
+	LoadSkin_ElvUI()
 end
 
 
@@ -41,8 +127,10 @@ function S:BetterWardrobe()
 
 	--Items
 	S:HandleDropDownBox(BW_SortDropDown)
+	--S:HandleDropDownBox(BW_WardrobeFilterDropDown)
+	
 
-	S:HandleButton(WardrobeCollectionFrame.FilterButton)
+	S:HandleButton(BW_WardrobeCollectionFrame.FilterButton)
 
 	for _, Frame in ipairs(BW_WardrobeCollectionFrame.ContentFrames) do
 		if Frame.Models then
@@ -144,7 +232,7 @@ function S:BetterWardrobe()
 	--SavedSets
 	--addon.SavedSetDropDownFrame.frame.backdrop:Hide()
 	S:HandleDropDownBox(BW_DBSavedSetDropdown)
-	S:HandleButton(BW_DropDownList1)
+	--S:HandleButton(BW_DropDownList1)
 
 	--BW_DBSavedSetDropdown:ClearAllPoints()
 	--BW_DBSavedSetDropdown:SetPoint("TOPRIGHT", "BW_SortDropDown", "TOPRIGHT", -0 , 0)

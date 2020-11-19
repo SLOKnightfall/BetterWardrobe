@@ -181,6 +181,7 @@ L["Missing:"] = true
 L["Armor Type"] = true
 
 L["Class Sets Only"] = true
+L["Hide Unavailable Sets"] = true
 L["MISC"] = "Sonstiges"
 L["Classic Set"] = true
 L["Quest Set"] = true
@@ -305,6 +306,8 @@ L["Added appearance in Collection List"] = "Vorlage in Sammelliste hinzugefügt"
 
 L["Set Substitution"] = true
 L["Substitue Item"] = true
+
+L["Item No Longer Available"] = true
 
 --------------------------------------------------------------------------
 -------------------------------- DATABASE --------------------------------

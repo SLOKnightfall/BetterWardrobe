@@ -1036,13 +1036,14 @@ function BetterWardrobeSetsCollectionMixin:ClearLatestSource()
 end
 
 
-function isAvailableItem(sourceID)
+function isAvailableItem(sourceID,setID)
 	local _, visualID = C_TransmogCollection.GetAppearanceSourceInfo(sourceID)		
 	local sources = C_TransmogCollection.GetAppearanceSources(visualID) or {} --Can return nil if no longer in game
 
 	if (#sources == 0) then
-		local setinfo = C_TransmogCollection.GetSourceInfo(sourceID)
-		if not setinfo.sourceType then 
+		local sourceInfo = C_TransmogCollection.GetSourceInfo(sourceID)
+		local setInfo = addon.GetSetInfo(setID)
+		if not sourceInfo.sourceType and not setInfo.sourceType then 
 			return false
 		end
 	end
@@ -1120,7 +1121,7 @@ function BetterWardrobeSetsCollectionMixin:DisplaySet(setID)
 			itemFrame.IconBorder:SetAlpha(0.3)
 			itemFrame.New:Hide()
 		end
-		if isAvailableItem(itemFrame.sourceID) then  
+		if isAvailableItem(itemFrame.sourceID, setInfo.setID) then  
 			itemFrame.unavailable:Hide()
 			--itemFrame.Icon:SetColorTexture(1,0,0,.5)
 		else 
@@ -1351,6 +1352,7 @@ function BW_WardrobeCollectionFrame_SetAppearanceTooltip(contentFrame, sources, 
 		headerIndex = WardrobeUtils_GetValidIndexForNumSources(BW_WardrobeCollectionFrame.tooltipSourceIndex, #sources)
 	end
 	BW_WardrobeCollectionFrame.tooltipSourceIndex = headerIndex
+	local setInfo = addon.GetSetInfo(contentFrame.selectedSetID)
 	headerSourceID = sources[headerIndex].sourceID
 
 	local name, nameColor, sourceText, sourceColor = WardrobeCollectionFrameModel_GetSourceTooltipInfo(sources[headerIndex])
@@ -1436,11 +1438,19 @@ function BW_WardrobeCollectionFrame_SetAppearanceTooltip(contentFrame, sources, 
 	end
 
 	if (not sources[headerIndex].isCollected) then
-		GameTooltip:AddLine(sourceText, sourceColor.r, sourceColor.g, sourceColor.b, 1, 1)
+		if sourceText then 
+			GameTooltip:AddLine(sourceText, sourceColor.r, sourceColor.g, sourceColor.b, 1, 1)
+		elseif setInfo.sourceType  then
+			GameTooltip:AddLine(_G["TRANSMOG_SOURCE_"..setInfo.sourceType], 1,1,1)
+		else
+			GameTooltip:AddLine(L["Item No Longer Available"],RED_FONT_COLOR.r, RED_FONT_COLOR.g, RED_FONT_COLOR.b)
+
+		end
 	end
 
 	local useError
 	local appearanceCollected = sources[headerIndex].isCollected
+
 	if (#sources > 1 and not appearanceCollected) then
 		-- only add "Other items using this appearance" if we're continuing to the same visualID
 		if (firstVisualID == sources[2].visualID) then
@@ -2362,12 +2372,18 @@ function BW_WardrobeCollectionFrame_OnShow(self)
 	BW_WardrobeCollectionFrame_UpdateTabButtons()
 
 	if #addon.GetSavedList() > 0 then 
-		WardrobeCollectionFrame.progressBar:SetWidth(160)
-		WardrobeCollectionFrame.progressBar.border:SetWidth(169)
+		WardrobeCollectionFrame.progressBar:SetWidth(130)
+		WardrobeCollectionFrame.progressBar.border:SetWidth(139)
 		WardrobeCollectionFrame.progressBar:ClearAllPoints()
-		WardrobeCollectionFrame.progressBar:SetPoint("TOPLEFT", WardrobeCollectionFrame.ItemsTab, "TOPLEFT", 250, -11)
-		WardrobeCollectionFrame.searchBox:SetWidth(105)
+		WardrobeCollectionFrame.progressBar:SetPoint("TOPLEFT", WardrobeCollectionFrame.ItemsTab, "TOPLEFT", 280, -11)
+
+		--WardrobeCollectionFrame.searchBox:ClearAllPoints()
+
+		--WardrobeCollectionFrame.searchBox:SetPoint("TOPLEFT", 59, -69)
+
+		WardrobeCollectionFrame.searchBox:SetWidth(90)
 		BW_WardrobeCollectionFrameTab4:Show()
+		WardrobeCollectionFrame.FilterButton:SetWidth(83)
 	end
 
 	addon.setdb.global.sets[addon.setdb:GetCurrentProfile()] = addon.GetSavedList()

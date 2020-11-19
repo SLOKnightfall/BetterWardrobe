@@ -1394,57 +1394,10 @@ function BW_ColorPicker_GetPreviousValues()
 	return ColorPickerFrame.previousValues.r, ColorPickerFrame.previousValues.g, ColorPickerFrame.previousValues.b;
 end
 
---[[
+--[[]]
 ------------------------------------------------------------------------------------------------------------------------
 -- Skins
 ------------------------------------------------------------------------------------------------------------------------
 
 -- ElvUI skin
-local function LoadSkin_ElvUI()
-    if not IsAddOnLoaded("ElvUI") then return end
-    local E = unpack(_G.ElvUI)
-    if E.private.skins.blizzard.misc ~= true then return end
-    for i = 1, MSA_DROPDOWNMENU_MAXLEVELS do
-        _G["MSA_DropDownList"..i.."MenuBackdrop"]:SetTemplate("Transparent")
-        _G["MSA_DropDownList"..i.."Backdrop"]:SetTemplate("Transparent")
-    end
-end
 
--- Tukui skin
-local function LoadSkin_Tukui()
-    if not IsAddOnLoaded("Tukui") then return end
-    local backdrop
-    for i = 1, MSA_DROPDOWNMENU_MAXLEVELS do
-        backdrop = _G["MSA_DropDownList"..i.."MenuBackdrop"]
-        backdrop:StripTextures()
-        backdrop:CreateBackdrop("Default")
-        backdrop:CreateShadow()
-        backdrop.IsSkinned = true
-        backdrop = _G["MSA_DropDownList"..i.."Backdrop"]
-        backdrop:StripTextures()
-        backdrop:CreateBackdrop("Default")
-        backdrop:CreateShadow()
-        backdrop.IsSkinned = true
-    end
-end
-
--- Aurora skin
-local function LoadSkin_Aurora()
-    if not IsAddOnLoaded("Aurora") then return end
-    local Skin = _G.Aurora.Skin
-    for i = 1, MSA_DROPDOWNMENU_MAXLEVELS do
-        Skin.TooltipBackdropTemplate(_G["MSA_DropDownList"..i.."MenuBackdrop"])
-        Skin.TooltipBackdropTemplate(_G["MSA_DropDownList"..i.."Backdrop"])
-    end
-end
-
--- Init skins
-lib.initFrame = lib.initFrame or CreateFrame("Frame")
-lib.initFrame:SetScript("OnEvent", function(self, event)
-    LoadSkin_ElvUI()
-    LoadSkin_Tukui()
-    LoadSkin_Aurora()
-    self:UnregisterEvent(event)
-end)
-lib.initFrame:RegisterEvent("PLAYER_ENTERING_WORLD")
-]]--

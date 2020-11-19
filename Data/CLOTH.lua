@@ -7110,6 +7110,7 @@ addon.ArmorSets["CLOTH"] ={
 		["minLevel"] =  50 ,
 		["name"] =  "Tidesages Armor" ,
 		["items"] = { 162590,162591,162592,162593,162594,162595,162597, },
+		["sourceType"] = 1,
 	},
 	[1288]={
 		["armorType"] =  1 ,

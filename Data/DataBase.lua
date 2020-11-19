@@ -87,7 +87,7 @@ do
 
 
 				setData["name"] = L[setData["name"]]
-				setData.oldnote = setData.note
+				setData.oldnote = setData.label
 
 				if not setData.note then
 					local note = "NOTE_"..(setData.label or 0)
@@ -190,9 +190,10 @@ do
 			if  (setData.isClass or 
 					(addon.Profile.IgnoreClassRestrictions and ((setData.filter == 6 or setData.filter == 7) and addon.Profile.IgnoreClassLookalikeRestrictions)) or 
 					(addon.Profile.IgnoreClassRestrictions and not addon.Profile.IgnoreClassLookalikeRestrictions)) 
-				and not (setData.oldnote == 6 or setData.oldnote == 8 or setData.oldnote == 16)
+				and not (setData.oldnote == 6 or setData.oldnote == 8 or setData.oldnote == 16 or setData.oldnote == 21)
 				and not setData.isFactionLocked 
-				and not setData.isHeritageArmor  then
+				and not setData.isHeritageArmor
+				and (not setData.unavailable or (addon.Profile.HideUnavalableSets and setData.unavailable)) then
 
 				for index, item in ipairs( setData["items"]) do
 					--if addon.setdb.global.itemSubstitute[item] then 
