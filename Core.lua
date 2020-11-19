@@ -944,7 +944,14 @@ local DB_Defaults = {
 	},
 
 	charSavedOutfits_defaults = {
-		char = {}
+		char = {			
+			item = {},
+			set = {},
+			extraset = {},
+			outfits = {},
+			lastTransmogOutfitIDSpec = {},
+			listUpdate = false,
+		}
 	},
 }
 
