@@ -161,13 +161,13 @@ L["item: %d - %s \n==>\nitem: %d - %s"] = true
 -------------------------- ARTIFACT APPEARANCES --------------------------
 --------------------------------------------------------------------------
 
-L["Base Appearance"] = "Basisvorlage"
-L["Class Hall Appearance"] = "Ordenshallenvorlage"
-L["Mythic Dungeon Quests Appearance"] = "Mythische Dungeonquest Vorlage"
-L["PvP Appearance"] = "PvP Vorlage"
-L["Hidden Appearance"] = "Versteckte Vorlage"
-L["Mage Tower Appearance"] = "Magierturm Vorlage"
-L["Learned from Item"] = "Erlernt von Gegenstand"
+L["Base Appearance"] = true
+L["Class Hall Appearance"] = true
+L["Mythic Dungeon Quests Appearance"] = true
+L["PvP Appearance"] = true
+L["Hidden Appearance"] = true
+L["Mage Tower Appearance"] = true
+L["Learned from Item"] = true
 
 --------------------------------------------------------------------------
 ----------------------------- DROPDOWN MENUS -----------------------------
@@ -182,7 +182,7 @@ L["Armor Type"] = true
 
 L["Class Sets Only"] = true
 L["Hide Unavailable Sets"] = true
-L["MISC"] = "Sonstiges"
+L["MISC"] = true
 L["Classic Set"] = true
 L["Quest Set"] = true
 L["Dungeon Set"] = true
@@ -302,7 +302,7 @@ L["Toggle Hidden View"] = true
 --------------------------------------------------------------------------
 
 L["Added missing appearances of: \124cffff7fff\124H%s:%s\124h[%s]\124h\124r"] = true
-L["Added appearance in Collection List"] = "Vorlage in Sammelliste hinzugefügt"
+L["Added appearance in Collection List"] = true
 
 L["Set Substitution"] = true
 L["Substitue Item"] = true
