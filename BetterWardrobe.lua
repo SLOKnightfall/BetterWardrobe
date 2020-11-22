@@ -562,27 +562,21 @@ function SetsDataProvider:GetSetSourceData(setID)
 		self.sourceData = {}
 	end
 
-	local info = addon.GetSetInfo(setID)
-	local sourceData
- 	if info and not info.type == "saved" then 
-		sourceData = {numCollected =  info.numCollected , numTotal = info.numTotal , sources = info.setSources}
-	else
-		sourceData = self.sourceData[setID]
-		if (not sourceData) then
-			local sources = addon.GetSetsources(setID)
-			local numCollected = 0
-			local numTotal = 0
-			if sources then
-				for sourceID, collected in pairs(sources) do
-					if (collected) then
-						numCollected = numCollected + 1
-					end
-					numTotal = numTotal + 1
+	local sourceData = self.sourceData[setID]
+	if (not sourceData) then
+		local sources = addon.GetSetsources(setID)
+		local numCollected = 0
+		local numTotal = 0
+		if sources then
+			for sourceID, collected in pairs(sources) do
+				if (collected) then
+					numCollected = numCollected + 1
 				end
-
-				sourceData = {numCollected = numCollected, numTotal = numTotal, sources = sources }
-				self.sourceData[setID] = sourceData
+				numTotal = numTotal + 1
 			end
+
+			sourceData = {numCollected = numCollected, numTotal = numTotal, sources = sources }
+			self.sourceData[setID] = sourceData
 		end
 	end
 	return sourceData
@@ -2388,7 +2382,7 @@ function BW_WardrobeCollectionFrame_OnShow(self)
 
 	addon.setdb.global.sets[addon.setdb:GetCurrentProfile()] = addon.GetSavedList()
 	addon.selectedArmorType = addon.Globals.CLASS_INFO[playerClass][3]
-SetsDataProvider:GetBaseSets()
+--SetsDataProvider:GetBaseSets()
 	addon.BuildClassArtifactAppearanceList()
 end
 

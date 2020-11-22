@@ -74,7 +74,7 @@ do
 				setData.isFactionLocked = string.find(setData.name, opposingFaction) 
 					--or string.find(setData.name, BFAFaction)
 					or string.find(setData.name, City)
-					or setData.side and setData.side == side
+					--or setData.side and setData.side == side
 				setData.isHeritageArmor = string.find(setData.name, "Heritage")
 
 
@@ -116,12 +116,13 @@ do
 						--setData.mod = setData.bonusid
 				setData.uiOrder = id * 100
 						--setData.filter = setData.filter + 1 -- fix for filter startin at 0
-				setData.numCollected = 0
-				setData.numTotal = 0
-				setData.setSources = {}
-				setData.sources = setData.sources or {}
+				--setData.numCollected = 0
+				--setData.numTotal = 0
+				--setData.setSources = {}
+				--setData.sources = setData.sources or {}
 
 				for index, item in ipairs( setData["items"]) do
+					--[[
 					setData.numTotal = setData.numTotal + 1
 					local mod = setData.mod or 0
 					local appearanceID, sourceID = C_TransmogCollection.GetItemInfo(item, mod)
@@ -159,7 +160,7 @@ do
 						end
 					else
 						--end
-					end
+					end]]
 
 					if setData.sources and setData.sources[item] and setData.sources[item] ~= 0 then 
 						local appearanceID = setData.sources[item]
@@ -192,8 +193,8 @@ do
 					(addon.Profile.IgnoreClassRestrictions and not addon.Profile.IgnoreClassLookalikeRestrictions)) 
 				and not (setData.oldnote == 6 or setData.oldnote == 8 or setData.oldnote == 16 or setData.oldnote == 21)
 				and not setData.isFactionLocked 
-				and not setData.isHeritageArmor
-				and (not setData.unavailable or (addon.Profile.HideUnavalableSets and setData.unavailable)) then
+				and not setData.isHeritageArmor then 
+				--and (not setData.unavailable or (addon.Profile.HideUnavalableSets and setData.unavailable)) then
 
 				for index, item in ipairs( setData["items"]) do
 					--if addon.setdb.global.itemSubstitute[item] then 
