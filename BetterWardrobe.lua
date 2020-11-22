@@ -400,7 +400,7 @@ function SetsDataProvider:FilterSearch(useBaseSet)
 	if 	BW_WardrobeCollectionFrame.selectedTransmogTab == 4 or BW_WardrobeCollectionFrame.selectedCollectionTab == 4 then
 		self.baseSets = baseSets
 		return
-	elseif BW_WardrobeCollectionFrame.selectedTransmogTab == 3 or BW_WardrobeCollectionFrame.selectedCollectionTab == 3 then
+	elseif BW_WardrobeCollectionFrame.selectedCollectionTab == 3 then
 		searchString = string.lower(BW_WardrobeCollectionFrameSearchBox:GetText())
 	else
 		searchString = string.lower(WardrobeCollectionFrameSearchBox:GetText())
@@ -504,7 +504,6 @@ function addon.Sets:GetLocationBasedCount(setInfo)
 			end
 		end
 	end
-
 	return collectedCount, totalCount
 end
 --SetsDataProvider:GetSetSourceCounts(data.setID)

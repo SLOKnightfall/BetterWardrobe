@@ -150,6 +150,7 @@ end
 		else
 			addon.SelecteSavedList = false
 		end
+
 		BW_WardrobeCollectionFrame_SetTab(2)
 		BW_WardrobeCollectionFrame_SetTab(4)
 		addon.savedSetCache = nil
@@ -214,8 +215,12 @@ function UI:OptionsDropDown_Initialize(level)
 							addon.includeLocation[i] = true
 						end
 						WardrobeCollectionFrame.SetsTransmogFrame:OnSearchUpdate()
-						BW_SetsTransmogFrame:OnSearchUpdate()
-						BW_UIDropDownMenu_Refresh(BW_LocationFilterDropDown, 1, refreshLevel)
+						--BW_SetsTransmogFrame:OnSearchUpdate()
+						if BW_WardrobeCollectionFrame.selectedTransmogTab == 3 then 
+							BW_WardrobeCollectionFrame_SetTab(2)
+							BW_WardrobeCollectionFrame_SetTab(3)
+						end
+						BW_UIDropDownMenu_Refresh(BW_TransmogOptionsDropDown, 1, refreshLevel)
 					end
 		BW_UIDropDownMenu_AddButton(info, level)
 
@@ -225,8 +230,13 @@ function UI:OptionsDropDown_Initialize(level)
 							addon.includeLocation[i] = false
 						end
 						WardrobeCollectionFrame.SetsTransmogFrame:OnSearchUpdate()
-						BW_SetsTransmogFrame:OnSearchUpdate()
-						BW_UIDropDownMenu_Refresh(BW_LocationFilterDropDown, 1, refreshLevel)
+						--BW_SetsTransmogFrame:OnSearchUpdate()
+												--BW_SetsTransmogFrame:OnSearchUpdate()
+						if BW_WardrobeCollectionFrame.selectedTransmogTab == 3 then 
+							BW_WardrobeCollectionFrame_SetTab(2)
+							BW_WardrobeCollectionFrame_SetTab(3)
+						end
+						BW_UIDropDownMenu_Refresh(BW_TransmogOptionsDropDown, 1, refreshLevel)
 					end
 		BW_UIDropDownMenu_AddButton(info, level)
 		
@@ -241,9 +251,14 @@ function UI:OptionsDropDown_Initialize(level)
 								addon.includeLocation[21] = value
 							end
 
-							BW_UIDropDownMenu_Refresh(BW_LocationFilterDropDown, 1, 1)
+							BW_UIDropDownMenu_Refresh(BW_TransmogOptionsDropDown, 1, 1)
 							WardrobeCollectionFrame.SetsTransmogFrame:OnSearchUpdate()
-							BW_SetsTransmogFrame:OnSearchUpdate()
+							--BW_SetsTransmogFrame:OnSearchUpdate()
+													--BW_SetsTransmogFrame:OnSearchUpdate()
+							if BW_WardrobeCollectionFrame.selectedTransmogTab == 3 then 
+								BW_WardrobeCollectionFrame_SetTab(2)
+								BW_WardrobeCollectionFrame_SetTab(3)
+							end
 						end
 				info.checked = function() return addon.includeLocation[index] end
 				BW_UIDropDownMenu_AddButton(info, level)
@@ -261,7 +276,7 @@ function UI:OptionsDropDown_Initialize(level)
 			info.value = i
 				info.func = function(a, b, c, value)
 					addon.Profile.PartialLimit = info.value
-					BW_UIDropDownMenu_Refresh(BW_LocationFilterDropDown, 1, 1)
+					BW_UIDropDownMenu_Refresh(BW_TransmogOptionsDropDown, 1, 1)
 					WardrobeCollectionFrame.SetsTransmogFrame:OnSearchUpdate()
 					BW_SetsTransmogFrame:OnSearchUpdate()
 				end

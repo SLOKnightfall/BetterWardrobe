@@ -370,8 +370,8 @@ end
 
 function 	UI.CreateOptionsDropdown()
 --local f = BW_UIDropDownMenu_Create("BW_TransmogOptionsDropDown", BW_WardrobeCollectionFrame)
-	local f = CreateFrame("Frame", "BW_TransmogOptionsDropDown", BW_WardrobeCollectionFrame, "BW_UIDropDownMenuTemplate")
-	BW_TransmogOptionsDropDown = f
-	BW_WardrobeCollectionFrame.OptionsDropDown = f
-	BW_WardrobeTransmogVendorOptionsDropDown_OnLoad(f)
+	local BW_TransmogOptionsDropDown= CreateFrame("Frame", "BW_TransmogOptionsDropDown", BW_WardrobeCollectionFrame, "BW_UIDropDownMenuTemplate")
+	BW_TransmogOptionsDropDown = BW_TransmogOptionsDropDown
+	BW_WardrobeCollectionFrame.OptionsDropDown = BW_TransmogOptionsDropDown
+	BW_WardrobeTransmogVendorOptionsDropDown_OnLoad(BW_TransmogOptionsDropDown)
 end
