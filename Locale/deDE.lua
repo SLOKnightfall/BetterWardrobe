@@ -20,6 +20,9 @@ L[LE_ITEM_SOURCE] = SOURCE:gsub("[:：]", "")
 L[LE_COLOR] = COLOR
 L[LE_EXPANSION] = "Erweiterung"
 
+L.OM_GOLD = "|c00FFD200"
+L.ENDCOLOR = "|r"
+
 --_G["BINDING_NAME_" .. name
 _G["BINDING_HEADER_BETTERWARDROBE"] = addonName
 _G["BINDING_NAME_BETTERWARDROBE_BINDING_PLAYERMODEL"] = "Spielermodell verwenden"
@@ -27,17 +30,28 @@ _G["BINDING_NAME_BETTERWARDROBE_BINDING_TARGETMODEL"] = "Zielmodell verwenden"
 _G["BINDING_NAME_BETTERWARDROBE_BINDING_TARGETGEAR"] = "Rüstung vom Ziel verwenden"
 _G["BINDING_NAME_BETTERWARDROBE_BINDING_TOGGLE_DRESSINGROOM"] = "Anprobe umschalten"
 
+L["CLOTH"] = "Stoff"
+L["LEATHER"] = "Leder"
+L["MAIL"] = "Kette"
+L["PLATE"] = "Platte"
+
 --------------------------------------------------------------------------
 ------------------------------ OPTIONS MENU ------------------------------
 --------------------------------------------------------------------------
 
 --############################-- TABS --#############################--
 
-L["Options"] = "Einstellungen"
+L["Options"] = "Optionen"
+L["Settings"] = "Einstellungen"
+L["Options Profiles"] = "Options Profile"
+
+L["List Profiles"] = "Listenprofile"
+L["Favorite Items & Sets"] = "Favorisierte Gegenstände und Sets"
+L["Hidden Items & Sets"] = "Ausgeblendete Gegenstände und Sets"
+
 L["Item Substitution"] = "Gegenstand ersetzen"
-L["Saved Outfits"] = "Gespeicherte Outfits"
-L["Profiles - Options Settings"] = "Profile - Einstellungen"
-L["Profiles - Collection Settings"] = "Profile - Sammlung"
+L["Items"] = "Gegenstände"
+L["Profiles"] = "Profile"
 
 --~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ GENERAL ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~--
 
@@ -49,6 +63,7 @@ L["Sets"] = true
 L["Extra Sets"] = true
 L["Collection List"] = "Sammelliste"
 L["TSM Source to Use"] = "Zu verwendende TSM-Quelle"
+L["Profiles for sharing the various lists across characters"] = "Profile zum Teilen der verschiedenen Listen zwischen Charakteren."
 
 --~~~~~~~~~~~~~~~~~~~~~~~ TRANSMOG VENODR WINDOW ~~~~~~~~~~~~~~~~~~~~~~~--
 
@@ -78,9 +93,9 @@ L["Show Item ID"] = "Zeige Gegenstands ID"
 L["Show if appearance is known"] = "Bereits bekannte Vorlagen anzeigen"
 L["Show if additional sources are available"] = "Zusätzliche Quellen anzeigen, wenn verfügbar"
 L["Show Token Information"] = "Zeige Tokeninfos"
-L["Show unable to uses as transmog warning"] = "Warnung für nicht benutzbare Transmogvorlagen anzeigen"
 
 L["Class can't use item for transmog"] = "Diese Klasse kann den Gegenstand nicht transmogrifizieren."
+L["Show unable to uses as transmog warning"] = "Warnung für nicht benutzbare Transmogvorlagen anzeigen"
 
 --~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ ITEM PREVIEW ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~--
 
@@ -127,6 +142,7 @@ L["Start Undressed"] = "Starte unbekleidet"
 L["Hide Weapons"] = "Waffen verstecken"
 L["Hide Shirt"] = "Hemd verstecken"
 L["Hide Tabard"] = "Wappenrock verstecken"
+L["Resize Window"] = "Fenstergröße ändern"
 
 --~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ ITEM SUBSTITUTION ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~--
 
@@ -134,20 +150,19 @@ L["Items"] = "Gegenstände"
 L["Base Item ID"] = "Basis Gegenstands ID"
 L["Not a valid itemID"] = "Keine gültige Gegenstands ID"
 L["Replacement Item ID"] = "Ersatz Gegenstands ID"
+L["Remove"] = "Entfernen"
 L["Add"] = "Hinzufügen"
 L["Item Locations Don't Match"] = "Gegenstandsvorlagen passen nicht zusammen"
 L["Saved Item Substitutes"] = "Gespeicherte Gegenstandsersetzungen"
 
-
 L["item: %d - %s \n==>\nitem: %d - %s"] = "Gegenstand: %d - %s \n==>\nGegenstand: %d - %s"
-L["Remove"] = "Entfernen"
 
 --------------------------------------------------------------------------
 -------------------------- ARTIFACT APPEARANCES --------------------------
 --------------------------------------------------------------------------
 
 L["Base Appearance"] = "Basisvorlage"
-L["Clas Hall Appearance"] = "Ordenshallenvorlage"
+L["Class Hall Appearance"] = "Ordenshallenvorlage"
 L["Mythic Dungeon Quests Appearance"] = "Mythische Dungeonquest Vorlage"
 L["PvP Appearance"] = "PvP Vorlage"
 L["Hidden Appearance"] = "Versteckte Vorlage"
@@ -166,6 +181,7 @@ L["Missing:"] = "Fehlend"
 L["Armor Type"] = "Rüstungstyp"
 
 L["Class Sets Only"] = "Nur Klassensets"
+L["Hide Unavailable Sets"] = "Blende" --
 L["MISC"] = "Sonstiges"
 L["Classic Set"] = true
 L["Quest Set"] = true
@@ -200,17 +216,15 @@ L["Delete"] = "Löschen"
 L["Add by Item ID"] = "Mit Gegenstands ID hinzufügen"
 
 L["Export TSM Groups"] = "Exportiere TSM Gruppen"
-L.OM_GOLD = "|c00FFD200"
-L["Collected"] = "Gesammelt"
-L.ENDCOLOR = "|r"
 L["%sgroup:Appearance Group %s,"] = true
+L["Collected"] = "Gesammelt"
 
 L["Type the item ID in the text box below"] = "Trage die Gegenstands ID in das untere Textfeld ein"
 
 L["List Name"] = "Listenname"
 
-L["Click: Show Collection List"] = "Klick: Zeige die Sammelliste" -- I'M NOT ABLE TO TRANLATE THIS IN THE CollectionList.xml
-L["Shift Click: Show Detail List"] = "Shift + Klick: Zeige die Detailierte Liste" -- I'M NOT ABLE TO TRANLATE THIS IN THE CollectionList.xml
+L["Click: Show Collection List"] = "Klick: Zeige die Sammelliste"
+L["Shift Click: Show Detail List"] = "Shift + Klick: Zeige die Detailierte Liste"
 
 --------------------------------------------------------------------------
 ----------------------------- DRESSING ROOM ------------------------------
@@ -297,21 +311,10 @@ L["Added appearance in Collection List"] = "Vorlage in Sammelliste hinzugefügt"
 L["Set Substitution"] = "Ersatz festlegen"
 L["Substitue Item"] = "Gegenstand ersetzen"
 
+L["Item No Longer Available"] = "Gegenstand nicht länger verfügbar"
+
 --------------------------------------------------------------------------
 -------------------------------- DATABASE --------------------------------
 --------------------------------------------------------------------------
 
 L["Saved Set"] = "Set gespeichert"
-
-
-
---[[
-COULD NOT FIND THESE LINES
-
-L["Model Options"] = true
-L["-%s%s"] = true
-L["Transmog Window"] = "Transmogrifiziererfenster"
-L["COLLECTIONLIST_TEXT"] = "%s - %s"
-L["SHOPPINGLIST_TEXT"] = "%s - %s: %s"
-L["Added missing appearances of: \124cffff7fff\124Htransmogset-extra:%s\124h[%s]\124h\124r"] = "Fehlende Vorlage hinzugefügt: \124cffff7fff\124Htransmogset-extra:%s\124h[%s]\124h\124r"
-]]
