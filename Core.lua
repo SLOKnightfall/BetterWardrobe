@@ -1196,6 +1196,7 @@ function addon:OnEnable()
 		addon.Init:BuildCollectionList()
 		addon.Init:BuildTransmogVendorUI()
 		addon.Init:BuildCollectionJournalUI()
+		addon:SendMessage("BW_OnPlayerEnterWorld")
 		
 	--WardrobeFilterDropDown_OnLoad(WardrobeCollectionFrame.FilterDropDown)
 	--WardrobeCollectionFrame.ItemsCollectionFrame:SetActiveSlot

@@ -15,22 +15,51 @@ if not IsAddOnLoaded("MogIt") then return end
 local  mog = _G["MogIt"]
 local L = LibStub("AceLocale-3.0"):GetLocale(addonName)
 
+
+local function SetHooks()
+	local ScrollFrames = {WardrobeCollectionFrameScrollFrame.buttons, BW_SetsCollectionFrameScrollFrame.buttons}
 --Hooks into the extra sets scroll frame buttons to allow ctrl-right clicking on the button to generate a mogit preview
-local orig_OnMouseUp = BW_WardrobeCollectionFrame.BW_SetsCollectionFrame.ScrollFrame.buttons[1]:GetScript("OnMouseUp")
-for i, button in ipairs(BW_WardrobeCollectionFrame.BW_SetsCollectionFrame.ScrollFrame.buttons) do
-	button:SetScript("OnMouseUp", function(self, button)
-		if IsControlKeyDown() and button == "RightButton" then
-			local preview = mog:GetPreview()
-			local sources = addon.GetSetsources(self.setID)
-			for source in pairs(sources) do
-				mog:AddToPreview(select(6, C_TransmogCollection.GetAppearanceSourceInfo(source)), preview)
-			end
-			return
+	for index, buttons in ipairs(ScrollFrames) do
+		local orig_OnMouseUp = buttons[1]:GetScript("OnMouseUp")
+		for i = 1, #buttons do
+			local button = buttons[i]
+			button:SetScript("OnMouseUp", function(self, button)
+				if IsControlKeyDown() and button == "RightButton" then
+					local preview = mog:GetPreview()
+					local sources = (index == 1 and C_TransmogSets.GetSetSources(self.setID)) or  addon.GetSetsources(self.setID)
+					for source in pairs(sources) do
+						mog:AddToPreview(select(6, C_TransmogCollection.GetAppearanceSourceInfo(source)), preview)
+					end
+					return
+				end
+				orig_OnMouseUp(self, button)
+			end)
 		end
-		orig_OnMouseUp(self, button)
-	end)
+	end
+
+	local orig_OnMouseDown = WardrobeCollectionFrame.ItemsCollectionFrame.Models[1]:GetScript("OnMouseDown")
+
+
+	for i, model in ipairs(WardrobeCollectionFrame.ItemsCollectionFrame.Models) do
+		model:SetScript("OnMouseDown", function(self, button)
+			if IsControlKeyDown() and button == "RightButton" then
+				local link
+				local sources = WardrobeCollectionFrame_GetSortedAppearanceSources(self.visualInfo.visualID)
+				if WardrobeCollectionFrame.tooltipSourceIndex then
+					local index = WardrobeUtils_GetValidIndexForNumSources(WardrobeCollectionFrame.tooltipSourceIndex, #sources)
+					link = select(6, C_TransmogCollection.GetAppearanceSourceInfo(sources[index].sourceID))
+				end
+				mog:AddToPreview(link)
+				return
+			end
+			orig_OnMouseDown(self, button)
+		end)
+	end
+	
 end
 
+
+addon:RegisterMessage("BW_OnPlayerEnterWorld", function() SetHooks() end)
 
 
 local Wishlist = mog:GetModule("Wishlist")
