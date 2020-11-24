@@ -420,6 +420,7 @@ function tooltip:ShowPreview(itemLink)
 			self:Hide()
 			return 
 		end
+	if self.previewShown then return end
 	local itemID, _, _, slot = GetItemInfoInstant(itemLink)
 	if self.item ~= itemLink then
 		self.item = itemLink
@@ -466,6 +467,7 @@ function tooltip:ShowPreview(itemLink)
 			end
 
 			self.model:TryOn(itemLink)
+			self.previewShown = true
 		else
 			self:Hide()
 			Models.normal:Hide()
@@ -479,6 +481,7 @@ end
 function tooltip.HideItem(self)
 	self.ShowTooltips = nil
 	tooltip.owner = nil
+	tooltip.previewShown = nil
 	tooltip.repos:Hide()
 	tooltip.check:Show()
 	tooltip:Hide()
