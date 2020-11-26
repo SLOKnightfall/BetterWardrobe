@@ -195,5 +195,5 @@ Globals.TAB_EXTRASETS = 3
 Globals.TAB_SAVED_SETS = 4
 Globals.TABS_MAX_WIDTH = 275
 
- Globals.FILTER_SOURCES = {L["MISC"], L["Classic Set"], L["Quest Set"], L["Dungeon Set"], L["Raid Recolor"], L["Raid Lookalike"], L["PvP"],L["Garrison"], L["Island Expedition"], L["Warfronts"]}
+ Globals.FILTER_SOURCES = {L["MISC"], L["Classic Set"], L["Quest Set"], L["Dungeon Set"], L["Raid Recolor"], L["Raid Lookalike"], L["PvP"],L["Garrison"], L["Island Expedition"], L["Warfronts"], L["Covenants"]}
  Globals.EXPANSIONS = {EXPANSION_NAME0, EXPANSION_NAME1, EXPANSION_NAME2, EXPANSION_NAME3, EXPANSION_NAME4, EXPANSION_NAME5, EXPANSION_NAME6, EXPANSION_NAME7, EXPANSION_NAME8}

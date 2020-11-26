@@ -192,6 +192,7 @@ L["PvP"] = true
 L["Garrison"] = true
 L["Island Expedition"] = true
 L["Warfronts"] = true
+L["Covenants"] = true
 
 --------------------------------------------------------------------------
 ---------------------------- COLLECTION LIST -----------------------------
@@ -419,7 +420,7 @@ L["NOTE_10"] = "Temple of Ahn'Qiraj Raid Set"
 L["NOTE_3"] = "Molten Core Set "
 L["NOTE_4"] = "Blackwing'sLair Set"
 L["NOTE_5"] = "Naxxramas (Original) Raid Set"
-L["NOTE_12"] = "Karazhan, Gruul'sLair and Magtheridon'sLair Raid Set"
+L["NOTE_12"] = "Karazhan, Gruul'sLair and Magtheridon's Lair Raid Set"
 L["NOTE_13"] = "Serpentshrine Cavern and Tempest Keep (The Eye) Raid Set"
 L["NOTE_18"] = "Hyjal Summit, Black Temple and Sunwell Plateau Raid Set"
 L["NOTE_23"] = "Naxxramas (Wrath) Raid Set"
@@ -448,7 +449,18 @@ L["NOTE_74"] = "Demon Invasion Event Set"
 L["NOTE_91"] = "Island Expeditions Event Set"
 L["NOTE_60"] = "Scourge Invasion Event Set"
 L["NOTE_69"] = "Garrison Set"
-L["NOTE_1001"] = "Shadowlands Invasion Event Set"
+
+L["NOTE_100"] = "Shadowlands Invasion Event Set"
+L["NOTE_101"] = "Shadowlands Questing Set"
+L["NOTE_102"] = "Shadowlands Dungeon Set"
+L["NOTE_103"] = "Kyrian Covenant Set"
+L["NOTE_104"] = "Venthyr Covenant Set"
+L["NOTE_105"] = "Necrolord Covenant Set"
+L["NOTE_106"] = "Night Fae Covenant Set"
+L["NOTE_107"] = "Shadowlands Crafted Set"
+L["NOTE_108"] = "Shadowlands Legendary Set"
+L["NOTE_109"] = "Castle Nathria Raid Set"
+L["NOTE_110"] = "Shadowlands PvP Set"
 
 L["Malfurion's Battlegear (Lookalike)"] = true
 L["Sunstrider's Regalia (Lookalike)"] = true
