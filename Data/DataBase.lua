@@ -413,10 +413,6 @@ local function buildSetSubstitutions()
 		return SET_INDEX[setID]
 	end
 
-
-
-
-
 	function addon.SetItemSubstitute(itemID, subID)
 		itemID = tonumber(itemID)
 		subID = tonumber(subID)

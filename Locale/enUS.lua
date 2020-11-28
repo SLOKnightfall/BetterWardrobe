@@ -461,6 +461,7 @@ L["NOTE_107"] = "Shadowlands Crafted Set"
 L["NOTE_108"] = "Shadowlands Legendary Set"
 L["NOTE_109"] = "Castle Nathria Raid Set"
 L["NOTE_110"] = "Shadowlands PvP Set"
+L["NOTE_111"] = "Shadowlands Crafted Set"
 
 L["Malfurion's Battlegear (Lookalike)"] = true
 L["Sunstrider's Regalia (Lookalike)"] = true

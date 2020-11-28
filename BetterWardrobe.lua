@@ -116,6 +116,7 @@ function addon.GetSetsources(setID)
 	local setInfo = addon.GetSetInfo(setID)
 	local setSources = {}
 	local atTransmogrifier = WardrobeFrame_IsAtTransmogrifier()
+	local unavailable = false
 
 	if BW_WardrobeCollectionFrame.selectedTransmogTab == 4 or BW_WardrobeCollectionFrame.selectedCollectionTab == 4 then
 		if setInfo and setInfo.sources then
@@ -158,6 +159,10 @@ function addon.GetSetsources(setID)
 						end
 		
 						local sourceInfo = sourceID and C_TransmogCollection.GetSourceInfo(sourceID)
+
+						if (sourceInfo and not sourceInfo.sourceType) and not setInfo.sourceType then 
+							unavailable = true
+						end
 						sources = sourceInfo and C_TransmogCollection.GetAppearanceSources(sourceInfo.visualID)
 					end
 		
@@ -167,6 +172,7 @@ function addon.GetSetsources(setID)
 							WardrobeCollectionFrame_SortSources(sources)
 						end
 						setSources[sources[1].sourceID] = sources[1].isCollected--and sourceInfo.isCollected
+
 					elseif sourceID then 
 						setSources[sourceID] = false
 					end
@@ -194,6 +200,10 @@ function addon.GetSetsources(setID)
 				for _, sourceID in ipairs(allSources) do
 	
 					local info = C_TransmogCollection.GetSourceInfo(sourceID)
+					if (info and not info.sourceType) and not setInfo.sourceType then 
+						unavailable = true
+					end
+
 					local isCollected = select(5,C_TransmogCollection.GetAppearanceSourceInfo(sourceID))
 					info.isCollected = isCollected
 					tinsert(list, info)
@@ -203,6 +213,9 @@ function addon.GetSetsources(setID)
 					WardrobeCollectionFrame_SortSources(list)
 				end
 				setSources[list[1].sourceID or sourceID ] = list[1].isCollected or false
+				if not list[1].sourceType and not setInfo.sourceType then 
+					unavailable = true
+				end
 
 
 
@@ -227,7 +240,7 @@ function addon.GetSetsources(setID)
 	end
 			--setSources[sourceID] = sourceInfo and sourceInfo.isCollected
 	--SourceDB[setID] = setSources
-	return setSources
+	return setSources, unavailable
 end
 
 local EmptyArmor = addon.Globals.EmptyArmor
@@ -406,16 +419,17 @@ function SetsDataProvider:FilterSearch(useBaseSet)
 		searchString = string.lower(WardrobeCollectionFrameSearchBox:GetText())
 	end
 
-
 	for i, data in ipairs(baseSets) do
-
-		local count , total = SetsDataProvider:GetSetSourceCounts(data.setID)
+		local setData = SetsDataProvider:GetSetSourceData(data.setID)
+		local count , total = setData.numCollected, setData.numTotal
+		local unavailable = setData.unavailable
 		local collected = count == total
 		if ((addon.filterCollected[1] and collected) or
 			(addon.filterCollected[2] and not collected)) and
 			CheckMissingLocation(data) and
 	 		addon.xpacSelection[data.expansionID] and
 			addon.filterSelection[data.filter] and
+			(not unavailable or (addon.Profile.HideUnavalableSets and unavailable)) and
 			(searchString and string.find(string.lower(data.name), searchString)) then -- or string.find(baseSet.label, searchString) or string.find(baseSet.description, searchString)then
 			tinsert(filteredSets, data)
 	end
@@ -563,7 +577,7 @@ function SetsDataProvider:GetSetSourceData(setID)
 
 	local sourceData = self.sourceData[setID]
 	if (not sourceData) then
-		local sources = addon.GetSetsources(setID)
+		local sources, unavailable = addon.GetSetsources(setID)
 		local numCollected = 0
 		local numTotal = 0
 		if sources then
@@ -574,7 +588,7 @@ function SetsDataProvider:GetSetSourceData(setID)
 				numTotal = numTotal + 1
 			end
 
-			sourceData = {numCollected = numCollected, numTotal = numTotal, sources = sources }
+			sourceData = {numCollected = numCollected, numTotal = numTotal, sources = sources, unavailable = unavailable }
 			self.sourceData[setID] = sourceData
 		end
 	end
@@ -791,7 +805,7 @@ end
 function BetterWardrobeSetsCollectionMixin:OnShow()
 	self:RegisterEvent("GET_ITEM_INFO_RECEIVED")
 	self:RegisterEvent("TRANSMOG_COLLECTION_ITEM_UPDATE")
-	self:RegisterEvent("TRANSMOG_COLLECTION_UPDATED")
+	--self:RegisterEvent("TRANSMOG_COLLECTION_UPDATED")
 	-- select the first set if not init
 
 	local baseSets = SetsDataProvider:GetBaseSets()
@@ -827,7 +841,7 @@ end
 function BetterWardrobeSetsCollectionMixin:OnHide()
 	self:UnregisterEvent("GET_ITEM_INFO_RECEIVED")
 	self:UnregisterEvent("TRANSMOG_COLLECTION_ITEM_UPDATE")
-	self:UnregisterEvent("TRANSMOG_COLLECTION_UPDATED")
+	--self:UnregisterEvent("TRANSMOG_COLLECTION_UPDATED")
 	SetsDataProvider:ClearSets()
 	WardrobeCollectionFrame_ClearSearch(LE_TRANSMOG_SEARCH_TYPE_BASE_SETS)
 
@@ -917,6 +931,8 @@ function BetterWardrobeSetsCollectionMixin:OnEvent(event, ...)
 			end
 		end
 		SetsDataProvider:ClearSets()
+		self:Refresh()
+		self:UpdateProgressBar()
 
 	elseif (event == "TRANSMOG_COLLECTION_SOURCE_REMOVED") then
 		local sourceID = ...
@@ -936,6 +952,8 @@ function BetterWardrobeSetsCollectionMixin:OnEvent(event, ...)
 			end
 		end
 		SetsDataProvider:ClearSets()
+		self:Refresh()
+		self:UpdateProgressBar()
 
 	elseif (event == "TRANSMOG_COLLECTION_ITEM_UPDATE") then
 		for itemFrame in self.DetailsFrame.itemFramesPool:EnumerateActive() do
@@ -1009,7 +1027,8 @@ local function GetSetCounts()
 	local collectedSets = 0
 
 	for i, data in ipairs(sets) do
-		local topSourcesCollected, topSourcesTotal = SetsDataProvider:GetSetSourceCounts(data.setID)
+		local sourceData = SetsDataProvider:GetSetSourceData(data.setID)
+		local topSourcesCollected, topSourcesTotal = sourceData.numCollected,sourceData.numTotal
 		if topSourcesCollected == topSourcesTotal then
 			collectedSets = collectedSets + 1
 		end
@@ -1637,6 +1656,10 @@ function BetterWardrobeSetsCollectionScrollFrameMixin:OnLoad()
 	BW_UIDropDownMenu_Initialize(self.FavoriteDropDown, BW_WardrobeSetsCollectionScrollFrame_FavoriteDropDownInit, "MENU")
 end
 
+local function CheckSetAvailability(setID)
+	local setData = SetsDataProvider:GetSetSourceData(setID)
+	return setData.unavailable
+end
 
 function BetterWardrobeSetsCollectionScrollFrameMixin:Update()
 	local offset = HybridScrollFrame_GetOffset(self)
@@ -1685,7 +1708,7 @@ function BetterWardrobeSetsCollectionScrollFrameMixin:Update()
 			button.SelectedTexture:SetShown(baseSet.setID == selectedBaseSetID)
 			button.Favorite:SetShown(isFavorite)
 			button.CollectionListVisual.Hidden.Icon:SetShown(isHidden)
-			button.CollectionListVisual.Unavailable.Icon:SetShown(baseSet.unavailable)
+			button.CollectionListVisual.Unavailable.Icon:SetShown(CheckSetAvailability(baseSet.setID))
 
 			button.CollectionListVisual.InvalidTexture:SetShown(not baseSet.isClass)
 			local isInList = addon.CollectionList:IsInList(baseSet.setID, "extraset")
