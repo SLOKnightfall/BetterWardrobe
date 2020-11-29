@@ -802,10 +802,20 @@ function BetterWardrobeSetsCollectionMixin:OnLoad()
 end
 
 
+
+
+function addon:BW_TRANSMOG_COLLECTION_UPDATED()
+		SetsDataProvider:ClearSets()
+		BW_SetsCollectionFrameScrollFrame:Refresh()
+		BW_SetsCollectionFrameScrollFrame:UpdateProgressBar()
+		BW_SetsCollectionFrameScrollFrame:ClearLatestSource()
+end
+
 function BetterWardrobeSetsCollectionMixin:OnShow()
 	self:RegisterEvent("GET_ITEM_INFO_RECEIVED")
 	self:RegisterEvent("TRANSMOG_COLLECTION_ITEM_UPDATE")
 	--self:RegisterEvent("TRANSMOG_COLLECTION_UPDATED")
+	addon:RegisterMessage("BW_TRANSMOG_COLLECTION_UPDATED")
 	-- select the first set if not init
 
 	local baseSets = SetsDataProvider:GetBaseSets()
@@ -842,6 +852,8 @@ function BetterWardrobeSetsCollectionMixin:OnHide()
 	self:UnregisterEvent("GET_ITEM_INFO_RECEIVED")
 	self:UnregisterEvent("TRANSMOG_COLLECTION_ITEM_UPDATE")
 	--self:UnregisterEvent("TRANSMOG_COLLECTION_UPDATED")
+	addon:UnregisterMessage("BW_TRANSMOG_COLLECTION_UPDATED")
+
 	SetsDataProvider:ClearSets()
 	WardrobeCollectionFrame_ClearSearch(LE_TRANSMOG_SEARCH_TYPE_BASE_SETS)
 
@@ -931,8 +943,7 @@ function BetterWardrobeSetsCollectionMixin:OnEvent(event, ...)
 			end
 		end
 		SetsDataProvider:ClearSets()
-		self:Refresh()
-		self:UpdateProgressBar()
+		addon:SendMessage("BW_TRANSMOG_COLLECTION_UPDATED")
 
 	elseif (event == "TRANSMOG_COLLECTION_SOURCE_REMOVED") then
 		local sourceID = ...
@@ -952,8 +963,7 @@ function BetterWardrobeSetsCollectionMixin:OnEvent(event, ...)
 			end
 		end
 		SetsDataProvider:ClearSets()
-		self:Refresh()
-		self:UpdateProgressBar()
+		addon:SendMessage("BW_TRANSMOG_COLLECTION_UPDATED")
 
 	elseif (event == "TRANSMOG_COLLECTION_ITEM_UPDATE") then
 		for itemFrame in self.DetailsFrame.itemFramesPool:EnumerateActive() do
@@ -963,8 +973,7 @@ function BetterWardrobeSetsCollectionMixin:OnEvent(event, ...)
 	elseif (event == "TRANSMOG_COLLECTION_UPDATED") then
 		SetsDataProvider:ClearSets()
 		self:Refresh()
-		self:UpdateProgressBar()
-		self:ClearLatestSource()
+
 	end
 end
 
