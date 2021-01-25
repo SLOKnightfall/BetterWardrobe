@@ -111,7 +111,7 @@ function addon:DressingRoom_Disable()
 	end		
 	DressUpFrame.MaximizeMinimizeFrame:SetOnMaximizedCallback(OnMaximize)
 
-	if not  GetCVarBool("miniDressupFrame") then 
+	if not GetCVarBool("miniDressupFrame") then 
 		OnMaximize(DressUpFrame)	
 	end
 	--addon.Profile.DR_OptionsEnable
@@ -184,11 +184,8 @@ function addon:DressUpVisual(...)
 		playerActor:TryOn(...)
 	end
 
-C_Timer.After(0, function() BW_DressingRoomItemDetailsMixin:UpdateButtons(false, true) end)
-	DressingRoom:TryOn(...)
-
-	
-
+	C_Timer.After(0, function() BW_DressingRoomItemDetailsMixin:UpdateButtons(false, true) end)
+		DressingRoom:TryOn(...)
 end
 
 
@@ -200,7 +197,7 @@ function addon:DressUpSources(appearanceSources, mainHandEnchant, offHandEnchant
 	end	
 
 	initUndress = false
---BW_DressingRoomItemDetailsMixin:UpdateButtons(true)
+		--BW_DressingRoomItemDetailsMixin:UpdateButtons(true)
 	--for i = 1, #appearanceSources do
 	for key, transmogSlot in pairs(TRANSMOG_SLOTS) do
 	local slotID = transmogSlot.location:GetSlotID();
@@ -272,9 +269,10 @@ function BetterWardrobe:ToggleDressingRoom()
 			DressUpFrame_Show(DressUpFrame)
 		end
 			C_Timer.After(0.2, function() BW_DressingRoomItemDetailsMixin:UpdateButtons(false, true) end)
-
 end
 
+
+--If the appearance hides the gear
 function DressingRoom:IsSlotHidden(slot_id)
 	local transmogLocation = TransmogUtil.GetTransmogLocation(slot_id, Enum.TransmogType.Appearance, Enum.TransmogModification.None);
 	local _, _, _, _, _, _, isHideVisual = C_Transmog.GetSlotInfo(transmogLocation)
@@ -288,20 +286,23 @@ function DressingRoom:OnShow()
 		--addon:SecureHook(DressUpModel, "TryOn", function(self,...) local itemSource, previewSlot, enchantID = ...; C_Timer.After(0.2, function(...) DressingRoom:TryOn(itemSource, previewSlot, enchantID)  end) end)
 	--end
 
-	if DressUpFrame.MaximizeMinimizeFrame:IsMinimized() then
+	--[[if IsAddOnLoaded("Narcissus") and DressUpFrame.MaximizeMinimizeFrame:IsMinimized() then
 		--DressUpFrame.ResetButton:SetWidth(40)
 		--BW_DressingRoomFrame.BW_DressingRoomHideArmorButton:SetWidth(60)
-
+		NarciBridge_DressUpFrame.SlotFrame:Hide()
+		BW_DressingRoomFrame.PreviewButtonFrame:SetShown(addon.Profile.DR_ShowItemButtons)
 	else
+		if  addon.Profile.DR_ShowNarcissusButtons then 
+			BW_DressingRoomFrame.PreviewButtonFrame:Hide()
+			NarciBridge_DressUpFrame.SlotFrame:Show()
+		end
 		--DressUpFrame.ResetButton:SetWidth(88)
 		--BW_DressingRoomFrame.BW_DressingRoomHideArmorButton:SetWidth(90)
 	end
-
-	BW_DressingRoomFrame.PreviewButtonFrame:SetShown(addon.Profile.DR_ShowItemButtons)
+]]--
 	DressingRoom:ToggleControlPanel(addon.Profile.DR_ShowControls)
 	DressingRoom:UpdateBackground()	
 	--DressUpFrame:SetSize(addon.Profile.DR_Width,addon.Profile.DR_Height)
-
 
 	if not GetCVarBool("transmogShouldersSeparately") then 
 		BW_DressingRoomFrame.PreviewButtonFrame.PreviewButtonRightShoulder:Hide()
@@ -311,7 +312,6 @@ function DressingRoom:OnShow()
 		BW_DressingRoomFrame.PreviewButtonFrame.PreviewButtonRightShoulder:Show()
 		BW_DressingRoomFrame.PreviewButtonFrame.PreviewButtonBack:ClearAllPoints()
 		BW_DressingRoomFrame.PreviewButtonFrame.PreviewButtonBack:SetPoint("TOPLEFT", BW_DressingRoomFrame.PreviewButtonFrame.PreviewButtonRightShoulder,"BOTTOMLEFT")
-	
 	end
 end
 
@@ -338,20 +338,6 @@ end
 
 function DressingRoom:GetInvSlotButton(slotID)
 	return SLOT_BUTTON_INDEX[slotID]
-end
-
-
-function addon:DressingRoom_SetItemFrameQuality(itemFrame)
-	if not itemFrame.itemLink then return end
-	local _, _, quality, _, _, _, _, _, _, texture = GetItemInfo(itemFrame.itemLink)
-		--local quality = C_TransmogCollection.GetSourceInfo(itemFrame.sourceID).quality
-		if ( quality == Enum.ItemQuality.Uncommon ) then
-			itemFrame.IconBorder:SetAtlas("loottab-set-itemborder-green", true)
-		elseif ( quality == Enum.ItemQuality.Rare ) then
-			itemFrame.IconBorder:SetAtlas("loottab-set-itemborder-blue", true)
-		elseif ( quality == Enum.ItemQuality.Epic ) then
-			itemFrame.IconBorder:SetAtlas("loottab-set-itemborder-purple", true)
-		end
 end
 
 
@@ -547,12 +533,15 @@ function BW_DressingRoomItemDetailsMixin:OnLoad()
 	local slot = self:GetID()
 	local invslot = INVENTORY_SLOT_NAMES[slot]
 	SLOT_BUTTON_INDEX[slot] = self
-	local _, slotTexture = GetInventorySlotInfo("HEADSLOT")
+	local _, slotTexture = GetInventorySlotInfo(invslot)
+	self.ShowItem = true
 	
 	self.Background:SetTexture(slotTexture)
 	self:RegisterForClicks("LeftButtonDown", "RightButtonDown")
 	
-	self.Icon:Hide()
+	self.Icon:Show()
+	self.IconBorder:SetDesaturation(0)
+	self.IconBorder:SetAlpha(1)
 end
 
 --/dump TRANSMOG_SLOTS[301]:GetSlotID()
@@ -561,41 +550,42 @@ function BW_DressingRoomItemDetailsMixin:UpdateButtons(clear, loadSet)
 	for index, button in pairs(Buttons) do
 		local itemlink
 		local slot = button:GetID()
-		if clear then
-			button:Update(nil)
-		else
-			if loadSet then
-				local playerActor = DressUpFrame.ModelScene:GetPlayerActor()
-				if (not playerActor) then
-					return false
-				end
 
-				local appearanceSourceID, illusionSourceID = playerActor:GetSlotTransmogSources(slot)
-				itemlink = select(6, C_TransmogCollection.GetAppearanceSourceInfo(appearanceSourceID))
-
-			else
-
-				itemlink = GetInventoryItemLink("player", slot)
-			
-				if itemlink then
-					local transmogLocation = TransmogUtil.GetTransmogLocation(slot, Enum.TransmogType.Appearance, Enum.TransmogModification.None)
-					local isTransmogrified, hasPending, _, _, _, hasUndo, isHideVisual = C_Transmog.GetSlotInfo(transmogLocation)
-							--local appliedSourceID, appliedVisualID, selectedSourceID, selectedVisualID = Addon:GetInfoForSlot(slot, Enum.TransmogType.Appearance)
-					local baseSourceID, baseVisualID, appliedSourceID, appliedVisualID, pendingSourceID, pendingVisualID, hasPendingUndo = C_Transmog.GetSlotVisualInfo(transmogLocation)
-
-					if isTransmogrified and not isHideVisual then
-						itemlink = select(6, C_TransmogCollection.GetAppearanceSourceInfo(appliedSourceID))
-					elseif isHideVisual then
-						itemlink = nil
-					end
-				end
+		if loadSet then
+			local playerActor = DressUpFrame.ModelScene:GetPlayerActor()
+			if (not playerActor) then
+				return false
 			end
 
-			button:Update(itemlink)
-		end
-	end
+			local appearanceSourceID, illusionSourceID = playerActor:GetSlotTransmogSources(slot)
+			itemlink = select(6, C_TransmogCollection.GetAppearanceSourceInfo(appearanceSourceID))
 
-	DressingRoom:SetHidden()
+		else
+
+			itemlink = GetInventoryItemLink("player", slot)
+		
+			if itemlink then
+				local transmogLocation = TransmogUtil.GetTransmogLocation(slot, Enum.TransmogType.Appearance, Enum.TransmogModification.None)
+				local isTransmogrified, hasPending, _, _, _, hasUndo, isHideVisual = C_Transmog.GetSlotInfo(transmogLocation)
+						--local appliedSourceID, appliedVisualID, selectedSourceID, selectedVisualID = Addon:GetInfoForSlot(slot, Enum.TransmogType.Appearance)
+				local baseSourceID, baseVisualID, appliedSourceID, appliedVisualID, pendingSourceID, pendingVisualID, hasPendingUndo = C_Transmog.GetSlotVisualInfo(transmogLocation)
+
+				if isTransmogrified  then --and not isHideVisual then
+					itemlink = select(6, C_TransmogCollection.GetAppearanceSourceInfo(appliedSourceID))
+				--elseif isHideVisual then
+					--itemlink = nil
+				end
+			end
+		end
+
+		if clear then
+			button:SetViewState(false)
+		else
+			button:SetViewState(true)
+		end
+		button:Update(itemlink)
+	end
+	--DressingRoom:SetHidden()
 end
 
 
@@ -609,7 +599,29 @@ function DressingRoom:Undress(slotID)
 end
 
 
-local HIDDEN_SLOTS = {INVSLOT_TABARD, INVSLOT_BODY, INVSLOT_MAINHAND, INVSLOT_OFFHAND}
+function BW_DressingRoomItemDetailsMixin:SetItemFrameQuality()
+	if not self.itemLink then self.IconBorder:Hide() return end
+	local _, _, quality, _, _, _, _, _, _, texture = GetItemInfo(self.itemLink)
+
+	--local quality = C_TransmogCollection.GetSourceInfo(itemFrame.sourceID).quality
+	if ( quality == Enum.ItemQuality.Uncommon ) then
+		self.IconBorder:SetAtlas("loottab-set-itemborder-green", true)
+	elseif ( quality == Enum.ItemQuality.Rare ) then
+		self.IconBorder:SetAtlas("loottab-set-itemborder-blue", true)
+	elseif ( quality == Enum.ItemQuality.Epic ) then
+		self.IconBorder:SetAtlas("loottab-set-itemborder-purple", true)
+	elseif ( quality == Enum.ItemQuality.Artifact ) then
+		self.IconBorder:SetAtlas("loottab-set-itemborder-artifact", true);
+	elseif ( quality == Enum.ItemQuality.Legendary ) then
+		self.IconBorder:SetAtlas("loottab-set-itemborder-orange", true);
+	else
+		self.IconBorder:SetAtlas("loottab-set-itemborder-white", true);
+	end
+	self.IconBorder:Show()
+end
+
+
+--[[local HIDDEN_SLOTS = {INVSLOT_TABARD, INVSLOT_BODY, INVSLOT_MAINHAND, INVSLOT_OFFHAND}
 function DressingRoom:SetHidden()
 	if not initHide then return end
 	 for _, slot in ipairs(HIDDEN_SLOTS) do
@@ -618,11 +630,15 @@ function DressingRoom:SetHidden()
 		if ((slot == INVSLOT_TABARD and Profile.DR_HideTabard) or
 					(slot == INVSLOT_BODY and Profile.DR_HideShirt) or
 					((slot == INVSLOT_MAINHAND or slot == INVSLOT_OFFHAND) and Profile.DR_HideWeapons )) and slot ~= dressupslot then
-				DressingRoom:Undress(slot)
-				button:Update(nil)
+				--DressingRoom:Undress(slot)
+				--button:Update(nil)
 		end
 	end
 	initHide = false
+end]]
+
+function BW_DressingRoomItemDetailsMixin:SetViewState(toggle)
+	self.ShowItem = toggle
 end
 
 
@@ -636,33 +652,38 @@ function BW_DressingRoomItemDetailsMixin:Update(itemLink)
 
 	self.itemLink = itemLink or nil
 
-	local skip = false
 	if (slot == INVSLOT_TABARD and Profile.DR_HideTabard) or
 		(slot == INVSLOT_BODY and Profile.DR_HideShirt) or
 		((slot == INVSLOT_MAINHAND or slot == INVSLOT_OFFHAND) and Profile.DR_HideWeapons ) then
-			--skip = true 
+			self.ShowItem = false
+	--else 
+		--self.ShowItem = true
 	end
 
-	if dressuplink == itemLink then skip = false end
+	--Force Show if viewing a link
+	if dressuplink == itemLink then self.ShowItem = true end
 
-	if (texture and not skip) and 
-		(not addon.Profile.DR_StartUndressed or
-		  	(addon.Profile.DR_StartUndressed and not initUndress ))  then
-
-		self.Icon:SetTexture(texture)
+	if (texture)  then
 		self.Icon:Show()
-		addon:DressingRoom_SetItemFrameQuality(self)
-		self.IconBorder:SetDesaturation(0)
-		self.IconBorder:SetAlpha(1)
+		self.Icon:SetTexture(texture)
+
+		if (self.ShowItem) and 
+			(not addon.Profile.DR_StartUndressed or
+			(addon.Profile.DR_StartUndressed and not initUndress ))  then
+
+			self.Icon:SetDesaturated(false)
+		else
+			self.ShowItem = false
+			self.Icon:SetDesaturated(true)
+			DressingRoom:Undress(slot)
+		end
+
 	else
 		self.Icon:Hide()
-		self.IconBorder:SetDesaturation(1)
-		self.IconBorder:SetAlpha(0.3)
-		--DressingRoom:Undress(slot)
-		self.itemLink = nil
+		DressingRoom:Undress(slot)
 	end
+	self:SetItemFrameQuality()
 end
-
 
 
 function BW_DressingRoomItemDetailsMixin:OnMouseDown(button)
@@ -682,6 +703,16 @@ function BW_DressingRoomItemDetailsMixin:OnMouseDown(button)
 		GameTooltip:ClearLines()
 		GameTooltip:AddLine(_G[INVENTORY_SLOT_NAMES[self:GetID()]])
 		GameTooltip:Show()
+	else
+		if self.ShowItem then
+			self.ShowItem = false
+			DressingRoom:Undress(slot)
+			self.Icon:SetDesaturated(true);
+		else
+			self.ShowItem = true
+			playerActor:TryOn(self.itemLink);
+			self.Icon:SetDesaturated(false);
+		end
 	end
 end
 
@@ -696,7 +727,6 @@ function BW_DressingRoomItemDetailsMixin:OnEnter()
 	else
 		GameTooltip:AddLine(_G[slot])
 	end
-	
 	GameTooltip:Show()
 	
 	ShoppingTooltip1:Hide()

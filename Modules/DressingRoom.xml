@@ -22,8 +22,6 @@
 		</Scripts>
 	</Button>
 
-
-
 	<Button name="BW_DressingRoomOutfitFrameButtonTemplate" inherits="WardrobeOutfitButtonTemplate" virtual="true" mixin="BW_DressingRoomOutfitButtonMixin"/>
 
 	<Frame name="BW_DressingRoomOutfitFrame" frameStrata="DIALOG" parent="UIParent" hidden="true" enableMouse="true" mixin="BW_DressingRoomOutfitFrameMixin">

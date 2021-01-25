@@ -148,7 +148,7 @@ local options = {
 							order = 1.2,
 							name = L["Ignore Class Restriction Filter"],
 							type = "toggle",
-							width = 1.3,
+							width = "full",--1.3,
 							arg = "IgnoreClassRestrictions",
 						},
 						IgnoreClassLookalikeRestrictions = {
@@ -158,6 +158,7 @@ local options = {
 							width = 1.4,
 							arg = "IgnoreClassLookalikeRestrictions",
 							disabled = function() return not addon.Profile.IgnoreClassRestrictions end,
+							hidden = true,
 						},
 						ShowCollectionUpdates = {
 							order = 2,
@@ -614,11 +615,18 @@ local options = {
 							type = "toggle",
 
 						},
+						DR_ShowNarcissusButtons = {
+							order = 2.1,
+							name = L["Show Narcissus Buttons"],
+							type = "toggle",
+							width = 1.5,
+
+						},
 						DR_ShowControls = {
 							order = 3,
 							name = L["Show DressingRoom Controls"],
 							type = "toggle",
-							width = 1.5,
+							width = "full",
 						},
 						DR_DimBackground = {
 							order = 4,

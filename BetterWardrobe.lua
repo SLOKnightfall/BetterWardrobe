@@ -853,7 +853,6 @@ function BetterWardrobeSetsCollectionMixin:OnHide()
 	self:UnregisterEvent("TRANSMOG_COLLECTION_ITEM_UPDATE")
 	--self:UnregisterEvent("TRANSMOG_COLLECTION_UPDATED")
 	addon:UnregisterMessage("BW_TRANSMOG_COLLECTION_UPDATED")
-
 	SetsDataProvider:ClearSets()
 	WardrobeCollectionFrame_ClearSearch(LE_TRANSMOG_SEARCH_TYPE_BASE_SETS)
 

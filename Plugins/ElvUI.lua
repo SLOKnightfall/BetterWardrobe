@@ -361,28 +361,31 @@ function S:BetterWardrobe()
 		--button.IconBorder:SetColorTexture(1, 1, 1, 0.1)
 	end
 
-	hooksecurefunc(addon, 'DressingRoom_SetItemFrameQuality', function(_, itemFrame)
-		local icon = itemFrame.Icon
-		if not icon.backdrop then
-			icon:CreateBackdrop()
-			icon:SetTexCoord(unpack(E.TexCoords))
-			itemFrame.IconBorder:Hide()
-			local level = itemFrame:GetFrameLevel()
-			if icon then 
-				itemFrame:SetFrameLevel(level +1)
-			end
-			icon.backdrop:SetFrameLevel(level + .5)
-		end
 
-		if itemFrame.itemLink then
-			--local quality = C_TransmogCollection.GetSourceInfo(itemFrame.sourceID).quality
-			local _, _, quality, _, _, _, _, _, _, texture = GetItemInfo(itemFrame.itemLink)
-			local color = BAG_ITEM_QUALITY_COLORS[quality or 1]
-			icon.backdrop:SetBackdropBorderColor(color.r, color.g, color.b)
-		else
-			icon.backdrop:SetBackdropBorderColor(unpack(E.media.bordercolor))
-		end
-	end)
+
+--Need to redo
+	--[[hooksecurefunc(addon, 'DressingRoom_SetItemFrameQuality', function(_, itemFrame)
+				local icon = itemFrame.Icon
+				if not icon.backdrop then
+					icon:CreateBackdrop()
+					icon:SetTexCoord(unpack(E.TexCoords))
+					itemFrame.IconBorder:Hide()
+					local level = itemFrame:GetFrameLevel()
+					if icon then 
+						itemFrame:SetFrameLevel(level +1)
+					end
+					icon.backdrop:SetFrameLevel(level + .5)
+				end
+		
+				if itemFrame.itemLink then
+					--local quality = C_TransmogCollection.GetSourceInfo(itemFrame.sourceID).quality
+					local _, _, quality, _, _, _, _, _, _, texture = GetItemInfo(itemFrame.itemLink)
+					local color = BAG_ITEM_QUALITY_COLORS[quality or 1]
+					icon.backdrop:SetBackdropBorderColor(color.r, color.g, color.b)
+				else
+					icon.backdrop:SetBackdropBorderColor(unpack(E.media.bordercolor))
+				end
+			end)]]--
 
 	-- Outfit Edit Frame
 	local WardrobeOutfitEditFrame = _G.BW_WardrobeOutfitEditFrame

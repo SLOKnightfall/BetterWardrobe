@@ -71,11 +71,11 @@ do
 							--local faction = setData[5]
 				local opposingFaction , City, side = OpposingFaction(faction) -- BFAFaction,
 				
-				setData.isFactionLocked = string.find(setData.name, opposingFaction) 
+				--setData.isFactionLocked = string.find(setData.name, opposingFaction) 
 					--or string.find(setData.name, BFAFaction)
-					or string.find(setData.name, City)
-					--or setData.side and setData.side == side
-				setData.isHeritageArmor = string.find(setData.name, "Heritage")
+					--or string.find(setData.name, City)
+				setData.isFactionLocked = setData.side and setData.side == side
+				--setData.isHeritageArmor = string.find(setData.name, "Heritage")
 
 
 				local classInfo = CLASS_INFO[playerClass]
@@ -84,7 +84,6 @@ do
 
 				setData.isClass = class
 				setData.className = className
-
 
 				setData["name"] = L[setData["name"]]
 				setData.oldnote = setData.label
@@ -102,18 +101,11 @@ do
 
 
 			--places some of the sets that didnt have correct filters
-				if setData.note == "NOTE_4" or setData.note == "NOTE_4" then
-					setData.filter = 4 
-				elseif setData.note == "NOTE_95" then
-					setData.filter = 7	
-				elseif setData.note == "NOTE_96" then 
-					setData.filter = 5
-				elseif setData.note == "NOTE_97" then 
-					setData.filter = 3
+				--if setData.note == "NOTE_4" or setData.note == "NOTE_4" then
+					--setData.filter = 4	
+				--end
 
-				end
-
-						--setData.mod = setData.bonusid
+				--setData.mod = setData.bonusid
 				setData.uiOrder = id * 100
 						--setData.filter = setData.filter + 1 -- fix for filter startin at 0
 				--setData.numCollected = 0
@@ -188,12 +180,12 @@ do
 
 	local function addArmor(armorSet)
 		for id, setData in pairs(armorSet) do
-			if  (setData.isClass or 
-					(addon.Profile.IgnoreClassRestrictions and ((setData.filter == 6 or setData.filter == 7) and addon.Profile.IgnoreClassLookalikeRestrictions)) or 
-					(addon.Profile.IgnoreClassRestrictions and not addon.Profile.IgnoreClassLookalikeRestrictions)) 
-				and not (setData.oldnote == 6 or setData.oldnote == 8 or setData.oldnote == 16 or setData.oldnote == 21)
-				and not setData.isFactionLocked 
-				and not setData.isHeritageArmor then 
+			if  (setData.isClass or addon.Profile.IgnoreClassRestrictions)
+					--(addon.Profile.IgnoreClassRestrictions and ((setData.filter == 6 or setData.filter == 7) and addon.Profile.IgnoreClassLookalikeRestrictions)) or 
+					--(addon.Profile.IgnoreClassRestrictions and not addon.Profile.IgnoreClassLookalikeRestrictions)) 
+				--and not (setData.oldnote == 6 or setData.oldnote == 8 or setData.oldnote == 16 )
+				and not setData.isFactionLocked then 
+				--and not setData.isHeritageArmor then 
 				--and (not setData.unavailable or (addon.Profile.HideUnavalableSets and setData.unavailable)) then
 
 				for index, item in ipairs( setData["items"]) do
