@@ -454,6 +454,8 @@ L["NOTE_108"] = "Shadowlands Legendary Set"
 
 L["NOTE_110"] = "Shadowlands PvP Set"
 L["NOTE_111"] = "Shadowlands Crafted Set"
+
+
 L["Mystic's Regalia (Recolor)"] = true
 L["Aboriginal Regalia (Recolor)"] = true
 L["Simple Regalia"] = true
@@ -694,7 +696,6 @@ L["Flirtation Regalia"] = true
 L["Dream Bough Regalia (Recolor)"] = true
 L["Dream Bough Regalia (Recolor)"] = true
 L["Dream Bough Regalia"] = true
-L["Ironweave Battlesuit"] = true
 L["Embersilk Battlegear"] = true
 L["Embersilk Battlegear (Recolor)"] = true
 L["Kirin Tor Garb (Recolor)"] = true
