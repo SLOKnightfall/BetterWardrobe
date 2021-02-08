@@ -132,7 +132,7 @@ function addon:DressingRoom_Enable()
 			DressingRoom:SetTarget()
 			--BW_DressingRoomItemDetailsMixin:UpdateButtons()
 		else
-			BW_DressingRoomItemDetailsMixin:UpdateButtons() 
+			BW_DressingRoomItemDetailsMixin:UpdateButtons("reset") 
 		end
 		end) end)
 
@@ -168,6 +168,7 @@ end
 
 function addon:DressUpVisual(...)
 	dressuplink = ...
+	local itemSource, previewSlot, enchantID = ...
 	if not dressuplink then return end
 
 	local playerActor = DressUpFrame.ModelScene:GetPlayerActor()
@@ -184,8 +185,8 @@ function addon:DressUpVisual(...)
 		playerActor:TryOn(...)
 	end
 
-	C_Timer.After(0, function() BW_DressingRoomItemDetailsMixin:UpdateButtons(false, true) end)
-		DressingRoom:TryOn(...)
+	C_Timer.After(0, function() BW_DressingRoomItemDetailsMixin:UpdateButtons("loadSet") end)
+		DressingRoom:TryOn(itemSource, previewSlot, enchantID, true)
 end
 
 
@@ -211,16 +212,16 @@ function addon:DressUpSources(appearanceSources, mainHandEnchant, offHandEnchant
 
 	DressingRoom:TryOn(appearanceSources[mainHandSlotID], "MAINHANDSLOT", mainHandEnchant)
 	DressingRoom:TryOn(appearanceSources[secondaryHandSlotID], "SECONDARYHANDSLOT", offHandEnchant)
-	C_Timer.After(0.2, function() BW_DressingRoomItemDetailsMixin:UpdateButtons(false, true) end)
+	C_Timer.After(0.2, function() BW_DressingRoomItemDetailsMixin:UpdateButtons("loadSet") end)
 	--BW_DressingRoomItemDetailsMixin:UpdateButtons(nil, import)
 	--C_Timer.After(0.1, function() BW_DressingRoomItemDetailsMixin:UpdateButtons(false, import) end)
 end
 
-
 local itemlinkbase = [["item:%d::::::::::::9:%d]]
-function DressingRoom:TryOn(itemSource, previewSlot, enchantID)
+function DressingRoom:TryOn(itemSource, previewSlot, enchantID, force)
 	--if not itemSource or itemSource == 0 then return end
 	local itemLink
+	local reset = true
 	if type(itemSource) == "number" then
 		itemLink = select(6, C_TransmogCollection.GetAppearanceSourceInfo(itemSource))
 			if not itemLink then
@@ -233,7 +234,7 @@ function DressingRoom:TryOn(itemSource, previewSlot, enchantID)
 	
 	if itemLink then
 		local targetSlotID
-		local _, _, _, _, _, itemType, itemSubType, _, itemEquipLoc = GetItemInfo(itemLink)
+		local _, _, itemQuality, _, _, itemType, itemSubType, _, itemEquipLoc, _, _, classID, subclassID = GetItemInfo(itemLink)
 		itemEquipLoc = INVENTORY_SLOT_NAMES[itemEquipLoc]
 
 		targetSlotID = previewSlot and GetInventorySlotInfo(previewSlot) or nil
@@ -242,11 +243,51 @@ function DressingRoom:TryOn(itemSource, previewSlot, enchantID)
 		end
 		dressuplink = itemLink
 		dressupslot = targetSlotID
+
 		if not targetSlotID then return end
 		local button = DressingRoom:GetInvSlotButton(targetSlotID)
+		if itemQuality == Enum.ItemQuality.Artifact then
+			button.Artifact = true 
+			button.itemSource = itemSource
+			button.enchantID = enchantID
+		else
+			button.Artifact = false 
+			button.itemSource = nil
+			button.enchantID = nil
+		end
+
+		if classID == LE_ITEM_CLASS_WEAPON then
+			local MHButton = DressingRoom:GetInvSlotButton(16)
+			local OHButton = DressingRoom:GetInvSlotButton(17)
+			if subclassID == LE_ITEM_WEAPON_BOWS  then 
+				reset = false
+				MHButton.Force = force
+				OHButton.Force = force
+				MHButton.Ranged = true
+				OHButton.Ranged = true
+			elseif subclassID == LE_ITEM_WEAPON_GUNS or subclassID == LE_ITEM_WEAPON_CROSSBOW then 
+				button.Ranged = true
+				MHButton.Force = force
+				OHButton.Force = force
+				MHButton.Ranged = true
+				OHButton.Ranged = true
+				reset = false
+
+
+			else
+				MHButton.Force = nil
+				OHButton.Force = nil
+				MHButton.Ranged = nil
+				OHButton.Ranged = nil
+				button.Ranged = nil
+
+
+			end
+		end
+		button.Force = force
 
 		if (itemSource == 0 and previewSlot) then
-			C_Timer.After(0, function() button:Update( nil) end)
+			C_Timer.After(0, function() button:Update(nil) end)
 		--elseif 	(targetSlotID == INVSLOT_TABARD and Profile.DR_HideTabard) or
 				--(targetSlotID == INVSLOT_BODY and Profile.DR_HideShirt) or
 				--((targetSlotID == INVSLOT_MAINHAND or targetSlotID == INVSLOT_OFFHAND) and Profile.DR_HideWeapons ) then
@@ -255,9 +296,9 @@ function DressingRoom:TryOn(itemSource, previewSlot, enchantID)
 			C_Timer.After(0.2, function() button:Update(itemLink) end)
 		end
 	end
-	
+
 	if targetSlotID == INVSLOT_MAINHAND or targetSlotID == INVSLOT_OFFHAND then
-		C_Timer.After(0.2, function() button:Update(itemLink) end)
+		C_Timer.After(0.2, function() button:Update(itemLink, reset) end)
 	end
 end
 
@@ -268,7 +309,7 @@ function BetterWardrobe:ToggleDressingRoom()
 		else
 			DressUpFrame_Show(DressUpFrame)
 		end
-			C_Timer.After(0.2, function() BW_DressingRoomItemDetailsMixin:UpdateButtons(false, true) end)
+			C_Timer.After(0.2, function() BW_DressingRoomItemDetailsMixin:UpdateButtons("loadSet") end)
 end
 
 
@@ -433,7 +474,7 @@ function BW_DressingRoomMixin:LoadOutfit(outfitID)
 	import = false
 	--DressingRoom:ResetItemButtons(false , true)
 	--BW_DressingRoomOutfitDropDown:OnOutfitApplied(outfitID)BW_DressingRoomItemDetailsMixin:UpdateButtons()
-	C_Timer.After(0.2, function() BW_DressingRoomItemDetailsMixin:UpdateButtons(false, true) end)
+	C_Timer.After(0.2, function() BW_DressingRoomItemDetailsMixin:UpdateButtons("loadSet") end)
 	--
 end
 
@@ -523,7 +564,7 @@ function BW_DressingRoomHideArmorButton_OnClick()
 		return false
 	end
 	playerActor:Undress()
-	BW_DressingRoomItemDetailsMixin:UpdateButtons(true)
+	BW_DressingRoomItemDetailsMixin:UpdateButtons("undress")
 end
 
 
@@ -545,13 +586,26 @@ function BW_DressingRoomItemDetailsMixin:OnLoad()
 end
 
 --/dump TRANSMOG_SLOTS[301]:GetSlotID()
-function BW_DressingRoomItemDetailsMixin:UpdateButtons(clear, loadSet)
+function BW_DressingRoomItemDetailsMixin:UpdateButtons(action)
+	local clear = false
+	local loadSet = false
+	local reset = false
+
+
+	if action == "clear" then 
+		clear = true
+	elseif action == "reset" then 
+		reset = true
+		--loadSet = true	
+	elseif action == "loadSet" then 
+		loadSet = true	
+	end
 
 	for index, button in pairs(Buttons) do
 		local itemlink
 		local slot = button:GetID()
 
-		if loadSet then
+		if (loadSet or button.LoadSet)   then
 			local playerActor = DressUpFrame.ModelScene:GetPlayerActor()
 			if (not playerActor) then
 				return false
@@ -561,7 +615,6 @@ function BW_DressingRoomItemDetailsMixin:UpdateButtons(clear, loadSet)
 			itemlink = select(6, C_TransmogCollection.GetAppearanceSourceInfo(appearanceSourceID))
 
 		else
-
 			itemlink = GetInventoryItemLink("player", slot)
 		
 			if itemlink then
@@ -580,10 +633,25 @@ function BW_DressingRoomItemDetailsMixin:UpdateButtons(clear, loadSet)
 
 		if clear then
 			button:SetViewState(false)
-		else
+			button.LoadSet = false
+		elseif loadSet then
+			--button:SetViewState(true)
+			button.LoadSet = true
+		elseif reset then 
+			--button.LoadSet = true
+			button.Force = false
 			button:SetViewState(true)
+		elseif action == "undress" then
+			button.Force = false 
+			button:SetViewState(false)
 		end
-		button:Update(itemlink)
+
+		if itemlink then 
+			button:Update(itemlink)
+		else
+			button:Update(nil,  reset)
+		end
+		--button:Update(itemlink, reset)
 	end
 	--DressingRoom:SetHidden()
 end
@@ -621,73 +689,82 @@ function BW_DressingRoomItemDetailsMixin:SetItemFrameQuality()
 end
 
 
---[[local HIDDEN_SLOTS = {INVSLOT_TABARD, INVSLOT_BODY, INVSLOT_MAINHAND, INVSLOT_OFFHAND}
-function DressingRoom:SetHidden()
-	if not initHide then return end
-	 for _, slot in ipairs(HIDDEN_SLOTS) do
-			button = DressingRoom:GetInvSlotButton(slot)
-
-		if ((slot == INVSLOT_TABARD and Profile.DR_HideTabard) or
-					(slot == INVSLOT_BODY and Profile.DR_HideShirt) or
-					((slot == INVSLOT_MAINHAND or slot == INVSLOT_OFFHAND) and Profile.DR_HideWeapons )) and slot ~= dressupslot then
-				--DressingRoom:Undress(slot)
-				--button:Update(nil)
-		end
-	end
-	initHide = false
-end]]
-
 function BW_DressingRoomItemDetailsMixin:SetViewState(toggle)
 	self.ShowItem = toggle
 end
 
 
-function BW_DressingRoomItemDetailsMixin:Update(itemLink)
+function BW_DressingRoomItemDetailsMixin:Update(itemLink, reset)
 	local Profile = addon.Profile
 	local slot = self:GetID()
 	local rarity, texture, _ = 0, nil
-	if itemLink then
-		_, _, rarity, _, _, _, _, _, _, texture = GetItemInfo(itemLink)
+	local undress = false
+
+	self.itemLink = itemLink or self.itemLink or nil
+
+	if self.itemLink and not reset then
+		_, _, rarity, _, _, _, _, _, _, texture = GetItemInfo(self.itemLink)
 	end
 
-	self.itemLink = itemLink or nil
 
-	if (slot == INVSLOT_TABARD and Profile.DR_HideTabard) or
-		(slot == INVSLOT_BODY and Profile.DR_HideShirt) or
-		((slot == INVSLOT_MAINHAND or slot == INVSLOT_OFFHAND) and Profile.DR_HideWeapons ) then
-			self.ShowItem = false
+	if self.Force then 
+		self.ShowItem = true
+		--self.Force = false
+	elseif ((slot == INVSLOT_TABARD and Profile.DR_HideTabard) or
+			(slot == INVSLOT_BODY and Profile.DR_HideShirt) or
+			((slot == INVSLOT_MAINHAND or slot == INVSLOT_OFFHAND or slot == INVSLOT_RANGED or slot == INVTYPE_RANGEDRIGHT) and Profile.DR_HideWeapons )) then
+			self.ShowItem = nil
 	--else 
 		--self.ShowItem = true
 	end
 
-	--Force Show if viewing a link
-	if dressuplink == itemLink then self.ShowItem = true end
+	if self.Ranged and slot == 17 and (self.Force or not Profile.DR_HideWeapons) then 
+		self.Icon:Hide()
+		self.itemLink = nil
+		self.ViewLink = nil
+		--self.IconBorder:Hide()
+		self:SetItemFrameQuality()
+		return
+	end
 
-	if (texture)  then
+	if (texture and not reset)  then
 		self.Icon:Show()
 		self.Icon:SetTexture(texture)
 
 		if (self.ShowItem) and 
 			(not addon.Profile.DR_StartUndressed or
 			(addon.Profile.DR_StartUndressed and not initUndress ))  then
-
 			self.Icon:SetDesaturated(false)
 		else
-			self.ShowItem = false
+			self.Force = nil
+			self.ViewLink = nil
+			self.ShowItem = nil
 			self.Icon:SetDesaturated(true)
-			DressingRoom:Undress(slot)
+			undress = true
 		end
 
 	else
+		self.Force = nil
+		self.itemLink = nil
+		self.ViewLink = nil
+		self.ShowItem = nil
 		self.Icon:Hide()
+		--self.Icon:SetDesaturated(true)
+		undress = true
+	end
+
+	if undress then
 		DressingRoom:Undress(slot)
 	end
+
 	self:SetItemFrameQuality()
 end
 
 
 function BW_DressingRoomItemDetailsMixin:OnMouseDown(button)
 	local slot = self:GetID()
+
+
 	local playerActor = DressUpFrame.ModelScene:GetPlayerActor()
 		if (not playerActor) then
 		return false
@@ -697,20 +774,36 @@ function BW_DressingRoomItemDetailsMixin:OnMouseDown(button)
 		if self.itemLink then
 			ChatEdit_InsertLink(self.itemLink)
 		end
+
 	elseif button == "RightButton" then
+		if slot == 16 and self.Ranged then 
+			DressingRoom:Undress(17)
+		elseif slot == 17 and self.Ranged then 
+			return
+		end
+
 		DressingRoom:Undress(slot)
-		self:Update(nil)
+		self:Update(nil, true)
 		GameTooltip:ClearLines()
 		GameTooltip:AddLine(_G[INVENTORY_SLOT_NAMES[self:GetID()]])
 		GameTooltip:Show()
 	else
 		if self.ShowItem then
 			self.ShowItem = false
+			if slot == 16 and self.Ranged then 
+				DressingRoom:Undress(17)
+			elseif slot == 17 and self.Ranged then 
+				return
+			end
 			DressingRoom:Undress(slot)
 			self.Icon:SetDesaturated(true);
 		else
 			self.ShowItem = true
-			playerActor:TryOn(self.itemLink);
+			if self.Artifact then
+				playerActor:TryOn(self.itemSource, nil, self.enchantID)
+			else
+				playerActor:TryOn(self.itemLink);
+			end
 			self.Icon:SetDesaturated(false);
 		end
 	end
@@ -848,8 +941,6 @@ local function DressupSettingsButton_OnClick(self)
 end
 
 
-
-
 local function BW_DressingRoomImportButton_OnClick(self)
 	local Profile = addon.Profile
 	local name  = addon.QueueList[3]
@@ -880,7 +971,7 @@ local function BW_DressingRoomImportButton_OnClick(self)
 				import = true
 				DressUpSources(sources)
 				import = false
-				C_Timer.After(0.2, function() BW_DressingRoomItemDetailsMixin:UpdateButtons(false, true) end)
+				C_Timer.After(0.2, function() BW_DressingRoomItemDetailsMixin:UpdateButtons("loadSet") end)
 			end,
 			isNotRadio = true,
 			notCheckable = true,
@@ -958,7 +1049,7 @@ function DressingRoom:SetTarget(arg1)
 			playerActor:SetModelByUnit(unit, sheatheWeapons, true);
 		end	
 	end
-	C_Timer.After(0.2, function() BW_DressingRoomItemDetailsMixin:UpdateButtons(false, true) end)
+	C_Timer.After(0.2, function() BW_DressingRoomItemDetailsMixin:UpdateButtons("loadSet") end)
 end
 BetterWardrobe.SetTarget = DressingRoom.SetTarget
 
@@ -1003,7 +1094,7 @@ function DressingRoom:INSPECT_READY(guid)
 	if #queued == 0 then
 		addon:UnregisterEvent("INSPECT_READY")
 		addon:UnregisterEvent("UNIT_INVENTORY_CHANGED")
-		C_Timer.After(0.2, function() BW_DressingRoomItemDetailsMixin:UpdateButtons(false, true) end)
+		C_Timer.After(0.2, function() BW_DressingRoomItemDetailsMixin:UpdateButtons("loadSet") end)
 	end
 end
 

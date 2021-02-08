@@ -12,7 +12,7 @@ Globals.ARMOR_MASK = {
   MAIL = 68,
   PLATE = 35,
 }
-
+--/dump GetSpellDescription(298886)
 Globals.CLASS_INFO = {
   DEATHKNIGHT = {6,32,"PLATE"},
   DEMONHUNTER = {12, 2048, "LEATHER"},
@@ -27,6 +27,23 @@ Globals.CLASS_INFO = {
   WARLOCK = {9, 256, "CLOTH"},
   WARRIOR = {1, 1, "PLATE"},
 }
+
+--[[
+
+bit.band(2,2053)
+
+DEATHKNIGHT
+a137006
+a137007
+
+a212612 -DEMONHUNTER
+a212613
+
+HUNTER
+]?a137015[Aspect of the Wild]?a137016[Trueshot]?a137017[Aspect of the Eagle]
+
+
+]]--
 
 Globals.ARMOR_CLASSES = {}
 for type in pairs(Globals.ARMOR_MASK ) do
@@ -67,6 +84,7 @@ Globals.INVENTORY_SLOT_NAMES = {
   [15] = "BACKSLOT",
   [16] = "MAINHANDSLOT",
   [17] = "SECONDARYHANDSLOT",
+  [18] = "MAINHANDSLOT",
   [19] = "TABARDSLOT",
   
   ["HEADSLOT"]          = 1,
@@ -103,7 +121,7 @@ Globals.INVENTORY_SLOT_NAMES = {
   ["INVTYPE_HOLDABLE"] =        17,
   ["INVTYPE_RANGED"] =          16,
   ["INVTYPE_THROWN"] =          16,
-  ["INVTYPE_RANGEDRIGHT"] =     17,
+  ["INVTYPE_RANGEDRIGHT"] =     16,
   ["INVTYPE_RELIC"] =           17,
   ["INVTYPE_TABARD"] =          19,
 }
