@@ -405,6 +405,19 @@ local function buildSetSubstitutions()
 		return SET_INDEX[setID]
 	end
 
+	function addon.GetSetArmorType(setID)
+		for index=1,4 do
+			local armorType = addon.Globals.ARMOR_TYPE[index]
+		for i, data in pairs(ArmorDB[armorType]) do
+
+			if data.setID == setID then 
+				print(setID)
+				return data.armorType
+			end
+		end
+	end
+	end
+
 	function addon.SetItemSubstitute(itemID, subID)
 		itemID = tonumber(itemID)
 		subID = tonumber(subID)

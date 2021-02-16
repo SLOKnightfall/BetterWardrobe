@@ -590,7 +590,8 @@ end
 	end
 end]]
 do
-local tempLink 
+local tempLink
+local tempSetID
 	hooksecurefunc("WardrobeCollectionFrame_OpenTransmogLink",  function(link) 
 
 		--if InCombatLockdown() then return end
@@ -621,7 +622,15 @@ local tempLink
 					local setID = tonumber(id);
 					BW_WardrobeCollectionFrame_SetTab(3);
 					--WardrobeCollectionFrame.SetsCollectionFrame:SelectSet(setID);
-					BW_WardrobeCollectionFrame.BW_SetsCollectionFrame:SelectSet(setID);
+					
+					local armorType = addon.GetSetArmorType(setID)
+					if addon.Globals.ARMOR_TYPE[armorType] ~= addon.selectedArmorType then 
+						addon.selectedArmorType = addon.Globals.ARMOR_TYPE[armorType]
+						BW_WardrobeCollectionFrame_SetTab(2)
+						BW_WardrobeCollectionFrame_SetTab(3)
+					end
+					tempSetID = setID
+					C_Timer.After(1.5, function() BW_WardrobeCollectionFrame.BW_SetsCollectionFrame:SelectSet(tempSetID); BW_WardrobeCollectionFrame.BW_SetsCollectionFrame:ScrollToSet(tempSetID); tempSetID = nil end)
 				end
 		
 	end)

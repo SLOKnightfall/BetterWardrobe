@@ -44,6 +44,7 @@ HUNTER
 
 
 ]]--
+Globals.ARMOR_TYPE = {"CLOTH", "LEATHER", "MAIL", "PLATE"}
 
 Globals.ARMOR_CLASSES = {}
 for type in pairs(Globals.ARMOR_MASK ) do
