@@ -641,6 +641,7 @@ local function CheckMissingLocation(setInfo)
 --function addon.Sets:GetLocationBasedCount(set)
 	local filtered = false
 	local invType = {}
+	local missingSelection = addon.Filters.Base.missingSelection
 
 		local sources = C_TransmogSets.GetSetSources(setInfo.setID)
 		for sourceID in pairs(sources) do
@@ -650,16 +651,16 @@ local function CheckMissingLocation(setInfo)
 				if #sources > 1 then
 					WardrobeCollectionFrame_SortSources(sources)
 				end
-				if  addon.missingSelection[sourceInfo.invType] and not sources[1].isCollected then
+				if  missingSelection[sourceInfo.invType] and not sources[1].isCollected then
 
 					return true
-				elseif addon.missingSelection[sourceInfo.invType] then 
+				elseif missingSelection[sourceInfo.invType] then 
 					filtered = true
 				end
 			end
 		end
 
-	for type, value in pairs(addon.missingSelection) do
+	for type, value in pairs(missingSelection) do
 		if value and invType[type] then
 			filtered = true
 		end
@@ -691,8 +692,9 @@ function SetsDataProvider:GetBaseSets()
 		local atTransmogrifier = WardrobeFrame_IsAtTransmogrifier()
 
 		local filteredSets = {}
+		local xpacSelection = addon.Filters.Base.xpacSelection
 		for i, data in ipairs(self.baseSets) do
-			if (addon.xpacSelection[data.expansionID + 1] and CheckMissingLocation(data)) or atTransmogrifier  then 
+			if (xpacSelection[data.expansionID + 1] and CheckMissingLocation(data)) or atTransmogrifier  then 
 				tinsert(filteredSets, data)
 			end
 		end

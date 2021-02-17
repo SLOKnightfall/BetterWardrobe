@@ -353,7 +353,9 @@ end
 local function CheckMissingLocation(setInfo)
 --function addon.Sets:GetLocationBasedCount(setInfo)
 	local filtered = false
-	for type, value in pairs(addon.missingSelection) do
+	local missingSelection = addon.Filters.Extra.missingSelection
+
+	for type, value in pairs(missingSelection) do
 		if value then
 			filtered = true
 			break
@@ -367,24 +369,25 @@ local function CheckMissingLocation(setInfo)
 		local sources = C_TransmogSets.GetSetSources(setInfo.setID)
 		for sourceID in pairs(sources) do
 			local isCollected = Sets.isMogKnown(sourceID) 
-			if addon.missingSelection[sourceInfo.invType] and not isCollected then		
+			if missingSelection[sourceInfo.invType] and not isCollected then		
 				return true
-			elseif addon.missingSelection[sourceInfo.invType] then 
+			elseif missingSelection[sourceInfo.invType] then 
 				filtered = true
 			end
 		end
 	else
-		for sourceID, isCollected in pairs(setInfo.setSources) do
+		local setSources = addon.GetSetsources(setInfo.setID)
+		for sourceID, isCollected in pairs(setSources) do
 			local sourceInfo = C_TransmogCollection.GetSourceInfo(sourceID)
-			if addon.missingSelection[sourceInfo.invType] and not isCollected then
+			if missingSelection[sourceInfo.invType] and not isCollected then
 				return true
-			elseif addon.missingSelection[sourceInfo.invType] then 
+			elseif missingSelection[sourceInfo.invType] then 
 				filtered = true 
 			end
 		end
 	end
 
-	for type, value in pairs(addon.missingSelection) do
+	for type, value in pairs(missingSelection) do
 		if value and invType[type] then
 			filtered = true
 		end
@@ -419,16 +422,21 @@ function SetsDataProvider:FilterSearch(useBaseSet)
 		searchString = string.lower(WardrobeCollectionFrameSearchBox:GetText())
 	end
 
+	local filterCollected = addon.Filters.Extra.filterCollected
+	local missingSelection = addon.Filters.Extra.missingSelection
+	local filterSelection = addon.Filters.Extra.filterSelection
+	local xpacSelection = addon.Filters.Extra.xpacSelection
+
 	for i, data in ipairs(baseSets) do
 		local setData = SetsDataProvider:GetSetSourceData(data.setID)
 		local count , total = setData.numCollected, setData.numTotal
 		local unavailable = setData.unavailable
 		local collected = count == total
-		if ((addon.filterCollected[1] and collected) or
-			(addon.filterCollected[2] and not collected)) and
+		if ((filterCollected[1] and collected) or
+			(filterCollected[2] and not collected)) and
 			CheckMissingLocation(data) and
-	 		addon.xpacSelection[data.expansionID] and
-			addon.filterSelection[data.filter] and
+	 		xpacSelection[data.expansionID] and
+			filterSelection[data.filter] and
 			(not unavailable or (addon.Profile.HideUnavalableSets and unavailable)) and
 			(searchString and string.find(string.lower(data.name), searchString)) then -- or string.find(baseSet.label, searchString) or string.find(baseSet.description, searchString)then
 			tinsert(filteredSets, data)
@@ -840,6 +848,8 @@ function BetterWardrobeSetsCollectionMixin:OnShow()
 	WardrobeCollectionFrame.progressBar:Show()
 	self:UpdateProgressBar()
 	self:RefreshCameras()
+
+	self:OnSearchUpdate()
 
 	--if (self:GetParent().SetsTabHelpBox:IsShown()) then
 		--self:GetParent().SetsTabHelpBox:Hide()
@@ -2416,6 +2426,7 @@ function BW_WardrobeCollectionFrame_OnShow(self)
 	addon.selectedArmorType = addon.Globals.CLASS_INFO[playerClass][3]
 --SetsDataProvider:GetBaseSets()
 	addon.BuildClassArtifactAppearanceList()
+
 end
 
 
@@ -2435,7 +2446,7 @@ function BW_WardrobeCollectionFrame_OnHide(self)
 	WardrobeCollectionFrame.selectedCollectionTab = TAB_ITEMS
 	BW_WardrobeCollectionFrame.selectedCollectionTab = TAB_ITEMS
 
-	addon:InitTables()
+	--addon:InitTables()
 	SetsDataProvider:ClearSets()
 	addon:ClearCache()
 	addon.selectedArmorType = addon.Globals.CLASS_INFO[playerClass][3]

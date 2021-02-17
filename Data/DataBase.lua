@@ -154,6 +154,7 @@ do
 						--end
 					end]]
 
+
 					if setData.sources and setData.sources[item] and setData.sources[item] ~= 0 then 
 						local appearanceID = setData.sources[item]
 						ItemDB[appearanceID] = ItemDB[appearanceID] or {}
