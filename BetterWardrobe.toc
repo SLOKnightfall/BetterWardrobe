@@ -6,6 +6,7 @@
 ## Notes: 
 ## LoadOnDemand: 1
 ## LoadWith: Blizzard_Collections
+## OptionalDeps: PetTracker
 ## SavedVariables: BetterWardrobe_Options, BetterWardrobe_CharacterData, BetterWardrobe_SavedSetData,BetterWardrobe_SubstituteItemData, BetterWardrobe_ListData
 
 #Libraries
@@ -53,6 +54,7 @@ Modules\ArtifactAppearances.lua
 Plugins\ElvUI.lua
 Plugins\CanIMogIt.lua
 Plugins\MogIt.lua
+
 #Data files
 Data\CameraData.lua
 Data\AppearanceData.lua

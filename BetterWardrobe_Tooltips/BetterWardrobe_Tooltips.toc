@@ -3,6 +3,7 @@
 ## Version: @project-version@
 ## Game Version: 9.0.2
 ## Author: SLOKnightfall
+## OptionalDeps: PetTracker
 ## Notes: Loader addon to display tooltips
 
 BetterWardrobe_Tooltips.lua

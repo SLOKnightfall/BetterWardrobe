@@ -331,7 +331,8 @@ function CollectionList:CreateDropdown()
 
 	--BW_CollectionList_Dropdown = BW_UIDropDownMenu_Create("BW_CollectionList_Dropdown", BW_ColectionListFrame)
 	BW_CollectionList_Dropdown:SetPoint("BOTTOM", -80, 15)
-	BW_CollectionList_Dropdown:SetFrameLevel(500)
+	local level = BW_ColectionListFrame:GetFrameLevel()
+	BW_CollectionList_Dropdown:SetFrameLevel(level+1)
 	--BW_UIDropDownMenu_SetWidth(BW_CollectionList_Dropdown, 157) -- Use in place of dropDown:SetWidth
 -- Bind an initializer function to the dropdown; see previous sections for initializer function examples.
 	BW_UIDropDownMenu_Initialize(BW_CollectionList_Dropdown, CollectionList.Dropdown_Initialize)

@@ -827,7 +827,7 @@ function BW_WardrobeCollectionFrame_SetTab(tabID)
 
 	BW_WardrobeCollectionFrame.BW_SetsCollectionFrame:Hide()
 	BW_WardrobeCollectionFrame.BW_SetsTransmogFrame:Hide()
-		BW_ColectionListFrame:SetShown(tab1 and not atTransmogrifier)
+	BW_ColectionListFrame:SetShown(WardrobeCollectionFrame:IsShown() and tab1 and not atTransmogrifier)
 	BW_WardrobeCollectionFrame.BW_SetsHideSlotButton:Hide()
 
 	BW_WardrobeToggle:SetShown(tab2 or tab3 or tab4 )

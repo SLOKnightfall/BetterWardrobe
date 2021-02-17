@@ -1297,8 +1297,10 @@ end
 function BetterWardrobeSetsCollectionMixin:GetSelectedSavedSetID()
 	if not self.selectedSavedSetID then
 		local savedSets = addon.GetSavedList()
-		if savedSets then 
+		if savedSets and #savedSets > 0  then 
 			self.selectedSavedSetID = savedSets[1].setID
+		else 
+			self.selectedSavedSetID = nil
 		end
 	end
 
@@ -2395,7 +2397,7 @@ function BW_WardrobeCollectionFrame_OnShow(self)
 	end
 	BW_WardrobeCollectionFrame_UpdateTabButtons()
 
-	if #addon.GetSavedList() > 0 then 
+	--if #addon.GetSavedList() > 0 then 
 		WardrobeCollectionFrame.progressBar:SetWidth(130)
 		WardrobeCollectionFrame.progressBar.border:SetWidth(139)
 		WardrobeCollectionFrame.progressBar:ClearAllPoints()
@@ -2408,7 +2410,7 @@ function BW_WardrobeCollectionFrame_OnShow(self)
 		WardrobeCollectionFrame.searchBox:SetWidth(90)
 		BW_WardrobeCollectionFrameTab4:Show()
 		WardrobeCollectionFrame.FilterButton:SetWidth(83)
-	end
+	--end
 
 	addon.setdb.global.sets[addon.setdb:GetCurrentProfile()] = addon.GetSavedList()
 	addon.selectedArmorType = addon.Globals.CLASS_INFO[playerClass][3]
