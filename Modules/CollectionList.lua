@@ -460,6 +460,7 @@ function CollectionList:IsInList(itemID, itemType, full)
 
 		for i, data in ipairs(profile) do
 			local collectionList = profile[i]
+			if not collectionList then return end
 			local isInList = collectionList[itemType][itemID]
 			if isInList then count = count + 1 end
 		end
@@ -506,6 +507,7 @@ function CollectionList:SelectedCollectionList(value)
 		addon.collectionListDB.profile.selectedCollectionList = value
 		BW_UIDropDownMenu_SetSelectedID(BW_CollectionList_Dropdown, value)
 		local list = CollectionList:CurrentList()
+		if not list then return end
 		BW_CollectionList_DropdownText:SetText(list.name)
 
 	end
