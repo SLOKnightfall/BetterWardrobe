@@ -1163,7 +1163,9 @@ function BetterWardrobeSetsCollectionMixin:DisplaySet(setID)
 		self:SetItemFrameQuality(itemFrame)
 		itemFrame:SetPoint("TOP", self.DetailsFrame, "TOP", xOffset + (i - 1) * BUTTON_SPACE, -94)
 		itemFrame:Show()
-		if not addon.setdb.profile.autoHideSlot.toggle or( addon.setdb.profile.autoHideSlot.toggle and not addon.setdb.profile.autoHideSlot[sortedSources[i].invType -1]) then
+		local invType = sortedSources[i].invType - 1
+		if invType  == 20 then invType = 5 end
+		if not addon.setdb.profile.autoHideSlot.toggle or( addon.setdb.profile.autoHideSlot.toggle and not addon.setdb.profile.autoHideSlot[invType]) then
 			self.Model:TryOn(sortedSources[i].sourceID)
 		end
 	end
