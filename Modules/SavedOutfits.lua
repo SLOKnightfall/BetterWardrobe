@@ -96,7 +96,7 @@ end
 
 
 local function IsDefaultSet(outfitID)
-		return outfitID < MAX_DEFAULT_OUTFITS  -- #C_TransmogCollection.GetOutfits()--MAX_DEFAULT_OUTFITS 
+	return outfitID < MAX_DEFAULT_OUTFITS  -- #C_TransmogCollection.GetOutfits()--MAX_DEFAULT_OUTFITS 
 end
 
 
@@ -247,8 +247,8 @@ function BW_WardrobeOutfitMixin:LoadOutfit(outfitID)
 	if (not outfitID) then
 		return
 	end
-local MogItOutfit = false
-if outfitID > 1000 then MogItOutfit = true end
+	local MogItOutfit = false
+	if outfitID > 1000 then MogItOutfit = true end
 
 
 	if IsDefaultSet(outfitID) then 
@@ -531,7 +531,6 @@ function BW_WardrobeOutfitMixin:CheckOutfitForSave(name)
 	local mainHandEnchant, offHandEnchant
 	local pendingSources = {}
 	local hadInvalidSources = false
-
 	for key, transmogSlot in pairs(TRANSMOG_SLOTS) do
 		local sourceID = self:GetSlotSourceID(transmogSlot.location);
 		if (sourceID ~= NO_TRANSMOG_SOURCE_ID) then
@@ -624,6 +623,7 @@ function BW_WardrobeOutfitFrameMixin:Toggle(dropDown)
 	end
 end
 
+
 local function GetButton(self, index)
 	local buttons = self.Buttons
 	local button = buttons[index]
@@ -638,9 +638,8 @@ local function GetButton(self, index)
 				button:SetPoint("TOPRIGHT", buttons[index-1], "BOTTOMRIGHT", 0, 0)
 			end
 		return button 
-
-
 end
+
 
 function BW_WardrobeOutfitFrameMixin:Update()
 	local outfits = GetOutfits(true)
@@ -708,7 +707,7 @@ local function GetDressingRoomSources()
 		local slot = button:GetID()
 
 		itemlink = button.itemLink --GetInventoryItemLink("player", slot)
-		if itemlink then
+		if itemlink and not button.isHidden then
 			local appearanceID, sourceID = C_TransmogCollection.GetItemInfo(itemlink)
 			sources[slot] =  sourceID
 			if sourceID and not icon then
@@ -723,15 +722,11 @@ end
 function BW_WardrobeOutfitFrameMixin:SaveOutfit(name)
 	local outfitID = LookupOutfitIDFromName(name) --or  ((#C_TransmogCollection.GetOutfits() <= MAX_DEFAULT_OUTFITS) and #C_TransmogCollection.GetOutfits() -1 ) -- or #GetOutfits()-1
 	local icon
-	local sources = {}--self.sources or GetDressingRoomSources()
-	local mainHandEnchant = self.mainHandEnchant or 0
-	local offHandEnchant = self.offHandEnchant or 0
 	local outfit
 
 	if DressUpFrame:IsShown() then
-		sources, icon  = GetDressingRoomSources()
+		self.sources, icon  = GetDressingRoomSources()
 	else
-		sources = self.sources
 		for key, transmogSlot in pairs(TRANSMOG_SLOTS) do
 			if ( transmogSlot.location:IsAppearance() ) then
 				local slotID = transmogSlot.location:GetSlotID();
@@ -747,19 +742,19 @@ function BW_WardrobeOutfitFrameMixin:SaveOutfit(name)
 	end
 
 	if (outfitID and IsDefaultSet(outfitID)) or (#C_TransmogCollection.GetOutfits() < MAX_DEFAULT_OUTFITS)  then 
-		outfitID = C_TransmogCollection.SaveOutfit(name, sources, mainHandEnchant, offHandEnchant, icon)
+		outfitID = C_TransmogCollection.SaveOutfit(name, self.sources, self.mainHandEnchant, self.offHandEnchant, icon)
 	else
 		if outfitID then 
-			addon.OutfitDB.char.outfits[LookupIndexFromID(outfitID)] = sources
+			addon.OutfitDB.char.outfits[LookupIndexFromID(outfitID)] = self.sources
 			outfit = addon.OutfitDB.char.outfits[LookupIndexFromID(outfitID)]
 		else
-			tinsert(addon.OutfitDB.char.outfits, sources)
+			tinsert(addon.OutfitDB.char.outfits, self.sources)
 			outfit = addon.OutfitDB.char.outfits[#addon.OutfitDB.char.outfits]
 		end
 
 		outfit["name"] = name
-		outfit["mainHandEnchant"] = mainHandEnchant
-		outfit["offHandEnchant"] = offHandEnchant
+		outfit["mainHandEnchant"] = self.mainHandEnchant or 0
+		outfit["offHandEnchant"] = self.offHandEnchant or 0
 		local icon = select(4, C_TransmogCollection.GetAppearanceSourceInfo(outfit[1]))
 		outfit["icon"] = icon
 		--outfitID = index
@@ -812,20 +807,14 @@ function BW_WardrobeOutfitFrameMixin:NameOutfit(newName, outfitID)
 	end
 
 	if outfitID and IsDefaultSet(outfitID) then
-			-- this is a rename
+	-- this is a rename
 		C_TransmogCollection.ModifyOutfit(outfitID, newName)
 	elseif outfitID then 
 		local index = LookupIndexFromID(outfitID)
 		addon.OutfitDB.char.outfits[index].name = newName
 	else
 		-- this is a new outfit
-		--self:SaveOutfit(newName)
-		--if DressUpFrame:IsShown() then
-			--BW_DressingRoomOutfitFrameMixin:SaveOutfit(newName)
-		--else
-
-			self:SaveOutfit(newName)
-		--end
+		self:SaveOutfit(newName)
 	end
 end
 
@@ -887,7 +876,7 @@ function BW_WardrobeOutfitFrameMixin:EvaluateSaveState()
 			BW_WardrobeOutfitFrame:ShowPopup("TRANSMOG_OUTFIT_ALL_INVALID_APPEARANCES")
 		end
 	else
-		BW_WardrobeOutfitFrame:ContinueWithSave()
+		self:ContinueWithSave()
 	end
 end
 
@@ -897,7 +886,7 @@ function BW_WardrobeOutfitFrameMixin:ContinueWithSave()
 		--if DressUpFrame:IsShown() then
 			--BW_DressingRoomOutfitFrameMixin:SaveOutfit(self.name)
 		--else
-			BW_WardrobeOutfitFrame:SaveOutfit(self.name)
+		BW_WardrobeOutfitFrame:SaveOutfit(self.name)
 		--end
 		BW_WardrobeOutfitFrame:ClosePopups()
 	else
@@ -965,6 +954,7 @@ function BW_WardrobeOutfitFrameMixin:CreateScrollFrame()
 	self.Buttons = self.moduleoptions.Buttons
 end
 
+
 --===================================================================================================================================
 BW_WardrobeOutfitButtonMixin = {} --CreateFromMixins(WardrobeOutfitButtonMixin)
 
@@ -981,6 +971,7 @@ function BW_WardrobeOutfitButtonMixin:OnClick()
 		BW_WardrobeOutfitFrame.dropDown:CheckOutfitForSave()
 	end
 end
+
 
 --===================================================================================================================================
 BW_WardrobeOutfitEditFrameMixin = CreateFromMixins(WardrobeOutfitEditFrameMixin)-- {}
@@ -1014,6 +1005,7 @@ function BW_WardrobeOutfitEditFrameMixin:OnAccept()
 	StaticPopupSpecial_Hide(self)
 	BW_WardrobeOutfitFrame:NameOutfit(self.EditBox:GetText(), self.outfitID)
 end
+
 
 --===================================================================================================================================
 BW_WardrobeOutfitCheckAppearancesMixin = CreateFromMixins(WardrobeOutfitCheckAppearancesMixin)

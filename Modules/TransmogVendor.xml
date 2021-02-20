@@ -2,7 +2,7 @@
 ..\FrameXML\UI.xsd">
 	<Script file="Randomizer.lua"/>
 
-	<Button name ="BetterWardrobeButtonTemplate" inherits="UIMenuButtonStretchTemplate" virtual="true" hidden="false">
+	<Button name ="BetterWardrobeButtonTemplate" inherits="SquareIconButtonTemplate" mixin="BW_DressingRoomButtonMixin" virtual="true" hidden="false">
 		<Size x="20" y="20"/>
 		<Layers>
 			<Layer level="ARTWORK">
@@ -16,7 +16,8 @@
 		</Layers>
 		<HighlightTexture file="Interface\Buttons\UI-Common-MouseHilight" alphaMode="ADD"/>
 		<Scripts>
-			<OnLeave function="GameTooltip_Hide"/>
+				<OnClick method="OnEnter" />
+				<OnLeave method="OnLeave" />
 		</Scripts>
 	</Button>
 

@@ -53,8 +53,10 @@ function UI:CreateButtons()
 	local BW_LoadQueueButton = CreateFrame("Button", "BW_LoadQueueButton", WardrobeTransmogFrame, "BetterWardrobeButtonTemplate")
 	BW_LoadQueueButton.Icon:SetTexture("Interface\\Buttons\\UI-OptionsButton")
 	BW_LoadQueueButton:SetPoint("TOPLEFT", WardrobeOutfitDropDown, "TOPRIGHT", 80 ,-5)
+	BW_LoadQueueButton.buttonID = "Import"
 	BW_LoadQueueButton:SetScript("OnClick", function(self) BW_TransmogVendorExportButton_OnClick(self) end)
-	BW_LoadQueueButton:SetScript("OnEnter", function(self) BW_DressingRoomButton_OnEnter(self, "Import") end)
+	--BW_LoadQueueButton:SetScript("OnEnter",  function(self) BW_DressingRoomButtonMixin:OnEnter(self) end)
+
 
 	--Randomize Button, Mixin defined in Randomizer.lua
 	local BW_RandomizeButton = CreateFrame("Button", "BW_RandomizeButton", WardrobeTransmogFrame, "BetterWardrobeButtonTemplate")
@@ -66,10 +68,9 @@ function UI:CreateButtons()
 	BW_RandomizeButton:SetScript("OnEnter", BW_RandomizeButton.OnEnter)
 
 	local BW_SlotHideButton = CreateFrame("Button", "BW_SlotHideButton", WardrobeTransmogFrame, "BetterWardrobeButtonTemplate")
-	BW_SlotHideButton:SetScript("OnEnter", function(self) BW_DressingRoomButton_OnEnter(self, "HideSlot") end)
-
-
-
+	BW_SlotHideButton.buttonID = "HideSlot"
+	--BW_SlotHideButton:SetScript("OnEnter", function(self) BW_DressingRoomButtonMixin:OnEnter() end)
+	
 	BW_SlotHideButton.Icon:SetTexture("Interface\\PvPRankBadges\\PvPRank12")
 	--Mixin(BW_SlotHideButton, BW_SlotHideButtonMixin)
 	BW_SlotHideButton:SetPoint("TOPLEFT", BW_RandomizeButton, "TOPRIGHT" , 0, 0)
