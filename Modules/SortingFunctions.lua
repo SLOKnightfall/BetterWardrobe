@@ -507,9 +507,8 @@ function addon.SortSet(sets, reverseUIOrder, ignorePatchID)
 		addon.SetSortOrder()
 		addon.Sort[GetTab()][addon.sortDB.sortDropdown](self, sets, reverseUIOrder or IsModifierKeyDown(), ignorePatchID)
 	else
-		addon.sortDB.reverse = false
+		addon.sortDB.reverse = true
 		addon.SetSortOrder()
 		addon.Sort[TAB_SAVED_SETS][LE_DEFAULT](self, sets, reverseUIOrder or IsModifierKeyDown(), ignorePatchID)
-
 	end
 end

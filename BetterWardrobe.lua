@@ -536,6 +536,11 @@ function SetsDataProvider:GetUsableSets(incVariants)
 		local atTransmogrifier = WardrobeFrame_IsAtTransmogrifier()
 		local countData
 
+		if (BW_WardrobeCollectionFrame.selectedCollectionTab == 4  or BW_WardrobeCollectionFrame.selectedTransmogTab == 4) then
+			self.usableSets = availableSets
+	 		return self.usableSets	
+		end
+
 		--Generates Useable Set
 		self.usableSets = {} --SetsDataProvider:GetUsableSets()
 		for i, set in ipairs(availableSets) do
@@ -1332,7 +1337,7 @@ end
 function BetterWardrobeSetsCollectionMixin:SelectSet(setID)
 	if BW_WardrobeCollectionFrame.selectedCollectionTab == 4 then
 		self:SelectSavedSet(setID)
-		self.selectedSavedSetID = setID
+		--self.selectedSavedSetID = setID
 	else
 		self.selectedSetID = setID
 	end
@@ -2051,13 +2056,8 @@ end
 
 
 function BetterWardrobeSetsTransmogMixin:UpdateSets()
-	local usableSets
-
-	if BW_WardrobeCollectionFrame.selectedTransmogTab == 4 or BW_WardrobeCollectionFrame.selectedCollectionTab == 4 then
-			usableSets = addon.GetSavedList()
-	else 
-		usableSets = SetsDataProvider:GetUsableSets()
-	end
+	SetsDataProvider:ClearSets()
+	local usableSets = SetsDataProvider:GetUsableSets()
 
 	self.PagingFrame:SetMaxPages(ceil(#usableSets / self.PAGE_SIZE))
 	local pendingTransmogModelFrame = nil
@@ -2186,13 +2186,14 @@ end
 
 function BetterWardrobeSetsTransmogMixin:ResetPage()
 	local page = 1
-
 	if (self.selectedSetID) then
+
 		local usableSets = SetsDataProvider:GetUsableSets()
 		self.PagingFrame:SetMaxPages(ceil(#usableSets / self.PAGE_SIZE))
 		for i, set in ipairs(usableSets) do
 			if (set.setID == self.selectedSetID) then
 				page = GetPage(i, self.PAGE_SIZE)
+
 				break
 			end
 		end
