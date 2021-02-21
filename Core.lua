@@ -615,13 +615,7 @@ local options = {
 							type = "toggle",
 
 						},
-						DR_ShowNarcissusButtons = {
-							order = 2.1,
-							name = L["Show Narcissus Buttons"],
-							type = "toggle",
-							width = 1.5,
 
-						},
 						DR_ShowControls = {
 							order = 3,
 							name = L["Show DressingRoom Controls"],

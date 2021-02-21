@@ -121,7 +121,7 @@ local function BuildDruidAppearances(artifactID, table)
 		local _, specName  = GetSpecializationInfoByID(artifactData.specID)
 		local camera
 
-		for _,i in pairs(index) do
+		for _, i in pairs(index) do
 			local data = artifactData.sets[i]
 			local appearanceID, sourceID = C_TransmogCollection.GetItemInfo(artifactID, i)
 			--local sources = WardrobeCollectionFrame_GetSortedAppearanceSources(appearanceID)

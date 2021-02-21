@@ -27,7 +27,7 @@ local GetIllusionSourceInfo = C_TransmogCollection.GetIllusionSourceInfo
 local newSet = {items = {}}
 -------------------------------
 local ItemList = {}
-local EmptySlotAlpha = 0.4 
+local EmptySlotAlpha = 0.4
 local UnitInfo = {
 	raceID = nil,
 	genderID = nil,
@@ -38,27 +38,40 @@ local HideArmorOnShow = false
 local HideWeaponOnShow = false
 local HideTabardOnShow = false
 local HideShirtOnShow = false
-local UseTargetModel = true;  
+local UseTargetModel = true
+local forceView = true
+local inspectView = false
 
 local TP = CreateFrame("GameTooltip", "BW_VirtualTooltip", nil, "GameTooltipTemplate")
 TP:SetScript("OnLoad", GameTooltip_OnLoad)
 TP:SetOwner(UIParent, 'ANCHOR_NONE')
+
+function BetterWardrobe:ToggleDressingRoom()
+		if DressUpFrame:IsShown() then 
+			HideUIPanel(DressUpFrame)
+		else
+			DressUpFrame_Show(DressUpFrame)
+		end
+		UpdateDressingRoom()
+end
 
 function addon.Init:DressingRoom()
 	DressingRoom:CreateDropDown()
 	Buttons = BW_DressingRoomFrame.PreviewButtonFrame.Slots
 	Profile = addon.Profile
 
-	if addon.Profile.DR_OptionsEnable then 
+	if addon.Profile.DR_OptionsEnable then
 		addon:DressingRoom_Enable()
+	else
+		addon:DressingRoom_Disable()
 	end
 end
+
 
 --Creates the Dressing Room Outfit Dropdown using the menu library
 function DressingRoom:CreateDropDown()
 	--local f = BW_UIDropDownMenu_Create("BW_DressingRoomOutfitDropDown", DressUpFrame)
 	local f  = CreateFrame("Frame", "BW_DressingRoomOutfitDropDown", DressUpFrame, "BW_UIDropDownMenuTemplate")
-
 	f.width = 163
 	f.minMenuStringWidth = 127
 	f.maxMenuStringWidth = 190
@@ -71,10 +84,9 @@ function DressingRoom:CreateDropDown()
 	local button = _G[f:GetName().."Button"]
 	f.SaveButton:SetPoint("LEFT", button, "RIGHT", 3, 0)
 	f.SaveButton:SetScript("OnClick", function(self)
-					PlaySound(SOUNDKIT.IG_MAINMENU_OPTION_CHECKBOX_ON);
-					local dropDown = self:GetParent();
-					print("clicky")
-					dropDown:CheckOutfitForSave(BW_UIDropDownMenu_GetText(dropDown));
+					PlaySound(SOUNDKIT.IG_MAINMENU_OPTION_CHECKBOX_ON)
+					local dropDown = self:GetParent()
+					dropDown:CheckOutfitForSave(BW_UIDropDownMenu_GetText(dropDown))
 				end)
 	f.SaveButton:SetText(SAVE)
 	f:SetScript("OnLoad", f.OnLoad)
@@ -88,16 +100,19 @@ function DressingRoom:CreateDropDown()
 end
 
 
+local reset = false
+local defaultWidth, defaultHeight = 450, 545
 function addon:DressingRoom_Enable()
+	BW_DressingRoomFrame:Show()
 	--hooksecurefunc("DressUpVisual", UpdateDressingRoom)
-
-	addon:SecureHook("DressUpVisual", UpdateDressingRoom)
-	addon:SecureHook("DressUpSources", UpdateDressingRoom)
+	--addon:SecureHook("DressUpVisual", UpdateDressingRoom)
+	--addon:SecureHook("DressUpSources", function() UpdateDressingRoom() end)
 	--addon:SecureHook("DressUpFrame_OnDressModel",function(self) DressingRoom:OnDressModel(self) end)
 				
 	--DressUpFrame.MaximizeMinimizeFrame:SetOnMaximizedCallback(DressingRoom.SetFrameSize)
 
-	addon:HookScript(DressUpFrameResetButton,"OnClick", function() 
+	addon:HookScript(DressUpFrameResetButton,"OnClick", function()
+		reset = true
 		HideArmorOnShow = addon.Profile.DR_StartUndressed
 		HideWeaponOnShow = addon.Profile.DR_HideWeapons
 		HideTabardOnShow = addon.Profile.DR_HideTabard
@@ -105,31 +120,48 @@ function addon:DressingRoom_Enable()
 		UpdateDressingRoom()
 	end)
 
+	local ReScaleFrame = DressUpFrame.MaximizeMinimizeFrame
+	
+	if ReScaleFrame then
+		local function OnMaximize(frame)
+			if Profile.DR_ResizeWindow then
+				frame:GetParent():SetSize(Profile.DR_Width, Profile.DR_Height)   --Override DressUpFrame Resize Mixin
+			else
+				frame:GetParent():SetSize(defaultWidth, defaultHeight)   --Override DressUpFrame Resize Mixin
+			end
+			UpdateUIPanelPositions(frame)
+		end
+		ReScaleFrame:SetOnMaximizedCallback(OnMaximize)
+	end
+
+	DressUpFrame:SetMovable(true)
+	DressUpFrame:RegisterForDrag("LeftButton")
+	DressUpFrame:SetScript("OnDragStart", DressUpFrame.StartMoving)
+	DressUpFrame:SetScript("OnDragStop", DressUpFrame.StopMovingOrSizing)
+
 	--addon:HookScript(DressUpFrame.MaximizeMinimizeFrame.MaximizeButton,"OnClick", function()  C_Timer.After(0, function() DressingRoom:SetFrameSize() end) end)
 end
 
 function addon:DressingRoom_Disable()
-	addon:Unhook("DressUpVisual")
+	BW_DressingRoomFrame:Hide()
+	--addon:Unhook("DressUpVisual")
 	addon:Unhook("DressUpSources")
-	addon:Unhook("DressUpFrame_OnDressModel")
+	--addon:Unhook("DressUpFrame_OnDressModel")
 	addon:Unhook(DressUpFrameResetButton,"OnClick")
 	--addon:Unhook(DressUpFrame.MaximizeMinimizeFrame.MaximizeButton,"OnClick")
 
-	BW_DressingRoomFrame:Hide()
-	--DressUpFrame:SetMovable(false)
-	--DressUpFrame:SetScript("OnDragStart", nil)
-	--DressUpFrame:SetScript("OnDragStop", nil)
-			
---	local function OnMaximize(frame)
-		--DressUpFrame:SetSize(450, 545);
-		--UpdateUIPanelPositions(frame);
-	--end		
-	--DressUpFrame.MaximizeMinimizeFrame:SetOnMaximizedCallback(OnMaximize)
+	DressUpFrame:SetMovable(false)
+	DressUpFrame:SetScript("OnDragStart", nil)
+	DressUpFrame:SetScript("OnDragStop", nil)
 
-	--if not GetCVarBool("miniDressupFrame") then 
-		--OnMaximize(DressUpFrame)	
-	--end
-	--addon.Profile.DR_OptionsEnable
+	local ReScaleFrame = DressUpFrame.MaximizeMinimizeFrame
+	if ReScaleFrame then
+		local function OnMaximize(frame)
+			frame:GetParent():SetSize(defaultWidth, defaultHeight)   --Override DressUpFrame Resize Mixin
+			UpdateUIPanelPositions(frame)
+		end
+		ReScaleFrame:SetOnMaximizedCallback(OnMaximize)
+	end
 end
 
 local function IsAppearanceKnown(itemLink)
@@ -157,199 +189,178 @@ end
 
 
 local rangedWeapon
-
 local function GetDressUpModelSlotSource(slotID, enchantID)
 	local playerActor = DressUpFrame.ModelScene:GetPlayerActor()
 	if (not playerActor) then
 		return
 	end
+
 	local appliedSourceID, illusionSourceID = playerActor:GetSlotTransmogSources(slotID)
-	local illusionName, isIllusionCollected, illusionHyperlink, illusionVisualID
-	if illusionSourceID and illusionSourceID ~= 0 then
-		local illusionSourceInfo = GetTransmogSourceInfo(illusionSourceID)
-		--print("illusionSourceID: "..illusionSourceID)
-		if illusionSourceInfo then
-			isIllusionCollected = illusionSourceInfo.isCollected
-			illusionVisualID, illusionName, illusionHyperlink = GetIllusionSourceInfo(illusionSourceID)
-			--print(illusionName)
-		end
-	end
+
 	if appliedSourceID < 0 then return end
 
 	local sourceInfo = GetTransmogSourceInfo(appliedSourceID)
 	if not sourceInfo then return end
 	local sourceType = sourceInfo.sourceType
-	local visualID = sourceInfo.sourceInfo
 	local itemModID = sourceInfo.itemModID
 	local itemID = sourceInfo.itemID
-	local itemName = sourceInfo.name 
-	local appearanceID, sourceID = GetTransmogItemInfo(itemID, itemModID)							        --appearanceID, sourceID
+	local itemName = sourceInfo.name
+	local appearanceID, sourceID = GetTransmogItemInfo(itemID, itemModID)
 	local itemIcon = C_TransmogCollection.GetSourceIcon(appliedSourceID)
-	local categoryID = sourceInfo.categoryID
 	local itemLink = select(6, C_TransmogCollection.GetAppearanceSourceInfo(appliedSourceID))
 	local hasAppearance = PlayerHasTransmog(itemID, itemModID) or IsAppearanceKnown(itemLink)
-	local itemQuality = sourceInfo.quality or 12	
 
-	if categoryID == 25 or categoryID == 26 or categoryID == 27 then 
-		rangedWeapon = true
-	elseif categoryID >= 12 then
-		rangedWeapon = false
-	end		
+	if slotID == 16 or slotID == 17 then 
+		local _, _, _, _, _, _, _, _, _, _, _, classID, subclassID = GetItemInfo(itemLink)
+		if classID == LE_ITEM_CLASS_WEAPON then
+			if subclassID == LE_ITEM_WEAPON_BOWS or subclassID == LE_ITEM_WEAPON_GUNS or subclassID == LE_ITEM_WEAPON_CROSSBOW then 
+				rangedWeapon = true
+			else
+				rangedWeapon = false
+			end
+		end	
+	end
 
 	return appliedSourceID, appearanceID, itemIcon, hasAppearance, itemLink, itemName, itemID
 end
 
+
 local function GetDressingSource(mainHandEnchant, offHandEnchant)
-	local button, appliedSourceID, icon, itemLink, itemName, itemID, bonusID, sourceTextColorized, isIllusionCollected, illusionHyperlink
 	local enchantID
 	local sharedActor = DressUpFrame.ModelScene:GetPlayerActor()
 
 	wipe(newSet.items)
 	wipe(ItemList)
 
+	
 	for _, button in pairs(Buttons) do
 		local slotID = button:GetID()
-			if slotID == 16 then
-				enchantID = mainHandEnchant or ""
-			elseif slotID == 17 then
-				enchantID = offHandEnchant or ""
-			else
-				enchantID = ""
+		if slotID == 16 then
+			enchantID = mainHandEnchant or ""
+		elseif slotID == 17 then
+			enchantID = offHandEnchant or ""
+		else
+			enchantID = ""
+		end
+		local appliedSourceID, appearanceID, icon, hasMog, itemLink,  itemName, itemID = GetDressUpModelSlotSource(slotID, enchantID)
+	
+		ItemList[slotID] = {itemName, sourceTextColorized, itemID, bonusID}
+		newSet.items[slotID] = itemLink
+		button.itemLink = itemLink
+		button.appearanceID = appearanceID
+
+		if icon then
+			if appliedSourceID then
+				button.sourceID = appliedSourceID
 			end
-			appliedSourceID, appearanceID, icon, hasMog, itemLink,  itemName, itemID = GetDressUpModelSlotSource(slotID, enchantID)
 
-			if illusionHyperlink then
-				--itemLink = illusionHyperlink
-			end     
-			ItemList[slotID] = {itemName, sourceTextColorized, itemID, bonusID}
-			newSet.items[slotID] = itemLink
-			--button = Buttons[slotID]
-			button.itemLink = itemLink
+			button.Icon:SetTexture(icon)
+			if hasMog then
+				button.IconBorder:SetAtlas("loottoast-itemborder-gold")
 
-			button.appearanceID = appearanceID
-			if icon then
-				if appliedSourceID then
-					button.sourceID = appliedSourceID
-				end
-				button.Icon:SetTexture(icon)
-				if hasMog then
-					button.Icon:SetDesaturated(false)
-					button.IconBorder:SetAtlas("loottoast-itemborder-gold")
-					--button.Black:Hide()
-					button.isHidden = false
-				else
-					button.IconBorder:SetAtlas("loottoast-itemborder-purple")
-					--button.Icon:SetDesaturated(true)
-					--button.Black:Show()
-				end
-				button:SetAlpha(1)
-				button.Icon:Show()
-
-				if HideArmorOnShow then 
-
-					--sharedActor:UndressSlot(button:GetID())
-					--button.Icon:SetDesaturated(true)
-				end
 			else
-				if button.isHidden then
-					button:SetAlpha(EmptySlotAlpha)
-				else
-					button:SetAlpha(EmptySlotAlpha)
-					button.Icon:Hide()
-				end
+				button.IconBorder:SetAtlas("loottoast-itemborder-purple")
 			end
-		
 
+			button.Icon:SetDesaturated(false)
+			button.isHidden = false
+			button:SetAlpha(1)
+			button.Icon:Show()
+			button.IconBorder:Show()
+		else
+			if button.isHidden then
+				button:SetAlpha(EmptySlotAlpha)
+			else
+				button:ResetButton()
+			end
+		end
 	end
 end
 
 
 local ActorIDByRace = {
-    [2]  = {483, 483},		-- Orc bow
-    [3]  = {471, nil},		-- Dwarf
-    [5]  = {472, 487},		-- UD   0.9585 seems small
-    [6]  = {449, 484},		-- Tauren
-    [7]  = {450, 450},		-- Gnome
-    [8]  = {485, 486},		-- Troll  0.9414 too high?  
-    [9]  = {476, 477},		-- Goblin
-    [11] = {475, 501},		-- Goat
-    [22] = {474, 500},      -- Worgen
-    [24] = {473, 473},		-- Pandaren
-    [28] = {490, 491},		-- Highmountain Tauren
-    [30] = {488, 489},		-- Lightforged Draenei
-    [31] = {492, 492},		-- Zandalari
-    [32] = {494, 497},		-- Kul'Tiran
-    [34] = {499, nil},		-- Dark Iron Dwarf
-    [35] = {924, 923},      -- Vulpera
-    [36] = {495, 498},		-- Mag'har
-    [37] = {929, 931},      -- Mechagnome
+	[2]  = {483, 483},		-- Orc bow
+	[3]  = {471, nil},		-- Dwarf
+	[5]  = {472, 487},		-- UD   0.9585 seems small
+	[6]  = {449, 484},		-- Tauren
+	[7]  = {450, 450},		-- Gnome
+	[8]  = {485, 486},		-- Troll  0.9414 too high?
+	[9]  = {476, 477},		-- Goblin
+	[11] = {475, 501},		-- Goat
+	[22] = {474, 500},      -- Worgen
+	[24] = {473, 473},		-- Pandaren
+	[28] = {490, 491},		-- Highmountain Tauren
+	[30] = {488, 489},		-- Lightforged Draenei
+	[31] = {492, 492},		-- Zandalari
+	[32] = {494, 497},		-- Kul'Tiran
+	[34] = {499, nil},		-- Dark Iron Dwarf
+	[35] = {924, 923},      -- Vulpera
+	[36] = {495, 498},		-- Mag'har
+	[37] = {929, 931},      -- Mechagnome
 }
 
-local DEFAULT_ACTOR_INFO_ID = 438;
+local DEFAULT_ACTOR_INFO_ID = 438
 
 local PanningYOffsetByRace = {
-    --[raceID] = { { male = {offsetY1 when frame maximiazed, offsetY2} }, {female = ...} }
-    [0] = {     --default
-        {-290, -110},
-    },
+	--[raceID] = { { male = {offsetY1 when frame maximiazed, offsetY2} }, {female = ...} }
+	[0] = {     --default
+		{-290, -110},
+	},
 
-    [4] = { --NE
-        {-317, -117},
-        {-282, -115.5},
-    },
+	[4] = { --NE
+		{-317, -117},
+		{-282, -115.5},
+	},
 
-    [10] = {    --BE
-        {-282, -110},
-        {-290, -116}, 
-    }
-    --/dump DressUpFrame.ModelScene:GetActiveCamera().panningYOffset
+	[10] = {    --BE
+		{-282, -110},
+		{-290, -116},
+	}
+	--/dump DressUpFrame.ModelScene:GetActiveCamera().panningYOffset
 }
 
-PanningYOffsetByRace[29] = PanningYOffsetByRace[10];
-local GetModelSceneActorInfoByID = C_ModelInfo.GetModelSceneActorInfoByID;
+PanningYOffsetByRace[29] = PanningYOffsetByRace[10]
+local GetModelSceneActorInfoByID = C_ModelInfo.GetModelSceneActorInfoByID
 
 local function GetPanningYOffset(raceID, genderID)
-    genderID = genderID -1;
-    if PanningYOffsetByRace[raceID] and PanningYOffsetByRace[raceID][genderID] then
-        return PanningYOffsetByRace[raceID][genderID]
-    else
-        return PanningYOffsetByRace[0][1]
-    end
+	genderID = genderID -1
+	if PanningYOffsetByRace[raceID] and PanningYOffsetByRace[raceID][genderID] then
+		return PanningYOffsetByRace[raceID][genderID]
+	else
+		return PanningYOffsetByRace[0][1]
+	end
 end
 
-function GetActorInfoByUnit(unit)
-    if not UnitExists(unit) or not UnitIsPlayer(unit) or not CanInspect(unit, false) then return nil, PanningYOffsetByRace[0][1]; end
-    
-    local _, _, raceID = UnitRace(unit);
-    local genderID = UnitSex(unit);
-    if raceID == 25 or raceID == 26 then --Pandaren A|H
-        raceID = 24
-    end
 
-    local actorInfoID;
-    if not (raceID and genderID) then
-        actorInfoID = DEFAULT_ACTOR_INFO_ID;     --438
-    elseif ActorIDByRace[raceID] then
-        actorInfoID = ActorIDByRace[raceID][genderID - 1] or DEFAULT_ACTOR_INFO_ID;
-    else
-        actorInfoID = DEFAULT_ACTOR_INFO_ID;     --438
-    end
+local function GetActorInfoByUnit(unit)
+	if not UnitExists(unit) or not UnitIsPlayer(unit) or not CanInspect(unit, false) then return nil, PanningYOffsetByRace[0][1] end
+	
+	local _, _, raceID = UnitRace(unit)
+	local genderID = UnitSex(unit)
+	if raceID == 25 or raceID == 26 then --Pandaren A|H
+		raceID = 24
+	end
 
-    return GetModelSceneActorInfoByID(actorInfoID)
+	local actorInfoID
+	if not (raceID and genderID) then
+		actorInfoID = DEFAULT_ACTOR_INFO_ID     --438
+	elseif ActorIDByRace[raceID] then
+		actorInfoID = ActorIDByRace[raceID][genderID - 1] or DEFAULT_ACTOR_INFO_ID
+	else
+		actorInfoID = DEFAULT_ACTOR_INFO_ID     --438
+	end
+
+	return GetModelSceneActorInfoByID(actorInfoID)
 end
 
 local IsCurrentModelPlayer = false
 
 local function UpdateDressingRoomModel(unit)
 	unit = unit or "player"
-	--local NarciBridge = NarciBridge_DressUpFrame
 	if not UnitExists(unit) then
 		return
 	elseif not UnitIsPlayer(unit) or not CanInspect(unit, false) then
-	   -- NarciBridge.OptionFrame.TryOnButton:Disable()
 		return
-	else
-	  --  NarciBridge.OptionFrame.TryOnButton:Enable()
 	end
 
 	SetDressUpBackground(unit)
@@ -357,7 +368,7 @@ local function UpdateDressingRoomModel(unit)
 	local actor = ModelScene:GetPlayerActor()
 	if not actor then return end
 	
-	--Acquire target's gears
+	--Acquire target's gear
 	BW_DressingRoomFrame:RegisterEvent("INSPECT_READY")
 	NotifyInspect(unit)
 
@@ -385,15 +396,11 @@ local function UpdateDressingRoomModel(unit)
 	end
 
 	if updateScale then
-		print(modelUnit)
 		local modelInfo = GetActorInfoByUnit(modelUnit)
-		After(0.0,function()
+		After(0,function()
 			ModelScene:InitializeActor(actor, modelInfo)   --Re-scale
 		end)
 	end
-
-	--Update Unsheathed Animation
-	--SetAnimationIDByUnit(unit)
 end
 
 
@@ -432,12 +439,32 @@ end
 function BW_DressingRoomItemButtonMixin:OnClick()
 end
 
+function BW_DressingRoomItemButtonMixin:ResetButton()
+	self.Icon:Hide()
+	self.IconBorder:Hide()
+	self.itemSource = nil
+	self.enchantID = nil
+	self.sourceID = nil
+	self.isHidden = false
+	self.itemLink = false
+	self:SetAlpha(EmptySlotAlpha)
+end
+
+function BW_DressingRoomItemButtonMixin:EnableButton()
+	self.Icon:SetDesaturated(false)
+	self:SetAlpha(1)
+	self.Icon:Show()
+	self.IconBorder:Show()
+end
+
 
 function BW_DressingRoomItemButtonMixin:OnMouseDown(button)
+	local sharedActor = DressUpFrame.ModelScene:GetPlayerActor()
+	GameTooltip:Hide()
+
 	if button == "LeftButton" then
-		GameTooltip:Hide()
+		if not self.sourceID then return end
 		self.isHidden = not self.isHidden
-		local sharedActor = DressUpFrame.ModelScene:GetPlayerActor()
 		if (not sharedActor) then
 			return
 		end
@@ -445,29 +472,33 @@ function BW_DressingRoomItemButtonMixin:OnMouseDown(button)
 		local slot = self:GetID()
 
 		if self.isHidden then
-			if slot == 16 and rangedWeapon then 
+			if slot == 16 and rangedWeapon then
+				sharedActor:UndressSlot(16)
 				sharedActor:UndressSlot(17)
-			elseif slot == 17 and rangedWeapon then 
-				return
+
 			end
 			sharedActor:UndressSlot(self:GetID())
 			self.Icon:SetDesaturated(true)
 			self:SetAlpha(EmptySlotAlpha)
+
 		elseif self.sourceID then
-			--print(self.sourceID)
-			--sharedActor:TryOn(self.sourceID)
-			
-
-			if self.Artifact then
-				sharedActor:TryOn(self.itemSource, nil, self.enchantID)
-			else
-				--sharedActor:TryOn(self.itemLink)
-				sharedActor:TryOn(self.sourceID)
-
-			end
+			sharedActor:TryOn(self.sourceID)
 			self:SetAlpha(1)
 			self.Icon:SetDesaturated(false)
 		end
+
+	elseif button == "RightButton" then
+		local slot = self:GetID()
+		if not self.sourceID then
+			return
+		elseif slot == 16 and rangedWeapon then
+			sharedActor:UndressSlot(16)
+			sharedActor:UndressSlot(17)
+			rangedWeapon = false
+		end
+
+		sharedActor:UndressSlot(self:GetID())
+		self:ResetButton()
 	end
 end
 
@@ -488,14 +519,14 @@ function BW_DressingRoomHideArmorButton_OnClick()
 
 end
 
+
 function UpdateDressingRoom(...)
-	local frame = BW_DressingRoomFrame
 	local viewedLink = ...
+	local frame = BW_DressingRoomFrame
 
-	local appearanceID = ((viewedLink and type(viewedLink) == "string") and C_TransmogCollection.GetItemInfo(viewedLink))
-
-	if not frame.pauseUpdate then
+	if not frame.pauseUpdate or viewedLink then
 		frame.pauseUpdate = true
+		inspectView = false
 		After(0, function()
 			GetDressingSource(frame.mainHandEnchant, frame.offHandEnchant)
 			frame.pauseUpdate = nil
@@ -504,24 +535,33 @@ function UpdateDressingRoom(...)
 				return false
 			end
 
-			for _, button in pairs(Buttons) do
-				local slot = button:GetID()
-				if ((HideWeaponOnShow and (slot == INVSLOT_MAINHAND or slot == INVSLOT_OFFHAND)) or 
-					(HideTabardOnShow and slot == INVSLOT_TABARD) or
-					(HideShirtOnShow and slot == INVSLOT_BODY) or
-					HideArmorOnShow ) 
-						and button.appearanceID ~= appearanceID then 
-					button.isHidden = true
-					sharedActor:UndressSlot(slot)
-					button.Icon:SetDesaturated(true)
-					button:SetAlpha(EmptySlotAlpha)
+			if not inspectView and (HideWeaponOnShow or HideTabardOnShow or HideShirtOnShow or HideArmorOnShow)  then 
+				for _, button in pairs(Buttons) do
+					local slot = button:GetID()
+					if ((HideWeaponOnShow and (slot == INVSLOT_MAINHAND or slot == INVSLOT_OFFHAND)) or
+						(HideTabardOnShow and slot == INVSLOT_TABARD) or
+						(HideShirtOnShow and slot == INVSLOT_BODY) or
+						HideArmorOnShow) then
+							button.isHidden = true
+							sharedActor:UndressSlot(slot)
+							button.Icon:SetDesaturated(true)
+							button:SetAlpha(EmptySlotAlpha)
+					end
 				end
+
+				HideArmorOnShow = false
+				HideWeaponOnShow = false
+				HideTabardOnShow = false
+				HideShirtOnShow = false
+				reset = false
 			end
 
-			HideArmorOnShow = false
-			HideWeaponOnShow = false
-			HideTabardOnShow = false
-			HideShirtOnShow = false
+			if viewedLink and forceView then 
+				sharedActor:TryOn(viewedLink)
+				forceView = false
+				UpdateDressingRoom()
+			end
+
 		end)
 	end
 end
@@ -529,17 +569,31 @@ end
 
 BW_DressingRoomFrameMixin = {}
 function BW_DressingRoomFrameMixin:OnLoad()
+	self:RegisterEvent("ADDON_LOADED")
 	hooksecurefunc("DressUpVisual", UpdateDressingRoom)
 end
 
 
 function BW_DressingRoomFrameMixin:OnShow()
+	if not Profile.DR_OptionsEnable then return end
+
 	BW_DressingRoomFrame.PreviewButtonFrame:SetShown(addon.Profile.DR_ShowItemButtons)
 	DressingRoom:UpdateBackground()	
 	HideArmorOnShow = addon.Profile.DR_StartUndressed
 	HideWeaponOnShow = addon.Profile.DR_HideWeapons
 	HideTabardOnShow = addon.Profile.DR_HideTabard
 	HideShirtOnShow = addon.Profile.DR_HideShirt
+	forceView = true
+
+	if not GetCVarBool("transmogShouldersSeparately") then 
+		BW_DressingRoomFrame.PreviewButtonFrame.PreviewButtonRightShoulder:Hide()
+		BW_DressingRoomFrame.PreviewButtonFrame.PreviewButtonBack:ClearAllPoints()
+		BW_DressingRoomFrame.PreviewButtonFrame.PreviewButtonBack:SetPoint("TOPLEFT", BW_DressingRoomFrame.PreviewButtonFrame.PreviewButtonLeftShoulder,"BOTTOMLEFT")
+	else
+		BW_DressingRoomFrame.PreviewButtonFrame.PreviewButtonRightShoulder:Show()
+		BW_DressingRoomFrame.PreviewButtonFrame.PreviewButtonBack:ClearAllPoints()
+		BW_DressingRoomFrame.PreviewButtonFrame.PreviewButtonBack:SetPoint("TOPLEFT", BW_DressingRoomFrame.PreviewButtonFrame.PreviewButtonRightShoulder,"BOTTOMLEFT")
+	end
 
 	After(0, function()
 		GetDressingSource()
@@ -554,6 +608,7 @@ end
 
 
 function BW_DressingRoomFrameMixin:OnEvent(event, ...)
+	local arg1 = ...
 	if event == "INSPECT_READY" then
 		self:UnregisterEvent("INSPECT_READY")
 		After(0,function()
@@ -561,17 +616,14 @@ function BW_DressingRoomFrameMixin:OnEvent(event, ...)
 			GetDressingSource(self.mainHandEnchant, self.offHandEnchant)
 			ClearInspectPlayer()
 		end)
+	elseif 	event == "ADDON_LOADED" and arg1 == "Blizzard_InspectUI" then 
+		addon:HookScript(InspectPaperDollFrame.ViewButton, "OnClick", function() inspectView = true end)
+		self:UnregisterEvent("ADDON_LOADED")
+
 	end
 end
 
-
-
-
-
---local ContextMenu = CreateFrame("Frame", addonName .. "ContextMenuFrame", UIParent, "UIDropDownMenuTemplate")
 local ContextMenu = CreateFrame("Frame", addonName .. "ContextMenuFrame", UIParent, "BW_UIDropDownMenuTemplate")
-
---local ContextMenu = BW_UIDropDownMenu_Create(addonName .. "ContextMenuFrame", UIParent)
 addon.ContextMenu = ContextMenu
 
 local function DressupSettingsButton_OnClick(self)
@@ -646,13 +698,7 @@ local function DressupSettingsButton_OnClick(self)
 	}
 	
 	BW_UIDropDownMenu_SetAnchor(ContextMenu, 0, 0, "BOTTOMLEFT", self, "BOTTOMLEFT")
-
-	--ContextMenu:SetPoint("BOTTOMLEFT", self, "BOTTOMLEFT", 0, 0)
 	BW_EasyMenu(contextMenuData, ContextMenu, ContextMenu, 0, 0, "MENU",5)
-
-	--DropDownList1:ClearAllPoints()
-	--DropDownList1:SetPoint("BOTTOMLEFT", self, "BOTTOMLEFT", 0, 0)
-	--DropDownList1:SetClampedToScreen(true)
 end
 
 
@@ -690,7 +736,6 @@ local function BW_DressingRoomImportButton_OnClick(self)
 				import = true
 				DressUpSources(sources)
 				import = false
-				--C_Timer.After(0.2, function() BW_DressingRoomItemDetailsMixin:UpdateButtons("loadSet") end)
 				UpdateDressingRoom()
 			end,
 			isNotRadio = true,
@@ -740,37 +785,25 @@ function BW_DressingRoomButtonMixin:OnMouseDown()
 	GameTooltip:Hide()
 	local button = self.buttonID
 	if not button then return end
-	if button == "Settings" then 
+	if button == "Settings" then
 		DressupSettingsButton_OnClick(self)
-	elseif button == "Import" then 
+	elseif button == "Import" then
 		BW_DressingRoomImportButton_OnClick(self)
-	elseif button == "Player" then 
-		--DressingRoom.showTarget = false
-		--DressingRoom:SetTargetGear(true)
+	elseif button == "Player" then
 		UseTargetModel = false
-		UpdateDressingRoomModel("target")
-	elseif button == "Target" then 
-		--DressingRoom.showTarget = true
-		--DressingRoom:SetTarget()
-		--UpdateDressingRoomModel("target")
+		UpdateDressingRoomModel("player")
+	elseif button == "Target" then
 		UseTargetModel = true
 		UpdateDressingRoomModel("target")
-	elseif button == "Gear" then 
+	elseif button == "Gear" then
 		--DressingRoom:SetTargetGear()
 		UseTargetModel = false
 		UpdateDressingRoomModel("target")
-	elseif button == "Reset" then 
+	elseif button == "Reset" then
 		text =  RESET
-	elseif button == "Undress" then 
+	elseif button == "Undress" then
 		BW_DressingRoomHideArmorButton_OnClick(self)
 	end
-end
-
-
-local function SetTooltip(frame, text)
-	GameTooltip:SetOwner(frame, "ANCHOR_RIGHT");
-	GameTooltip:SetText(text)
-	GameTooltip:Show()
 end
 
 
@@ -778,25 +811,27 @@ function BW_DressingRoomButtonMixin:OnEnter()
 	local button = self.buttonID
 	local text
 	if not button then return end
-	if button == "Settings" then 
+	if button == "Settings" then
 	text =  L["General Options"]
-	elseif button == "Import" then 
+	elseif button == "Import" then
 		text =  L["Import/Export Options"]
-	elseif button == "Player" then 
+	elseif button == "Player" then
 		text =  L["Use Player Model"]
-	elseif button == "Target" then 
+	elseif button == "Target" then
 		text =  L["Use Target Model"]
-	elseif button == "Gear" then 
+	elseif button == "Gear" then
 		text =  L["Use Target Gear"]
-	elseif button == "Reset" then 
+	elseif button == "Reset" then
 		text =  RESET
-	elseif button == "Undress" then 
+	elseif button == "Undress" then
 		text = L["Undress"]
-	elseif button == "HideSlot" then 
+	elseif button == "HideSlot" then
 		text = L["Hide Armor Slots"]
 	end
 
-	SetTooltip(self, text)
+	GameTooltip:SetOwner(self, "ANCHOR_RIGHT")
+	GameTooltip:SetText(text)
+	GameTooltip:Show()
 end
 
 
@@ -823,15 +858,14 @@ end
 
 
 BW_DressingRoomMixin = CreateFromMixins(BW_WardrobeOutfitMixin)
-
 function BW_DressingRoomMixin:OnLoad()
 DressUpFrameOutfitDropDown:Hide()
-		local button = _G[self:GetName().."Button"]
+	local button = _G[self:GetName().."Button"]
 	button:SetScript("OnMouseDown", function(self)
 						PlaySound(SOUNDKIT.IG_MAINMENU_OPTION_CHECKBOX_ON)
 						BW_DressingRoomOutfitFrame:Toggle(self:GetParent())
-						end
-					)
+						end)
+
 	BW_UIDropDownMenu_JustifyText(self, "LEFT")
 	if self.width then
 		BW_UIDropDownMenu_SetWidth(self, self.width)
@@ -880,8 +914,7 @@ function BW_DressingRoomMixin:LoadOutfit(outfitID)
 	if not outfitID then
 		return false
 	end
-	--if 	initUndress  then return end
-	dressuplink = nil
+
 	local playerActor = DressUpFrame.ModelScene:GetPlayerActor()
 		if (not playerActor) then
 		return false
@@ -891,13 +924,13 @@ function BW_DressingRoomMixin:LoadOutfit(outfitID)
 	if outfitID > 1000 then MogItOutfit = true end
 
 	playerActor:Undress()
-	--DressingRoom:ResetItemButtons(DressingRoom:ResetItemButtons(not addon.Profile.DR_StartUndressed) , true)
-	--
+	UpdateDressingRoom()
+
 	import = true
 	if self:IsDefaultSet(outfitID) then
 		DressUpSources(C_TransmogCollection.GetOutfitSources(outfitID))
 	else
-		local outfit 
+		local outfit
 		if outfitID > 1000 then
 			outfit = addon.MogIt.MogitSets[outfitID]
 		else
@@ -905,23 +938,18 @@ function BW_DressingRoomMixin:LoadOutfit(outfitID)
 		end
 
 		local outfit_sources = {}
-		--need to itterate a full table as the DressUpSources uses the table size 
-		for i=1, 19  do
+		--need to itterate a full table as the DressUpSources uses the table size
+		for i = 1, 19  do
 			outfit_sources[i] = outfit[i] or NO_TRANSMOG_SOURCE_ID
 		end
 		DressUpSources(outfit_sources, outfit["mainHandEnchant"], outfit["offHandEnchant"])
 	end
 	import = false
-	--DressingRoom:ResetItemButtons(false , true)
-	--BW_DressingRoomOutfitDropDown:OnOutfitApplied(outfitID)BW_DressingRoomItemDetailsMixin:UpdateButtons()
 	UpdateDressingRoom()
-	--C_Timer.After(0.2, function() BW_DressingRoomItemDetailsMixin:UpdateButtons("loadSet") end)
-	--
 end
 
 
 BW_DressingRoomOutfitFrameMixin = CreateFromMixins(BW_WardrobeOutfitFrameMixin)
-
 function BW_DressingRoomOutfitFrameMixin:Toggle(dropDown)
 	if self.dropDown == dropDown and self:IsShown() then
 		self:Hide()
@@ -937,22 +965,22 @@ end
 
 
 function BW_DressingRoomOutfitFrameMixin:GetSlotSourceID(transmogLocation)
-	local playerActor = DressUpFrame.ModelScene:GetPlayerActor();
+	local playerActor = DressUpFrame.ModelScene:GetPlayerActor()
 	if (not playerActor) then
-		return;
+		return
 	end
 
 	-- TODO: GetSlotTransmogSources needs to use modification
-	local appearanceSourceID, illusionSourceID = playerActor:GetSlotTransmogSources(transmogLocation:GetSlotID());
+	local appearanceSourceID, illusionSourceID = playerActor:GetSlotTransmogSources(transmogLocation:GetSlotID())
 	if ( transmogLocation:IsAppearance() ) then
-		return appearanceSourceID;
+		return appearanceSourceID
 	elseif ( transmogLocation:IsIllusion() ) then
-		return illusionSourceID;
+		return illusionSourceID
 	end
 end
 
-BW_DressingRoomOutfitButtonMixin = CreateFromMixins(BW_WardrobeOutfitButtonMixin)
 
+BW_DressingRoomOutfitButtonMixin = CreateFromMixins(BW_WardrobeOutfitButtonMixin)
 function BW_DressingRoomOutfitButtonMixin:OnClick()
 	PlaySound(SOUNDKIT.IG_MAINMENU_OPTION_CHECKBOX_ON)
 	BW_DressingRoomOutfitFrame:Hide()
@@ -965,13 +993,10 @@ end
 
 
 function BW_DressingRoomHideArmorButton_OnClick()
-	dressuplink = nil
 	local playerActor = DressUpFrame.ModelScene:GetPlayerActor()
 		if (not playerActor) then
 		return false
 	end
 	playerActor:Undress()
 	UpdateDressingRoom()
-
-	--BW_DressingRoomItemDetailsMixin:UpdateButtons("undress")
 end

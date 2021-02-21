@@ -341,10 +341,13 @@ function tooltip:ShowTooltip(itemLink)
 		
 
 		local setIDs = C_TransmogSets.GetSetsContainingSourceID(sourceID)
+		local shownSetNames = {}
 		if addon.Profile.ShowSetTooltips and #setIDs > 0 then
 			if not addHeader then
 				addHeader = true
 				addLine(self, L["HEADERTEXT"])
+				---addLine(self, "..")
+				--GameTooltip:AddTexture("Interface\\QUESTFRAME\\UI-HorizontalBreak.blp",{width = 150, height = 32})
 			end
 
 			for i, setID in pairs(setIDs) do
@@ -356,6 +359,7 @@ function tooltip:ShowTooltip(itemLink)
 					color = GREEN_FONT_COLOR_CODE
 				end
 				addDoubleLine (self," ",L["-%s %s(%d/%d)"]:format(setInfo.name or "", color, collected, total))
+				shownSetNames[setInfo.name] = true
 
 				if addon.Profile.ShowDetailedListTooltips then
 					local sources = C_TransmogSets.GetSetSources(setID)
@@ -382,27 +386,29 @@ function tooltip:ShowTooltip(itemLink)
 
 			addDoubleLine (self,"|cffffd100"..L["Part of Extra Set:"], " ")
 			for _, data in pairs(setData) do
-				local collected, total = addon.ExtraSetsDataProvider:GetSetSourceCounts(data.setID)
-				local color = YELLOW_FONT_COLOR_CODE
-				if collected == total then
-					color = GREEN_FONT_COLOR_CODE
-				end
+				--if not shownSetNames[data.name] then 
+					local collected, total = addon.ExtraSetsDataProvider:GetSetSourceCounts(data.setID)
+					local color = YELLOW_FONT_COLOR_CODE
+					if collected == total then
+						color = GREEN_FONT_COLOR_CODE
+					end
 
-				addDoubleLine (self," ",L["-%s %s(%d/%d)"]:format(data.name or "", color, collected, total))
+					addDoubleLine (self," ",L["-%s %s(%d/%d)"]:format(data.name or "", color, collected, total))
 
-				if addon.Profile.ShowDetailedListTooltips then
-					local sources = addon.GetSetsources(data.setID)
-					for sourceID, collected in pairs(sources) do
-						local sourceInfo = C_TransmogCollection.GetSourceInfo(sourceID)
-						if collected and not addon.Profile.ShowMissingDetailedListTooltips then
-							color = GREEN_FONT_COLOR_CODE
-							addDoubleLine (self," ",L["|TInterface\\RaidFrame\\ReadyCheck-Ready:0|t %s%s"]:format(color, sourceInfo.name or ""))
-						elseif not collected then
-							color = RED_FONT_COLOR_CODE
-							addDoubleLine (self," ",L["|TInterface\\RaidFrame\\ReadyCheck-NotReady:0|t %s%s"]:format(color, sourceInfo.name or ""))
+					if addon.Profile.ShowDetailedListTooltips then
+						local sources = addon.GetSetsources(data.setID)
+						for sourceID, collected in pairs(sources) do
+							local sourceInfo = C_TransmogCollection.GetSourceInfo(sourceID)
+							if collected and not addon.Profile.ShowMissingDetailedListTooltips then
+								color = GREEN_FONT_COLOR_CODE
+								addDoubleLine (self," ",L["|TInterface\\RaidFrame\\ReadyCheck-Ready:0|t %s%s"]:format(color, sourceInfo.name or ""))
+							elseif not collected then
+								color = RED_FONT_COLOR_CODE
+								addDoubleLine (self," ",L["|TInterface\\RaidFrame\\ReadyCheck-NotReady:0|t %s%s"]:format(color, sourceInfo.name or ""))
+							end
 						end
 					end
-				end
+				--end
 			end
 		end
 
