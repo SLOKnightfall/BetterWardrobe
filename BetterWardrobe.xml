@@ -355,10 +355,11 @@
 					</Layer>
 				</Layers>
 				<Scripts>
+					<OnLoad> 
+						self.buttonID = "HideSlot" 
+					</OnLoad>
 					<OnEnter>
-						BW_DressingRoomButton_OnEnter(self, "HideSlot")
-					</OnEnter>
-					<OnLeave function="GameTooltip_Hide"/>
+					BW_DressingRoomButtonMixin.OnEnter(self)  </OnEnter>
 				</Scripts>
 			</Button>
 			<DropDownToggleButton parentKey="FilterButton" inherits="UIMenuButtonStretchTemplate" text="FILTER" hidden="true">

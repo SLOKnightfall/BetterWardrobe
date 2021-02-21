@@ -98,7 +98,7 @@ do
 				local baseItem = setData.items[1]
 				local visualID, sourceID = addon.GetItemSource(baseItem)
 				setData.itemAppearance = addon.ItemAppearance[visualID]
-
+				setData.armorType = armorType
 
 			--places some of the sets that didnt have correct filters
 				--if setData.note == "NOTE_4" or setData.note == "NOTE_4" then
@@ -171,7 +171,7 @@ do
 					
 			
 				end
-
+				SET_INDEX[id] = setData
 				ArmorDB[armorType][id] = setData
 			end
 		end
@@ -203,7 +203,7 @@ do
 					end
 				end
 
-				SET_INDEX[id] = setData
+				--SET_INDEX[id] = setData
 				tinsert(SET_DATA, setData)	
 			end
 			--else --print(setInfo)
@@ -278,7 +278,7 @@ local function buildSetSubstitutions()
 	function addon.Init:BuildDB()
 		buildSetSubstitutions()
 		local armorSet = ArmorDB[addon.selectedArmorType] or ArmorDB[CLASS_INFO[playerClass][3]]
-		wipe(SET_INDEX)
+		--wipe(SET_INDEX)
 		wipe(SET_DATA)
 		addArmor(armorSet)
 		addArmor(ArmorDB["COSMETIC"])
@@ -293,7 +293,7 @@ local function buildSetSubstitutions()
 		--addon.ArmorSets = nil
 		wipe(addon.ArmorSetModCache)
 		--addon.extraSetsCache = nil
-		wipe(SET_INDEX)
+		--wipe(SET_INDEX)
 		wipe(SET_DATA)
 		addon.ClearArtifactData()
 		--wipe(addon.SavedSetCache)
@@ -412,7 +412,7 @@ local function buildSetSubstitutions()
 		for i, data in pairs(ArmorDB[armorType]) do
 
 			if data.setID == setID then 
-				print(setID)
+				--print(setID)
 				return data.armorType
 			end
 		end
@@ -441,7 +441,7 @@ local function buildSetSubstitutions()
 
 		--local appearanceID, sourceID = C_TransmogCollection.GetItemInfo(itemID|itemString [, itemModID])
 
-		addon.itemsubdb.profile.items[itemID] = {["subID"] = subID, ["itemLink"]  =link1, ["subLink"] = link2}
+		addon.itemsubdb.profile.items[itemID] = {["subID"] = subID, ["itemLink"] = link1, ["subLink"] = link2}
 
 		local item = Item:CreateFromItemID(itemID)
 		item:ContinueOnItemLoad(function()

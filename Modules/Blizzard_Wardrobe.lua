@@ -590,50 +590,63 @@ end
 	end
 end]]
 do
+	local function displayset(setID) C_Timer.After(addon.ViewDelay, function()
+			BW_WardrobeCollectionFrame.BW_SetsCollectionFrame:SelectSet(setID)
+			BW_WardrobeCollectionFrame.BW_SetsCollectionFrame:ScrollToSet(setID)
+			BW_WardrobeCollectionFrame.BW_SetsCollectionFrame:DisplaySet(setID)
+			addon.ViewDelay = 0
+			end)	
+		end
 local tempLink
 local tempSetID
 	hooksecurefunc("WardrobeCollectionFrame_OpenTransmogLink",  function(link) 
-
+	--addon:Hook("WardrobeCollectionFrame_OpenTransmogLink", function(link)
 		--if InCombatLockdown() then return end
 		if ( not CollectionsJournal:IsVisible() or not WardrobeCollectionFrame:IsVisible() ) then
 			--securecall(function() ToggleCollectionsJournal(5) end)
 		end
-			tempLink = link
+		tempLink = link
 
-				local linkType, id = strsplit(":", tempLink);
+		local linkType, id = strsplit(":", tempLink);
 
-				if ( linkType == "transmogappearance" ) then
-					--local sourceID = tonumber(id);
-					BW_WardrobeCollectionFrame_SetTab(TAB_ITEMS);
+		if ( linkType == "transmogappearance" ) then
+			--local sourceID = tonumber(id);
+			BW_WardrobeCollectionFrame_SetTab(TAB_ITEMS);
 
-					-- For links a base appearance is fine
-					--local categoryID = C_TransmogCollection.GetAppearanceSourceInfo(sourceID);
-					--local slot = WardrobeCollectionFrame_GetSlotFromCategoryID(categoryID);
-					--local transmogLocation = TransmogUtil.GetTransmogLocation(slot, Enum.TransmogType.Appearance, Enum.TransmogModification.None);
-					--WardrobeCollectionFrame.ItemsCollectionFrame:GoToSourceID(sourceID, transmogLocation);
+			-- For links a base appearance is fine
+			--local categoryID = C_TransmogCollection.GetAppearanceSourceInfo(sourceID);
+			--local slot = WardrobeCollectionFrame_GetSlotFromCategoryID(categoryID);
+			--local transmogLocation = TransmogUtil.GetTransmogLocation(slot, Enum.TransmogType.Appearance, Enum.TransmogModification.None);
+			--WardrobeCollectionFrame.ItemsCollectionFrame:GoToSourceID(sourceID, transmogLocation);
 
-				elseif ( linkType == "transmogset") then
-					--local setID = tonumber(id);
-					BW_WardrobeCollectionFrame_SetTab(TAB_SETS);
-					--BW_WardrobeCollectionFrame.BW_SetsCollectionFrame:SelectSet(setID);
-					--BW_WardrobeCollectionFrame.SetsCollectionFrame:SelectSet(setID);
+		elseif ( linkType == "transmogset") then
+			--local setID = tonumber(id);
+			BW_WardrobeCollectionFrame_SetTab(TAB_SETS);
+			--BW_WardrobeCollectionFrame.BW_SetsCollectionFrame:SelectSet(setID);
+			--BW_WardrobeCollectionFrame.SetsCollectionFrame:SelectSet(setID);
 
-				elseif ( linkType == "transmogset-extra") then
-					local setID = tonumber(id);
-					BW_WardrobeCollectionFrame_SetTab(3);
-					--WardrobeCollectionFrame.SetsCollectionFrame:SelectSet(setID);
-					
-					local armorType = addon.GetSetArmorType(setID)
-					if addon.Globals.ARMOR_TYPE[armorType] ~= addon.selectedArmorType then 
-						addon.selectedArmorType = addon.Globals.ARMOR_TYPE[armorType]
-						BW_WardrobeCollectionFrame_SetTab(2)
-						BW_WardrobeCollectionFrame_SetTab(3)
-					end
-					tempSetID = setID
-					C_Timer.After(1.5, function() BW_WardrobeCollectionFrame.BW_SetsCollectionFrame:SelectSet(tempSetID); BW_WardrobeCollectionFrame.BW_SetsCollectionFrame:ScrollToSet(tempSetID); tempSetID = nil end)
-				end
-		
-	end)
+		elseif ( linkType == "transmogset-extra") then
+			local setID = tonumber(id)
+
+			addon:RegisterMessage("BW_TRANSMOG_EXTRASETSHOWN", function(self) 
+				addon:UnregisterMessage("BW_TRANSMOG_EXTRASETSHOWN")
+				displayset(setID)
+			end)
+
+			local setInfo = addon.GetSetInfo(setID)
+			local armorType = setInfo.armorType
+			if armorType ~= addon.selectedArmorType then 
+				addon.selectedArmorType = armorType
+				BW_WardrobeCollectionFrame_SetTab(2)
+				BW_WardrobeCollectionFrame_SetTab(3)
+			else 
+				BW_WardrobeCollectionFrame_SetTab(3)
+
+			end
+
+			displayset(setID)
+		end
+	end, true)
 end
 
 
@@ -1024,6 +1037,7 @@ function WardrobeCollectionFrame.SetsCollectionFrame:DisplaySet(setID)
 		self.DetailsFrame.VariantSetsButton:Show();
 		self.DetailsFrame.VariantSetsButton:SetText(setInfo.description);
 	end
+
 end
 
 

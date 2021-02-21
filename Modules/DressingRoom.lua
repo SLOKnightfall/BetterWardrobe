@@ -807,7 +807,8 @@ function BW_DressingRoomButtonMixin:OnMouseDown()
 end
 
 
-function BW_DressingRoomButtonMixin:OnEnter()
+function BW_DressingRoomButtonMixin.OnEnter(self)
+	--local self = 	button or self
 	local button = self.buttonID
 	local text
 	if not button then return end
@@ -835,11 +836,9 @@ function BW_DressingRoomButtonMixin:OnEnter()
 end
 
 
-
 function BW_DressingRoomButtonMixin:OnLeave()
 	GameTooltip:Hide()
 end
-
 
 
 function DressingRoom:UpdateBackground()
@@ -854,7 +853,6 @@ function DressingRoom:UpdateBackground()
 		DressUpFrame.ModelBackground:SetVertexColor(0, 0, 0)
 	end
 end
-
 
 
 BW_DressingRoomMixin = CreateFromMixins(BW_WardrobeOutfitMixin)

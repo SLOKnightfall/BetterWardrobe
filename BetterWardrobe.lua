@@ -20,6 +20,7 @@ addon.QueueList = {}
 addon.validSetCache = {}
 addon.usableSourceCache = {}
 addon.Init = {}
+addon.ViewDelay = 3
 local newTransmogInfo  = {["latestSource"] = NO_TRANSMOG_SOURCE_ID} --{[99999999] = {[58138] = 10}, }
 addon.TRANSMOG_SET_FILTER = {}
 _G[addonName] = {}
@@ -1174,6 +1175,8 @@ function BetterWardrobeSetsCollectionMixin:DisplaySet(setID)
 			self.Model:TryOn(sortedSources[i].sourceID)
 		end
 	end
+
+	addon:SendMessage("BW_TRANSMOG_EXTRASETSHOWN")
 end
 
 
@@ -2047,11 +2050,13 @@ function BetterWardrobeSetsTransmogMixin:OnHide()
 	SetsDataProvider:ClearSets()
 	WardrobeCollectionFrame_ClearSearch(LE_TRANSMOG_SEARCH_TYPE_USABLE_SETS)
 	self.sourceQualityTable = nil
+	addon.ViewDelay = 3
 end
 
 
 function BetterWardrobeSetsTransmogMixin:UpdateProgressBar()
 	WardrobeCollectionFrame_UpdateProgressBar(GetSetCounts())
+	--addon:SendMessage("BW_TRANSMOG_EXTRASETSHOWN2")
 end
 
 
