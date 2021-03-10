@@ -56,7 +56,7 @@ Plugins\CanIMogIt.lua
 Plugins\MogIt.lua
 
 #Data files
-Data\ColorData.lua
+#Data\ColorData.lua
 Data\CameraData.lua
 Data\AppearanceData.lua
 Data\ArtifactData.lua
