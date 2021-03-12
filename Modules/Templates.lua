@@ -9,7 +9,7 @@ BW_SetIconMixin = {}
 function BW_SetIconMixin:OnEnter()
 	if self.Icon:IsVisible() then 
 		GameTooltip:SetOwner(self, "ANCHOR_RIGHT")
-		GameTooltip:SetText(L["Contains Unavaiable Items"])
+		GameTooltip:SetText(L["Contains Unavailable Items"])
 		GameTooltip:Show()
 	end
 end
