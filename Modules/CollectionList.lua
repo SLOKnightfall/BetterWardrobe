@@ -143,7 +143,7 @@ function CollectionList:UpdateList(type, typeID, add, sourceID)
 		for sourceID, isCollected in pairs(sources) do
 
 			local sourceInfo = C_TransmogCollection.GetSourceInfo(sourceID)
-			local visualID = C_TransmogCollection.GetItemInfo(sourceInfo.itemID, itemModID)--(type == "set" and sourceInfo.visualID) or addon.GetItemSource(sourceID, setInfo.mod)
+			local visualID = C_TransmogCollection.GetItemInfo(sourceInfo.itemID, itemModID or sourceInfo.itemModID)--(type == "set" and sourceInfo.visualID) or addon.GetItemSource(sourceID, setInfo.mod)
 
 			if add and visualID then
 				collectionList[type][typeID][visualID] = add
