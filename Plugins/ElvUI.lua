@@ -115,9 +115,8 @@ function MyPlugin:Initialize()
 end
 
 
-function S:BetterWardrobe()
-	if not (E.private.skins.blizzard.enable and E.private.skins.blizzard.collections) then return end
 
+local function applySkins ()
 	-- Appearances Tab
 	local WardrobeCollectionFrame = _G.BW_WardrobeCollectionFrame
 	S:HandleTab(WardrobeCollectionFrame.ItemsTab)
@@ -128,7 +127,7 @@ function S:BetterWardrobe()
 	--Items
 	S:HandleDropDownBox(BW_SortDropDown)
 	--S:HandleDropDownBox(BW_WardrobeFilterDropDown)
-	
+
 
 	S:HandleButton(BW_WardrobeCollectionFrame.FilterButton)
 
@@ -289,7 +288,7 @@ function S:BetterWardrobe()
 	S:HandleButton(BW_RandomizeButton)
 	BW_RandomizeButton:ClearAllPoints()
 	BW_RandomizeButton:Point("TOPLEFT",BW_LoadQueueButton, "TOPRIGHT", 0, 0)
-	
+
 	S:HandleButton(BW_SlotHideButton)
 	BW_SlotHideButton:ClearAllPoints()
 	BW_SlotHideButton:Point("TOPLEFT",BW_RandomizeButton, "TOPRIGHT", 0, 0)
@@ -329,7 +328,7 @@ function S:BetterWardrobe()
 	S:HandleButton(BW_DressingRoomOutfitDropDown.SaveButton)
 	BW_DressingRoomOutfitDropDown.SaveButton:ClearAllPoints()
 	BW_DressingRoomOutfitDropDown.SaveButton:SetPoint("LEFT", BW_DressingRoomOutfitDropDown, "RIGHT", 3, 0)
-	
+
 	S:HandleButton(BW_DressingRoomFrame.BW_DressingRoomSettingsButton)
 	BW_DressingRoomFrame.BW_DressingRoomSettingsButton:SetSize(25,25)
 	BW_DressingRoomFrame.BW_DressingRoomSettingsButton:SetPoint("BOTTOMLEFT", 2,2)
@@ -371,12 +370,12 @@ function S:BetterWardrobe()
 					icon:SetTexCoord(unpack(E.TexCoords))
 					itemFrame.IconBorder:Hide()
 					local level = itemFrame:GetFrameLevel()
-					if icon then 
+					if icon then
 						itemFrame:SetFrameLevel(level +1)
 					end
 					icon.backdrop:SetFrameLevel(level + .5)
 				end
-		
+
 				if itemFrame.itemLink then
 					--local quality = C_TransmogCollection.GetSourceInfo(itemFrame.sourceID).quality
 					local _, _, quality, _, _, _, _, _, _, texture = GetItemInfo(itemFrame.itemLink)
@@ -398,5 +397,13 @@ function S:BetterWardrobe()
 	S:HandleButton(WardrobeOutfitEditFrame.DeleteButton)
 end
 
-S:AddCallbackForAddon('BetterWardrobe') 
+function S:BetterWardrobe()
+	if not (E.private.skins.blizzard.enable and E.private.skins.blizzard.collections) then return end
+
+	-- execute this on the next frame to prevent it from executing before OnEnable
+	-- in Core.lua
+	C_Timer.After(0, applySkins)
+end
+
+S:AddCallbackForAddon('BetterWardrobe')
 E:RegisterModule(MyPlugin:GetName())  --Register the module with ElvUI. ElvUI will now call MyPlugin:Initialize() when ElvUI is ready to load our plugin.
