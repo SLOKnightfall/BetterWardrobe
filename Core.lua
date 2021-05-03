@@ -858,7 +858,7 @@ function addon.RefreshOutfitData()
 	addon.setdb.global.sets[name] = nil
 
 	addon.RefreshOutfitData()
-	addon.RefreshSaveOutfitDropdown()
+	--addon.RefreshSaveOutfitDropdown()
 	end
 	local args = {} 
 	local i = 1
@@ -1135,21 +1135,23 @@ function addon:OnEnable()
 
 	self.setdb = LibStub("AceDB-3.0"):New("BetterWardrobe_SavedSetData", DB_Defaults.savedsets_defaults)
 	self.itemsubdb = LibStub("AceDB-3.0"):New("BetterWardrobe_SubstituteItemData", DB_Defaults.itemsub_defaults, true)
-	self.OutfitDB = LibStub("AceDB-3.0"):New(listDB.OutfitDB, DB_Defaults.charSavedOutfits_defaults) 
+	self.OutfitDB = LibStub("AceDB-3.0"):New(listDB.OutfitDB, DB_Defaults.charSavedOutfits_defaults)
 
-	self.favoritesDB =  LibStub("AceDB-3.0"):New(listDB.favoritesDB, DB_Defaults.list_defaults) 
-	self.collectionListDB =  LibStub("AceDB-3.0"):New(listDB.collectionListDB, DB_Defaults.collectionList_defaults) 
-	self.HiddenAppearanceDB =  LibStub("AceDB-3.0"):New(listDB.HiddenAppearanceDB, DB_Defaults.list_defaults) 
+	self.favoritesDB =  LibStub("AceDB-3.0"):New(listDB.favoritesDB, DB_Defaults.list_defaults)
+	self.collectionListDB =  LibStub("AceDB-3.0"):New(listDB.collectionListDB, DB_Defaults.collectionList_defaults)
+	self.HiddenAppearanceDB =  LibStub("AceDB-3.0"):New(listDB.HiddenAppearanceDB, DB_Defaults.list_defaults)
+	self.char_savedOutfits = LibStub("AceDB-3.0"):New("BetterWardrobe_SavedOutfitData", charSavedOutfits_defaults, true)
 
 	local profile = self.setdb:GetCurrentProfile()
+
 
 	--self.setdb.global[profile] = self.setdb.char
 	addon.SelecteSavedList = false
 	options.args.subitems = itemSub_options
 	options.args.subitems.name = L["Item Substitution"]
 
-	--options.args.char_savedOutfits = savedOutfits_options
-	--options.args.char_savedOutfits.name = L["Saved Outfits"]
+	options.args.char_savedOutfits = savedOutfits_options
+	options.args.char_savedOutfits.name = L["Saved Outfits"]
 
 	options.args.subitems.args.options = LibStub("AceDBOptions-3.0"):GetOptionsTable(self.itemsubdb)
 	--options.args.char_savedOutfits.args.profiles = LibStub("AceDBOptions-3.0"):GetOptionsTable(self.char_savedOutfits)
