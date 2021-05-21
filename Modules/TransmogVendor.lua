@@ -299,11 +299,11 @@ function UI.ExtendTransmogView(reset)
 
 	if addon.Profile.ExtraLargeTransmogArea then
 		scale = 1.25
-		WardrobeFrame:SetWidth(1650)
+		WardrobeFrame:SetWidth(GetScreenWidth())
 		WardrobeFrame:SetClampedToScreen(true)
 		WardrobeFrame:SetHeight(UIParent:GetHeight() -25);
 
-		WardrobeTransmogFrame:SetWidth(950);
+		WardrobeTransmogFrame:SetWidth(math.floor(GetScreenWidth()*0.5757));
 		WardrobeTransmogFrame:SetHeight(WardrobeFrame:GetHeight() -90);
 		WardrobeTransmogFrame:SetPoint("TOPLEFT", WardrobeFrame, 4, -60)
 
@@ -313,7 +313,7 @@ function UI.ExtendTransmogView(reset)
 		WardrobeTransmogFrame.Inset.BG:SetAllPoints()
 
 		WardrobeTransmogFrame.ModelScene.HeadButton:ClearAllPoints()
-		WardrobeTransmogFrame.ModelScene.HeadButton:SetPoint("TOP", WardrobeTransmogFrame.ModelScene, "TOP", -348, -41)
+		WardrobeTransmogFrame.ModelScene.HeadButton:SetPoint("TOP", WardrobeTransmogFrame.ModelScene, "TOP", -340, -41)
 		WardrobeTransmogFrame.ModelScene.HandsButton:ClearAllPoints()
 		WardrobeTransmogFrame.ModelScene.HandsButton:SetPoint("TOP", WardrobeTransmogFrame.ModelScene, "TOP", 345, -118)
 
