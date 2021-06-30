@@ -36,20 +36,7 @@
 
 	<Button name="BW_DressingRoomOutfitFrameButtonTemplate" inherits="WardrobeOutfitButtonTemplate" virtual="true" mixin="BW_DressingRoomOutfitButtonMixin"/>
 	
-	<Frame name="BW_DressingRoomOutfitFrame" frameStrata="DIALOG" parent="UIParent" hidden="true" enableMouse="true" mixin="BW_DressingRoomOutfitFrameMixin">
-		<Size x="224" y="200"/>
-		<Anchors>
-			<Anchor point="TOPLEFT"/>
-		</Anchors>
-		<Frames>
-			<Frame parentKey="Border" inherits="DialogBorderDarkTemplate"/>
-		</Frames>
-		<Scripts>
-			<OnHide method="OnHide"/>
-			<OnUpdate method="OnUpdate"/>
-			<OnLoad method="CreateScrollFrame"/>
-		</Scripts>
-	</Frame>
+
 
 	<Frame name="BW_DressingRoomFrame" parent="DressUpFrame" mixin="BW_DressingRoomFrameMixin">
 		<Anchors>
@@ -277,4 +264,40 @@
 		</Scripts>
 	</Frame>
 
+
+	<Frame name="BetterWardrobeOutfitDropDownTemplate" inherits="BW_UIDropDownMenuTemplate" virtual="true" mixin="BW_WardrobeOutfitDropDownMixin">
+		<Size x="100" y="22"/>
+		<Frames>
+			<Button parentKey="SaveButton" inherits="UIPanelButtonTemplate" text="SAVE">
+				<Size x="88" y="22"/>
+				<Anchors>
+					<Anchor point="LEFT" relativePoint="RIGHT" x="-13" y="-3"/>
+				</Anchors>
+				<Scripts>
+					<OnClick>
+						PlaySound(SOUNDKIT.IG_MAINMENU_OPTION_CHECKBOX_ON);
+						local dropDown = self:GetParent();
+						dropDown:CheckOutfitForSave(dropDown.selectedOutfitID);
+					</OnClick>
+				</Scripts>
+			</Button>
+		</Frames>
+		<Scripts>
+			<OnLoad method="OnLoad"/>
+			<OnEvent method="OnEvent"/>
+			<OnShow method="OnShow"/>
+			<OnHide method="OnHide"/>
+		</Scripts>
+	</Frame>
+
+	<Frame name="BW_DressingRoomOutfitDropDown" parent = "DressUpFrame" inherits="BetterWardrobeOutfitDropDownTemplate" mixin="BW_DressUpOutfitMixin">
+		<KeyValues>
+			<KeyValue key="width" value="163" type="number"/>
+			<KeyValue key="minMenuStringWidth" value="127" type="number"/>
+			<KeyValue key="maxMenuStringWidth" value="190" type="number"/>
+		</KeyValues>
+		<Anchors>
+			<Anchor point="TOP" x="-23" y="-28"/>
+		</Anchors>
+	</Frame>
 </Ui>

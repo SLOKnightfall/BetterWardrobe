@@ -10,10 +10,52 @@ function addon.Init:BuildTransmogVendorUI()
 	UI:CreateDropDown()
 	--UI.OptionsDropDown_Initialize()
 	UI.ExtendTransmogView()
+	UpdateSlotButtons()
+
+
+
+----Temp fix for reseting head slot position when sencondary slot is toggled
+	function WardrobeTransmogFrame:CheckSecondarySlotButtons()
+	local headButton = self.HeadButton;
+	local mainShoulderButton = self.ShoulderButton;
+	local secondaryShoulderButton = self.SecondaryShoulderButton;
+	local secondaryShoulderTransmogged = TransmogUtil.IsSecondaryTransmoggedForItemLocation(secondaryShoulderButton.itemLocation);
+
+	local pendingInfo = C_Transmog.GetPending(secondaryShoulderButton.transmogLocation);
+	local showSecondaryShoulder = false;
+	if not pendingInfo then
+		showSecondaryShoulder = secondaryShoulderTransmogged;
+	elseif pendingInfo.type == Enum.TransmogPendingType.ToggleOff then
+		showSecondaryShoulder = false;
+	else
+		showSecondaryShoulder = true;
+	end
+
+	secondaryShoulderButton:SetShown(showSecondaryShoulder);
+	self.ToggleSecondaryAppearanceCheckbox:SetChecked(showSecondaryShoulder);
+
+	local point, relativeTo, relativePoint, xOfs, yOfs = headButton:GetPoint()
+	if showSecondaryShoulder then
+		headButton:SetPoint("TOP", xOfs, -15);
+		secondaryShoulderButton:SetPoint("TOP", mainShoulderButton, "BOTTOM", 0, -10);
+	else
+		headButton:SetPoint("TOP", xOfs, -41);
+		secondaryShoulderButton:SetPoint("TOP", mainShoulderButton, "TOP");
+	end
+
+	if not showSecondaryShoulder and self.selectedSlotButton == secondaryShoulderButton then
+		self:SelectSlotButton(mainShoulderButton);
+	end
+end
+	----addon:SecureHook(WardrobeTransmogFrame,"CheckSecondarySlotButtons", function()  C_Timer.After(0.1, function() print("SD"); UI.ExtendTransmogView() end)  end)
+
+
 end
 
 
 function UI:CreateDropDown()
+	WardrobeOutfitDropDown:Hide()
+
 	--Frame Mixin functionaly in SavedOutfits.lua file
 	--BW_WardrobeOutfitDropDown = CreateFrame("Frame", "BW_WardrobeOutfitDropDown", WardrobeTransmogFrame, "BW_WardrobeOutfitDropDownTemplate")
 	local f = CreateFrame("Frame", "BW_WardrobeOutfitDropDown", WardrobeTransmogFrame, "BW_UIDropDownMenuTemplate")
@@ -44,6 +86,9 @@ function UI:CreateDropDown()
 	f:SetScript("OnShow", f.OnShow)
 	f:SetScript("OnHide", f.OnHide)
 	BW_WardrobeOutfitDropDown = f
+
+	----local f = CreateFrame("Frame", "BW_WardrobeOutfitFrame", WardrobeTransmogFrame, "BW_WardrobeOutfitFrameTemplate")
+
 end
 
 
@@ -69,7 +114,7 @@ function UI:CreateButtons()
 
 	local BW_SlotHideButton = CreateFrame("Button", "BW_SlotHideButton", WardrobeTransmogFrame, "BetterWardrobeButtonTemplate")
 	BW_SlotHideButton.buttonID = "HideSlot"
-	--BW_SlotHideButton:SetScript("OnEnter", function(self) BW_DressingRoomButtonMixin:OnEnter() end)
+	BW_SlotHideButton:SetScript("OnEnter", function(self) BW_DressingRoomButtonMixin:OnEnter() end)
 	
 	BW_SlotHideButton.Icon:SetTexture("Interface\\PvPRankBadges\\PvPRank12")
 	--Mixin(BW_SlotHideButton, BW_SlotHideButtonMixin)
@@ -79,6 +124,12 @@ function UI:CreateButtons()
 	--BW_SlotHideButton:SetScript("OnMouseUp", BW_SlotHideButton.OnMouseUp)
 	--BW_SlotHideButton:SetScript("OnMouseDown", BW_SlotHideButton.OnMouseDown)
 	--BW_SlotHideButton:SetScript("OnEnter", BW_SlotHideButton.OnEnter)
+
+	local BW_TransmogOptionsDropDown= CreateFrame("Frame", "BW_TransmogOptionsDropDown", BetterWardrobeCollectionFrame, "BW_UIDropDownMenuTemplate")
+	BW_TransmogOptionsDropDown = BW_TransmogOptionsDropDown
+----	BetterWardrobeCollectionFrame.OptionsDropDown = BW_TransmogOptionsDropDown
+BetterWardrobeTransmogVendorOptionsDropDown_OnLoad(BW_TransmogOptionsDropDown)
+
 end
 
 
@@ -116,7 +167,7 @@ end
 --[[function UI.OptionsDropDown_Initialize(self)
 	local  f = addon.Frame:Create("SimpleGroup")
 	--UI.SavedSetDropDownFrame = f
-	f.frame:SetParent("BW_WardrobeCollectionFrame")
+	f.frame:SetParent("BetterWardrobeCollectionFrame")
 	f:SetWidth(87)--, 22)
 	f:SetHeight(22)
 
@@ -168,7 +219,7 @@ function BW_TransmogOptionsButton_OnEnter(self)
 	end
 end
 
-function BW_WardrobeTransmogVendorOptionsDropDown_OnLoad(self)
+function BetterWardrobeTransmogVendorOptionsDropDown_OnLoad(self)
 	BW_UIDropDownMenu_Initialize(self, UI.OptionsDropDown_Initialize, "MENU")
 end
 
@@ -215,11 +266,11 @@ function UI:OptionsDropDown_Initialize(level)
 						for i in pairs(locationDrowpDown) do
 							addon.includeLocation[i] = true
 						end
-						WardrobeCollectionFrame.SetsTransmogFrame:OnSearchUpdate()
+						BetterWardrobeCollectionFrame.SetsTransmogFrame:OnSearchUpdate()
 						--BW_SetsTransmogFrame:OnSearchUpdate()
-						if BW_WardrobeCollectionFrame.selectedTransmogTab == 3 then 
-							BW_WardrobeCollectionFrame_SetTab(2)
-							BW_WardrobeCollectionFrame_SetTab(3)
+						if BetterWardrobeCollectionFrame.selectedTransmogTab == 3 then 
+							----BW_WardrobeCollectionFrame_SetTab(2)
+							----BW_WardrobeCollectionFrame_SetTab(3)
 						end
 						BW_UIDropDownMenu_Refresh(BW_TransmogOptionsDropDown, 1, refreshLevel)
 					end
@@ -230,12 +281,12 @@ function UI:OptionsDropDown_Initialize(level)
 						for i in pairs(locationDrowpDown) do
 							addon.includeLocation[i] = false
 						end
-						WardrobeCollectionFrame.SetsTransmogFrame:OnSearchUpdate()
+						BetterWardrobeCollectionFrame.SetsTransmogFrame:OnSearchUpdate()
 						--BW_SetsTransmogFrame:OnSearchUpdate()
 												--BW_SetsTransmogFrame:OnSearchUpdate()
-						if BW_WardrobeCollectionFrame.selectedTransmogTab == 3 then 
-							BW_WardrobeCollectionFrame_SetTab(2)
-							BW_WardrobeCollectionFrame_SetTab(3)
+						if BetterWardrobeCollectionFrame.selectedTransmogTab == 3 then 
+						--	--BW_WardrobeCollectionFrame_SetTab(2)
+							----BW_WardrobeCollectionFrame_SetTab(3)
 						end
 						BW_UIDropDownMenu_Refresh(BW_TransmogOptionsDropDown, 1, refreshLevel)
 					end
@@ -253,12 +304,12 @@ function UI:OptionsDropDown_Initialize(level)
 							end
 
 							BW_UIDropDownMenu_Refresh(BW_TransmogOptionsDropDown, 1, 1)
-							WardrobeCollectionFrame.SetsTransmogFrame:OnSearchUpdate()
+							BetterWardrobeCollectionFrame.SetsTransmogFrame:OnSearchUpdate()
 							--BW_SetsTransmogFrame:OnSearchUpdate()
 													--BW_SetsTransmogFrame:OnSearchUpdate()
-							if BW_WardrobeCollectionFrame.selectedTransmogTab == 3 then 
-								BW_WardrobeCollectionFrame_SetTab(2)
-								BW_WardrobeCollectionFrame_SetTab(3)
+							if BetterWardrobeCollectionFrame.selectedTransmogTab == 3 then 
+								----BW_WardrobeCollectionFrame_SetTab(2)
+								----BW_WardrobeCollectionFrame_SetTab(3)
 							end
 						end
 				info.checked = function() return addon.includeLocation[index] end
@@ -278,8 +329,8 @@ function UI:OptionsDropDown_Initialize(level)
 				info.func = function(a, b, c, value)
 					addon.Profile.PartialLimit = info.value
 					BW_UIDropDownMenu_Refresh(BW_TransmogOptionsDropDown, 1, 1)
-					WardrobeCollectionFrame.SetsTransmogFrame:OnSearchUpdate()
-					BW_SetsTransmogFrame:OnSearchUpdate()
+					BetterWardrobeCollectionFrame.SetsTransmogFrame:OnSearchUpdate()
+					----BW_SetsTransmogFrame:OnSearchUpdate()
 				end
 			info.checked = 	function() return info.value == addon.Profile.PartialLimit end
 			BW_UIDropDownMenu_AddButton(info, level)
@@ -358,19 +409,20 @@ function UI.ExtendTransmogView(reset)
 		WardrobeTransmogFrame.Inset.BG:ClearAllPoints()
 		WardrobeTransmogFrame.Inset.BG:SetAllPoints()
 
-		WardrobeTransmogFrame.ModelScene.HeadButton:ClearAllPoints()
-		WardrobeTransmogFrame.ModelScene.HeadButton:SetPoint("TOP", WardrobeTransmogFrame.ModelScene, "TOP", -208, -41)
-		WardrobeTransmogFrame.ModelScene.HandsButton:ClearAllPoints()
-		WardrobeTransmogFrame.ModelScene.HandsButton:SetPoint("TOP", WardrobeTransmogFrame.ModelScene, "TOP", 205, -118)
+		WardrobeTransmogFrame.HeadButton:ClearAllPoints()
+		WardrobeTransmogFrame.HeadButton:SetPoint("TOP", WardrobeTransmogFrame.ModelScene, "TOP", -208, -41)
 
-		WardrobeTransmogFrame.ModelScene.MainHandButton:ClearAllPoints()
-		WardrobeTransmogFrame.ModelScene.MainHandButton:SetPoint("TOP", WardrobeTransmogFrame.ModelScene, "BOTTOM", -26, -5)
-		WardrobeTransmogFrame.ModelScene.SecondaryHandButton:ClearAllPoints()
-		WardrobeTransmogFrame.ModelScene.SecondaryHandButton:SetPoint("TOP", WardrobeTransmogFrame.ModelScene, "BOTTOM", 27, -5)
-		WardrobeTransmogFrame.ModelScene.MainHandEnchantButton:ClearAllPoints()
-		WardrobeTransmogFrame.ModelScene.MainHandEnchantButton:SetPoint("BOTTOM", WardrobeTransmogFrame.ModelScene.MainHandButton, "BOTTOM", 0, -20)
-		WardrobeTransmogFrame.ModelScene.SecondaryHandEnchantButton:ClearAllPoints()
-		WardrobeTransmogFrame.ModelScene.SecondaryHandEnchantButton:SetPoint("BOTTOM", WardrobeTransmogFrame.ModelScene.SecondaryHandButton, "BOTTOM", 0, -20)
+		WardrobeTransmogFrame.HandsButton:ClearAllPoints()
+		WardrobeTransmogFrame.HandsButton:SetPoint("TOP", WardrobeTransmogFrame, "TOP", 205, -118)
+
+		WardrobeTransmogFrame.MainHandButton:ClearAllPoints()
+		WardrobeTransmogFrame.MainHandButton:SetPoint("TOP", WardrobeTransmogFrame.ModelScene, "BOTTOM", -26, -5)
+		WardrobeTransmogFrame.SecondaryHandButton:ClearAllPoints()
+		WardrobeTransmogFrame.SecondaryHandButton:SetPoint("TOP", WardrobeTransmogFrame.ModelScene, "BOTTOM", 27, -5)
+		WardrobeTransmogFrame.MainHandEnchantButton:ClearAllPoints()
+		WardrobeTransmogFrame.MainHandEnchantButton:SetPoint("BOTTOM", WardrobeTransmogFrame.ModelScene.MainHandButton, "BOTTOM", 0, -20)
+		WardrobeTransmogFrame.SecondaryHandEnchantButton:ClearAllPoints()
+		WardrobeTransmogFrame.SecondaryHandEnchantButton:SetPoint("BOTTOM", WardrobeTransmogFrame.ModelScene.SecondaryHandButton, "BOTTOM", 0, -20)
 		
 		BW_WardrobeOutfitDropDown:ClearAllPoints()
 		BW_WardrobeOutfitDropDown:SetPoint("TOPLEFT", WardrobeTransmogFrame, 35, 28)
@@ -402,19 +454,19 @@ function UI.ExtendTransmogView(reset)
 		WardrobeTransmogFrame.ModelScene.ClearAllPendingButton:ClearAllPoints()
 		WardrobeTransmogFrame.ModelScene.ClearAllPendingButton:SetPoint("TOPRIGHT", WardrobeTransmogFrame.ModelScene, "TOPRIGHT", -5, -10)
 		
-		WardrobeTransmogFrame.ModelScene.HeadButton:ClearAllPoints()
-		WardrobeTransmogFrame.ModelScene.HeadButton:SetPoint("TOP", WardrobeTransmogFrame.ModelScene, "TOP", -121, -41)
-		WardrobeTransmogFrame.ModelScene.HandsButton:ClearAllPoints()
-		WardrobeTransmogFrame.ModelScene.HandsButton:SetPoint("TOP", WardrobeTransmogFrame.ModelScene, "TOP", 123, -118)
+		WardrobeTransmogFrame.HeadButton:ClearAllPoints()
+		WardrobeTransmogFrame.HeadButton:SetPoint("TOP", WardrobeTransmogFrame.ModelScene, "TOP", -121, -41)
+		WardrobeTransmogFrame.HandsButton:ClearAllPoints()
+		WardrobeTransmogFrame.HandsButton:SetPoint("TOP", WardrobeTransmogFrame.ModelScene, "TOP", 123, -118)
 
-		WardrobeTransmogFrame.ModelScene.MainHandButton:ClearAllPoints()
-		WardrobeTransmogFrame.ModelScene.MainHandButton:SetPoint("BOTTOM", WardrobeTransmogFrame.ModelScene, "BOTTOM", -26, 45)
-		WardrobeTransmogFrame.ModelScene.SecondaryHandButton:ClearAllPoints()
-		WardrobeTransmogFrame.ModelScene.SecondaryHandButton:SetPoint("BOTTOM", WardrobeTransmogFrame.ModelScene, "BOTTOM", 27, 45)
-		WardrobeTransmogFrame.ModelScene.MainHandEnchantButton:ClearAllPoints()
-		WardrobeTransmogFrame.ModelScene.MainHandEnchantButton:SetPoint("BOTTOM", WardrobeTransmogFrame.ModelScene.MainHandButton, "BOTTOM", 0, -20)
-		WardrobeTransmogFrame.ModelScene.SecondaryHandEnchantButton:ClearAllPoints()
-		WardrobeTransmogFrame.ModelScene.SecondaryHandEnchantButton:SetPoint("BOTTOM", WardrobeTransmogFrame.ModelScene.SecondaryHandButton, "BOTTOM", 0, -20)
+		WardrobeTransmogFrame.MainHandButton:ClearAllPoints()
+		WardrobeTransmogFrame.MainHandButton:SetPoint("BOTTOM", WardrobeTransmogFrame.ModelScene, "BOTTOM", -26, 45)
+		WardrobeTransmogFrame.SecondaryHandButton:ClearAllPoints()
+		WardrobeTransmogFrame.SecondaryHandButton:SetPoint("BOTTOM", WardrobeTransmogFrame.ModelScene, "BOTTOM", 27, 45)
+		WardrobeTransmogFrame.MainHandEnchantButton:ClearAllPoints()
+		WardrobeTransmogFrame.MainHandEnchantButton:SetPoint("BOTTOM", WardrobeTransmogFrame.ModelScene.MainHandButton, "BOTTOM", 0, -20)
+		WardrobeTransmogFrame.SecondaryHandEnchantButton:ClearAllPoints()
+		WardrobeTransmogFrame.SecondaryHandEnchantButton:SetPoint("BOTTOM", WardrobeTransmogFrame.ModelScene.SecondaryHandButton, "BOTTOM", 0, -20)
 
 		BW_WardrobeOutfitDropDown:ClearAllPoints()
 		BW_WardrobeOutfitDropDown:SetPoint("TOPLEFT", WardrobeTransmogFrame, -14, 28)
@@ -429,7 +481,7 @@ function UI.ExtendTransmogView(reset)
 		end
 	end
 
-	for i, button in pairs(	WardrobeTransmogFrame.ModelScene.SlotButtons) do
+	for i, button in pairs(	WardrobeTransmogFrame.SlotButtons) do
 		button:SetScale(scale);
 
 	end
@@ -442,4 +494,90 @@ end
 addon.ExtendTransmogView = UI.ExtendTransmogView
 
 
+---TEMP till dressing room module loaded
+BW_DressingRoomButtonMixin = {}
+function BW_DressingRoomButtonMixin:OnMouseDown()
+	GameTooltip:Hide()
+	local button = self.buttonID
+	if not button then return end
+	if button == "Settings" then
+		DressupSettingsButton_OnClick(self)
+	elseif button == "Import" then
+		BW_DressingRoomImportButton_OnClick(self)
+	elseif button == "Player" then
+		UseTargetModel = false
+		UpdateDressingRoomModel("player")
+	elseif button == "Target" then
+		UseTargetModel = true
+		UpdateDressingRoomModel("target")
+	elseif button == "Gear" then
+		--DressingRoom:SetTargetGear()
+		UseTargetModel = false
+		UpdateDressingRoomModel("target")
+	elseif button == "Reset" then
+		text =  RESET
+	elseif button == "Undress" then
+		BW_DressingRoomHideArmorButton_OnClick(self)
+	end
+end
 
+
+function BW_DressingRoomButtonMixin.OnEnter(self)
+	--local self = 	button or self
+	local button = self.buttonID
+	local text
+	if not button then return end
+	if button == "Settings" then
+	text =  L["General Options"]
+	elseif button == "Import" then
+		text =  L["Import/Export Options"]
+	elseif button == "Player" then
+		text =  L["Use Player Model"]
+	elseif button == "Target" then
+		text =  L["Use Target Model"]
+	elseif button == "Gear" then
+		text =  L["Use Target Gear"]
+	elseif button == "Reset" then
+		text =  RESET
+	elseif button == "Undress" then
+		text = L["Undress"]
+	elseif button == "HideSlot" then
+		text = L["Hide Armor Slots"]
+	end
+
+	GameTooltip:SetOwner(self, "ANCHOR_RIGHT")
+	GameTooltip:SetText(text)
+	GameTooltip:Show()
+end
+
+
+function BW_DressingRoomButtonMixin:OnLeave()
+	GameTooltip:Hide()
+end
+
+function UpdateSlotButtons()
+	for i, button in pairs(WardrobeTransmogFrame.SlotButtons) do
+		addon:SecureHook(button, "OnUserSelect", function(slotButton, fromOnClick) 
+			if slotButton then
+				slotButton:SetSelected(true);
+				if (fromOnClick and BetterWardrobeCollectionFrame.activeFrame ~= BetterWardrobeCollectionFrame.ItemsCollectionFrame) then
+					BetterWardrobeCollectionFrame:ClickTab(BetterWardrobeCollectionFrame.ItemsTab);
+				end
+				if ( BetterWardrobeCollectionFrame.activeFrame == BetterWardrobeCollectionFrame.ItemsCollectionFrame ) then
+					local _, _, selectedSourceID = TransmogUtil.GetInfoForEquippedSlot(slotButton.transmogLocation);
+					local forceGo = slotButton.transmogLocation:IsIllusion();
+					local forTransmog = true;
+					local effectiveCategory;
+					if slotButton.transmogLocation:IsEitherHand() then
+						effectiveCategory = C_Transmog.GetSlotEffectiveCategory(slotButton.transmogLocation);
+					end
+					BetterWardrobeCollectionFrame.ItemsCollectionFrame:GoToSourceID(selectedSourceID, slotButton.transmogLocation, forceGo, forTransmog, effectiveCategory);
+					BetterWardrobeCollectionFrame.ItemsCollectionFrame:SetTransmogrifierAppearancesShown(true);
+				end
+			else
+				BetterWardrobeCollectionFrame.ItemsCollectionFrame:SetTransmogrifierAppearancesShown(false);
+			end
+		end)
+
+	end
+end

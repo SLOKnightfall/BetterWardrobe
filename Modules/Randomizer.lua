@@ -30,8 +30,13 @@ local finalselection = {}
 --Updates the model after all items has been selected so model and pending looks match
 local function finalUpdate()
 	for slotID, mog in pairs(finalselection)do
-		local transmogLocation = TransmogUtil.GetTransmogLocation(slotID, Enum.TransmogType.Appearance, Enum.TransmogModification.None);
-		C_Transmog.SetPending(transmogLocation, mog, Enum.TransmogType.Appearance)
+
+		local transmogLocation = TransmogUtil.GetTransmogLocation(slotID, Enum.TransmogType.Appearance, Enum.TransmogModification.Main);
+		pendingInfo = TransmogUtil.CreateTransmogPendingInfo(Enum.TransmogPendingType.Apply, mog);
+		C_Transmog.SetPending(transmogLocation, pendingInfo);
+
+		----local transmogLocation = TransmogUtil.GetTransmogLocation(slotID, Enum.TransmogType.Appearance, Enum.TransmogModification.Main);
+		-----C_Transmog.SetPending(transmogLocation, mog, Enum.TransmogType.Appearance)
 		finalselection[slotID] = nil
 	end
 end
@@ -64,7 +69,7 @@ function BW_RandomizeButtonMixin:BuildAppearanceList()
 		local slot = slotInfo.slotID
 		local slotID = slotInfo.location:GetSlotID()
 
-		local transmogLocation = TransmogUtil.GetTransmogLocation(slotID, Enum.TransmogType.Appearance, Enum.TransmogModification.None);
+		local transmogLocation = TransmogUtil.GetTransmogLocation(slotID, Enum.TransmogType.Appearance, Enum.TransmogModification.Main);
 
 		AppearanceList[slotID] = AppearanceList[slotID] or {}
 
@@ -103,8 +108,11 @@ local function RandomizeBySlot(slotID)
 			for _, source in pairs(sourceList) do
 				if source.isCollected then
 
-					local transmogLocation = TransmogUtil.GetTransmogLocation(slotID, Enum.TransmogType.Appearance, Enum.TransmogModification.None);
-					C_Transmog.SetPending(transmogLocation, source.sourceID, Enum.TransmogType.Appearance)
+					local transmogLocation = TransmogUtil.GetTransmogLocation(slotID, Enum.TransmogType.Appearance, Enum.TransmogModification.Main);
+					pendingInfo = TransmogUtil.CreateTransmogPendingInfo(Enum.TransmogPendingType.Apply, source.sourceID);
+					C_Transmog.SetPending(transmogLocation, pendingInfo);
+
+					----C_Transmog.SetPending(transmogLocation, source.sourceID, Enum.TransmogType.Appearance)
 					finalselection[slotID] = source.sourceID
 					break
 				end

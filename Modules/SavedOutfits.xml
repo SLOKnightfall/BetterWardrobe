@@ -16,7 +16,7 @@
 	<Button name="BW_WardrobeOutfitFrameButtonTemplate" inherits="WardrobeOutfitButtonTemplate" virtual="true" mixin="BW_WardrobeOutfitButtonMixin">
 	</Button>
 
-	<Frame name="BW_WardrobeOutfitEditFrame" parent="UIParent" hidden="true" frameStrata="DIALOG"  mixin="BW_WardrobeOutfitEditFrameMixin">
+	<Frame name="BW_WardrobeOutfitEditFrame" parent="UIParent" hidden="true" frameStrata="DIALOG"  mixin="BW_WardrobeOutfitEditFrameMixin" >
 		<Size x="320" y="174"/>
 		<Anchors>
 			<Anchor point="CENTER"/>
@@ -132,7 +132,7 @@
 		</Scripts>
 	</Frame>
 
-	<Frame name="BW_WardrobeOutfitFrame" frameStrata="DIALOG" parent="WardrobeTransmogFrame" hidden="true" enableMouse="true" mixin="BW_WardrobeOutfitFrameMixin">
+	<Frame name="BW_WardrobeOutfitFrame" frameStrata="DIALOG" parent="UIParent" hidden="true" enableMouse="true" mixin="BW_WardrobeOutfitFrameMixin"   >
 		<Size x="224" y="200"/>
 		<Anchors>
 			<Anchor point="TOPLEFT"/>
@@ -147,7 +147,7 @@
 		</Scripts>
 	</Frame>
 
-	<Frame name="BW_WardrobeOutfitCheckAppearancesFrame" inherits="LoadingSpinnerTemplate" hidden="true" mixin="BW_WardrobeOutfitCheckAppearancesMixin">
+	<Frame name="BW_WardrobeOutfitCheckAppearancesFrameTemplate" inherits="LoadingSpinnerTemplate" hidden="true" mixin="BW_WardrobeOutfitCheckAppearancesMixin" virtual="true">
 		<Scripts>
 			<OnLoad method="OnLoad"/>
 			<OnShow method="OnShow"/>

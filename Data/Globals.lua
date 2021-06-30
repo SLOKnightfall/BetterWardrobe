@@ -30,7 +30,9 @@ Globals.CLASS_INFO = {
 
 --[[
 
-bit.band(2,2053)
+bit.band( 3592,400)
+
+bit.band(1,35)
 
 DEATHKNIGHT
 a137006
@@ -45,6 +47,8 @@ HUNTER
 
 ]]--
 Globals.ARMOR_TYPE = {"CLOTH", "LEATHER", "MAIL", "PLATE"}
+Globals.ARMOR_TYPE_ID = {["CLOTH"] = 1, ["LEATHER"]=2, ["MAIL"]=3, ["PLATE"]=4}
+
 
 Globals.ARMOR_CLASSES = {}
 for type in pairs(Globals.ARMOR_MASK ) do

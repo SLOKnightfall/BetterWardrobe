@@ -56,6 +56,9 @@ function BetterWardrobe:ToggleDressingRoom()
 end
 
 function addon.Init:DressingRoom()
+	----mix1()
+		DressUpFrameOutfitDropDown:Hide()
+
 	DressingRoom:CreateDropDown()
 	Buttons = BW_DressingRoomFrame.PreviewButtonFrame.Slots
 	Profile = addon.Profile
@@ -71,13 +74,15 @@ end
 --Creates the Dressing Room Outfit Dropdown using the menu library
 function DressingRoom:CreateDropDown()
 	--local f = BW_UIDropDownMenu_Create("BW_DressingRoomOutfitDropDown", DressUpFrame)
-	local f  = CreateFrame("Frame", "BW_DressingRoomOutfitDropDown", DressUpFrame, "BW_UIDropDownMenuTemplate")
+	----local f  = CreateFrame("Frame", "BW_DressingRoomOutfitDropDown", DressUpFrame, "BW_UIDropDownMenuTemplate")
+	f = BW_DressingRoomOutfitDropDown
 	f.width = 163
 	f.minMenuStringWidth = 127
 	f.maxMenuStringWidth = 190
 
 	f:SetPoint("TOP", -23, -28)
-	Mixin(f, WardrobeOutfitDropDownMixin)
+
+--[[	Mixin(f, WardrobeOutfitDropDownMixin)
 	Mixin(f, BW_DressingRoomMixin)
 	f.SaveButton = CreateFrame("Button", nil, f, "UIPanelButtonTemplate")
 	f.SaveButton:SetSize(88, 22)
@@ -97,6 +102,8 @@ function DressingRoom:CreateDropDown()
 	DressUpFrame.BW_OutfitDropDown = f
 	BW_DressingRoomOutfitDropDown = f
 	f:SetFrameLevel(500)
+	DressUpFrameOutfitDropDown:Hide()
+	BW_WardrobeOutfitDropDown = f]]
 end
 
 
@@ -195,8 +202,10 @@ local function GetDressUpModelSlotSource(slotID, enchantID)
 		return
 	end
 
-	local appliedSourceID, illusionSourceID = playerActor:GetSlotTransmogSources(slotID)
-
+	local slotname = TransmogUtil.GetSlotName(slotID)
+	local transmogLocation = TransmogUtil.GetTransmogLocation(slotname, Enum.TransmogType.Appearance, Enum.TransmogModification.Main);
+	local info = playerActor:GetItemTransmogInfoList()
+	appliedSourceID = info[slotID].appearanceID
 	if appliedSourceID < 0 then return end
 
 	local sourceInfo = GetTransmogSourceInfo(appliedSourceID)
@@ -232,7 +241,6 @@ local function GetDressingSource(mainHandEnchant, offHandEnchant)
 	wipe(newSet.items)
 	wipe(ItemList)
 
-	
 	for _, button in pairs(Buttons) do
 		local slotID = button:GetID()
 		if slotID == 16 then
@@ -523,6 +531,7 @@ end
 function UpdateDressingRoom(...)
 	local viewedLink = ...
 	local frame = BW_DressingRoomFrame
+	if not BW_DressingRoomFrame then return end
 
 	if not frame.pauseUpdate or viewedLink then
 		frame.pauseUpdate = true
@@ -567,10 +576,12 @@ function UpdateDressingRoom(...)
 end
 
 
+
 BW_DressingRoomFrameMixin = {}
 function BW_DressingRoomFrameMixin:OnLoad()
 	self:RegisterEvent("ADDON_LOADED")
 	hooksecurefunc("DressUpVisual", UpdateDressingRoom)
+	hooksecurefunc("DressUpCollectionAppearance", UpdateDressingRoom)
 end
 
 
@@ -606,14 +617,12 @@ function BW_DressingRoomFrameMixin:OnHide()
 	self.isActorHooked = false
 end
 
-
 function BW_DressingRoomFrameMixin:OnEvent(event, ...)
 	local arg1 = ...
 	if event == "INSPECT_READY" then
 		self:UnregisterEvent("INSPECT_READY")
 		After(0,function()
-			self.mainHandEnchant, self.offHandEnchant = DressUpSources(C_TransmogCollection.GetInspectSources())
-			GetDressingSource(self.mainHandEnchant, self.offHandEnchant)
+			DressUpItemTransmogInfoList(C_TransmogCollection.GetInspectItemTransmogInfoList());
 			ClearInspectPlayer()
 		end)
 	elseif 	event == "ADDON_LOADED" and arg1 == "Blizzard_InspectUI" then 
@@ -855,140 +864,6 @@ function DressingRoom:UpdateBackground()
 end
 
 
-BW_DressingRoomMixin = CreateFromMixins(BW_WardrobeOutfitMixin)
-function BW_DressingRoomMixin:OnLoad()
-DressUpFrameOutfitDropDown:Hide()
-	local button = _G[self:GetName().."Button"]
-	button:SetScript("OnMouseDown", function(self)
-						PlaySound(SOUNDKIT.IG_MAINMENU_OPTION_CHECKBOX_ON)
-						BW_DressingRoomOutfitFrame:Toggle(self:GetParent())
-						end)
-
-	BW_UIDropDownMenu_JustifyText(self, "LEFT")
-	if self.width then
-		BW_UIDropDownMenu_SetWidth(self, self.width)
-	end
-	WardrobeOutfitDropDown:Hide()
-
-	--addon:SecureHook(nil, "WardrobeTransmogFrame_OnTransmogApplied", function()
-			--if BW_WardrobeOutfitDropDown.selectedOutfitID and BW_WardrobeOutfitDropDown:IsOutfitDressed( then
-				--WardrobeTransmogFrame.BW_OutfitDropDown:OnOutfitApplied(BW_WardrobeOutfitDropDown.selectedOutfitID)
-			--end
-		--end, true)
-end
-
-
-function BW_DressingRoomMixin:OnShow()
-	self:RegisterEvent("TRANSMOG_OUTFITS_CHANGED")
-	self:RegisterEvent("TRANSMOGRIFY_UPDATE")
-	self:SelectOutfit(BW_WardrobeOutfitDropDown:GetLastOutfitID(), true)
-end
-
-
-function BW_DressingRoomMixin:OnHide()
-	self:UnregisterEvent("TRANSMOG_OUTFITS_CHANGED")
-	self:UnregisterEvent("TRANSMOGRIFY_UPDATE")
-	BW_DressingRoomOutfitFrame:ClosePopups(self)
-	if ( BW_DressingRoomOutfitFrame.dropDown == self ) then
-		BW_DressingRoomOutfitFrame:Hide()
-	end
-end
-
-function WardrobeOutfitDropDownMixin:OnEvent(event)
-	if ( event == "TRANSMOG_OUTFITS_CHANGED" ) then
-		-- try to reselect the same outfit to update the name
-		-- if it changed or clear the name if it got deleted
-		self:SelectOutfit(self.selectedOutfitID)
-		if ( BW_DressingRoomOutfitFrame:IsShown() ) then
-			BW_DressingRoomOutfitFrame:Update()
-		end
-	end
-	-- don't need to do anything for "TRANSMOGRIFY_UPDATE" beyond updating the save button
-	self:UpdateSaveButton()
-end
-
-
-function BW_DressingRoomMixin:LoadOutfit(outfitID)
-	if not outfitID then
-		return false
-	end
-
-	local playerActor = DressUpFrame.ModelScene:GetPlayerActor()
-		if (not playerActor) then
-		return false
-	end
-
-	local MogItOutfit = false
-	if outfitID > 1000 then MogItOutfit = true end
-
-	playerActor:Undress()
-	UpdateDressingRoom()
-
-	import = true
-	if self:IsDefaultSet(outfitID) then
-		DressUpSources(C_TransmogCollection.GetOutfitSources(outfitID))
-	else
-		local outfit
-		if outfitID > 1000 then
-			outfit = addon.MogIt.MogitSets[outfitID]
-		else
-			outfit = addon.OutfitDB.char.outfits[LookupIndexFromID(outfitID)]
-		end
-
-		local outfit_sources = {}
-		--need to itterate a full table as the DressUpSources uses the table size
-		for i = 1, 19  do
-			outfit_sources[i] = outfit[i] or NO_TRANSMOG_SOURCE_ID
-		end
-		DressUpSources(outfit_sources, outfit["mainHandEnchant"], outfit["offHandEnchant"])
-	end
-	import = false
-	UpdateDressingRoom()
-end
-
-
-BW_DressingRoomOutfitFrameMixin = CreateFromMixins(BW_WardrobeOutfitFrameMixin)
-function BW_DressingRoomOutfitFrameMixin:Toggle(dropDown)
-	if self.dropDown == dropDown and self:IsShown() then
-		self:Hide()
-	else
-		CloseDropDownMenus()
-		BW_CloseDropDownMenus()
-		self.dropDown = dropDown
-		self:Show()
-		self:SetPoint("TOPLEFT", self.dropDown, "BOTTOMLEFT", 8, -3)
-		self:Update()
-	end
-end
-
-
-function BW_DressingRoomOutfitFrameMixin:GetSlotSourceID(transmogLocation)
-	local playerActor = DressUpFrame.ModelScene:GetPlayerActor()
-	if (not playerActor) then
-		return
-	end
-
-	-- TODO: GetSlotTransmogSources needs to use modification
-	local appearanceSourceID, illusionSourceID = playerActor:GetSlotTransmogSources(transmogLocation:GetSlotID())
-	if ( transmogLocation:IsAppearance() ) then
-		return appearanceSourceID
-	elseif ( transmogLocation:IsIllusion() ) then
-		return illusionSourceID
-	end
-end
-
-
-BW_DressingRoomOutfitButtonMixin = CreateFromMixins(BW_WardrobeOutfitButtonMixin)
-function BW_DressingRoomOutfitButtonMixin:OnClick()
-	PlaySound(SOUNDKIT.IG_MAINMENU_OPTION_CHECKBOX_ON)
-	BW_DressingRoomOutfitFrame:Hide()
-	if self.outfitID then
-		BW_DressingRoomOutfitFrame.dropDown:SelectOutfit(self.outfitID, true)
-	else
-		BW_DressingRoomOutfitFrame.dropDown:CheckOutfitForSave()
-	end
-end
-
 
 function BW_DressingRoomHideArmorButton_OnClick()
 	local playerActor = DressUpFrame.ModelScene:GetPlayerActor()
@@ -996,5 +871,55 @@ function BW_DressingRoomHideArmorButton_OnClick()
 		return false
 	end
 	playerActor:Undress()
+	UpdateDressingRoom()
+end
+
+----BW_WardrobeOutfitFrameMixin = CreateFromMixins(WardrobeOutfitFrameMixin)
+
+BW_WardrobeOutfitDropDownMixin = CreateFromMixins(WardrobeOutfitDropDownMixin) ----BW_DressingRoomOutfitDropDown inherits
+
+BW_DressUpOutfitMixin = CreateFromMixins(DressUpOutfitMixin)  ----BW_DressingRoomOutfitDropDown
+
+function BW_DressUpOutfitMixin:OnLoad()
+
+	local button = _G[self:GetName().."Button"]
+	button:SetScript("OnMouseDown", function(self)
+						PlaySound(SOUNDKIT.IG_MAINMENU_OPTION_CHECKBOX_ON)
+						BW_WardrobeOutfitFrame:Toggle(BW_DressingRoomOutfitDropDown)--self:GetParent())
+						end
+					)
+	BW_UIDropDownMenu_JustifyText(self, "LEFT")
+	if (self.width) then
+		BW_UIDropDownMenu_SetWidth(self, self.width)
+	end
+--[[
+	addon:SecureHook(WardrobeTransmogFrame, "OnTransmogApplied", function()
+	C_Timer.After(.5, function()
+			if BW_WardrobeOutfitDropDown.selectedOutfitID and BW_WardrobeOutfitDropDown:IsOutfitDressed() then
+				BW_WardrobeOutfitDropDown:OnOutfitApplied(BW_WardrobeOutfitDropDown.selectedOutfitID)
+			end
+		end)
+		end, true)
+		]]
+end
+
+
+function BW_WardrobeOutfitDropDownMixin:SelectOutfit(outfitID, loadOutfit)
+	local name;
+	if ( outfitID ) then
+		name = C_TransmogCollection.GetOutfitInfo(outfitID);
+	end
+	if ( name ) then
+		UIDropDownMenu_SetText(self, name);
+	else
+		outfitID = nil;
+		UIDropDownMenu_SetText(self, GRAY_FONT_COLOR_CODE..TRANSMOG_OUTFIT_NONE..FONT_COLOR_CODE_CLOSE);
+	end
+	self.selectedOutfitID = outfitID;
+	if ( loadOutfit ) then
+		self:LoadOutfit(outfitID);
+	end
+	self:UpdateSaveButton();
+	self:OnSelectOutfit(outfitID);
 	UpdateDressingRoom()
 end

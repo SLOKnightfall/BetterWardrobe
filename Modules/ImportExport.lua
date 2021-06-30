@@ -60,15 +60,17 @@ local function ImportSet(importString)
 	importString = importString and importString:match("items=([^#]+)")
 	if importString then
 		local tbl = {};
+
 		for item in importString:gmatch("([^:;]+)") do
 			local itemID, bonusMod = item:match("^(%d+)%.%d+%.%d+%.%d+%.%d+%.%d+%.%d+%.%d+%.%d+%.%d+%.(%d+)")
 			itemID = itemID or item:match("^(%d+)");
 			local link = ToStringItem(tonumber(itemID), tonumber(bonusMod))
-			local appearanceID, sourceID = C_TransmogCollection.GetItemInfo(link)
-			table.insert(tbl, sourceID)
+			table.insert(tbl, link)
 		end
 		BW_DressingRoomHideArmorButton_OnClick()
-		DressUpSources(tbl)
+		for i, link in ipairs(tbl) do
+			DressUpLink(link)
+		end
 	end
 end
 
@@ -231,7 +233,9 @@ local function ExportTransmogVendorSet()
 	local str;
 	for key, transmogSlot in pairs(TRANSMOG_SLOTS) do
 		if ( transmogSlot.location:IsAppearance() ) then
-			local sourceID = WardrobeOutfitDropDown:GetSlotSourceID(transmogSlot.location)
+			
+			----local sourceID = WardrobeOutfitDropDown:GetSlotSourceID(transmogSlot.location)
+			local _, _, sourceID = TransmogUtil.GetInfoForEquippedSlot(transmogSlot.location);
 			if ( sourceID ) then
 				local sourceInfo = C_TransmogCollection.GetSourceInfo(sourceID)
 				if sourceInfo then 
@@ -293,7 +297,8 @@ function addon:CreateChatLinkTransmogVendor()
 	local string = [[/run local function f(i,b)DressUpItemLink("item:"..i.."::::::::::::9:"..b);end;]]
 	for key, transmogSlot in pairs(TRANSMOG_SLOTS) do
 		if ( transmogSlot.location:IsAppearance() ) then
-			local sourceID = WardrobeOutfitDropDown:GetSlotSourceID(transmogSlot.location)
+			local _, _, sourceID = TransmogUtil.GetInfoForEquippedSlot(transmogSlot.location)
+			----local sourceID = WardrobeOutfitDropDown:GetSlotSourceID(transmogSlot.location)
 			if ( sourceID ) then
 				local sourceInfo = C_TransmogCollection.GetSourceInfo(sourceID)
 				if sourceInfo then 

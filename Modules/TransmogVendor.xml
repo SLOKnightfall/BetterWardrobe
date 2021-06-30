@@ -1,5 +1,6 @@
 <Ui xmlns="http://www.blizzard.com/wow/ui/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.blizzard.com/wow/ui/
 ..\FrameXML\UI.xsd">
+	<Script file="TransmogVendor.lua"/>
 	<Script file="Randomizer.lua"/>
 
 	<Button name ="BetterWardrobeButtonTemplate" inherits="SquareIconButtonTemplate" mixin="BW_DressingRoomButtonMixin" virtual="true" hidden="false">

@@ -31,7 +31,7 @@ function addon.Init:BuildTooltips()
 	Models.modelZoomed:SetUnit("player")
 	tooltip.rotate:SetShown(addon.Profile.TooltipPreviewRotate)
 	tooltip:SetSize(addon.Profile.TooltipPreview_Width, addon.Profile.TooltipPreview_Height)
-	C_TransmogCollection.SetShowMissingSourceInItemTooltips(addon.Profile.ShowAdditionalSourceTooltips)
+	----C_TransmogCollection.SetShowMissingSourceInItemTooltips(addon.Profile.ShowAdditionalSourceTooltips)
 
 	tooltip:SetScript("OnShow", function(self)
 		if addon.Profile.TooltipPreview_MouseRotate and not InCombatLockdown() then
@@ -109,6 +109,7 @@ function addon.Init:BuildTooltips()
 --tooltip.model:SetPoint("TOPLEFT", tooltip, "TOPLEFT", 5, -5)
 --tooltip.model:SetPoint("BOTTOMRIGHT", tooltip, "BOTTOMRIGHT", -5, 5)
 --tooltip.model:SetAnimation(0, 0)
+
 --tooltip.model:SetLight(true, false, 0, 0.8, -1, 1, 1, 1, 1, 0.3, 1, 1, 1)
 
 end
@@ -213,9 +214,14 @@ local function GetSourceFromItem(item)
 			tooltip.model:Undress()
 			tooltip.model:TryOn(item)
 			for i = 1, 19 do
-				local source = tooltip.model:GetSlotTransmogSources(i)
-				if source ~= 0 then
-					itemSourceID[item] = source
+				local itemTransmogInfo = tooltip.model:GetItemTransmogInfo(i)
+				local appearanceID = itemTransmogInfo and itemTransmogInfo.appearanceID or Constants.Transmog.NoTransmogID;
+
+				----local source = tooltip.model:GetSlotTransmogSources(i)
+				----if source ~= 0 then
+				if appearanceID ~= 0 then
+
+					itemSourceID[item] = appearanceID
 					break
 				end
 			end
@@ -353,7 +359,7 @@ function tooltip:ShowTooltip(itemLink)
 			for i, setID in pairs(setIDs) do
 				local setInfo = C_TransmogSets.GetSetInfo(setID)
 				addDoubleLine (self,"|cffffd100"..L["Part of Set:"], " ")
-				local collected, total = addon.SetsDataProvider:GetSetSourceCounts(setID)
+				local collected, total = 0,0------addon.SetsDataProvider:GetSetSourceCounts(setID)
 				local color = YELLOW_FONT_COLOR_CODE
 				if collected == total then
 					color = GREEN_FONT_COLOR_CODE
@@ -387,7 +393,7 @@ function tooltip:ShowTooltip(itemLink)
 			addDoubleLine (self,"|cffffd100"..L["Part of Extra Set:"], " ")
 			for _, data in pairs(setData) do
 				--if not shownSetNames[data.name] then 
-					local collected, total = addon.ExtraSetsDataProvider:GetSetSourceCounts(data.setID)
+					local collected, total = 0,0 ------addon.ExtraSetsDataProvider:GetSetSourceCounts(data.setID)
 					local color = YELLOW_FONT_COLOR_CODE
 					if collected == total then
 						color = GREEN_FONT_COLOR_CODE
@@ -430,9 +436,10 @@ function tooltip:ShowPreview(itemLink)
 	local itemID, _, _, slot = GetItemInfoInstant(itemLink)
 	if self.item ~= itemLink then
 		self.item = itemLink
-
 		local slot = select(9, GetItemInfo(itemID))
-		if (not addon.Profile.TooltipPreview_MogOnly or select(3, C_Transmog.GetItemInfo(itemID))) and addon.Globals.tooltip_slots[slot] and IsDressableItem(itemLink) then
+		------if (not addon.Profile.TooltipPreview_MogOnly or select(3, C_Transmog.GetItemInfo(itemID))) and addon.Globals.tooltip_slots[slot] and IsDressableItem(itemLink) then
+
+		if addon.Globals.tooltip_slots[slot] and IsDressableItem(itemLink) then
 			local cameraID, itemCamera
 			if addon.Profile.TooltipPreview_ZoomItem or addon.Profile.TooltipPreview_ZoomWeapon then
 				cameraID, itemCamera = addon.Camera:GetCameraID(itemLink, addon.Profile.TooltipPreview_CustomModel and addon.Profile.TooltipPreview_CustomRace, addon.Profile.TooltipPreview_CustomModel and addon.Profile.TooltipPreview_CustomGender)

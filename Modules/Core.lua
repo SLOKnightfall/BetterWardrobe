@@ -995,6 +995,82 @@ addon.frame = f
 
 ---Ace based addon initilization
 function addon:OnInitialize()
+	--print(string.byte(addon.VisualColors[42592])
+	local DB_Defaults = DB_Defaults
+	BetterWardrobe_ListData = BetterWardrobe_ListData or {}
+	local listDB = BetterWardrobe_ListData
+	listDB.favoritesDB = listDB.favoritesDB or {}
+	listDB.collectionListDB = listDB.collectionListDB or {}
+	listDB.HiddenAppearanceDB = listDB.HiddenAppearanceDB or {}
+	listDB.OutfitDB = listDB.OutfitDB or {}
+
+	--UpdateDB()
+
+--Create all the profiled DB
+	self.db = LibStub("AceDB-3.0"):New("BetterWardrobe_Options", defaults, true)
+	options.args.settings.args.options = LibStub("AceDBOptions-3.0"):GetOptionsTable(self.db)
+	options.args.settings.args.options.name = L["Options Profiles"]
+	options.args.settings.args.options.order = 2
+
+	self.chardb = LibStub("AceDB-3.0"):New("BetterWardrobe_CharacterData", DB_Defaults.char_defaults)
+	--options.args.list_profiles.args.charprofiles = LibStub("AceDBOptions-3.0"):GetOptionsTable(self.chardb)
+	--options.args.list_profiles.args.charprofiles.name = L["Profiles - Collection Settings"]
+
+	self.setdb = LibStub("AceDB-3.0"):New("BetterWardrobe_SavedSetData", DB_Defaults.savedsets_defaults)
+	self.itemsubdb = LibStub("AceDB-3.0"):New("BetterWardrobe_SubstituteItemData", DB_Defaults.itemsub_defaults, true)
+	self.OutfitDB = LibStub("AceDB-3.0"):New(listDB.OutfitDB, DB_Defaults.charSavedOutfits_defaults)
+
+	self.favoritesDB =  LibStub("AceDB-3.0"):New(listDB.favoritesDB, DB_Defaults.list_defaults)
+	self.collectionListDB =  LibStub("AceDB-3.0"):New(listDB.collectionListDB, DB_Defaults.collectionList_defaults)
+	self.HiddenAppearanceDB =  LibStub("AceDB-3.0"):New(listDB.HiddenAppearanceDB, DB_Defaults.list_defaults)
+	self.char_savedOutfits = LibStub("AceDB-3.0"):New("BetterWardrobe_SavedOutfitData", charSavedOutfits_defaults, true)
+
+	local profile = self.setdb:GetCurrentProfile()
+
+
+	--self.setdb.global[profile] = self.setdb.char
+	addon.SelecteSavedList = false
+	options.args.subitems = itemSub_options
+	options.args.subitems.name = L["Item Substitution"]
+
+	options.args.char_savedOutfits = savedOutfits_options
+	options.args.char_savedOutfits.name = L["Saved Outfits"]
+
+	options.args.subitems.args.options = LibStub("AceDBOptions-3.0"):GetOptionsTable(self.itemsubdb)
+	--options.args.char_savedOutfits.args.profiles = LibStub("AceDBOptions-3.0"):GetOptionsTable(self.char_savedOutfits)
+
+	options.args.list_profiles.args.favoriteLists = LibStub("AceDBOptions-3.0"):GetOptionsTable(self.favoritesDB)
+	options.args.list_profiles.args.favoriteLists.name = L["Favorite Items & Sets"]
+	options.args.list_profiles.args.favoriteLists.order = 2
+
+	options.args.list_profiles.args.collectionLists = LibStub("AceDBOptions-3.0"):GetOptionsTable(self.collectionListDB)
+	options.args.list_profiles.args.collectionLists.name = L["Collection List"]
+	options.args.list_profiles.args.collectionLists.order = 3
+
+
+
+	options.args.list_profiles.args.HiddenAppearanceDB = LibStub("AceDBOptions-3.0"):GetOptionsTable(self.HiddenAppearanceDB)
+	options.args.list_profiles.args.HiddenAppearanceDB.name = L["Hidden Items & Sets"]
+	options.args.list_profiles.args.HiddenAppearanceDB.order = 4
+
+
+
+	LibStub("AceConfigRegistry-3.0"):ValidateOptionsTable(options, addonName)
+	LibStub("AceConfig-3.0"):RegisterOptionsTable(addonName, options)
+
+	self.optionsFrame = LibStub("AceConfigDialog-3.0"):AddToBlizOptions("BetterWardrobe", "BetterWardrobe")
+	self.db.RegisterCallback(addon, "OnProfileChanged", "RefreshConfig")
+	self.db.RegisterCallback(addon, "OnProfileCopied", "RefreshConfig")
+
+
+	self.collectionListDB.RegisterCallback(addon, "OnProfileChanged", "RefreshCollectionListData")
+
+
+	self.itemsubdb.RegisterCallback(addon, "OnProfileReset", "RefreshSubItemData")	
+
+	if firstRun then
+		listDB.lastUpdte = 1
+	end
 
 end
 
@@ -1106,135 +1182,136 @@ function UpdateDB()
 	end
 end
 
-
-
-
-
 function addon:OnEnable()
-
 	_,playerClass, classID = UnitClass("player")
-	local DB_Defaults = DB_Defaults
-	BetterWardrobe_ListData = BetterWardrobe_ListData or {}
-	local listDB = BetterWardrobe_ListData
-	listDB.favoritesDB = listDB.favoritesDB or {}
-	listDB.collectionListDB = listDB.collectionListDB or {}
-	listDB.HiddenAppearanceDB = listDB.HiddenAppearanceDB or {}
-	listDB.OutfitDB = listDB.OutfitDB or {}
-
-	UpdateDB()
-
---Create all the profiled DB
-	self.db = LibStub("AceDB-3.0"):New("BetterWardrobe_Options", defaults, true)
-	options.args.settings.args.options = LibStub("AceDBOptions-3.0"):GetOptionsTable(self.db)
-	options.args.settings.args.options.name = L["Options Profiles"]
-	options.args.settings.args.options.order = 2
-
-	self.chardb = LibStub("AceDB-3.0"):New("BetterWardrobe_CharacterData", DB_Defaults.char_defaults)
-	--options.args.list_profiles.args.charprofiles = LibStub("AceDBOptions-3.0"):GetOptionsTable(self.chardb)
-	--options.args.list_profiles.args.charprofiles.name = L["Profiles - Collection Settings"]
-
-	self.setdb = LibStub("AceDB-3.0"):New("BetterWardrobe_SavedSetData", DB_Defaults.savedsets_defaults)
-	self.itemsubdb = LibStub("AceDB-3.0"):New("BetterWardrobe_SubstituteItemData", DB_Defaults.itemsub_defaults, true)
-	self.OutfitDB = LibStub("AceDB-3.0"):New(listDB.OutfitDB, DB_Defaults.charSavedOutfits_defaults)
-
-	self.favoritesDB =  LibStub("AceDB-3.0"):New(listDB.favoritesDB, DB_Defaults.list_defaults)
-	self.collectionListDB =  LibStub("AceDB-3.0"):New(listDB.collectionListDB, DB_Defaults.collectionList_defaults)
-	self.HiddenAppearanceDB =  LibStub("AceDB-3.0"):New(listDB.HiddenAppearanceDB, DB_Defaults.list_defaults)
-	self.char_savedOutfits = LibStub("AceDB-3.0"):New("BetterWardrobe_SavedOutfitData", charSavedOutfits_defaults, true)
-
-	local profile = self.setdb:GetCurrentProfile()
-
-
-	--self.setdb.global[profile] = self.setdb.char
-	addon.SelecteSavedList = false
-	options.args.subitems = itemSub_options
-	options.args.subitems.name = L["Item Substitution"]
-
-	options.args.char_savedOutfits = savedOutfits_options
-	options.args.char_savedOutfits.name = L["Saved Outfits"]
-
-	options.args.subitems.args.options = LibStub("AceDBOptions-3.0"):GetOptionsTable(self.itemsubdb)
-	--options.args.char_savedOutfits.args.profiles = LibStub("AceDBOptions-3.0"):GetOptionsTable(self.char_savedOutfits)
-
-	options.args.list_profiles.args.favoriteLists = LibStub("AceDBOptions-3.0"):GetOptionsTable(self.favoritesDB)
-	options.args.list_profiles.args.favoriteLists.name = L["Favorite Items & Sets"]
-	options.args.list_profiles.args.favoriteLists.order = 2
-
-	options.args.list_profiles.args.collectionLists = LibStub("AceDBOptions-3.0"):GetOptionsTable(self.collectionListDB)
-	options.args.list_profiles.args.collectionLists.name = L["Collection List"]
-	options.args.list_profiles.args.collectionLists.order = 3
-
-
-
-	options.args.list_profiles.args.HiddenAppearanceDB = LibStub("AceDBOptions-3.0"):GetOptionsTable(self.HiddenAppearanceDB)
-	options.args.list_profiles.args.HiddenAppearanceDB.name = L["Hidden Items & Sets"]
-	options.args.list_profiles.args.HiddenAppearanceDB.order = 4
-
-
-
-	LibStub("AceConfigRegistry-3.0"):ValidateOptionsTable(options, addonName)
-	LibStub("AceConfig-3.0"):RegisterOptionsTable(addonName, options)
-
-	self.optionsFrame = LibStub("AceConfigDialog-3.0"):AddToBlizOptions("BetterWardrobe", "BetterWardrobe")
-	self.db.RegisterCallback(addon, "OnProfileChanged", "RefreshConfig")
-	self.db.RegisterCallback(addon, "OnProfileCopied", "RefreshConfig")
-
-
-	self.collectionListDB.RegisterCallback(addon, "OnProfileChanged", "RefreshCollectionListData")
-
-
-	self.itemsubdb.RegisterCallback(addon, "OnProfileReset", "RefreshSubItemData")	
-
-	if firstRun then
-		listDB.lastUpdte = 1
-	end
-	--WardrobeTransmogFrameSpecDropDown_Initialize()
-
-	--BWData = BWData or {}
-
 	addon.Profile = self.db.profile
 	Profile = addon.Profile
+
 	addon.Init:InitDB()
-	addon.Init:Blizzard_Wardrobe()
-	--C_Timer.After(0.2, function()
-		addon.Init:BuildUI()
-		addon.Init:BuildTooltips()
-		addon.Init:DressingRoom()
-		--addon.SetSortOrder(false)
-		addon.Init:BuildCollectionList()
-		addon.Init:BuildTransmogVendorUI()
-		addon.Init:BuildCollectionJournalUI()
-		addon:SendMessage("BW_OnPlayerEnterWorld")
-		
-	--WardrobeFilterDropDown_OnLoad(WardrobeCollectionFrame.FilterDropDown)
-	--WardrobeCollectionFrame.ItemsCollectionFrame:SetActiveSlot
---end )
+	--addon.Init:BuildTooltips()
 
-	C_Timer.After(0.5, function()
-		addon.RefreshSubItemData()
-		addon.RefreshOutfitData()
-	end)
-	self:SecureHook(WardrobeCollectionFrame.ItemsCollectionFrame,"SetActiveSlot")
-	self:SecureHook(WardrobeCollectionFrame.ItemsCollectionFrame,"UpdateItems")
+	if IsAddOnLoaded("Blizzard_Collections") then 
+		addon.Init:LoadModules()
+	else
+		addon:RegisterEvent("ADDON_LOADED", "EventHandler")
+	end
+	---loadll()
+	------local f = CreateFrame("Frame", "BW_DressingRoomOutfitFrame", WardrobeCollectionFrame, "BW_DressingRoomOutfitFrameTemplate" )
 
-	self:Hook(C_TransmogSets,"SetIsFavorite",function()
-		C_Timer.After(0, function()
-			WardrobeCollectionFrame.SetsCollectionFrame.ScrollFrame:Update()
-			WardrobeCollectionFrame.SetsCollectionFrame:OnSearchUpdate()
-		end)
-	end, true)
+	addon.Init:DressingRoom()
+	--addon.Init.LoadCollectionListModule()
+	--BW_ColectionListFrameTemplate
+	addon.Init:BuildTooltips()
+end
 
-	f:RegisterEvent("TRANSMOG_COLLECTION_SOURCE_ADDED")
-	f:RegisterEvent("TRANSMOG_COLLECTION_SOURCE_REMOVED")
-	f:SetScript("OnEvent", function (self,  ...)BetterWardrobeSetsCollectionMixin:OnEvent(...) end)
-	--self:SecureHook(WardrobeOutfitDropDown,"OnUpdate")
 
-		--WardrobeOutfi--tDropDownButton:SetScript("OnMouseDown", function(self)
-					--	PlaySound(SOUNDKIT.IG_MAINMENU_OPTION_CHECKBOX_ON)
-						--BW_WardrobeOutfitFrame:Toggle(self:GetParent())
-						--end
-				--	)
 
-				--WardrobeCollectionFrame.ItemsCollectionFrame.RightShoulderCheckbox:Show() 
+--Hides default collection window when at transmog vendor
+local function UpdateTransmogVendor()
+	WardrobeCollectionFrame:Hide();
+	BetterWardrobeCollectionFrame:Show();
+	BetterWardrobeCollectionFrame:SetContainer(WardrobeFrame);
+end
+
+
+--Loads various modules and builds frames once the Blizzard_Collection addon is loaded
+function addon.Init:LoadModules()
+
+	function CollectionsJournal_UpdateSelectedTab(self)
+	local selected = CollectionsJournal_GetTab(self);
+
+	if (not CollectionsJournal_ValidateTab(selected)) then
+		PanelTemplates_SetTab(self, 1);
+		selected = 1;
+	end
+	
+	MountJournal:SetShown(selected == 1);
+	PetJournal:SetShown(selected == 2);
+	ToyBox:SetShown(selected == 3);
+	HeirloomsJournal:SetShown(selected == 4);
+	-- don't touch the wardrobe frame if it's used by the transmogrifier
+	if ( WardrobeCollectionFrame:GetParent() == self or not WardrobeCollectionFrame:GetParent():IsShown() ) then
+		if ( selected == 5 ) then
+			HideUIPanel(WardrobeFrame);
+			WardrobeCollectionFrame:Hide();
+			BetterWardrobeCollectionFrame:SetContainer(self);
+		else
+			WardrobeCollectionFrame:Hide();
+			BetterWardrobeCollectionFrame:Hide();
+		end
+	end
+
+	if ( selected == 1 ) then
+		CollectionsJournalTitleText:SetText(MOUNTS);
+	elseif (selected == 2 ) then
+		CollectionsJournalTitleText:SetText(PET_JOURNAL);
+	elseif (selected == 3 ) then
+		CollectionsJournalTitleText:SetText(TOY_BOX);
+	elseif (selected == 4 ) then
+		CollectionsJournalTitleText:SetText(HEIRLOOMS);
+	elseif (selected == 5 ) then
+		CollectionsJournalTitleText:SetText(WARDROBE);
+	end
+
+	HelpTip:HideAll(self);
 
 end
+
+	addon.Init:LoadWardrobeModule()
+
+	local f = CreateFrame("Frame", "BetterWardrobeCollectionFrame", UIParent, "BetterWardrobeCollectionFrameTemplate" )
+
+	WardrobeFrame:HookScript("OnShow",  function() UpdateTransmogVendor() end)
+	
+
+
+	----WardrobeTransmogFrame:HookScript("CheckSecondarySlotButtons",  function() print("XXX") end)
+
+ initCollectionList()
+ addon.Init:BuildCollectionList()
+
+ addon.Init:BuildTransmogVendorUI()
+	--local f = CreateFrame("Frame", "BetterWardrobeFrame", UIParent, "BetterWardrobeFrameTemplate" )
+
+	--addon.Init:LoadWardrobeUIModule()
+
+	--addon.Init:BuildUI()
+	--addon.Init.LoadCollectionListModule()
+	--local f = CreateFrame("Frame", "BW_ColectionListFrame", WardrobeCollectionFrame, "BW_ColectionListFrameTemplate" )
+
+
+
+
+	--addon.Init:BuildCollectionJournalUI()
+	
+	----addon.Init:BuildTransmogVendorUI()
+	--local f = CreateFrame("Frame", "BW_WardrobeOutfitEditFrameTemplate", WardrobeCollectionFrame, "BW_WardrobeOutfitEditFrameTemplate" )
+
+	--addon.Init.LoadSavedOutfitsModule()
+
+	--addon.Init.LoadDressingRoomModule()
+addon.Init.SortDropDown_Initialize()
+end
+
+
+function addon:EventHandler(event, arg1, ...)
+	if event == "ADDON_LOADED" and arg1 == "Blizzard_Collections" then 
+		addon.Init:LoadModules()
+		addon:SendMessage("BW_OnPlayerEnterWorld")
+		addon:UnregisterEvent("ADDON_LOADED")
+	end
+end
+
+
+
+
+
+
+
+
+	-----addon.Init:Blizzard_Wardrobe()
+		-----addon.Init:DressingRoom()
+		--addon.SetSortOrder(false)
+		-----addon.Init:BuildCollectionList()
+
+	-----	

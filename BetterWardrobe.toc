@@ -1,13 +1,10 @@
-﻿## Interface: 90005
+﻿## Interface: 90100
 ## Title: BetterWardrobe (@project-version@)
 ## Version: @project-version@
-## Game Version: 9.0.5
+## Game Version: 9.1
 ## Author: SLOKnightfall
 ## Notes: 
-## LoadOnDemand: 1
-## LoadWith: Blizzard_Collections
-## OptionalDeps: PetTracker
-## SavedVariables: BetterWardrobe_Options, BetterWardrobe_CharacterData, BetterWardrobe_SavedSetData,BetterWardrobe_SubstituteItemData, BetterWardrobe_ListData
+## SavedVariables: BetterWardrobe_Options, BetterWardrobe_CharacterData, BetterWardrobe_SavedSetData, BetterWardrobe_SubstituteItemData, BetterWardrobe_ListData
 
 #Libraries
 Libs\LibStub\LibStub.lua
@@ -32,28 +29,12 @@ Locale\enUS.lua
 Locale\deDE.lua
 Locale\zhTW.lua
 
+
 #Core files
 #Modules\Inspect.lua
 Data\Globals.lua
 Modules\Templates.xml
-Core.lua
-BetterWardrobe.xml
-
-
-#Modules
-Modules\TransmogVendor.xml
-Modules\ImportExport.lua
-
-Modules\SavedOutfits.xml
-Modules\CollectionList.xml
-Modules\Tooltips.lua
-Modules\DressingRoom.xml
-Modules\ArtifactAppearances.lua
-
-#3rd party addon compatability
-Plugins\ElvUI.lua
-Plugins\CanIMogIt.lua
-Plugins\MogIt.lua
+Modules\Core.lua
 
 #Data files
 #Data\ColorData.lua
@@ -61,9 +42,35 @@ Data\CameraData.lua
 Data\AppearanceData.lua
 Data\ArtifactData.lua
 #Data\SourceData.lua
+
+Data\DataBase.lua
 Data\CLOTH.lua
 Data\LEATHER.lua
 Data\MAIL.lua
 Data\PLATE.lua
 Data\COSMETIC.lua
 
+#Modules
+Modules\ArtifactAppearances.lua
+Modules\Wardrobe.xml
+Modules\SavedOutfits.xml
+Modules\CollectionList.xml
+Modules\TransmogVendor.xml
+Modules\DressingRoom.xml
+Modules\ImportExport.lua
+Modules\Tooltips.lua
+#Modules\UI.lua
+Modules\SortingFunctions.lua
+
+
+#3rd party addon compatability
+#Plugins\ElvUI.lua
+#Plugins\CanIMogIt.lua
+#Plugins\MogIt.lua
+
+
+#@do-not-package@
+#Testing
+UnitTests\DataBase.lua
+
+#@end-do-not-package@

@@ -107,9 +107,6 @@ local ClassArtifacts = {
 }
 
 
-
-
-
 local function BuildDruidAppearances(artifactID, table)
 
 	local sourceList = {}
@@ -125,12 +122,15 @@ local function BuildDruidAppearances(artifactID, table)
 			local data = artifactData.sets[i]
 			local appearanceID, sourceID = C_TransmogCollection.GetItemInfo(artifactID, i)
 			--local sources = WardrobeCollectionFrame_GetSortedAppearanceSources(appearanceID)
+			local cameraVariation = 0
 
-			local appearance_camera = C_TransmogCollection.GetAppearanceCameraID(appearanceID)
+			local appearance_camera = C_TransmogCollection.GetAppearanceCameraID(appearanceID, cameraVariation)
 			if appearance_camera == 0 then
 				for i=9, 32 do
 					local appearanceID, sourceID = C_TransmogCollection.GetItemInfo(artifactID, i) -- 128861
-					local camera = C_TransmogCollection.GetAppearanceCameraID(appearanceID)	
+								local cameraVariation = 0
+
+					local camera = C_TransmogCollection.GetAppearanceCameraID(appearanceID, cameraVariation)	
 
 					if camera ~= 0 then 
 						appearance_camera = camera
@@ -172,13 +172,12 @@ local function BuildDruidAppearances(artifactID, table)
 	return table
 end
 
-
-
 local visualIDIndex = {}
 local sourcelist = {}
 function addon.BuildClassArtifactAppearanceList() 
 	wipe(visualIDIndex)
 	wipe(sourcelist)
+
 	local _, playerClass, classID = UnitClass("player")
 	local artifactList = ClassArtifacts[playerClass]
 	local uiOrderBase = 0
@@ -189,12 +188,19 @@ function addon.BuildClassArtifactAppearanceList()
 		local camera
 		for index, data in pairs(artifactData.sets) do
 		--for i = 9, 32 do
-			local appearanceID, sourceID = C_TransmogCollection.GetItemInfo(itemID, index) -- 128861
-			appearance_camera = C_TransmogCollection.GetAppearanceCameraID(appearanceID)
+			local appearanceID, sourceID = data.appearance, data.source
+			--local appearanceID, sourceID = C_TransmogCollection.GetItemInfo(itemID, index) -- 128861
+
+			local cameraVariation = 0
+
+			appearance_camera = C_TransmogCollection.GetAppearanceCameraID(appearanceID,cameraVariation)
 			if appearance_camera == 0 then
 				for i=9, 32 do
-					local appearanceID, sourceID = C_TransmogCollection.GetItemInfo(itemID, index) -- 128861
-					local camera = C_TransmogCollection.GetAppearanceCameraID(appearanceID)	
+					local appearanceID, sourceID = data.appearance, data.source
+					--local appearanceID, sourceID = C_TransmogCollection.GetItemInfo(itemID, index) -- 128861
+					local cameraVariation = 0
+
+					local camera = C_TransmogCollection.GetAppearanceCameraID(appearanceID, cameraVariation)	
 
 					if camera ~= 0 then 
 						appearance_camera = camera
@@ -252,6 +258,7 @@ function addon.BuildClassArtifactAppearanceList()
 				tinsert(sourcelist, sourceInfo)
 			end
 		end
+		
 	end
 
 --sourcelist = BuildDruidAppearances(128821, sourcelist)
@@ -279,14 +286,20 @@ end
 
 
 function addon.SetArtifactAppearanceTooltip(contentFrame, sourceInfo, sourceID)
-	WardrobeCollectionFrame.tooltipContentFrame = contentFrame;
-	WardrobeCollectionFrame.tooltipSourceIndex = 1
+	BetterWardrobeCollectionFrame.tooltipContentFrame = contentFrame;
+	BetterWardrobeCollectionFrame.tooltipSourceIndex = 1
 	--local sourceInfo = frame.visualInfo --visualIDIndex[frame.visualInfo.visualID] 
-	--bob = frame.visualInfo
+	--B = frame.visualInfo
 	if sourceInfo then 
 
-	local name, nameColor, sourceText, sourceColor = WardrobeCollectionFrameModel_GetSourceTooltipInfo(sourceInfo);
-	GameTooltip:SetText(name)--, nameColor.r, nameColor.g, nameColor.b);
+
+	local name, nameColor = sourceInfo.name, ARTIFACT_GOLD_COLOR ----BetterWardrobeCollectionFrame:GetAppearanceNameTextAndColor(sourceInfo);
+	local sourceText, sourceColor = BetterWardrobeCollectionFrame:GetAppearanceSourceTextAndColor(sourceInfo);
+	GameTooltip:SetText(name, nameColor:GetRGB());
+
+
+	----local name, nameColor, sourceText, sourceColor = WardrobeCollectionFrameModel_GetSourceTooltipInfo(sourceInfo);
+	----GameTooltip:SetText(name)--, nameColor.r, nameColor.g, nameColor.b);
 	-- print(sourceInfo.sourceType)
 	--[[	--GameTooltip:AddLine(" ")
 				if sourceInfo.mod <= 12 then 
@@ -307,7 +320,6 @@ function addon.SetArtifactAppearanceTooltip(contentFrame, sourceInfo, sourceID)
 	
 		GameTooltip:AddLine(sourceInfo.specName)
 		if not sourceInfo.isCollected then
-
 			if sourceInfo.mod >= 25 and sourceInfo.mod <= 28 and not sourceInfo.unlock then 
 				GameTooltip:AddLine(L["Learned from Item"]);
 			else

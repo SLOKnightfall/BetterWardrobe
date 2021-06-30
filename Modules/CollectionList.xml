@@ -1,8 +1,9 @@
 <Ui xmlns="http://www.blizzard.com/wow/ui/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.blizzard.com/wow/ui/
 ..\FrameXML\UI.xsd">
-<Script file="CollectionList.lua"/>
 
-	<Frame name = "BW_ColectionListFrame" parent = "WardrobeCollectionFrame"  hidden="false" setAllPoints="true" mixin="BetterWardrobeSetsCollectionListMixin">
+	<Script file="CollectionList.lua"/>
+
+	<Frame name = "BW_ColectionListFrameTemplate" parent = "BetterWardrobeCollectionFrame"  hidden="false" setAllPoints="true" mixin="BetterWardrobeSetsCollectionListMixin" virtual = "true">
 		<Frames>
 			<Frame name = "BW_CollectionListTitle" parentKey="CollectionListTitle" hidden="true" enableMouse="false" >
 				<Anchors>

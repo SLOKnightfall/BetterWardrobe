@@ -3,7 +3,7 @@
 
 	<Script file="Templates.lua"/>
 
-	<Frame name="BetterWardrobeSetInfoTemplate" parentKey="SetInfo" virtual="true" setAllPoints="true">
+	<Frame name="BetterWardrobeSetInfoTemplate" parentKey="SetInfo" virtual="true" setAllPoints="true" hidden="false">
 		<Anchors>
 			<Anchor point="TOPLEFT" x="2" y="-2" relativePoint="TOPLEFT"/>
 			<Anchor point="BOTTOMRIGHT" x="2" y="-2" relativePoint="BOTTOMRIGHT"/>
@@ -33,7 +33,7 @@
 		</Layers>
 	</Frame>
 
-	<Frame name="BetterWardrobeIconsTemplate" parentKey="CollectionListVisual" virtual="true" setAllPoints="true" mixin="BW_SetIconMixin">
+	<Frame name="BetterWardrobeIconsTemplate" parentKey="CollectionListVisual" virtual="true" setAllPoints="true" mixin="BW_SetIconMixin" hidden="false">
 		<Anchors>
 			<Anchor point="TOPLEFT" x="2" y="-2" relativePoint="TOPLEFT"/>
 			<Anchor point="BOTTOMRIGHT" x="2" y="-2" relativePoint="BOTTOMRIGHT"/>

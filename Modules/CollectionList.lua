@@ -10,13 +10,23 @@ CollectionList.showAll = true
 
 local MogItLoaded = false
 
+
+function initCollectionList()
+	local f = CreateFrame("Frame", "BW_ColectionListFrame", BetterWardrobeCollectionFrame, "BW_ColectionListFrameTemplate" )
+	local ContextMenu = CreateFrame("Frame", addonName .. "ContextMenuFrame", UIParent, "BW_UIDropDownMenuTemplate")
+addon.ContextMenu = ContextMenu
+
+end
+
+
+
 function CollectionList:BuildCollectionList(complete)
 	local list = {}
 	local searchString = string.lower(WardrobeCollectionFrameSearchBox:GetText())
 	local filterCollected = C_TransmogCollection.GetCollectedShown()
 	local filterUncollected = C_TransmogCollection.GetUncollectedShown()
 	local filterSource = {}
-	local selectedCategory = WardrobeCollectionFrame.ItemsCollectionFrame:GetActiveCategory()
+	local selectedCategory = BetterWardrobeCollectionFrame.ItemsCollectionFrame:GetActiveCategory()
 	for i = 1, 6 do
 		filterSource[i] = C_TransmogCollection.IsSourceTypeFilterChecked(i)
 	end
@@ -119,9 +129,9 @@ function CollectionList:UpdateList(type, typeID, add, sourceID)
 
 	if type == "item" then --TypeID is visualID
 		collectionList[type][typeID] = add or nil
-		if WardrobeCollectionFrame.ItemsCollectionFrame:IsShown() then
-			WardrobeCollectionFrame.ItemsCollectionFrame:RefreshVisualsList()
-			WardrobeCollectionFrame.ItemsCollectionFrame:UpdateItems()
+		if BetterWardrobeCollectionFrame.ItemsCollectionFrame:IsShown() then
+			BetterWardrobeCollectionFrame.ItemsCollectionFrame:RefreshVisualsList()
+			BetterWardrobeCollectionFrame.ItemsCollectionFrame:UpdateItems()
 			print(add and L["Appearance added."] or L["Appearance removed."] )
 		end
 		
@@ -152,13 +162,13 @@ function CollectionList:UpdateList(type, typeID, add, sourceID)
 			addSet = self:UpdateList("item", visualID, add or nil)	
 		end
 
-		if type == "set" then
-			WardrobeCollectionFrame.SetsCollectionFrame:OnSearchUpdate()
-			WardrobeCollectionFrame.SetsTransmogFrame:OnSearchUpdate()
-		else
-			BW_SetsTransmogFrame:OnSearchUpdate()
-			BW_SetsCollectionFrame:OnSearchUpdate()
-		end
+		----if type == "set" then
+			BetterWardrobeCollectionFrame.SetsCollectionFrame:OnSearchUpdate()
+			BetterWardrobeCollectionFrame.SetsTransmogFrame:OnSearchUpdate()
+		----else
+		----	BW_SetsTransmogFrame:OnSearchUpdate()
+		----	BW_SetsCollectionFrame:OnSearchUpdate()
+		-----end
 
 		--print( addSet and L["%s: Uncollected items added"]:format(setName) or L["No new appearces needed."])
 		return addSet
@@ -172,12 +182,12 @@ function BetterWardrobeSetsCollectionListMixin:Toggle(toggleState)
 		CollectionList:GenerateListView()
 	else
 		local atTransmogrifier = WardrobeFrame_IsAtTransmogrifier()
-		local transmogLocation = TransmogUtil.GetTransmogLocation("HEADSLOT", Enum.TransmogType.Appearance, Enum.TransmogModification.None);
-		WardrobeCollectionFrame.ItemsCollectionFrame:SetActiveSlot(transmogLocation);
-		--WardrobeCollectionFrame.ItemsCollectionFrame:SetActiveSlot("HEADSLOT", Enum.TransmogType.Appearance)
-		WardrobeCollectionFrame.ItemsCollectionFrame:RefreshVisualsList()
-		WardrobeCollectionFrame.ItemsCollectionFrame:UpdateItems()
-		WardrobeCollectionFrame.ItemsCollectionFrame.SlotsFrame:SetShown(not toggleState and not atTransmogrifier)
+		local transmogLocation = TransmogUtil.GetTransmogLocation("HEADSLOT", Enum.TransmogType.Appearance, Enum.TransmogModification.Main);
+		BetterWardrobeCollectionFrame.ItemsCollectionFrame:SetActiveSlot(transmogLocation);
+		--BetterWardrobeCollectionFrame.ItemsCollectionFrame:SetActiveSlot("HEADSLOT", Enum.TransmogType.Appearance)
+		BetterWardrobeCollectionFrame.ItemsCollectionFrame:RefreshVisualsList()
+		BetterWardrobeCollectionFrame.ItemsCollectionFrame:UpdateItems()
+		BetterWardrobeCollectionFrame.ItemsCollectionFrame.SlotsFrame:SetShown(not toggleState and not atTransmogrifier)
 		--WardrobeCollectionFrameWeaponDropDown:SetShown(not toggleState)
 		self.CollectionListTitle:SetShown(toggleState)
 		local listcount = CollectionList:ListCount("item")
@@ -214,7 +224,7 @@ function addon:IsWeaponCat()
 end
 
 
-local catchAll = TransmogUtil.GetTransmogLocation("HEADSLOT", Enum.TransmogType.Appearance, Enum.TransmogModification.None)
+local catchAll = TransmogUtil.GetTransmogLocation("HEADSLOT", Enum.TransmogType.Appearance, Enum.TransmogModification.Main)
 --function WardrobeItemsCollectionMixin:SetActiveSlot(transmogLocation, category, ignorePreviousSlot)
 local function slotOnClick(self, transmogLocation)
 	local slotButtons = self.parent.Buttons
@@ -227,19 +237,19 @@ local function slotOnClick(self, transmogLocation)
 	if self.transmogLocation:IsAppearance() then
 		CollectionList.Category = transmogLocation and self.transmogLocation:GetArmorCategoryID() or self.transmogLocation:GetSlotID() + 100
 		CollectionList.showAll = false
-		WardrobeCollectionFrame.ItemsCollectionFrame:ChangeModelsSlot(transmogLocation);
+		BetterWardrobeCollectionFrame.ItemsCollectionFrame:ChangeModelsSlot(transmogLocation);
 	else 
 
 		CollectionList.Category = catchAll and catchAll:GetArmorCategoryID()
-		WardrobeCollectionFrame.ItemsCollectionFrame:ChangeModelsSlot(catchAll);
+		BetterWardrobeCollectionFrame.ItemsCollectionFrame:ChangeModelsSlot(catchAll);
 		CollectionList.showAll = true
 	end
 
 	CloseDropDownMenus()
 	BW_CloseDropDownMenus()
 	PlaySound(SOUNDKIT.UI_TRANSMOG_GEAR_SLOT_CLICK);
-	WardrobeCollectionFrame.ItemsCollectionFrame:RefreshVisualsList()
-	WardrobeCollectionFrame.ItemsCollectionFrame:UpdateItems()
+	BetterWardrobeCollectionFrame.ItemsCollectionFrame:RefreshVisualsList()
+	BetterWardrobeCollectionFrame.ItemsCollectionFrame:UpdateItems()
 end
 
 
@@ -254,7 +264,7 @@ function BetterWardrobeSetsCollectionListMixin:CreateSlotButtons()
 	button.NormalTexture:ClearAllPoints()
 	button.NormalTexture:SetAllPoints()
 	button.NormalTexture:SetAtlas("transmog-nav-slot-enchant", false);
-	button.transmogLocation = TransmogUtil.GetTransmogLocation("MAINHANDSLOT", Enum.TransmogType.Illusion, Enum.TransmogModification.None)
+	button.transmogLocation = TransmogUtil.GetTransmogLocation("MAINHANDSLOT", Enum.TransmogType.Illusion, Enum.TransmogModification.Main)
 	button.parent = parentFrame
 	button.SelectedTexture:SetShown(true)
 
@@ -293,8 +303,8 @@ end
 function CollectionList:Dropdown_OnClick(arg1, arg2, checked)
 		CollectionList:SelectedCollectionList(arg1)
 		--BW_UIDropDownMenu_SetSelectedID(BW_CollectionList_Dropdown, arg1)
-		WardrobeCollectionFrame.ItemsCollectionFrame:RefreshVisualsList()
-		WardrobeCollectionFrame.ItemsCollectionFrame:UpdateItems()
+		BetterWardrobeCollectionFrame.ItemsCollectionFrame:RefreshVisualsList()
+		BetterWardrobeCollectionFrame.ItemsCollectionFrame:UpdateItems()
 end
 
 
@@ -420,8 +430,8 @@ function CollectionList:AddList(name)
 	local default = {item = {}, set = {}, extraset = {}, name = name}
 	tinsert(profile.lists, default)
 	local list = CollectionList:SelectedCollectionList(#profile.lists)
-	WardrobeCollectionFrame.ItemsCollectionFrame:RefreshVisualsList()
-	WardrobeCollectionFrame.ItemsCollectionFrame:UpdateItems()
+	BetterWardrobeCollectionFrame.ItemsCollectionFrame:RefreshVisualsList()
+	BetterWardrobeCollectionFrame.ItemsCollectionFrame:UpdateItems()
 
 	return true
 end
@@ -446,8 +456,8 @@ function CollectionList:DeleteList()
 	end
 	tremove(profile.lists, CollectionList:SelectedCollectionList())
 	CollectionList:SelectedCollectionList(1)
-	WardrobeCollectionFrame.ItemsCollectionFrame:RefreshVisualsList()
-	WardrobeCollectionFrame.ItemsCollectionFrame:UpdateItems()
+	BetterWardrobeCollectionFrame.ItemsCollectionFrame:RefreshVisualsList()
+	BetterWardrobeCollectionFrame.ItemsCollectionFrame:UpdateItems()
 	return true
 end
 

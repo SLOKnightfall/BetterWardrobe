@@ -5,7 +5,6 @@ local addonName, addon = ...
 addon = LibStub("AceAddon-3.0"):GetAddon(addonName)
 
 local f = addon.frame
-local Wardrobe = WardrobeCollectionFrame.ItemsCollectionFrame
 
 
 
@@ -60,9 +59,9 @@ local function GetTab(tab)
 	local tabID
 
 	if ( atTransmogrifier ) then
-		tabID = WardrobeCollectionFrame.selectedTransmogTab
+		tabID = BetterWardrobeCollectionFrame.selectedTransmogTab
 	else
-		tabID = WardrobeCollectionFrame.selectedCollectionTab
+		tabID = BetterWardrobeCollectionFrame.selectedCollectionTab
 	end
 	return tabID, atTransmogrifier
 
@@ -75,9 +74,9 @@ local function CheckTab(tab)
 	local atTransmogrifier = WardrobeFrame_IsAtTransmogrifier()
 
 		if ( atTransmogrifier ) then
-			tabID = WardrobeCollectionFrame.selectedTransmogTab
+			tabID = BetterWardrobeCollectionFrame.selectedTransmogTab
 		else
-			tabID = WardrobeCollectionFrame.selectedCollectionTab
+			tabID = BetterWardrobeCollectionFrame.selectedCollectionTab
 		end
 	return tabID == tab
 end
@@ -98,6 +97,8 @@ end
 
  -- takes around 5 to 30 onupdates
 local function CacheHeaders()
+	local Wardrobe = BetterWardrobeCollectionFrame.ItemsCollectionFrame
+
 	for k in pairs(nameCache) do
 		-- oh my god so much wasted tables
 		local appearances = WardrobeCollectionFrame_GetSortedAppearanceSources(k)[1] or {}
@@ -150,15 +151,15 @@ local Sort = {
 	end,
 
 	["SortItemAlphabetic"] = function()
-		if Wardrobe:IsVisible() then -- check if wardrobe is still open after caching is finished
-			sort(Wardrobe:GetFilteredVisualsList(), function(source1, source2)
+		if BetterWardrobeCollectionFrame.ItemsCollectionFrame:IsVisible() then -- check if wardrobe is still open after caching is finished
+			sort(BetterWardrobeCollectionFrame.ItemsCollectionFrame:GetFilteredVisualsList(), function(source1, source2)
 				if nameVisuals[source1.visualID] and nameVisuals[source2.visualID] then
 					return SortOrder(nameVisuals[source1.visualID], nameVisuals[source2.visualID])
 				else
 					return SortOrder(source1.uiOrder, source2.uiOrder)
 				end
 			end)
-			Wardrobe:UpdateItems()
+			BetterWardrobeCollectionFrame.ItemsCollectionFrame:UpdateItems()
 		end
 	end,
 
@@ -487,11 +488,14 @@ addon.Sort = Sort
 
 
 function addon.SetSortOrder()
-	SortOrder = addon.sortDB.reverse and SortReverse or SortNormal
+	----SortOrder = addon.sortDB.reverse and SortReverse or SortNormal
+	SortOrder =  SortNormal
 end
 
 
 function addon.SortCollection(frame)
+	local Wardrobe = BetterWardrobeCollectionFrame.ItemsCollectionFrame
+
 	if CheckTab(1) then 
 		addon.Sort[1][addon.sortDB.sortDropdown](Wardrobe)
 		Wardrobe:UpdateItems()
@@ -501,13 +505,14 @@ end
 
 function addon.SortSet(sets, reverseUIOrder, ignorePatchID)
  	if not sets  then return end
+
  --	if DropDownList1:IsShown() then return end
  	if not CheckTab(4) then 
 		addon.sortDB.reverse = IsModifierKeyDown()
 		addon.SetSortOrder()
 		addon.Sort[GetTab()][addon.sortDB.sortDropdown](self, sets, reverseUIOrder or IsModifierKeyDown(), ignorePatchID)
 	else
-		addon.sortDB.reverse = true
+		addon.sortDB.reverse = false
 		addon.SetSortOrder()
 		addon.Sort[TAB_SAVED_SETS][LE_DEFAULT](self, sets, reverseUIOrder or IsModifierKeyDown(), ignorePatchID)
 	end
