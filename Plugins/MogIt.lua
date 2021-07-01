@@ -62,7 +62,7 @@ end
 addon:RegisterMessage("BW_OnPlayerEnterWorld", function() SetHooks() end)
 
 
-local Wishlist = mog:GetModule("Wishlist")
+ Wishlist = mog:GetModule("Wishlist")
 function MogIt.GetMogitOutfits() 
 	local sets = Wishlist:GetSets(nil, true)
 	if #sets == 0 then return end

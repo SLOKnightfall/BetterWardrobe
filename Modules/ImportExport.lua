@@ -8,7 +8,7 @@ local AceGUI = LibStub("AceGUI-3.0")
 
 local IE ={}
 
-function Export(itemString, button)
+local function Export(itemString, button)
 	if LISTWINDOW then LISTWINDOW:Hide() end
 
 	for _, listPopup in pairs(BW_WardrobeOutfitFrameMixin.popups) do

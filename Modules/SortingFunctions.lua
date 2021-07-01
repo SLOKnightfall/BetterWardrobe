@@ -170,7 +170,7 @@ local Sort = {
 				return set1.favorite
 			end
 
-			return SortOrder(set1.name, set2.name)
+			return SortOrder(set2.name, set1.name)
 		end
 
 		table.sort(sets, comparison)

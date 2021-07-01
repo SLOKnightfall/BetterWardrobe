@@ -238,24 +238,62 @@ function UI:OptionsDropDown_Initialize(level)
 	info.keepShownOnClick = true
 	
 	if level == 1 then
-		info.hasArrow = true
+		info.hasArrow = false
 		info.isNotRadio = true
-		info.notCheckable = true
+		info.keepShownOnClick = false
+		
 
-		info.text = "Include:"
+		info.text = L["Show Incomplete Sets"]
 		info.value = 1
+		info.func = function(_, _, _, value)
+			addon.Profile.ShowIncomplete = not addon.Profile.ShowIncomplete
+			BetterWardrobeCollectionFrame.SetsTransmogFrame:OnSearchUpdate()
+		end
+		info.checked = function() return addon.Profile.ShowIncomplete end
 		BW_UIDropDownMenu_AddButton(info, level)
 
+		info.keepShownOnClick = true
 		info.hasArrow = true
 		info.isNotRadio = true
 		info.notCheckable = true
-		info.checked = false
+		if addon.Profile.ShowIncomplete then 
+		BW_UIDropDownMenu_AddSeparator()
 
-		info.text = "Cuttoff:"
-		info.value = 2
+		info.keepShownOnClick = true
+		info.hasArrow = false
+		info.isNotRadio = true
+		info.notCheckable = false
+
+		info.text = L["Hide Missing Set Pieces at Transmog Vendor"]
+		info.value = 4
+		info.func = function(_, _, _, value)
+			addon.Profile.HideMissing = not addon.Profile.HideMissing
+			BetterWardrobeCollectionFrame.SetsTransmogFrame:OnSearchUpdate()
+			BetterWardrobeCollectionFrame.SetsTransmogFrame:UpdateSets()
+		end
+		info.checked = function() return addon.Profile.HideMissing end
 		BW_UIDropDownMenu_AddButton(info, level)
 
-	elseif level == 2  and BW_UIDROPDOWNMENU_MENU_VALUE == 1 then
+		info.keepShownOnClick = true
+		info.hasArrow = true
+		info.isNotRadio = true
+		info.notCheckable = true
+
+			info.text = "Include:"
+			info.value = 2
+			BW_UIDropDownMenu_AddButton(info, level)
+
+			info.hasArrow = true
+			info.isNotRadio = true
+			info.notCheckable = true
+			info.checked = false
+
+			info.text = "Cuttoff:"
+			info.value = 3
+			BW_UIDropDownMenu_AddButton(info, level)
+		end
+
+	elseif level == 2  and BW_UIDROPDOWNMENU_MENU_VALUE == 2 and addon.Profile.ShowIncomplete then
 		info.hasArrow = false
 		info.isNotRadio = true
 		info.notCheckable = true
@@ -317,7 +355,7 @@ function UI:OptionsDropDown_Initialize(level)
 			end
 		end
 
-	elseif level == 2 and BW_UIDROPDOWNMENU_MENU_VALUE == 2 then
+	elseif level == 2 and BW_UIDROPDOWNMENU_MENU_VALUE == 3 and addon.Profile.ShowIncomplete then
 		local refreshLevel = 2
 		info.notCheckable = false
 		info.keepShownOnClick = false

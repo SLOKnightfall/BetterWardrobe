@@ -238,7 +238,8 @@ function tooltip:ShowTooltip(itemLink)
 	if not itemLink or self.ShowTooltips then return end
 
 	local itemID, _, _, slot = GetItemInfoInstant(itemLink)
-	local dressable = IsDressableItem(itemID)
+	print(itemID)
+	local dressable = itemID and IsDressableItem(itemID)
 	local token = LAT:ItemIsToken(itemID)
 
 	--No need to update tooltips if item is not token or a mog
