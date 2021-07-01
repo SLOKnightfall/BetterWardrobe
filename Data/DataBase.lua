@@ -373,6 +373,7 @@ do
 
 
 	function addon.GetSavedList()
+		print("gse")
 		--if not addon.savedSetCache then 
 			local savedOutfits = addon.GetOutfits()
 			local list = {}
@@ -388,15 +389,23 @@ do
 				info.expansionID = 1
 				info.favorite = false
 				info.hiddenUtilCollected = false
+
 				info.label = L["Saved Set"]
 				info.limitedTimeSet = false
 				info.patchID = ""
 				info.setID = data.setID or (data.outfitID + 5000)
+				---print(info.setID)
 				info.uiOrder = data.uiOrder or (data.index * 100)
 				info.icon = data.icon
 				info.isClass = true
 				info.type = "Saved"
+				if data.outfitID - 5000 > 20 then
+				print("extedf") 
+				print()
+info.label = L["Extended Saved Set"]
+				end
 
+					if info.setID == 5022 then print("found") end
 				if data.set == "default" then 
 					local outfitItemTransmogInfoList = C_TransmogCollection.GetOutfitItemTransmogInfoList(data.outfitID);
 					info.sources = {}
@@ -416,6 +425,9 @@ do
 			
 			addon.SavedSetCache = list
 	--	end
+
+
+	print(#addon.SavedSetCache)
 		return addon.SavedSetCache
 	end
 

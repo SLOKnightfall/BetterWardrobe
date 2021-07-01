@@ -307,7 +307,7 @@ function CollectionList:Dropdown_OnClick(arg1, arg2, checked)
 		BetterWardrobeCollectionFrame.ItemsCollectionFrame:UpdateItems()
 end
 
-
+local MogItKey
 function CollectionList:Dropdown_Initialize(frame, level, menuList)
 	local list = addon.collectionListDB.profile.lists
 	local info = BW_UIDropDownMenu_CreateInfo()
@@ -329,6 +329,7 @@ function CollectionList:Dropdown_Initialize(frame, level, menuList)
 		info.func = CollectionList.Dropdown_OnClick
 		info.text, info.arg1 = "MogIt Wishlist", #list + 1
 		info.checked = false
+		MogItKey = info.arg1
 
 		BW_UIDropDownMenu_AddButton(info)
 	end
@@ -416,7 +417,7 @@ end
 
 
 function CollectionList:AddMogItData()
-	MogItLoaded = IsAddOnLoaded("MogIt")
+	MogItLoaded = true --IsAddOnLoaded("MogIt")
 	 if not MogItLoaded and CollectionList:SelectedCollectionList() == "MOGIT" then 
 	 	CollectionList:SelectedCollectionList(1)
 	 end
@@ -477,6 +478,7 @@ function CollectionList:IsInList(itemID, itemType, full)
 		return count ~= 0, count
 	else
 		local collectionList = addon.CollectionList:CurrentList()
+		xxx= collectionList
 		local isInList = collectionList[itemType][itemID] or false
 		return isInList	
 	end
@@ -503,7 +505,7 @@ end
 
 function CollectionList:CurrentList()
 	local selectedList = CollectionList:SelectedCollectionList()
-	if selectedList == "MOGIT" then 
+	if selectedList == MogItKey then 
 		return addon.MogIt.GetMogitWishlist()
 	else
 		return addon.collectionListDB.profile.lists[selectedList]

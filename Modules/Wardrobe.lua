@@ -453,7 +453,6 @@ function BW_TransmogFrameMixin:Update()
 end
 
 function BW_TransmogFrameMixin:SetPendingTransmog(transmogID, category)
-	print("Setpend")
 	if self.selectedSlotButton then
 
 		local transmogLocation = self.selectedSlotButton.transmogLocation;
@@ -1071,6 +1070,7 @@ end
 
 local tabReset
 function BetterWardrobeCollectionFrameMixin:ClickTab(tab)
+		local atTransmogrifier = C_Transmog.IsAtTransmogNPC()
 	----self:SetTab(1);
 	----self:SetTab(tab:GetID());
 	---BetterWardrobeSetsDataProviderMixin:GetBaseSets()
@@ -1081,6 +1081,9 @@ function BetterWardrobeCollectionFrameMixin:ClickTab(tab)
 	----BetterWardrobeCollectionFrame.SetsTransmogFrame:UpdateProgressBar()
 	RefreshLists()
 	BetterWardrobeCollectionFrame:SetTab(1)
+	if atTransmogrifier then
+			addon.ClearSets();
+end
 	self:SetTab(tab:GetID());
 	
 	PanelTemplates_ResizeTabsToFit(BetterWardrobeCollectionFrame, TABS_MAX_WIDTH);
@@ -1353,7 +1356,9 @@ function BetterWardrobeCollectionFrameMixin:OnHide()
 	for i, frame in ipairs(self.ContentFrames) do
 		frame:Hide();
 	end
-
+		addon.sortDB.sortDropdown = 1
+	BW_UIDropDownMenu_SetSelectedValue(BW_SortDropDown, addon.sortDB.sortDropdown)
+	BW_UIDropDownMenu_SetText(BW_SortDropDown, COMPACT_UNIT_FRAME_PROFILE_SORTBY.." "..L[addon.sortDB.sortDropdown])
 	addon.selectedArmorType = addon.Globals.CLASS_INFO[playerClass][3]
 end
 
@@ -2383,7 +2388,6 @@ function BetterWardrobeItemsCollectionMixin:GetCameraVariation()
 end
 
 function BetterWardrobeItemsCollectionMixin:UpdateItems()
-	print("upitm")
 	local isArmor;
 	local cameraID;
 	local appearanceVisualID;	-- for weapon when looking at enchants
@@ -2417,7 +2421,6 @@ function BetterWardrobeItemsCollectionMixin:UpdateItems()
 			effectiveCategory = C_Transmog.GetSlotEffectiveCategory(self.transmogLocation);
 		end
 		baseSourceID, baseVisualID, appliedSourceID, appliedVisualID, pendingSourceID, pendingVisualID, hasPendingUndo = C_Transmog.GetSlotVisualInfo(self.transmogLocation);
-		print(baseVisualID)
 		if ( appliedVisualID ~= NO_TRANSMOG_VISUAL_ID ) then
 			if ( hasPendingUndo ) then
 				pendingVisualID = baseVisualID;
@@ -2654,7 +2657,6 @@ function BetterWardrobeItemsCollectionMixin:SelectVisual(visualID)
 	if not C_Transmog.IsAtTransmogNPC() then
 		return;
 	end
-print("SelVis")
 	local sourceID;
 	if ( self.transmogLocation:IsAppearance() ) then
 		sourceID = self:GetAnAppearanceSourceFromVisual(visualID, true);
@@ -2669,7 +2671,6 @@ print("SelVis")
 	end
 	-- artifacts from other specs will not have something valid
 	if sourceID ~= Constants.Transmog.NoTransmogID then
-		print("333")
 		WardrobeTransmogFrame:SetPendingTransmog(sourceID, self.activeCategory);
 		PlaySound(SOUNDKIT.UI_TRANSMOG_ITEM_CLICK);
 	end
@@ -2993,7 +2994,7 @@ function BetterWardrobeSetsTransmogModelMixin:RefreshTooltip()
 		local numTotalSlots = 0
 		local waitingOnQuality = false
 		local sourceQualityTable = self:GetParent().sourceQualityTable;
-	if not self.setID then print("missing setid") return end
+	--if not self.setID then print("missing setid") return end
 
 	if BetterWardrobeCollectionFrame.selectedTransmogTab == 4 or BetterWardrobeCollectionFrame.selectedCollectionTab == 4 then
 		return
@@ -3512,13 +3513,22 @@ end
 
  function RefreshLists()
 	--local tabID = addon.GetTab()
+	local atTransmogrifier = C_Transmog.IsAtTransmogNPC();
 	if BetterWardrobeCollectionFrame.selectedCollectionTab == 2 then
-		BetterWardrobeCollectionFrame.SetsCollectionFrame:OnSearchUpdate()
-		BetterWardrobeCollectionFrame.SetsTransmogFrame:OnSearchUpdate()
+		if atTransmogrifier then 
+			BetterWardrobeCollectionFrame.SetsTransmogFrame:OnSearchUpdate()
+		else
+			BetterWardrobeCollectionFrame.SetsCollectionFrame:OnSearchUpdate()
+		end
 	elseif BetterWardrobeCollectionFrame.selectedCollectionTab == 3 then
-		BetterWardrobeCollectionFrame.SetsCollectionFrame:OnSearchUpdate()
+		----BetterWardrobeCollectionFrame.SetsCollectionFrame:OnSearchUpdate()
 		----BetterWardrobeCollectionFrame.SetsCollectionFrame:RefreshScrollList()
-		BetterWardrobeCollectionFrame.SetsTransmogFrame:OnSearchUpdate()
+		---BetterWardrobeCollectionFrame.SetsTransmogFrame:OnSearchUpdate()
+		if atTransmogrifier then 
+			BetterWardrobeCollectionFrame.SetsTransmogFrame:OnSearchUpdate()
+		else
+			BetterWardrobeCollectionFrame.SetsCollectionFrame:OnSearchUpdate()
+		end
 	end
 end
 
@@ -4118,7 +4128,6 @@ function BetterWardrobeSetsDataProviderMixin:GetBaseSets()
 	local atTransmogrifier = WardrobeFrame_IsAtTransmogrifier()
 	local currentTab = (atTransmogrifier and BetterWardrobeCollectionFrame.selectedTransmogTab) or BetterWardrobeCollectionFrame.selectedCollectionTab
 	if ( not self.baseSets) then
-		print("nobase")
 		set_data = C_TransmogSets.GetBaseSets()
 		self.baseSets = set_data
 		exta_data = Sets:ClearHidden(addon.GetBaseList(), "extraset") --C_TransmogSets.GetBaseSets()
@@ -4161,7 +4170,7 @@ function BetterWardrobeSetsDataProviderMixin:GetBaseSets()
 							self:SortSets(self.baseSets);
 						end
 					end]]
-
+print(self.baseSets.setID == 5022)
 	return self.baseSets;
 end
 
@@ -4979,7 +4988,6 @@ function BetterWardrobeSetsCollectionMixin:DisplaySet(setID)
 	end
 
 	self.DetailsFrame.Label:SetText((setInfo.label or "")..((not setInfo.isClass and setInfo.className) and " -"..setInfo.className.."-" or "") )
-
 	self.DetailsFrame.LimitedSet:SetShown(setInfo.limitedTimeSet);
 
 	if setInfo.limitedTimeSet then
@@ -5098,6 +5106,10 @@ function BetterWardrobeSetsCollectionMixin:DisplaySavedSet(setID)
 	end
 
 	self.DetailsFrame.Label:SetText(setInfo.label)
+
+
+	self.DetailsFrame.LimitedSet:Hide()
+	 self.DetailsFrame.VariantSetsButton:Hide();
 
 	self.DetailsFrame.itemFramesPool:ReleaseAll()
 	self.Model:Undress()
@@ -5930,7 +5942,7 @@ function BetterWardrobeSetsTransmogMixin:OnHide()
 	self:UnregisterEvent("PLAYER_EQUIPMENT_CHANGED");
 	self:UnregisterEvent("TRANSMOG_SETS_UPDATE_FAVORITE");
 	self.loadingSetID = nil;
-	SetsDataProvider:ClearSets();
+	--SetsDataProvider:ClearSets();
 	self:GetParent():ClearSearch(Enum.TransmogSearchType.UsableSets);
 	self.sourceQualityTable = nil;
 	addon.ViewDelay = 3
@@ -6199,6 +6211,7 @@ end
 
 function BetterWardrobeSetsTransmogMixin:LoadSet(setID)
 	if BetterWardrobeCollectionFrame.selectedTransmogTab == 4 or BetterWardrobeCollectionFrame.selectedCollectionTab == 4 then
+		print(setID)
 		if addon.SelecteSavedList then 
 			BW_WardrobeOutfitDropDown:SelectDBOutfit(setID, true)
 		else

@@ -4,7 +4,8 @@
 ## Game Version: 9.1
 ## Author: SLOKnightfall
 ## Notes: 
-## SavedVariables: BetterWardrobe_Options, BetterWardrobe_CharacterData, BetterWardrobe_SavedSetData, BetterWardrobe_SubstituteItemData, BetterWardrobe_ListData
+## OptionalDeps: MogIt,
+## SavedVariables: BetterWardrobe_Options, BetterWardrobe_CharacterData, BetterWardrobe_SavedSetData, BetterWardrobe_SubstituteItemData, BetterWardrobe_ListData, BetterWardrobe_Mogitdata
 
 #Libraries
 Libs\LibStub\LibStub.lua

@@ -7,12 +7,93 @@ addon = LibStub("AceAddon-3.0"):GetAddon(addonName)
 local MogIt = {}
 addon.MogIt = MogIt
 function MogIt.GetMogitOutfits() return {} end
-function MogIt.GetMogitWishlist() return {["extraset"] = {},["name"] = "MogIt Wishlist",["item"] = {},	["set"] = {},} end
+--function MogIt.GetMogitWishlist() return {["extraset"] = {},["name"] = "MogIt Wishlist",["item"] = {},	["set"] = {},} end
 MogIt.MogitSets = {}
 
 
-if not IsAddOnLoaded("MogIt") then return end
-local  mog = _G["MogIt"]
+----if not IsAddOnLoaded("MogIt") then return end
+
+----addon:RegisterMessage("BW_OnPlayerEnterWorld", function() SetHooks() end)
+
+if IsAddOnLoaded("MogIt") and not BetterWardrobe_Mogitdata then
+	BetterWardrobe_Mogitdata = CopyTable(MogItWishlist)
+end
+
+local function BuildWishlist()
+	local name = UnitName("player")
+	local realm = GetRealmName()
+	local profileName = name.." - "..realm
+	local wishlistData = BetterWardrobe_Mogitdata.profiles[profileName].items
+	return wishlistData
+end
+
+local function GetMogitSets()
+	local name = UnitName("player")
+	local realm = GetRealmName()
+	local profileName = name.." - "..realm
+	 local setdata = BetterWardrobe_Mogitdata.profiles[profileName].sets
+	return setdata
+end
+
+function MogIt.GetMogitWishlist()
+	local list = BuildWishlist()
+	local item_list = {["extraset"] = {},["name"] = "MogIt Wishlist",["item"] = {},	["set"] = {},}
+	for i, itemlink in ipairs(list) do
+		if type(itemlink) == "string" then	
+			local appearanceID, sourceID = C_TransmogCollection.GetItemInfo(itemlink)
+			if appearanceID then 
+				item_list.item[appearanceID] = true
+			end
+		end
+	end
+	return item_list
+end
+
+function MogIt.GetMogitOutfits() 
+	local sets = GetMogitSets()
+	if #sets == 0 then return end
+
+	local mogSets = {}
+	for i, set in pairs(sets) do
+		local data = {}
+		data.name = "MogIt - " .. set.name or ""
+		data.set = "mogit"
+		data.index = i + 5000
+		data.outfitID = 5000 + i
+		data.mainHandEnchant = 0
+		data.offHandEnchant = 0
+
+		local items = set.items
+		for i, invSlot in ipairs(addon.Globals.slots) do
+			local slotID = GetInventorySlotInfo(invSlot)
+			local item = items[invSlot]
+			local icon
+			if item then
+				local sourceID = addon.GetSourceFromItem(item)
+				data[slotID] = sourceID
+				if not icon then 
+					icon = select(5, GetItemInfoInstant(item))
+					data.icon = icon
+				end
+			end
+		end
+		MogIt.MogitSets[data.index] = data
+		tinsert(mogSets, data)
+	end
+
+	return mogSets
+end
+
+--for character, data in pairs(BetterWardrobe_SavedSetData.MogItWishlist) do
+
+
+	--for index, item_data in ipairs(wishlistData) do
+--
+	--end
+
+
+
+--[[local  mog = _G["MogIt"]
 local L = LibStub("AceLocale-3.0"):GetLocale(addonName)
 
 
@@ -179,4 +260,4 @@ function MogIt.UpdateWishlistItem(type, typeID, add)
 		return addSet
 	end
 
-end
+end]]
