@@ -140,7 +140,7 @@ addon.GetOutfitName = GetOutfitName
 
 StaticPopupDialogs["BW_NAME_TRANSMOG_OUTFIT"] = {
 	preferredIndex = 3,
-	text = TRANSMOG_OUTFIT_NAME,
+	text = "pish",
 	button1 = SAVE,
 	button2 = CANCEL,
 	OnAccept = function(self)
@@ -218,7 +218,7 @@ StaticPopupDialogs["BW_CONFIRM_OVERWRITE_TRANSMOG_OUTFIT"] = {
 		--if DressUpFrame:IsShown() then
 			--BW_DressingRoomOutfitFrameMixin:SaveOutfit(self.data)
 		--else
-			BW_WardrobeOutfitFrame:SaveOutfit(self.data)
+			BW_WardrobeOutfitFrame:NewOutfit(self.data)
 		--end
 	end,
 	OnCancel = function (self)
@@ -277,17 +277,21 @@ function BW_WardrobeOutfitMixin:LoadOutfit(outfitID)
 			local data = outfit[slotID]
 			if data and data ~= NO_TRANSMOG_SOURCE_ID then 
 			--if type(slot) == "number" then 
-			local transmogLocation = TransmogUtil.GetTransmogLocation(slotID, Enum.TransmogType.Appearance, Enum.TransmogModification.None);
+			local transmogLocation = TransmogUtil.GetTransmogLocation(slotID, Enum.TransmogType.Appearance, Enum.TransmogModification.Main);
+			local pendingInfo = TransmogUtil.CreateTransmogPendingInfo(Enum.TransmogPendingType.Apply, data);
+			C_Transmog.SetPending(transmogLocation, pendingInfo);
 			--C_Transmog.SetPending(slot, Enum.TransmogType.Appearance, data)
-			C_Transmog.SetPending(transmogLocation, data, Enum.TransmogType.Appearance);
+			----C_Transmog.SetPending(transmogLocation, data);
+
+
 			end
 		end
 
-	local transmogLocation = TransmogUtil.GetTransmogLocation(GetInventorySlotInfo("MAINHANDSLOT"), Enum.TransmogType.Illusion, Enum.TransmogModification.None);
-	C_Transmog.SetPending(transmogLocation, outfit["mainHandEnchant"], Enum.TransmogType.Illusion);
+	--local transmogLocation = TransmogUtil.GetTransmogLocation(GetInventorySlotInfo("MAINHANDSLOT"), Enum.TransmogType.Illusion, Enum.TransmogModification.Main);
+	--C_Transmog.SetPending(transmogLocation, outfit["mainHandEnchant"]);
 
-	transmogLocation = TransmogUtil.GetTransmogLocation(GetInventorySlotInfo("SECONDARYHANDSLOT"), Enum.TransmogType.Illusion, Enum.TransmogModification.None);
-	C_Transmog.SetPending(transmogLocation, outfit["offHandEnchant"], Enum.TransmogType.Illusion);
+	--transmogLocation = TransmogUtil.GetTransmogLocation(GetInventorySlotInfo("SECONDARYHANDSLOT"), Enum.TransmogType.Illusion, Enum.TransmogModification.Main);
+	--C_Transmog.SetPending(transmogLocation, outfit["offHandEnchant"]);
 
 		--C_Transmog.SetPending(GetInventorySlotInfo("MAINHANDSLOT"), LE_TRANSMOG_TYPE_ILLUSION, outfit["mainHandEnchant"])
 		--C_Transmog.SetPending(GetInventorySlotInfo("SECONDARYHANDSLOT"), LE_TRANSMOG_TYPE_ILLUSION, outfit["offHandEnchant"])
@@ -402,7 +406,7 @@ function BW_WardrobeOutfitMixin:LoadDBOutfit(outfitID)
 		local emptySlotData = addon.Sets:GetEmptySlots()
 		for i, x in pairs(outfitdata.sources) do
 			if  i ~= 7 and emptySlotData[i] then
-				local transmogLocation = TransmogUtil.GetTransmogLocation(i, Enum.TransmogType.Appearance, Enum.TransmogModification.None);
+				local transmogLocation = TransmogUtil.GetTransmogLocation(i, Enum.TransmogType.Appearance, Enum.TransmogModification.Main);
 
 				local _, source = addon.GetItemSource(emptySlotData[i]) --C_TransmogCollection.GetItemInfo(emptySlotData[i])
 				C_Transmog.SetPending(transmogLocation, source, Enum.TransmogType.Appearance)
@@ -411,7 +415,7 @@ function BW_WardrobeOutfitMixin:LoadDBOutfit(outfitID)
 		
 		for slot , data in pairs(outfitdata.sources) do
 			if data ~= 0 then 
-				local transmogLocation = TransmogUtil.GetTransmogLocation(slot, Enum.TransmogType.Appearance, Enum.TransmogModification.None);
+				local transmogLocation = TransmogUtil.GetTransmogLocation(slot, Enum.TransmogType.Appearance, Enum.TransmogModification.Main);
 
 				C_Transmog.SetPending(transmogLocation, data, Enum.TransmogType.Appearance )						
 			end
@@ -443,7 +447,6 @@ end
 
 function BW_WardrobeOutfitMixin:SelectOutfit(outfitID, loadOutfit)
 	local name
-
 	if (outfitID) then
 		name = GetOutfitName(outfitID)
 	end
@@ -550,12 +553,12 @@ function BW_WardrobeOutfitMixin:IsOutfitDressed()
 				end
 			end
 		
-			local mainHandIllusionTransmogLocation = TransmogUtil.GetTransmogLocation("MAINHANDSLOT", Enum.TransmogType.Illusion, Enum.TransmogModification.None);
+			local mainHandIllusionTransmogLocation = TransmogUtil.GetTransmogLocation("MAINHANDSLOT", Enum.TransmogType.Illusion, Enum.TransmogModification.Main);
 			local mainHandSourceID = self:GetSlotSourceID(mainHandIllusionTransmogLocation);
 			if (mainHandSourceID ~= mainHandEnchant) then
 				return false
 			end
-			local offHandIllusionTransmogLocation = TransmogUtil.GetTransmogLocation("SECONDARYHANDSLOT", Enum.TransmogType.Illusion, Enum.TransmogModification.None);
+			local offHandIllusionTransmogLocation = TransmogUtil.GetTransmogLocation("SECONDARYHANDSLOT", Enum.TransmogType.Illusion, Enum.TransmogModification.Main);
 			local offHandSourceID = self:GetSlotSourceID(offHandIllusionTransmogLocation);
 		
 			if (offHandSourceID ~= offHandEnchant) then
@@ -567,11 +570,11 @@ end
 
 
 function BW_WardrobeOutfitMixin:CheckOutfitForSave(name)
+	local sources = {}
 	local pendingAppearances = { };
 	local hasInvalidAppearances = false;
 	local hasValidAppearances = false;
 	local itemTransmogInfoList = self:GetItemTransmogInfoList();
-
 	-- only need to check main appearanceIDs
 	-- secondaryAppearanceIDs will only be set at the transmogrifier or from ctrl-clicking in the collection, and as such are automatically valid
 	-- all illusions are collectible
@@ -592,6 +595,11 @@ function BW_WardrobeOutfitMixin:CheckOutfitForSave(name)
 
 				if isValidAppearance then
 					hasValidAppearances = true;
+					if (IsSourceArtifact(appearanceID)) then
+						sources[slotID] = NO_TRANSMOG_SOURCE_ID
+					else
+						sources[slotID] = appearanceID
+					end
 				else
 					hasInvalidAppearances = true;
 				end
@@ -603,6 +611,8 @@ function BW_WardrobeOutfitMixin:CheckOutfitForSave(name)
 	end
 
 	-- store the state for this save
+	BW_WardrobeOutfitFrame.sources = sources
+	BW_WardrobeOutfitFrame.name = name
 	BW_WardrobeOutfitFrame.pendingAppearances = pendingAppearances;
 	BW_WardrobeOutfitFrame.itemTransmogInfoList = itemTransmogInfoList;
 	BW_WardrobeOutfitFrame.hasValidAppearances = hasValidAppearances;
@@ -652,6 +662,32 @@ function BW_WardrobeOutfitFrameMixin:Toggle(dropDown)
 	end
 end
 
+function BW_WardrobeOutfitFrameMixin:OnUpdate(elapsed)
+	local mouseFocus = GetMouseFocus();
+	for i = 1, #self.Buttons do
+		local button = self.Buttons[i];
+		if ( button == mouseFocus or button:IsMouseOver() ) then
+			if ( button.outfitID ) then
+				button.EditButton:Show();
+			else
+				button.EditButton:Hide();
+			end
+			button.Highlight:Show();
+		else
+			button.EditButton:Hide();
+			button.Highlight:Hide();
+		end
+	end
+	if ( BW_UIDROPDOWNMENU_OPEN_MENU ) then
+		self:Hide();
+	end
+	if ( self.timer ) then
+		self.timer = self.timer - elapsed;
+		if ( self.timer < 0 ) then
+			self:Hide();
+		end
+	end
+end
 
 local function GetButton(self, index)
 	local buttons = self.Buttons
@@ -748,7 +784,7 @@ local function GetDressingRoomSources()
 end
 
 
-function BW_WardrobeOutfitFrameMixin:SaveOutfit(name)
+function BW_WardrobeOutfitFrameMixin:NewOutfit(name)
 	local outfitID = LookupOutfitIDFromName(name) --or  ((#C_TransmogCollection.GetOutfits() <= MAX_DEFAULT_OUTFITS) and #C_TransmogCollection.GetOutfits() -1 ) -- or #GetOutfits()-1
 	local icon
 	local outfit
@@ -756,28 +792,28 @@ function BW_WardrobeOutfitFrameMixin:SaveOutfit(name)
 	if DressUpFrame:IsShown() then
 		self.sources, icon  = GetDressingRoomSources()
 	else
-		for key, transmogSlot in pairs(TRANSMOG_SLOTS) do
-			if ( transmogSlot.location:IsAppearance() ) then
-				local slotID = transmogSlot.location:GetSlotID();
-				local sourceID = self.sources[slotID];
-				if ( sourceID ) then
-					icon = select(4, C_TransmogCollection.GetAppearanceSourceInfo(sourceID));
-					if ( icon ) then
-						break;
-					end
-				end
+	for slotID, itemTransmogInfo in ipairs(BW_WardrobeOutfitFrame.itemTransmogInfoList) do
+		local appearanceID = itemTransmogInfo.appearanceID;
+		if appearanceID ~= Constants.Transmog.NoTransmogID then
+			icon = select(4, C_TransmogCollection.GetAppearanceSourceInfo(appearanceID));
+			if icon then
+				break;
 			end
 		end
 	end
-
+	end
+					local sources = {}
+					for i, data in pairs(BW_WardrobeOutfitFrame.itemTransmogInfoList) do
+						sources[i]= data.appearanceID
+					end
 	if (outfitID and IsDefaultSet(outfitID)) or (#C_TransmogCollection.GetOutfits() < MAX_DEFAULT_OUTFITS)  then 
-		outfitID = C_TransmogCollection.SaveOutfit(name, self.sources, self.mainHandEnchant, self.offHandEnchant, icon)
+		outfitID = C_TransmogCollection.NewOutfit(name, icon, BW_WardrobeOutfitFrame.itemTransmogInfoList);
 	else
 		if outfitID then 
-			addon.OutfitDB.char.outfits[LookupIndexFromID(outfitID)] = self.sources
-			outfit = addon.OutfitDB.char.outfits[LookupIndexFromID(outfitID)]
+			addon.OutfitDB.char.outfits[LookupIndexFromID(outfitID)] = sources
+			outfit = addon.OutfitDB.char.outfits[LookupIndexFromID(outfitID)] or {}
 		else
-			tinsert(addon.OutfitDB.char.outfits, self.sources)
+			tinsert(addon.OutfitDB.char.outfits, sources)
 			outfit = addon.OutfitDB.char.outfits[#addon.OutfitDB.char.outfits]
 		end
 
@@ -837,13 +873,14 @@ function BW_WardrobeOutfitFrameMixin:NameOutfit(newName, outfitID)
 
 	if outfitID and IsDefaultSet(outfitID) then
 	-- this is a rename
-		C_TransmogCollection.ModifyOutfit(outfitID, newName)
+		C_TransmogCollection.RenameOutfit(outfitID, newName);
 	elseif outfitID then 
 		local index = LookupIndexFromID(outfitID)
 		addon.OutfitDB.char.outfits[index].name = newName
 	else
 		-- this is a new outfit
-		self:SaveOutfit(newName)
+		BW_WardrobeOutfitFrameMixin:NewOutfit(newName)
+		--self:SaveOutfit(newName)
 	end
 end
 
@@ -883,7 +920,7 @@ function BW_WardrobeOutfitFrameMixin:ClosePopups(requestingDropDown)
 	self.sources = nil
 	self.mainHandEnchant = nil
 	self.offHandEnchant = nil
-	self.pendingSources = nil
+	self.pendingAppearances = nil
 	self.hadInvalidSources = nil
 	self.name = nil
 	self.popupDropDown = nil
@@ -891,7 +928,7 @@ end
 
 
 function BW_WardrobeOutfitFrameMixin:EvaluateSaveState()
-	if (next(self.pendingSources)) then
+	if (next(self.pendingAppearances)) then
 		-- wait
 		if (not StaticPopup_Visible("TRANSMOG_OUTFIT_CHECKING_APPEARANCES")) then
 			BW_WardrobeOutfitFrame:ShowPopup("TRANSMOG_OUTFIT_CHECKING_APPEARANCES", nil, nil, nil, BW_WardrobeOutfitCheckAppearancesFrame)
@@ -902,9 +939,9 @@ function BW_WardrobeOutfitFrameMixin:EvaluateSaveState()
 
 	elseif self.hasInvalidAppearances then
 		-- warn
-		WardrobeOutfitFrame:ShowPopup("BW_TRANSMOG_OUTFIT_SOME_INVALID_APPEARANCES");
+		BW_WardrobeOutfitFrame:ShowPopup("BW_TRANSMOG_OUTFIT_SOME_INVALID_APPEARANCES");
 	else
-		WardrobeOutfitFrame:ContinueWithSave();
+		BW_WardrobeOutfitFrame:ContinueWithSave();
 	end
 end
 
@@ -1006,7 +1043,7 @@ BW_WardrobeOutfitEditFrameMixin = CreateFromMixins(WardrobeOutfitEditFrameMixin)
 
 function BW_WardrobeOutfitEditFrameMixin:ShowForOutfit(outfitID)
 	BW_WardrobeOutfitFrame:Hide()
-	BW_DressingRoomOutfitFrame:Hide()
+------	BW_DressingRoomOutfitFrame:Hide()
 	BW_WardrobeOutfitFrame:ShowPopup(self)
 	self.outfitID = outfitID
 	local name = GetOutfitName(outfitID)
@@ -1017,7 +1054,7 @@ end
 
 function BW_WardrobeOutfitEditFrameMixin:OnDelete()
 	BW_WardrobeOutfitFrame:Hide()
-	BW_DressingRoomOutfitFrame:Hide()
+-------	BW_DressingRoomOutfitFrame:Hide()
 	local name = GetOutfitName(self.outfitID)
 	BW_WardrobeOutfitFrame:ShowPopup("BW_CONFIRM_DELETE_TRANSMOG_OUTFIT", name, nil, self.outfitID)
 end
@@ -1028,7 +1065,7 @@ function BW_WardrobeOutfitEditFrameMixin:OnAccept()
 		return
 	end
 	BW_WardrobeOutfitFrame:Hide()
-	BW_DressingRoomOutfitFrame:Hide()
+-------	BW_DressingRoomOutfitFrame:Hide()
 	
 	StaticPopupSpecial_Hide(self)
 	BW_WardrobeOutfitFrame:NameOutfit(self.EditBox:GetText(), self.outfitID)
@@ -1039,15 +1076,15 @@ end
 BW_WardrobeOutfitCheckAppearancesMixin = CreateFromMixins(WardrobeOutfitCheckAppearancesMixin)
 
 function WardrobeOutfitCheckAppearancesMixin:OnEvent(event, sourceID, canCollect)
-	if (BW_WardrobeOutfitFrame.pendingSources[sourceID]) then
+	if (BW_WardrobeOutfitFrame.pendingAppearances[sourceID]) then
 		if (canCollect) then
-			local slotID = BW_WardrobeOutfitFrame.pendingSources[sourceID]
+			local slotID = BW_WardrobeOutfitFrame.pendingAppearances[sourceID]
 			BW_WardrobeOutfitFrame.sources[slotID] = sourceID
 		else
 			BW_WardrobeOutfitFrame.hadInvalidSources = true
 		end
 
-		BW_WardrobeOutfitFrame.pendingSources[sourceID] = nil
+		BW_WardrobeOutfitFrame.pendingAppearances[sourceID] = nil
 		BW_WardrobeOutfitFrame:EvaluateSaveState()
 	end
 end

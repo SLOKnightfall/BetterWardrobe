@@ -566,7 +566,8 @@ function BetterWardrobeOutfitMixin:LoadOutfit(outfitID)
 	if ( not outfitID ) then
 		return;
 	end
-	C_Transmog.LoadOutfit(outfitID);
+	----C_Transmog.LoadOutfit(outfitID);
+
 end
 
 function BetterWardrobeOutfitMixin:GetItemTransmogInfoList()
@@ -4170,7 +4171,6 @@ function BetterWardrobeSetsDataProviderMixin:GetBaseSets()
 							self:SortSets(self.baseSets);
 						end
 					end]]
-print(self.baseSets.setID == 5022)
 	return self.baseSets;
 end
 
@@ -6211,7 +6211,6 @@ end
 
 function BetterWardrobeSetsTransmogMixin:LoadSet(setID)
 	if BetterWardrobeCollectionFrame.selectedTransmogTab == 4 or BetterWardrobeCollectionFrame.selectedCollectionTab == 4 then
-		print(setID)
 		if addon.SelecteSavedList then 
 			BW_WardrobeOutfitDropDown:SelectDBOutfit(setID, true)
 		else

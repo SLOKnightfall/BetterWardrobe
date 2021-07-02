@@ -903,7 +903,11 @@ function BW_DressUpOutfitMixin:OnLoad()
 		]]
 end
 
+local MAX_DEFAULT_OUTFITS = C_TransmogCollection.GetNumMaxOutfits()
 
+local function IsDefaultSet(outfitID)
+	return outfitID < MAX_DEFAULT_OUTFITS  -- #C_TransmogCollection.GetOutfits()--MAX_DEFAULT_OUTFITS 
+end
 function BW_WardrobeOutfitDropDownMixin:SelectOutfit(outfitID, loadOutfit)
 	local name;
 	if ( outfitID ) then
@@ -912,14 +916,61 @@ function BW_WardrobeOutfitDropDownMixin:SelectOutfit(outfitID, loadOutfit)
 	if ( name ) then
 		UIDropDownMenu_SetText(self, name);
 	else
-		outfitID = nil;
+		----outfitID = nil;
 		UIDropDownMenu_SetText(self, GRAY_FONT_COLOR_CODE..TRANSMOG_OUTFIT_NONE..FONT_COLOR_CODE_CLOSE);
 	end
 	self.selectedOutfitID = outfitID;
 	if ( loadOutfit ) then
-		self:LoadOutfit(outfitID);
+		BW_WardrobeOutfitDropDownMixin:LoadOutfit(outfitID);
 	end
 	self:UpdateSaveButton();
 	self:OnSelectOutfit(outfitID);
+	UpdateDressingRoom()
+end
+
+function BW_WardrobeOutfitDropDownMixin:LoadOutfit(outfitID)
+	if not outfitID then
+		return false
+	end
+	local playerActor = DressUpFrame.ModelScene:GetPlayerActor()
+		if (not playerActor) then
+		return false
+	end
+
+	local MogItOutfit = false
+	if outfitID > 1000 then MogItOutfit = true end
+
+	playerActor:Undress()
+	UpdateDressingRoom()
+	import = true
+	if IsDefaultSet(outfitID) then
+		DressUpItemTransmogInfoList(C_TransmogCollection.GetOutfitItemTransmogInfoList(outfitID));
+		XXXX = C_TransmogCollection.GetOutfitItemTransmogInfoList(outfitID)
+
+	else
+		----TODO FIX
+--[[		local outfit
+		print(outfitID)
+		if outfitID > 1000 then
+			outfit = addon.MogIt.MogitSets[outfitID]
+		else
+			outfit = addon.OutfitDB.char.outfits[LookupIndexFromID(outfitID)]
+			print(LookupIndexFromID(outfitID))
+			XXX=outfit
+		end
+
+		local outfit_sources = {}
+		--need to itterate a full table as the DressUpSources uses the table size
+		for i = 1, 19  do
+			outfit_sources[i] = {["appearanceID"] = (outfit[i] or NO_TRANSMOG_SOURCE_ID)}
+			outfit_sources["mainHandEnchant"]= outfit["mainHandEnchant"]
+			outfit_sources["offHandEnchant"] = outfit["offHandEnchant"]
+		end
+		
+		--DressUpSources(outfit_sources, outfit["mainHandEnchant"], outfit["offHandEnchant"])
+		DressUpItemTransmogInfoList(outfit_sources);]]
+
+	end
+	import = false
 	UpdateDressingRoom()
 end
