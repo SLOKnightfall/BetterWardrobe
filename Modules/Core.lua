@@ -1291,6 +1291,8 @@ end
 
 	--addon.Init.LoadDressingRoomModule()
 addon.Init.SortDropDown_Initialize()
+	addon:UpdateCanIMogIt()
+
 end
 
 

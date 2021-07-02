@@ -1,8 +1,12 @@
 
 --Pulled from CanIMogIt Overlay Sets.lua
+local addonName, addon = ...
+addon = LibStub("AceAddon-3.0"):GetAddon(addonName)
+
+function addon:UpdateCanIMogIt() 
+end
 
 if not IsAddOnLoaded("CanIMogIt") then return end
-
 local addonName, addon = ...
 --addon = LibStub("AceAddon-3.0"):NewAddon(addon, addonName, "AceEvent-3.0", "AceConsole-3.0", "AceHook-3.0")
 addon = LibStub("AceAddon-3.0"):GetAddon(addonName)
@@ -25,9 +29,13 @@ local function CIMI_AddToFrameSets(parentFrame)
             	local have, total = addon.GetSetSourceCounts(parentFrame.setID)
    				local ratioText = CanIMogIt:_GetRatioTextColor(have, total)
     			ratioText = ratioText ..  have .. "/" .. total
-                frame.CanIMogItSetText:SetShown(BW_WardrobeCollectionFrame.selectedCollectionTab == 3)
-    			
-                frame.CanIMogItSetText:SetText(ratioText or "")
+                frame.CanIMogItSetText:SetShown(BetterWardrobeCollectionFrame.selectedCollectionTab == 2 or BetterWardrobeCollectionFrame.selectedCollectionTab == 3)
+    			if BetterWardrobeCollectionFrame.selectedCollectionTab == 2  then
+                    frame.CanIMogItSetText:SetText(CanIMogIt:GetSetsVariantText(parentFrame.setID) or "")
+
+                else
+                  frame.CanIMogItSetText:SetText(ratioText or "")
+                end
             else
                 frame.CanIMogItSetText:SetText("")
             end
@@ -36,35 +44,37 @@ local function CIMI_AddToFrameSets(parentFrame)
 end
 
 
-local function BW_WardrobeCollectionFrame_CIMIOnValueChanged()
+local function BetterWardrobeCollectionFrame_CIMIOnValueChanged()
     -- For each button, update the text value
     for i=1,CanIMogIt.NUM_WARDROBE_COLLECTION_BUTTONS do
-        local frame = _G["BW_SetsCollectionFrameScrollFrameButton"..i]
+        local frame = _G["BetterWardrobeCollectionFrameScrollFrameButton"..i]
         if frame and frame.CanIMogItOverlay and frame.setID then
             frame.CanIMogItOverlay:UpdateText()
         end
     end
 end
 
+
+function addon:UpdateCanIMogIt()
     for i=1,CanIMogIt.NUM_WARDROBE_COLLECTION_BUTTONS do
-        local frame = _G["BW_SetsCollectionFrameScrollFrameButton"..i]
+        local frame = _G["BetterWardrobeCollectionFrameScrollFrameButton"..i]
         if frame then
             CIMI_AddToFrameSets(frame)
         end
     end
-
       -- When the scrollbar moves, update the display.
-    _G["BW_SetsCollectionFrameScrollFrameScrollBar"]:HookScript("OnValueChanged", BW_WardrobeCollectionFrame_CIMIOnValueChanged)
-    addon:SecureHook(BW_SetsCollectionFrame,"Refresh", function() C_Timer.After(.05,BW_WardrobeCollectionFrame_CIMIOnValueChanged) end)
+    _G["BetterWardrobeCollectionFrameScrollFrameScrollBar"]:HookScript("OnValueChanged", BetterWardrobeCollectionFrame_CIMIOnValueChanged)
+    addon:SecureHook(BetterWardrobeCollectionFrame.SetsCollectionFrame,"Refresh", function() C_Timer.After(.05,BetterWardrobeCollectionFrame_CIMIOnValueChanged) end)
 
-    _G["BW_WardrobeCollectionFrameTab2"]:HookScript("OnClick", WardrobeCollectionFrame_CIMIOnValueChanged)
-    _G["BW_WardrobeCollectionFrameTab3"]:HookScript("OnClick", BW_WardrobeCollectionFrame_CIMIOnValueChanged)
+    _G["BetterWardrobeCollectionFrameTab2"]:HookScript("OnClick", WardrobeCollectionFrame_CIMIOnValueChanged)
+    _G["BetterWardrobeCollectionFrameTab3"]:HookScript("OnClick", BetterWardrobeCollectionFrame_CIMIOnValueChanged)
 
-    CanIMogIt:RegisterMessage("OptionUpdate", function () C_Timer.After(.05, BW_WardrobeCollectionFrame_CIMIOnValueChanged) end)
+    CanIMogIt:RegisterMessage("OptionUpdate", function () C_Timer.After(.05, BetterWardrobeCollectionFrame_CIMIOnValueChanged) end)
 
 	addon.frame:SetScript("OnEvent",  function (self, event, addonName)
 	    if event == "TRANSMOG_SEARCH_UPDATED" then
         	-- Must add a delay, as the frame updates after this is called.
-       	 	C_Timer.After(.05, BW_WardrobeCollectionFrame_CIMIOnValueChanged)
+       	 	C_Timer.After(.05, BetterWardrobeCollectionFrame_CIMIOnValueChanged)
     	end
 	end)
+end
