@@ -390,11 +390,6 @@ function UI.ExtendTransmogView(reset)
 		scale = 1.25
         screenWidth = math.floor(UIParent:GetWidth()); --1605??
         
-        print('uipw: '..screenWidth);
-        print('uiph: '..math.floor(screenWidth * 0.5515));
-        print('uiphe: '..math.ceil(screenWidth * -0.1994));
-        print('uipha: '..math.floor(screenWidth * 0.2025));
-
 		WardrobeFrame:SetWidth(screenWidth)
 		WardrobeFrame:SetClampedToScreen(true)
 		WardrobeFrame:SetHeight(UIParent:GetHeight() -25);
