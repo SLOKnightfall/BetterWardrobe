@@ -520,7 +520,7 @@ do
 
 			addon.Init:BuildDB()
 			addon.GetBaseList()
-			if BW_SetsCollectionFrame:IsShown() then 
+			if BW_SetsCollectionFrame:IsShown() then  --0--TODO FIX
 				BW_SetsCollectionFrame:Refresh()
 				BW_SetsCollectionFrame:OnSearchUpdate()
 			end

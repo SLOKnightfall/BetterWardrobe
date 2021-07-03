@@ -682,23 +682,6 @@
 					<OnLoad function="BetterWardrobeFilterDropDown_OnLoad"/>
 				</Scripts>
 			</Frame>
-						<Frame parentKey="TransmogOptionsButtonCover" hidden="false" enableMouse="true">
-				<Size x="93" y="50"/>
-				<Anchors>
-					<Anchor point="BOTTOMRIGHT" x="-55" y="80"/>
-				</Anchors>
-				<Scripts>
-					<OnEnter>
-						BW_TransmogOptionsButton_OnEnter(self)
-					</OnEnter>
-					<OnShow>
-						local level = BetterWardrobeCollectionFrame.TransmogOptionsButton:GetFrameLevel()
-						BetterWardrobeCollectionFrame.TransmogOptionsButtonCover:SetFrameLevel(level+5)
-
-					</OnShow>
-					<OnLeave function="GameTooltip_Hide"/>
-				</Scripts>
-			</Frame>
 			<DropDownToggleButton parentKey="TransmogOptionsButton" name="BW_TransmogOptionsButton" inherits="UIMenuButtonStretchTemplate" text="Options" hidden="false">
 				<Size x="93" y="22"/>
 				<Anchors>
@@ -1109,7 +1092,7 @@
 									<Anchor point="BOTTOMLEFT" relativePoint="BOTTOMRIGHT" x="4" y="8"/>
 								</Anchors>
 							</Slider>
-							<Frame name="WardrobeSetsFavoriteDropDown" parentKey="FavoriteDropDown" inherits="BW_UIDropDownMenuTemplate" enableMouse="true"/>
+							<Frame parentKey="FavoriteDropDown" inherits="BW_UIDropDownMenuTemplate" enableMouse="true"/>
 						</Frames>
 						<Scripts>
 							<OnLoad method="OnLoad"/>
@@ -1853,7 +1836,7 @@
 			<Anchor point="CENTER" x="0" y="0"/>
 		</Anchors>
 		<Frames>
-			<Frame name="WardrobeTransmogFrame.ToggleSecondaryAppearanceCheckbox:Show()" mixin="BW_TransmogFrameMixin">
+			<Frame name="BetterWardrobeTransmogFrame" mixin="BW_TransmogFrameMixin">
 				<Size x="300" y="495"/>
 				<Anchors>
 					<Anchor point="TOPLEFT" x="4" y="-86"/>

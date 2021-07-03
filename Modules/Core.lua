@@ -993,6 +993,7 @@ f.model:SetAutoDress(false)
 f.model:SetUnit("PLAYER")
 addon.frame = f
 
+
 ---Ace based addon initilization
 function addon:OnInitialize()
 	--print(string.byte(addon.VisualColors[42592])
@@ -1190,11 +1191,7 @@ function addon:OnEnable()
 	addon.Init:InitDB()
 	--addon.Init:BuildTooltips()
 
-	if IsAddOnLoaded("Blizzard_Collections") then 
-		addon.Init:LoadModules()
-	else
-		addon:RegisterEvent("ADDON_LOADED", "EventHandler")
-	end
+
 	---loadll()
 	------local f = CreateFrame("Frame", "BW_DressingRoomOutfitFrame", WardrobeCollectionFrame, "BW_DressingRoomOutfitFrameTemplate" )
 
@@ -1202,6 +1199,12 @@ function addon:OnEnable()
 	--addon.Init.LoadCollectionListModule()
 	--BW_ColectionListFrameTemplate
 	addon.Init:BuildTooltips()
+
+	if IsAddOnLoaded("Blizzard_Collections") then 
+		addon.Init:LoadModules()
+	else
+		addon:RegisterEvent("ADDON_LOADED", "EventHandler")
+	end
 end
 
 
@@ -1216,46 +1219,28 @@ end
 
 --Loads various modules and builds frames once the Blizzard_Collection addon is loaded
 function addon.Init:LoadModules()
-
-	function CollectionsJournal_UpdateSelectedTab(self)
-	local selected = CollectionsJournal_GetTab(self);
-
-	if (not CollectionsJournal_ValidateTab(selected)) then
-		PanelTemplates_SetTab(self, 1);
-		selected = 1;
+	--Check to make sure that the Blizzard Frames have completed loading
+	if not WardrobeTransmogFrame then 
+		C_Timer.After(0.5, function() addon.Init:LoadModules() end)
+		return false
 	end
-	
-	MountJournal:SetShown(selected == 1);
-	PetJournal:SetShown(selected == 2);
-	ToyBox:SetShown(selected == 3);
-	HeirloomsJournal:SetShown(selected == 4);
-	-- don't touch the wardrobe frame if it's used by the transmogrifier
-	if ( WardrobeCollectionFrame:GetParent() == self or not WardrobeCollectionFrame:GetParent():IsShown() ) then
-		if ( selected == 5 ) then
-			HideUIPanel(WardrobeFrame);
-			WardrobeCollectionFrame:Hide();
-			BetterWardrobeCollectionFrame:SetContainer(self);
-		else
-			WardrobeCollectionFrame:Hide();
-			BetterWardrobeCollectionFrame:Hide();
+
+	--Hooks into the colection tabs and sets Better Wardobe when viewing the wardrobe collection
+	addon:SecureHook(nil, "CollectionsJournal_UpdateSelectedTab", function(self) 
+		local selected = CollectionsJournal_GetTab(self);
+
+		-- don't touch the wardrobe frame if it's used by the transmogrifier
+		if ( WardrobeCollectionFrame:GetParent() == self or not WardrobeCollectionFrame:GetParent():IsShown() ) then
+			if ( selected == 5 ) then
+				HideUIPanel(WardrobeFrame);
+				WardrobeCollectionFrame:Hide();
+				BetterWardrobeCollectionFrame:SetContainer(self);
+			else
+				WardrobeCollectionFrame:Hide();
+				BetterWardrobeCollectionFrame:Hide();
+			end
 		end
-	end
-
-	if ( selected == 1 ) then
-		CollectionsJournalTitleText:SetText(MOUNTS);
-	elseif (selected == 2 ) then
-		CollectionsJournalTitleText:SetText(PET_JOURNAL);
-	elseif (selected == 3 ) then
-		CollectionsJournalTitleText:SetText(TOY_BOX);
-	elseif (selected == 4 ) then
-		CollectionsJournalTitleText:SetText(HEIRLOOMS);
-	elseif (selected == 5 ) then
-		CollectionsJournalTitleText:SetText(WARDROBE);
-	end
-
-	HelpTip:HideAll(self);
-
-end
+	end)
 
 	addon.Init:LoadWardrobeModule()
 
