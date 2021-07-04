@@ -32,6 +32,7 @@ local IN_PROGRESS_FONT_COLOR =addon.Globals.IN_PROGRESS_FONT_COLOR
 local IN_PROGRESS_FONT_COLOR_CODE = addon.Globals.IN_PROGRESS_FONT_COLOR_CODE
 local COLLECTION_LIST_WIDTH = addon.Globals.COLLECTION_LIST_WIDTH
 
+addon.useAltSet = false
 
 local Sets = {}
 addon.Sets = Sets
@@ -1322,6 +1323,7 @@ function BetterWardrobeCollectionFrameMixin:OnShow()
 	self:UpdateTabButtons();
 
 	addon.selectedArmorType = addon.Globals.CLASS_INFO[playerClass][3]
+	addon.refreshData = true
 end
 
 function BetterWardrobeCollectionFrameMixin:OnHide()
@@ -1346,6 +1348,7 @@ self:SetTab(1)
 	BW_UIDropDownMenu_SetSelectedValue(BW_SortDropDown, addon.sortDB.sortDropdown)
 	BW_UIDropDownMenu_SetText(BW_SortDropDown, COMPACT_UNIT_FRAME_PROFILE_SORTBY.." "..L[addon.sortDB.sortDropdown])
 	addon.selectedArmorType = addon.Globals.CLASS_INFO[playerClass][3]
+	addon.useAltSet = false
 end
 
 function BetterWardrobeCollectionFrameMixin:OnKeyDown(key)
@@ -3977,9 +3980,12 @@ function BetterWardrobeFilterDropDown_InitializeBaseSets(self, level)
 				info.text = L[name]
 				info.func = function(info, arg1, _, value)
 						addon.selectedArmorType = arg1
+						addon.useAltSet = true
+						--addon.refreshData = true
 						--addon.extraSetsCache = nil
 						----BW_WardrobeCollectionFrame_SetTab(2)
 						----BW_WardrobeCollectionFrame_SetTab(3)
+						RefreshLists()
 				end
 				info.arg1 = name
 				info.checked = 	function() return addon.selectedArmorType == name end
@@ -4162,8 +4168,13 @@ function BetterWardrobeSetsDataProviderMixin:GetBaseSets(filter)
 		tabReset = nil
 		if BetterWardrobeCollectionFrame:CheckTab(3) then
 			----self.baseSets = Sets:ClearHidden(addon.GetBaseList(), "extraset") --C_TransmogSets.GetBaseSets()   ----TODO: Fix
-			self.baseSets = addon.GetBaseList()
 
+			if addon.useAltSet then
+
+				self.baseSets = addon.GetAltList()
+			else
+				self.baseSets = addon.GetBaseList()
+			end
 		elseif BetterWardrobeCollectionFrame:CheckTab(4) then
 			self.baseSets = addon.GetSavedList()
 			----self:SortSets(self.baseSets)
@@ -4292,7 +4303,7 @@ function BetterWardrobeSetsDataProviderMixin:GetUsableSets(incVariants)
 				end
 			elseif Profile.ShowIncomplete or BetterWardrobeVisualToggle.VisualMode then
 				self.usableSets = {}
-				local availableSets = self:GetBaseSets(true)
+				local availableSets = self:GetBaseSets(BetterWardrobeCollectionFrame:CheckTab(2) )
 				for i, set in ipairs(availableSets) do
 					if not setIDS[set.setID or set.baseSetID] then 
 						local topSourcesCollected, topSourcesTotal = addon.Sets:GetLocationBasedCount(set) --SetsDataProvider:GetSetSourceCounts(set.setID)

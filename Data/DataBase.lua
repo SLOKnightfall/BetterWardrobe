@@ -36,6 +36,7 @@ local hiddenSet ={
 	["isClass"] = true,
 }
 local SET_DATA = {}
+local ALT_SET_DATA = {}
 local SET_INDEX = {}
 local ArmorDB = {}
 
@@ -278,7 +279,8 @@ do
 	end
 
 
-	local function addArmor(armorSet)
+	local function addArmor(armorSet, set)
+		local defaultSet = set or SET_DATA 
 		for id, setData in pairs(armorSet) do
 			if  (setData.isClass or addon.Profile.IgnoreClassRestrictions) then 
 					--(addon.Profile.IgnoreClassRestrictions and ((setData.filter == 6 or setData.filter == 7) and addon.Profile.IgnoreClassLookalikeRestrictions)) or 
@@ -301,7 +303,7 @@ do
 						setData.sources[replacementID] = appearanceID
 					end
 				end
-				tinsert(SET_DATA, setData)	
+				tinsert(set, setData)	
 			end
 		end
 	end
@@ -347,12 +349,25 @@ do
 		local armorSet = ArmorDB[addon.selectedArmorType] or ArmorDB[CLASS_INFO[playerClass][3]]
 		--wipe(SET_INDEX)
 		wipe(SET_DATA)
-		addArmor(armorSet)
-		addArmor(ArmorDB["COSMETIC"])
+		addArmor(armorSet, SET_DATA)
+		addArmor(ArmorDB["COSMETIC"], SET_DATA)
 		--Add Hidden Set
 		SET_INDEX[0] = hiddenSet
 		--tinsert(SET_DATA, hiddenSet)
 		addon.BuildClassArtifactAppearanceList()
+	end
+
+	function addon.Init:BuildAltDB()
+		buildSetSubstitutions()
+		local armorSet = ArmorDB[addon.selectedArmorType]
+		--wipe(SET_INDEX)
+		wipe(ALT_SET_DATA)
+		addArmor(armorSet, ALT_SET_DATA)
+		addArmor(ArmorDB["COSMETIC"], ALT_SET_DATA)
+		--Add Hidden Set
+		--ALT_SET_INDEX[0] = hiddenSet
+		--tinsert(SET_DATA, hiddenSet)
+		--addon.BuildClassArtifactAppearanceList()
 	end
 
 
@@ -376,6 +391,11 @@ do
 			addon.refreshData = false
 		end
 		return SET_DATA
+	end
+
+	function addon.GetAltList()
+		addon.Init:BuildAltDB()
+	return ALT_SET_DATA
 	end
 
 
