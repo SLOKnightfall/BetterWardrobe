@@ -393,8 +393,9 @@ function BW_TransmogFrameMixin:SelectSlotButton(slotButton, fromOnClick)
 	self:EvaluateSecondaryAppearanceCheckbox();
 end
 
-addon:SecureHook(WardrobeTransmogFrame, "SelectSlotButton", function(self, slotButton, fromOnClick) BW_TransmogFrameMixin.SelectSlotButton(self, slotButton, fromOnClick) end)
 
+addon:SecureHook(WardrobeTransmogFrame, "GetRandomAppearanceID", function(self) BW_TransmogFrameMixin.GetRandomAppearanceID(self) end)
+addon:SecureHook(WardrobeTransmogFrame, "SelectSlotButton", function(self, slotButton, fromOnClick) BW_TransmogFrameMixin.SelectSlotButton(self, slotButton, fromOnClick) end)
 
 function BW_TransmogFrameMixin:EvaluateSecondaryAppearanceCheckbox()
 	local showToggleCheckbox = false;
@@ -404,12 +405,19 @@ function BW_TransmogFrameMixin:EvaluateSecondaryAppearanceCheckbox()
 	self.ToggleSecondaryAppearanceCheckbox:SetShown(showToggleCheckbox);
 end
 
+addon:SecureHook(WardrobeTransmogFrame, "EvaluateSecondaryAppearanceCheckbox", function(self) BW_TransmogFrameMixin.EvaluateSecondaryAppearanceCheckbox(self) end)
+
+
 function BW_TransmogFrameMixin:GetSelectedTransmogLocation()
 	if self.selectedSlotButton then
 		return self.selectedSlotButton.transmogLocation;
 	end
 	return nil;
 end
+
+
+addon:SecureHook(WardrobeTransmogFrame, "GetSelectedTransmogLocation", function(self) BW_TransmogFrameMixin.GetSelectedTransmogLocation(self) end)
+
 
 function BW_TransmogFrameMixin:RefreshPlayerModel()
 	if self.ModelScene.previousActor then
@@ -455,6 +463,8 @@ function BW_TransmogFrameMixin:Update()
 		self:SelectSlotButton(self.selectedSlotButton);
 	end
 end
+----addon:SecureHook(WardrobeTransmogFrame, "Update", function(self) BW_TransmogFrameMixin.Update(self) end)
+
 
 function BW_TransmogFrameMixin:SetPendingTransmog(transmogID, category)
 	if self.selectedSlotButton then
@@ -470,6 +480,7 @@ function BW_TransmogFrameMixin:SetPendingTransmog(transmogID, category)
 		C_Transmog.SetPending(transmogLocation, pendingInfo);
 	end
 end
+addon:SecureHook(WardrobeTransmogFrame, "SetPendingTransmog", function(self,...) BW_TransmogFrameMixin.Update(self,...) end)
 
 function BW_TransmogFrameMixin:UpdateApplyButton()
 	local cost = C_Transmog.GetApplyCost();
@@ -497,6 +508,7 @@ function BW_TransmogFrameMixin:GetSlotButton(transmogLocation)
 		end
 	end
 end
+addon:SecureHook(WardrobeTransmogFrame, "GetSlotButton", function(self,...) BW_TransmogFrameMixin.GetSlotButton(self,...) end)
 
 function BW_TransmogFrameMixin:ApplyPending(lastAcceptedWarningIndex)
 	if ( lastAcceptedWarningIndex == 0 or not self.applyWarningsTable ) then
@@ -551,6 +563,8 @@ function BW_TransmogFrameMixin:OnTransmogApplied()
 		dropDown:OnOutfitApplied(dropDown.selectedOutfitID);
 	end
 end
+--addon:SecureHook(WardrobeTransmogFrame, "OnTransmogApplied", function(self,...) BW_TransmogFrameMixin.OnTransmogApplied(self,...) end)
+
 
 BetterWardrobeOutfitMixin = { };
 
@@ -1909,6 +1923,7 @@ function BetterWardrobeItemsCollectionMixin:OnShow()
 		self:ChangeModelsSlot(self.transmogLocation);
 		needsUpdate = true;
 	else
+		print("gagg")
 		local transmogLocation = TransmogUtil.GetTransmogLocation("HEADSLOT", Enum.TransmogType.Appearance, Enum.TransmogModification.Main);
 		self:SetActiveSlot(transmogLocation);
 	end
@@ -1926,7 +1941,7 @@ function BetterWardrobeItemsCollectionMixin:OnShow()
 
 	-- tab tutorial
 	SetCVarBitfield("closedInfoFrames", LE_FRAME_TUTORIAL_TRANSMOG_JOURNAL_TAB, true);
-	self:CheckHelpTip();
+	--self:CheckHelpTip();
 end
 
 function BetterWardrobeItemsCollectionMixin:OnHide()
