@@ -6,6 +6,7 @@ local L = LibStub("AceLocale-3.0"):GetLocale(addonName)
 
 local MAX_DEFAULT_OUTFITS = C_TransmogCollection.GetNumMaxOutfits()
 
+--Coresponds to wardrobeOutfits
 
 --Function to update character to reflect DB changes
 function addon.Init.SavedOutfitDBUpdate(force) 
@@ -140,11 +141,11 @@ addon.GetOutfitName = GetOutfitName
 
 StaticPopupDialogs["BW_NAME_TRANSMOG_OUTFIT"] = {
 	preferredIndex = 3,
-	text = "pish",
+	text = TRANSMOG_OUTFIT_NAME,
 	button1 = SAVE,
 	button2 = CANCEL,
 	OnAccept = function(self)
-		BW_WardrobeOutfitFrame:NameOutfit(self.editBox:GetText(), self.data)
+		BetterWardrobeOutfitFrame:NameOutfit(self.editBox:GetText(), self.data)
 	end,
 	timeout = 0,
 	whileDead = 1,
@@ -182,7 +183,7 @@ StaticPopupDialogs["BW_CONFIRM_DELETE_TRANSMOG_OUTFIT"] = {
 	text = TRANSMOG_OUTFIT_CONFIRM_DELETE,
 	button1 = YES,
 	button2 = NO,
-	OnAccept = function (self) BW_WardrobeOutfitFrame:DeleteOutfit(self.data) end,
+	OnAccept = function (self) BetterWardrobeOutfitFrame:DeleteOutfit(self.data) end,
 	OnCancel = function (self) end,
 	hideOnEscape = 1,
 	timeout = 0,
@@ -195,14 +196,14 @@ StaticPopupDialogs["BW_TRANSMOG_OUTFIT_SOME_INVALID_APPEARANCES"] = {
 	button1 = OKAY,
 	button2 = CANCEL,
 	OnShow = function(self)
-		if (BW_WardrobeOutfitFrame.name) then
+		if (BetterWardrobeOutfitFrame.name) then
 			self.button1:SetText(SAVE)
 		else
 			self.button1:SetText(CONTINUE)
 		end
 	end,
 	OnAccept = function(self)
-		BW_WardrobeOutfitFrame:ContinueWithSave()
+		BetterWardrobeOutfitFrame:ContinueWithSave()
 	end,
 	hideOnEscape = 1,
 	timeout = 0,
@@ -215,10 +216,12 @@ StaticPopupDialogs["BW_CONFIRM_OVERWRITE_TRANSMOG_OUTFIT"] = {
 	button1 = YES,
 	button2 = NO,
 	OnAccept = function (self) 
-		--if DressUpFrame:IsShown() then
+		local name = self.data;
+		BetterWardrobeOutfitFrame:SaveOutfit(self.data)
+		--if DressUpFrame:IsShown() then --todo fix
 			--BW_DressingRoomOutfitFrameMixin:SaveOutfit(self.data)
 		--else
-			BW_WardrobeOutfitFrame:NewOutfit(self.data)
+			--BetterWardrobeOutfitFrame:NewOutfit(self.data)
 		--end
 	end,
 	OnCancel = function (self)
@@ -236,345 +239,169 @@ StaticPopupDialogs["BW_CONFIRM_OVERWRITE_TRANSMOG_OUTFIT"] = {
 }
 
 
+
 --===================================================================================================================================
-BW_WardrobeOutfitMixin = {}
 
-function BW_WardrobeOutfitMixin:OnOutfitApplied(outfitID)
-	local value = outfitID or ""
-	if GetCVarBool("transmogCurrentSpecOnly") then
-		local specIndex = GetSpecialization()
-		addon.OutfitDB.char.lastTransmogOutfitIDSpec[specIndex] = value
-		--SetCVar("lastTransmogOutfitIDSpec"..specIndex, value)
-	else
-		for specIndex = 1, GetNumSpecializations() do
-			--SetCVar("lastTransmogOutfitIDSpec"..specIndex, value)
-			addon.OutfitDB.char.lastTransmogOutfitIDSpec[specIndex] = value
-		end
-	end
-end
+BetterWardrobeOutfitDropDownMixin = { };
 
-
-function BW_WardrobeOutfitMixin:LoadOutfit(outfitID)
-	if (not outfitID) then
-		return
-	end
-	local MogItOutfit = false
-	if outfitID > 1000 then MogItOutfit = true end
-
-
-	if IsDefaultSet(outfitID) then 
-		C_Transmog.LoadOutfit(outfitID)
-	else
-		local outfit 
-		if outfitID > 1000 then
-			outfit = addon.MogIt.MogitSets[outfitID]
-		else
-			outfit = addon.OutfitDB.char.outfits[LookupIndexFromID(outfitID)]
-		end
-		--for slot , data in pairs(outfit) do
-		for key, transmogSlot in pairs(TRANSMOG_SLOTS) do
-			local slotID = transmogSlot.location:GetSlotID();
-			local data = outfit[slotID]
-			if data and data ~= NO_TRANSMOG_SOURCE_ID then 
-			--if type(slot) == "number" then 
-			local transmogLocation = TransmogUtil.GetTransmogLocation(slotID, Enum.TransmogType.Appearance, Enum.TransmogModification.Main);
-			local pendingInfo = TransmogUtil.CreateTransmogPendingInfo(Enum.TransmogPendingType.Apply, data);
-			C_Transmog.SetPending(transmogLocation, pendingInfo);
-			--C_Transmog.SetPending(slot, Enum.TransmogType.Appearance, data)
-			----C_Transmog.SetPending(transmogLocation, data);
-
-
-			end
-		end
-
-	--local transmogLocation = TransmogUtil.GetTransmogLocation(GetInventorySlotInfo("MAINHANDSLOT"), Enum.TransmogType.Illusion, Enum.TransmogModification.Main);
-	--C_Transmog.SetPending(transmogLocation, outfit["mainHandEnchant"]);
-
-	--transmogLocation = TransmogUtil.GetTransmogLocation(GetInventorySlotInfo("SECONDARYHANDSLOT"), Enum.TransmogType.Illusion, Enum.TransmogModification.Main);
-	--C_Transmog.SetPending(transmogLocation, outfit["offHandEnchant"]);
-
-		--C_Transmog.SetPending(GetInventorySlotInfo("MAINHANDSLOT"), LE_TRANSMOG_TYPE_ILLUSION, outfit["mainHandEnchant"])
-		--C_Transmog.SetPending(GetInventorySlotInfo("SECONDARYHANDSLOT"), LE_TRANSMOG_TYPE_ILLUSION, outfit["offHandEnchant"])
-	end
-end
-
-function BW_WardrobeOutfitMixin:GetItemTransmogInfoList()
-	local playerActor = WardrobeTransmogFrame.ModelScene:GetPlayerActor();
-	if playerActor then
-		return playerActor:GetItemTransmogInfoList();
-	end
-	return nil;
-end
-
-
-function BW_WardrobeOutfitMixin:OnOutfitSaved(outfitID)
-	if C_Transmog.GetApplyCost() then
-		self:OnOutfitApplied(outfitID);
-	end
-end
-
---[[
-function BW_WardrobeOutfitMixin:GetSlotSourceID(transmogLocation)
-	local isTransmogrified, hasPending, isPendingCollected, canTransmogrify, cannotTransmogrifyReason, hasUndo = C_Transmog.GetSlotInfo(transmogLocation);
-
-	if (not canTransmogrify and not hasUndo) then
-		return NO_TRANSMOG_SOURCE_ID
-	end
-
-	local _, _, sourceID = TransmogUtil.GetInfoForEquippedSlot(transmogLocation);
-	return sourceID
-end
-
-nd
-end
-]]
-
-
-
-function BW_WardrobeOutfitMixin:OnLoad()
-	local button = _G[self:GetName().."Button"]
+function BetterWardrobeOutfitDropDownMixin:OnLoad()
+	local button = _G[self:GetName().."Button"];
 	button:SetScript("OnMouseDown", function(self)
-						PlaySound(SOUNDKIT.IG_MAINMENU_OPTION_CHECKBOX_ON)
-						BW_WardrobeOutfitFrame:Toggle(BW_WardrobeOutfitDropDown)--self:GetParent())
+						PlaySound(SOUNDKIT.IG_MAINMENU_OPTION_CHECKBOX_ON);
+						BetterWardrobeOutfitFrame:Toggle(self:GetParent());
 						end
-					)
-	BW_UIDropDownMenu_JustifyText(self, "LEFT")
-	if (self.width) then
-		BW_UIDropDownMenu_SetWidth(self, self.width)
+					);
+	BW_UIDropDownMenu_JustifyText(self, "LEFT");
+	if ( self.width ) then
+		BW_UIDropDownMenu_SetWidth(self, self.width);
 	end
-	WardrobeOutfitDropDown:Hide()
-
-	addon:SecureHook(WardrobeTransmogFrame, "OnTransmogApplied", function()
-	C_Timer.After(.5, function()
-			if BW_WardrobeOutfitDropDown.selectedOutfitID and BW_WardrobeOutfitDropDown:IsOutfitDressed() then
-				BW_WardrobeOutfitDropDown:OnOutfitApplied(BW_WardrobeOutfitDropDown.selectedOutfitID)
-			end
-		end)
-		end, true)
 end
 
-
-function BW_WardrobeOutfitMixin:OnShow()
+function BetterWardrobeOutfitDropDownMixin:OnShow()
 	self:RegisterEvent("TRANSMOG_OUTFITS_CHANGED");
 	self:RegisterEvent("TRANSMOGRIFY_UPDATE");
 	self:SelectOutfit(self:GetLastOutfitID(), true);
 end
 
-
-function BW_WardrobeOutfitMixin:OnHide()
-	self:UnregisterEvent("TRANSMOG_OUTFITS_CHANGED")
-	self:UnregisterEvent("TRANSMOGRIFY_UPDATE")
-	BW_WardrobeOutfitFrame:ClosePopups(self)
-	if (BW_WardrobeOutfitFrame.dropDown == self) then
-		BW_WardrobeOutfitFrame:Hide()
+function BetterWardrobeOutfitDropDownMixin:OnHide()
+	self:UnregisterEvent("TRANSMOG_OUTFITS_CHANGED");
+	self:UnregisterEvent("TRANSMOGRIFY_UPDATE");
+	BetterWardrobeOutfitFrame:ClosePopups(self);
+	if ( BetterWardrobeOutfitFrame.dropDown == self ) then
+		BetterWardrobeOutfitFrame:Hide();
 	end
 end
 
-
-function BW_WardrobeOutfitMixin:OnEvent(event)
-	if (event == "TRANSMOG_OUTFITS_CHANGED") then
+function BetterWardrobeOutfitDropDownMixin:OnEvent(event)
+	if ( event == "TRANSMOG_OUTFITS_CHANGED" ) then
 		-- try to reselect the same outfit to update the name
 		-- if it changed or clear the name if it got deleted
-		self:SelectOutfit(self.selectedOutfitID)
-		if (BW_WardrobeOutfitFrame:IsShown()) then
-			BW_WardrobeOutfitFrame:Update()
+		self:SelectOutfit(self.selectedOutfitID);
+		if ( BetterWardrobeOutfitFrame:IsShown() ) then
+			BetterWardrobeOutfitFrame:Update();
 		end
 	end
-	if not addon.SelecteSavedList then 
+	-- don't need to do anything for "TRANSMOGRIFY_UPDATE" beyond updating the save button
+		----if not addon.SelecteSavedList then 
 	-- don't need to do anything for "TRANSMOGRIFY_UPDATE" beyond updating the save button
 	self:UpdateSaveButton()
-	end
+	----end
 end
 
 
-function BW_WardrobeOutfitMixin:LoadDBOutfit(outfitID)
-	if (not outfitID) then
-		return
-	end
-
-	local outfits = addon.GetSavedList()
-	local outfitdata
-	for i, data in ipairs(outfits) do
-		if data.setID == outfitID then 
-			outfitdata = data
-			break
-		end
-	end
-
-	if not outfitdata then return end
-
-		local emptySlotData = addon.Sets:GetEmptySlots()
-		for i, x in pairs(outfitdata.sources) do
-			if  i ~= 7 and emptySlotData[i] then
-				local transmogLocation = TransmogUtil.GetTransmogLocation(i, Enum.TransmogType.Appearance, Enum.TransmogModification.Main);
-
-				local _, source = addon.GetItemSource(emptySlotData[i]) --C_TransmogCollection.GetItemInfo(emptySlotData[i])
-				C_Transmog.SetPending(transmogLocation, source, Enum.TransmogType.Appearance)
-			end
-		end
-		
-		for slot , data in pairs(outfitdata.sources) do
-			if data ~= 0 then 
-				local transmogLocation = TransmogUtil.GetTransmogLocation(slot, Enum.TransmogType.Appearance, Enum.TransmogModification.Main);
-
-				C_Transmog.SetPending(transmogLocation, data, Enum.TransmogType.Appearance )						
-			end
-		end
-	--C_Transmog.SetPending(GetInventorySlotInfo("MAINHANDSLOT"), LE_TRANSMOG_TYPE_ILLUSION, outfit["mainHandEnchant"])
-		--C_Transmog.SetPending(GetInventorySlotInfo("SECONDARYHANDSLOT"), LE_TRANSMOG_TYPE_ILLUSION, outfit["offHandEnchant"])
-end
-
-
-function BW_WardrobeOutfitMixin:UpdateSaveButton()
-	if (self.selectedOutfitID) then
-		self.SaveButton:SetEnabled(not self:IsOutfitDressed())
+function BetterWardrobeOutfitDropDownMixin:UpdateSaveButton()
+	if ( self.selectedOutfitID ) then
+		self.SaveButton:SetEnabled(not self:IsOutfitDressed());
 	else
-		self.SaveButton:SetEnabled(false)
+		self.SaveButton:SetEnabled(false);
 	end
 end
 
-
-function BW_WardrobeOutfitMixin:SelectDBOutfit(outfitID, loadOutfit)
-	local name
-	--self.selectedOutfitID = outfitID
-	if (loadOutfit) then
-		self:LoadDBOutfit(outfitID)
-	end
-	--self:UpdateSaveButton()
-	--self:OnSelectOutfit(outfitID)
+function BetterWardrobeOutfitDropDownMixin:OnOutfitSaved(outfitID)
 end
 
+function BetterWardrobeOutfitDropDownMixin:SelectOutfit(outfitID, loadOutfit)
 
-function BW_WardrobeOutfitMixin:SelectOutfit(outfitID, loadOutfit)
 	local name
 	if (outfitID) then
 		name = GetOutfitName(outfitID)
 	end
 
-	if (name) then
-		BW_UIDropDownMenu_SetText(self, name)
+	if ( name ) then
+		BW_UIDropDownMenu_SetText(self, name);
 	else
-		outfitID = nil
-		BW_UIDropDownMenu_SetText(self, GRAY_FONT_COLOR_CODE..TRANSMOG_OUTFIT_NONE..FONT_COLOR_CODE_CLOSE)
+		outfitID = nil;
+		BW_UIDropDownMenu_SetText(self, GRAY_FONT_COLOR_CODE..TRANSMOG_OUTFIT_NONE..FONT_COLOR_CODE_CLOSE);
 	end
-
-	self.selectedOutfitID = outfitID
-	if (loadOutfit) then
-		self:LoadOutfit(outfitID)
+	self.selectedOutfitID = outfitID;
+	if ( loadOutfit ) then
+		self:LoadOutfit(outfitID);
 	end
-	self:UpdateSaveButton()
-	self:OnSelectOutfit(outfitID)
+	self:UpdateSaveButton();
+	self:OnSelectOutfit(outfitID);
 end
 
-
-function BW_WardrobeOutfitMixin:OnSelectOutfit(outfitID)
-	-- outfitID can be 0, so use empty string for none
-	local value = outfitID or ""
-	for specIndex = 1, GetNumSpecializations() do
-		if addon.OutfitDB.char.lastTransmogOutfitIDSpec[specIndex] == "" then
-			--SetCVar("lastTransmogOutfitIDSpec"..specIndex, value)
-			addon.OutfitDB.char.lastTransmogOutfitIDSpec[specIndex] = value
-		end
-	end
+function BetterWardrobeOutfitDropDownMixin:LoadOutfit(outfitID)
+	-- nothing to see here
 end
 
-
-function BW_WardrobeOutfitMixin:GetLastOutfitID()
-	local specIndex = GetSpecialization()
-	addon.OutfitDB.char.lastTransmogOutfitIDSpec[specIndex] = addon.OutfitDB.char.lastTransmogOutfitIDSpec[specIndex] or GetCVar("lastTransmogOutfitIDSpec"..specIndex)
-	return tonumber(addon.OutfitDB.char.lastTransmogOutfitIDSpec[specIndex])
+function BetterWardrobeOutfitDropDownMixin:OnSelectOutfit(outfitID)
+	-- nothing to see here
 end
 
+function BetterWardrobeOutfitDropDownMixin:GetLastOutfitID()
+	return nil;
+end
 
 local function IsSourceArtifact(sourceID)
-	local link = select(6, C_TransmogCollection.GetAppearanceSourceInfo(sourceID))
+	local link = select(6, C_TransmogCollection.GetAppearanceSourceInfo(sourceID));
 	if not link then
 		return false;
 	end
 	local _, _, quality = GetItemInfo(link);
-
 	return quality == Enum.ItemQuality.Artifact;
 end
 
-
-function BW_WardrobeOutfitMixin:IsOutfitDressed()
-	if (not self.selectedOutfitID) then
-		return true
-	end
-
-	local outfitItemTransmogInfoList = C_TransmogCollection.GetOutfitItemTransmogInfoList(self.selectedOutfitID);
-	if not outfitItemTransmogInfoList then
+function BetterWardrobeOutfitDropDownMixin:IsOutfitDressed()
+	if not self.selectedOutfitID then
 		return true;
 	end
 
-	local currentItemTransmogInfoList = self:GetItemTransmogInfoList();
-	if not currentItemTransmogInfoList then
-		return true;
-	end
+	if self:IsDefaultSet(self.selectedOutfitID) then 
 
-	for slotID, itemTransmogInfo in ipairs(currentItemTransmogInfoList) do
-		if not itemTransmogInfo:IsEqual(outfitItemTransmogInfoList[slotID]) then
-			if itemTransmogInfo.appearanceID ~= Constants.Transmog.NoTransmogID then
-				return false;
+		local outfitItemTransmogInfoList = C_TransmogCollection.GetOutfitItemTransmogInfoList(self.selectedOutfitID);
+		if not outfitItemTransmogInfoList then
+			return true;
+		end
+
+		local currentItemTransmogInfoList = self:GetItemTransmogInfoList();
+		if not currentItemTransmogInfoList then
+			return true;
+		end
+
+		for slotID, itemTransmogInfo in ipairs(currentItemTransmogInfoList) do
+			if not itemTransmogInfo:IsEqual(outfitItemTransmogInfoList[slotID]) then
+				if itemTransmogInfo.appearanceID ~= Constants.Transmog.NoTransmogID then
+					return false;
+				end
 			end
 		end
-	end
-	return true;
+		return true;
 
-	--[[local appearanceSources, mainHandEnchant, offHandEnchant
-			if IsDefaultSet(self.selectedOutfitID) then 
-				appearanceSources, mainHandEnchant, offHandEnchant = C_TransmogCollection.GetOutfitSources(self.selectedOutfitID);
-			else
-				local outfit
-				if self.selectedOutfitID > 5000 then
-					return true
-				else
-					 outfit = addon.OutfitDB.char.outfits[LookupIndexFromID(self.selectedOutfitID)]
-				end
-				appearanceSources = outfit
-				mainHandEnchant = outfit["mainHandEnchant"]
-				offHandEnchant = outfit["offHandEnchant"]
-			end
-		
-			if (not appearanceSources) then
-				return true
-			end
-		
-			for key, transmogSlot in pairs(TRANSMOG_SLOTS) do
-				if transmogSlot.location:IsAppearance() then
-					local sourceID = self:GetSlotSourceID(transmogSlot.location);
-					local slotID = transmogSlot.location:GetSlotID();
-					if (sourceID ~= NO_TRANSMOG_SOURCE_ID and sourceID ~= appearanceSources[slotID]) then
-						-- No artifacts in outfits, their sourceID is overriden to NO_TRANSMOG_SOURCE_ID
-						if (not IsSourceArtifact(sourceID) or appearanceSources[slotID] ~= NO_TRANSMOG_SOURCE_ID) then
-							return false
-						end
-					end
+	else
+		local outfit = addon.OutfitDB.char.outfits[LookupIndexFromID(self.selectedOutfitID)]
+		if not outfit then
+			return true;
+		end
+		local outfitItemTransmogInfoList = {}
+		--need to itterate a full table as the DressUpSources uses the table size
+		for i = 1, 19  do
+			outfitItemTransmogInfoList[i] = ItemUtil.CreateItemTransmogInfo(outfit[i]);
+		end
+
+		local currentItemTransmogInfoList = self:GetItemTransmogInfoList();
+		if not currentItemTransmogInfoList then
+			return true;
+		end
+
+		for slotID, itemTransmogInfo in ipairs(currentItemTransmogInfoList) do
+			if not itemTransmogInfo:IsEqual(outfitItemTransmogInfoList[slotID]) then
+				if itemTransmogInfo.appearanceID ~= Constants.Transmog.NoTransmogID then
+					return false;
 				end
 			end
-		
-			local mainHandIllusionTransmogLocation = TransmogUtil.GetTransmogLocation("MAINHANDSLOT", Enum.TransmogType.Illusion, Enum.TransmogModification.Main);
-			local mainHandSourceID = self:GetSlotSourceID(mainHandIllusionTransmogLocation);
-			if (mainHandSourceID ~= mainHandEnchant) then
-				return false
-			end
-			local offHandIllusionTransmogLocation = TransmogUtil.GetTransmogLocation("SECONDARYHANDSLOT", Enum.TransmogType.Illusion, Enum.TransmogModification.Main);
-			local offHandSourceID = self:GetSlotSourceID(offHandIllusionTransmogLocation);
-		
-			if (offHandSourceID ~= offHandEnchant) then
-				return false
-			end
-		
-			return true]]
+		end
+		return true;
+
+	end
 end
 
-
-function BW_WardrobeOutfitMixin:CheckOutfitForSave(name)
-	local sources = {}
+function BetterWardrobeOutfitDropDownMixin:CheckOutfitForSave(outfitID)
 	local pendingAppearances = { };
 	local hasInvalidAppearances = false;
 	local hasValidAppearances = false;
 	local itemTransmogInfoList = self:GetItemTransmogInfoList();
+
 	-- only need to check main appearanceIDs
 	-- secondaryAppearanceIDs will only be set at the transmogrifier or from ctrl-clicking in the collection, and as such are automatically valid
 	-- all illusions are collectible
@@ -595,11 +422,6 @@ function BW_WardrobeOutfitMixin:CheckOutfitForSave(name)
 
 				if isValidAppearance then
 					hasValidAppearances = true;
-					if (IsSourceArtifact(appearanceID)) then
-						sources[slotID] = NO_TRANSMOG_SOURCE_ID
-					else
-						sources[slotID] = appearanceID
-					end
 				else
 					hasInvalidAppearances = true;
 				end
@@ -611,27 +433,25 @@ function BW_WardrobeOutfitMixin:CheckOutfitForSave(name)
 	end
 
 	-- store the state for this save
-	BW_WardrobeOutfitFrame.sources = sources
-	BW_WardrobeOutfitFrame.name = name
-	BW_WardrobeOutfitFrame.pendingAppearances = pendingAppearances;
-	BW_WardrobeOutfitFrame.itemTransmogInfoList = itemTransmogInfoList;
-	BW_WardrobeOutfitFrame.hasValidAppearances = hasValidAppearances;
-	BW_WardrobeOutfitFrame.hasInvalidAppearances = hasInvalidAppearances;
-	BW_WardrobeOutfitFrame.outfitID = outfitID;
+	BetterWardrobeOutfitFrame.pendingAppearances = pendingAppearances;
+	BetterWardrobeOutfitFrame.itemTransmogInfoList = itemTransmogInfoList;
+	BetterWardrobeOutfitFrame.hasValidAppearances = hasValidAppearances;
+	BetterWardrobeOutfitFrame.hasInvalidAppearances = hasInvalidAppearances;
+	BetterWardrobeOutfitFrame.outfitID = outfitID;
 	-- save the dropdown
-	BW_WardrobeOutfitFrame.popupDropDown = self;
+	BetterWardrobeOutfitFrame.popupDropDown = self;
 
-	BW_WardrobeOutfitFrame:EvaluateSaveState();
+	BetterWardrobeOutfitFrame:EvaluateSaveState();
 end
 
-function BW_WardrobeOutfitMixin:IsDefaultSet(outfitID)
+function BetterWardrobeOutfitDropDownMixin:IsDefaultSet(outfitID)
 		return IsDefaultSet(outfitID)
 end
 
 --===================================================================================================================================
-BW_WardrobeOutfitFrameMixin = CreateFromMixins(WardrobeOutfitFrameMixin)
+BetterWardrobeOutfitFrameMixin = { };
 
-BW_WardrobeOutfitFrameMixin.popups = {
+BetterWardrobeOutfitFrameMixin.popups = {
 	"BW_NAME_TRANSMOG_OUTFIT",
 	"BW_CONFIRM_DELETE_TRANSMOG_OUTFIT",
 	"CONFIRM_SAVE_TRANSMOG_OUTFIT",
@@ -641,28 +461,29 @@ BW_WardrobeOutfitFrameMixin.popups = {
 	"TRANSMOG_OUTFIT_ALL_INVALID_APPEARANCES",
 	"BETTER_WARDROBE_IMPORT_ITEM_POPUP",
 	"BETTER_WARDROBE_IMPORT_SET_POPUP"
-}
+};
 
-local OUTFIT_FRAME_MIN_STRING_WIDTH = 152
-local OUTFIT_FRAME_MAX_STRING_WIDTH = 216
-local OUTFIT_FRAME_ADDED_PIXELS = 90	-- pixels added to string width
+local OUTFIT_FRAME_MIN_STRING_WIDTH = 152;
+local OUTFIT_FRAME_MAX_STRING_WIDTH = 216;
+local OUTFIT_FRAME_ADDED_PIXELS = 90;	-- pixels added to string width
 
-function BW_WardrobeOutfitFrameMixin:Toggle(dropDown)
-	if (self.dropDown == dropDown and self:IsShown()) then
+function BetterWardrobeOutfitFrameMixin:OnHide()
+	self.timer = nil;
+end
 
-		BW_WardrobeOutfitFrame:Hide()
+function BetterWardrobeOutfitFrameMixin:Toggle(dropDown)
+	if ( self.dropDown == dropDown and self:IsShown() ) then
+		BetterWardrobeOutfitFrame:Hide();
 	else
-		CloseDropDownMenus()
-		BW_CloseDropDownMenus()
-		self.dropDown = dropDown
-
-		self:Show()
-		self:SetPoint("TOPLEFT", self.dropDown, "BOTTOMLEFT", 8, -3)
-		self:Update()
+		CloseDropDownMenus();
+		self.dropDown = dropDown;
+		self:Show();
+		self:SetPoint("TOPLEFT", self.dropDown, "BOTTOMLEFT", 8, -3);
+		self:Update();
 	end
 end
 
-function BW_WardrobeOutfitFrameMixin:OnUpdate(elapsed)
+function BetterWardrobeOutfitFrameMixin:OnUpdate(elapsed)
 	local mouseFocus = GetMouseFocus();
 	for i = 1, #self.Buttons do
 		local button = self.Buttons[i];
@@ -689,14 +510,23 @@ function BW_WardrobeOutfitFrameMixin:OnUpdate(elapsed)
 	end
 end
 
+function BetterWardrobeOutfitFrameMixin:StartHideCountDown()
+	self.timer = BW_UIDROPDOWNMENU_SHOW_TIME;
+end
+
+function BetterWardrobeOutfitFrameMixin:StopHideCountDown()
+	self.timer = nil;
+end
+
+
 local function GetButton(self, index)
 	local buttons = self.Buttons
 	local button = buttons[index]
 			if (not button) then
-				button = CreateFrame("BUTTON", nil, self.Content, self:GetName().."ButtonTemplate")
+				button = CreateFrame("BUTTON", nil, self.Content, "BetterWardrobeOutfitButtonTemplate")
 				button.EditButton:SetScript("OnClick", function(self)
 					PlaySound(SOUNDKIT.IG_MAINMENU_OPTION_CHECKBOX_ON)
-					BW_WardrobeOutfitEditFrame:ShowForOutfit(self:GetParent().outfitID)
+					BetterWardrobeOutfitEditFrame:ShowForOutfit(self:GetParent().outfitID)
 				end)
 
 				button:SetPoint("TOPLEFT", buttons[index-1], "BOTTOMLEFT", 0, 0)
@@ -705,16 +535,15 @@ local function GetButton(self, index)
 		return button 
 end
 
-
-function BW_WardrobeOutfitFrameMixin:Update()
+function BetterWardrobeOutfitFrameMixin:Update()
 	local outfits = GetOutfits(true)
-	--local mogit_Outfits = addon.GetMogitOutfits()
-	local buttons = self.Buttons
-	local numButtons = 0
-	local stringWidth = 0
-	local minStringWidth = self.dropDown.minMenuStringWidth or OUTFIT_FRAME_MIN_STRING_WIDTH
-	local maxStringWidth = self.dropDown.maxMenuStringWidth or OUTFIT_FRAME_MAX_STRING_WIDTH
-	self:SetWidth(maxStringWidth + OUTFIT_FRAME_ADDED_PIXELS)
+	----local mogit_Outfits = addon.GetMogitOutfits()
+	local buttons = self.Buttons;
+	local numButtons = 0;
+	local stringWidth = 0;
+	local minStringWidth = self.dropDown.minMenuStringWidth or OUTFIT_FRAME_MIN_STRING_WIDTH;
+	local maxStringWidth = self.dropDown.maxMenuStringWidth or OUTFIT_FRAME_MAX_STRING_WIDTH;
+	self:SetWidth(maxStringWidth + OUTFIT_FRAME_ADDED_PIXELS);
 	for i = 1, #outfits do
 		local outfit = outfits[i]
 		if outfit then
@@ -755,44 +584,18 @@ function BW_WardrobeOutfitFrameMixin:Update()
 	for i = #outfits  + 2 , #buttons do
 		buttons[i]:Hide()
 	end
-
-	stringWidth = max(stringWidth, minStringWidth)
-	stringWidth = min(stringWidth, maxStringWidth)
-	self:SetWidth(stringWidth + OUTFIT_FRAME_ADDED_PIXELS)
-	self:SetHeight(30 + 7 * 20)
+	stringWidth = max(stringWidth, minStringWidth);
+	stringWidth = min(stringWidth, maxStringWidth);
+	self:SetWidth(stringWidth + OUTFIT_FRAME_ADDED_PIXELS);
+	self:SetHeight(30 + numButtons * 20);
 end
 
-
-local function GetDressingRoomSources()
-	local icon
-	local sources = {}
-	local Buttons = BW_DressingRoomFrame.PreviewButtonFrame.Slots
-	for index, button in pairs(Buttons) do
-		local itemlink = nil
-		local slot = button:GetID()
-
-		itemlink = button.itemLink --GetInventoryItemLink("player", slot)
-		if itemlink and not button.isHidden then
-			local appearanceID, sourceID = C_TransmogCollection.GetItemInfo(itemlink)
-			sources[slot] =  sourceID
-			if sourceID and not icon then
-				icon = select(4, C_TransmogCollection.GetAppearanceSourceInfo(sourceID))
-			end
-		end
-	end
-	return sources, icon
-end
-
-
-function BW_WardrobeOutfitFrameMixin:NewOutfit(name)
+function BetterWardrobeOutfitFrameMixin:NewOutfit(name)
 	local outfitID = LookupOutfitIDFromName(name) --or  ((#C_TransmogCollection.GetOutfits() <= MAX_DEFAULT_OUTFITS) and #C_TransmogCollection.GetOutfits() -1 ) -- or #GetOutfits()-1
 	local icon
 	local outfit
 
-	if DressUpFrame:IsShown() then
-		self.sources, icon  = GetDressingRoomSources()
-	else
-	for slotID, itemTransmogInfo in ipairs(BW_WardrobeOutfitFrame.itemTransmogInfoList) do
+	for slotID, itemTransmogInfo in ipairs(self.itemTransmogInfoList) do
 		local appearanceID = itemTransmogInfo.appearanceID;
 		if appearanceID ~= Constants.Transmog.NoTransmogID then
 			icon = select(4, C_TransmogCollection.GetAppearanceSourceInfo(appearanceID));
@@ -801,46 +604,46 @@ function BW_WardrobeOutfitFrameMixin:NewOutfit(name)
 			end
 		end
 	end
+
+	local sources = {}
+	for i, data in pairs(self.itemTransmogInfoList) do
+		sources[i] = data.appearanceID
 	end
-					local sources = {}
-					for i, data in pairs(BW_WardrobeOutfitFrame.itemTransmogInfoList) do
-						sources[i]= data.appearanceID
-					end
+
 	if (outfitID and IsDefaultSet(outfitID)) or (#C_TransmogCollection.GetOutfits() < MAX_DEFAULT_OUTFITS)  then 
-		outfitID = C_TransmogCollection.NewOutfit(name, icon, BW_WardrobeOutfitFrame.itemTransmogInfoList);
+		outfitID = C_TransmogCollection.NewOutfit(name, icon, self.itemTransmogInfoList);
 	else
 		if outfitID then 
-			addon.OutfitDB.char.outfits[LookupIndexFromID(outfitID)] = sources
-			outfit = addon.OutfitDB.char.outfits[LookupIndexFromID(outfitID)] or {}
+			addon.OutfitDB.char.outfits[LookupIndexFromID(outfitID)]  = addon.OutfitDB.char.outfits[LookupIndexFromID(outfitID)] or {}
+			outfit = addon.OutfitDB.char.outfits[LookupIndexFromID(outfitID)]
 		else
-			tinsert(addon.OutfitDB.char.outfits, sources)
+			tinsert(addon.OutfitDB.char.outfits, {})
 			outfit = addon.OutfitDB.char.outfits[#addon.OutfitDB.char.outfits]
 		end
-
 		outfit["name"] = name
-		outfit["mainHandEnchant"] = self.mainHandEnchant or 0
-		outfit["offHandEnchant"] = self.offHandEnchant or 0
-		local icon = select(4, C_TransmogCollection.GetAppearanceSourceInfo(outfit[1]))
+		----local icon = select(4, C_TransmogCollection.GetAppearanceSourceInfo(outfit[1]))
 		outfit["icon"] = icon
+		outfit.itemTransmogInfoList =  self.itemTransmogInfoList or {}
 		--outfitID = index
 	end
 
-	if (self.popupDropDown) then
-		self.popupDropDown:SelectOutfit(outfitID)
-		self.popupDropDown:OnOutfitSaved(outfitID)
+
+	if ( self.popupDropDown ) then
+		self.popupDropDown:SelectOutfit(outfitID);
+		self.popupDropDown:OnOutfitSaved(outfitID);
 	end
 
 	addon.setdb.global.sets[addon.setdb:GetCurrentProfile()] = addon.GetSavedList()
+
 end
 
-
-function BW_WardrobeOutfitFrameMixin:DeleteOutfit(outfitID)
+function BetterWardrobeOutfitFrameMixin:DeleteOutfit(outfitID)
 	if IsDefaultSet(outfitID) then
 		C_TransmogCollection.DeleteOutfit(outfitID)
 	else
 		tremove(addon.OutfitDB.char.outfits, LookupIndexFromID(outfitID))
 	end
-
+----TODO:CHeck
 	if GetCVarBool("transmogCurrentSpecOnly") then
 		local specIndex = GetSpecialization()
 		local value = addon.OutfitDB.char.lastTransmogOutfitIDSpec[specIndex]
@@ -854,18 +657,18 @@ function BW_WardrobeOutfitFrameMixin:DeleteOutfit(outfitID)
 		if type(value) == number and value > 0  then  addon.OutfitDB.char.lastTransmogOutfitIDSpec[specIndex] = value - 1 end
 		end
 	end
+
 	addon.setdb.global.sets[addon.setdb:GetCurrentProfile()] = addon.GetSavedList()
 end
 
-
-function BW_WardrobeOutfitFrameMixin:NameOutfit(newName, outfitID)
+function BetterWardrobeOutfitFrameMixin:NameOutfit(newName, outfitID)
 	local outfits = GetOutfits(true)
 	for i = 1, #outfits do
 		if (outfits[i].name == newName) then
 			if (outfitID) then
 				UIErrorsFrame:AddMessage(TRANSMOG_OUTFIT_ALREADY_EXISTS, 1.0, 0.1, 0.1, 1.0)
 			else
-				BW_WardrobeOutfitFrame:ShowPopup("BW_CONFIRM_OVERWRITE_TRANSMOG_OUTFIT", newName, nil, newName)
+				BetterWardrobeOutfitFrame:ShowPopup("BW_CONFIRM_OVERWRITE_TRANSMOG_OUTFIT", newName, nil, newName)
 			end
 			return
 		end
@@ -879,88 +682,92 @@ function BW_WardrobeOutfitFrameMixin:NameOutfit(newName, outfitID)
 		addon.OutfitDB.char.outfits[index].name = newName
 	else
 		-- this is a new outfit
-		BW_WardrobeOutfitFrameMixin:NewOutfit(newName)
-		--self:SaveOutfit(newName)
+		self:NewOutfit(newName);
 	end
 end
 
-
-function BW_WardrobeOutfitFrameMixin:ShowPopup(popup, ...)
+function BetterWardrobeOutfitFrameMixin:ShowPopup(popup, ...)
 	-- close all other popups
 	for _, listPopup in pairs(self.popups) do
-		if (listPopup ~= popup) then
-			StaticPopup_Hide(listPopup)
+		if ( listPopup ~= popup ) then
+			StaticPopup_Hide(listPopup);
 		end
 	end
-
-	if (popup ~= BW_WardrobeOutfitEditFrame) then
-		StaticPopupSpecial_Hide(BW_WardrobeOutfitEditFrame)
+	if ( popup ~= BetterWardrobeOutfitEditFrame ) then
+		StaticPopupSpecial_Hide(BetterWardrobeOutfitEditFrame);
 	end
 
-	self.popupDropDown = self.dropDown
-	if (popup == BW_WardrobeOutfitEditFrame) then
-		StaticPopupSpecial_Show(BW_WardrobeOutfitEditFrame)
+	self.popupDropDown = self.dropDown;
+	if ( popup == BetterWardrobeOutfitEditFrame ) then
+		StaticPopupSpecial_Show(BetterWardrobeOutfitEditFrame);
 	else
-		StaticPopup_Show(popup, ...)
+		StaticPopup_Show(popup, ...);
 	end
 end
 
-
-function BW_WardrobeOutfitFrameMixin:ClosePopups(requestingDropDown)
-	if (requestingDropDown and requestingDropDown ~= self.popupDropDown) then
-		return
+function BetterWardrobeOutfitFrameMixin:ClosePopups(requestingDropDown)
+	if ( requestingDropDown and requestingDropDown ~= self.popupDropDown ) then
+		return;
 	end
-
 	for _, popup in pairs(self.popups) do
-		StaticPopup_Hide(popup)
+		StaticPopup_Hide(popup);
 	end
-	StaticPopupSpecial_Hide(BW_WardrobeOutfitEditFrame)
+	StaticPopupSpecial_Hide(BetterWardrobeOutfitEditFrame);
 
 	-- clean up
-	self.sources = nil
-	self.mainHandEnchant = nil
-	self.offHandEnchant = nil
-	self.pendingAppearances = nil
-	self.hadInvalidSources = nil
+	self.itemTransmogInfoList = nil;
+	self.pendingAppearances = nil;
+	self.hasValidAppearances = nil;
+	self.hasInvalidAppearances = nil;
+	self.outfitID = nil;
+	self.popupDropDown = nil;
 	self.name = nil
-	self.popupDropDown = nil
+	self.sources = nil
 end
 
-
-function BW_WardrobeOutfitFrameMixin:EvaluateSaveState()
-	if (next(self.pendingAppearances)) then
+function BetterWardrobeOutfitFrameMixin:EvaluateSaveState()
+	if next(self.pendingAppearances) then
 		-- wait
-		if (not StaticPopup_Visible("TRANSMOG_OUTFIT_CHECKING_APPEARANCES")) then
-			BW_WardrobeOutfitFrame:ShowPopup("TRANSMOG_OUTFIT_CHECKING_APPEARANCES", nil, nil, nil, BW_WardrobeOutfitCheckAppearancesFrame)
+		if ( not StaticPopup_Visible("TRANSMOG_OUTFIT_CHECKING_APPEARANCES") ) then
+			BetterWardrobeOutfitFrame:ShowPopup("TRANSMOG_OUTFIT_CHECKING_APPEARANCES", nil, nil, nil, WardrobeOutfitCheckAppearancesFrame);
 		end
 	elseif not self.hasValidAppearances then
 		-- stop
-		BW_WardrobeOutfitFrame:ShowPopup("TRANSMOG_OUTFIT_ALL_INVALID_APPEARANCES");
-
+		BetterWardrobeOutfitFrame:ShowPopup("TRANSMOG_OUTFIT_ALL_INVALID_APPEARANCES");
 	elseif self.hasInvalidAppearances then
 		-- warn
-		BW_WardrobeOutfitFrame:ShowPopup("BW_TRANSMOG_OUTFIT_SOME_INVALID_APPEARANCES");
+		BetterWardrobeOutfitFrame:ShowPopup("BW_TRANSMOG_OUTFIT_SOME_INVALID_APPEARANCES");
 	else
-		BW_WardrobeOutfitFrame:ContinueWithSave();
+		BetterWardrobeOutfitFrame:ContinueWithSave();
+	end
+end
+
+function BetterWardrobeOutfitFrameMixin:ContinueWithSave()
+	if self.outfitID and IsDefaultSet(self.outfitID) then
+	-- this is a rename
+		C_TransmogCollection.ModifyOutfit(self.outfitID, self.itemTransmogInfoList);
+		BetterWardrobeOutfitFrame:ClosePopups()
+	elseif self.outfitID then 
+			addon.OutfitDB.char.outfits[LookupIndexFromID(self.outfitID)]  = addon.OutfitDB.char.outfits[LookupIndexFromID(self.outfitID)] or {}
+			outfit = addon.OutfitDB.char.outfits[LookupIndexFromID(self.outfitID)]
+			outfit.itemTransmogInfoList =  self.itemTransmogInfoList or {}
+
+
+		--[[local index = LookupIndexFromID(self.outfitID)
+						local outfit = addon.OutfitDB.char.outfits[index]
+						local sources = {}
+						for i, data in pairs(self.itemTransmogInfoList) do
+							outfit[i] = data.appearanceID
+						end]]
+			BetterWardrobeOutfitFrame:ClosePopups()
+	else
+		-- this is a new outfit
+		WardrobeOutfitFrame:ShowPopup("BW_NAME_TRANSMOG_OUTFIT");
 	end
 end
 
 
-function BW_WardrobeOutfitFrameMixin:ContinueWithSave()
-	if (self.name) then
-		--if DressUpFrame:IsShown() then
-			--BW_DressingRoomOutfitFrameMixin:SaveOutfit(self.name)
-		--else
-		BW_WardrobeOutfitFrame:SaveOutfit(self.name)
-		--end
-		BW_WardrobeOutfitFrame:ClosePopups()
-	else
-		BW_WardrobeOutfitFrame:ShowPopup("BW_NAME_TRANSMOG_OUTFIT")
-	end
-end
-
-
-function BW_WardrobeOutfitFrameMixin:CreateScrollFrame()
+function BetterWardrobeOutfitFrameMixin:CreateScrollFrame()
 	self:SetFrameLevel(5000)
 	self.scrollframe = self.scrollframe or CreateFrame("ScrollFrame", self:GetName().."ScrollFrame", self, "UIPanelScrollFrameTemplate")
 	self.scrollchild = self.scrollchild or CreateFrame("Frame") -- not sure what happens if you do, but to be safe, don't parent this yet (or do anything with it)
@@ -992,10 +799,10 @@ function BW_WardrobeOutfitFrameMixin:CreateScrollFrame()
 
 	self.Content = self.moduleoptions
 
-	local button = CreateFrame("BUTTON", nil, self.Content, self:GetName().."ButtonTemplate")
+	local button = CreateFrame("BUTTON", nil, self.Content, "BetterWardrobeOutfitButtonTemplate")
 	button.EditButton:SetScript("OnClick", function(self)
 		PlaySound(SOUNDKIT.IG_MAINMENU_OPTION_CHECKBOX_ON)
-		BW_WardrobeOutfitEditFrame:ShowForOutfit(self:GetParent().outfitID)
+		BetterWardrobeOutfitEditFrame:ShowForOutfit(self:GetParent().outfitID)
 	end)
 	button.EditButton:Hide()
 
@@ -1009,210 +816,85 @@ function BW_WardrobeOutfitFrameMixin:CreateScrollFrame()
 	button.Selection:Hide()
 
 	function self.moduleoptions:StartHideCountDown()
-		return BW_WardrobeOutfitFrame:StartHideCountDown()
+		return BetterWardrobeOutfitFrame:StartHideCountDown()
 	end
 
 	function self.moduleoptions:StopHideCountDown()
-		return BW_WardrobeOutfitFrame:StopHideCountDown()
+		return BetterWardrobeOutfitFrame:StopHideCountDown()
 	end
 
 	self.Buttons = self.moduleoptions.Buttons
 end
 
-
 --===================================================================================================================================
-BW_WardrobeOutfitButtonMixin = {} --CreateFromMixins(WardrobeOutfitButtonMixin)
+BetterWardrobeOutfitButtonMixin = { };
 
-function BW_WardrobeOutfitButtonMixin:OnClick()
-	PlaySound(SOUNDKIT.IG_MAINMENU_OPTION_CHECKBOX_ON)
-	BW_WardrobeOutfitFrame:Hide()
-	if (self.outfitID) then
-		BW_WardrobeOutfitFrame.dropDown:SelectOutfit(self.outfitID, true)
+function BetterWardrobeOutfitButtonMixin:OnClick()
+	PlaySound(SOUNDKIT.IG_MAINMENU_OPTION_CHECKBOX_ON);
+	BetterWardrobeOutfitFrame:Hide();
+	if ( self.outfitID ) then
+		BetterWardrobeOutfitFrame.dropDown:SelectOutfit(self.outfitID, true);
 	else
 		--if ( WardrobeTransmogFrame and HelpTip:IsShowing(WardrobeTransmogFrame, TRANSMOG_OUTFIT_DROPDOWN_TUTORIAL) ) then
 			--HelpTip:Hide(WardrobeTransmogFrame, TRANSMOG_OUTFIT_DROPDOWN_TUTORIAL);
-			--SetCVarBitfield("closedInfoFrames", LE_FRAME_TUTORIAL_TRANSMOG_OUTFIT_DROPDOWN, true)
+			--SetCVarBitfield("closedInfoFrames", LE_FRAME_TUTORIAL_TRANSMOG_OUTFIT_DROPDOWN, true);
 		--end
-		BW_WardrobeOutfitFrame.dropDown:CheckOutfitForSave()
+		BetterWardrobeOutfitFrame.dropDown:CheckOutfitForSave();
 	end
 end
-
 
 --===================================================================================================================================
-BW_WardrobeOutfitEditFrameMixin = CreateFromMixins(WardrobeOutfitEditFrameMixin)-- {}
+BetterWardrobeOutfitEditFrameMixin = { };
 
-function BW_WardrobeOutfitEditFrameMixin:ShowForOutfit(outfitID)
-	BW_WardrobeOutfitFrame:Hide()
-------	BW_DressingRoomOutfitFrame:Hide()
-	BW_WardrobeOutfitFrame:ShowPopup(self)
-	self.outfitID = outfitID
-	local name = GetOutfitName(outfitID)
-
-	self.EditBox:SetText(name)
+function BetterWardrobeOutfitEditFrameMixin:ShowForOutfit(outfitID)
+	BetterWardrobeOutfitFrame:Hide();
+	BetterWardrobeOutfitFrame:ShowPopup(self);
+	self.outfitID = outfitID;
+	local name = GetOutfitName(outfitID);
+	self.EditBox:SetText(name);
 end
 
-
-function BW_WardrobeOutfitEditFrameMixin:OnDelete()
-	BW_WardrobeOutfitFrame:Hide()
--------	BW_DressingRoomOutfitFrame:Hide()
-	local name = GetOutfitName(self.outfitID)
-	BW_WardrobeOutfitFrame:ShowPopup("BW_CONFIRM_DELETE_TRANSMOG_OUTFIT", name, nil, self.outfitID)
+function BetterWardrobeOutfitEditFrameMixin:OnDelete()
+	BetterWardrobeOutfitFrame:Hide();
+	local name = C_TransmogCollection.GetOutfitInfo(self.outfitID);
+	BetterWardrobeOutfitFrame:ShowPopup("CONFIRM_DELETE_TRANSMOG_OUTFIT", name, nil,  self.outfitID);
 end
 
-
-function BW_WardrobeOutfitEditFrameMixin:OnAccept()
-	if (not self.AcceptButton:IsEnabled()) then
-		return
+function BetterWardrobeOutfitEditFrameMixin:OnAccept()
+	if ( not self.AcceptButton:IsEnabled() ) then
+		return;
 	end
-	BW_WardrobeOutfitFrame:Hide()
--------	BW_DressingRoomOutfitFrame:Hide()
-	
-	StaticPopupSpecial_Hide(self)
-	BW_WardrobeOutfitFrame:NameOutfit(self.EditBox:GetText(), self.outfitID)
+	StaticPopupSpecial_Hide(self);
+	BetterWardrobeOutfitFrame:NameOutfit(self.EditBox:GetText(), self.outfitID);
 end
-
 
 --===================================================================================================================================
-BW_WardrobeOutfitCheckAppearancesMixin = CreateFromMixins(WardrobeOutfitCheckAppearancesMixin)
+BetterWardrobeOutfitCheckAppearancesMixin = { };
 
-function WardrobeOutfitCheckAppearancesMixin:OnEvent(event, sourceID, canCollect)
-	if (BW_WardrobeOutfitFrame.pendingAppearances[sourceID]) then
-		if (canCollect) then
-			local slotID = BW_WardrobeOutfitFrame.pendingAppearances[sourceID]
-			BW_WardrobeOutfitFrame.sources[slotID] = sourceID
-		else
-			BW_WardrobeOutfitFrame.hadInvalidSources = true
-		end
-
-		BW_WardrobeOutfitFrame.pendingAppearances[sourceID] = nil
-		BW_WardrobeOutfitFrame:EvaluateSaveState()
-	end
+function BetterWardrobeOutfitCheckAppearancesMixin:OnLoad()
+	self.Anim:Play();
 end
 
---local f = CreateFrame("Frame", "BW_WardrobeOutfitEditFrame", UIParent, "BW_WardrobeOutfitEditFrameTemplate" )
---local f = CreateFrame("Frame", "BW_WardrobeOutfitFrame", UIParent, "BW_WardrobeOutfitFrameTemplate" )
-
-
-
-	--BW_DBSavedSetDropdown = CreateFrame("Frame", "BW_DBSavedSetDropdown", BW_WardrobeCollectionFrame, "BW_UIDropDownMenuTemplate")
-
-	--BW_DBSavedSetDropdown = BW_UIDropDownMenu_Create("BW_DBSavedSetDropdown", BW_WardrobeCollectionFrame)
-	--BW_DBSavedSetDropdown:SetParent("BW_WardrobeCollectionFrame")
-	---BW_DBSavedSetDropdown:ClearAllPoints()
-	--BW_DBSavedSetDropdown:SetPoint("TOPRIGHT", "BW_SortDropDown", "TOPRIGHT")
-	--BW_UIDropDownMenu_SetWidth(BW_DBSavedSetDropdown, 165) -- Use in place of dropDown:SetWidth
--- Bind an initializer function to the dropdown; see previous sections for initializer function examples.
-	--BW_UIDropDownMenu_Initialize(BW_DBSavedSetDropdown, SavedOutfitDB_Dropdown_Menu)
-	--BW_UIDropDownMenu_SetSelectedValue(BW_DBSavedSetDropdown, addon.setdb:GetCurrentProfile())
----end
-
-
-
-
-
-local outfitDropdown
-function addon.RefreshSaveOutfitDropdown()
-	local list = {}
-
-	for name in pairs(addon.setdb.global.sets)do
-		tinsert(list, name)
-	end
-	outfitDropdown:SetList(list)
-
-	for i, name in ipairs(list) do
-		if name == addon.setdb:GetCurrentProfile() then
-			outfitDropdown:SetValue(i)
-			break
-		end
-	end
+function BetterWardrobeOutfitCheckAppearancesMixin:OnShow()
+	self:RegisterEvent("TRANSMOG_SOURCE_COLLECTABILITY_UPDATE");
 end
 
-
-local function SavedOutfitDB_Dropdown_OnClick(self, arg1, arg2, checked)
-		local value = arg1
-		local name = UnitName("player")
-		local realm = GetRealmName()
-
-		if arg1 ~= addon.setdb:GetCurrentProfile() then 
-		addon.SelecteSavedList = arg1
-		else
-			addon.SelecteSavedList = false
-		end
-
-		BW_WardrobeCollectionFrame_SetTab(2)
-		BW_WardrobeCollectionFrame_SetTab(4)
-			BW_UIDropDownMenu_SetSelectedValue(BW_DBSavedSetDropdown, arg1)
-		--BW_UIDropDownMenu_SetText(BW_DBSavedSetDropdown, arg1)
-		addon.savedSetCache = nil
+function BetterWardrobeOutfitCheckAppearancesMixin:OnHide()
+	self:UnregisterEvent("TRANSMOG_SOURCE_COLLECTABILITY_UPDATE");
 end
 
-
-function SavedOutfitDB_Dropdown_Menu(frame, level, menuList)
-	local count = 1
-	for name in pairs(addon.setdb.global.sets)do
-		 local info = BW_UIDropDownMenu_CreateInfo()
-		 info.func = SavedOutfitDB_Dropdown_OnClick
-		 info.text, info.arg1 = name, name
-		  BW_UIDropDownMenu_AddButton(info)
-		if name == addon.setdb:GetCurrentProfile() then
-			BW_UIDropDownMenu_SetSelectedValue(BW_DBSavedSetDropdown, name)
+function BetterWardrobeOutfitCheckAppearancesMixin:OnEvent(event, appearanceID, canCollect)
+	local slotID = BetterWardrobeOutfitFrame.pendingAppearances[appearanceID];
+	if slotID then
+		if not canCollect then
+			BetterWardrobeOutfitFrame.hasInvalidAppearances = true;
+			for i, itemTransmogInfo in ipairs(BetterWardrobeOutfitFrame.itemTransmogInfoList) do
+				if itemTransmogInfo.appearanceID == appearanceID then
+					itemTransmogInfo:Clear();
+				end
+			end
 		end
-		  count = count +1
+		BetterWardrobeOutfitFrame.pendingAppearances[appearanceID] = nil;
+		BetterWardrobeOutfitFrame:EvaluateSaveState();
 	end
-end
-
-
---Dropdownmenu for the selection of other character's saved sets
-function SavedSetsDropDown_Initialize(self)
-	--local f = BW_UIDropDownMenu_Create("BW_DBSavedSetDropdown", BetterWardrobeCollectionFrame)
-	BW_DBSavedSetDropdown = CreateFrame("Frame", "BW_DBSavedSetDropdown", BetterWardrobeCollectionFrame, "BW_UIDropDownMenuTemplate")
-
-	--BW_DBSavedSetDropdown = BW_UIDropDownMenu_Create("BW_DBSavedSetDropdown", BetterWardrobeCollectionFrame)
-	--BW_DBSavedSetDropdown:SetParent("BetterWardrobeCollectionFrame")
-	--BW_DBSavedSetDropdown:ClearAllPoints()
-	BW_DBSavedSetDropdown:SetPoint("TOPRIGHT", "BW_SortDropDown", "TOPRIGHT")
-	BW_UIDropDownMenu_SetWidth(BW_DBSavedSetDropdown, 165) -- Use in place of dropDown:SetWidth
--- Bind an initializer function to the dropdown; see previous sections for initializer function examples.
-	BW_UIDropDownMenu_Initialize(BW_DBSavedSetDropdown, SavedOutfitDB_Dropdown_Menu)
-	BW_UIDropDownMenu_SetSelectedValue(BW_DBSavedSetDropdown, addon.setdb:GetCurrentProfile())
-	BW_DBSavedSetDropdown:Hide()
-
-
-
---[[	local  f = addon.Frame:Create("SimpleGroup")
-	addon.SavedSetDropDownFrame = f
-	f.frame:SetParent("BetterWardrobeCollectionFrame")
-	f:SetWidth(87)--, 22)
-	f:SetHeight(22)
-
-	f:ClearAllPoints()
-	f:SetPoint("TOPLEFT", BW_SortDropDown.frame, "TOPLEFT")
-
-
-	local dropdown = addon.Frame:Create("Dropdown")
-	dropdown:SetWidth(175)--, 22)
-	--dropdown:SetHeight(22)
-	f:AddChild(dropdown)
-	outfitDropdown = dropdown
-	addon.RefreshSaveOutfitDropdown(dropdown)
-
-
-
-	
-	dropdown:SetCallback("OnValueChanged", function(widget) 
-		local value = widget.list[widget.value]
-		local name = UnitName("player")
-		local realm = GetRealmName()
-
-		if value ~= addon.setdb:GetCurrentProfile() then 
-			addon.SelecteSavedList = widget.list[widget.value]
-		else
-			addon.SelecteSavedList = false
-		end
-		BW_WardrobeCollectionFrame_SetTab(2)
-		BW_WardrobeCollectionFrame_SetTab(4)
-		addon.savedSetCache = nil
-	end)]]
-
-
 end

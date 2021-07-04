@@ -53,11 +53,14 @@ Data\COSMETIC.lua
 
 #Modules
 Modules\ArtifactAppearances.lua
-Modules\Wardrobe.xml
 Modules\SavedOutfits.xml
+Modules\DressingRoom.xml
+Modules\Wardrobe.xml
+
+
 Modules\CollectionList.xml
 Modules\TransmogVendor.xml
-Modules\DressingRoom.xml
+
 Modules\ImportExport.lua
 Modules\Tooltips.lua
 #Modules\UI.lua

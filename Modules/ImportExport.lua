@@ -11,7 +11,7 @@ local IE ={}
 local function Export(itemString, button)
 	if LISTWINDOW then LISTWINDOW:Hide() end
 
-	for _, listPopup in pairs(BW_WardrobeOutfitFrameMixin.popups) do
+	for _, listPopup in pairs(BetterWardrobeOutfitFrameMixin.popups) do
 		StaticPopup_Hide(listPopup)
 	end
 
@@ -250,7 +250,10 @@ local function ExportTransmogVendorSet()
 end
 
 
+--compare?items=57290.0.0.0.0.0.0.0.0.0.0:163458.0.0.0.0.0.0.0.0.0.1:37513.0.0.0.0.0.0.0.0.0.0:173460.0.0.0.0.0.0.0.0.0.0:98093.0.0.0.0.0.0.0.0.0.0:38115.0.0.0.0.0.0.0.0.0.0:152399.0.0.0.0.0.0.0.0.0.0:80698.0.0.0.0.0.0.0.0.0.0:167829.0.0.0.0.0.0.0.0.0.0:98149.0.0.0.0.0.0.0.0.0.0:35870.0.0.0.0.0.0.0.0.0.0:62968.0.0.0.0.0.0.0.0.0.0:155409.0.0.0.0.0.0.0.0.0.0
+
 function IE.ImportTransmogVendorSet(importString)
+	print("?")
 	importString = importString and importString:match("items=([^#]+)")
 	if importString then
 		local transmogSources = {};
@@ -261,14 +264,16 @@ function IE.ImportTransmogVendorSet(importString)
 			local appearanceID, sourceID = C_TransmogCollection.GetItemInfo(link)
 			if sourceID then 
 			local sourceInfo = C_TransmogCollection.GetSourceInfo(sourceID)
-			if sourceInfo then
-				local slot = C_Transmog.GetSlotForInventoryType(sourceInfo.invType);
-				transmogSources[slot] = sourceID
+				if sourceInfo then
+					local slot = C_Transmog.GetSlotForInventoryType(sourceInfo.invType);
+					local pendingInfo = TransmogUtil.CreateTransmogPendingInfo(Enum.TransmogPendingType.Apply, appearanceID);
+					local transmogLocation = TransmogUtil.CreateTransmogLocation(slot, Enum.TransmogType.Appearance, Enum.TransmogModification.Main);
+					xxxx= pendingInfo
+					C_Transmog.SetPending(transmogLocation, pendingInfo);
+				end
+
 			end
 		end
-	end
-		C_Transmog.ClearAllPending();
-		C_Transmog.LoadSources(transmogSources, -1, -1);
 	end
 end
 
@@ -338,7 +343,7 @@ function BW_TransmogVendorExportButton_OnClick(self)
 			text = L["Import Item"],
 			func = function()
 				importFrom = "Transmog"
-				BW_WardrobeOutfitFrameMixin:ShowPopup("BETTER_WARDROBE_IMPORT_ITEM_POPUP")
+				BetterWardrobeOutfitFrameMixin:ShowPopup("BETTER_WARDROBE_IMPORT_ITEM_POPUP")
 			end,
 			isNotRadio = true,
 			notCheckable = true,
@@ -347,7 +352,7 @@ function BW_TransmogVendorExportButton_OnClick(self)
 			text = L["Import Set"],
 			func = function()
 				importFrom = "Transmog"
-				BW_WardrobeOutfitFrameMixin:ShowPopup("BETTER_WARDROBE_IMPORT_SET_POPUP")
+				BetterWardrobeOutfitFrameMixin:ShowPopup("BETTER_WARDROBE_IMPORT_SET_POPUP")
 			end,
 			isNotRadio = true,
 			notCheckable = true,

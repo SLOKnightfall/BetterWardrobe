@@ -37,14 +37,11 @@ addon.useAltSet = false
 local Sets = {}
 addon.Sets = Sets
 
-function addon.Init:LoadWardrobeModule()
+
 
 local EXCLUSION_CATEGORY_OFFHAND	= 1;
 local EXCLUSION_CATEGORY_MAINHAND	= 2;
 
-local function GetPage(entryIndex, pageSize)
-	return floor((entryIndex-1) / pageSize) + 1;
-end
 
 local function GetAdjustedDisplayIndexFromKeyPress(contentFrame, index, numEntries, key)
 	if ( key == WARDROBE_PREV_VISUAL_KEY ) then
@@ -97,7 +94,7 @@ end
 -- ************************************************************************************************************************************************************
 -- **** TRANSMOG **********************************************************************************************************************************************
 -- ************************************************************************************************************************************************************
-
+function addon.Init:LoadWardrobeModule()
 BW_TransmogFrameMixin = { };
 
 function BW_TransmogFrameMixin:OnLoad()
@@ -566,55 +563,7 @@ end
 --addon:SecureHook(WardrobeTransmogFrame, "OnTransmogApplied", function(self,...) BW_TransmogFrameMixin.OnTransmogApplied(self,...) end)
 
 
-BetterWardrobeOutfitMixin = { };
 
---[[function BetterWardrobeOutfitMixin:OnOutfitApplied(outfitID)
-	local value = outfitID or "";
-	if GetCVarBool("transmogCurrentSpecOnly") then
-		local specIndex = GetSpecialization();
-		SetCVar("lastTransmogOutfitIDSpec"..specIndex, value);
-	else
-		for specIndex = 1, GetNumSpecializations() do
-			SetCVar("lastTransmogOutfitIDSpec"..specIndex, value);
-		end
-	end
-end
-
-function BetterWardrobeOutfitMixin:LoadOutfit(outfitID)
-	if ( not outfitID ) then
-		return;
-	end
-	----C_Transmog.LoadOutfit(outfitID);
-
-end
-]]
-function BetterWardrobeOutfitMixin:GetItemTransmogInfoList()
-	local playerActor = WardrobeTransmogFrame.ModelScene:GetPlayerActor();
-	if playerActor then
-		return playerActor:GetItemTransmogInfoList();
-	end
-	return nil;
-end
-
-function BetterWardrobeOutfitMixin:OnOutfitSaved(outfitID)
-	if C_Transmog.GetApplyCost() then
-		self:OnOutfitApplied(outfitID);
-	end
-end
-
-function BetterWardrobeOutfitMixin:OnSelectOutfit(outfitID)
-	-- outfitID can be 0, so use empty string for none
-	local value = outfitID or "";
-	for specIndex = 1, GetNumSpecializations() do
-		if GetCVar("lastTransmogOutfitIDSpec"..specIndex) == "" then
-			SetCVar("lastTransmogOutfitIDSpec"..specIndex, value);
-		end
-	end
-end
-
-function BetterWardrobeOutfitMixin:GetLastOutfitID()
-	local specIndex = GetSpecialization();
-	return tonumber(GetCVar("lastTransmogOutfitIDSpec"..specIndex));
 end
 
 TransmogSlotButtonMixin = { };
@@ -1907,7 +1856,6 @@ function BetterWardrobeItemsCollectionMixin:OnShow()
 	self:RegisterEvent("TRANSMOGRIFY_UPDATE");
 	self:RegisterEvent("PLAYER_EQUIPMENT_CHANGED");
 	self:RegisterEvent("TRANSMOGRIFY_SUCCESS");
-
 	local needsUpdate = false;	-- we don't need to update if we call :SetActiveSlot as that will do an update
 	if ( self.jumpToLatestCategoryID and self.jumpToLatestCategoryID ~= self.activeCategory and not C_Transmog.IsAtTransmogNPC() ) then
 		local slot = CollectionWardrobeUtil.GetSlotFromCategoryID(self.jumpToLatestCategoryID);
@@ -1923,7 +1871,7 @@ function BetterWardrobeItemsCollectionMixin:OnShow()
 		self:ChangeModelsSlot(self.transmogLocation);
 		needsUpdate = true;
 	else
-		print("gagg")
+		needsUpdate = true;
 		local transmogLocation = TransmogUtil.GetTransmogLocation("HEADSLOT", Enum.TransmogType.Appearance, Enum.TransmogModification.Main);
 		self:SetActiveSlot(transmogLocation);
 	end
@@ -2236,6 +2184,12 @@ function BetterWardrobeItemsCollectionMixin:SetActiveCategory(category, slotChan
 		self:GetParent():SwitchSearchCategory();
 	end
 end
+
+
+local function GetPage(entryIndex, pageSize)
+	return floor((entryIndex-1) / pageSize) + 1;
+end
+
 
 function BetterWardrobeItemsCollectionMixin:ResetPage()
 	local page = 1;
@@ -6178,9 +6132,9 @@ end
 function BetterWardrobeSetsTransmogMixin:LoadSet(setID)
 	if BetterWardrobeCollectionFrame:CheckTab(4) then
 		if addon.SelecteSavedList then 
-			BW_WardrobeOutfitDropDown:SelectDBOutfit(setID, true)
+			BetterWardrobeOutfitDropDown:SelectOutfit(setID, true)
 		else
-			BW_WardrobeOutfitDropDown:SelectOutfit(setID - 5000, true)
+			BetterWardrobeOutfitDropDown:SelectOutfit(setID - 5000, true)
 		end
 		return
 	end
@@ -6805,7 +6759,7 @@ function addon.Sets:GetLocationBasedCount(setInfo)
 	return collectedCount, totalCount
 end
 
-end
+
 
 
 
@@ -6942,4 +6896,89 @@ function addon.Init.SortDropDown_Initialize()
 			else
 				BW_SortDropDown:SetPoint("TOPLEFT", Wardrobe.WeaponDropDown, "BOTTOMLEFT", 0, LegionWardrobeY)
 			end]]
+end
+
+
+BetterWardrobeOutfitMixin = { };
+
+function BetterWardrobeOutfitMixin:OnOutfitApplied(outfitID)
+	local value = outfitID or "";
+	if GetCVarBool("transmogCurrentSpecOnly") then
+		local specIndex = GetSpecialization();
+		SetCVar("lastTransmogOutfitIDSpec"..specIndex, value);
+	else
+		for specIndex = 1, GetNumSpecializations() do
+			SetCVar("lastTransmogOutfitIDSpec"..specIndex, value);
+		end
+	end
+end
+
+
+
+function addon.IsDefaultSet(outfitID)
+	local MAX_DEFAULT_OUTFITS = C_TransmogCollection.GetNumMaxOutfits()
+	return outfitID < MAX_DEFAULT_OUTFITS  -- #C_TransmogCollection.GetOutfits()--MAX_DEFAULT_OUTFITS 
+end
+
+function BetterWardrobeOutfitMixin:LoadOutfit(outfitID)
+	if (not outfitID) then
+		return
+	end
+	local MogItOutfit = false
+	if outfitID > 1000 then MogItOutfit = true end
+
+
+	if addon.IsDefaultSet(outfitID) then 
+		C_Transmog.LoadOutfit(outfitID)
+	else
+		local outfit 
+		if outfitID > 1000 then
+			outfit = addon.MogIt.MogitSets[outfitID]
+		else
+			outfit = addon.OutfitDB.char.outfits[LookupIndexFromID(outfitID)]
+		end
+
+		----Contains new data tables
+		if outfit.itemTransmogInfoList then
+			local ItemTransmogInfoList = {}
+			local actor = WardrobeTransmogFrame.ModelScene:GetPlayerActor();
+			for i = 1, 19  do
+				local info = outfit.itemTransmogInfoList[i]
+				local itemTransmogInfo = ItemUtil.CreateItemTransmogInfo(info.appearanceID, info.secondaryAppearanceID, info.illusionID);
+				actor:SetItemTransmogInfo(itemTransmogInfo, slotID, false);
+			end
+		end
+	end
+end
+
+
+
+function BetterWardrobeOutfitMixin:GetItemTransmogInfoList()
+	local playerActor = WardrobeTransmogFrame.ModelScene:GetPlayerActor();
+	if playerActor then
+		return playerActor:GetItemTransmogInfoList();
+	end
+	return nil;
+end
+
+function BetterWardrobeOutfitMixin:OnOutfitSaved(outfitID)
+	if C_Transmog.GetApplyCost() then
+		self:OnOutfitApplied(outfitID);
+	end
+end
+
+function BetterWardrobeOutfitMixin:OnSelectOutfit(outfitID)
+	-- outfitID can be 0, so use empty string for none
+	local value = outfitID or "";
+	for specIndex = 1, GetNumSpecializations() do
+		if GetCVar("lastTransmogOutfitIDSpec"..specIndex) == "" then
+			SetCVar("lastTransmogOutfitIDSpec"..specIndex, value);
+		end
+	end
+end
+
+function BetterWardrobeOutfitMixin:GetLastOutfitID()
+	local specIndex = GetSpecialization();
+	if not specIndex then return end
+	return tonumber(GetCVar("lastTransmogOutfitIDSpec"..specIndex));
 end

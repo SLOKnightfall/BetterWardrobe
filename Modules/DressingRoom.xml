@@ -36,8 +36,6 @@
 
 	<Button name="BW_DressingRoomOutfitFrameButtonTemplate" inherits="WardrobeOutfitButtonTemplate" virtual="true" mixin="BW_DressingRoomOutfitButtonMixin"/>
 	
-
-
 	<Frame name="BW_DressingRoomFrame" parent="DressUpFrame" mixin="BW_DressingRoomFrameMixin">
 		<Anchors>
 			<Anchor point="TOPLEFT"/>
@@ -264,33 +262,7 @@
 		</Scripts>
 	</Frame>
 
-
-	<Frame name="BetterWardrobeOutfitDropDownTemplate" inherits="BW_UIDropDownMenuTemplate" virtual="true" mixin="BW_WardrobeOutfitDropDownMixin">
-		<Size x="100" y="22"/>
-		<Frames>
-			<Button parentKey="SaveButton" inherits="UIPanelButtonTemplate" text="SAVE">
-				<Size x="88" y="22"/>
-				<Anchors>
-					<Anchor point="LEFT" relativePoint="RIGHT" x="-13" y="-3"/>
-				</Anchors>
-				<Scripts>
-					<OnClick>
-						PlaySound(SOUNDKIT.IG_MAINMENU_OPTION_CHECKBOX_ON);
-						local dropDown = self:GetParent();
-						dropDown:CheckOutfitForSave(dropDown.selectedOutfitID);
-					</OnClick>
-				</Scripts>
-			</Button>
-		</Frames>
-		<Scripts>
-			<OnLoad method="OnLoad"/>
-			<OnEvent method="OnEvent"/>
-			<OnShow method="OnShow"/>
-			<OnHide method="OnHide"/>
-		</Scripts>
-	</Frame>
-
-	<Frame name="BW_DressingRoomOutfitDropDown" parent = "DressUpFrame" inherits="BetterWardrobeOutfitDropDownTemplate" mixin="BW_DressUpOutfitMixin">
+	<Frame parentKey="BW_OutfitDropDown" parent="DressUpFrame" name="BetterWardrobeDressUpFrameDropDown" inherits="BetterWardrobeOutfitDropDownTemplate" mixin="BetterDressUpOutfitMixin" >
 		<KeyValues>
 			<KeyValue key="width" value="163" type="number"/>
 			<KeyValue key="minMenuStringWidth" value="127" type="number"/>
@@ -299,5 +271,7 @@
 		<Anchors>
 			<Anchor point="TOP" x="-23" y="-28"/>
 		</Anchors>
+		<Scripts>
+		</Scripts>
 	</Frame>
 </Ui>

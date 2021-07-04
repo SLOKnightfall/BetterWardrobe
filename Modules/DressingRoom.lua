@@ -75,12 +75,12 @@ end
 function DressingRoom:CreateDropDown()
 	--local f = BW_UIDropDownMenu_Create("BW_DressingRoomOutfitDropDown", DressUpFrame)
 	----local f  = CreateFrame("Frame", "BW_DressingRoomOutfitDropDown", DressUpFrame, "BW_UIDropDownMenuTemplate")
-	f = BW_DressingRoomOutfitDropDown
-	f.width = 163
-	f.minMenuStringWidth = 127
-	f.maxMenuStringWidth = 190
+	----f = BW_DressingRoomOutfitDropDown
+	----f.width = 163
+	----f.minMenuStringWidth = 127
+	----f.maxMenuStringWidth = 190
 
-	f:SetPoint("TOP", -23, -28)
+----f:SetPoint("TOP", -23, -28)
 
 --[[	Mixin(f, WardrobeOutfitDropDownMixin)
 	Mixin(f, BW_DressingRoomMixin)
@@ -511,23 +511,6 @@ function BW_DressingRoomItemButtonMixin:OnMouseDown(button)
 end
 
 
-function BW_DressingRoomHideArmorButton_OnClick()
-	local sharedActor = DressUpFrame.ModelScene:GetPlayerActor()
-		if (not sharedActor) then
-			return false
-		end
-
-	for _, button in pairs(Buttons) do
-		button.isHidden = true
-		local slot = button:GetID()
-		sharedActor:UndressSlot(slot)
-		button.Icon:SetDesaturated(true)
-		button:SetAlpha(EmptySlotAlpha)
-	end
-
-end
-
-
 function UpdateDressingRoom(...)
 	local viewedLink = ...
 	local frame = BW_DressingRoomFrame
@@ -753,7 +736,7 @@ local function BW_DressingRoomImportButton_OnClick(self)
 		{
 			text = L["Import Item"],
 			func = function()
-				BW_WardrobeOutfitFrameMixin:ShowPopup("BETTER_WARDROBE_IMPORT_ITEM_POPUP")
+				BetterWardrobeOutfitFrameMixin:ShowPopup("BETTER_WARDROBE_IMPORT_ITEM_POPUP")
 			end,
 			isNotRadio = true,
 			notCheckable = true,
@@ -761,7 +744,7 @@ local function BW_DressingRoomImportButton_OnClick(self)
 		{
 			text = L["Import Set"],
 			func = function()
-				BW_WardrobeOutfitFrameMixin:ShowPopup("BETTER_WARDROBE_IMPORT_SET_POPUP")
+				BetterWardrobeOutfitFrameMixin:ShowPopup("BETTER_WARDROBE_IMPORT_SET_POPUP")
 			end,
 			isNotRadio = true,
 			notCheckable = true,
@@ -874,61 +857,20 @@ function BW_DressingRoomHideArmorButton_OnClick()
 	UpdateDressingRoom()
 end
 
-----BW_WardrobeOutfitFrameMixin = CreateFromMixins(WardrobeOutfitFrameMixin)
 
-BW_WardrobeOutfitDropDownMixin = CreateFromMixins(WardrobeOutfitDropDownMixin) ----BW_DressingRoomOutfitDropDown inherits
 
-BW_DressUpOutfitMixin = CreateFromMixins(DressUpOutfitMixin)  ----BW_DressingRoomOutfitDropDown
+--======
+BetterDressUpOutfitMixin = { };
 
-function BW_DressUpOutfitMixin:OnLoad()
-
-	local button = _G[self:GetName().."Button"]
-	button:SetScript("OnMouseDown", function(self)
-						PlaySound(SOUNDKIT.IG_MAINMENU_OPTION_CHECKBOX_ON)
-						BW_WardrobeOutfitFrame:Toggle(BW_DressingRoomOutfitDropDown)--self:GetParent())
-						end
-					)
-	BW_UIDropDownMenu_JustifyText(self, "LEFT")
-	if (self.width) then
-		BW_UIDropDownMenu_SetWidth(self, self.width)
+function BetterDressUpOutfitMixin:GetItemTransmogInfoList()
+	local playerActor = DressUpFrame.ModelScene:GetPlayerActor();
+	if playerActor then
+		return playerActor:GetItemTransmogInfoList();
 	end
---[[
-	addon:SecureHook(WardrobeTransmogFrame, "OnTransmogApplied", function()
-	C_Timer.After(.5, function()
-			if BW_WardrobeOutfitDropDown.selectedOutfitID and BW_WardrobeOutfitDropDown:IsOutfitDressed() then
-				BW_WardrobeOutfitDropDown:OnOutfitApplied(BW_WardrobeOutfitDropDown.selectedOutfitID)
-			end
-		end)
-		end, true)
-		]]
+	return nil;
 end
 
-local MAX_DEFAULT_OUTFITS = C_TransmogCollection.GetNumMaxOutfits()
-
-local function IsDefaultSet(outfitID)
-	return outfitID < MAX_DEFAULT_OUTFITS  -- #C_TransmogCollection.GetOutfits()--MAX_DEFAULT_OUTFITS 
-end
-function BW_WardrobeOutfitDropDownMixin:SelectOutfit(outfitID, loadOutfit)
-	local name;
-	if ( outfitID ) then
-		name = C_TransmogCollection.GetOutfitInfo(outfitID);
-	end
-	if ( name ) then
-		UIDropDownMenu_SetText(self, name);
-	else
-		----outfitID = nil;
-		UIDropDownMenu_SetText(self, GRAY_FONT_COLOR_CODE..TRANSMOG_OUTFIT_NONE..FONT_COLOR_CODE_CLOSE);
-	end
-	self.selectedOutfitID = outfitID;
-	if ( loadOutfit ) then
-		BW_WardrobeOutfitDropDownMixin:LoadOutfit(outfitID);
-	end
-	self:UpdateSaveButton();
-	self:OnSelectOutfit(outfitID);
-	UpdateDressingRoom()
-end
-
-function BW_WardrobeOutfitDropDownMixin:LoadOutfit(outfitID)
+function BetterDressUpOutfitMixin:LoadOutfit(outfitID)
 	if not outfitID then
 		return false
 	end
@@ -943,32 +885,18 @@ function BW_WardrobeOutfitDropDownMixin:LoadOutfit(outfitID)
 	playerActor:Undress()
 	UpdateDressingRoom()
 	import = true
-	if IsDefaultSet(outfitID) then
+	if addon.IsDefaultSet(outfitID) then
 		DressUpItemTransmogInfoList(C_TransmogCollection.GetOutfitItemTransmogInfoList(outfitID));
-		XXXX = C_TransmogCollection.GetOutfitItemTransmogInfoList(outfitID)
-
 	else
-		----TODO FIX
---[[		local outfit
-		print(outfitID)
+		local outfit
+		local itemTransmogInfoList
 		if outfitID > 1000 then
 			outfit = addon.MogIt.MogitSets[outfitID]
 		else
 			outfit = addon.OutfitDB.char.outfits[LookupIndexFromID(outfitID)]
-			print(LookupIndexFromID(outfitID))
-			XXX=outfit
+			itemTransmogInfoList = outfit.itemTransmogInfoList
 		end
-
-		local outfit_sources = {}
-		--need to itterate a full table as the DressUpSources uses the table size
-		for i = 1, 19  do
-			outfit_sources[i] = {["appearanceID"] = (outfit[i] or NO_TRANSMOG_SOURCE_ID)}
-			outfit_sources["mainHandEnchant"]= outfit["mainHandEnchant"]
-			outfit_sources["offHandEnchant"] = outfit["offHandEnchant"]
-		end
-		
-		--DressUpSources(outfit_sources, outfit["mainHandEnchant"], outfit["offHandEnchant"])
-		DressUpItemTransmogInfoList(outfit_sources);]]
+		DressUpItemTransmogInfoList(itemTransmogInfoList);
 
 	end
 	import = false

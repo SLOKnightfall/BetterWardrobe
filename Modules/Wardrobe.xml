@@ -1903,7 +1903,7 @@
 							</Layer>
 						</Layers>
 					</Frame>
-					<Frame parentKey="OutfitDropDown" name="BetterWardrobeOutfitDropDown" inherits="WardrobeOutfitDropDownTemplate" mixin="BetterWardrobeOutfitMixin">
+					<Frame parentKey="OutfitDropDown" name="XXBetterWardrobeOutfitDropDown" inherits="WardrobeOutfitDropDownTemplate" mixin="BetterWardrobeOutfitMixin">
 						<KeyValues>
 							<KeyValue key="width" value="188" type="number"/>
 							<KeyValue key="minMenuStringWidth" value="152" type="number"/>
@@ -2158,5 +2158,17 @@
 		<Scripts>
 			<OnLoad method="OnLoad"/>
 		</Scripts>
+	</Frame>
+
+		<Frame parentKey="OutfitDropDown" name="BetterWardrobeOutfitDropDown" inherits="BetterWardrobeOutfitDropDownTemplate" mixin="BetterWardrobeOutfitMixin" parent = "UIParent" hidden = "false">
+		<KeyValues>
+			<KeyValue key="width" value="188" type="number"/>
+			<KeyValue key="minMenuStringWidth" value="152" type="number"/>
+			<KeyValue key="maxMenuStringWidth" value="216" type="number"/>
+		</KeyValues>
+		<Anchors>
+			<Anchor point="TOPLEFT" x="-14" y="28"/>
+		</Anchors>
+
 	</Frame>
 </Ui>

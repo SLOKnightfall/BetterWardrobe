@@ -440,6 +440,43 @@ do
 						info.sources[i] = data[i] or 0
 					end
 				end
+--[[
+									--converts setdata to new info lists
+					if not data.itemTransmogInfoList then 
+						local outfitData = {}
+						outfitData["outfitID"] = data.outfitID
+						outfitData["name"] = data.name
+						outfitData["set"] = data.set
+						outfitData["icon"] = data.icon
+						outfitData["index"] = data.index
+
+						local ItemTransmogInfoList = {}
+						--for dataIndex, sourceID in ipairs(data) do
+						for i = 1, 19  do
+							local illusionID
+							if i == 16 then 
+								illusionID = data["mainHandEnchant"]
+							elseif i == 17 then 
+								illusionID = data["offHandEnchant"]
+							else
+								illusionID = 0
+							end
+							ItemTransmogInfoList[i] = ItemUtil.CreateItemTransmogInfo(data[i] or 0, 0, illusionID);
+							----outfit = outfitData
+
+						end
+						--ItemTransmogInfoList["Clear"] = nil 
+						--ItemTransmogInfoList["IsEqual"] = nil 
+						--ItemTransmogInfoList["Init"] = nil 
+						outfitData["ItemTransmogInfoList"] = ItemTransmogInfoList
+
+						--addon.OutfitDB.char.outfits[data.index] = outfitData
+						--data = outfitData
+						--outfitData["ItemTransmogInfoList"] = ItemTransmogInfoList
+					end
+
+					--info.itemTransmogInfoList = data.itemTransmogInfoList
+				end]]
 
 				SET_INDEX[info.setID] = info
 				tinsert(list, info)
