@@ -371,6 +371,10 @@ do
 
 
 	function addon.GetBaseList()
+		if addon.refreshData then 
+			addon.Init:BuildDB()
+			addon.refreshData = false
+		end
 		return SET_DATA
 	end
 
