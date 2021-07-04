@@ -218,8 +218,11 @@ do
 				if C_TransmogSets.GetBaseSetID(id) == id then 
 
 					if setData.requiredFaction and setData.requiredFaction == playerFaction or setData.requiredFaction == nil then 
-
-						setData.name = "BL-" .. setData.name.." - "..(setData.description or "")
+						--setData.name = "BL-" .. setData.name.." - "..(setData.description or "")
+						if not setData.nameUpdate then 
+							setData.name = setData.name.." - "..(setData.description or "")
+						end
+						setData.nameUpdate = true
 						local classInfo = CLASS_INFO[playerClass]
 						local class = (setData.classMask and setData.classMask == classInfo[1]) or not setData.classMask
 						local className = (setData.classMask and GetClassInfo(setData.classMask)) or nil
