@@ -84,7 +84,7 @@ local function GetOutfits(character)
 			end
 		end
 
-		----local mogit_Outfits = addon.MogIt.GetMogitOutfits()
+		local mogit_Outfits = addon.MogIt.GetMogitOutfits()
 		if mogit_Outfits then 
 			for i, data in ipairs(mogit_Outfits) do
 				--local index = #FullList

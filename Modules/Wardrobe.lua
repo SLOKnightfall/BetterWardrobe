@@ -1278,11 +1278,20 @@ function BetterWardrobeCollectionFrameMixin:OnShow()
 	local hasAlternateForm, inAlternateForm = C_PlayerInfo.GetAlternateFormInfo();
 	self.inAlternateForm = inAlternateForm;
 
+local selectedtab
 	if C_Transmog.IsAtTransmogNPC() then
-		self:SetTab(self.selectedTransmogTab);
+		 selectedtab = self.selectedTransmogTab
 	else
-		self:SetTab(self.selectedCollectionTab);
+		selectedtab = self.selectedCollectionTab
+	self:SetTab(1)
+	self:SetTab(2)
+	self:SetTab(3)
+	self:SetTab(4)
+
+		self:SetTab(selectedtab);
 	end
+
+
 	self:UpdateTabButtons();
 
 	addon.selectedArmorType = addon.Globals.CLASS_INFO[playerClass][3]

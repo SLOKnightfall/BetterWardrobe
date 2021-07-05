@@ -253,7 +253,6 @@ end
 --compare?items=57290.0.0.0.0.0.0.0.0.0.0:163458.0.0.0.0.0.0.0.0.0.1:37513.0.0.0.0.0.0.0.0.0.0:173460.0.0.0.0.0.0.0.0.0.0:98093.0.0.0.0.0.0.0.0.0.0:38115.0.0.0.0.0.0.0.0.0.0:152399.0.0.0.0.0.0.0.0.0.0:80698.0.0.0.0.0.0.0.0.0.0:167829.0.0.0.0.0.0.0.0.0.0:98149.0.0.0.0.0.0.0.0.0.0:35870.0.0.0.0.0.0.0.0.0.0:62968.0.0.0.0.0.0.0.0.0.0:155409.0.0.0.0.0.0.0.0.0.0
 
 function IE.ImportTransmogVendorSet(importString)
-	print("?")
 	importString = importString and importString:match("items=([^#]+)")
 	if importString then
 		local transmogSources = {};
@@ -268,7 +267,6 @@ function IE.ImportTransmogVendorSet(importString)
 					local slot = C_Transmog.GetSlotForInventoryType(sourceInfo.invType);
 					local pendingInfo = TransmogUtil.CreateTransmogPendingInfo(Enum.TransmogPendingType.Apply, appearanceID);
 					local transmogLocation = TransmogUtil.CreateTransmogLocation(slot, Enum.TransmogType.Appearance, Enum.TransmogModification.Main);
-					xxxx= pendingInfo
 					C_Transmog.SetPending(transmogLocation, pendingInfo);
 				end
 

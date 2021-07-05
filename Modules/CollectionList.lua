@@ -324,6 +324,7 @@ function CollectionList:Dropdown_Initialize(frame, level, menuList)
 	end
 
 	if MogItLoaded then 
+		
 		--key["MOGIT"] = "MogIt Wishlist"
 		--local info = BW_UIDropDownMenu_CreateInfo()
 		info.func = CollectionList.Dropdown_OnClick
