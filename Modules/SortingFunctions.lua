@@ -139,9 +139,11 @@ local Sort = {
 					return SortOrder(set1.patchID, set2.patchID)
 				end
 			end
-
+			if ( set1.expansionID ~= set2.expansionID ) then
+				return SortOrder(set1.expansionID, set2.expansionID)
+			end
 			if ( set1.uiOrder ~= set2.uiOrder ) then
-				return SortOrder(set1.uiOrder, set2.uiOrder)
+				--return SortOrder(set1.uiOrder, set2.uiOrder)
 			end
 
 			return SortOrder(set1.setID, set2.setID)
@@ -368,7 +370,7 @@ local Sort = {
 		end,
 
 		[LE_APPEARANCE] = function(self, sets, reverseUIOrder, ignorePatchID)
-			for i, data in ipairs(sets) do
+--[[			for i, data in ipairs(sets) do
 				local setID = data.setID
 				local sources = C_TransmogSets.GetSetSources(setID)  --[{sourceID =collected}]
 				local sourceID
@@ -377,10 +379,10 @@ local Sort = {
 				 	sourceID = i
 					 break
 				end
-			
+		
 				local sourceInfo = C_TransmogCollection.GetSourceInfo(sourceID)
 				data.visualID = sourceInfo.visualID
-			end
+			end]]
 
 			sort(sets, function(source1, source2)
 					if addon.ItemAppearance[source1.visualID] and addon.ItemAppearance[source2.visualID] then
@@ -393,19 +395,19 @@ local Sort = {
 
 		-- sort by the color in filename
 		[LE_COLOR] = function(self, sets, reverseUIOrder, ignorePatchID)
-			for i, data in ipairs(sets) do
+--[[			for i, data in ipairs(sets) do
 				local setID = data.setID
 				local sources = C_TransmogSets.GetSetSources(setID)  --[{sourceID =collected}]
 				local sourceID
 
 				for i,d in pairs(sources) do
-				 	sourceID = i
-					 break
-				end
+								 	sourceID = i
+									 break
+								end
 			
 				local sourceInfo = C_TransmogCollection.GetSourceInfo(sourceID)
 				data.visualID = sourceInfo.visualID
-			end
+			end]]
 
 			addon.Sort.SortColor(sets)
 		end,
@@ -477,7 +479,7 @@ local Sort = {
 					return groupFavorite1
 				end
 
-				return SortOrder(set1.uiOrder, set2.uiOrder)
+				return SortOrder(set2.uiOrder, set1.uiOrder)
 			end
 
 			table.sort(sets, comparison)

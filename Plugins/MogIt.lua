@@ -28,10 +28,12 @@ local function BuildWishlist()
 end
 
 local function GetMogitSets()
+	if not BetterWardrobe_Mogitdata then return {} end
 	local name = UnitName("player")
 	local realm = GetRealmName()
 	local profileName = name.." - "..realm
-	 local setdata = BetterWardrobe_Mogitdata.profiles[profileName].sets
+
+	local setdata = BetterWardrobe_Mogitdata.profiles[profileName].sets
 	return setdata
 end
 

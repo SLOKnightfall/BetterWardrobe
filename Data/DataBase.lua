@@ -74,6 +74,7 @@ function BuildBlizzSets()
 
 	local allSets = C_TransmogSets.GetAllSets()
 	for i, data in ipairs(allSets) do
+		data.expansionID  = data.expansionID + 1
 		for armor, mask in ipairs(armorMask) do 
 			if bit.band(data.classMask, mask) ~= 0 then
 				local baseSet = C_TransmogSets.GetBaseSetID(data.setID)
@@ -89,6 +90,16 @@ function BuildBlizzSets()
 			end
 		end
 	end
+end
+
+local function getClassMask(mask)
+
+for i, d in pairs(addon.Globals.CLASS_INFO) do 
+
+	if mask == d[2] then return d[1] end
+end
+
+
 end
 
 
@@ -116,8 +127,9 @@ do
 					--setData.isHeritageArmor = string.find(setData.name, "Heritage")
 
 					local classInfo = CLASS_INFO[playerClass]
-					local class = (setData.classMask and setData.classMask == classInfo[1]) or not setData.classMask
-					local className = (setData.classMask and GetClassInfo(setData.classMask)) or nil
+					local classMask = getClassMask(setData.classMask)
+					local class = (classMask and classMask == classInfo[1]) or not setData.classMask
+					local className = (classMask and GetClassInfo(classMask)) or nil
 
 					setData.isClass = class
 					setData.className = className
@@ -226,8 +238,13 @@ do
 						setData.nameUpdate = true
 						local classInfo = CLASS_INFO[playerClass]
 						local class = (setData.classMask and setData.classMask == classInfo[1]) or not setData.classMask
-						local className = (setData.classMask and GetClassInfo(setData.classMask)) or nil
-
+						---local className = (setData.classMask and GetClassInfo(getClassMask(setData.classMask))) or nil
+					if setData.classMask == 8  then 
+						--print (L[setData["name"]]); 
+					--	print((setData.classMask)) 
+end
+--print(setData.expansionID)
+						--setData.expansionID = setData.expansionID -3
 						setData.isClass = class
 						setData.className = className
 						setData.Blizzard = true
@@ -660,6 +677,10 @@ end
 
 	function addon.GetSetsources(setID)
 	--if SourceDB[setID] then return SourceDB[setID] end
+
+	if setID  > 50000 then
+		--return  C_TransmogCollection.GetSourceInfo(setID)
+	end
 
 	local setInfo = addon.GetSetInfo(setID)
 	local setSources = {}

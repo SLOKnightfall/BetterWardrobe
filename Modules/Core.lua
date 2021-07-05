@@ -1005,7 +1005,7 @@ function addon:OnInitialize()
 	listDB.HiddenAppearanceDB = listDB.HiddenAppearanceDB or {}
 	listDB.OutfitDB = listDB.OutfitDB or {}
 
-	--UpdateDB()
+	UpdateDB()
 
 --Create all the profiled DB
 	self.db = LibStub("AceDB-3.0"):New("BetterWardrobe_Options", defaults, true)
