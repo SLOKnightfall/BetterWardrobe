@@ -24,16 +24,16 @@ local L = LibStub("AceLocale-3.0"):GetLocale(addonName)
 --Determines type of set based on setID
 local function DetermineSetType(setID)
 
-	if BetterWardrobeCollectionFrame:CheckTab(2) then --- or setID > 1000000 then 
+	if WardrobeCollectionFrame:CheckTab(2) then --- or setID > 1000000 then 
 	--Blizzard Set
 
 
 		return "set"
 
 	--Extra Set
-	elseif BetterWardrobeCollectionFrame:CheckTab(3) then 
+	elseif WardrobeCollectionFrame:CheckTab(3) then 
 		return "extraSet"
-	elseif BetterWardrobeCollectionFrame:CheckTab(4) then 
+	elseif WardrobeCollectionFrame:CheckTab(4) then 
 	--Mogit set
 	--Saved Set
 	return "savedset"
@@ -160,6 +160,45 @@ end
 function addon:IsFavoriteItem(visualID)
 	return addon.favoritesDB.profile.item[visualID]
 end
+
+
+local Sets = {}
+
+function Sets:ClearHidden(setList, type)
+print("clear")	
+if addon.Profile.ShowHidden then return setList end
+	local newSet = {}
+	for i, setInfo in pairs(setList) do
+		local itemID = setInfo.setID or setInfo.visualID
+		if not addon.HiddenAppearanceDB.profile[type][itemID] then
+			tinsert(newSet, setInfo)
+			--print(itemID)
+
+		else
+			--print("setInfo.name")
+			--print(itemID)
+
+		end
+	end
+	--print(#newSet)
+	return newSet
+end
+
+addon.RefreshFilter = true
+function addon:FilterSets(setData, setType)
+	if not addon.RefreshFilter then return setData end
+
+	local FilterSets = {}
+	local searchString = string.lower(WardrobeCollectionFrameSearchBox:GetText())
+
+
+
+	FilterSets =  Sets:ClearHidden(setData, setType)
+
+	addon.RefreshFilter = false
+	return FilterSets
+end
+
 
 
 

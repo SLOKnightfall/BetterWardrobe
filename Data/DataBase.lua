@@ -687,7 +687,7 @@ end
 	local atTransmogrifier = WardrobeFrame_IsAtTransmogrifier()
 	local unavailable = false
 
-	if BetterWardrobeCollectionFrame and (BetterWardrobeCollectionFrame.selectedTransmogTab == 4 or BetterWardrobeCollectionFrame.selectedCollectionTab == 4) then
+	if WardrobeCollectionFrame and (WardrobeCollectionFrame.selectedTransmogTab == 4 or WardrobeCollectionFrame.selectedCollectionTab == 4) then
 		if setInfo and setInfo.sources then
 			for i, sourceID in ipairs(setInfo.sources) do	
 

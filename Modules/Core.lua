@@ -1201,6 +1201,9 @@ function addon:OnEnable()
 	addon.Init:BuildTooltips()
 
 	if IsAddOnLoaded("Blizzard_Collections") then 
+
+		BetterWardrobeCollectionFrame = WardrobeCollectionFrame
+
 		addon.Init:LoadModules()
 	else
 		addon:RegisterEvent("ADDON_LOADED", "EventHandler")
@@ -1225,30 +1228,126 @@ function addon.Init:LoadModules()
 		return false
 	end
 
-	--Hooks into the colection tabs and sets Better Wardobe when viewing the wardrobe collection
-	addon:SecureHook(nil, "CollectionsJournal_UpdateSelectedTab", function(self) 
-		local selected = CollectionsJournal_GetTab(self);
 
-		-- don't touch the wardrobe frame if it's used by the transmogrifier
-		if ( WardrobeCollectionFrame:GetParent() == self or not WardrobeCollectionFrame:GetParent():IsShown() ) then
-			if ( selected == 5 ) then
-				HideUIPanel(WardrobeFrame);
-				WardrobeCollectionFrame:Hide();
-				BetterWardrobeCollectionFrame:SetContainer(self);
-			else
-				WardrobeCollectionFrame:Hide();
-				BetterWardrobeCollectionFrame:Hide();
-			end
-		end
-	end)
-
-	addon.Init:LoadWardrobeModule()
+----BetterWardrobeCollectionFrame = {}
+	--addon.Init:LoadWardrobeModule()
 
 	local f = CreateFrame("Frame", "BetterWardrobeCollectionFrame", UIParent, "BetterWardrobeCollectionFrameTemplate" )
 
-	WardrobeFrame:HookScript("OnShow",  function() UpdateTransmogVendor() end)
-	
+	f.ItemsTab:SetParent("WardrobeCollectionFrame")
+	WardrobeCollectionFrame.ItemsTab:Hide()
+	WardrobeCollectionFrame.ItemsTab = f.ItemsTab
+	WardrobeCollectionFrameTab1 = f.ItemsTab
 
+
+	f.SetsTab:SetParent("WardrobeCollectionFrame")
+	WardrobeCollectionFrame.SetsTab:Hide()
+	WardWardrobeCollectionFrameTab2 = f.SetsTab
+	WardrobeCollectionFrameTab2.SetsTab = f.SetsTab
+
+	f.ExtraSetsTab:SetParent("WardrobeCollectionFrame")
+	WardrobeCollectionFrame.ExtraSetsTab = f.ExtraSetsTab
+	WardrobeCollectionFrameTab3 = f.ExtraSetsTab
+
+	f.SavedSetsTab:SetParent("WardrobeCollectionFrame")
+	WardrobeCollectionFrame.SavedSetsTab = f.SavedSetsTab
+	WardrobeCollectionFrameTab4 = f.SavedSetsTab
+
+	WardrobeCollectionFrame.Tabs = {f.ItemsTab, f.SetsTab, f.ExtraSetsTab, f.SavedSetsTab}
+	PanelTemplates_SetNumTabs(WardrobeCollectionFrame, 4);
+
+	f.VisualToggle:SetParent("WardrobeCollectionFrame")
+	WardrobeCollectionFrame.VisualToggle = f.VisualToggle
+
+	f.FilterButton:SetParent("WardrobeCollectionFrame")
+	WardrobeCollectionFrame.FilterButton:Hide()
+	WardrobeCollectionFrame.FilterButton = f.FilterButton
+	f.FilterButton:ClearAllPoints();
+	f.FilterButton:SetPoint("LEFT",WardrobeCollectionFrame.SearchBox,"RIGHT", 2, -1)
+
+	f.FilterDropDown:SetParent("WardrobeCollectionFrame")
+	WardrobeCollectionFrame.FilterDropDown = f.FilterDropDown
+
+	f.TransmogOptionsButton:SetParent("WardrobeCollectionFrame")
+	WardrobeCollectionFrame.TransmogOptionsButton = f.TransmogOptionsButton
+	f.TransmogOptionsButton:ClearAllPoints();
+	f.TransmogOptionsButton:SetPoint("BOTTOMRIGHT",WardrobeCollectionFrame,"BOTTOMRIGHT", -55, 80)
+
+
+
+
+	f.BW_SetsHideSlotButton:SetParent("WardrobeCollectionFrame")
+	WardrobeCollectionFrame.BW_SetsHideSlotButton = f.BW_SetsHideSlotButton
+
+	f.ItemsCollectionFrame:SetParent("WardrobeCollectionFrame")
+	f.ItemsCollectionFrame:ClearAllPoints();
+	f.ItemsCollectionFrame:SetPoint("TOPLEFT",WardrobeCollectionFrame,"TOPLEFT", 4, -60)
+	f.ItemsCollectionFrame:SetPoint("BOTTOMRIGHT",WardrobeCollectionFrame,"BOTTOMRIGHT", -6, 5)
+	WardrobeCollectionFrame.ItemsCollectionFrame:Hide()
+	WardrobeCollectionFrame.ItemsCollectionFrame = f.ItemsCollectionFrame
+	f.ItemsCollectionFrame.transmogLocation = WardrobeCollectionFrame.ItemsCollectionFrame.transmogLocation
+
+
+	WardrobeCollectionFrameWeaponDropDown = f.ItemsCollectionFrame.WeaponDropDown
+
+
+	f.SetsCollectionFrame:SetParent("WardrobeCollectionFrame")
+	f.SetsCollectionFrame:ClearAllPoints();
+	f.SetsCollectionFrame:SetPoint("TOPLEFT",WardrobeCollectionFrame,"TOPLEFT", 4, -60)
+	f.SetsCollectionFrame:SetPoint("BOTTOMRIGHT",WardrobeCollectionFrame,"BOTTOMRIGHT", -6, 5)
+	WardrobeCollectionFrame.SetsCollectionFrame:Hide()
+	f.SetsCollectionFrame.transmogLocation = WardrobeCollectionFrame.SetsCollectionFrame.transmogLocation
+	WardrobeCollectionFrame.SetsCollectionFrame = f.SetsCollectionFrame
+
+
+	f.SetsTransmogFrame:SetParent("WardrobeCollectionFrame")
+	f.SetsTransmogFrame:ClearAllPoints();
+	f.SetsTransmogFrame:SetPoint("TOPLEFT",WardrobeCollectionFrame,"TOPLEFT", 4, -60)
+	f.SetsTransmogFrame:SetPoint("BOTTOMRIGHT",WardrobeCollectionFrame,"BOTTOMRIGHT", -6, 5)
+	WardrobeCollectionFrame.SetsTransmogFrame:Hide()
+	f.SetsTransmogFrame.transmogLocation = WardrobeCollectionFrame.SetsTransmogFrame.transmogLocation
+	WardrobeCollectionFrame.SetsTransmogFrame = f.SetsTransmogFrame
+
+	WardrobeCollectionFrame.ContentFrames = {f.ItemsCollectionFrame, f.SetsCollectionFrame, f.SetsTransmogFrame}
+
+	----Mixin(WardrobeCollectionFrame, WardrobeCollectionFrameMixin)
+	--[[function WardrobeCollectionFrame:CheckTab(tab)
+		local atTransmogrifier = C_Transmog.IsAtTransmogNPC();
+		if (atTransmogrifier and WardrobeCollectionFrame.selectedTransmogTab == tab) or WardrobeCollectionFrame.selectedCollectionTab == tab then
+			return true
+		end
+	end]]
+
+
+	Mixin(WardrobeCollectionFrame, BetterWardrobeCollectionFrameMixin)
+--WardrobeCollectionFrame.SetTab = BetterWardrobeCollectionFrame.SetTab
+--WardrobeCollectionFrame.ClickTab = BetterWardrobeCollectionFrame.ClickTab
+
+	WardrobeCollectionFrame.progressBar:SetWidth(130)
+	WardrobeCollectionFrame.progressBar.border:SetWidth(139)
+	WardrobeCollectionFrame.progressBar:ClearAllPoints()
+	WardrobeCollectionFrame.progressBar:SetPoint("TOPLEFT", WardrobeCollectionFrame.ItemsTab, "TOPLEFT", 280, -11)
+
+
+	--[[WardrobeFrame:HookScript("OnShow",  function() UpdateTransmogVendor() end)
+			
+		--Hooks into the colection tabs and sets Better Wardobe when viewing the wardrobe collection
+					addon:SecureHook(nil, "CollectionsJournal_UpdateSelectedTab", function(self) 
+						local selected = CollectionsJournal_GetTab(self);
+				
+						-- don't touch the wardrobe frame if it's used by the transmogrifier
+						if ( WardrobeCollectionFrame:GetParent() == self or not WardrobeCollectionFrame:GetParent():IsShown() ) then
+							if ( selected == 5 ) then
+								HideUIPanel(WardrobeFrame);
+								WardrobeCollectionFrame:Hide();
+								BetterWardrobeCollectionFrame:SetContainer(self);
+							else
+								WardrobeCollectionFrame:Hide();
+								BetterWardrobeCollectionFrame:Hide();
+							end
+						end
+					end)
+				]]
 
 	----WardrobeTransmogFrame:HookScript("CheckSecondarySlotButtons",  function() print("XXX") end)
 

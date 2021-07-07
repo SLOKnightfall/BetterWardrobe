@@ -59,9 +59,9 @@ local function GetTab(tab)
 	local tabID
 
 	if ( atTransmogrifier ) then
-		tabID = BetterWardrobeCollectionFrame.selectedTransmogTab
+		tabID = WardrobeCollectionFrame.selectedTransmogTab
 	else
-		tabID = BetterWardrobeCollectionFrame.selectedCollectionTab
+		tabID = WardrobeCollectionFrame.selectedCollectionTab
 	end
 	return tabID, atTransmogrifier
 
@@ -74,9 +74,9 @@ local function CheckTab(tab)
 	local atTransmogrifier = WardrobeFrame_IsAtTransmogrifier()
 
 		if ( atTransmogrifier ) then
-			tabID = BetterWardrobeCollectionFrame.selectedTransmogTab
+			tabID = WardrobeCollectionFrame.selectedTransmogTab
 		else
-			tabID = BetterWardrobeCollectionFrame.selectedCollectionTab
+			tabID = WardrobeCollectionFrame.selectedCollectionTab
 		end
 	return tabID == tab
 end
@@ -97,7 +97,7 @@ end
 
  -- takes around 5 to 30 onupdates
 local function CacheHeaders()
-	local Wardrobe = BetterWardrobeCollectionFrame.ItemsCollectionFrame
+	local Wardrobe = WardrobeCollectionFrame.ItemsCollectionFrame
 
 	for k in pairs(nameCache) do
 		-- oh my god so much wasted tables
@@ -153,15 +153,15 @@ local Sort = {
 	end,
 
 	["SortItemAlphabetic"] = function()
-		if BetterWardrobeCollectionFrame.ItemsCollectionFrame:IsVisible() then -- check if wardrobe is still open after caching is finished
-			sort(BetterWardrobeCollectionFrame.ItemsCollectionFrame:GetFilteredVisualsList(), function(source1, source2)
+		if WardrobeCollectionFrame.ItemsCollectionFrame:IsVisible() then -- check if wardrobe is still open after caching is finished
+			sort(WardrobeCollectionFrame.ItemsCollectionFrame:GetFilteredVisualsList(), function(source1, source2)
 				if nameVisuals[source1.visualID] and nameVisuals[source2.visualID] then
 					return SortOrder(nameVisuals[source1.visualID], nameVisuals[source2.visualID])
 				else
 					return SortOrder(source1.uiOrder, source2.uiOrder)
 				end
 			end)
-			BetterWardrobeCollectionFrame.ItemsCollectionFrame:UpdateItems()
+			WardrobeCollectionFrame.ItemsCollectionFrame:UpdateItems()
 		end
 	end,
 
@@ -496,7 +496,7 @@ end
 
 
 function addon.SortCollection(frame)
-	local Wardrobe = BetterWardrobeCollectionFrame.ItemsCollectionFrame
+	local Wardrobe = WardrobeCollectionFrame.ItemsCollectionFrame
 
 	if CheckTab(1) then 
 		addon.Sort[1][addon.sortDB.sortDropdown](Wardrobe)

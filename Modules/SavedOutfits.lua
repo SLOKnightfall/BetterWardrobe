@@ -931,7 +931,7 @@ local function SavedOutfitDB_Dropdown_OnClick(self, arg1, arg2, checked)
 		else
 			addon.SelecteSavedList = false
 		end
-BetterWardrobeCollectionFrame.SetsCollectionFrame:OnSearchUpdate()
+WardrobeCollectionFrame.SetsCollectionFrame:OnSearchUpdate()
 		BW_UIDropDownMenu_SetSelectedValue(BW_DBSavedSetDropdown, arg1)
 		--BW_UIDropDownMenu_SetText(BW_DBSavedSetDropdown, arg1)
 		addon.savedSetCache = nil
@@ -956,7 +956,7 @@ end
 --Dropdownmenu for the selection of other character's saved sets
 function addon.Init.SavedSetsDropDown_Initialize(self)
 	--local f = BW_UIDropDownMenu_Create("BW_DBSavedSetDropdown", BW_WardrobeCollectionFrame)
-	BW_DBSavedSetDropdown = CreateFrame("Frame", "BW_DBSavedSetDropdown", BetterWardrobeCollectionFrame, "BW_UIDropDownMenuTemplate")
+	BW_DBSavedSetDropdown = CreateFrame("Frame", "BW_DBSavedSetDropdown", WardrobeCollectionFrame, "BW_UIDropDownMenuTemplate")
 
 	--BW_DBSavedSetDropdown = BW_UIDropDownMenu_Create("BW_DBSavedSetDropdown", BW_WardrobeCollectionFrame)
 	--BW_DBSavedSetDropdown:SetParent("BW_WardrobeCollectionFrame")

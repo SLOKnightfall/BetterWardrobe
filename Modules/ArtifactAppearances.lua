@@ -286,16 +286,16 @@ end
 
 
 function addon.SetArtifactAppearanceTooltip(contentFrame, sourceInfo, sourceID)
-	BetterWardrobeCollectionFrame.tooltipContentFrame = contentFrame;
-	BetterWardrobeCollectionFrame.tooltipSourceIndex = 1
+	WardrobeCollectionFrame.tooltipContentFrame = contentFrame;
+	WardrobeCollectionFrame.tooltipSourceIndex = 1
 	--local sourceInfo = frame.visualInfo --visualIDIndex[frame.visualInfo.visualID] 
 	--B = frame.visualInfo
 	if sourceInfo then 
 
 
-	local name, nameColor = sourceInfo.name, ARTIFACT_GOLD_COLOR ----BetterWardrobeCollectionFrame:GetAppearanceNameTextAndColor(sourceInfo);
-	local sourceText, sourceColor = BetterWardrobeCollectionFrame:GetAppearanceSourceTextAndColor(sourceInfo);
-	GameTooltip:SetText(name, nameColor:GetRGB());
+	local name, nameColor = sourceInfo.name, ARTIFACT_GOLD_COLOR ----WardrobeCollectionFrame:GetAppearanceNameTextAndColor(sourceInfo);
+	local sourceText, sourceColor = WardrobeCollectionFrame:GetAppearanceSourceTextAndColor(sourceInfo);
+	GameTooltip:SetText(name, nameColor:GetRGBA());
 
 
 	----local name, nameColor, sourceText, sourceColor = WardrobeCollectionFrameModel_GetSourceTooltipInfo(sourceInfo);

@@ -17,7 +17,7 @@ local L = LibStub("AceLocale-3.0"):GetLocale(addonName)
 
 
 local function SetHooks()
-	local ScrollFrames = {WardrobeCollectionFrameScrollFrame.buttons, BetterWardrobeCollectionFrameScrollFrame.buttons}
+	local ScrollFrames = {WardrobeCollectionFrameScrollFrame.buttons, WardrobeCollectionFrameScrollFrame.buttons}
 --Hooks into the extra sets scroll frame buttons to allow ctrl-right clicking on the button to generate a mogit preview
 	for index, buttons in ipairs(ScrollFrames) do
 		local orig_OnMouseUp = buttons[1]:GetScript("OnMouseUp")

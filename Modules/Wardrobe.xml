@@ -340,7 +340,7 @@
 				</Anchors>
 				<Scripts>
 					<OnClick>
-						BetterWardrobeCollectionFrame:ClickTab(self);
+						WardrobeCollectionFrame:ClickTab(self);
 					</OnClick>
 				</Scripts>
 			</Button>
@@ -349,7 +349,7 @@
 					<KeyValue key="minWidth" value="57" type="number"/>
 				</KeyValues>
 				<Anchors>
-					<Anchor point="LEFT" relativeTo="$parentTab1" relativePoint="RIGHT" x="0" y="0"/>
+					<Anchor point="LEFT" relativeKey="$parent.ItemsTab"  relativePoint="RIGHT" x="0" y="0"/>
 				</Anchors>
 				<Frames>
 					<Frame parentKey="FlashFrame" hidden="true">
@@ -375,7 +375,7 @@
 				</Frames>
 				<Scripts>
 					<OnClick>
-						BetterWardrobeCollectionFrame:ClickTab(self);
+						WardrobeCollectionFrame:ClickTab(self);
 					</OnClick>
 				</Scripts>
 			</Button>
@@ -384,7 +384,7 @@
 					<KeyValue key="minWidth" value="57" type="number"/>
 				</KeyValues>
 				<Anchors>
-					<Anchor point="LEFT" relativeTo="$parentTab2" relativePoint="RIGHT" x="0" y="0"/>
+					<Anchor point="LEFT" relativeKey="$parent.SetsTab" relativePoint="RIGHT" x="0" y="0"/>
 				</Anchors>
 				<Frames>
 					<Frame parentKey="FlashFrame" hidden="true">
@@ -410,7 +410,7 @@
 				</Frames>
 				<Scripts>
 					<OnClick>
-						BetterWardrobeCollectionFrame:ClickTab(self);
+						WardrobeCollectionFrame:ClickTab(self);
 					</OnClick>
 				</Scripts>
 			</Button>
@@ -419,7 +419,7 @@
 					<KeyValue key="minWidth" value="57" type="number"/>
 				</KeyValues>
 				<Anchors>
-					<Anchor point="LEFT" relativeTo="$parentTab3" relativePoint="RIGHT" x="0" y="0"/>
+					<Anchor point="LEFT" relativeKey="$parent.ExtraSetsTab"  relativePoint="RIGHT" x="0" y="0"/>
 				</Anchors>
 				<Frames>
 					<Frame parentKey="FlashFrame" hidden="true">
@@ -445,7 +445,7 @@
 				</Frames>
 				<Scripts>
 					<OnClick>
-						BetterWardrobeCollectionFrame:ClickTab(self);
+						WardrobeCollectionFrame:ClickTab(self);
 					</OnClick>
 				</Scripts>
 			</Button>
