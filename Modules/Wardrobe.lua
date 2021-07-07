@@ -4907,6 +4907,47 @@ function BetterWardrobeSetsCollectionMixin:OnEvent(event, ...)
 	end
 end
 
+function addon.SetHasNewSourcesForSlot(setID, transmogSlot)
+	if not  newTransmogInfo[setID] then return false end
+	for itemID, location in pairs(newTransmogInfo[setID]) do
+		if location  == transmogSlot then 
+			return true
+		end	
+	end
+	return false
+end 
+
+
+function addon.ClearSetNewSourcesForSlot(setID, transmogSlot)
+	if not  newTransmogInfo[setID] then return end
+
+	local count = 0
+	for itemID, location in pairs(newTransmogInfo[setID]) do
+		count = count + 1
+		if location  == transmogSlot then 
+			newTransmogInfo[setID][itemID] = nil
+			count = count - 1
+		end
+	end
+
+	if count <= 0 then 
+		newTransmogInfo[setID] = nil
+		SetsDataProvider:ResetBaseSetNewStatus(setID)
+	end
+end
+
+
+function addon.GetSetNewSources(setID)
+	local sources = {}
+	if not  newTransmogInfo[setID] then return sources end
+
+	for itemID in pairs(newTransmogInfo[setID]) do
+		local _, soucre = C_TransmogCollection.GetItemInfo(itemID)
+		tinsert(sources, source)
+	end
+	return sources
+end
+
 local function GetSetCounts()
 	local sets = addon.GetBaseList()
 	local totalSets = #sets
