@@ -5979,7 +5979,8 @@ function BetterWardrobeSetsTransmogMixin:OnEvent(event, ...)
 			C_Timer.After(0, function()
 				self.pendingRefresh = nil;
 				if self:IsShown() then
-					local resetSelection = (event == "TRANSMOGRIFY_UPDATE");
+					local resetSelection = (event == "TRANSMOGRIFY_SUCCESS");
+                    --Changed the above to Success rather than Update so it only changes back to page 1 when you apply the look
 					self:Refresh(resetSelection);
 				end;
 			end);
@@ -7070,23 +7071,52 @@ function BetterWardrobeOutfitMixin:LoadOutfit(outfitID)
 		if outfit.itemTransmogInfoList then
 			local actor = WardrobeTransmogFrame.ModelScene:GetPlayerActor();
 			for i = 1, 19  do
-				local info = outfit.itemTransmogInfoList[i]
-				local itemTransmogInfo = ItemUtil.CreateItemTransmogInfo(info.appearanceID, info.secondaryAppearanceID, info.illusionID);
-				actor:SetItemTransmogInfo(itemTransmogInfo, i, false);
+                if TransmogUtil.GetSlotName(i) ~= nil then
+                    local info = outfit.itemTransmogInfoList[i]
+                    local itemTransmogInfo = ItemUtil.CreateItemTransmogInfo(info.appearanceID, info.secondaryAppearanceID, info.illusionID);
+                    local slotName = TransmogUtil.GetSlotName(i)
+                    if slotName ~= nil then
+                        local itemLocation = TransmogUtil.CreateTransmogLocation(slotName, Enum.TransmogType.Appearance, Enum.TransmogModification.None)
+                        local itemPending = nil
+                        itemPending = TransmogUtil.CreateTransmogPendingInfo(Enum.TransmogPendingType.Apply, info.appearanceID)
+                        C_Transmog.SetPending(itemLocation, itemPending)
+                        if i == 3 then
+                            itemLocation = TransmogUtil.CreateTransmogLocation(slotName, Enum.TransmogType.Appearance, Enum.TransmogModification.Secondary)
+                            itemPending = TransmogUtil.CreateTransmogPendingInfo(Enum.TransmogPendingType.Apply, info.secondaryAppearanceID or 0)
+                            C_Transmog.SetPending(itemLocation, itemPending)
+                        elseif i == 16 or i == 17 then
+                            itemLocation = TransmogUtil.CreateTransmogLocation(slotName, Enum.TransmogType.Illusion, Enum.TransmogModification.Main)
+                            itemPending = TransmogUtil.CreateTransmogPendingInfo(Enum.TransmogPendingType.Apply, info.illusionID)
+                            C_Transmog.SetPending(itemLocation, itemPending)
+                        end
+                    end
+                end
 			end
 
 		else
 			for i = 1, 19  do
-				local appearanceID = outfit[i]
-				local illusionID = 0
-				if i == 16 then
-					illusionID = outfit.mainHandEnchant
-				elseif i == 17 then
-					illusionID = outfit.offHandEnchant
-				end
-				local itemTransmogInfo = ItemUtil.CreateItemTransmogInfo(appearanceID, 0, illusionID);
-				actor:SetItemTransmogInfo(itemTransmogInfo, i, false);
-				ItemTransmogInfoList[i] = itemTransmogInfo
+                if TransmogUtil.GetSlotName(i) ~= nil then
+                    local appearanceID = outfit[i]
+                    local illusionID = 0
+                    if i == 16 then
+                        illusionID = outfit.mainHandEnchant
+                    elseif i == 17 then
+                        illusionID = outfit.offHandEnchant
+                    end
+                    local itemTransmogInfo = ItemUtil.CreateItemTransmogInfo(appearanceID, 0, illusionID);
+                    local slotName = TransmogUtil.GetSlotName(i)
+                    if slotName ~= nil then
+                        local itemLocation = TransmogUtil.CreateTransmogLocation(slotName, Enum.TransmogType.Appearance, Enum.TransmogModification.None)
+                        local itemPending = TransmogUtil.CreateTransmogPendingInfo(Enum.TransmogPendingType.Apply, appearanceID)
+                        C_Transmog.SetPending(itemLocation, itemPending)
+                        if i == 16 or i == 17 then
+                            itemLocation = TransmogUtil.CreateTransmogLocation(slotName, Enum.TransmogType.Illusion, Enum.TransmogModification.Main)
+                            itemPending = TransmogUtil.CreateTransmogPendingInfo(Enum.TransmogPendingType.Apply, illusionID)
+                            C_Transmog.SetPending(itemLocation, itemPending)
+                        end
+                    end
+                    ItemTransmogInfoList[i] = itemTransmogInfo
+                end
 			end
 			--print("converted")
 			--addon.OutfitDB.char.outfits[LookupIndexFromID(outfitID)]["ItemTransmogInfoList"] = ItemTransmogInfoList
