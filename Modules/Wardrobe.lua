@@ -7004,13 +7004,37 @@ function addon.IsDefaultSet(outfitID)
 	return outfitID < MAX_DEFAULT_OUTFITS  -- #C_TransmogCollection.GetOutfits()--MAX_DEFAULT_OUTFITS 
 end
 
+function BetterWardrobeOutfitMixin:FakeInfoList(outfit)
+    local fakeInfoList = {}
+    for i = 1,19 do
+        local listEntry = {}
+        listEntry.Clear = nil
+        listEntry.IsEqual = nil
+        listEntry.Init = nil
+        if i == 16 then
+            listEntry.illusionID = outfit.mainHandEnchant
+        elseif i == 17 then
+            listEntry.illusionID = outfit.offHandEnchant
+        else
+            listEntry.illusionID = Constants.Transmog.NoTransmogID
+        end
+        listEntry.secondaryAppearanceID = Constants.Transmog.NoTransmogID
+        if outfit[i] == nil then
+            listEntry.appearanceID = 0
+        else
+            listEntry.appearanceID = outfit[i]
+        end
+        tinsert(fakeInfoList,listEntry)
+    end
+    return fakeInfoList
+end
+
 function BetterWardrobeOutfitMixin:LoadOutfit(outfitID)
 	if (not outfitID) then
 		return
 	end
 	local MogItOutfit = false
 	if outfitID > 1000 then MogItOutfit = true end
-
 
 	if addon.IsDefaultSet(outfitID) then 
 		C_Transmog.LoadOutfit(outfitID)
@@ -7022,19 +7046,33 @@ function BetterWardrobeOutfitMixin:LoadOutfit(outfitID)
 			outfit = addon.OutfitDB.char.outfits[LookupIndexFromID(outfitID)]
 		end
 
-		----Contains new data tables
-		if outfit.itemTransmogInfoList then
-			local ItemTransmogInfoList = {}
-			local actor = WardrobeTransmogFrame.ModelScene:GetPlayerActor();
-			for i = 1, 19  do
-				local info = outfit.itemTransmogInfoList[i]
-				local itemTransmogInfo = ItemUtil.CreateItemTransmogInfo(info.appearanceID, info.secondaryAppearanceID, info.illusionID);
-				actor:SetItemTransmogInfo(itemTransmogInfo, slotID, false);
-			end
-		end
+        --Use new data tables if they exist, fake it otherwise
+        local infoList = {}
+		if outfit.itemTransmogInfoList == nil or #outfit.itemTransmogInfoList == 0 then --Does NOT contain new data tables
+            infoList = self:FakeInfoList(outfit)
+        else  --DOES contain new data tables
+            infoList = outfit.itemTransmogInfoList
+        end
+
+        local actor = WardrobeTransmogFrame.ModelScene:GetPlayerActor();
+        for i = 1, 19  do
+            local info = infoList[i]
+            if info.appearanceID == nil then
+                info.appearanceID = 0
+            end
+            local itemTransmogInfo = ItemUtil.CreateItemTransmogInfo(info.appearanceID, info.secondaryAppearanceID, info.illusionID);
+
+            if actor ~= nil then
+                actor:SetItemTransmogInfo(itemTransmogInfo, slotID, false);
+                if addon.Globals.INVENTORY_SLOT_NAMES[i] ~= nil then
+                    local tmLoc = TransmogUtil.CreateTransmogLocation(addon.Globals.INVENTORY_SLOT_NAMES[i], Enum.TransmogType.Appearance, Enum.TransmogModification.None)
+                    local tmPend = TransmogUtil.CreateTransmogPendingInfo(Enum.TransmogPendingType.Apply, info.appearanceID)
+                    C_Transmog.SetPending(tmLoc, tmPend)
+                end
+            end
+        end
 	end
 end
-
 
 
 function BetterWardrobeOutfitMixin:GetItemTransmogInfoList()
