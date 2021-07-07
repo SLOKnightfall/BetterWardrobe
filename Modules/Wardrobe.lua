@@ -7073,6 +7073,12 @@ function BetterWardrobeOutfitMixin:LoadOutfit(outfitID)
 				local info = outfit.itemTransmogInfoList[i]
 				local itemTransmogInfo = ItemUtil.CreateItemTransmogInfo(info.appearanceID, info.secondaryAppearanceID, info.illusionID);
 				actor:SetItemTransmogInfo(itemTransmogInfo, i, false);
+                local slotName = addon.Globals.INVENTORY_SLOT_NAMES[i]
+                if slotName ~= nil then
+                    local itemLocation = TransmogUtil.CreateTransmogLocation(slotName, Enum.TransmogType.Appearance, Enum.TransmogModification.None)
+                    local itemPending = TransmogUtil.CreateTransmogPendingInfo(Enum.TransmogPendingType.Apply, info.appearanceID)
+                    C_Transmog.SetPending(itemLocation, itemPending)
+                end
 			end
 
 		else
@@ -7086,6 +7092,12 @@ function BetterWardrobeOutfitMixin:LoadOutfit(outfitID)
 				end
 				local itemTransmogInfo = ItemUtil.CreateItemTransmogInfo(appearanceID, 0, illusionID);
 				actor:SetItemTransmogInfo(itemTransmogInfo, i, false);
+                local slotName = addon.Globals.INVENTORY_SLOT_NAMES[i]
+                if slotName ~= nil then
+                    local itemLocation = TransmogUtil.CreateTransmogLocation(slotName, Enum.TransmogType.Appearance, Enum.TransmogModification.None)
+                    local itemPending = TransmogUtil.CreateTransmogPendingInfo(Enum.TransmogPendingType.Apply, appearanceID)
+                    C_Transmog.SetPending(itemLocation, itemPending)
+                end
 				ItemTransmogInfoList[i] = itemTransmogInfo
 			end
 			--print("converted")
