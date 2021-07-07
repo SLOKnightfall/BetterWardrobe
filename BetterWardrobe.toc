@@ -52,6 +52,7 @@ Data\PLATE.lua
 Data\COSMETIC.lua
 
 #Modules
+Modules\BlizzardAPI.lua
 Modules\ArtifactAppearances.lua
 Modules\SavedOutfits.xml
 Modules\DressingRoom.xml
