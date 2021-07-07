@@ -898,3 +898,110 @@ function BetterWardrobeOutfitCheckAppearancesMixin:OnEvent(event, appearanceID, 
 		BetterWardrobeOutfitFrame:EvaluateSaveState();
 	end
 end
+
+
+
+
+local outfitDropdown
+function addon.RefreshSaveOutfitDropdown()
+	local list = {}
+
+	for name in pairs(addon.setdb.global.sets)do
+		tinsert(list, name)
+	end
+	outfitDropdown:SetList(list)
+
+	for i, name in ipairs(list) do
+		if name == addon.setdb:GetCurrentProfile() then
+			outfitDropdown:SetValue(i)
+			break
+		end
+	end
+end
+
+
+local function SavedOutfitDB_Dropdown_OnClick(self, arg1, arg2, checked)
+		local value = arg1
+		local name = UnitName("player")
+		local realm = GetRealmName()
+
+		if arg1 ~= addon.setdb:GetCurrentProfile() then 
+		addon.SelecteSavedList = arg1
+		else
+			addon.SelecteSavedList = false
+		end
+BetterWardrobeCollectionFrame.SetsCollectionFrame:OnSearchUpdate()
+		BW_UIDropDownMenu_SetSelectedValue(BW_DBSavedSetDropdown, arg1)
+		--BW_UIDropDownMenu_SetText(BW_DBSavedSetDropdown, arg1)
+		addon.savedSetCache = nil
+end
+
+
+function SavedOutfitDB_Dropdown_Menu(frame, level, menuList)
+	local count = 1
+	for name in pairs(addon.setdb.global.sets)do
+		 local info = BW_UIDropDownMenu_CreateInfo()
+		 info.func = SavedOutfitDB_Dropdown_OnClick
+		 info.text, info.arg1 = name, name
+		  BW_UIDropDownMenu_AddButton(info)
+		if name == addon.setdb:GetCurrentProfile() then
+			BW_UIDropDownMenu_SetSelectedValue(BW_DBSavedSetDropdown, name)
+		end
+		  count = count +1
+	end
+end
+
+
+--Dropdownmenu for the selection of other character's saved sets
+function addon.Init.SavedSetsDropDown_Initialize(self)
+	--local f = BW_UIDropDownMenu_Create("BW_DBSavedSetDropdown", BW_WardrobeCollectionFrame)
+	BW_DBSavedSetDropdown = CreateFrame("Frame", "BW_DBSavedSetDropdown", BetterWardrobeCollectionFrame, "BW_UIDropDownMenuTemplate")
+
+	--BW_DBSavedSetDropdown = BW_UIDropDownMenu_Create("BW_DBSavedSetDropdown", BW_WardrobeCollectionFrame)
+	--BW_DBSavedSetDropdown:SetParent("BW_WardrobeCollectionFrame")
+	--BW_DBSavedSetDropdown:ClearAllPoints()
+	BW_DBSavedSetDropdown:SetPoint("TOPRIGHT", "BW_SortDropDown", "TOPRIGHT")
+	BW_UIDropDownMenu_SetWidth(BW_DBSavedSetDropdown, 165) -- Use in place of dropDown:SetWidth
+-- Bind an initializer function to the dropdown; see previous sections for initializer function examples.
+	BW_UIDropDownMenu_Initialize(BW_DBSavedSetDropdown, SavedOutfitDB_Dropdown_Menu)
+	BW_UIDropDownMenu_SetSelectedValue(BW_DBSavedSetDropdown, addon.setdb:GetCurrentProfile())
+
+
+
+--[[	local  f = addon.Frame:Create("SimpleGroup")
+	addon.SavedSetDropDownFrame = f
+	f.frame:SetParent("BW_WardrobeCollectionFrame")
+	f:SetWidth(87)--, 22)
+	f:SetHeight(22)
+
+	f:ClearAllPoints()
+	f:SetPoint("TOPLEFT", BW_SortDropDown.frame, "TOPLEFT")
+
+
+	local dropdown = addon.Frame:Create("Dropdown")
+	dropdown:SetWidth(175)--, 22)
+	--dropdown:SetHeight(22)
+	f:AddChild(dropdown)
+	outfitDropdown = dropdown
+	addon.RefreshSaveOutfitDropdown(dropdown)
+
+
+
+	
+	dropdown:SetCallback("OnValueChanged", function(widget) 
+		local value = widget.list[widget.value]
+		local name = UnitName("player")
+		local realm = GetRealmName()
+
+		if value ~= addon.setdb:GetCurrentProfile() then 
+			addon.SelecteSavedList = widget.list[widget.value]
+		else
+			addon.SelecteSavedList = false
+		end
+		BW_WardrobeCollectionFrame_SetTab(2)
+		BW_WardrobeCollectionFrame_SetTab(4)
+		addon.savedSetCache = nil
+	end)]]
+
+
+end

@@ -441,7 +441,7 @@ end
 				info.icon = data.icon
 				info.isClass = true
 				info.type = "Saved"
-				if data.outfitID > 20 then
+				if data.outfitID and data.outfitID > 20 then
 					info.label = L["Extended Saved Set"]
 				end
 

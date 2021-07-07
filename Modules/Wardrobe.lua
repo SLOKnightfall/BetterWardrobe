@@ -1081,7 +1081,7 @@ function BetterWardrobeCollectionFrameMixin:SetTab(tabID)
 	local tab3 = (tabID == TAB_EXTRASETS)
 	local tab4 = (tabID == TAB_SAVED_SETS)
 
-	----BW_DBSavedSetDropdown:Hide()
+	BW_DBSavedSetDropdown:Hide()
 	self.TransmogOptionsButton:SetShown(atTransmogrifier and (tab2 or tab3))
 	--self.TransmogOptionsButton:SetEnabled(addon.Profile.ShowIncomplete)
 
@@ -1203,7 +1203,7 @@ function BetterWardrobeCollectionFrameMixin:SetTab(tabID)
 		self.SetsCollectionFrame:SetShown(not atTransmogrifier);
 		self.SetsTransmogFrame:SetShown(atTransmogrifier);
 
-		--BW_DBSavedSetDropdown:Show()
+		BW_DBSavedSetDropdown:Show()
 		BW_SortDropDown:Hide()
 		local savedCount = #addon.GetSavedList()
 		WardrobeCollectionFrame_UpdateProgressBar(savedCount, savedCount)
@@ -1646,16 +1646,15 @@ function BetterWardrobeCollectionFrameMixin:RestartSearchTracking()
 end
 
 function BetterWardrobeCollectionFrameMixin:SetSearch(text)
-if BetterWardrobeCollectionFrame:CheckTab(2) then
+	if BetterWardrobeCollectionFrame:CheckTab(3) then
+		--addon.FilterSearch()
+		self:RestartSearchTracking();
+	else 
 		if text == "" then
 			C_TransmogCollection.ClearSearch(self:GetSearchType());
 		else
 			C_TransmogCollection.SetSearch(self:GetSearchType(), text);
 		end
-		self:RestartSearchTracking();
-
-	elseif BetterWardrobeCollectionFrame:CheckTab(3) then
-		--addon.FilterSearch()
 		self:RestartSearchTracking();
 	end
 end
@@ -2752,7 +2751,7 @@ function BetterWardrobeItemsCollectionMixin:OnSearchUpdate(category)
 	if ( self.resetPageOnSearchUpdated ) then
 		self.resetPageOnSearchUpdated = nil;
 		self:ResetPage();
-	elseif ( C_Transmog.IsAtTransmogNPC() and WardrobeCollectionFrameSearchBox:GetText() == "" ) then
+	elseif ( C_Transmog.IsAtTransmogNPC() and BetterWardrobeCollectionFrameSearchBox:GetText() == "" ) then
 		local _, _, selectedSourceID = TransmogUtil.GetInfoForEquippedSlot(self.transmogLocation);
 		local transmogLocation = WardrobeTransmogFrame:GetSelectedTransmogLocation();
 		local effectiveCategory = transmogLocation and C_Transmog.GetSlotEffectiveCategory(transmogLocation) or Enum.TransmogCollectionType.None;
