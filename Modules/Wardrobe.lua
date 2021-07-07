@@ -2676,7 +2676,7 @@ function BetterWardrobeItemsCollectionMixin:SetAppearanceTooltip(frame)
 			return;
 		end
 		addon.SetArtifactAppearanceTooltip(self, frame.visualInfo)
- 	else
+	else
 		self:RefreshAppearanceTooltip();
 	end
 end
@@ -3124,13 +3124,13 @@ local function ToggleHidden(model, isHidden)
 
 		-----BetterWardrobeCollectionFrame.SetsCollectionFrame:OnSearchUpdate()
 		-----BetterWardrobeCollectionFrame.SetsTransmogFrame:OnSearchUpdate()
- 		print(format("%s "..name.." %s", isHidden and L["unhiding_set"] or L["hiding_set"], isHidden and L["unhiding_set_end"] or L["hiding_set_end"]))
+		print(format("%s "..name.." %s", isHidden and L["unhiding_set"] or L["hiding_set"], isHidden and L["unhiding_set_end"] or L["hiding_set_end"]))
 	else
 		local setInfo = addon.GetSetInfo(model.setID)
 		local name = setInfo["name"]
 		addon.HiddenAppearanceDB.profile.extraset[model.setID] = not isHidden and name or nil
- 		print(format("%s "..name.." %s", isHidden and L["unhiding_set"] or L["hiding_set"], isHidden and L["unhiding_set_end"] or L["hiding_set_end"]))
- 		-----BetterWardrobeCollectionFrame.SetsCollectionFrame:OnSearchUpdate()
+		print(format("%s "..name.." %s", isHidden and L["unhiding_set"] or L["hiding_set"], isHidden and L["unhiding_set_end"] or L["hiding_set_end"]))
+		-----BetterWardrobeCollectionFrame.SetsCollectionFrame:OnSearchUpdate()
 		-----BetterWardrobeCollectionFrame.SetsTransmogFrame:OnSearchUpdate()
 
 	end
@@ -4176,7 +4176,7 @@ function BetterWardrobeSetsDataProviderMixin:GetBaseSets(filter)
 				if ((filterCollected[1] and collected) or
 					(filterCollected[2] and not collected)) and
 					CheckMissingLocation(data) and
-			 		xpacSelection[data.expansionID] then ----and
+					xpacSelection[data.expansionID] then ----and
 					--filterSelection[data.filter] and
 					--(not unavailable or (addon.Profile.HideUnavalableSets and unavailable)) and
 					-----(searchString and string.find(string.lower(data.name), searchString)) then -- or string.find(baseSet.label, searchString) or string.find(baseSet.description, searchString)then
@@ -4220,7 +4220,7 @@ function BetterWardrobeSetsDataProviderMixin:GetBaseSets(filter)
 				if ((filterCollected[1] and collected) or
 					(filterCollected[2] and not collected)) and
 					CheckMissingLocation(data) and
-			 		xpacSelection[data.expansionID] and
+					xpacSelection[data.expansionID] and
 					filterSelection[data.filter] and
 					(not unavailable or (addon.Profile.HideUnavalableSets and unavailable)) and
 					(searchString and string.find(string.lower(data.name), searchString)) then -- or string.find(baseSet.label, searchString) or string.find(baseSet.description, searchString)then
@@ -4732,7 +4732,7 @@ function BetterWardrobeSetsCollectionMixin:OnShow()
 
 		savedSets = addon.GetSavedList()
 		if ( baseSets and baseSets[1] ) then
- 			self.selectedSetID = baseSets[1].setID
+			self.selectedSetID = baseSets[1].setID
 		end
 		if ( extraSets and extraSets[1] ) then
 			self.selectedExtraSetID = extraSets[1].setID
@@ -6752,7 +6752,7 @@ function Sets:GetEmptySlots()
 	local setInfo = {}
 
 	for i,x in pairs(EmptyArmor) do
-	 	setInfo[i]=x
+		setInfo[i]=x
 	end
 
 	return setInfo
@@ -7062,15 +7062,57 @@ function BetterWardrobeOutfitMixin:LoadOutfit(outfitID)
 			outfit = addon.OutfitDB.char.outfits[LookupIndexFromID(outfitID)]
 		end
 
+
 		----Contains new data tables
+		local actor = WardrobeTransmogFrame.ModelScene:GetPlayerActor();
+		local ItemTransmogInfoList = {}
+
 		if outfit.itemTransmogInfoList then
-			local ItemTransmogInfoList = {}
 			local actor = WardrobeTransmogFrame.ModelScene:GetPlayerActor();
 			for i = 1, 19  do
 				local info = outfit.itemTransmogInfoList[i]
 				local itemTransmogInfo = ItemUtil.CreateItemTransmogInfo(info.appearanceID, info.secondaryAppearanceID, info.illusionID);
-				actor:SetItemTransmogInfo(itemTransmogInfo, slotID, false);
+				actor:SetItemTransmogInfo(itemTransmogInfo, i, false);
 			end
+
+		else
+			for i = 1, 19  do
+				local appearanceID = outfit[i]
+				local illusionID = 0
+				if i == 16 then
+					illusionID = outfit.mainHandEnchant
+				elseif i == 17 then
+					illusionID = outfit.offHandEnchant
+				end
+				local itemTransmogInfo = ItemUtil.CreateItemTransmogInfo(appearanceID, 0, illusionID);
+				actor:SetItemTransmogInfo(itemTransmogInfo, i, false);
+				ItemTransmogInfoList[i] = itemTransmogInfo
+			end
+			--print("converted")
+			--addon.OutfitDB.char.outfits[LookupIndexFromID(outfitID)]["ItemTransmogInfoList"] = ItemTransmogInfoList
+
+
+--[[
+						if i == 16 then
+				info.secondaryAppearanceID = Constants.Transmog.NoTransmogID
+				info.illusionID = outfit.mainHandEnchant
+			elseif i == 17 then
+				info.secondaryAppearanceID = Constants.Transmog.NoTransmogID
+				info.illusionID = outfit.offHandEnchant
+			end
+			local ItemTransmogInfoList = {}
+			local actor = WardrobeTransmogFrame.ModelScene:GetPlayerActor();
+			for key, transmogSlot in pairs(TRANSMOG_SLOTS) do
+				local slotID = transmogSlot.location:GetSlotID();
+				local info = outfit[slotID]
+				if info and info ~= NO_TRANSMOG_SOURCE_ID then 
+					local itemTransmogInfo = ItemUtil.CreateItemTransmogInfo(info.appearanceID, info.secondaryAppearanceID, info.illusionID);
+					ItemTransmogInfoList[i] = itemTransmogInfo
+					actor:SetItemTransmogInfo(itemTransmogInfo, slotID, false);
+				end
+			end]]
+			--outfit.itemTransmogInfoList = itemTransmogInfoList
+
 		end
 	end
 end

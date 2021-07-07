@@ -379,6 +379,7 @@ function BetterWardrobeOutfitDropDownMixin:IsOutfitDressed()
 			outfitItemTransmogInfoList[i] = ItemUtil.CreateItemTransmogInfo(outfit[i]);
 		end
 
+
 		local currentItemTransmogInfoList = self:GetItemTransmogInfoList();
 		if not currentItemTransmogInfoList then
 			return true;
