@@ -1074,9 +1074,8 @@ function BetterWardrobeCollectionFrameMixin:SetTab(tabID)
 	local tab4 = (tabID == TAB_SAVED_SETS)
 
 	BW_DBSavedSetDropdown:Hide()
-	self.TransmogOptionsButton:SetShown(atTransmogrifier and (tab2 or tab3))
+	self.TransmogOptionsButton:SetShown(atTransmogrifier and not tab4)
 	--self.TransmogOptionsButton:SetEnabled(addon.Profile.ShowIncomplete)
-
 
 	self.BW_SetsHideSlotButton:Hide()
 	BW_ColectionListFrame:SetShown(WardrobeCollectionFrame:IsShown() and tab1 and not atTransmogrifier)
@@ -1088,6 +1087,9 @@ function BetterWardrobeCollectionFrameMixin:SetTab(tabID)
 	----self.ItemsCollectionFrame:Hide();
 	self.SetsCollectionFrame:Hide();
 	self.SetsTransmogFrame:Hide();
+
+	BW_SortDropDown:ClearAllPoints();
+	BW_SortDropDown:SetPoint("TOPRIGHT", WardrobeCollectionFrame.ItemsCollectionFrame, "TOPRIGHT",-30, -10)
 
 	if tabID == TAB_ITEMS then
 		self.activeFrame = self.ItemsCollectionFrame;
@@ -1104,6 +1106,7 @@ function BetterWardrobeCollectionFrameMixin:SetTab(tabID)
 
 		BW_SortDropDown:Show()
 		BW_SortDropDown:ClearAllPoints();
+
 
 		local _, isWeapon = C_TransmogCollection.GetCategoryInfo((WardrobeCollectionFrame and WardrobeCollectionFrame.ItemsCollectionFrame:GetActiveCategory()) or 1)
 		local yOffset = (atTransmogrifier and (isWeapon and 55 or 32)) or LegionWardrobeY
@@ -1130,6 +1133,7 @@ function BetterWardrobeCollectionFrameMixin:SetTab(tabID)
 		self.SearchBox:ClearAllPoints();
 		BW_SortDropDown:Show()
 		BW_SortDropDown:ClearAllPoints();
+
 		if ( atTransmogrifier )  then
 			self.activeFrame = self.SetsTransmogFrame;
 			self.SearchBox:SetPoint("TOPRIGHT", -97, -35);
@@ -1196,6 +1200,8 @@ function BetterWardrobeCollectionFrameMixin:SetTab(tabID)
 		self.SetsTransmogFrame:SetShown(atTransmogrifier);
 
 		BW_DBSavedSetDropdown:Show()
+		--BW_SortDropDown:SetPoint("TOPLEFT", BetterWardrobeVisualToggle, "TOPRIGHT", 5, 0)
+
 		BW_SortDropDown:Hide()
 		local savedCount = #addon.GetSavedList()
 		WardrobeCollectionFrame_UpdateProgressBar(savedCount, savedCount)
@@ -1791,7 +1797,7 @@ function BetterWardrobeItemsCollectionMixin:OnLoad()
 	self.PAGE_SIZE = self.NUM_ROWS * self.NUM_COLS;
 
 	BW_UIDropDownMenu_Initialize(self.RightClickDropDown, nil, "MENU");
-	self.RightClickDropDown.initialize = WardrobeCollectionFrameRightClickDropDown_Init;
+	self.RightClickDropDown.initialize = BetterWardrobeCollectionFrameRightClickDropDown_Init;
 
 	self:RegisterEvent("TRANSMOG_COLLECTION_UPDATED");
 
@@ -2830,7 +2836,7 @@ function BetterWardrobeItemsModelMixin:OnMouseDown(button)
 		if ( dropDown.activeFrame ~= self ) then
 			CloseDropDownMenus();
 		end
-		----if ( not self.visualInfo.isCollected or self.visualInfo.isHideVisual or itemsCollectionFrame.transmogLocation:IsIllusion() ) then
+		--if ( not self.visualInfo.isCollected or self.visualInfo.isHideVisual or itemsCollectionFrame.transmogLocation:IsIllusion() ) then
 		if ( self.visualInfo.isHideVisual or itemsCollectionFrame.transmogLocation:IsIllusion() ) then
 			return;
 		end
@@ -3142,7 +3148,7 @@ function BetterWardrobeCollectionFrameRightClickDropDown_Init(self)
 		info.arg2 = 1;
 	end
 	info.notCheckable = true;
-	info.func = function(_, visualID, value) WardrobeCollectionFrameModelDropDown_SetFavorite(visualID, value); end;
+	info.func = function(_, visualID, value) BetterWardrobeCollectionFrameModelDropDown_SetFavorite(visualID, value); end;
 	BW_UIDropDownMenu_AddButton(info);
 
 	BW_UIDropDownMenu_AddSeparator()
@@ -3225,6 +3231,7 @@ end
 
 
 function addon:SetFavoriteItem(visualID, set)
+	print(addon.favoritesDB.profile.item[visualID])
 	if addon.favoritesDB.profile.item[visualID] then
 		addon.favoritesDB.profile.item[visualID] = nil
 	else
@@ -3242,25 +3249,34 @@ end
 
 function BetterWardrobeCollectionFrameModelDropDown_SetFavorite(visualID, value, confirmed)
 	local set = (value == 1);
+
 	if ( set and not confirmed ) then
 		local allSourcesConditional = true;
 		local collected = false
-		local sources = C_TransmogCollection.GetAppearanceSources(visualID);
+		print(visualID)
+		local sources = C_TransmogCollection.GetAppearanceSources(44770);
 		for i, sourceInfo in ipairs(sources) do
 			local info = C_TransmogCollection.GetAppearanceInfoBySource(sourceInfo.sourceID);
+			if info.isCollected then 
+				collected = true
+			end
 			if ( info.sourceIsCollectedPermanent ) then
 				allSourcesConditional = false;
 				break;
 			end
 		end
-		if ( allSourcesConditional ) then
+		if ( allSourcesConditional and collected ) then
 			StaticPopup_Show("TRANSMOG_FAVORITE_WARNING", nil, nil, visualID);
 			return;
 		elseif ( allSourcesConditional and not collected ) then 
 			addon:SetFavoriteItem(visualID, set)
 			return 
 		end
+	else
+		addon:SetFavoriteItem(visualID, set)
+
 	end
+
 	if addon:IsFavoriteItem(visualID) then 
 		addon:SetFavoriteItem(visualID, set)
 	else
@@ -3472,10 +3488,7 @@ local function RefreshLists()
 		addon.SetsDataProvider:ClearVariantSets();
 		addon.SetsDataProvider:ClearUsableSets();
 		WardrobeCollectionFrame.SetsCollectionFrame:Refresh();
-	end
-
-
-										
+	end										
 end
 
 function BetterWardrobeFilterDropDown_OnLoad(self)
@@ -3616,6 +3629,19 @@ function BetterWardrobeFilterDropDown_InitializeBaseSets(self, level)
 			BW_UIDropDownMenu_AddButton(info, level);
 
 			BW_UIDropDownMenu_AddSeparator()
+			info.checked = 	true
+			info.isNotRadio = true
+			info.func = function(info, arg1, _, value)
+						addon.Profile.ShowHidden = not addon.Profile.ShowHidden
+						RefreshLists()
+				end
+			info.hasArrow = false
+			info.notCheckable = false
+			info.checked = addon.Profile.ShowHidden
+			info.text = L["Show Hidden Items"]
+			info.value = 4
+			BW_UIDropDownMenu_AddButton(info, level)
+
 			info.checked = 	nil
 			info.isNotRadio = nil
 			info.func =  nil
@@ -3764,6 +3790,20 @@ function BetterWardrobeFilterDropDown_InitializeBaseSets(self, level)
 
 			BW_UIDropDownMenu_AddButton(info, level)
 			BW_UIDropDownMenu_AddSeparator()
+
+			info.checked = 	true
+			info.isNotRadio = true
+			info.func = function(info, arg1, _, value)
+						addon.Profile.ShowHidden = not addon.Profile.ShowHidden
+						RefreshLists()
+				end
+			info.hasArrow = false
+			info.notCheckable = false
+			info.checked = addon.Profile.ShowHidden
+			info.text = L["Show Hidden Items"]
+			info.value = 4
+			BW_UIDropDownMenu_AddButton(info, level)
+
 
 			info.text = L["Class Sets Only"]
 			info.func = function(_, _, _, value)
@@ -3956,10 +3996,6 @@ function BetterWardrobeFilterDropDown_InitializeBaseSets(self, level)
 				info.func = function(info, arg1, _, value)
 						addon.selectedArmorType = arg1
 						addon.useAltSet = true
-						--addon.refreshData = true
-						--addon.extraSetsCache = nil
-						----BW_WardrobeCollectionFrame_SetTab(2)
-						----BW_WardrobeCollectionFrame_SetTab(3)
 						RefreshLists()
 				end
 				info.arg1 = name
@@ -4156,6 +4192,8 @@ function BetterWardrobeSetsDataProviderMixin:GetBaseSets(filter)
 			self.baseSets = C_TransmogSets.GetBaseSets();
 			if not atTransmogrifier then 
 				self.baseSets = addon:FilterSets(self.baseSets)
+			else
+
 			end
 			self:DetermineFavorites();
 			self:SortSets(self.baseSets);
@@ -4165,12 +4203,13 @@ function BetterWardrobeSetsDataProviderMixin:GetBaseSets(filter)
 	elseif 	WardrobeCollectionFrame:CheckTab(3) then
 		basesets = self.baseExtraSets
 		if not self.baseExtraSets then 
-				if addon.useAltSet then
-					self.baseExtraSets = addon.GetAltList()
-				else
-					self.baseExtraSets = addon.GetBaseList()
-				end
-			if not atTransmogrifier then 
+			if addon.useAltSet then
+				self.baseExtraSets = addon.GetAltList()
+			else
+				self.baseExtraSets = addon.GetBaseList()
+			end
+
+			if not atTransmogrifier then
 				self.baseExtraSets = addon:FilterSets(self.baseExtraSets)
 			end
 			self:SortSets(self.baseExtraSets);
@@ -4286,7 +4325,7 @@ function BetterWardrobeSetsDataProviderMixin:GetUsableSets(incVariants)
 			if ( not self.usableExtraSets ) then
 
 				--Generates Useable Set
-				local availableSets = self:GetBaseSets()
+				local availableSets = self:GetBaseSets(false)
 				local countData
 				self.usableExtraSets = {} --BetterWardrobeSetsDataProviderMixin:GetUsableSets()
 				for i, set in ipairs(availableSets) do
@@ -5526,8 +5565,7 @@ local function BetterWardrobeSetsCollectionScrollFrame_FavoriteDropDownInit(self
 			--local targetSetID = WardrobeCollectionFrame.SetsCollectionFrame:GetDefaultSetIDForBaseSet(self.baseSetID)
 			info.func = function()
 				addon.favoritesDB.profile.extraset[self.baseSetID] = true
-				WardrobeCollectionFrame.SetsCollectionFrame:Refresh()
-				WardrobeCollectionFrame.SetsCollectionFrame:OnSearchUpdate()
+				RefreshLists()
 			end
 		end
 	end
@@ -5886,6 +5924,8 @@ function BetterWardrobeSetsTransmogMixin:OnShow()
 	self:RegisterEvent("PLAYER_EQUIPMENT_CHANGED");
 	self:RegisterEvent("TRANSMOG_SETS_UPDATE_FAVORITE");
 
+	addon.SetsDataProvider:ClearSets();
+
 	self:RefreshCameras();
 	local RESET_SELECTION = true;
 	self:Refresh(RESET_SELECTION);
@@ -5972,6 +6012,7 @@ function BetterWardrobeSetsTransmogMixin:Refresh(resetSelection)
 			--self:UpdateSets();
 	--	end
 	--else
+
 
 		--self.appliedSetID = self.APPLIED_SOURCE_INDEX
 		if ( resetSelection ) then
@@ -6498,15 +6539,13 @@ function BetterWardrobeSetsTransmogMixin:OpenRightClickDropDown()
 			info.text = BATTLE_PET_UNFAVORITE
 			info.func = function()
 				addon.favoritesDB.profile.extraset[setID] = nil
-				WardrobeCollectionFrame.SetsTransmogFrame:Refresh()
-				----WardrobeCollectionFrame.SetsTransmogFrame:OnSearchUpdate()
+				RefreshLists()
 			 end
 		else
 			info.text = BATTLE_PET_FAVORITE
 			info.func = function()
 				addon.favoritesDB.profile.extraset[setID] = true
-				WardrobeCollectionFrame.SetsTransmogFrame:Refresh()
-				----WardrobeCollectionFrame.SetsTransmogFrame:OnSearchUpdate()
+				RefreshLists()
 			end
 		end
 		info.notCheckable = true
@@ -6585,6 +6624,7 @@ function BetterWardrobeSetsTransmogMixin:SetFavorite(setID, favorite)
 	else
 		C_TransmogSets.SetIsFavorite(setID, false);
 	end
+	RefreshLists()
 end
 
 do

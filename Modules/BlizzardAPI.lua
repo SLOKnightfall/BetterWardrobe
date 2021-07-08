@@ -306,7 +306,7 @@ function addon:FilterSets(setList, setType)
 		end
 	end
 
-	setList =  Sets:ClearHidden(FilterSets)
+	
 	return setList
 end
 
@@ -314,6 +314,8 @@ end
 function addon:SearchSets(setList)
 	local searchedSets = {}
 	local searchString = string.lower(WardrobeCollectionFrameSearchBox:GetText())
+
+	setList =  Sets:ClearHidden(setList)
 	if searchString == "" then return setList end
 
 	for i, data in ipairs(setList) do

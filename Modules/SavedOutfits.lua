@@ -931,9 +931,12 @@ local function SavedOutfitDB_Dropdown_OnClick(self, arg1, arg2, checked)
 		else
 			addon.SelecteSavedList = false
 		end
-WardrobeCollectionFrame.SetsCollectionFrame:OnSearchUpdate()
+		WardrobeCollectionFrame.SetsCollectionFrame:OnSearchUpdate()
+		WardrobeCollectionFrame.SetsTransmogFrame:OnSearchUpdate()
+
 		BW_UIDropDownMenu_SetSelectedValue(BW_DBSavedSetDropdown, arg1)
 		--BW_UIDropDownMenu_SetText(BW_DBSavedSetDropdown, arg1)
+
 		addon.savedSetCache = nil
 end
 

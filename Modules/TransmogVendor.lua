@@ -245,6 +245,7 @@ end
 
 function UI:OptionsDropDown_Initialize(level)
 	local refreshLevel = 1
+
 	local info = BW_UIDropDownMenu_CreateInfo()
 	info.keepShownOnClick = true
 	
@@ -253,57 +254,70 @@ function UI:OptionsDropDown_Initialize(level)
 		info.isNotRadio = true
 		info.keepShownOnClick = false
 		
-
-		info.text = L["Show Incomplete Sets"]
-		info.value = 1
-		info.func = function(_, _, _, value)
-			addon.Profile.ShowIncomplete = not addon.Profile.ShowIncomplete
-			WardrobeCollectionFrame.SetsTransmogFrame:OnSearchUpdate()
-		end
-		info.checked = function() return addon.Profile.ShowIncomplete end
-		BW_UIDropDownMenu_AddButton(info, level)
-
-		info.keepShownOnClick = true
-		info.hasArrow = true
+		info.checked = 	true
 		info.isNotRadio = true
-		info.notCheckable = true
-		if addon.Profile.ShowIncomplete then 
-		BW_UIDropDownMenu_AddSeparator()
-
-		info.keepShownOnClick = true
+		info.func = function(info, arg1, _, value)
+					addon.Profile.ShowHidden = not addon.Profile.ShowHidden
+					WardrobeCollectionFrame.SetsTransmogFrame:OnSearchUpdate()
+			end
 		info.hasArrow = false
-		info.isNotRadio = true
 		info.notCheckable = false
-
-		info.text = L["Hide Missing Set Pieces at Transmog Vendor"]
-		info.value = 4
-		info.func = function(_, _, _, value)
-			addon.Profile.HideMissing = not addon.Profile.HideMissing
-			WardrobeCollectionFrame.SetsTransmogFrame:OnSearchUpdate()
-			WardrobeCollectionFrame.SetsTransmogFrame:UpdateSets()
-		end
-		info.checked = function() return addon.Profile.HideMissing end
+		info.checked = addon.Profile.ShowHidden
+		info.text = L["Show Hidden Items"]
+		info.value = 6
 		BW_UIDropDownMenu_AddButton(info, level)
 
-		info.keepShownOnClick = true
-		info.hasArrow = true
-		info.isNotRadio = true
-		info.notCheckable = true
-
-			info.text = "Include:"
-			info.value = 2
+		if  WardrobeCollectionFrame:CheckTab(2) or WardrobeCollectionFrame:CheckTab(3) then 
+				info.text = L["Show Incomplete Sets"]
+			info.value = 1
+			info.func = function(_, _, _, value)
+				addon.Profile.ShowIncomplete = not addon.Profile.ShowIncomplete
+				WardrobeCollectionFrame.SetsTransmogFrame:OnSearchUpdate()
+			end
+			info.checked = function() return addon.Profile.ShowIncomplete end
 			BW_UIDropDownMenu_AddButton(info, level)
 
+			info.keepShownOnClick = true
 			info.hasArrow = true
 			info.isNotRadio = true
 			info.notCheckable = true
-			info.checked = false
+			if addon.Profile.ShowIncomplete then 
+			BW_UIDropDownMenu_AddSeparator()
 
-			info.text = "Cuttoff:"
-			info.value = 3
+			info.keepShownOnClick = true
+			info.hasArrow = false
+			info.isNotRadio = true
+			info.notCheckable = false
+
+			info.text = L["Hide Missing Set Pieces at Transmog Vendor"]
+			info.value = 4
+			info.func = function(_, _, _, value)
+				addon.Profile.HideMissing = not addon.Profile.HideMissing
+				WardrobeCollectionFrame.SetsTransmogFrame:OnSearchUpdate()
+				WardrobeCollectionFrame.SetsTransmogFrame:UpdateSets()
+			end
+			info.checked = function() return addon.Profile.HideMissing end
 			BW_UIDropDownMenu_AddButton(info, level)
-		end
 
+			info.keepShownOnClick = true
+			info.hasArrow = true
+			info.isNotRadio = true
+			info.notCheckable = true
+
+				info.text = "Include:"
+				info.value = 2
+				BW_UIDropDownMenu_AddButton(info, level)
+
+				info.hasArrow = true
+				info.isNotRadio = true
+				info.notCheckable = true
+				info.checked = false
+
+				info.text = "Cuttoff:"
+				info.value = 3
+				BW_UIDropDownMenu_AddButton(info, level)
+			end
+		end
 	elseif level == 2  and BW_UIDROPDOWNMENU_MENU_VALUE == 2 and addon.Profile.ShowIncomplete then
 		info.hasArrow = false
 		info.isNotRadio = true

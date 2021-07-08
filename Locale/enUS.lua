@@ -75,6 +75,7 @@ L["LargeTransmogArea_Tooltip"] = "Increases the Transmog Vendor Window"
 L["ExtraLargeTransmogArea_Tooltip"] = "Increase the Transmog Vendor Window to fill width of screen"
 L["Show Incomplete Sets"] = true
 L["Show Items set to Hidden"] = true
+L["Show Hidden Items"] = true
 L["Hide Missing Set Pieces at Transmog Vendor"] = true
 L["Use Hidden Transmog for Missing Set Pieces"] = true
 L["Required pieces"] = true
