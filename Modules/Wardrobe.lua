@@ -1639,7 +1639,6 @@ end
 
 function BetterWardrobeCollectionFrameMixin:SetSearch(text)
 	--if WardrobeCollectionFrame:CheckTab(3) then
-		--addon.FilterSearch()
 		--self:RestartSearchTracking();
 	--else 
 		if text == "" then
@@ -3464,15 +3463,19 @@ for i, types in ipairs(sets) do
 end
 
 local function RefreshLists()
-	--local tabID = addon.GetTab()
-	if WardrobeCollectionFrame.selectedCollectionTab == 2 then
-		WardrobeCollectionFrame.SetsCollectionFrame:OnSearchUpdate() --This makes filters work
-		WardrobeCollectionFrame.SetsTransmogFrame:OnSearchUpdate()
-	elseif WardrobeCollectionFrame.selectedCollectionTab == 3 then
-		WardrobeCollectionFrame.SetsCollectionFrame:OnSearchUpdate() --This makes filters work
-		--WardrobeCollectionFrame.SetsCollectionFrame:RefreshScrollList()
-		WardrobeCollectionFrame.SetsTransmogFrame:OnSearchUpdate()
+	local atTransmog =C_Transmog.IsAtTransmogNPC();
+	if atTransmog then
+		addon.SetsDataProvider:ClearUsableSets();
+		WardrobeCollectionFrame.SetsTransmogFrame:UpdateSets();
+	else
+		addon.SetsDataProvider:ClearBaseSets();
+		addon.SetsDataProvider:ClearVariantSets();
+		addon.SetsDataProvider:ClearUsableSets();
+		WardrobeCollectionFrame.SetsCollectionFrame:Refresh();
 	end
+
+
+										
 end
 
 function BetterWardrobeFilterDropDown_OnLoad(self)
@@ -4135,11 +4138,13 @@ end
 	return not filtered
 end
 
+
 local buildingSets = false
 function BetterWardrobeSetsDataProviderMixin:GetBaseSets(filter)
 	buildingSets = false
 	local filteredSets = {}
 	local useBaseSet = not WardrobeFrame_IsAtTransmogrifier()
+	local atTransmogrifier = C_Transmog.IsAtTransmogNPC()
 	local searchString = string.lower(WardrobeCollectionFrameSearchBox:GetText())
 	local basesets = {}
 
@@ -4148,12 +4153,13 @@ function BetterWardrobeSetsDataProviderMixin:GetBaseSets(filter)
 	if 	WardrobeCollectionFrame:CheckTab(2) then
 		basesets = self.baseSets
 		if ( not self.baseSets ) then
-			print("building")
 			self.baseSets = C_TransmogSets.GetBaseSets();
+			if not atTransmogrifier then 
+				self.baseSets = addon:FilterSets(self.baseSets)
+			end
 			self:DetermineFavorites();
 			self:SortSets(self.baseSets);
 		end
-		self.baseSets = addon:FilterSets(self.baseSets, "set")
 		return self.baseSets
 
 	elseif 	WardrobeCollectionFrame:CheckTab(3) then
@@ -4164,11 +4170,12 @@ function BetterWardrobeSetsDataProviderMixin:GetBaseSets(filter)
 				else
 					self.baseExtraSets = addon.GetBaseList()
 				end
-
+			if not atTransmogrifier then 
+				self.baseExtraSets = addon:FilterSets(self.baseExtraSets)
+			end
 			self:SortSets(self.baseExtraSets);
 		end
 
-		addon:FilterSets(self.baseExtraSets, "extraset")
 		return self.baseExtraSets
 
 	elseif 	WardrobeCollectionFrame:CheckTab(4) then
@@ -4211,7 +4218,6 @@ function BetterWardrobeSetsDataProviderMixin:GetUsableSets(incVariants)
 		local Profile = addon.Profile
 		if (WardrobeCollectionFrame:CheckTab(2)) then
 			if ( not self.usableSets ) then
-				print(11)
 				if not Profile.ShowIncomplete  then 
 					self.usableSets = C_TransmogSets.GetUsableSets();
 					self:SortSets(self.usableSets);
@@ -4267,7 +4273,10 @@ function BetterWardrobeSetsDataProviderMixin:GetUsableSets(incVariants)
 						end
 					end
 				end
+
+				self.usableSets = addon:SearchSets(self.usableSets)
 				self:SortSets(self.usableSets)
+
 			end
 			
 			buildUseable = false
@@ -4282,9 +4291,9 @@ function BetterWardrobeSetsDataProviderMixin:GetUsableSets(incVariants)
 				self.usableExtraSets = {} --BetterWardrobeSetsDataProviderMixin:GetUsableSets()
 				for i, set in ipairs(availableSets) do
 					local topSourcesCollected, topSourcesTotal
-					topSourcesCollected, topSourcesTotal = BetterWardrobeSetsDataProviderMixin:GetSetSourceCounts(set.setID)
+					topSourcesCollected, topSourcesTotal = self:GetSetSourceCounts(set.setID)
 
-					local cutoffLimit = (Profile.ShowIncomplete and ((topSourcesTotal <= Profile.PartialLimit and topSourcesTotal) or  Profile.PartialLimit)) or topSourcesTotal --BetterWardrobeSetsDataProviderMixin:GetSetSourceCounts(set.setID)
+					local cutoffLimit = (Profile.ShowIncomplete and ((topSourcesTotal <= Profile.PartialLimit and topSourcesTotal) or  Profile.PartialLimit)) or topSourcesTotal --self:GetSetSourceCounts(set.setID)
 					if (BetterWardrobeVisualToggle.viewAll and BetterWardrobeVisualToggle.VisualMode) or (not atTransmogrifier and BetterWardrobeVisualToggle.VisualMode) or topSourcesCollected >= cutoffLimit  and topSourcesTotal > 0 then --and not C_TransmogSets.IsSetUsable(set.setID) then
 						tinsert(self.usableExtraSets, set)
 					end
@@ -4309,6 +4318,7 @@ function BetterWardrobeSetsDataProviderMixin:GetUsableSets(incVariants)
 															end]]
 
 				end
+				self.usableExtraSets = addon:SearchSets(self.usableExtraSets)
 				self:SortSets(self.usableExtraSets)
 			end
 				
@@ -4457,9 +4467,7 @@ end
 local setsByExpansion = {}
 local setsByFilter = {}
 local filterinprogress = false
-function BetterWardrobeSetsDataProviderMixin:FilterSearch(useBaseSet)
-	
-end
+
 
 
 
@@ -4566,10 +4574,6 @@ function BetterWardrobeSetsDataProviderMixin:ClearSets()
 	self.sourceExtraData = nil;
 end
 
-function addon.ClearSets()
-	BetterWardrobeSetsDataProviderMixin:ClearSets()
-end
-----addon.ClearSets = BetterWardrobeSetsDataProviderMixin.ClearSets(BetterWardrobeSetsDataProviderMixin)
 
 function BetterWardrobeSetsDataProviderMixin:ClearBaseSets()
 	self.baseSets = nil;
@@ -4629,18 +4633,13 @@ function BetterWardrobeSetsDataProviderMixin:RefreshFavorites()
 end
 
 local SetsDataProvider = CreateFromMixins(BetterWardrobeSetsDataProviderMixin);
-
+addon.SetsDataProvider = SetsDataProvider
 
 function addon.GetSetSourceCounts(setID) 
 		local sourceData = SetsDataProvider:GetSetSourceData(setID);
 	return sourceData.numCollected, sourceData.numTotal;
 end
 
-
-function addon.FilterSearch(useBaseSet)
-	SetsDataProvider:FilterSearch(useBaseSet)
-
-end
 
 BetterWardrobeSetsCollectionMixin = {};
 
@@ -5192,7 +5191,6 @@ function BetterWardrobeSetsCollectionMixin:OnSearchUpdate()
 		SetsDataProvider:ClearBaseSets();
 		SetsDataProvider:ClearVariantSets();
 		SetsDataProvider:ClearUsableSets();
-		-----SetsDataProvider:FilterSearch(true)  -TODO:  Check
 		self:Refresh();
 	end
 end
@@ -6924,12 +6922,10 @@ function addon.Init.SortDropDown_Initialize()
 										Wardrobe:UpdateItems()
 										Wardrobe:UpdateWeaponDropDown()
 									elseif tabID == 2 then
-										WardrobeCollectionFrame.SetsCollectionFrame:OnSearchUpdate()
-										WardrobeCollectionFrame.SetsTransmogFrame:OnSearchUpdate()
-						
+										RefreshLists()
 									elseif tabID == 3 then
-										WardrobeCollectionFrame.SetsCollectionFrame:OnSearchUpdate()
-										WardrobeCollectionFrame.SetsTransmogFrame:OnSearchUpdate()
+										RefreshLists()
+
 									end
 								end
 						
