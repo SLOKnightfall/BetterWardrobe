@@ -961,7 +961,7 @@ function addon.Init.SavedSetsDropDown_Initialize(self)
 	--BW_DBSavedSetDropdown = BW_UIDropDownMenu_Create("BW_DBSavedSetDropdown", BW_WardrobeCollectionFrame)
 	--BW_DBSavedSetDropdown:SetParent("BW_WardrobeCollectionFrame")
 	--BW_DBSavedSetDropdown:ClearAllPoints()
-	BW_DBSavedSetDropdown:SetPoint("TOPRIGHT", "BW_SortDropDown", "TOPRIGHT")
+	BW_DBSavedSetDropdown:SetPoint("TOPRIGHT", "BW_SortDropDown", "TOPRIGHT", 0, 17)
 	BW_UIDropDownMenu_SetWidth(BW_DBSavedSetDropdown, 165) -- Use in place of dropDown:SetWidth
 -- Bind an initializer function to the dropdown; see previous sections for initializer function examples.
 	BW_UIDropDownMenu_Initialize(BW_DBSavedSetDropdown, SavedOutfitDB_Dropdown_Menu)
