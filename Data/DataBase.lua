@@ -270,7 +270,7 @@ end
 						if setData.PvP then 
 							setData.filter = 7
 						elseif setData.setID <=2221 and setData.setID >= 2015   then 
-							print(setData.setID)
+							--print(setData.setID)
 							--setData.filter = 11 
 						else
 							setData.filter = 1

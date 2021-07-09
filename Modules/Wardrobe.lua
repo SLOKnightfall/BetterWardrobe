@@ -4675,7 +4675,8 @@ local SetsDataProvider = CreateFromMixins(BetterWardrobeSetsDataProviderMixin);
 addon.SetsDataProvider = SetsDataProvider
 
 function addon.GetSetSourceCounts(setID) 
-		local sourceData = SetsDataProvider:GetSetSourceData(setID);
+	if not setID then return 0,0 end
+	local sourceData = SetsDataProvider:GetSetSourceData(setID);
 	return sourceData.numCollected, sourceData.numTotal;
 end
 

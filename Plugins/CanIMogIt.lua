@@ -26,6 +26,7 @@ local function CIMI_AddToFrameSets(parentFrame)
 
         function frame:UpdateText()
             if CanIMogItOptions["showSetInfo"] then
+                if not parentFrame.setID then frame.CanIMogItSetText:SetText(""); return end
             	local have, total = addon.GetSetSourceCounts(parentFrame.setID)
    				local ratioText = CanIMogIt:_GetRatioTextColor(have, total)
     			ratioText = ratioText ..  have .. "/" .. total
@@ -47,7 +48,7 @@ end
 local function WardrobeCollectionFrame_CIMIOnValueChanged()
     -- For each button, update the text value
     for i=1,CanIMogIt.NUM_WARDROBE_COLLECTION_BUTTONS do
-        local frame = _G["WardrobeCollectionFrameScrollFrameButton"..i]
+        local frame = _G["BetterWardrobeCollectionFrameScrollFrameButton"..i]
         if frame and frame.CanIMogItOverlay and frame.setID then
             frame.CanIMogItOverlay:UpdateText()
         end
@@ -57,17 +58,17 @@ end
 
 function addon:UpdateCanIMogIt()
     for i=1,CanIMogIt.NUM_WARDROBE_COLLECTION_BUTTONS do
-        local frame = _G["WardrobeCollectionFrameScrollFrameButton"..i]
+        local frame = _G["BetterWardrobeCollectionFrameScrollFrameButton"..i]
         if frame then
             CIMI_AddToFrameSets(frame)
         end
     end
       -- When the scrollbar moves, update the display.
-    _G["WardrobeCollectionFrameScrollFrameScrollBar"]:HookScript("OnValueChanged", WardrobeCollectionFrame_CIMIOnValueChanged)
+    _G["BetterWardrobeCollectionFrameScrollFrameScrollBar"]:HookScript("OnValueChanged", WardrobeCollectionFrame_CIMIOnValueChanged)
     addon:SecureHook(WardrobeCollectionFrame.SetsCollectionFrame,"Refresh", function() C_Timer.After(.05,WardrobeCollectionFrame_CIMIOnValueChanged) end)
 
-    _G["WardrobeCollectionFrameTab2"]:HookScript("OnClick", WardrobeCollectionFrame_CIMIOnValueChanged)
-    _G["WardrobeCollectionFrameTab3"]:HookScript("OnClick", WardrobeCollectionFrame_CIMIOnValueChanged)
+    _G["BetterWardrobeCollectionFrameTab2"]:HookScript("OnClick", WardrobeCollectionFrame_CIMIOnValueChanged)
+    _G["BetterWardrobeCollectionFrameTab3"]:HookScript("OnClick", WardrobeCollectionFrame_CIMIOnValueChanged)
 
     CanIMogIt:RegisterMessage("OptionUpdate", function () C_Timer.After(.05, WardrobeCollectionFrame_CIMIOnValueChanged) end)
 
