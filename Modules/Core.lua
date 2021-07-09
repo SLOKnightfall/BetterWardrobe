@@ -1200,13 +1200,19 @@ function addon:OnEnable()
 	--BW_ColectionListFrameTemplate
 	addon.Init:BuildTooltips()
 
+
 	if IsAddOnLoaded("Blizzard_Collections") then 
 
 		BetterWardrobeCollectionFrame = WardrobeCollectionFrame
 
 		addon.Init:LoadModules()
+		
 	else
 		addon:RegisterEvent("ADDON_LOADED", "EventHandler")
+				addon:RegisterEvent("TRANSMOG_COLLECTION_SOURCE_REMOVED", "EventHandler")
+
+		addon:RegisterEvent("TRANSMOG_COLLECTION_SOURCE_ADDED", "EventHandler")
+
 	end
 end
 
@@ -1381,11 +1387,18 @@ addon.Init.SortDropDown_Initialize()
 end
 
 
-function addon:EventHandler(event, arg1, ...)
-	if event == "ADDON_LOADED" and arg1 == "Blizzard_Collections" then 
+function addon:EventHandler(event, ...)
+	if event == "ADDON_LOADED" and ... == "Blizzard_Collections" then 
 		addon.Init:LoadModules()
 		addon:SendMessage("BW_OnPlayerEnterWorld")
 		addon:UnregisterEvent("ADDON_LOADED")
+
+	elseif (event == "TRANSMOG_COLLECTION_SOURCE_ADDED") then
+		local x = ...
+		BetterWardrobeCollectionFrameMixin:OnEvent(event, x)
+	elseif (event == "TRANSMOG_COLLECTION_SOURCE_REMOVED") then
+		local x = ...
+		BetterWardrobeCollectionFrameMixin:OnEvent(event, x)
 	end
 end
 
