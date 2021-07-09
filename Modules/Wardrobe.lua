@@ -2669,8 +2669,28 @@ function BetterWardrobeItemsCollectionMixin:SelectVisual(visualID)
 	if not C_Transmog.IsAtTransmogNPC() then
 		return;
 	end
+
 	local sourceID;
 	if ( self.transmogLocation:IsAppearance() ) then
+		--Fix for shoulder and wrist hidden item appearance
+		if visualID == 24531 or visualID == 40284 then
+			local modType = Enum.TransmogModification.Main
+			local itemLocation = TransmogUtil.GetItemLocationFromTransmogLocation(self.transmogLocation);
+			local secondarySelected = self.transmogLocation:IsSecondary()
+			if secondarySelected then 
+				modType = Enum.TransmogModification.Secondary
+			end
+
+			local slotID = TransmogUtil.GetSlotID(self:GetActiveSlot());
+			local emptySlotData = Sets:GetEmptySlots() 
+			local _, source = addon.GetItemSource(emptySlotData[slotID]) --C_TransmogCollection.GetItemInfo(emptySlotData[i])
+			local transmogLocation = TransmogUtil.GetTransmogLocation(slotID, Enum.TransmogType.Appearance, modType);
+			pendingInfo = TransmogUtil.CreateTransmogPendingInfo(Enum.TransmogPendingType.Apply, source);
+			C_Transmog.SetPending(transmogLocation, pendingInfo);
+
+			return 
+		end
+
 		sourceID = self:GetAnAppearanceSourceFromVisual(visualID, true);
 	else
 		local visualsList = self:GetFilteredVisualsList();
@@ -2877,8 +2897,6 @@ function BetterWardrobeItemsModelMixin:OnMouseDown(button)
 
 	if ( button == "LeftButton" ) then
 		CloseDropDownMenus();
-		xxxx= self.visualInfo 
-		print(self.visualInfo.visualID)
 		self:GetParent():SelectVisual(self.visualInfo.visualID);
 	elseif ( button == "RightButton" ) then
 		local dropDown = self:GetParent().RightClickDropDown;
@@ -6523,7 +6541,7 @@ end
 
 function BetterWardrobeSetsTransmogMixin:OpenRightClickDropDown()
 	--Default
---[[local setID = self.RightClickDropDown.activeFrame.setID;
+--[[	local setID = self.RightClickDropDown.activeFrame.setID;
 	local info = BW_UIDropDownMenu_CreateInfo();
 	if ( C_TransmogSets.GetIsFavorite(setID) ) then
 		info.text = BATTLE_PET_UNFAVORITE;
