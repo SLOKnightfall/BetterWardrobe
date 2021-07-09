@@ -4190,11 +4190,11 @@ function BetterWardrobeSetsDataProviderMixin:GetBaseSets(filter)
 		basesets = self.baseSets
 		if ( not self.baseSets ) then
 			self.baseSets = C_TransmogSets.GetBaseSets();
-			if not atTransmogrifier then 
+			--if not atTransmogrifier then 
 				self.baseSets = addon:FilterSets(self.baseSets)
-			else
+			--else
 
-			end
+			--end
 			self:DetermineFavorites();
 			self:SortSets(self.baseSets);
 		end
@@ -4209,9 +4209,9 @@ function BetterWardrobeSetsDataProviderMixin:GetBaseSets(filter)
 				self.baseExtraSets = addon.GetBaseList()
 			end
 
-			if not atTransmogrifier then
+			--if not atTransmogrifier then
 				self.baseExtraSets = addon:FilterSets(self.baseExtraSets)
-			end
+			--end
 			self:SortSets(self.baseExtraSets);
 		end
 

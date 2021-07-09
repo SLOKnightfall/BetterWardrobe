@@ -307,7 +307,7 @@ function addon:FilterSets(setList, setType)
 	end
 
 	
-	return setList
+	return FilterSets
 end
 
 

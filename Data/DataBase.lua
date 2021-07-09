@@ -75,18 +75,22 @@ function BuildBlizzSets()
 	local allSets = C_TransmogSets.GetAllSets()
 	for i, data in ipairs(allSets) do
 		data.expansionID  = data.expansionID + 1
+		data.BuildBlizzSets = true
+
+		
 		for armor, mask in ipairs(armorMask) do 
-			if bit.band(data.classMask, mask) ~= 0 then
+
+			if bit.band(data.classMask, mask) == data.classMask then
 				local baseSet = C_TransmogSets.GetBaseSetID(data.setID)
 				--Create Bizzard sets not being shown on sets tab
-				if baseSet == data.setID and not BlizzardBaseSets[data.setID] then 
+				--if baseSet == data.setID and not BlizzardBaseSets[data.setID] then 
 					if isPVP(data.setID) then data.PvP = true end
 					WowSets[Globals.ARMOR_TYPE[armor]][data.setID] = data
-					break
+					--break
 
 				--Create Variants List
 				--elseif baseSet =~ data.setID and not BlizzardBaseSets[data.setID] then 
-				end
+				--end
 			end
 		end
 	end
@@ -123,7 +127,7 @@ do
 
 			for id, setData in pairs(data) do
 				if (setData.side and setData.side == GetFactionID(playerFaction) or setData.side == nil) and 
-				 	setData.filter ~= 5 and setData.filter ~= 7 and setData.filter ~= 11 then 
+				 	(not data.BuildBlizzSets and (setData.filter ~= 5 and setData.filter ~= 7 and setData.filter ~= 11)) then 
 					--setData.isHeritageArmor = string.find(setData.name, "Heritage")
 
 					local classInfo = CLASS_INFO[playerClass]
@@ -263,16 +267,22 @@ end
 							end
 						end
 
+						if setData.PvP then 
+							setData.filter = 7
+						elseif setData.setID <=2221 and setData.setID >= 2015   then 
+							print(setData.setID)
+							--setData.filter = 11 
+						else
+							setData.filter = 1
+						end
+
+
 						setData.hiddenUntilCollected = false
 						setData.armorType = armorType
 						setData.setID  = id*100000
 						setData.armorType = Globals.ARMOR_TYPE_ID[armorType]
 
-						if setData.PvP then 
-							setData.filter = 7
-						else
-							setData.filter = 5
-						end
+
 
 					--If it was an old Rated armor set, flag it as no longer obtainable.
 					if (setData.description == ELITE) and setData.patchID < buildID then
