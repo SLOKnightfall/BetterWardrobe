@@ -78,6 +78,8 @@ function BuildBlizzSets()
 		data.expansionID  = data.expansionID + 1
 		data.BuildBlizzSets = true
 
+
+
 		
 		for armor, mask in ipairs(armorMask) do 
 
@@ -96,6 +98,7 @@ function BuildBlizzSets()
 					WowSets[Globals.ARMOR_TYPE[armor]][data.setID] = data
 					--break
 
+
 				--Create Variants List
 				--elseif baseSet =~ data.setID and not BlizzardBaseSets[data.setID] then 
 				--end
@@ -105,7 +108,17 @@ function BuildBlizzSets()
 			WowSets["COSMETIC"][data.setID] = data
 
 			end
+
+
 		end
+								if data.PvP then 
+							data.filter = 7
+						elseif data.setID <=2221 and data.setID >= 2015   then 
+						--rint(setData.setID)
+							data.filter = 11
+						else
+							data.filter = 5
+						end
 	end
 end
 
@@ -283,14 +296,14 @@ do
 							end
 						end
 
-						if setData.PvP then 
+--[[						if setData.PvP then 
 							setData.filter = 7
 						elseif setData.setID <=2221 and setData.setID >= 2015   then 
-							--print(setData.setID)
-							--setData.filter = 11 
-						else
+							print(setData.setID)
 							setData.filter = 1
-						end
+						else
+							setData.filter = 5
+						end]]
 
 
 						setData.hiddenUntilCollected = false
