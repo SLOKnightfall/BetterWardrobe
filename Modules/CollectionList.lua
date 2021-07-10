@@ -11,7 +11,7 @@ CollectionList.showAll = true
 local MogItLoaded = false
 
 
-function initCollectionList()
+function  addon.Init:initCollectionList()
 	local f = CreateFrame("Frame", "BW_ColectionListFrame", WardrobeCollectionFrame, "BW_ColectionListFrameTemplate" )
 	local ContextMenu = CreateFrame("Frame", addonName .. "ContextMenuFrame", UIParent, "BW_UIDropDownMenuTemplate")
 addon.ContextMenu = ContextMenu

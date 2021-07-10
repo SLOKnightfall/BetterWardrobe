@@ -2384,6 +2384,7 @@ end
 function BetterWardrobeItemsCollectionMixin:FilterVisuals()
 	local isAtTransmogrifier = C_Transmog.IsAtTransmogNPC();
 	local visualsList = self.visualsList;
+
 	local filteredVisualsList = { };
 	local slotID = self.transmogLocation.slotID;
 	for i, visualInfo in ipairs(visualsList) do
@@ -2722,6 +2723,7 @@ end
 function BetterWardrobeItemsCollectionMixin:RefreshVisualsList()
 	if self.transmogLocation:IsIllusion() then
 		self.visualsList = C_TransmogCollection.GetIllusions();
+
 	else
 		if self:GetActiveCategory() == Enum.TransmogCollectionType.Paired and not C_Transmog.IsAtTransmogNPC() then 
 				self.visualsList = addon.GetClassArtifactAppearanceList() 
@@ -2730,7 +2732,6 @@ function BetterWardrobeItemsCollectionMixin:RefreshVisualsList()
 		end
 
 	end
-
 	--Mod to allow visual view of sets from the journal
 	if BW_CollectionListButton.ToggleState then self.visualsList = addon.CollectionList:BuildCollectionList() end
 

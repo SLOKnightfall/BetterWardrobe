@@ -4,7 +4,7 @@
 ## Game Version: 9.1
 ## Author: SLOKnightfall
 ## Notes: 
-## OptionalDeps: MogIt, CanIMogIt, LegionTransmog
+## OptionalDeps: MogIt, CanIMogIt, LegionWardrobe, WardrobeEnhanced, Rarity
 ## SavedVariables: BetterWardrobe_Options, BetterWardrobe_CharacterData, BetterWardrobe_SavedSetData, BetterWardrobe_SubstituteItemData, BetterWardrobe_ListData, BetterWardrobe_Mogitdata
 
 #Libraries
@@ -72,6 +72,8 @@ Modules\SortingFunctions.lua
 #Plugins\ElvUI.lua
 Plugins\CanIMogIt.lua
 Plugins\MogIt.lua
+Plugins\WardrobeEnhanced.lua
+
 
 
 #@do-not-package@

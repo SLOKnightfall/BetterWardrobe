@@ -1183,6 +1183,8 @@ function UpdateDB()
 	end
 end
 
+local inizliaed
+
 function addon:OnEnable()
 	_,playerClass, classID = UnitClass("player")
 	addon.Profile = self.db.profile
@@ -1200,22 +1202,17 @@ function addon:OnEnable()
 	--BW_ColectionListFrameTemplate
 	addon.Init:BuildTooltips()
 
-
 	if IsAddOnLoaded("Blizzard_Collections") then 
-
 		BetterWardrobeCollectionFrame = WardrobeCollectionFrame
-
-		addon.Init:LoadModules()
-		
+		C_Timer.After(0.5, function() addon.Init:LoadModules() end)
 	else
 		addon:RegisterEvent("ADDON_LOADED", "EventHandler")
-				addon:RegisterEvent("TRANSMOG_COLLECTION_SOURCE_REMOVED", "EventHandler")
-
+		addon:RegisterEvent("TRANSMOG_COLLECTION_SOURCE_REMOVED", "EventHandler")
 		addon:RegisterEvent("TRANSMOG_COLLECTION_SOURCE_ADDED", "EventHandler")
-
 	end
-end
 
+	inizliaed = true
+end
 
 
 --Hides default collection window when at transmog vendor
@@ -1225,26 +1222,30 @@ local function UpdateTransmogVendor()
 	BetterWardrobeCollectionFrame:SetContainer(WardrobeFrame);
 end
 
-
+ 
 --Loads various modules and builds frames once the Blizzard_Collection addon is loaded
 function addon.Init:LoadModules()
+	--Check to make sure that the addon has completed loading
+	if not inizliaed then 
+		print ("not initi")
+				C_Timer.After(0.5, function() addon.Init:LoadModules() end)
+		return false
+	end
+
 	--Check to make sure that the Blizzard Frames have completed loading
 	if not WardrobeTransmogFrame then 
 		C_Timer.After(0.5, function() addon.Init:LoadModules() end)
 		return false
 	end
 
+	C_Timer.After(0, function() addon.Init:UpdateWardrobeEnhanced() end)
 
-----BetterWardrobeCollectionFrame = {}
-	--addon.Init:LoadWardrobeModule()
 
 	local f = CreateFrame("Frame", "BetterWardrobeCollectionFrame", UIParent, "BetterWardrobeCollectionFrameTemplate" )
-
 	f.ItemsTab:SetParent("WardrobeCollectionFrame")
 	WardrobeCollectionFrame.ItemsTab:Hide()
 	WardrobeCollectionFrame.ItemsTab = f.ItemsTab
 	WardrobeCollectionFrameTab1 = f.ItemsTab
-
 
 	f.SetsTab:SetParent("WardrobeCollectionFrame")
 	WardrobeCollectionFrame.SetsTab:Hide()
@@ -1279,9 +1280,6 @@ function addon.Init:LoadModules()
 	f.TransmogOptionsButton:ClearAllPoints();
 	f.TransmogOptionsButton:SetPoint("BOTTOMRIGHT",WardrobeCollectionFrame,"BOTTOMRIGHT", -55, 80)
 
-
-
-
 	f.BW_SetsHideSlotButton:SetParent("WardrobeCollectionFrame")
 	WardrobeCollectionFrame.BW_SetsHideSlotButton = f.BW_SetsHideSlotButton
 
@@ -1293,9 +1291,7 @@ function addon.Init:LoadModules()
 	WardrobeCollectionFrame.ItemsCollectionFrame = f.ItemsCollectionFrame
 	f.ItemsCollectionFrame.transmogLocation = WardrobeCollectionFrame.ItemsCollectionFrame.transmogLocation
 
-
 	WardrobeCollectionFrameWeaponDropDown = f.ItemsCollectionFrame.WeaponDropDown
-
 
 	f.SetsCollectionFrame:SetParent("WardrobeCollectionFrame")
 	f.SetsCollectionFrame:ClearAllPoints();
@@ -1304,7 +1300,6 @@ function addon.Init:LoadModules()
 	WardrobeCollectionFrame.SetsCollectionFrame:Hide()
 	f.SetsCollectionFrame.transmogLocation = WardrobeCollectionFrame.SetsCollectionFrame.transmogLocation
 	WardrobeCollectionFrame.SetsCollectionFrame = f.SetsCollectionFrame
-
 
 	f.SetsTransmogFrame:SetParent("WardrobeCollectionFrame")
 	f.SetsTransmogFrame:ClearAllPoints();
@@ -1316,18 +1311,7 @@ function addon.Init:LoadModules()
 
 	WardrobeCollectionFrame.ContentFrames = {f.ItemsCollectionFrame, f.SetsCollectionFrame, f.SetsTransmogFrame}
 
-	----Mixin(WardrobeCollectionFrame, WardrobeCollectionFrameMixin)
-	--[[function WardrobeCollectionFrame:CheckTab(tab)
-		local atTransmogrifier = C_Transmog.IsAtTransmogNPC();
-		if (atTransmogrifier and WardrobeCollectionFrame.selectedTransmogTab == tab) or WardrobeCollectionFrame.selectedCollectionTab == tab then
-			return true
-		end
-	end]]
-
-
 	Mixin(WardrobeCollectionFrame, BetterWardrobeCollectionFrameMixin)
---WardrobeCollectionFrame.SetTab = BetterWardrobeCollectionFrame.SetTab
---WardrobeCollectionFrame.ClickTab = BetterWardrobeCollectionFrame.ClickTab
 
 	WardrobeCollectionFrame.progressBar:SetWidth(130)
 	WardrobeCollectionFrame.progressBar.border:SetWidth(139)
@@ -1335,60 +1319,18 @@ function addon.Init:LoadModules()
 	WardrobeCollectionFrame.progressBar:SetPoint("TOPLEFT", WardrobeCollectionFrame.ItemsTab, "TOPLEFT", 280, -11)
 
 
-	--[[WardrobeFrame:HookScript("OnShow",  function() UpdateTransmogVendor() end)
-			
-		--Hooks into the colection tabs and sets Better Wardobe when viewing the wardrobe collection
-					addon:SecureHook(nil, "CollectionsJournal_UpdateSelectedTab", function(self) 
-						local selected = CollectionsJournal_GetTab(self);
-				
-						-- don't touch the wardrobe frame if it's used by the transmogrifier
-						if ( WardrobeCollectionFrame:GetParent() == self or not WardrobeCollectionFrame:GetParent():IsShown() ) then
-							if ( selected == 5 ) then
-								HideUIPanel(WardrobeFrame);
-								WardrobeCollectionFrame:Hide();
-								BetterWardrobeCollectionFrame:SetContainer(self);
-							else
-								WardrobeCollectionFrame:Hide();
-								BetterWardrobeCollectionFrame:Hide();
-							end
-						end
-					end)
-				]]
-
-	----WardrobeTransmogFrame:HookScript("CheckSecondarySlotButtons",  function() print("XXX") end)
-
- initCollectionList()
- addon.Init:BuildCollectionList()
-
- addon.Init:BuildTransmogVendorUI()
-	--local f = CreateFrame("Frame", "BetterWardrobeFrame", UIParent, "BetterWardrobeFrameTemplate" )
-
-	--addon.Init:LoadWardrobeUIModule()
-
-	--addon.Init:BuildUI()
-	--addon.Init.LoadCollectionListModule()
-	--local f = CreateFrame("Frame", "BW_ColectionListFrame", WardrobeCollectionFrame, "BW_ColectionListFrameTemplate" )
-
-
-
-
-	--addon.Init:BuildCollectionJournalUI()
-	
-	----addon.Init:BuildTransmogVendorUI()
-	--local f = CreateFrame("Frame", "BW_WardrobeOutfitEditFrameTemplate", WardrobeCollectionFrame, "BW_WardrobeOutfitEditFrameTemplate" )
-
-	--addon.Init.LoadSavedOutfitsModule()
-
-	--addon.Init.LoadDressingRoomModule()
-addon.Init.SortDropDown_Initialize()
+ 	addon.Init:initCollectionList()
+ 	addon.Init:BuildCollectionList()
+	addon.Init:BuildTransmogVendorUI()
+	addon.Init.SortDropDown_Initialize()
 	addon:UpdateCanIMogIt()
 	addon.Init.SavedSetsDropDown_Initialize()
-
 end
 
 
 function addon:EventHandler(event, ...)
 	if event == "ADDON_LOADED" and ... == "Blizzard_Collections" then 
+		print("load addon col")
 		addon.Init:LoadModules()
 		addon:SendMessage("BW_OnPlayerEnterWorld")
 		addon:UnregisterEvent("ADDON_LOADED")
@@ -1401,17 +1343,3 @@ function addon:EventHandler(event, ...)
 		BetterWardrobeCollectionFrameMixin:OnEvent(event, x)
 	end
 end
-
-
-
-
-
-
-
-
-	-----addon.Init:Blizzard_Wardrobe()
-		-----addon.Init:DressingRoom()
-		--addon.SetSortOrder(false)
-		-----addon.Init:BuildCollectionList()
-
-	-----	

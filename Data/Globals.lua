@@ -31,7 +31,7 @@ Globals.CLASS_INFO = {
 --[[
 
 bit.band( 3592,1024)
-
+bit.bor( 3592,1024)
 bit.band(1,35)
 
 DEATHKNIGHT
