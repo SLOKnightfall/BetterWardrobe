@@ -58,11 +58,12 @@ local pvpDescriptions = {
 }
 
 local armorMask = {400, 3592, 68, 35}
-local WowSets = {{}, {}, {}, {}}
+local WowSets = {{}, {}, {}, {}, {}}
 WowSets["CLOTH"] = WowSets[1]
 WowSets["LEATHER"] = WowSets[2]
 WowSets["MAIL"] = WowSets[3]
 WowSets["PLATE"] = WowSets[4]
+WowSets["COSMETIC"] = WowSets[5]
 
 -- Gets all the Blizzard sets, filters out any sets shown in the base set tab and adds them to the apropriate ArmorDB
 function BuildBlizzSets()
@@ -80,7 +81,14 @@ function BuildBlizzSets()
 		
 		for armor, mask in ipairs(armorMask) do 
 
-			if bit.band(data.classMask, mask) == data.classMask or bit.band(data.classMask, mask) ~= 0 then
+			--if bit.band(data.classMask, mask) == data.classMask  then
+--print(bit.band(data.classMask, mask))
+
+--bit.bor( 3592,1024)
+--print(data.classMask)
+			--if bit.band(data.classMask, mask) == mask  then
+			if bit.bor(mask, data.classMask) == mask then
+
 				local baseSet = C_TransmogSets.GetBaseSetID(data.setID)
 				--Create Bizzard sets not being shown on sets tab
 				--if baseSet == data.setID and not BlizzardBaseSets[data.setID] then 
@@ -91,6 +99,11 @@ function BuildBlizzSets()
 				--Create Variants List
 				--elseif baseSet =~ data.setID and not BlizzardBaseSets[data.setID] then 
 				--end
+			elseif data.classMask == 0 then 
+
+				--print(data.setID)
+			WowSets["COSMETIC"][data.setID] = data
+
 			end
 		end
 	end
@@ -232,7 +245,7 @@ do
 			ArmorDB[armorType] = ArmorDB[armorType] or {}
 			for id, setData in pairs(data) do
 
-				if C_TransmogSets.GetBaseSetID(id) == id then 
+				if C_TransmogSets.GetBaseSetID(id) ~= id then 
 
 					if setData.requiredFaction and setData.requiredFaction == playerFaction or setData.requiredFaction == nil then 
 						--setData.name = "BL-" .. setData.name.." - "..(setData.description or "")
@@ -241,7 +254,8 @@ do
 						end
 						setData.nameUpdate = true
 						local classInfo = CLASS_INFO[playerClass]
-						local class = (setData.classMask and setData.classMask == 0) or (setData.classMask and setData.classMask == classInfo[2]) or not setData.classMask
+						--print(setData.classMask)
+						local class = (setData.classMask and setData.classMask == 0) or (setData.classMask and bit.band(setData.classMask, classInfo[2])  == classInfo[2]) or not setData.classMask
 						---local className = (setData.classMask and GetClassInfo(getClassMask(setData.classMask))) or nil
 					
 					--print(setData.classMask)

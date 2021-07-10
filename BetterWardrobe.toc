@@ -4,7 +4,7 @@
 ## Game Version: 9.1
 ## Author: SLOKnightfall
 ## Notes: 
-## OptionalDeps: MogIt, CanIMogIt
+## OptionalDeps: MogIt, CanIMogIt, LegionTransmog
 ## SavedVariables: BetterWardrobe_Options, BetterWardrobe_CharacterData, BetterWardrobe_SavedSetData, BetterWardrobe_SubstituteItemData, BetterWardrobe_ListData, BetterWardrobe_Mogitdata
 
 #Libraries

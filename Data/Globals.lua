@@ -30,7 +30,7 @@ Globals.CLASS_INFO = {
 
 --[[
 
-bit.band( 3592,400)
+bit.band( 3592,1024)
 
 bit.band(1,35)
 
