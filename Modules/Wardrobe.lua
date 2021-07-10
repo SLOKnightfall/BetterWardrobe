@@ -604,32 +604,29 @@ function BetterWardrobeOutfitMixin:LoadOutfit(outfitID)
 		local ItemTransmogInfoList = {}
 
 		if outfit.itemTransmogInfoList then
-			local actor = WardrobeTransmogFrame.ModelScene:GetPlayerActor();
+            local actor = WardrobeTransmogFrame.ModelScene:GetPlayerActor();
 			for i = 1, 19  do
                 if TransmogUtil.GetSlotName(i) ~= nil then
-                    local appearanceID = outfit[i]
-                    local illusionID = 0
-                    if i == 16 then
-                        illusionID = outfit.mainHandEnchant
-                    elseif i == 17 then
-                        illusionID = outfit.offHandEnchant
-                    end
-                    local itemTransmogInfo = ItemUtil.CreateItemTransmogInfo(appearanceID, 0, illusionID);
+                    local info = outfit.itemTransmogInfoList[i]
+                    local itemTransmogInfo = ItemUtil.CreateItemTransmogInfo(info.appearanceID, info.secondaryAppearanceID, info.illusionID);
                     local slotName = TransmogUtil.GetSlotName(i)
                     if slotName ~= nil then
                         local itemLocation = TransmogUtil.CreateTransmogLocation(slotName, Enum.TransmogType.Appearance, Enum.TransmogModification.None)
-                        local itemPending = TransmogUtil.CreateTransmogPendingInfo(Enum.TransmogPendingType.Apply, appearanceID)
+                        local itemPending = nil
+                        itemPending = TransmogUtil.CreateTransmogPendingInfo(Enum.TransmogPendingType.Apply, info.appearanceID)
                         C_Transmog.SetPending(itemLocation, itemPending)
-                        if i == 16 or i == 17 then
+                        if i == 3 then
+                            itemLocation = TransmogUtil.CreateTransmogLocation(slotName, Enum.TransmogType.Appearance, Enum.TransmogModification.Secondary)
+                            itemPending = TransmogUtil.CreateTransmogPendingInfo(Enum.TransmogPendingType.Apply, info.secondaryAppearanceID or 0)
+                            C_Transmog.SetPending(itemLocation, itemPending)
+                        elseif i == 16 or i == 17 then
                             itemLocation = TransmogUtil.CreateTransmogLocation(slotName, Enum.TransmogType.Illusion, Enum.TransmogModification.Main)
-                            itemPending = TransmogUtil.CreateTransmogPendingInfo(Enum.TransmogPendingType.Apply, illusionID)
+                            itemPending = TransmogUtil.CreateTransmogPendingInfo(Enum.TransmogPendingType.Apply, info.illusionID)
                             C_Transmog.SetPending(itemLocation, itemPending)
                         end
                     end
-                    ItemTransmogInfoList[i] = itemTransmogInfo
                 end
 			end
-
 		else
 			for i = 1, 19  do
                 if TransmogUtil.GetSlotName(i) ~= nil then
