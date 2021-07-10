@@ -5602,7 +5602,7 @@ local function BetterWardrobeSetsCollectionScrollFrame_FavoriteDropDownInit(self
 	local baseSet = SetsDataProvider:GetBaseSetByID(self.baseSetID);
 	local type = tabType[addon.GetTab()]
 
-	local variantSets =  0 -----SetsDataProvider:GetVariantSets(self.baseSetID);   ---TODO:REvisit
+	local variantSets =  {}-- 0 -----SetsDataProvider:GetVariantSets(self.baseSetID);   ---TODO:REvisit
 	local useDescription = (#variantSets > 0);
 
 	local info = BW_UIDropDownMenu_CreateInfo()

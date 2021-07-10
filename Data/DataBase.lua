@@ -80,7 +80,7 @@ function BuildBlizzSets()
 		
 		for armor, mask in ipairs(armorMask) do 
 
-			if bit.band(data.classMask, mask) == data.classMask then
+			if bit.band(data.classMask, mask) == data.classMask or bit.band(data.classMask, mask) ~= 0 then
 				local baseSet = C_TransmogSets.GetBaseSetID(data.setID)
 				--Create Bizzard sets not being shown on sets tab
 				--if baseSet == data.setID and not BlizzardBaseSets[data.setID] then 
@@ -241,12 +241,14 @@ do
 						end
 						setData.nameUpdate = true
 						local classInfo = CLASS_INFO[playerClass]
-						local class = (setData.classMask and setData.classMask == classInfo[1]) or not setData.classMask
+						local class = (setData.classMask and setData.classMask == 0) or (setData.classMask and setData.classMask == classInfo[2]) or not setData.classMask
 						---local className = (setData.classMask and GetClassInfo(getClassMask(setData.classMask))) or nil
-					if setData.classMask == 8  then 
+					
+					--print(setData.classMask)
+					--if setData.classMask == 8  then 
 						--print (L[setData["name"]]); 
 					--	print((setData.classMask)) 
-end
+--end
 --print(setData.expansionID)
 						--setData.expansionID = setData.expansionID -3
 						setData.isClass = class
