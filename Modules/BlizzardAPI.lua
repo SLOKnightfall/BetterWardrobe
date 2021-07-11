@@ -17,7 +17,8 @@ local Profile
 local playerNme
 local realmName
 local playerClass, classID,_
-
+local Sets = {}
+addon.Sets = Sets
 
 local L = LibStub("AceLocale-3.0"):GetLocale(addonName)
 
@@ -162,13 +163,14 @@ function addon:IsFavoriteItem(visualID)
 end
 
 
-local Sets = {}
 
 function Sets:ClearHidden(setList)
 if addon.Profile.ShowHidden then return setList end
 
-	local setType = "set"
-	if WardrobeCollectionFrame:CheckTab(3) then
+	local setType = "item"
+	if WardrobeCollectionFrame:CheckTab(2) then
+		setType = "set"
+	elseif WardrobeCollectionFrame:CheckTab(3) then
 		setType = "extraset"
 	elseif WardrobeCollectionFrame:CheckTab(4) then 
 		return setList
@@ -259,7 +261,6 @@ else
 end
 	return not filtered
 end
-
 
 addon.RefreshFilter = true
 function addon:FilterSets(setList, setType)

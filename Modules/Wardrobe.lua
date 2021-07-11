@@ -34,12 +34,13 @@ local COLLECTION_LIST_WIDTH = addon.Globals.COLLECTION_LIST_WIDTH
 
 addon.useAltSet = false
 
-local Sets = {}
-addon.Sets = Sets
+--local Sets = {}
+--addon.Sets = Sets
 
 
 local EXCLUSION_CATEGORY_OFFHAND	= 1;
 local EXCLUSION_CATEGORY_MAINHAND	= 2;
+local Sets = addon.Sets
 
 
 local function GetAdjustedDisplayIndexFromKeyPress(contentFrame, index, numEntries, key)
@@ -2404,6 +2405,9 @@ function BetterWardrobeItemsCollectionMixin:FilterVisuals()
 			end
 		end
 	end
+
+	filteredVisualsList = addon.Sets:ClearHidden(filteredVisualsList, "item")--self.visualsList
+
 	self.filteredVisualsList = filteredVisualsList;
 end
 
