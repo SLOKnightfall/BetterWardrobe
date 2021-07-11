@@ -28,6 +28,16 @@ Globals.CLASS_INFO = {
   WARRIOR = {1, 1, "PLATE"},
 }
 
+
+Globals.CLASS_MASK_TO_ID = {}
+
+
+for i, data in pairs(Globals.CLASS_INFO) do
+  Globals.CLASS_MASK_TO_ID[data[2]] = data[1]
+end
+
+
+
 --[[
 
 bit.band( 3592,1024)

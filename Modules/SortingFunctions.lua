@@ -127,7 +127,7 @@ local Sort = {
 			end
 
 			if ( set1.favorite ~= set2.favorite ) then
-				return set1.favorite
+				--return set1.favorite
 			end
 
 			if ( set1.expansionID ~= set2.expansionID ) then
@@ -136,17 +136,18 @@ local Sort = {
 
 			if not ignorePatchID then
 				if ( set1.patchID ~= set2.patchID ) then
-					return SortOrder(set1.patchID, set2.patchID)
+					--return SortOrder(set1.patchID, set2.patchID)
 				end
 			end
 			if ( set1.expansionID ~= set2.expansionID ) then
 				return SortOrder(set1.expansionID, set2.expansionID)
 			end
 			if ( set1.uiOrder ~= set2.uiOrder ) then
-				--return SortOrder(set1.uiOrder, set2.uiOrder)
+				return SortOrder(set1.uiOrder, set2.uiOrder)
 			end
 
-			return SortOrder(set1.setID, set2.setID)
+			--return SortOrder(set1.setID, set2.setID)
+			return SortOrder(set2.name, set1.name)
 		end
 
 		table.sort(sets, comparison)

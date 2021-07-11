@@ -605,53 +605,53 @@ function BetterWardrobeOutfitMixin:LoadOutfit(outfitID)
 		local ItemTransmogInfoList = {}
 
 		if outfit.itemTransmogInfoList then
-            local actor = WardrobeTransmogFrame.ModelScene:GetPlayerActor();
+			local actor = WardrobeTransmogFrame.ModelScene:GetPlayerActor();
 			for i = 1, 19  do
-                if TransmogUtil.GetSlotName(i) ~= nil then
-                    local info = outfit.itemTransmogInfoList[i]
-                    local itemTransmogInfo = ItemUtil.CreateItemTransmogInfo(info.appearanceID, info.secondaryAppearanceID, info.illusionID);
-                    local slotName = TransmogUtil.GetSlotName(i)
-                    if slotName ~= nil then
-                        local itemLocation = TransmogUtil.CreateTransmogLocation(slotName, Enum.TransmogType.Appearance, Enum.TransmogModification.None)
-                        local itemPending = nil
-                        itemPending = TransmogUtil.CreateTransmogPendingInfo(Enum.TransmogPendingType.Apply, info.appearanceID)
-                        C_Transmog.SetPending(itemLocation, itemPending)
-                        if i == 3 then
-                            itemLocation = TransmogUtil.CreateTransmogLocation(slotName, Enum.TransmogType.Appearance, Enum.TransmogModification.Secondary)
-                            itemPending = TransmogUtil.CreateTransmogPendingInfo(Enum.TransmogPendingType.Apply, info.secondaryAppearanceID or 0)
-                            C_Transmog.SetPending(itemLocation, itemPending)
-                        elseif i == 16 or i == 17 then
-                            itemLocation = TransmogUtil.CreateTransmogLocation(slotName, Enum.TransmogType.Illusion, Enum.TransmogModification.Main)
-                            itemPending = TransmogUtil.CreateTransmogPendingInfo(Enum.TransmogPendingType.Apply, info.illusionID)
-                            C_Transmog.SetPending(itemLocation, itemPending)
-                        end
-                    end
-                end
+				if TransmogUtil.GetSlotName(i) ~= nil then
+					local info = outfit.itemTransmogInfoList[i]
+					local itemTransmogInfo = ItemUtil.CreateItemTransmogInfo(info.appearanceID, info.secondaryAppearanceID, info.illusionID);
+					local slotName = TransmogUtil.GetSlotName(i)
+					if slotName ~= nil then
+						local itemLocation = TransmogUtil.CreateTransmogLocation(slotName, Enum.TransmogType.Appearance, Enum.TransmogModification.None)
+						local itemPending = nil
+						itemPending = TransmogUtil.CreateTransmogPendingInfo(Enum.TransmogPendingType.Apply, info.appearanceID)
+						C_Transmog.SetPending(itemLocation, itemPending)
+						if i == 3 then
+							itemLocation = TransmogUtil.CreateTransmogLocation(slotName, Enum.TransmogType.Appearance, Enum.TransmogModification.Secondary)
+							itemPending = TransmogUtil.CreateTransmogPendingInfo(Enum.TransmogPendingType.Apply, info.secondaryAppearanceID or 0)
+							C_Transmog.SetPending(itemLocation, itemPending)
+						elseif i == 16 or i == 17 then
+							itemLocation = TransmogUtil.CreateTransmogLocation(slotName, Enum.TransmogType.Illusion, Enum.TransmogModification.Main)
+							itemPending = TransmogUtil.CreateTransmogPendingInfo(Enum.TransmogPendingType.Apply, info.illusionID)
+							C_Transmog.SetPending(itemLocation, itemPending)
+						end
+					end
+				end
 			end
 		else
 			for i = 1, 19  do
-                if TransmogUtil.GetSlotName(i) ~= nil then
-                    local appearanceID = outfit[i]
-                    local illusionID = 0
-                    if i == 16 then
-                        illusionID = outfit.mainHandEnchant
-                    elseif i == 17 then
-                        illusionID = outfit.offHandEnchant
-                    end
-                    local itemTransmogInfo = ItemUtil.CreateItemTransmogInfo(appearanceID, 0, illusionID);
-                    local slotName = TransmogUtil.GetSlotName(i)
-                    if slotName ~= nil then
-                        local itemLocation = TransmogUtil.CreateTransmogLocation(slotName, Enum.TransmogType.Appearance, Enum.TransmogModification.None)
-                        local itemPending = TransmogUtil.CreateTransmogPendingInfo(Enum.TransmogPendingType.Apply, appearanceID)
-                        C_Transmog.SetPending(itemLocation, itemPending)
-                        if i == 16 or i == 17 then
-                            itemLocation = TransmogUtil.CreateTransmogLocation(slotName, Enum.TransmogType.Illusion, Enum.TransmogModification.Main)
-                            itemPending = TransmogUtil.CreateTransmogPendingInfo(Enum.TransmogPendingType.Apply, illusionID)
-                            C_Transmog.SetPending(itemLocation, itemPending)
-                        end
-                    end
-                    ItemTransmogInfoList[i] = itemTransmogInfo
-                end
+				if TransmogUtil.GetSlotName(i) ~= nil then
+					local appearanceID = outfit[i]
+					local illusionID = 0
+					if i == 16 then
+						illusionID = outfit.mainHandEnchant
+					elseif i == 17 then
+						illusionID = outfit.offHandEnchant
+					end
+					local itemTransmogInfo = ItemUtil.CreateItemTransmogInfo(appearanceID, 0, illusionID);
+					local slotName = TransmogUtil.GetSlotName(i)
+					if slotName ~= nil then
+						local itemLocation = TransmogUtil.CreateTransmogLocation(slotName, Enum.TransmogType.Appearance, Enum.TransmogModification.None)
+						local itemPending = TransmogUtil.CreateTransmogPendingInfo(Enum.TransmogPendingType.Apply, appearanceID)
+						C_Transmog.SetPending(itemLocation, itemPending)
+						if i == 16 or i == 17 then
+							itemLocation = TransmogUtil.CreateTransmogLocation(slotName, Enum.TransmogType.Illusion, Enum.TransmogModification.Main)
+							itemPending = TransmogUtil.CreateTransmogPendingInfo(Enum.TransmogPendingType.Apply, illusionID)
+							C_Transmog.SetPending(itemLocation, itemPending)
+						end
+					end
+					ItemTransmogInfoList[i] = itemTransmogInfo
+				end
 			end
 			--print("converted")
 			--addon.OutfitDB.char.outfits[LookupIndexFromID(outfitID)]["ItemTransmogInfoList"] = ItemTransmogInfoList
@@ -4723,25 +4723,75 @@ end
 
 function BetterWardrobeSetsDataProviderMixin:GetSortedSetSources(setID)
 	local returnTable = { };
+	local isCollectedAccount = false;
+	local canCharCollectIt = false;
+	local isCollectedChar = false;
 	local sourceData = self:GetSetSourceData(setID);
 	if WardrobeCollectionFrame:CheckTab(2) then
 		for i, primaryAppearance in ipairs(sourceData.primaryAppearances) do
 			local sourceID = primaryAppearance.appearanceID;
 			local sourceInfo = C_TransmogCollection.GetSourceInfo(sourceID);
+			local appSources = C_TransmogCollection.GetAllAppearanceSources(sourceInfo.visualID);
+				--local appSources2 = C_TransmogCollection.GetAppearanceSources(sourceInfo.visualID);
+if appSources then
+	  for _,sourceID2 in pairs(appSources) do
+		local sources = C_TransmogCollection.GetSourceInfo(sourceID2);
+		
+		local link = select(6, C_TransmogCollection.GetAppearanceSourceInfo(sources.sourceID));
+		if sources.isCollected then
+		  isCollectedAccount = true;
+		end
+		local isForClass = sourceData.isClass
+		
+		if isPlayerArmorWeight and not canCharCollectIt and isForClass then
+		  canCharCollectIt = true;
+		end
+		if isPlayerArmorWeight and not isCollectedChar and isForClass and sources.isCollected then
+		  isCollectedChar = true;
+		end
+		
+		if isCollectedAccount and canCharCollectIt and isCollectedChar then
+		  break;
+		end
+	  end
+	end
 
 			if ( sourceInfo ) then
 				local sortOrder = EJ_GetInvTypeSortOrder(sourceInfo.invType);
-				tinsert(returnTable, { sourceID = sourceID, collected = primaryAppearance.collected, sortOrder = sortOrder, itemID = sourceInfo.itemID, invType = sourceInfo.invType });
+				tinsert(returnTable, { sourceID = sourceID, collected = primaryAppearance.collected, sortOrder = sortOrder, itemID = sourceInfo.itemID, invType = sourceInfo.invType, isCollectedChar = isCollectedChar, canCharCollectIt = canCharCollectIt });
 			end
 		end
 	else
 	----elseif WardrobeCollectionFrame:CheckTab(3) then
 		for sourceID, collected in pairs(sourceData.sources) do
 			local sourceInfo = C_TransmogCollection.GetSourceInfo(sourceID)
-
+			local appSources = C_TransmogCollection.GetAllAppearanceSources(sourceInfo.visualID);
+				--local appSources2 = C_TransmogCollection.GetAppearanceSources(sourceInfo.visualID);
+if appSources then
+	  for _,sourceID2 in pairs(appSources) do
+		local sources = C_TransmogCollection.GetSourceInfo(sourceID2);
+		
+		local link = select(6, C_TransmogCollection.GetAppearanceSourceInfo(sources.sourceID));
+		if sources.isCollected then
+		  isCollectedAccount = true;
+		end
+		local isForClass = sourceData.isClass
+		
+		if true and not canCharCollectIt and isForClass then
+		  canCharCollectIt = true;
+		end
+		if true and not isCollectedChar and isForClass and sources.isCollected then
+		  isCollectedChar = true;
+		end
+		
+		if isCollectedAccount and canCharCollectIt and isCollectedChar then
+		  break;
+		end
+	  end
+	end
 			if (sourceInfo) then
 				local sortOrder = EJ_GetInvTypeSortOrder(sourceInfo.invType)
-				tinsert(returnTable, {sourceID = sourceID, collected = collected, sortOrder = sortOrder, itemID = sourceInfo.itemID, invType = sourceInfo.invType, visualID = sourceInfo.visualID  })
+				tinsert(returnTable, {sourceID = sourceID, collected = collected, sortOrder = sortOrder, itemID = sourceInfo.itemID, invType = sourceInfo.invType, visualID = sourceInfo.visualID, isCollectedChar = isCollectedChar, canCharCollectIt = canCharCollectIt  })
 			end
 		end
 	end
@@ -5002,7 +5052,6 @@ end
 
 function addon.ClearSetNewSourcesForSlot(setID, transmogSlot)
 	if not  newTransmogInfo[setID] then return end
-print(">")
 	local count = 0
 	for itemID, location in pairs(newTransmogInfo[setID]) do
 		count = count + 1
@@ -5170,6 +5219,24 @@ function BetterWardrobeSetsCollectionMixin:DisplaySet(setID)
 
 			--itemFrame.Icon:SetColorTexture(0,0,0,.5)
 		----end
+
+	if ( sortedSources[i].collected ) then
+		if sortedSources[i].isCollectedChar then
+		itemFrame.itemFrameType = "Collected";
+		else
+			if sortedSources[i].canCharCollectIt then
+			  itemFrame.itemFrameType = "CollectedCharCantUse";
+			else
+			  itemFrame.itemFrameType = "CollectedCharCantGet";
+			end
+	 	end
+	else
+		if (not sortedSources[i].canCharCollectIt) then
+			itemFrame.itemFrameType = "NotCollectedCharCantGet";
+		  else
+			itemFrame.itemFrameType = "NotCollected";
+		  end
+	end
 
 		self:SetItemFrameQuality(itemFrame);
 		itemFrame:SetPoint("TOP", self.DetailsFrame, "TOP", xOffset + (i - 1) * BUTTON_SPACE, -94);
@@ -5789,7 +5856,14 @@ function BetterWardrobeSetsCollectionScrollFrameMixin:Update()
 			end
 
 			button:Show();
-			button.Name:SetText(baseSet.name..((not baseSet.isClass and baseSet.className) and "-"..baseSet.className.."-" or "") )
+
+			local classIcon = ""
+			--if baseSet.classTag then 
+			--local classIcon = GetClassAtlas(baseSet.classTag)
+			--classIcon ="|A:"..classIcon..":16:16|a"
+			--end
+				--button.Name:SetText(baseSet.name or "")
+			button.Name:SetText(baseSet.name..((baseSet.className) and " ("..baseSet.className..")" or "") )
 			----button.Name:SetText(baseSet.name);
 
 			local topSourcesCollected, topSourcesTotal = addon.GetSetSourceCounts(baseSet.setID)  --SetsDataProvider:GetSetSourceTopCounts(baseSet.setID);
@@ -5801,6 +5875,8 @@ function BetterWardrobeSetsCollectionScrollFrameMixin:Update()
 			elseif ( topSourcesCollected == 0 ) then
 				color = GRAY_FONT_COLOR;
 			end
+
+
 
 			button.setCollected = setCollected
 			button.Name:SetTextColor(color.r, color.g, color.b);
@@ -6051,7 +6127,7 @@ function BetterWardrobeSetsTransmogMixin:OnEvent(event, ...)
 				self.pendingRefresh = nil;
 				if self:IsShown() then
 					local resetSelection = (event == "TRANSMOGRIFY_SUCCESS");
-                    --Changed the above to Success rather than Update so it only changes back to page 1 when you apply the look
+					--Changed the above to Success rather than Update so it only changes back to page 1 when you apply the look
 					self:Refresh(resetSelection);
 				end;
 			end);
@@ -6273,9 +6349,11 @@ function BetterWardrobeSetsTransmogMixin:UpdateSets()
 				--model.CollectionListVisual.Collection.Collected_Icon:SetShown(false)
 				model.setID = set.setID
 				local name = setInfo["name"]
-				local description = (setInfo["description"] and "\n"..setInfo["description"]) or ""
-				local class = (not setInfo.isClass and setInfo.className and "\n-"..setInfo.className.."-") or ""
-				model.SetInfo.setName:SetText(("%s%s%s"):format(name, description,class))
+				local description = ""
+
+				--local description = (setInfo["description"] and "\n-"..setInfo["description"].."-") or ""
+				local classname = (setInfo.className and "\n ("..setInfo.className..")") or ""
+				model.SetInfo.setName:SetText(("%s%s%s"):format(name, description, classname or ""))
 				if WardrobeCollectionFrame:CheckTab(4) then
 					model.SetInfo.progress:Hide()
 				else

@@ -78,8 +78,17 @@ function BuildBlizzSets()
 		data.expansionID  = data.expansionID + 1
 		data.BuildBlizzSets = true
 
+if data.classMask and Globals.CLASS_MASK_TO_ID[data.classMask] then 
 
+	--if Globals.CLASS_MASK_TO_ID[data.classMask] then
+		--print(data.classMask)
+		data.classID = Globals.CLASS_MASK_TO_ID[data.classMask]
+		--print(data.classID)
+		data.className, data.classTag = GetClassInfo(data.classID);
 
+	-- print(Globals.CLASS_MASK_TO_ID[data.classMask]) 
+
+	end
 		
 		for armor, mask in ipairs(armorMask) do 
 
@@ -132,6 +141,9 @@ end
 
 end
 
+local UIID_Counter = {1,1150,2000,3390,4580,6200,8000, 10110, 11000}
+local Set_Counter = {1,1150,2000,3390,4580,6200,8000, 10110, 11000}
+
 
 local function OpposingFaction(faction)
 	local faction = UnitFactionGroup("player")
@@ -158,11 +170,25 @@ do
 
 					local classInfo = CLASS_INFO[playerClass]
 					local classMask = getClassMask(setData.classMask)
-					local class = (classMask and classMask == classInfo[1]) or not setData.classMask
+					local class =  (setData.classMask)
 					local className = (classMask and GetClassInfo(classMask)) or nil
+					
+setData.isClass = setData.classMask == classInfo[1] or not setData.classMask
+					--local class = (setData.classMask and setData.classMask == 0) or (setData.classMask and bit.band(setData.classMask, classInfo[2])  == classInfo[2]) or not setData.classMask
+					setData.className = setData.classMask and GetClassInfo(setData.classMask)
 
-					setData.isClass = class
-					setData.className = className
+
+					if data.classMask then 
+
+	--if Globals.CLASS_MASK_TO_ID[data.classMask] then
+		--print(data.classMask)
+		--data.classID = Globals.CLASS_MASK_TO_ID[data.classMask]
+		--print(data.classID)
+		--data.className, data.classTag = GetClassInfo(data.classID);
+
+	-- print(Globals.CLASS_MASK_TO_ID[data.classMask]) 
+
+	end
 
 					setData["name"] = L[setData["name"]]
 					setData.oldnote = setData.label
@@ -185,7 +211,10 @@ do
 					--end
 
 					--setData.mod = setData.bonusid
-					setData.uiOrder = id * 100
+					--print(setData.expansionID)
+
+
+					--UIID_Counter[setData.expansionID]
 						--setData.filter = setData.filter + 1 -- fix for filter startin at 0
 					--setData.numCollected = 0
 					--setData.numTotal = 0
@@ -247,6 +276,8 @@ do
 																		addon.ArmorSetModCache[item][setMod] = {visualID, sourceID}
 																	end]]
 					end
+					setData.uiOrder = UIID_Counter[setData.expansionID] -- id * 100
+					UIID_Counter[setData.expansionID] = UIID_Counter[setData.expansionID] +1
 					SET_INDEX[id] = setData
 					ArmorDB[armorType][id] = setData
 				end
@@ -279,7 +310,7 @@ do
 --print(setData.expansionID)
 						--setData.expansionID = setData.expansionID -3
 						setData.isClass = class
-						setData.className = className
+						--setData.className = className
 						setData.Blizzard = true
 						setData.items = {}
 						setData.sources = {}
@@ -326,6 +357,8 @@ do
 						--local baseItem = setData.items[1]
 						---local visualID, sourceID = addon.GetItemSource(baseItem)
 						--setData.itemAppearance = addon.ItemAppearance[visualID]
+											setData.uiOrder = UIID_Counter[setData.expansionID] -- id * 100
+					UIID_Counter[setData.expansionID] = UIID_Counter[setData.expansionID] +1
 						SET_INDEX[setData.setID] = setData
 						ArmorDB[armorType][setData.setID] = setData
 					end
