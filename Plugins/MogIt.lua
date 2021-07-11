@@ -10,14 +10,35 @@ function MogIt.GetMogitOutfits() return {} end
 function MogIt.GetMogitWishlist() return {["extraset"] = {},["name"] = "MogIt Wishlist",["item"] = {},	["set"] = {},} end
 MogIt.MogitSets = {}
 
+function MogIt:DeleteSet(setName, noConfirm)
+end
+function MogIt:RenameSet(setName)
+end
 
 if not IsAddOnLoaded("MogIt") then return end
 local  mog = _G["MogIt"]
 local L = LibStub("AceLocale-3.0"):GetLocale(addonName)
-
+local Wishlist = mog:GetModule("Wishlist")
 
 local function SetHooks()
-	local ScrollFrames = {WardrobeCollectionFrameScrollFrame.buttons, WardrobeCollectionFrameScrollFrame.buttons}
+	addon:SecureHook(Wishlist, "DeleteSet", function(self)  addon:SendMessage("BW_TRANSMOG_COLLECTION_UPDATED") end)
+	addon:SecureHook(Wishlist, "RenameSet", function(self) addon:SendMessage("BW_TRANSMOG_COLLECTION_UPDATED") end)
+	addon:SecureHook(Wishlist, "CreateSet", function(self) addon:SendMessage("BW_TRANSMOG_COLLECTION_UPDATED") end)
+	addon:SecureHook(Wishlist, "GetSet", function(self) addon:SendMessage("BW_TRANSMOG_COLLECTION_UPDATED") end)
+	addon:SecureHook(Wishlist, "BuildList", function(self) addon:SendMessage("BW_TRANSMOG_COLLECTION_UPDATED") end)
+end
+
+function MogIt:DeleteSet(setName, noConfirm)
+	Wishlist:DeleteSet(setName, noConfirm)
+	--addon:SendMessage("BW_TRANSMOG_COLLECTION_UPDATED")
+end
+
+function MogIt:RenameSet(setName)
+	Wishlist:RenameSet(setName)
+	--addon:SendMessage("BW_TRANSMOG_COLLECTION_UPDATED")
+end
+local function UpdateFrames()
+	local ScrollFrames = {BetterWardrobeCollectionFrameScrollFrame.buttons, WardrobeCollectionFrameScrollFrame.buttons}
 --Hooks into the extra sets scroll frame buttons to allow ctrl-right clicking on the button to generate a mogit preview
 	for index, buttons in ipairs(ScrollFrames) do
 		local orig_OnMouseUp = buttons[1]:GetScript("OnMouseUp")
@@ -55,14 +76,18 @@ local function SetHooks()
 			orig_OnMouseDown(self, button)
 		end)
 	end
+
+
+
 	
 end
 
+addon:RegisterMessage("BW_ADDON_LOADED", function() UpdateFrames() end)
 
 addon:RegisterMessage("BW_OnPlayerEnterWorld", function() SetHooks() end)
 
 
-local Wishlist = mog:GetModule("Wishlist")
+
 function MogIt.GetMogitOutfits() 
 	local sets = Wishlist:GetSets(nil, true)
 	if #sets == 0 then return end
@@ -70,8 +95,10 @@ function MogIt.GetMogitOutfits()
 	local mogSets = {}
 	for i, set in pairs(sets) do
 		local data = {}
-		data.name = "MogIt - " .. set.name or ""
+		data.name = set.name or ""
+		--data.name = "MogIt - " .. set.name or ""
 		data.set = "mogit"
+		data.label = L["MogIt Set"]
 		data.index = i + 5000
 		data.outfitID = 5000 + i
 		data.mainHandEnchant = 0
@@ -113,7 +140,7 @@ function MogIt.GetMogitWishlist()
 end
 
 
-function matchVisual(itemlink)
+local function matchVisual(itemlink)
 	local appearanceID, sourceID = C_TransmogCollection.GetItemInfo(itemlink)
 	local list = Wishlist:BuildList()
 

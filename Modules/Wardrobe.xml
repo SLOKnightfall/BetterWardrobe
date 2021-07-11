@@ -267,6 +267,39 @@
 		</Layers>
 		<Frames>
 			<Frame inherits="BetterWardrobeIconsTemplate" />
+			<Button parentKey="EditButton" inherits="BetterWardrobeOutfitButtonButtonTemplate">
+				<KeyValues>
+					<KeyValue key="tooltipText" value="TRANSMOG_OUTFIT_EDIT" type="global"/>
+				</KeyValues>
+				<Size x="16" y="16"/>
+				<Anchors>
+					<Anchor point="RIGHT" x="-2"/>
+				</Anchors>
+				<Layers>
+					<Layer level="ARTWORK">
+						<Texture file="Interface\WorldMap\GEAR_64GREY" alpha="0.5" parentKey="texture"/>
+					</Layer>
+				</Layers>
+				<Scripts>
+					<OnClick>
+						local name = self:GetParent().Name:GetText()
+						--print(self:GetParent().setID)
+						PlaySound(SOUNDKIT.IG_MAINMENU_OPTION_CHECKBOX_ON);
+						BetterWardrobeOutfitEditFrame:ShowForOutfit_CollectionJournal(self:GetParent().setID, name, self);
+					</OnClick>
+
+					<OnEnter>
+						self.texture:SetAlpha(1.0);
+						GameTooltip:SetOwner(self, "ANCHOR_RIGHT");
+						GameTooltip:SetText(self.tooltipText);
+					</OnEnter>
+					<OnLeave>
+						self.texture:SetAlpha(0.5);
+						GameTooltip_Hide();
+					</OnLeave>
+
+				</Scripts>
+			</Button>
 		</Frames>
 		<Scripts>
 			<OnMouseUp>

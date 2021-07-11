@@ -78,25 +78,12 @@ function BuildBlizzSets()
 		data.expansionID  = data.expansionID + 1
 		data.BuildBlizzSets = true
 
-if data.classMask and Globals.CLASS_MASK_TO_ID[data.classMask] then 
-
-	--if Globals.CLASS_MASK_TO_ID[data.classMask] then
-		--print(data.classMask)
-		data.classID = Globals.CLASS_MASK_TO_ID[data.classMask]
-		--print(data.classID)
-		data.className, data.classTag = GetClassInfo(data.classID);
-
-	-- print(Globals.CLASS_MASK_TO_ID[data.classMask]) 
-
-	end
+		if data.classMask and Globals.CLASS_MASK_TO_ID[data.classMask] then 
+			data.classID = Globals.CLASS_MASK_TO_ID[data.classMask]
+			data.className, data.classTag = GetClassInfo(data.classID);
+		end
 		
 		for armor, mask in ipairs(armorMask) do 
-
-			--if bit.band(data.classMask, mask) == data.classMask  then
---print(bit.band(data.classMask, mask))
-
---bit.bor( 3592,1024)
---print(data.classMask)
 			--if bit.band(data.classMask, mask) == mask  then
 			if bit.bor(mask, data.classMask) == mask then
 
@@ -112,22 +99,19 @@ if data.classMask and Globals.CLASS_MASK_TO_ID[data.classMask] then
 				--elseif baseSet =~ data.setID and not BlizzardBaseSets[data.setID] then 
 				--end
 			elseif data.classMask == 0 then 
-
-				--print(data.setID)
-			WowSets["COSMETIC"][data.setID] = data
-
+				WowSets["COSMETIC"][data.setID] = data
 			end
-
-
 		end
-								if data.PvP then 
-							data.filter = 7
-						elseif data.setID <=2221 and data.setID >= 2015   then 
-						--rint(setData.setID)
-							data.filter = 11
-						else
-							data.filter = 5
-						end
+		--PvP Sets
+		if data.PvP then 
+			data.filter = 7
+		--Covenant Sets
+		elseif data.setID <=2221 and data.setID >= 2015   then 
+			data.filter = 11
+		--Raid Sets
+		else
+			data.filter = 5
+		end
 	end
 end
 
@@ -142,7 +126,6 @@ end
 end
 
 local UIID_Counter = {1,1150,2000,3390,4580,6200,8000, 10110, 11000}
-local Set_Counter = {1,1150,2000,3390,4580,6200,8000, 10110, 11000}
 
 
 local function OpposingFaction(faction)
@@ -173,22 +156,10 @@ do
 					local class =  (setData.classMask)
 					local className = (classMask and GetClassInfo(classMask)) or nil
 					
-setData.isClass = setData.classMask == classInfo[1] or not setData.classMask
+					setData.isClass = setData.classMask == classInfo[1] or not setData.classMask
 					--local class = (setData.classMask and setData.classMask == 0) or (setData.classMask and bit.band(setData.classMask, classInfo[2])  == classInfo[2]) or not setData.classMask
 					setData.className = setData.classMask and GetClassInfo(setData.classMask)
 
-
-					if data.classMask then 
-
-	--if Globals.CLASS_MASK_TO_ID[data.classMask] then
-		--print(data.classMask)
-		--data.classID = Globals.CLASS_MASK_TO_ID[data.classMask]
-		--print(data.classID)
-		--data.className, data.classTag = GetClassInfo(data.classID);
-
-	-- print(Globals.CLASS_MASK_TO_ID[data.classMask]) 
-
-	end
 
 					setData["name"] = L[setData["name"]]
 					setData.oldnote = setData.label
@@ -340,25 +311,24 @@ setData.isClass = setData.classMask == classInfo[1] or not setData.classMask
 						setData.hiddenUntilCollected = false
 						setData.armorType = armorType
 						setData.setID  = id*100000
+						--setData.
 						setData.armorType = Globals.ARMOR_TYPE_ID[armorType]
 
+						--If it was an old Rated armor set, flag it as no longer obtainable.
+						if (setData.description == ELITE) and setData.patchID < buildID then
+							setData.noLongerObtainable = true
+							setData.limitedTimeSet = nil
+						end
 
-
-					--If it was an old Rated armor set, flag it as no longer obtainable.
-					if (setData.description == ELITE) and setData.patchID < buildID then
-						setData.noLongerObtainable = true
-						setData.limitedTimeSet = nil
-					end
-
-			
-	--if data.label == "Pandaria Challenge Dungeons" then
-	--  data.noLongerObtainable = true
-	--end	
-						--local baseItem = setData.items[1]
-						---local visualID, sourceID = addon.GetItemSource(baseItem)
-						--setData.itemAppearance = addon.ItemAppearance[visualID]
-											setData.uiOrder = UIID_Counter[setData.expansionID] -- id * 100
-					UIID_Counter[setData.expansionID] = UIID_Counter[setData.expansionID] +1
+				
+						--if data.label == "Pandaria Challenge Dungeons" then
+						--  data.noLongerObtainable = true
+						--end	
+							--local baseItem = setData.items[1]
+							---local visualID, sourceID = addon.GetItemSource(baseItem)
+							--setData.itemAppearance = addon.ItemAppearance[visualID]
+						setData.uiOrder = UIID_Counter[setData.expansionID]
+						UIID_Counter[setData.expansionID] = UIID_Counter[setData.expansionID] +1
 						SET_INDEX[setData.setID] = setData
 						ArmorDB[armorType][setData.setID] = setData
 					end
@@ -442,7 +412,7 @@ setData.isClass = setData.classMask == classInfo[1] or not setData.classMask
 		addArmor(ArmorDB["COSMETIC"], SET_DATA)
 		--Add Hidden Set
 		SET_INDEX[0] = hiddenSet
-		--tinsert(SET_DATA, hiddenSet)
+		tinsert(SET_DATA, hiddenSet)
 		addon.BuildClassArtifactAppearanceList()
 	end
 
@@ -505,17 +475,17 @@ setData.isClass = setData.classMask == classInfo[1] or not setData.classMask
 				info.favorite = false
 				info.hiddenUtilCollected = false
 
-				info.label = L["Saved Set"]
+				info.label = data.label
+				info.set  = data.set
 				info.limitedTimeSet = false
 				info.patchID = ""
 				info.setID = data.setID or (data.outfitID + 5000)
+
 				info.uiOrder = data.uiOrder or (data.index * 100)
 				info.icon = data.icon
 				info.isClass = true
 				info.type = "Saved"
-				if data.outfitID and data.outfitID > 20 then
-					info.label = L["Extended Saved Set"]
-				end
+
 
 				if data.set == "default" then 
 					local outfitItemTransmogInfoList = C_TransmogCollection.GetOutfitItemTransmogInfoList(data.outfitID);

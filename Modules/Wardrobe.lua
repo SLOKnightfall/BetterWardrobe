@@ -640,8 +640,8 @@ function BetterWardrobeOutfitMixin:LoadOutfit(outfitID)
 					end
 					local itemTransmogInfo = ItemUtil.CreateItemTransmogInfo(appearanceID, 0, illusionID);
 					local slotName = TransmogUtil.GetSlotName(i)
-					if slotName ~= nil then
-						local itemLocation = TransmogUtil.CreateTransmogLocation(slotName, Enum.TransmogType.Appearance, Enum.TransmogModification.None)
+					if slotName ~= nil  and appearanceID then
+						local itemLocation = TransmogUtil.CreateTransmogLocation(slotName, Enum.TransmogType.Appearance, Enum.TransmogModification.Main)
 						local itemPending = TransmogUtil.CreateTransmogPendingInfo(Enum.TransmogPendingType.Apply, appearanceID)
 						C_Transmog.SetPending(itemLocation, itemPending)
 						if i == 16 or i == 17 then
@@ -3249,7 +3249,6 @@ end
 
 local function ToggleHidden(model, isHidden)
 	local tabID = addon.GetTab()
-	------print(tabID)
 	if tabID == 1 then
 		local visualID = model.visualInfo.visualID
 		local source = WardrobeCollectionFrame_GetSortedAppearanceSources(visualID)[1]
@@ -3396,7 +3395,7 @@ end
 
 
 function addon:SetFavoriteItem(visualID, set)
-	print(addon.favoritesDB.profile.item[visualID])
+	--print(addon.favoritesDB.profile.item[visualID])
 	if addon.favoritesDB.profile.item[visualID] then
 		addon.favoritesDB.profile.item[visualID] = nil
 	else
@@ -3418,7 +3417,7 @@ function BetterWardrobeCollectionFrameModelDropDown_SetFavorite(visualID, value,
 	if ( set and not confirmed ) then
 		local allSourcesConditional = true;
 		local collected = false
-		print(visualID)
+		--print(visualID)
 		local sources = C_TransmogCollection.GetAppearanceSources(44770);
 		for i, sourceInfo in ipairs(sources) do
 			local info = C_TransmogCollection.GetAppearanceInfoBySource(sourceInfo.sourceID);
@@ -4906,10 +4905,12 @@ function BetterWardrobeSetsCollectionMixin:OnLoad()
 end
 
 function addon:BW_TRANSMOG_COLLECTION_UPDATED()
-		SetsDataProvider:ClearSets()
-		WardrobeCollectionFrameScrollFrame:Refresh()
-		WardrobeCollectionFrameScrollFrame:UpdateProgressBar()
-		WardrobeCollectionFrameScrollFrame:ClearLatestSource()
+		--SetsDataProvider:ClearSets()
+		--WardrobeCollectionFrameScrollFrame:Refresh()
+		--WardrobeCollectionFrameScrollFrame:UpdateProgressBar()
+		--WardrobeCollectionFrameScrollFrame:ClearLatestSource()
+		C_Timer.After(0, function() RefreshLists() end)
+
 end
 
 function BetterWardrobeSetsCollectionMixin:OnShow()
@@ -4927,7 +4928,7 @@ function BetterWardrobeSetsCollectionMixin:OnShow()
 		local extraSets = addon.GetBaseList()
 		SetsDataProvider:SortSets(extraSets);
 
-		savedSets = addon.GetSavedList()
+		local savedSets = addon.GetSavedList()
 		if ( baseSets and baseSets[1] ) then
 			----self:SelectSet(self:GetDefaultSetIDForBaseSet(baseSets[1].setID));  --Todo check
 			self.selectedSetID = baseSets[1].setID
@@ -5899,6 +5900,8 @@ function BetterWardrobeSetsCollectionScrollFrameMixin:Update()
 
 			button.New:SetShown(SetsDataProvider:IsBaseSetNew(baseSet.setID));
 			button.setID = baseSet.setID;
+
+			button.EditButton:SetShown(WardrobeCollectionFrame:CheckTab(4))
 
 			if ( topSourcesCollected == 0 or setCollected ) then
 				button.ProgressBar:Hide();

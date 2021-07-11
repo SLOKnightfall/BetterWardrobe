@@ -479,7 +479,6 @@ function CollectionList:IsInList(itemID, itemType, full)
 		return count ~= 0, count
 	else
 		local collectionList = addon.CollectionList:CurrentList()
-		xxx= collectionList
 		local isInList = collectionList[itemType][itemID] or false
 		return isInList	
 	end

@@ -286,7 +286,7 @@ if WE_Frames.WatcherFrame then
 
 
 	if  completed < 5 then
-		print("missed one")
+		--print("missed one")
 		addon.Init:UpdateWardrobeEnhanced()
 		return
 	end

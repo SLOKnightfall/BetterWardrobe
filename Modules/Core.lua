@@ -1211,6 +1211,8 @@ function addon:OnEnable()
 		addon:RegisterEvent("TRANSMOG_COLLECTION_SOURCE_ADDED", "EventHandler")
 	end
 
+	addon:RegisterEvent("PLAYER_ENTERING_WORLD", "EventHandler")
+
 	inizliaed = true
 end
 
@@ -1227,8 +1229,7 @@ end
 function addon.Init:LoadModules()
 	--Check to make sure that the addon has completed loading
 	if not inizliaed then 
-		print ("not initi")
-				C_Timer.After(0.5, function() addon.Init:LoadModules() end)
+		C_Timer.After(0.5, function() addon.Init:LoadModules() end)
 		return false
 	end
 
@@ -1330,11 +1331,11 @@ end
 
 function addon:EventHandler(event, ...)
 	if event == "ADDON_LOADED" and ... == "Blizzard_Collections" then 
-		print("load addon col")
 		addon.Init:LoadModules()
-		addon:SendMessage("BW_OnPlayerEnterWorld")
+		addon:SendMessage("BW_ADDON_LOADED")
 		addon:UnregisterEvent("ADDON_LOADED")
-
+	elseif (event == "PLAYER_ENTERING_WORLD") then
+		addon:SendMessage("BW_OnPlayerEnterWorld")
 	elseif (event == "TRANSMOG_COLLECTION_SOURCE_ADDED") then
 		local x = ...
 		BetterWardrobeCollectionFrameMixin:OnEvent(event, x)

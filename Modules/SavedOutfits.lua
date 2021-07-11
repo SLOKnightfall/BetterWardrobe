@@ -55,6 +55,8 @@ local function GetOutfits(character)
 			for i, data in ipairs(FullList) do
 				data.set = "extra"
 				data.index = i
+				data.label = L["Extended Saved Set"]
+
 			end
 		else
 			----FullList = C_TransmogCollection.GetOutfits()
@@ -68,7 +70,9 @@ local function GetOutfits(character)
 				data.outfitID = outfitID
 				data.name = name
 				data.icon = icon
+				data.label = L["Saved Set"]
 				FullList[i] = data
+
 			end
 
 			if addon.OutfitDB.char.outfits then 
@@ -77,6 +81,7 @@ local function GetOutfits(character)
 					data.set = "extra"
 					data.index = i
 					data.name = addon.OutfitDB.char.outfits[i].name
+					data.label = L["Extended Saved Set"]
 					tinsert(FullList, data)
 					--FullList[#FullList].outfitID = MAX_DEFAULT_OUTFITS + i
 					--data.set = "default"
@@ -87,6 +92,8 @@ local function GetOutfits(character)
 		local mogit_Outfits = addon.MogIt.GetMogitOutfits()
 		if mogit_Outfits then 
 			for i, data in ipairs(mogit_Outfits) do
+				data.set = "mogit"
+				data.label = L["MogIt Saved Set"]
 				--local index = #FullList
 				tinsert(FullList, data)
 			end
@@ -105,6 +112,12 @@ end
 
 local function IsDefaultSet(outfitID)
 	return outfitID < MAX_DEFAULT_OUTFITS  -- #C_TransmogCollection.GetOutfits()--MAX_DEFAULT_OUTFITS 
+end
+
+
+
+local function IsMogitSet(outfitID)
+	return outfitID >= 10000 
 end
 
 
@@ -301,7 +314,7 @@ function BetterWardrobeOutfitDropDownMixin:OnOutfitSaved(outfitID)
 end
 
 function BetterWardrobeOutfitDropDownMixin:SelectOutfit(outfitID, loadOutfit)
-
+print('sssd')
 	local name
 	if (outfitID) then
 		name = GetOutfitName(outfitID)
@@ -660,6 +673,7 @@ function BetterWardrobeOutfitFrameMixin:DeleteOutfit(outfitID)
 	end
 
 	addon.setdb.global.sets[addon.setdb:GetCurrentProfile()] = addon.GetSavedList()
+	addon:SendMessage("BW_TRANSMOG_COLLECTION_UPDATED")
 end
 
 function BetterWardrobeOutfitFrameMixin:NameOutfit(newName, outfitID)
@@ -857,8 +871,8 @@ end
 
 function BetterWardrobeOutfitEditFrameMixin:OnDelete()
 	BetterWardrobeOutfitFrame:Hide();
-	local name = C_TransmogCollection.GetOutfitInfo(self.outfitID);
-	BetterWardrobeOutfitFrame:ShowPopup("CONFIRM_DELETE_TRANSMOG_OUTFIT", name, nil,  self.outfitID);
+	local name = C_TransmogCollection.GetOutfitInfo(self.outfitID) or self.name;
+	BetterWardrobeOutfitFrame:ShowPopup("BW_CONFIRM_DELETE_TRANSMOG_OUTFIT", name, nil,  self.outfitID);
 end
 
 function BetterWardrobeOutfitEditFrameMixin:OnAccept()
@@ -867,6 +881,7 @@ function BetterWardrobeOutfitEditFrameMixin:OnAccept()
 	end
 	StaticPopupSpecial_Hide(self);
 	BetterWardrobeOutfitFrame:NameOutfit(self.EditBox:GetText(), self.outfitID);
+	addon:SendMessage("BW_TRANSMOG_COLLECTION_UPDATED")
 end
 
 --===================================================================================================================================
@@ -960,52 +975,57 @@ end
 function addon.Init.SavedSetsDropDown_Initialize(self)
 	--local f = BW_UIDropDownMenu_Create("BW_DBSavedSetDropdown", BW_WardrobeCollectionFrame)
 	BW_DBSavedSetDropdown = CreateFrame("Frame", "BW_DBSavedSetDropdown", WardrobeCollectionFrame, "BW_UIDropDownMenuTemplate")
-
-	--BW_DBSavedSetDropdown = BW_UIDropDownMenu_Create("BW_DBSavedSetDropdown", BW_WardrobeCollectionFrame)
-	--BW_DBSavedSetDropdown:SetParent("BW_WardrobeCollectionFrame")
-	--BW_DBSavedSetDropdown:ClearAllPoints()
 	BW_DBSavedSetDropdown:SetPoint("TOPRIGHT", "BW_SortDropDown", "TOPRIGHT")
 	BW_UIDropDownMenu_SetWidth(BW_DBSavedSetDropdown, 165) -- Use in place of dropDown:SetWidth
+
 -- Bind an initializer function to the dropdown; see previous sections for initializer function examples.
 	BW_UIDropDownMenu_Initialize(BW_DBSavedSetDropdown, SavedOutfitDB_Dropdown_Menu)
 	BW_UIDropDownMenu_SetSelectedValue(BW_DBSavedSetDropdown, addon.setdb:GetCurrentProfile())
+end
 
 
+local MogItSetNAme
+local function BW_DressingRoomImportButton_OnClicks(outfitID, name, parent)
 
---[[	local  f = addon.Frame:Create("SimpleGroup")
-	addon.SavedSetDropDownFrame = f
-	f.frame:SetParent("BW_WardrobeCollectionFrame")
-	f:SetWidth(87)--, 22)
-	f:SetHeight(22)
+	MogItSetNAme = name
+	local contextMenuData = {
+		{
+			text = L["Rename"],
+			func = function()
+				addon.MogIt:RenameSet(MogItSetNAme)
+				MogItSetNAme = nil
+			end,
 
-	f:ClearAllPoints()
-	f:SetPoint("TOPLEFT", BW_SortDropDown.frame, "TOPLEFT")
+			isNotRadio = true,
+			notCheckable = true,
+		},
+		{
+			text = L["Delete"],
+			func = function()
+				addon.MogIt:DeleteSet(MogItSetNAme)
+				MogItSetNAme = nil
+			end,
+			isNotRadio = true,
+			notCheckable = true,
+		},
+		
+	}
+	BW_UIDropDownMenu_SetAnchor(addon.ContextMenu, 0, 0, "BOTTOMLEFT", parent, "BOTTOMLEFT")
+	BW_EasyMenu(contextMenuData, addon.ContextMenu, parent, 0, 0, "MENU")
+end
 
-
-	local dropdown = addon.Frame:Create("Dropdown")
-	dropdown:SetWidth(175)--, 22)
-	--dropdown:SetHeight(22)
-	f:AddChild(dropdown)
-	outfitDropdown = dropdown
-	addon.RefreshSaveOutfitDropdown(dropdown)
-
-
-
-	
-	dropdown:SetCallback("OnValueChanged", function(widget) 
-		local value = widget.list[widget.value]
-		local name = UnitName("player")
-		local realm = GetRealmName()
-
-		if value ~= addon.setdb:GetCurrentProfile() then 
-			addon.SelecteSavedList = widget.list[widget.value]
-		else
-			addon.SelecteSavedList = false
-		end
-		BW_WardrobeCollectionFrame_SetTab(2)
-		BW_WardrobeCollectionFrame_SetTab(4)
-		addon.savedSetCache = nil
-	end)]]
-
+function BetterWardrobeOutfitEditFrameMixin:ShowForOutfit_CollectionJournal(outfitID, name, parent)
+	BetterWardrobeOutfitFrame:Hide();
+	--Mogit Sets
+	if outfitID >=10000 then
+		BW_DressingRoomImportButton_OnClicks(outfitID, name, parent)
+		
+	--Saved Sets
+	else
+		BetterWardrobeOutfitFrame:ShowPopup(self);
+		self.outfitID = outfitID - 5000
+		self.name = name
+		self.EditBox:SetText(name);
+	end
 
 end
