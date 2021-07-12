@@ -99,6 +99,14 @@ local function GetOutfits(character)
 			end
 		end
 
+		local transmogOutfits_Sets = addon.TransmogOutfits.GetOutfits()
+		if transmogOutfits_Sets then 
+			for i, data in ipairs(transmogOutfits_Sets) do
+				--local index = #FullList
+				tinsert(FullList, data)
+			end
+		end
+
 		return FullList
 end
 addon.GetOutfits = GetOutfits
@@ -985,39 +993,22 @@ end
 
 
 
-function BetterWardrobeOutfitFrameMixin:ImportMogitSet(outfitID)
-	local icon
-	local outfit
 
-	itemTransmogInfoList = {}
-	local setdata = addon.GetSetInfo(outfitID)
-	local name = setdata.name.." (Copy)"
-	local icon = setdata.icon
-	local itemlist = setdata.sources
-
-	--for key, transmogSlot in pairs(TRANSMOG_SLOTS) do
-	for slotID = 1, 19 do
-		--local slotID = transmogSlot.location:GetSlotID();
-		local itemTransmogInfo = ItemUtil.CreateItemTransmogInfo(itemlist[slotID] or 0, 0, 0);
-		itemTransmogInfoList[slotID] = itemTransmogInfo
-	end
-
-	if (outfitID and IsDefaultSet(outfitID)) or (#C_TransmogCollection.GetOutfits() < MAX_DEFAULT_OUTFITS)  then 
-		outfitID = C_TransmogCollection.NewOutfit(name, icon, itemTransmogInfoList);
-	else
-		tinsert(addon.OutfitDB.char.outfits, {})
-		outfit = addon.OutfitDB.char.outfits[#addon.OutfitDB.char.outfits]
-		outfit["name"] = name
-		outfit["icon"] = setdata.icon
-		outfit.itemTransmogInfoList =  itemTransmogInfoList or {}
-	end
-
-	addon:SendMessage("BW_TRANSMOG_COLLECTION_UPDATED")
-end
 
 local MogItSetName
 local MogItSetID
+local plugin
+local plugin_index
 local function BW_DressingRoomImportButton_OnClicks(outfitID, name, parent)
+	
+
+	if outfitID >=12000 then
+		plugin = addon.TransmogOutfits
+		plugin_index = outfitID
+	else
+		plugin = addon.MogIt
+		plugin_index = MogItSetName
+	end
 
 	MogItSetName = name
 	MogItSetID = outfitID
@@ -1025,18 +1016,23 @@ local function BW_DressingRoomImportButton_OnClicks(outfitID, name, parent)
 		{
 			text = L["Create Copy"],
 			func = function()
-				BetterWardrobeOutfitFrameMixin:ImportMogitSet(MogItSetID, MogItSetName)
+				plugin:CopySet(MogItSetID, MogItSetName)
+				--BetterWardrobeOutfitFrameMixin:ImportMogitSet(MogItSetID, MogItSetName)
 				MogItSetName = nil
 				MogItSetID = nil
+				plugin = nil
+
 			end,
 			isNotRadio = true,
 			notCheckable = true,
 		},{
 			text = L["Rename"],
 			func = function()
-				addon.MogIt:RenameSet(MogItSetName)
+				plugin:RenameSet(plugin_index)
 				MogItSetName = nil
 				MogItSetID = nil
+				plugin = nil
+				plugin_index = nil
 
 			end,
 
@@ -1046,9 +1042,12 @@ local function BW_DressingRoomImportButton_OnClicks(outfitID, name, parent)
 		{
 			text = L["Delete"],
 			func = function()
-				addon.MogIt:DeleteSet(MogItSetName)
+				plugin:DeleteSet(plugin_index)
 				MogItSetName = nil
 				MogItSetID = nil
+				plugin = nil
+				plugin_index = nil
+
 
 			end,
 			isNotRadio = true,
@@ -1061,8 +1060,9 @@ local function BW_DressingRoomImportButton_OnClicks(outfitID, name, parent)
 end
 
 function BetterWardrobeOutfitEditFrameMixin:ShowForOutfit_CollectionJournal(outfitID, name, parent)
+	print(outfitID)
 	BetterWardrobeOutfitFrame:Hide();
-	--Mogit Sets
+	--Other Addon Sets
 	if outfitID >=10000 then
 		BW_DressingRoomImportButton_OnClicks(outfitID, name, parent)
 		

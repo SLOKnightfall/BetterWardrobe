@@ -127,13 +127,8 @@ end
 
 function addon.Init:UpdateWardrobeEnhanced()
 	wipe(WE_HideFrames)
-	local f=CreateFrame("Frame",nil,UIParent)
-	f:ClearAllPoints()
-	f:SetPoint("TOPRIGHT",100, 100)
-	f:SetSize(1,1)
-	f:Hide()
 	local completed = 0
-
+	local f = addon.prisonFrame
 	local function ButtonOnEnter(self)
 		if not self.tooltip then return end
 			GameTooltip:SetOwner(self, "ANCHOR_RIGHT")

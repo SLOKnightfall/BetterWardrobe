@@ -21,6 +21,7 @@ addon.validSetCache = {}
 addon.usableSourceCache = {}
 addon.UI = {}
 addon.Init = {}
+addon.Plugins = {}
 local newTransmogInfo  = {["latestSource"] = NO_TRANSMOG_SOURCE_ID} --{[99999999] = {[58138] = 10}, }
 addon.TRANSMOG_SET_FILTER = {}
 _G[addonName] = {}
@@ -1344,3 +1345,11 @@ function addon:EventHandler(event, ...)
 		BetterWardrobeCollectionFrameMixin:OnEvent(event, x)
 	end
 end
+
+
+local f=CreateFrame("Frame",nil,UIParent)
+	f:ClearAllPoints()
+	f:SetPoint("TOPRIGHT",100, 100)
+	f:SetSize(1,1)
+	f:Hide()
+	addon.prisonFrame = f

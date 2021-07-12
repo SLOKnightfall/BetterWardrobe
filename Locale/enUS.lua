@@ -63,6 +63,7 @@ L["Print Set Collection alerts to chat:"] = true
 L["Sets"] = true
 L["Extra Sets"] = true
 L["MogIt Saved Set"] = true
+L["TransmogOutfits Saved Set"] = true
 L["Collection List"] = true
 L["TSM Source to Use"] = true
 L["Profiles for sharing the various lists across characters"] = true

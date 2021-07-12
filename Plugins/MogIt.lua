@@ -103,6 +103,7 @@ function MogIt.GetMogitOutfits()
 		data.outfitID = 5000 + i
 		data.mainHandEnchant = 0
 		data.offHandEnchant = 0
+		data.offShoulder = 0
 
 		local items = set.items
 		for i, invSlot in ipairs(addon.Globals.slots) do
@@ -206,4 +207,40 @@ function MogIt.UpdateWishlistItem(type, typeID, add)
 		return addSet
 	end
 
+end
+
+local MAX_DEFAULT_OUTFITS = C_TransmogCollection.GetNumMaxOutfits()
+local function IsDefaultSet(outfitID)
+	
+	return outfitID < MAX_DEFAULT_OUTFITS  -- #C_TransmogCollection.GetOutfits()--MAX_DEFAULT_OUTFITS 
+end
+
+function MogIt:CopySet(outfitID)
+	local icon
+	local outfit
+
+	itemTransmogInfoList = {}
+	local setdata = addon.GetSetInfo(outfitID)
+	local name = setdata.name.." (Copy)"
+	local icon = setdata.icon
+	local itemlist = setdata.sources
+
+	--for key, transmogSlot in pairs(TRANSMOG_SLOTS) do
+	for slotID = 1, 19 do
+		--local slotID = transmogSlot.location:GetSlotID();
+		local itemTransmogInfo = ItemUtil.CreateItemTransmogInfo(itemlist[slotID] or 0, 0, 0);
+		itemTransmogInfoList[slotID] = itemTransmogInfo
+	end
+
+	if (outfitID and IsDefaultSet(outfitID)) or (#C_TransmogCollection.GetOutfits() < MAX_DEFAULT_OUTFITS)  then 
+		outfitID = C_TransmogCollection.NewOutfit(name, icon, itemTransmogInfoList);
+	else
+		tinsert(addon.OutfitDB.char.outfits, {})
+		outfit = addon.OutfitDB.char.outfits[#addon.OutfitDB.char.outfits]
+		outfit["name"] = name
+		outfit["icon"] = setdata.icon
+		outfit.itemTransmogInfoList =  itemTransmogInfoList or {}
+	end
+
+	addon:SendMessage("BW_TRANSMOG_COLLECTION_UPDATED")
 end
