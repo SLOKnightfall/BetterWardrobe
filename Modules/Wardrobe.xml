@@ -269,7 +269,7 @@
 			<Frame inherits="BetterWardrobeIconsTemplate" />
 			<Button parentKey="EditButton" inherits="BetterWardrobeOutfitButtonButtonTemplate">
 				<KeyValues>
-					<KeyValue key="tooltipText" value="TRANSMOG_OUTFIT_EDIT" type="global"/>
+					<KeyValue key="tooltipText" value="Options" type="string"/>
 				</KeyValues>
 				<Size x="16" y="16"/>
 				<Anchors>

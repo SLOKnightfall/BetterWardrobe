@@ -984,16 +984,60 @@ function addon.Init.SavedSetsDropDown_Initialize(self)
 end
 
 
-local MogItSetNAme
+
+function BetterWardrobeOutfitFrameMixin:ImportMogitSet(outfitID)
+	local icon
+	local outfit
+
+	itemTransmogInfoList = {}
+	local setdata = addon.GetSetInfo(outfitID)
+	local name = setdata.name.." (Copy)"
+	local icon = setdata.icon
+	local itemlist = setdata.sources
+
+	--for key, transmogSlot in pairs(TRANSMOG_SLOTS) do
+	for slotID = 1, 19 do
+		--local slotID = transmogSlot.location:GetSlotID();
+		local itemTransmogInfo = ItemUtil.CreateItemTransmogInfo(itemlist[slotID] or 0, 0, 0);
+		itemTransmogInfoList[slotID] = itemTransmogInfo
+	end
+
+	if (outfitID and IsDefaultSet(outfitID)) or (#C_TransmogCollection.GetOutfits() < MAX_DEFAULT_OUTFITS)  then 
+		outfitID = C_TransmogCollection.NewOutfit(name, icon, itemTransmogInfoList);
+	else
+		tinsert(addon.OutfitDB.char.outfits, {})
+		outfit = addon.OutfitDB.char.outfits[#addon.OutfitDB.char.outfits]
+		outfit["name"] = name
+		outfit["icon"] = setdata.icon
+		outfit.itemTransmogInfoList =  itemTransmogInfoList or {}
+	end
+
+	addon:SendMessage("BW_TRANSMOG_COLLECTION_UPDATED")
+end
+
+local MogItSetName
+local MogItSetID
 local function BW_DressingRoomImportButton_OnClicks(outfitID, name, parent)
 
-	MogItSetNAme = name
+	MogItSetName = name
+	MogItSetID = outfitID
 	local contextMenuData = {
 		{
+			text = L["Create Copy"],
+			func = function()
+				BetterWardrobeOutfitFrameMixin:ImportMogitSet(MogItSetID, MogItSetName)
+				MogItSetName = nil
+				MogItSetID = nil
+			end,
+			isNotRadio = true,
+			notCheckable = true,
+		},{
 			text = L["Rename"],
 			func = function()
-				addon.MogIt:RenameSet(MogItSetNAme)
-				MogItSetNAme = nil
+				addon.MogIt:RenameSet(MogItSetName)
+				MogItSetName = nil
+				MogItSetID = nil
+
 			end,
 
 			isNotRadio = true,
@@ -1002,8 +1046,10 @@ local function BW_DressingRoomImportButton_OnClicks(outfitID, name, parent)
 		{
 			text = L["Delete"],
 			func = function()
-				addon.MogIt:DeleteSet(MogItSetNAme)
-				MogItSetNAme = nil
+				addon.MogIt:DeleteSet(MogItSetName)
+				MogItSetName = nil
+				MogItSetID = nil
+
 			end,
 			isNotRadio = true,
 			notCheckable = true,

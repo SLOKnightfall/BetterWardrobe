@@ -215,6 +215,7 @@ L["View All"] = true
 L["Add List"] = true
 L["Rename"] = true
 L["Delete"] = true
+L["Create Copy"] = true
 L["Add by Item ID"] = true
 
 L["Export TSM Groups"] = true
