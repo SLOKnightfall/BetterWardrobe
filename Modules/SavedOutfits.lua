@@ -322,7 +322,6 @@ function BetterWardrobeOutfitDropDownMixin:OnOutfitSaved(outfitID)
 end
 
 function BetterWardrobeOutfitDropDownMixin:SelectOutfit(outfitID, loadOutfit)
-print('sssd')
 	local name
 	if (outfitID) then
 		name = GetOutfitName(outfitID)
@@ -1060,7 +1059,6 @@ local function BW_DressingRoomImportButton_OnClicks(outfitID, name, parent)
 end
 
 function BetterWardrobeOutfitEditFrameMixin:ShowForOutfit_CollectionJournal(outfitID, name, parent)
-	print(outfitID)
 	BetterWardrobeOutfitFrame:Hide();
 	--Other Addon Sets
 	if outfitID >=10000 then

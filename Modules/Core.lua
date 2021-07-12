@@ -67,8 +67,11 @@ function optionHandler:Setter(info, value)
 		C_TransmogCollection.SetShowMissingSourceInItemTooltips(value);
 
 	elseif info.arg == "ExtraLargeTransmogArea" or info.arg == "LargeTransmogArea" then 
-		WardrobeFrame.extended = false
+		addon.TransmogVendorSizeUpdated = false
 		addon.ExtendTransmogView()
+	elseif info.arg == "ExtraLargeTransmogAreaMax" then 
+		addon.ExtendTransmogView(true)
+
 	end
 end
 
@@ -108,6 +111,7 @@ function optionHandler:TSM_MarketGetter(info)
 	return optionHandler:Getter(info)
 end
 
+local screenWidth =  math.floor(UIParent:GetWidth())
 --ACE3 Options Constuctor
 local options = {
 	name = "BetterWardrobe",
@@ -217,7 +221,7 @@ local options = {
 							order = 1.1,
 							name = L["Larger Transmog Area"],
 							type = "toggle",
-							width = 1.2,
+							width = 1.8,
 							arg = "LargeTransmogArea",
 							desc = L["LargeTransmogArea_Tooltip"],
 						},
@@ -228,6 +232,19 @@ local options = {
 							width = 1.4,
 							arg = "ExtraLargeTransmogArea",
 							desc = L["ExtraLargeTransmogArea_Tooltip"],
+						},
+						ExtraLargeTransmogAreaMax = {
+							order = 1.3,
+							name = L["Max Width"],
+							type = "range",
+							width = "full",
+							min = 1200,
+							max = screenWidth,
+							step = 1,
+							bigStep = 100,
+							width = 1.6,
+							arg = "ExtraLargeTransmogAreaMax",
+							desc = L["ExtraLargeTransmogAreaMax_Tooltip"],
 						},
 						ShowIncomplete = {
 							order = 2,
@@ -915,6 +932,7 @@ local defaults = {
 		TooltipPreview_DressingDummy = false, 
 		IgnoreClassRestrictions = false,
 		ExtraLargeTransmogArea = false,
+		ExtraLargeTransmogAreaMax = screenWidth,
 	}
 }
 local DB_Defaults = {

@@ -55,9 +55,9 @@ end
 
 function UI:CreateDropDown()
 	WardrobeOutfitDropDown:Hide()
-	BetterWardrobeOutfitDropDown:SetParent(WardrobeTransmogFrame)
-	BetterWardrobeOutfitDropDown:ClearAllPoints()
-	BetterWardrobeOutfitDropDown:SetPoint("TOPLEFT", -14, -28)
+--	BetterWardrobeOutfitDropDown:SetParent(WardrobeTransmogFrame)
+	--BetterWardrobeOutfitDropDown:ClearAllPoints()
+	--BetterWardrobeOutfitDropDown:SetPoint("TOPLEFT", -14, -28)
 
 	addon:SecureHook(WardrobeTransmogFrame, "OnTransmogApplied", function()
 	C_Timer.After(.5, function()
@@ -404,7 +404,7 @@ end
 
 -- Base Transmog Sets Window Upates
 function UI.ExtendTransmogView(reset)
-	if WardrobeFrame and WardrobeFrame.extended then return end
+	if WardrobeFrame and addon.TransmogVendorSizeUpdated and not reset  or not WardrobeFrame then return end
 
 	--if not addon.Profile.LargeTransmogArea or not addon.Profile.ExtraLargeTransmogArea then return end
 	local scale = 1
@@ -413,25 +413,36 @@ function UI.ExtendTransmogView(reset)
 
 	if addon.Profile.ExtraLargeTransmogArea then
 		scale = 1.25
-        screenWidth = math.floor(UIParent:GetWidth()); --1605??
+
+        local itemFrameWidth = math.floor(WardrobeCollectionFrame.ItemsCollectionFrame:GetWidth()) + 5
+		local screenWidth = addon.Profile.ExtraLargeTransmogAreaMax or math.floor(UIParent:GetWidth())-- 1680 --math.floor(UIParent:GetWidth())
+        local frameWidth = screenWidth - itemFrameWidth
         
 		WardrobeFrame:SetWidth(screenWidth)
 		WardrobeFrame:SetClampedToScreen(true)
 		WardrobeFrame:SetHeight(UIParent:GetHeight() -25);
+        WardrobeTransmogFrame:SetWidth(frameWidth);
 
-        WardrobeTransmogFrame:SetWidth(885);
 		WardrobeTransmogFrame:SetHeight(WardrobeFrame:GetHeight() -90);
 		WardrobeTransmogFrame:SetPoint("TOPLEFT", WardrobeFrame, 4, -60)
-
 		WardrobeTransmogFrame.ModelScene:ClearAllPoints()
-		WardrobeTransmogFrame.ModelScene:SetPoint("TOPLEFT", WardrobeTransmogFrame, 25, -20)
-		WardrobeTransmogFrame.ModelScene:SetPoint("BOTTOMRIGHT", WardrobeTransmogFrame, -25, 20)
-		WardrobeTransmogFrame.Inset.BG:SetAllPoints()
 
+		WardrobeTransmogFrame.ModelScene:SetHeight(WardrobeFrame:GetHeight() -90);
+
+		if frameWidth > 800 then 
+			WardrobeTransmogFrame.ModelScene:SetWidth(800);
+			WardrobeTransmogFrame.ModelScene:SetPoint("TOP", WardrobeTransmogFrame)
+			WardrobeTransmogFrame.ModelScene:SetPoint("BOTTOM", WardrobeTransmogFrame)
+		else
+			WardrobeTransmogFrame.ModelScene:SetPoint("TOPLEFT", WardrobeTransmogFrame, 25, -20)
+			WardrobeTransmogFrame.ModelScene:SetPoint("BOTTOMRIGHT", WardrobeTransmogFrame, -25, 20)
+		end
+		
+		WardrobeTransmogFrame.Inset.BG:SetAllPoints()
 		WardrobeTransmogFrame.HeadButton:ClearAllPoints()
-		WardrobeTransmogFrame.HeadButton:SetPoint("TOP", WardrobeTransmogFrame.ModelScene, "TOP", math.ceil(screenWidth * -0.1994), -41) -- -320
+		WardrobeTransmogFrame.HeadButton:SetPoint("TOP", WardrobeTransmogFrame.ModelScene, "TOP", math.ceil(frameWidth * -0.3), -41) -- -320
 		WardrobeTransmogFrame.HandsButton:ClearAllPoints()
-		WardrobeTransmogFrame.HandsButton:SetPoint("TOP", WardrobeTransmogFrame.ModelScene, "TOP", math.floor(screenWidth * 0.2025), -118) --325
+		WardrobeTransmogFrame.HandsButton:SetPoint("TOP", WardrobeTransmogFrame.ModelScene, "TOP", math.floor(frameWidth * 0.3), -118) --325
 
 		WardrobeTransmogFrame.MainHandButton:ClearAllPoints()
 		WardrobeTransmogFrame.MainHandButton:SetPoint("BOTTOM", WardrobeTransmogFrame.ModelScene, "BOTTOM", -26, 15)
@@ -447,6 +458,7 @@ function UI.ExtendTransmogView(reset)
 
 		WardrobeTransmogFrame.ModelScene.ClearAllPendingButton:SetPoint("TOPRIGHT", WardrobeTransmogFrame, -20, -20)
 		WardrobeTransmogFrame.ModelScene.ControlFrame:SetPoint("TOP", WardrobeTransmogFrame, "TOP", 0, -4)
+
 		BetterWardrobeOutfitDropDown:ClearAllPoints()
 		BetterWardrobeOutfitDropDown:SetPoint("TOPLEFT", WardrobeTransmogFrame, 35, 28)
 		BW_LoadQueueButton:ClearAllPoints()
@@ -535,7 +547,7 @@ function UI.ExtendTransmogView(reset)
 		WardrobeTransmogFrame.MainHandEnchantButton:ClearAllPoints()
 		WardrobeTransmogFrame.MainHandEnchantButton:SetPoint("BOTTOM", WardrobeTransmogFrame.MainHandButton, "BOTTOM", 0, -20)
 		WardrobeTransmogFrame.SecondaryHandEnchantButton:ClearAllPoints()
-		WardrobeTransmogFrame.SecondaryHandEnchantButton:SetPoint("BOTTOM", WardrobeTransmogFrame.SecondaryHandButton, "BOTTOM", 0, -20)
+		WardrobeTransmogFrame.SecondaryHandEnchantButton:SetPoint("BOTTOM", WardrobeTransmogFrame.SecondaryHandButton, "BOTTOM", 0, -20)	
 
 		BetterWardrobeOutfitDropDown:ClearAllPoints()
 		BetterWardrobeOutfitDropDown:SetPoint("TOPLEFT", WardrobeTransmogFrame, -14, 28)
@@ -558,7 +570,7 @@ function UI.ExtendTransmogView(reset)
 	WardrobeTransmogFrame.ModelScene.ClearAllPendingButton:SetScale(scale)
 
 	UpdateUIPanelPositions()
-	WardrobeFrame.extended = true
+	addon.TransmogVendorSizeUpdated = true
 end
 addon.ExtendTransmogView = UI.ExtendTransmogView
 

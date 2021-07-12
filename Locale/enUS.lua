@@ -73,8 +73,12 @@ L["Profiles for sharing the various lists across characters"] = true
 L["Transmog Vendor Window"] = true
 L["Larger Transmog Area"] = true
 L["Extra Large Transmog Area"] = true
+L["Max Width"] = true
+
 L["LargeTransmogArea_Tooltip"] = "Increases the Transmog Vendor Window"
 L["ExtraLargeTransmogArea_Tooltip"] = "Increase the Transmog Vendor Window to fill width of screen"
+L["LargeTransmogArea_Tooltip"] = "Increases the Transmog Vendor Window"
+L["ExtraLargeTransmogAreaMax_Tooltip"] = "Increase the Transmog Vendor Window to fill width of screen"
 L["Show Incomplete Sets"] = true
 L["Show Items set to Hidden"] = true
 L["Show Hidden Items"] = true

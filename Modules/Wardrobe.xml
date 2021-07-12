@@ -1514,6 +1514,17 @@
 					<OnMouseWheel method="OnMouseWheel"/>
 				</Scripts>
 			</Frame>
+			<Frame parentKey="OutfitDropDown" name="BetterWardrobeOutfitDropDown" parent = "WardrobeTransmogFrame" inherits="BetterWardrobeOutfitDropDownTemplate" mixin="BetterWardrobeOutfitMixin"  hidden = "false">
+						<KeyValues>
+							<KeyValue key="width" value="188" type="number"/>
+							<KeyValue key="minMenuStringWidth" value="152" type="number"/>
+							<KeyValue key="maxMenuStringWidth" value="216" type="number"/>
+						</KeyValues>
+						<Anchors>
+							<Anchor point="TOPLEFT" x="-14" y="28"/>
+						</Anchors>
+
+					</Frame>
 		</Frames>
 		<Scripts>
 			<OnLoad method="OnLoad"/>
@@ -2191,17 +2202,5 @@
 		<Scripts>
 			<OnLoad method="OnLoad"/>
 		</Scripts>
-	</Frame>
-
-		<Frame parentKey="OutfitDropDown" name="BetterWardrobeOutfitDropDown" inherits="BetterWardrobeOutfitDropDownTemplate" mixin="BetterWardrobeOutfitMixin" parent = "UIParent" hidden = "false">
-		<KeyValues>
-			<KeyValue key="width" value="188" type="number"/>
-			<KeyValue key="minMenuStringWidth" value="152" type="number"/>
-			<KeyValue key="maxMenuStringWidth" value="216" type="number"/>
-		</KeyValues>
-		<Anchors>
-			<Anchor point="TOPLEFT" x="-14" y="28"/>
-		</Anchors>
-
 	</Frame>
 </Ui>
