@@ -301,7 +301,24 @@ function BetterWardrobeOutfitDropDownMixin:IsOutfitDressed()
 
 	if addon.GetSetType(self.selectedOutfitID) == "default" then 
 		local selectedOutfitID = self.selectedOutfitID - 5000
-		DressUpItemTransmogInfoList(C_TransmogCollection.GetOutfitItemTransmogInfoList(selectedOutfitID));
+			local outfitItemTransmogInfoList = C_TransmogCollection.GetOutfitItemTransmogInfoList(selectedOutfitID);
+			if not outfitItemTransmogInfoList then
+				return true;
+			end
+
+			local currentItemTransmogInfoList = self:GetItemTransmogInfoList();
+			if not currentItemTransmogInfoList then
+				return true;
+			end
+
+			for slotID, itemTransmogInfo in ipairs(currentItemTransmogInfoList) do
+				if not itemTransmogInfo:IsEqual(outfitItemTransmogInfoList[slotID]) then
+					if itemTransmogInfo.appearanceID ~= Constants.Transmog.NoTransmogID then
+						return false;
+					end
+				end
+			end
+			return true;
 
 
 	else

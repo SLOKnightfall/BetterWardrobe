@@ -890,6 +890,7 @@ function BetterDressUpOutfitMixin:LoadOutfit(outfitID)
 	local setType = addon.GetSetType(outfitID)
 	
 	if setType == "default" then
+		local outfitID = outfitID - 5000
 		DressUpItemTransmogInfoList(C_TransmogCollection.GetOutfitItemTransmogInfoList(outfitID));
 	else
 		outfit = addon.GetSetInfo(outfitID)
