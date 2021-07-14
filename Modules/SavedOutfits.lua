@@ -704,7 +704,7 @@ function BetterWardrobeOutfitFrameMixin:ContinueWithSave()
 								set_sources[sourceInfo.itemID] = data.appearanceID
 								set_items[i] = sourceInfo.itemID
 							else
-	set_items[i] = 0
+								set_items[i] = 0
 							end
 
 						--	local sources  = C_TransmogCollection.GetAppearanceSources(data.appearanceID)

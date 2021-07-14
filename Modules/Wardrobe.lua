@@ -7163,9 +7163,9 @@ end
 
 	addon:SecureHook("SetItemRef", function(link) 
 		--if InCombatLockdown() then return end
-		if ( not CollectionsJournal:IsVisible() or not WardrobeCollectionFrame:IsVisible() ) then
+		--if ( not CollectionsJournal:IsVisible() or not WardrobeCollectionFrame:IsVisible() ) then
 			--securecall(function() ToggleCollectionsJournal(5) end)
-		end
+		--end
 		tempLink = link
 
 		local linkType, id = strsplit(":", tempLink);
