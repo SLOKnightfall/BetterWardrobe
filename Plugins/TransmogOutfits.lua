@@ -101,7 +101,7 @@ addon:SecureHook("TransmogOutfitRenameDone", function(self) addon:SendMessage("B
 
 
 
-function TransmogOutfitSearchOutfit()
+--[[function TransmogOutfitSearchOutfit()
 	local blizzardOutfits = C_TransmogCollection.GetOutfits()
 	transmogOutfitFoundOutfits = {}
 	if (transmogOutfitSelectSearchBox and transmogOutfitSelectSearchBox:GetText() == "") or not transmogOutfitSelectSearchBox then
@@ -132,7 +132,7 @@ function TransmogOutfitSearchOutfit()
 		transmogOutfitSelectFrame:Hide()
 		transmogOutfitSelectFrame:Show()
 	end
-end
+end]]
 
 function TransmogOutfits:RenameSet(setID)
 	if not setID then return end

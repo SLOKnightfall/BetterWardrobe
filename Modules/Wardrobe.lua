@@ -5208,10 +5208,27 @@ function BetterWardrobeSetsCollectionMixin:DisplaySavedSet(setID)
 
 	local setType = addon.GetSetType(setID)
 	local sortedSources = {}
+	local mainShoulder
+	local offShoulderindex
+	local offShoulder
 
 	if setType == "default" then
 		--(setID and addon.GetSetInfo(setID)) or nil
-		sortedSources = setInfo.sources
+		local sources  = C_TransmogCollection.GetOutfitItemTransmogInfoList(setID - 5000)
+		for slotID, itemTransmogInfo in ipairs(sources) do
+			if itemTransmogInfo.appearanceID ~= 0 then 
+				if slotID == 3 and not mainShoulder then
+					mainShoulder = itemTransmogInfo.appearanceID
+					offShoulder = itemTransmogInfo.secondaryAppearanceID
+					offShoulderindex = #sortedSources + 2
+				end
+				tinsert(sortedSources, itemTransmogInfo.appearanceID)
+				if offShoulder ~= 0 then 
+					tinsert(sortedSources, itemTransmogInfo.secondaryAppearanceID)
+				end
+			end	  
+		end
+		--sortedSources = setInfo.sources
 		
 	elseif setType == "mogit" then
 		for i, sourceID in pairs(setInfo.sources) do	
@@ -5220,16 +5237,30 @@ function BetterWardrobeSetsCollectionMixin:DisplaySavedSet(setID)
 	elseif setType == "transmog_outfits"  or setType == "extra" then
 		for i, itemID in pairs(setInfo.items) do
 			if itemID ~= 0 then 
-			local _, sourceID = C_TransmogCollection.GetItemInfo(itemID)	
+				local _, sourceID = C_TransmogCollection.GetItemInfo(itemID)
+				local sourceInfo = C_TransmogCollection.GetSourceInfo(sourceID)
+				if sourceInfo.invType - 1 == 3 and not mainShoulder then 
+					mainShoulder = sourceInfo.sourceID
+					offShoulderindex = #sortedSources + 2
+				end	
 				tinsert(sortedSources, sourceID)
 			end
 		end
-	
+
+		if setInfo.offShoulder and setInfo.offShoulder ~= 0 then
+			local baseSourceID = C_Transmog.GetSlotVisualInfo(TransmogUtil.GetTransmogLocation("SHOULDERSLOT", Enum.TransmogType.Appearance, Enum.TransmogModification.Secondary))
+			if setInfo.offShoulder ~= baseSourceID then
+				offShoulder = setInfo.offShoulder
+				tinsert(sortedSources, offShoulderindex , offShoulder)
+			end	
+		end 
 	end
 
+
+
 	if setInfo then
-		for i = 1, #setInfo.sources do
-			local sourceInfo = setInfo.sources[i] and C_TransmogCollection.GetSourceInfo(setInfo.sources[i])
+		for i = 1, #sortedSources do
+			local sourceInfo = sortedSources[i] and C_TransmogCollection.GetSourceInfo(sortedSources[i])
 			if sourceInfo then
 				row1 = row1 + 1
 			end
@@ -5249,9 +5280,11 @@ function BetterWardrobeSetsCollectionMixin:DisplaySavedSet(setID)
 	local yOffset2 = yOffset1 - 40
 	local itemCount = 0
 
+
 	for i = 1, #sortedSources do
 		if sortedSources[i] then
 		local sourceInfo = C_TransmogCollection.GetSourceInfo(sortedSources[i])
+
 		if sourceInfo then
 		itemCount = itemCount + 1
 			local itemFrame = self.DetailsFrame.itemFramesPool:Acquire()
@@ -5299,6 +5332,11 @@ function BetterWardrobeSetsCollectionMixin:DisplaySavedSet(setID)
 			self.Model:TryOn(sourceInfo.sourceID)
 			end
 		end
+	end
+
+	if mainShoulder and offShoulder then 
+		local itemTransmogInfo = ItemUtil.CreateItemTransmogInfo(mainShoulder, offShoulder, 0)
+		self.Model:SetItemTransmogInfo(itemTransmogInfo, 3, false)
 	end
 end
 
@@ -6210,12 +6248,6 @@ function BetterWardrobeSetsTransmogMixin:UpdateSets()
 
 
 	else
-
-		
-
-
-
-		----SetsDataProvider:ClearSets()   -This breaks searching
 		local usableSets = SetsDataProvider:GetUsableSets();
 		self.PagingFrame:SetMaxPages(ceil(#usableSets / self.PAGE_SIZE));
 		local pendingTransmogModelFrame = nil;
@@ -6242,7 +6274,7 @@ function BetterWardrobeSetsTransmogMixin:UpdateSets()
 					
 				--if ( model.setID ~= set.setID ) then
 					model:Undress();
-					 sourceData = SetsDataProvider:GetSetSourceData(set.setID);
+					sourceData = SetsDataProvider:GetSetSourceData(set.setID);
 					local tab = WardrobeCollectionFrame.selectedTransmogTab
 					for sourceID in pairs(sourceData.sources) do
 						if (tab == 4 and not BetterWardrobeVisualToggle.VisualMode) or
@@ -6255,7 +6287,8 @@ function BetterWardrobeSetsTransmogMixin:UpdateSets()
 					end
 
 				if addon.GetSetType(set.setID)  then 
-					if set.mainShoulder and set.offShoulder ~= 0 and set.offShoulder ~= 104114 then
+					local baseSourceID = C_Transmog.GetSlotVisualInfo(TransmogUtil.GetTransmogLocation("SHOULDERSLOT", Enum.TransmogType.Appearance, Enum.TransmogModification.Secondary))
+					if set.mainShoulder and set.offShoulder ~= 0 and set.offShoulder ~= baseSourceID then
 						local itemTransmogInfo = ItemUtil.CreateItemTransmogInfo(set.mainShoulder, set.offShoulder, 0);
 						local result = model:SetItemTransmogInfo(itemTransmogInfo);
 					elseif set.mainShoulder then 
