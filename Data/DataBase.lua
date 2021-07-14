@@ -458,6 +458,101 @@ do
 	end
 
 
+local MAX_DEFAULT_OUTFITS = C_TransmogCollection.GetNumMaxOutfits()
+
+function addon.GetOutfits(character)
+	local name = UnitName("player")
+	local realm = GetRealmName()
+	local profile = addon.SelecteSavedList 
+	local FullList = {}
+	local savedOutfits
+	if addon.SelecteSavedList and not character then 
+		FullList = addon.setdb.global.sets[addon.SelecteSavedList]
+		for i, data in ipairs(FullList) do
+			data.set = "extra"
+			data.index = i
+			data.label = L["Extended Saved Set"]
+		end
+
+	else
+		--Blizzard Sets
+		local outfits = C_TransmogCollection.GetOutfits();
+		local baseID = 0
+		for i, outfitID in ipairs(outfits) do
+			local data = {}
+			local name, icon = C_TransmogCollection.GetOutfitInfo(outfitID);
+			data.set = "default"
+			data.index = i
+			data.outfitID = outfitID + 5000
+			data.name = name
+			data.icon = icon
+			data.label = L["Saved Set"]
+			FullList[i] = data
+		end
+
+	--Extended Sets
+		if addon.OutfitDB.char.outfits then 
+			for i, data in ipairs(addon.OutfitDB.char.outfits) do
+				data.outfitID = MAX_DEFAULT_OUTFITS + i +5000
+				data.set = "extra"
+				data.index = i
+				data.name = addon.OutfitDB.char.outfits[i].name
+				data.label = L["Extended Saved Set"]
+				tinsert(FullList, data)
+				--FullList[#FullList].outfitID = MAX_DEFAULT_OUTFITS + i
+				--data.set = "default"
+			end
+		end
+	end
+
+	--MogIt Sets
+	local mogit_Outfits = addon.MogIt.GetMogitOutfits()
+	if mogit_Outfits then 
+		for i, data in ipairs(mogit_Outfits) do
+			--local index = #FullList
+			tinsert(FullList, data)
+		end
+	end
+
+	--TransmogOutfits Sets
+	local transmogOutfits_Sets = addon.TransmogOutfits.GetOutfits()
+	if transmogOutfits_Sets then 
+		for i, data in ipairs(transmogOutfits_Sets) do
+			--local index = #FullList
+			tinsert(FullList, data)
+		end
+	end
+
+	return FullList
+end
+
+
+
+function addon.IsDefaultSet(outfitID)
+	local savedSets = addon.GetSavedList()
+	for i, data in ipairs(savedSets) do
+		if data.setID == outfitID and data.set == "default" then 
+			return true
+		end
+	end
+	return false
+	--local MAX_DEFAULT_OUTFITS = C_TransmogCollection.GetNumMaxOutfits()
+	----return outfitID < MAX_DEFAULT_OUTFITS  -- #C_TransmogCollection.GetOutfits()--MAX_DEFAULT_OUTFITS 
+end
+
+
+function addon.GetSetType(outfitID)
+	local savedSets = addon.GetSavedList()
+	for i, data in ipairs(savedSets) do
+		if data.setID == outfitID then 
+			return data.set
+		end
+	end
+	return false
+	--local MAX_DEFAULT_OUTFITS = C_TransmogCollection.GetNumMaxOutfits()
+	----return outfitID < MAX_DEFAULT_OUTFITS  -- #C_TransmogCollection.GetOutfits()--MAX_DEFAULT_OUTFITS 
+end
+
 	function addon.GetSavedList()
 		--if not addon.savedSetCache then 
 			local savedOutfits = addon.GetOutfits()
@@ -479,16 +574,18 @@ do
 				info.set  = data.set
 				info.limitedTimeSet = false
 				info.patchID = ""
-				info.setID = data.setID or (data.outfitID + 5000)
+				info.setID = data.setID or (data.outfitID)
 
 				info.uiOrder = data.uiOrder or (data.index * 100)
 				info.icon = data.icon
 				info.isClass = true
 				info.type = "Saved"
-
+				info.mainShoulder = data.mainShoulder or 0
+				info.offShoulder = data.offShoulder or 0
+				info.itemTransmogInfoList = data.itemTransmogInfoList
 
 				if data.set == "default" then 
-					local outfitItemTransmogInfoList = C_TransmogCollection.GetOutfitItemTransmogInfoList(data.outfitID);
+					local outfitItemTransmogInfoList = C_TransmogCollection.GetOutfitItemTransmogInfoList(data.outfitID - 5000);
 					info.sources = {}
 					for i, data in pairs(outfitItemTransmogInfoList) do
 						info.sources[i]= data.appearanceID
@@ -496,7 +593,7 @@ do
 					----info.sources = C_TransmogCollection.GetOutfitSources(data.outfitID)
 				elseif  #info.sources == 0 then 
 					for i = 1, 19 do  ----was 16?
-						info.sources[i] = data[i] or 0
+						--info.sources[i] = data[i] or 0
 					end
 				end
 --[[
@@ -717,7 +814,7 @@ function addon.GetItemSource(itemID, itemMod)
 end
 
 
-	function addon.GetSetsources(setID)
+function addon.GetSetsources(setID)
 	--if SourceDB[setID] then return SourceDB[setID] end
 
 	if setID  > 50000 then
@@ -728,8 +825,12 @@ end
 	local setSources = {}
 	local atTransmogrifier = WardrobeFrame_IsAtTransmogrifier()
 	local unavailable = false
+	local SetType = addon.GetSetType(setID)
 
-	if WardrobeCollectionFrame and (WardrobeCollectionFrame.selectedTransmogTab == 4 or WardrobeCollectionFrame.selectedCollectionTab == 4) then
+	if SetType == "default" then
+
+	--if WardrobeCollectionFrame and (WardrobeCollectionFrame.selectedTransmogTab == 4 or WardrobeCollectionFrame.selectedCollectionTab == 4) then
+
 		if setInfo and setInfo.sources then
 			for i, sourceID in ipairs(setInfo.sources) do	
 

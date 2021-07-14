@@ -18,8 +18,28 @@ function TransmogOutfits.GetOutfits()
 	local mogSets = {}
 	for i, set in pairs(sets) do
 		local data = {}
-		for index, setdata in pairs(set) do
-			data[i] = setdata
+		data.items = {}
+		data.sources = {}
+		--for index, setdata in pairs(set) do
+		for index = 1, 19 do
+
+				local setdata = set[index]
+				if setdata then 
+					local info = C_TransmogCollection.GetSourceInfo(setdata)
+					local itemID = info and info.itemID or 0
+					local visualID = info and info.visualID or 0
+
+					if not data.icon and itemID then
+						local _, _, _, icon = C_TransmogCollection.GetAppearanceSourceInfo(setdata)
+ 
+						icon = itemID
+					end
+
+					data.sources[itemID] = visualID
+					tinsert(data.items, itemID)
+				end
+
+			--data[index] = setdata
 		end
 
 		data.set = "transmog_outfits"
@@ -28,16 +48,17 @@ function TransmogOutfits.GetOutfits()
 		data.outfitID = 7000 + i
 		data.label = L["TransmogOutfits Saved Set"]
 
-		data.mainHandEnchant = set.enchant1 or 0
-		data.offHandEnchant = set.enchant2 or 0
-		data.enchant1 = nil
-		data.enchant1 = nil
-		data.offShoulder = data[33]
-		data[33] = nil
+		data.mainHandEnchant = set.enchant1 or Constants.Transmog.NoTransmogID
+		data.offHandEnchant = set.enchant2 or Constants.Transmog.NoTransmogID
+		--data.enchant1 = nil
+		--data.enchant1 = nil
+		data.mainShoulder = set[3] or nil
+		data.offShoulder = set[33] or nil
+		--data[33] = nil
 		data.orgIndex = i
 		data.name = set.name or ""
 
-		data.icon = 133745
+		----data.icon = 133745
 --[[		for i, invSlot in ipairs(addon.Globals.slots) do
 			local slotID = GetInventorySlotInfo(invSlot)
 			local item = data[invSlot]
@@ -145,7 +166,7 @@ local function IsDefaultSet(outfitID)
 	return outfitID < MAX_DEFAULT_OUTFITS  -- #C_TransmogCollection.GetOutfits()--MAX_DEFAULT_OUTFITS 
 end
 
-function MogIt:TransmogOutfits(outfitID)
+--[[function MogIt:TransmogOutfits(outfitID)
 	local icon
 	local outfit
 
@@ -173,4 +194,4 @@ function MogIt:TransmogOutfits(outfitID)
 	end
 
 	addon:SendMessage("BW_TRANSMOG_COLLECTION_UPDATED")
-end
+end]]

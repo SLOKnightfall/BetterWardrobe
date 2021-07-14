@@ -44,74 +44,6 @@ end
 BW_SavedOutfitDBUpdate = addon.Init.SavedOutfitDBUpdate
 
 
-local function GetOutfits(character)
-		local name = UnitName("player")
-		local realm = GetRealmName()
-		local profile = addon.SelecteSavedList 
-		local FullList = {}
-		local savedOutfits
-		if addon.SelecteSavedList and not character then 
-			FullList = addon.setdb.global.sets[addon.SelecteSavedList]
-			for i, data in ipairs(FullList) do
-				data.set = "extra"
-				data.index = i
-				data.label = L["Extended Saved Set"]
-
-			end
-		else
-			----FullList = C_TransmogCollection.GetOutfits()
-			local outfits = C_TransmogCollection.GetOutfits();
-			local baseID = 0
-			for i, outfitID in ipairs(outfits) do
-				local data = {}
-				local name, icon = C_TransmogCollection.GetOutfitInfo(outfitID);
-				data.set = "default"
-				data.index = i
-				data.outfitID = outfitID
-				data.name = name
-				data.icon = icon
-				data.label = L["Saved Set"]
-				FullList[i] = data
-
-			end
-
-			if addon.OutfitDB.char.outfits then 
-				for i, data in ipairs(addon.OutfitDB.char.outfits) do
-					data.outfitID = MAX_DEFAULT_OUTFITS + i
-					data.set = "extra"
-					data.index = i
-					data.name = addon.OutfitDB.char.outfits[i].name
-					data.label = L["Extended Saved Set"]
-					tinsert(FullList, data)
-					--FullList[#FullList].outfitID = MAX_DEFAULT_OUTFITS + i
-					--data.set = "default"
-				end
-			end
-		end
-
-		local mogit_Outfits = addon.MogIt.GetMogitOutfits()
-		if mogit_Outfits then 
-			for i, data in ipairs(mogit_Outfits) do
-				data.set = "mogit"
-				data.label = L["MogIt Saved Set"]
-				--local index = #FullList
-				tinsert(FullList, data)
-			end
-		end
-
-		local transmogOutfits_Sets = addon.TransmogOutfits.GetOutfits()
-		if transmogOutfits_Sets then 
-			for i, data in ipairs(transmogOutfits_Sets) do
-				--local index = #FullList
-				tinsert(FullList, data)
-			end
-		end
-
-		return FullList
-end
-addon.GetOutfits = GetOutfits
-
-
 local function GetTableIndex(index)
 	local numOutfits = #C_TransmogCollection.GetOutfits()
 	return index - numOutfits + 1
@@ -119,18 +51,13 @@ end
 
 
 local function IsDefaultSet(outfitID)
-	return outfitID < MAX_DEFAULT_OUTFITS  -- #C_TransmogCollection.GetOutfits()--MAX_DEFAULT_OUTFITS 
-end
-
-
-
-local function IsMogitSet(outfitID)
-	return outfitID >= 10000 
+	return addon.IsDefaultSet(outfitID)
+	--return outfitID < MAX_DEFAULT_OUTFITS  -- #C_TransmogCollection.GetOutfits()--MAX_DEFAULT_OUTFITS 
 end
 
 
 function LookupOutfitIDFromName(name)
-	local outfits = GetOutfits(true)
+	local outfits = addon.GetOutfits(true)
 	for i, data in ipairs(outfits) do
 		if data.name == name then
 			return data.outfitID
@@ -141,7 +68,7 @@ end
 
 
 function LookupIndexFromID(outfitID)
-	local outfits = GetOutfits(true)
+	local outfits = addon.GetOutfits(true)
 	for i, data in ipairs(outfits) do
 		if data.outfitID == outfitID then
 			return data.index
@@ -152,11 +79,12 @@ end
 
 
 local function GetOutfitName(outfitID)
-	local index = LookupIndexFromID(outfitID)
-	local name, icon = C_TransmogCollection.GetOutfitInfo(outfitID);
-	----return C_TransmogCollection.GetOutfitName(outfitID) or (index and addon.MogIt.MogitSets[index] and addon.MogIt.MogitSets[index].name) or (index and addon.OutfitDB.char.outfits[index].name)
-
-	return name or (index and addon.MogIt.MogitSets[index] and addon.MogIt.MogitSets[index].name) or (index and addon.OutfitDB.char.outfits[index].name)
+	local savedSets = addon.GetSavedList()
+	for i, data in ipairs(savedSets) do
+		if data.setID == outfitID then 
+			return data.name
+		end
+	end
 end
 addon.GetOutfitName = GetOutfitName
 
@@ -326,14 +254,18 @@ function BetterWardrobeOutfitDropDownMixin:SelectOutfit(outfitID, loadOutfit)
 	if (outfitID) then
 		name = GetOutfitName(outfitID)
 	end
-
 	if ( name ) then
 		BW_UIDropDownMenu_SetText(self, name);
 	else
 		outfitID = nil;
 		BW_UIDropDownMenu_SetText(self, GRAY_FONT_COLOR_CODE..TRANSMOG_OUTFIT_NONE..FONT_COLOR_CODE_CLOSE);
 	end
+
 	self.selectedOutfitID = outfitID;
+	if WardrobeCollectionFrame then 
+		WardrobeCollectionFrame.SetsTransmogFrame.selectedSetID = outfitID;
+	end
+
 	if ( loadOutfit ) then
 		self:LoadOutfit(outfitID);
 	end
@@ -367,26 +299,10 @@ function BetterWardrobeOutfitDropDownMixin:IsOutfitDressed()
 		return true;
 	end
 
-	if self:IsDefaultSet(self.selectedOutfitID) then 
+	if addon.GetSetType(self.selectedOutfitID) == "default" then 
+		local selectedOutfitID = self.selectedOutfitID - 5000
+		DressUpItemTransmogInfoList(C_TransmogCollection.GetOutfitItemTransmogInfoList(selectedOutfitID));
 
-		local outfitItemTransmogInfoList = C_TransmogCollection.GetOutfitItemTransmogInfoList(self.selectedOutfitID);
-		if not outfitItemTransmogInfoList then
-			return true;
-		end
-
-		local currentItemTransmogInfoList = self:GetItemTransmogInfoList();
-		if not currentItemTransmogInfoList then
-			return true;
-		end
-
-		for slotID, itemTransmogInfo in ipairs(currentItemTransmogInfoList) do
-			if not itemTransmogInfo:IsEqual(outfitItemTransmogInfoList[slotID]) then
-				if itemTransmogInfo.appearanceID ~= Constants.Transmog.NoTransmogID then
-					return false;
-				end
-			end
-		end
-		return true;
 
 	else
 		local outfit = addon.OutfitDB.char.outfits[LookupIndexFromID(self.selectedOutfitID)]
@@ -466,7 +382,7 @@ function BetterWardrobeOutfitDropDownMixin:CheckOutfitForSave(outfitID)
 end
 
 function BetterWardrobeOutfitDropDownMixin:IsDefaultSet(outfitID)
-		return IsDefaultSet(outfitID)
+		return addon.IsDefaultSet(outfitID)
 end
 
 --===================================================================================================================================
@@ -557,7 +473,7 @@ local function GetButton(self, index)
 end
 
 function BetterWardrobeOutfitFrameMixin:Update()
-	local outfits = GetOutfits(true)
+	local outfits = addon.GetOutfits(true)
 	----local mogit_Outfits = addon.GetMogitOutfits()
 	local buttons = self.Buttons;
 	local numButtons = 0;
@@ -684,7 +600,7 @@ function BetterWardrobeOutfitFrameMixin:DeleteOutfit(outfitID)
 end
 
 function BetterWardrobeOutfitFrameMixin:NameOutfit(newName, outfitID)
-	local outfits = GetOutfits(true)
+	local outfits = addon.GetOutfits(true)
 	for i = 1, #outfits do
 		if (outfits[i].name == newName) then
 			if (outfitID) then
@@ -767,20 +683,36 @@ end
 function BetterWardrobeOutfitFrameMixin:ContinueWithSave()
 	if self.outfitID and IsDefaultSet(self.outfitID) then
 	-- this is a rename
-		C_TransmogCollection.ModifyOutfit(self.outfitID, self.itemTransmogInfoList);
+		C_TransmogCollection.ModifyOutfit(self.outfitID - 5000, self.itemTransmogInfoList);
 		BetterWardrobeOutfitFrame:ClosePopups()
 	elseif self.outfitID then 
 			addon.OutfitDB.char.outfits[LookupIndexFromID(self.outfitID)]  = addon.OutfitDB.char.outfits[LookupIndexFromID(self.outfitID)] or {}
 			outfit = addon.OutfitDB.char.outfits[LookupIndexFromID(self.outfitID)]
-			outfit.itemTransmogInfoList =  self.itemTransmogInfoList or {}
+			--outfit.itemTransmogInfoList =  self.itemTransmogInfoList or {}
 
 
-		--[[local index = LookupIndexFromID(self.outfitID)
-						local outfit = addon.OutfitDB.char.outfits[index]
-						local sources = {}
+		--local index = LookupIndexFromID(self.outfitID)
+						--local outfit = addon.OutfitDB.char.outfits[index]
+						local set_sources = {}
+						local set_items = {}
 						for i, data in pairs(self.itemTransmogInfoList) do
-							outfit[i] = data.appearanceID
-						end]]
+							
+							local sourceInfo = C_TransmogCollection.GetSourceInfo(data.appearanceID)
+							if sourceInfo then 
+								local sources  = C_TransmogCollection.GetAppearanceSources(data.appearanceID)
+								--outfit[i] = data.appearanceID
+								set_sources[sourceInfo.itemID] = data.appearanceID
+								set_items[i] = sourceInfo.itemID
+							else
+	set_items[i] = 0
+							end
+
+						--	local sources  = C_TransmogCollection.GetAppearanceSources(data.appearanceID)
+							--outfit[i] = data.appearanceID
+							--set_sources[sourceInfo.itemID] = data.appearanceID
+						end
+						outfit.sources = set_sources
+						outfit.items = set_items
 			BetterWardrobeOutfitFrame:ClosePopups()
 	else
 		-- this is a new outfit
@@ -854,6 +786,7 @@ BetterWardrobeOutfitButtonMixin = { };
 function BetterWardrobeOutfitButtonMixin:OnClick()
 	PlaySound(SOUNDKIT.IG_MAINMENU_OPTION_CHECKBOX_ON);
 	BetterWardrobeOutfitFrame:Hide();
+
 	if ( self.outfitID ) then
 		BetterWardrobeOutfitFrame.dropDown:SelectOutfit(self.outfitID, true);
 	else
@@ -1071,5 +1004,4 @@ function BetterWardrobeOutfitEditFrameMixin:ShowForOutfit_CollectionJournal(outf
 		self.name = name
 		self.EditBox:SetText(name);
 	end
-
 end

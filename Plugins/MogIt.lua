@@ -89,7 +89,7 @@ addon:RegisterMessage("BW_OnPlayerEnterWorld", function() SetHooks() end)
 
 
 function MogIt.GetMogitOutfits() 
-	local sets = Wishlist:GetSets(nil, true)
+	 sets = Wishlist:GetSets(nil, true)
 	if #sets == 0 then return end
 
 	local mogSets = {}
@@ -99,32 +99,38 @@ function MogIt.GetMogitOutfits()
 		--data.name = "MogIt - " .. set.name or ""
 		data.set = "mogit"
 		data.label = L["MogIt Set"]
-		data.index = i + 5000
-		data.outfitID = 5000 + i
+		data.index = i + 6000
+		data.outfitID = 6000 + i
 		data.mainHandEnchant = 0
 		data.offHandEnchant = 0
 		data.offShoulder = 0
+		data.items = {}
 
 		local items = set.items
+		local sources = {}
 		for i, invSlot in ipairs(addon.Globals.slots) do
 			local slotID = GetInventorySlotInfo(invSlot)
 			local item = items[invSlot]
+			data.items[slotID] = item
 			local icon
 			if item then
 				local sourceID = addon.GetSourceFromItem(item)
-				data[slotID] = sourceID
+				--print(sourceID)
+				sources[item] = sourceID
 				if not icon then 
 					icon = select(5, GetItemInfoInstant(item))
 					data.icon = icon
 				end
 			end
 		end
+		data.sources = sources
 		MogIt.MogitSets[data.index] = data
 		tinsert(mogSets, data)
 	end
 
 	return mogSets
 end
+
 
 function MogIt.GetMogitWishlist()
 	local list = Wishlist:BuildList()
@@ -191,22 +197,16 @@ function MogIt.UpdateWishlistItem(type, typeID, add)
 		end
 
 		for sourceID, isCollected in pairs(sources) do
-
 			local sourceInfo = C_TransmogCollection.GetSourceInfo(sourceID)
-
 			local visualID = C_TransmogCollection.GetItemInfo(sourceInfo.itemID, itemModID)--(type == "set" and sourceInfo.visualID) or addon.GetItemSource(sourceID, setInfo.mod)
 			if visualID then 
-
 				addSet = MogIt.UpdateWishlistItem("item", visualID, add or nil)	
 			end
 		end
 
-
-
 		--print( addSet and L["%s: Uncollected items added"]:format(setName) or L["No new appearces needed."])
 		return addSet
 	end
-
 end
 
 local MAX_DEFAULT_OUTFITS = C_TransmogCollection.GetNumMaxOutfits()

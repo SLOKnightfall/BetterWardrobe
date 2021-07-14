@@ -870,6 +870,8 @@ function BetterDressUpOutfitMixin:GetItemTransmogInfoList()
 	return nil;
 end
 
+
+
 function BetterDressUpOutfitMixin:LoadOutfit(outfitID)
 	if not outfitID then
 		return false
@@ -885,19 +887,49 @@ function BetterDressUpOutfitMixin:LoadOutfit(outfitID)
 	playerActor:Undress()
 	UpdateDressingRoom()
 	import = true
-	if addon.IsDefaultSet(outfitID) then
+	local setType = addon.GetSetType(outfitID)
+	
+	if setType == "default" then
 		DressUpItemTransmogInfoList(C_TransmogCollection.GetOutfitItemTransmogInfoList(outfitID));
 	else
-		local outfit
-		local itemTransmogInfoList
-		if outfitID > 1000 then
-			outfit = addon.MogIt.MogitSets[outfitID]
-		else
-			outfit = addon.OutfitDB.char.outfits[LookupIndexFromID(outfitID)]
-			itemTransmogInfoList = outfit.itemTransmogInfoList
-		end
-		DressUpItemTransmogInfoList(itemTransmogInfoList);
+		outfit = addon.GetSetInfo(outfitID)
+		local itemTransmogInfoList = {}
 
+		if setType == "mogit" or setType == "transmog_outfits" then 
+			local items = outfit.items
+			local itemTransmogInfo
+			--for i,s in pairs(items) do
+			for i = 1, 19 do
+				local item = items[i]
+				local secondary = (i == 3 and outfit.offShoulder) or 0
+				if item then 
+					local appearanceID, sourceID = C_TransmogCollection.GetItemInfo(item)
+					itemTransmogInfo = ItemUtil.CreateItemTransmogInfo(sourceID or 0, secondary, 0);
+				else
+					itemTransmogInfo = ItemUtil.CreateItemTransmogInfo( 0, 0, 0);
+				end
+					itemTransmogInfoList[i] = itemTransmogInfo
+				
+			end
+			
+		elseif setType == "extra" then 
+			local items = outfit.items
+			local itemTransmogInfo
+			--for i,s in pairs(items) do
+			for i = 1, 19 do
+				local item = items[i]
+				local secondary = (i == 3 and outfit.offShoulder) or 0
+				if item then 
+					local appearanceID, sourceID = C_TransmogCollection.GetItemInfo(item)
+					itemTransmogInfo = ItemUtil.CreateItemTransmogInfo(sourceID or 0, secondary, 0);
+				else
+					itemTransmogInfo = ItemUtil.CreateItemTransmogInfo( 0, 0, 0);
+				end
+					itemTransmogInfoList[i] = itemTransmogInfo
+				
+			end
+		end
+DressUpItemTransmogInfoList(itemTransmogInfoList);
 	end
 	import = false
 	UpdateDressingRoom()
