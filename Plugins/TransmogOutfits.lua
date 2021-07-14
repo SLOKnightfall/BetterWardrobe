@@ -100,8 +100,8 @@ addon:SecureHook("TransmogOutfitRemoveYes", function(self) addon:SendMessage("BW
 addon:SecureHook("TransmogOutfitRenameDone", function(self) addon:SendMessage("BW_TRANSMOG_COLLECTION_UPDATED") end)
 
 
-
---[[function TransmogOutfitSearchOutfit()
+--Tweaks original function to allow changes via the BW saved set list
+function TransmogOutfitSearchOutfit()
 	local blizzardOutfits = C_TransmogCollection.GetOutfits()
 	transmogOutfitFoundOutfits = {}
 	if (transmogOutfitSelectSearchBox and transmogOutfitSelectSearchBox:GetText() == "") or not transmogOutfitSelectSearchBox then
@@ -132,13 +132,13 @@ addon:SecureHook("TransmogOutfitRenameDone", function(self) addon:SendMessage("B
 		transmogOutfitSelectFrame:Hide()
 		transmogOutfitSelectFrame:Show()
 	end
-end]]
+end
 
 function TransmogOutfits:RenameSet(setID)
 	if not setID then return end
 
 	local blizzardOutfits = C_TransmogCollection.GetOutfits()
-	setID = setID - 12000
+	setID = setID - 7000
 	local setData = transmogOutfitOutfits[setID]
 
 	local index = setID + #blizzardOutfits
@@ -152,19 +152,50 @@ function TransmogOutfits:DeleteSet(setID)
 	if not setID then return end
 		
 	local blizzardOutfits = C_TransmogCollection.GetOutfits()
-	setID = setID - 12000
+	setID = setID - 7000
 	local index = setID + #blizzardOutfits
 	transmogOutfitCurrentOutfit = index
 	TransmogOutfitRemoveOutfit()
 end
 
-
-
 local MAX_DEFAULT_OUTFITS = C_TransmogCollection.GetNumMaxOutfits()
 local function IsDefaultSet(outfitID)
 	
-	return outfitID < MAX_DEFAULT_OUTFITS  -- #C_TransmogCollection.GetOutfits()--MAX_DEFAULT_OUTFITS 
+	return outfitID - 5000 < MAX_DEFAULT_OUTFITS  -- #C_TransmogCollection.GetOutfits()--MAX_DEFAULT_OUTFITS 
 end
+
+function TransmogOutfits:CopySet(setID)
+	if not setID then return end
+		
+	local icon
+	local outfit
+
+	local itemTransmogInfoList = {}
+	local setdata = addon.GetSetInfo(setID)
+	local name = setdata.name.." (Copy)"
+	local icon = setdata.icon
+	local itemlist = setdata.sources
+
+	--for key, transmogSlot in pairs(TRANSMOG_SLOTS) do
+	for slotID = 1, 19 do
+		--local slotID = transmogSlot.location:GetSlotID();
+		local itemTransmogInfo = ItemUtil.CreateItemTransmogInfo(itemlist[slotID] or 0, 0, 0);
+		itemTransmogInfoList[slotID] = itemTransmogInfo
+	end
+
+	if (setID and IsDefaultSet(setID)) or (#C_TransmogCollection.GetOutfits() < MAX_DEFAULT_OUTFITS)  then 
+		setID = C_TransmogCollection.NewOutfit(name, icon, itemTransmogInfoList);
+	else
+		tinsert(addon.OutfitDB.char.outfits, setdata)
+		outfit = addon.OutfitDB.char.outfits[#addon.OutfitDB.char.outfits]
+		outfit["name"] = name
+		outfit.setID = nil
+	end
+
+	addon:SendMessage("BW_TRANSMOG_COLLECTION_UPDATED")
+end
+
+
 
 --[[function MogIt:TransmogOutfits(outfitID)
 	local icon

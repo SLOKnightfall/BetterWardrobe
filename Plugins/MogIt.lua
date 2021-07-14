@@ -219,7 +219,7 @@ function MogIt:CopySet(outfitID)
 	local icon
 	local outfit
 
-	itemTransmogInfoList = {}
+	local itemTransmogInfoList = {}
 	local setdata = addon.GetSetInfo(outfitID)
 	local name = setdata.name.." (Copy)"
 	local icon = setdata.icon
@@ -235,11 +235,12 @@ function MogIt:CopySet(outfitID)
 	if (outfitID and IsDefaultSet(outfitID)) or (#C_TransmogCollection.GetOutfits() < MAX_DEFAULT_OUTFITS)  then 
 		outfitID = C_TransmogCollection.NewOutfit(name, icon, itemTransmogInfoList);
 	else
-		tinsert(addon.OutfitDB.char.outfits, {})
+		tinsert(addon.OutfitDB.char.outfits, setdata)
 		outfit = addon.OutfitDB.char.outfits[#addon.OutfitDB.char.outfits]
 		outfit["name"] = name
-		outfit["icon"] = setdata.icon
-		outfit.itemTransmogInfoList =  itemTransmogInfoList or {}
+		outfit.setID = nil
+		--outfit["icon"] = setdata.icon
+		--outfit.itemTransmogInfoList =  itemTransmogInfoList or {}
 	end
 
 	addon:SendMessage("BW_TRANSMOG_COLLECTION_UPDATED")

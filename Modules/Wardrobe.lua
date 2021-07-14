@@ -5256,8 +5256,6 @@ function BetterWardrobeSetsCollectionMixin:DisplaySavedSet(setID)
 		end 
 	end
 
-
-
 	if setInfo then
 		for i = 1, #sortedSources do
 			local sourceInfo = sortedSources[i] and C_TransmogCollection.GetSourceInfo(sortedSources[i])

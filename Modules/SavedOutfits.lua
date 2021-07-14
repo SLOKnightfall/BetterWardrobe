@@ -559,14 +559,17 @@ function BetterWardrobeOutfitFrameMixin:NewOutfit(name)
 		end
 	end
 
+print(name)
 	local sources = {}
 	for i, data in pairs(self.itemTransmogInfoList) do
 		sources[i] = data.appearanceID
 	end
 
 	if (outfitID and IsDefaultSet(outfitID)) or (#C_TransmogCollection.GetOutfits() < MAX_DEFAULT_OUTFITS)  then 
+		print(1)
 		outfitID = C_TransmogCollection.NewOutfit(name, icon, self.itemTransmogInfoList);
 	else
+		print(2)
 		if outfitID then 
 			addon.OutfitDB.char.outfits[LookupIndexFromID(outfitID)]  = addon.OutfitDB.char.outfits[LookupIndexFromID(outfitID)] or {}
 			outfit = addon.OutfitDB.char.outfits[LookupIndexFromID(outfitID)]
@@ -577,7 +580,8 @@ function BetterWardrobeOutfitFrameMixin:NewOutfit(name)
 		outfit["name"] = name
 		----local icon = select(4, C_TransmogCollection.GetAppearanceSourceInfo(outfit[1]))
 		outfit["icon"] = icon
-		outfit.itemTransmogInfoList =  self.itemTransmogInfoList or {}
+		outfit.sources = sources
+		--outfit.itemTransmogInfoList =  self.itemTransmogInfoList or {}
 		--outfitID = index
 	end
 
@@ -634,6 +638,8 @@ function BetterWardrobeOutfitFrameMixin:NameOutfit(newName, outfitID)
 		C_TransmogCollection.RenameOutfit(outfitID, newName);
 	elseif outfitID then 
 		local index = LookupIndexFromID(outfitID)
+		print(outfitID)
+		print(index)
 		addon.OutfitDB.char.outfits[index].name = newName
 	else
 		-- this is a new outfit
@@ -950,8 +956,12 @@ local plugin
 local plugin_index
 local function BW_DressingRoomImportButton_OnClicks(outfitID, name, parent)
 	
+print(name)
+print(outfitID)
+	MogItSetName = name
+	MogItSetID = outfitID
 
-	if outfitID >=12000 then
+	if outfitID >=7000 then
 		plugin = addon.TransmogOutfits
 		plugin_index = outfitID
 	else
@@ -959,8 +969,7 @@ local function BW_DressingRoomImportButton_OnClicks(outfitID, name, parent)
 		plugin_index = MogItSetName
 	end
 
-	MogItSetName = name
-	MogItSetID = outfitID
+
 	local contextMenuData = {
 		{
 			text = L["Create Copy"],
@@ -1011,13 +1020,13 @@ end
 function BetterWardrobeOutfitEditFrameMixin:ShowForOutfit_CollectionJournal(outfitID, name, parent)
 	BetterWardrobeOutfitFrame:Hide();
 	--Other Addon Sets
-	if outfitID >=10000 then
+	if outfitID >=6000 then
 		BW_DressingRoomImportButton_OnClicks(outfitID, name, parent)
 		
 	--Saved Sets
 	else
 		BetterWardrobeOutfitFrame:ShowPopup(self);
-		self.outfitID = outfitID - 5000
+		self.outfitID = outfitID
 		self.name = name
 		self.EditBox:SetText(name);
 	end
