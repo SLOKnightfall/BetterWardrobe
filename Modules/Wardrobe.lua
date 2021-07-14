@@ -5174,7 +5174,7 @@ function BetterWardrobeSetsCollectionMixin:DisplaySet(setID)
 end
 ----TODO:CHECK
 function BetterWardrobeSetsCollectionMixin:DisplaySavedSet(setID)
-	local setInfo = (setID and addon.GetSetInfo(setID)) or nil
+	 local setInfo = (setID and addon.GetSetInfo(setID)) or nil
 	if (not setInfo) then
 		self.DetailsFrame:Hide()
 		self.Model:Hide()
@@ -5206,6 +5206,27 @@ function BetterWardrobeSetsCollectionMixin:DisplaySavedSet(setID)
 	local row2 = 0
 	local yOffset1 = -94
 
+	local setType = addon.GetSetType(setID)
+	local sortedSources = {}
+
+	if setType == "default" then
+		--(setID and addon.GetSetInfo(setID)) or nil
+		sortedSources = setInfo.sources
+		
+	elseif setType == "mogit" then
+		for i, sourceID in pairs(setInfo.sources) do	
+			tinsert(sortedSources, sourceID)
+		end
+	elseif setType == "transmog_outfits"  or setType == "extra" then
+		for i, itemID in pairs(setInfo.items) do
+			if itemID ~= 0 then 
+			local _, sourceID = C_TransmogCollection.GetItemInfo(itemID)	
+				tinsert(sortedSources, sourceID)
+			end
+		end
+	
+	end
+
 	if setInfo then
 		for i = 1, #setInfo.sources do
 			local sourceInfo = setInfo.sources[i] and C_TransmogCollection.GetSourceInfo(setInfo.sources[i])
@@ -5222,7 +5243,7 @@ function BetterWardrobeSetsCollectionMixin:DisplaySavedSet(setID)
 	end
 
 	local BUTTON_SPACE = 37	-- button width + spacing between 2 buttons
-	local sortedSources = setInfo.sources --SetsDataProvider:GetSortedSetSources(setID)
+	--local sortedSources = setInfo.sources --SetsDataProvider:GetSortedSetSources(setID)
 	local xOffset = -floor((row1 - 1) * BUTTON_SPACE / 2)
 	local xOffset2 = -floor((row2 - 1) * BUTTON_SPACE / 2)
 	local yOffset2 = yOffset1 - 40
@@ -5230,7 +5251,6 @@ function BetterWardrobeSetsCollectionMixin:DisplaySavedSet(setID)
 
 	for i = 1, #sortedSources do
 		if sortedSources[i] then
-	
 		local sourceInfo = C_TransmogCollection.GetSourceInfo(sortedSources[i])
 		if sourceInfo then
 		itemCount = itemCount + 1
@@ -5256,7 +5276,6 @@ function BetterWardrobeSetsCollectionMixin:DisplaySavedSet(setID)
 
 			self:SetItemFrameQuality(itemFrame)
 			local move = (itemCount > 10)
-
 			if itemCount <= 10 then
 				itemFrame:SetPoint("TOP", self.DetailsFrame, "TOP", xOffset + (itemCount - 1) * BUTTON_SPACE, yOffset1)
 
@@ -6376,7 +6395,6 @@ function BetterWardrobeSetsTransmogMixin:LoadSet(setID)
 			local primaryAppearances = C_TransmogSets.GetSetPrimaryAppearances(setID);
 			for i, primaryAppearance in ipairs(primaryAppearances) do
 				local sourceID = primaryAppearance.appearanceID;
-				print(sourceID)
 				local sourceInfo = C_TransmogCollection.GetSourceInfo(sourceID);
 				local slot = C_Transmog.GetSlotForInventoryType(sourceInfo.invType);
 				if slot then 
@@ -6471,7 +6489,6 @@ function BetterWardrobeSetsTransmogMixin:LoadSet(setID)
 			local secondaryTransmogLocation = TransmogUtil.CreateTransmogLocation(3, Enum.TransmogType.Appearance, Enum.TransmogModification.Secondary);
 
 			if offShoulder and (offShoulder ~= 0 and offShoulder ~= 104114) then
-				print(offShoulder)
 				local secondaryPendingInfo = TransmogUtil.CreateTransmogPendingInfo(Enum.TransmogPendingType.Apply, offShoulder or Constants.Transmog.NoTransmogID);
 				C_Transmog.SetPending(secondaryTransmogLocation, secondaryPendingInfo);
 			--elseif offShoulder == 104114 then
