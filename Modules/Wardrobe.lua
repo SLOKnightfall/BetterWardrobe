@@ -1841,7 +1841,7 @@ function BetterWardrobeItemsCollectionMixin:CheckLatestAppearance(changeTab)
 		self.jumpToLatestAppearanceID = latestAppearanceID;
 		self.jumpToLatestCategoryID = latestAppearanceCategoryID;
 
-		if ( changeTab and not CollectionsJournal:IsShown() ) then
+		if ( changeTab and CollectionsJournal:IsShown() ) then
 			CollectionsJournal_SetTab(CollectionsJournal, 5);
 		end
 	end
