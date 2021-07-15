@@ -23,7 +23,7 @@ FillLocalizedClassList(CLASS_NAMES_LOCALIZED) --Fills a table with localized cla
 
 local ARMOR_MASK = Globals.ARMOR_MASK
 local EmptyArmor = Globals.EmptyArmor
-local subitemlist = {}
+ local subitemlist = {}
 local hiddenSet ={
 	["setID"] =  0 ,
 	["name"] =  "Hidden",
@@ -383,12 +383,13 @@ do
 	local function buildSetSubstitutions()
 		wipe(subitemlist)
 		if not addon.itemsubdb.profile.items then return end
-
 		for itemID, sub_data in pairs(addon.itemsubdb.profile.items) do
+			print(itemID)
 			local appearanceID, sourceID = C_TransmogCollection.GetItemInfo(itemID)
 			local sources = C_TransmogCollection.GetAppearanceSources(appearanceID)
 			if sources then 
 				for i, data in ipairs(sources) do
+					print(sub_data.subID)
 					subitemlist[data.itemID] = sub_data.subID
 				end
 			end
@@ -437,6 +438,7 @@ do
 		--wipe(SET_INDEX)
 		wipe(SET_DATA)
 		addon.ClearArtifactData()
+		wipe(subitemlist)
 		--wipe(addon.SavedSetCache)
 		addon.SavedSetCache =  nil
 
@@ -736,13 +738,13 @@ end
 			end)
 
 			addon:ClearCache()
-			addon.ExtraSetsDataProvider:ClearSets()
+			addon.SetsDataProvider:ClearSets()
 
 			addon.Init:BuildDB()
-			addon.GetBaseList()
-			if BW_SetsCollectionFrame:IsShown() then  --0--TODO FIX
-				BW_SetsCollectionFrame:Refresh()
-				BW_SetsCollectionFrame:OnSearchUpdate()
+
+			if WardrobeCollectionFrame.SetsCollectionFrame:IsShown() then  --0--TODO FIX
+				WardrobeCollectionFrame.SetsCollectionFrame:Refresh()
+				WardrobeCollectionFrame.SetsCollectionFrame:OnSearchUpdate()
 			end
 			addon.RefreshSubItemData()
 		end
@@ -762,11 +764,26 @@ end
 			addon.itemsubdb.profile.items[info.itemID] = nil
 		end
 
+
+			addon:ClearCache()
+			addon.SetsDataProvider:ClearSets()
+
+			addon.Init:BuildDB()
+			addon.GetBaseList()
+			if WardrobeCollectionFrame.SetsCollectionFrame:IsShown() then  --0--TODO FIX
+				WardrobeCollectionFrame.SetsCollectionFrame:Refresh()
+				WardrobeCollectionFrame.SetsCollectionFrame:OnSearchUpdate()
+			end
+			addon.RefreshSubItemData()
+
+
+
 		addon:ClearCache()
-		addon.ExtraSetsDataProvider:ClearSets()
+
 		addon.Init:BuildDB()
 		addon.GetBaseList()
 		addon.RefreshSubItemData()
+		addon.RefreshLists()
 	end
 
 function addon.GetItemSource(itemID, itemMod)

@@ -828,7 +828,7 @@ local itemSub_options = {
 
 function addon.RefreshSubItemData()
 	local function RemoveItemSubstitute(itemID)
-	addon:RemoveItemSubstitute(itemID)
+		addon:RemoveItemSubstitute(itemID)
 	end
 	local args = {} 
 	for i, data in pairs(addon.itemsubdb.profile.items) do

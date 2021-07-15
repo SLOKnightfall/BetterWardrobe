@@ -3594,6 +3594,7 @@ local function RefreshLists()
 		WardrobeCollectionFrame.SetsCollectionFrame:Refresh();
 	end										
 end
+addon.RefreshLists = RefreshLists
 
 function BetterWardrobeFilterDropDown_OnLoad(self)
 	BW_UIDropDownMenu_Initialize(self, BetterWardrobeFilterDropDown_Initialize, "MENU")
@@ -6037,7 +6038,103 @@ function BetterWardrobeSetsDetailsItemMixin:OnLeave()
 	WardrobeCollectionFrame:HideAppearanceTooltip();
 end
 
-function BetterWardrobeSetsDetailsItemMixin:OnMouseDown()
+local BW_ItemSubDropDownMenu = CreateFrame("Frame", "BW_ItemSubDropDownMenu", UIParent, "BW_UIDropDownMenuTemplate")
+--local BW_ItemSubDropDownMenu = BW_UIDropDownMenu_Create("BW_ItemSubDropDownMenu", UIParent)
+
+BW_ItemSubDropDownMenu:SetFrameLevel(500)
+local clickedItemID = nil
+local BW_ItemSubDropDownMenu_Table = {
+    {
+        text = L["Substitue Item"],
+        func = function(self)    		
+          	BetterWardrobeOutfitFrameMixin:ShowPopup("BETTER_WARDROBE_SUBITEM_POPUP")
+        end,
+        notCheckable = 1,
+    },
+    {
+        text = CLOSE,
+        func = function() BW_CloseDropDownMenus() end,
+        notCheckable = 1,
+    },
+ 
+}
+
+StaticPopupDialogs["BETTER_WARDROBE_SUBITEM_INVALID_POPUP"] = {
+	text = L["Not a valid itemID"],
+	preferredIndex = 3,
+	button1 = "OK",
+	button2 = CANCEL,
+	editBoxWidth = 260,
+	EditBoxOnEnterPressed = function(self)
+		if (self:GetParent().button1:IsEnabled()) then
+			StaticPopup_OnClick(self:GetParent(), 1)
+		end
+	end,
+	OnAccept = function(self)
+		--ImportSet(self.editBox:GetText());
+		 BetterWardrobeOutfitFrameMixin:ShowPopup("BETTER_WARDROBE_SUBITEM_POPUP")
+	end,
+	EditBoxOnEscapePressed = function()BetterWardrobeOutfitFrameMixin:ShowPopup("BETTER_WARDROBE_SUBITEM_POPUP") end,
+	exclusive = true,
+	whileDead = true,
+};
+
+StaticPopupDialogs["BETTER_WARDROBE_SUBITEM_WRONG_LOCATION_POPUP"] = {
+	text = L["Item Locations Don't Match"],
+	preferredIndex = 3,
+	button1 = "OK",
+	button2 = CANCEL,
+	editBoxWidth = 260,
+	EditBoxOnEnterPressed = function(self)
+		if (self:GetParent().button1:IsEnabled()) then
+			StaticPopup_OnClick(self:GetParent(), 1)
+		end
+	end,
+	OnAccept = function(self)
+		--ImportSet(self.editBox:GetText());
+		 BetterWardrobeOutfitFrameMixin:ShowPopup("BETTER_WARDROBE_SUBITEM_POPUP")
+	end,
+	EditBoxOnEscapePressed = function()BetterWardrobeOutfitFrameMixin:ShowPopup("BETTER_WARDROBE_SUBITEM_POPUP") end,
+	exclusive = true,
+	whileDead = true,
+};
+
+StaticPopupDialogs["BETTER_WARDROBE_SUBITEM_POPUP"] = {
+	text = L["Item ID"],
+	preferredIndex = 3,
+	button1 = L["Set Substitution"],
+	button2 = CANCEL,
+	hasEditBox = true,
+	maxLetters = 512,
+	editBoxWidth = 260,
+	OnShow = function(self)
+		if LISTWINDOW then LISTWINDOW:Hide() end
+		self.editBox:SetText("")
+	end,
+	EditBoxOnEnterPressed = function(self)
+		if (self:GetParent().button1:IsEnabled()) then
+			StaticPopup_OnClick(self:GetParent(), 1)
+		end
+	end,
+	OnAccept = function(self)
+		local value = self.editBox:GetText()
+		local id = tonumber(value)
+
+		if id == nil then BetterWardrobeOutfitFrameMixin:ShowPopup("BETTER_WARDROBE_SUBITEM_INVALID_POPUP")  return false end
+
+		local itemEquipLoc1 = GetItemInfoInstant(tonumber(value)) 
+		if not itemEquipLoc1 == nil then BetterWardrobeOutfitFrameMixin:ShowPopup("BETTER_WARDROBE_SUBITEM_INVALID_POPUP") return false end
+
+		addon.SetItemSubstitute(clickedItemID, value)
+		--ImportSet(self.editBox:GetText());
+		clickedItemID = nil
+	end,
+	EditBoxOnEscapePressed = HideParentPanel,
+	exclusive = true,
+	whileDead = true,
+};
+
+function BetterWardrobeSetsDetailsItemMixin:OnMouseDown(button)
 	if ( IsModifiedClick("CHATLINK") ) then
 		local sourceInfo = C_TransmogCollection.GetSourceInfo(self.sourceID);
 		local slot = C_Transmog.GetSlotForInventoryType(sourceInfo.invType);
@@ -6060,6 +6157,7 @@ function BetterWardrobeSetsDetailsItemMixin:OnMouseDown()
 		end
 	elseif ( IsModifiedClick("DRESSUP") ) then
 		DressUpVisual(self.sourceID);
+
 
 	elseif button == "RightButton"  and WardrobeCollectionFrame.selectedCollectionTab == 3 then ---TODO review
 		clickedItemID = self.itemID
@@ -7285,3 +7383,5 @@ end
 
 		end
 	end, true)
+
+
