@@ -500,6 +500,26 @@ function addon.GetOutfits(character)
 				data.index = i
 				data.name = addon.OutfitDB.char.outfits[i].name
 				data.label = L["Extended Saved Set"]
+
+--[[[				if not data.items then
+				local items =  {}
+				local sources = {}
+					for index=1, 19 do
+						if data[index] then 
+
+							local sourceInfo = C_TransmogCollection.GetSourceInfo(data[index])
+							if sourceInfo then
+
+								sources[sourceInfo.itemID] = data[i] 
+								items[index] = sourceInfo.itemID
+							end
+						end
+					end
+					data.items = items
+					data.sources = sources
+				end]]
+				
+
 				tinsert(FullList, data)
 				--FullList[#FullList].outfitID = MAX_DEFAULT_OUTFITS + i
 				--data.set = "default"
@@ -593,12 +613,29 @@ end
 						info.sources[i]= data.appearanceID
 					end
 					----info.sources = C_TransmogCollection.GetOutfitSources(data.outfitID)
-				elseif  #info.sources == 0 then 
-					for i = 1, 19 do  ----was 16?
+				--elseif  #info.sources == 0 then 
+					--for i = 1, 19 do  ----was 16?
 						--info.sources[i] = data[i] or 0
+					--end
+				--end
+
+				elseif not data.items then
+					local items =  {}
+					local sources = {}
+					for index=1, 19 do
+						if data[index] then 
+							local sourceInfo = C_TransmogCollection.GetSourceInfo(data[index])
+							if sourceInfo then
+								sources[sourceInfo.itemID] = data[index] 
+								items[index] = sourceInfo.itemID
+							end
+						end
 					end
+					info.items = items
+					info.sources = sources
 				end
 --[[
+
 									--converts setdata to new info lists
 					if not data.itemTransmogInfoList then 
 						local outfitData = {}

@@ -336,6 +336,11 @@
 				</Texture>
 			</Layer>
 			<Layer level="OVERLAY">
+				<Texture parentKey="Replacement" atlas="transmog-icon-revert-small" useAtlasSize="true" hidden="true">
+					<Anchors>
+						<Anchor point="BOTTOMLEFT" relativeKey="$parent" x="-10" y = "-15"/>
+					</Anchors>
+				</Texture>
 				<Texture parentKey="IconBorder" atlas="loottab-set-itemborder-green" useAtlasSize="true">
 					<Anchors>
 						<Anchor point="RIGHT" relativeKey="$parent.Icon" relativePoint="CENTER" x="20" y="1"/>
@@ -353,8 +358,34 @@
 						</AnimationGroup>
 					</Animations>
 				</Texture>
+
 			</Layer>
 		</Layers>
+
+
+
+					<Frame parentKey="Favorite" setAllPoints="true">
+				<Layers>
+					<Layer level="ARTWORK">
+						<Texture parentKey="Icon" atlas="collections-icon-favorites" useAtlasSize="true" hidden="true">
+							<Anchors>
+								<Anchor point="TOPLEFT" x="-12" y="13" relativePoint="TOPLEFT"/>
+							</Anchors>
+						</Texture>
+					</Layer>
+				</Layers>
+			</Frame>
+			<Frame parentKey="HideVisual" setAllPoints="true">
+				<Layers>
+					<Layer level="ARTWORK">
+						<Texture parentKey="Icon" atlas="transmog-icon-hidden" useAtlasSize="true" hidden="true">
+							<Anchors>
+								<Anchor point="TOPLEFT" x="-12" y="13" relativePoint="TOPLEFT"/>
+							</Anchors>
+						</Texture>
+					</Layer>
+				</Layers>
+			</Frame>
 		<Scripts>
 			<OnEnter method="OnEnter"/>
 			<OnLeave method="OnLeave"/>

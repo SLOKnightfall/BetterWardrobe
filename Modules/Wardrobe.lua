@@ -6376,7 +6376,6 @@ function BetterWardrobeSetsTransmogMixin:UpdateSets()
 
 		self.NoValidSetsLabel:SetShown(not C_TransmogSets.HasUsableSets())
 
-
 	else
 		local usableSets = SetsDataProvider:GetUsableSets();
 		self.PagingFrame:SetMaxPages(ceil(#usableSets / self.PAGE_SIZE));
@@ -6387,8 +6386,9 @@ function BetterWardrobeSetsTransmogMixin:UpdateSets()
 			local index = i + indexOffset;
 				set = usableSets[index];
 			if ( set ) then
+				local setType =  addon.GetSetType(set.setID)
 				model:Show();
-				if addon.GetSetType(set.setID) == "default" then 
+				if setType == "default" then 
 					local sources  = C_TransmogCollection.GetOutfitItemTransmogInfoList(set.setID - 5000)
 					model:Undress()
 					for slotID, itemTransmogInfo in ipairs(sources) do
@@ -6651,7 +6651,9 @@ function BetterWardrobeSetsTransmogMixin:LoadSet(setID)
 			local TransmogLocation = TransmogUtil.CreateTransmogLocation(3, Enum.TransmogType.Appearance, Enum.TransmogModification.Main);
 			local secondaryTransmogLocation = TransmogUtil.CreateTransmogLocation(3, Enum.TransmogType.Appearance, Enum.TransmogModification.Secondary);
 
-			if offShoulder and (offShoulder ~= 0 and offShoulder ~= 104114) then
+
+			local baseSourceID = C_Transmog.GetSlotVisualInfo(TransmogUtil.GetTransmogLocation("SHOULDERSLOT", Enum.TransmogType.Appearance, Enum.TransmogModification.Secondary))
+			if offShoulder and offShoulder ~= 0 and offShoulder ~= baseSourceID then			
 				local secondaryPendingInfo = TransmogUtil.CreateTransmogPendingInfo(Enum.TransmogPendingType.Apply, offShoulder or Constants.Transmog.NoTransmogID);
 				C_Transmog.SetPending(secondaryTransmogLocation, secondaryPendingInfo);
 			--elseif offShoulder == 104114 then
