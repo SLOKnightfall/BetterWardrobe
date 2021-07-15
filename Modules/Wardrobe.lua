@@ -441,7 +441,7 @@ function BW_TransmogFrameMixin:Update()
 	end
 
 	self:UpdateApplyButton();
-	self.OutfitDropDown:UpdateSaveButton();
+	self.BW_OutfitDropDown:UpdateSaveButton();
 
 	self:CheckSecondarySlotButtons();
 
@@ -564,13 +564,29 @@ end
 BetterWardrobeOutfitMixin = { };
 
 function BetterWardrobeOutfitMixin:OnOutfitApplied(outfitID)
-	local value = outfitID or "";
-	if GetCVarBool("transmogCurrentSpecOnly") then
-		local specIndex = GetSpecialization();
-		SetCVar("lastTransmogOutfitIDSpec"..specIndex, value);
-	else
-		for specIndex = 1, GetNumSpecializations() do
+	addon.OutfitDB.char.lastTransmogOutfitIDSpec = addon.OutfitDB.char.lastTransmogOutfitIDSpec or {}
+
+	if addon.IsDefaultSet(outfitID) then
+		local value = outfitID - 5000 or "";
+		if GetCVarBool("transmogCurrentSpecOnly") then
+			local specIndex = GetSpecialization();
 			SetCVar("lastTransmogOutfitIDSpec"..specIndex, value);
+			addon.OutfitDB.char.lastTransmogOutfitIDSpec[specIndex] =  ""
+		else
+			for specIndex = 1, GetNumSpecializations() do
+				SetCVar("lastTransmogOutfitIDSpec"..specIndex, value);
+				addon.OutfitDB.char.lastTransmogOutfitIDSpec[specIndex] =  ""
+			end
+		end
+	else
+		local value = outfitID or "";
+		if GetCVarBool("transmogCurrentSpecOnly") then
+			local specIndex = GetSpecialization();
+			addon.OutfitDB.char.lastTransmogOutfitIDSpec[specIndex] = value
+		else
+			for specIndex = 1, GetNumSpecializations() do
+				addon.OutfitDB.char.lastTransmogOutfitIDSpec[specIndex] = value
+			end
 		end
 	end
 end
@@ -591,6 +607,7 @@ end
 
 
 function BetterWardrobeOutfitMixin:GetItemTransmogInfoList()
+	if not WardrobeTransmogFrame then return nil end
 	local playerActor = WardrobeTransmogFrame.ModelScene:GetPlayerActor();
 	if playerActor then
 		return playerActor:GetItemTransmogInfoList();
@@ -605,11 +622,24 @@ function BetterWardrobeOutfitMixin:OnOutfitSaved(outfitID)
 end
 
 function BetterWardrobeOutfitMixin:OnSelectOutfit(outfitID)
-	-- outfitID can be 0, so use empty string for none
-	local value = outfitID or "";
-	for specIndex = 1, GetNumSpecializations() do
-		if GetCVar("lastTransmogOutfitIDSpec"..specIndex) == "" then
-			SetCVar("lastTransmogOutfitIDSpec"..specIndex, value);
+	addon.OutfitDB.char.lastTransmogOutfitIDSpec = addon.OutfitDB.char.lastTransmogOutfitIDSpec or {}
+
+	if addon.IsDefaultSet(outfitID) then
+
+		-- outfitID can be 0, so use empty string for none
+		local value = outfitID - 5000 or "";
+		for specIndex = 1, GetNumSpecializations() do
+			if GetCVar("lastTransmogOutfitIDSpec"..specIndex) == "" then
+				SetCVar("lastTransmogOutfitIDSpec"..specIndex, value);
+				addon.OutfitDB.char.lastTransmogOutfitIDSpec[specIndex] = ""
+			end
+		end
+	else
+		local value = outfitID or "";
+		for specIndex = 1, GetNumSpecializations() do
+			if addon.OutfitDB.char.lastTransmogOutfitIDSpec[specIndex] == "" then
+				addon.OutfitDB.char.lastTransmogOutfitIDSpec[specIndex] = value
+			end
 		end
 	end
 end
@@ -617,7 +647,11 @@ end
 function BetterWardrobeOutfitMixin:GetLastOutfitID()
 	local specIndex = GetSpecialization();
 	if not specIndex then return end
-	return tonumber(GetCVar("lastTransmogOutfitIDSpec"..specIndex));
+	if addon.OutfitDB.char.lastTransmogOutfitIDSpec[specIndex] then 
+		return addon.OutfitDB.char.lastTransmogOutfitIDSpec[specIndex]
+	else
+		return tonumber(GetCVar("lastTransmogOutfitIDSpec"..specIndex)+5000);
+	end
 end
 
 

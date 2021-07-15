@@ -253,6 +253,18 @@
 					<OnLeave method="OnLeave" />
 				</Scripts>
 			</Button>
+					<Frame parentKey="BW_OutfitDropDown"  name="BetterWardrobeDressUpFrameDropDown" inherits="BetterWardrobeOutfitDropDownTemplate" mixin="BetterDressUpOutfitMixin" >
+			<KeyValues>
+				<KeyValue key="width" value="163" type="number"/>
+				<KeyValue key="minMenuStringWidth" value="127" type="number"/>
+				<KeyValue key="maxMenuStringWidth" value="190" type="number"/>
+			</KeyValues>
+			<Anchors>
+				<Anchor point="TOP" relativeTo="DressUpFrame" relativePoint="TOP" x="-23" y="-28"/>
+			</Anchors>
+			<Scripts>
+			</Scripts>
+		</Frame>
 		</Frames>
 		<Scripts>
 			<OnLoad method="OnLoad" />
@@ -260,18 +272,8 @@
 			<OnEvent method="OnEvent" />
 			<OnHide method="OnHide" />
 		</Scripts>
+
 	</Frame>
 
-	<Frame parentKey="BW_OutfitDropDown" parent="DressUpFrame" name="BetterWardrobeDressUpFrameDropDown" inherits="BetterWardrobeOutfitDropDownTemplate" mixin="BetterDressUpOutfitMixin" >
-		<KeyValues>
-			<KeyValue key="width" value="163" type="number"/>
-			<KeyValue key="minMenuStringWidth" value="127" type="number"/>
-			<KeyValue key="maxMenuStringWidth" value="190" type="number"/>
-		</KeyValues>
-		<Anchors>
-			<Anchor point="TOP" x="-23" y="-28"/>
-		</Anchors>
-		<Scripts>
-		</Scripts>
-	</Frame>
+
 </Ui>

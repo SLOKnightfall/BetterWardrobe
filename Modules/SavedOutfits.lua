@@ -559,17 +559,14 @@ function BetterWardrobeOutfitFrameMixin:NewOutfit(name)
 		end
 	end
 
-print(name)
 	local sources = {}
 	for i, data in pairs(self.itemTransmogInfoList) do
 		sources[i] = data.appearanceID
 	end
 
 	if (outfitID and IsDefaultSet(outfitID)) or (#C_TransmogCollection.GetOutfits() < MAX_DEFAULT_OUTFITS)  then 
-		print(1)
 		outfitID = C_TransmogCollection.NewOutfit(name, icon, self.itemTransmogInfoList);
 	else
-		print(2)
 		if outfitID then 
 			addon.OutfitDB.char.outfits[LookupIndexFromID(outfitID)]  = addon.OutfitDB.char.outfits[LookupIndexFromID(outfitID)] or {}
 			outfit = addon.OutfitDB.char.outfits[LookupIndexFromID(outfitID)]
@@ -585,7 +582,6 @@ print(name)
 		--outfitID = index
 	end
 
-
 	if ( self.popupDropDown ) then
 		self.popupDropDown:SelectOutfit(outfitID);
 		self.popupDropDown:OnOutfitSaved(outfitID);
@@ -597,13 +593,20 @@ end
 
 function BetterWardrobeOutfitFrameMixin:DeleteOutfit(outfitID)
 	if IsDefaultSet(outfitID) then
-		C_TransmogCollection.DeleteOutfit(outfitID)
+		C_TransmogCollection.DeleteOutfit(outfitID - 5000)
 	else
 		tremove(addon.OutfitDB.char.outfits, LookupIndexFromID(outfitID))
 	end
-----TODO:CHeck
+
+
+--[[---TODO:CHeck
 	if GetCVarBool("transmogCurrentSpecOnly") then
 		local specIndex = GetSpecialization()
+
+		if addon.IsDefaultSet(outfitID) then
+			SetCVar("lastTransmogOutfitIDSpec"..specIndex, value)
+
+
 		local value = addon.OutfitDB.char.lastTransmogOutfitIDSpec[specIndex]
 		if type(value) == number and value > 0 then  addon.OutfitDB.char.lastTransmogOutfitIDSpec[specIndex] = value - 1 end
 
@@ -614,7 +617,7 @@ function BetterWardrobeOutfitFrameMixin:DeleteOutfit(outfitID)
 		local value = addon.OutfitDB.char.lastTransmogOutfitIDSpec[specIndex]
 		if type(value) == number and value > 0  then  addon.OutfitDB.char.lastTransmogOutfitIDSpec[specIndex] = value - 1 end
 		end
-	end
+	end]]
 
 	addon.setdb.global.sets[addon.setdb:GetCurrentProfile()] = addon.GetSavedList()
 	addon:SendMessage("BW_TRANSMOG_COLLECTION_UPDATED")
@@ -878,9 +881,6 @@ function BetterWardrobeOutfitCheckAppearancesMixin:OnEvent(event, appearanceID, 
 	end
 end
 
-
-
-
 local outfitDropdown
 function addon.RefreshSaveOutfitDropdown()
 	local list = {}
@@ -948,20 +948,15 @@ end
 
 
 
-
-
 local MogItSetName
 local MogItSetID
 local plugin
 local plugin_index
 local function BW_DressingRoomImportButton_OnClicks(outfitID, name, parent)
-	
-print(name)
-print(outfitID)
 	MogItSetName = name
 	MogItSetID = outfitID
 
-	if outfitID >=7000 then
+	if outfitID >= 7000 then
 		plugin = addon.TransmogOutfits
 		plugin_index = outfitID
 	else
@@ -969,13 +964,11 @@ print(outfitID)
 		plugin_index = MogItSetName
 	end
 
-
 	local contextMenuData = {
 		{
 			text = L["Create Copy"],
 			func = function()
 				plugin:CopySet(MogItSetID, MogItSetName)
-				--BetterWardrobeOutfitFrameMixin:ImportMogitSet(MogItSetID, MogItSetName)
 				MogItSetName = nil
 				MogItSetID = nil
 				plugin = nil
@@ -983,7 +976,8 @@ print(outfitID)
 			end,
 			isNotRadio = true,
 			notCheckable = true,
-		},{
+		},
+		{
 			text = L["Rename"],
 			func = function()
 				plugin:RenameSet(plugin_index)

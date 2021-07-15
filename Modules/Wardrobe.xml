@@ -1514,7 +1514,7 @@
 					<OnMouseWheel method="OnMouseWheel"/>
 				</Scripts>
 			</Frame>
-			<Frame parentKey="OutfitDropDown" name="BetterWardrobeOutfitDropDown" parent = "WardrobeTransmogFrame" inherits="BetterWardrobeOutfitDropDownTemplate" mixin="BetterWardrobeOutfitMixin"  hidden = "false">
+			<Frame parentKey="BW_OutfitDropDown" name="BetterWardrobeOutfitDropDown" parent = "WardrobeTransmogFrame" inherits="BetterWardrobeOutfitDropDownTemplate" mixin="BetterWardrobeOutfitMixin"  hidden = "false">
 						<KeyValues>
 							<KeyValue key="width" value="188" type="number"/>
 							<KeyValue key="minMenuStringWidth" value="152" type="number"/>
