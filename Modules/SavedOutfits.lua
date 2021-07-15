@@ -240,7 +240,7 @@ end
 
 function BetterWardrobeOutfitDropDownMixin:UpdateSaveButton()
 	if ( self.selectedOutfitID ) then
-		self.SaveButton:SetEnabled(not self:IsOutfitDressed());
+		self.SaveButton:SetEnabled(DressUpFrame:IsShown() or not self:IsOutfitDressed());
 	else
 		self.SaveButton:SetEnabled(false);
 	end
