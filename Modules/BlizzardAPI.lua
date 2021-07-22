@@ -113,8 +113,9 @@ end
 function addon.C_TransmogSets.GetBaseSetsCounts()
 
 	if WardrobeCollectionFrame:CheckTab(2) then
-		--self:GetParent():UpdateProgressBar(C_TransmogSets.GetBaseSetsCounts());
-	elseif WardrobeCollectionFrame:CheckTab(3) then
+		return C_TransmogSets.GetBaseSetsCounts();
+	--elseif WardrobeCollectionFrame:CheckTab(3) then
+	else
 		local sets = addon.GetBaseList()
 		local totalSets = #sets or 0
 		local collectedSets = 0
@@ -130,7 +131,6 @@ function addon.C_TransmogSets.GetBaseSetsCounts()
 		return collectedSets, totalSets
 	end
 end
-
 
 
 function addon.C_TransmogSets.SetHasNewSources(setID)
@@ -179,7 +179,7 @@ function addon.C_TransmogSets.GetSetSources(setID)
 		if setID  > 100000 then setID = setID/100000 end
 		return  C_TransmogSets.GetSetSources(setID)
 	end
-	local setInfo = addon.GetSetInfo(setID)
+	 setInfo = addon.GetSetInfo(setID)
 	local setSources = {}
 	local atTransmogrifier = WardrobeFrame_IsAtTransmogrifier()
 	local unavailable = false
@@ -201,6 +201,18 @@ function addon.C_TransmogSets.GetSetSources(setID)
 				end
 				setSources[sources[1].sourceID] = sources[1].isCollected--and sourceInfo.isCollected
 			end
+
+			if slotID == 3 and data.secondaryAppearanceID then
+				local sourceInfo = C_TransmogCollection.GetSourceInfo(data.secondaryAppearanceID)
+				local sources =  sourceInfo and C_TransmogCollection.GetAppearanceSources(sourceInfo.visualID)
+				if sources then
+					--items[sources.itemID] = true
+					if #sources > 1 then
+						WardrobeCollectionFrame_SortSources(sources)
+					end
+					setSources[sources[1].sourceID] = sources[1].isCollected--and sourceInfo.isCollected
+				end
+			end
  		end
 
 		return setSources, unavailable
@@ -210,6 +222,7 @@ function addon.C_TransmogSets.GetSetSources(setID)
 		if not setInfo.itemData then 
 			--print(setID)
 		else
+
 		for slotID, sourceData in pairs(setInfo.itemData) do
 			local sourceID = sourceData[2]
 			local appearanceID = sourceData[3]
@@ -230,6 +243,19 @@ function addon.C_TransmogSets.GetSetSources(setID)
 				end
 			end
 		end
+
+			if setInfo.itemData[3] and setInfo.offShoulder then
+				local sourceInfo = C_TransmogCollection.GetSourceInfo(setInfo.offShoulder)
+				local sources =  sourceInfo and C_TransmogCollection.GetAppearanceSources(sourceInfo.visualID)
+				if sources then
+					--items[sources.itemID] = true
+					if #sources > 1 then
+						WardrobeCollectionFrame_SortSources(sources)
+					end
+					setSources[sources[1].sourceID] = sources[1].isCollected--and sourceInfo.isCollected
+				end
+			end
+
 	end
 		return setSources, unavailable
 
