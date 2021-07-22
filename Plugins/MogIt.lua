@@ -89,10 +89,11 @@ addon:RegisterMessage("BW_OnPlayerEnterWorld", function() SetHooks() end)
 
 
 function MogIt.GetMogitOutfits() 
-	 sets = Wishlist:GetSets(nil, true)
+	local sets = Wishlist:GetSets(nil, true)
 	if #sets == 0 then return end
 
 	local mogSets = {}
+	local slotList = addon.Globals.slots
 	for i, set in pairs(sets) do
 		local data = {}
 		data.name = set.name or ""
@@ -104,33 +105,52 @@ function MogIt.GetMogitOutfits()
 		data.mainHandEnchant = 0
 		data.offHandEnchant = 0
 		data.offShoulder = 0
-		data.items = {}
+		data.itemData = data.itemData or {}
 
-		local items = set.items
-		local sources = {}
-		for i, invSlot in ipairs(addon.Globals.slots) do
+		for i, invSlot in ipairs(slotList) do
 			local slotID = GetInventorySlotInfo(invSlot)
-			local item = items[invSlot]
-			data.items[slotID] = item
-			local icon
-			if item then
-				local sourceID = addon.GetSourceFromItem(item)
-				--print(sourceID)
-				sources[item] = sourceID
-				if not icon then 
-					icon = select(5, GetItemInfoInstant(item))
+			local itemLink = set.items[invSlot]
+		--print(itemLink)
+			if itemLink then
+				local appearanceID, sourceID = C_TransmogCollection.GetItemInfo(itemLink)
+				local sourceInfo = C_TransmogCollection.GetSourceInfo(sourceID)
+				local appearanceID = sourceInfo.visualID
+				local itemID = sourceInfo.itemID
+				local itemMod = sourceInfo.itemModID
+				----print(invSlot)
+				data.itemData[slotID] = {"'"..itemID..":"..itemMod.."'", sourceID, appearanceID}
+				if not data.icon then
+					--local categoryID, visualID, canEnchant, icon, isCollected, itemLink, transmogLink, unknown1 = C_TransmogCollection.GetAppearanceSourceInfo(itemLink)
+					local _, _, _, _, icon, _, _ = GetItemInfoInstant(itemLink) 
 					data.icon = icon
 				end
 			end
 		end
-		data.sources = sources
+		--[[local items = set.items
+						local sources = {}
+						for i, invSlot in ipairs(addon.Globals.slots) do
+							local slotID = GetInventorySlotInfo(invSlot)
+							local item = items[invSlot]
+							data.items[slotID] = item
+							local icon
+							if item then
+								local sourceID = addon.GetSourceFromItem(item)
+								local sourceInfo =  C_TransmogCollection.GetSourceInfo(sourceID)
+								--print(sourceID)
+								sources[item] = sourceInfo.visualID
+								if not icon then 
+									icon = select(5, GetItemInfoInstant(item))
+									data.icon = icon
+								end
+							end
+						end]]
+		--data.sources = sources
 		MogIt.MogitSets[data.index] = data
 		tinsert(mogSets, data)
 	end
 
 	return mogSets
 end
-
 
 function MogIt.GetMogitWishlist()
 	local list = Wishlist:BuildList()

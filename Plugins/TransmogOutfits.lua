@@ -18,10 +18,10 @@ function TransmogOutfits.GetOutfits()
 	local mogSets = {}
 	for i, set in pairs(sets) do
 		local data = {}
-		data.items = {}
-		data.sources = {}
+		--data.items = {}
+		--data.sources = {}
 		--for index, setdata in pairs(set) do
-		for index = 1, 19 do
+--[[		for index = 1, 19 do
 
 				local setdata = set[index]
 				if setdata then 
@@ -40,12 +40,13 @@ function TransmogOutfits.GetOutfits()
 				end
 
 			--data[index] = setdata
-		end
+		end]]
 
 		data.set = "transmog_outfits"
 		data.label = "TransmogOutfits"
 		data.index = i + 7000		
 		data.outfitID = 7000 + i
+		data.set = "transmogoutfits"
 		data.label = L["TransmogOutfits Saved Set"]
 
 		data.mainHandEnchant = set.enchant1 or Constants.Transmog.NoTransmogID
@@ -57,19 +58,28 @@ function TransmogOutfits.GetOutfits()
 		--data[33] = nil
 		data.orgIndex = i
 		data.name = set.name or ""
+		data.itemData = {}
 
 		----data.icon = 133745
---[[		for i, invSlot in ipairs(addon.Globals.slots) do
+		for i, invSlot in ipairs(addon.Globals.slots) do
 			local slotID = GetInventorySlotInfo(invSlot)
-			local item = data[invSlot]
-			local icon
-			if item then
-				local categoryID, visualID, canEnchant, icon, isCollected, itemLink, transmogLink, unknown1 = C_TransmogCollection.GetAppearanceSourceInfo(item)
+			local sourceID = set[slotID]
+			if sourceID then 
+				local sourceInfo = C_TransmogCollection.GetSourceInfo(sourceID)
+				if sourceInfo then 
+					local appearanceID = sourceInfo.visualID
+					local itemID = sourceInfo.itemID
+					local itemMod = sourceInfo.itemModID
+					data.itemData[slotID] = {"'"..itemID..":"..itemMod.."'", sourceID, appearanceID}
 
-					data.icon = icon
-
+					if not data.icon then
+						--local categoryID, visualID, canEnchant, icon, isCollected, itemLink, transmogLink, unknown1 = C_TransmogCollection.GetAppearanceSourceInfo(itemID)
+						local _, _, _, _, icon, _, _ = GetItemInfoInstant(itemID) 
+						data.icon = icon
+					end
+				end
 			end
-		end]]
+		end
 
 		--MogIt.MogitSets[data.index] = data
 		tinsert(mogSets, data)

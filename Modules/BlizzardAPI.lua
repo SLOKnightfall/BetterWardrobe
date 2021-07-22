@@ -20,6 +20,7 @@ local playerClass, classID,_
 local Sets = {}
 addon.Sets = Sets
 
+--local SetsDataProvider = addon.SetsDataProvider
 local L = LibStub("AceLocale-3.0"):GetLocale(addonName)
 
 --Determines type of set based on setID
@@ -45,6 +46,7 @@ addon.DetermineSetType = DetermineSetType
 
 
 addon.C_TransmogSets = {}
+addon.C_TransmogCollection = {}	
 
 --C_TransmogSets.GetSetPrimaryAppearances(setID);
 --[[	Name = "GetSetPrimaryAppearances",
@@ -107,6 +109,30 @@ end
 function addon.C_TransmogSets.SetIsFavorite(setID, value)
 end
 
+
+function addon.C_TransmogSets.GetBaseSetsCounts()
+
+	if WardrobeCollectionFrame:CheckTab(2) then
+		--self:GetParent():UpdateProgressBar(C_TransmogSets.GetBaseSetsCounts());
+	elseif WardrobeCollectionFrame:CheckTab(3) then
+		local sets = addon.GetBaseList()
+		local totalSets = #sets or 0
+		local collectedSets = 0
+		local SetsDataProvider = addon.SetsDataProvider
+
+		for i, data in ipairs(sets) do
+			local sourceData = SetsDataProvider:GetSetSourceData(data.setID)
+			local topSourcesCollected, topSourcesTotal = sourceData.numCollected,sourceData.numTotal
+			if topSourcesCollected == topSourcesTotal then
+				collectedSets = collectedSets + 1
+			end
+		end
+		return collectedSets, totalSets
+	end
+end
+
+
+
 function addon.C_TransmogSets.SetHasNewSources(setID)
 	local setType = DetermineSetType(setID)
 
@@ -119,7 +145,6 @@ function addon.C_TransmogSets.SetHasNewSources(setID)
 		else
 			return false
 		end
-	else
 	end
 end
 
@@ -145,6 +170,73 @@ function addon.C_TransmogSets.GetBaseSetID(setID)
 	end
 end
 
+
+function addon.C_TransmogSets.GetSetSources(setID)
+	--if SourceDB[setID] then return SourceDB[setID] end
+
+	--Default Blizzard Set
+	if setID  > 100000  or WardrobeCollectionFrame:CheckTab(2) then
+		if setID  > 100000 then setID = setID/100000 end
+		return  C_TransmogSets.GetSetSources(setID)
+	end
+	local setInfo = addon.GetSetInfo(setID)
+	local setSources = {}
+	local atTransmogrifier = WardrobeFrame_IsAtTransmogrifier()
+	local unavailable = false
+	local SetType = setInfo.setType
+	local sources = {}
+
+	--Blizzard Saved Set
+	if SetType == "default" then
+		--print("bigB")
+ 		local setTransmogInfo = C_TransmogCollection.GetOutfitItemTransmogInfoList(setID - 5000)
+ 		for slotID, data in ipairs(setTransmogInfo) do
+ 			--print(slotID)
+ 			local sourceInfo = data.appearanceID and C_TransmogCollection.GetSourceInfo(data.appearanceID)
+			local sources =  sourceInfo and C_TransmogCollection.GetAppearanceSources(sourceInfo.visualID)
+			if sources then
+				--items[sources.itemID] = true
+				if #sources > 1 then
+					WardrobeCollectionFrame_SortSources(sources)
+				end
+				setSources[sources[1].sourceID] = sources[1].isCollected--and sourceInfo.isCollected
+			end
+ 		end
+
+		return setSources, unavailable
+
+	--Other Sets
+	else
+		if not setInfo.itemData then 
+			--print(setID)
+		else
+		for slotID, sourceData in pairs(setInfo.itemData) do
+			local sourceID = sourceData[2]
+			local appearanceID = sourceData[3]
+			if sourceID ~= 0 then 
+				--local sourceInfo = sourceID and C_TransmogCollection.GetSourceInfo(sourceID)
+				local sources =  appearanceID and C_TransmogCollection.GetAppearanceSources(appearanceID)
+						--if (sourceInfo and not sourceInfo.sourceType) and not setInfo.sourceType then 
+							--unavailable = true
+					--	end
+				if sources then
+					--items[sources.itemID] = true
+					if #sources > 1 then
+						WardrobeCollectionFrame_SortSources(sources)
+					end
+					setSources[sources[1].sourceID] = sources[1].isCollected--and sourceInfo.isCollected
+				elseif sourceID then 
+					--setSources[sourceID] = false
+				end
+			end
+		end
+	end
+		return setSources, unavailable
+
+	end
+
+
+end
 
 function addon:SetFavoriteItem(visualID, set)
 	if addon.favoritesDB.profile.item[visualID] then
@@ -334,3 +426,29 @@ end
 					C_TransmogSets.SetBaseSetsFilter(LE_TRANSMOG_SET_FILTER_PVE, value);
 				end
 	info.checked = C_TransmogSets.GetBaseSetsFilter(LE_TRANSMOG_SET_FILTER_PVE);]]
+
+
+function addon.C_TransmogCollection.GetOutfitItemTransmogInfoList(setID)
+	local  setData = addon.GetSetInfo(setID)
+	local itemTransmogInfoList = {}
+	local offShoulder = setData.offShoulder or 0
+	local mainHandEnchant = setData.mainHandEnchant or 0
+	local offHandEnchant = setData.offHandEnchant or 0
+
+	for slotID, data in pairs(setData.itemData) do
+		local itemTransmogInfo
+		if slotID == 3 then
+			itemTransmogInfo = ItemUtil.CreateItemTransmogInfo(data[3] or 0, offShoulder, 0)
+		elseif slotID == 16 then
+			itemTransmogInfo = ItemUtil.CreateItemTransmogInfo(data[3] or 0, 0, mainHandEnchant)
+		elseif slotID == 17 then
+			itemTransmogInfo = ItemUtil.CreateItemTransmogInfo(data[3] or 0, 0, offHandEnchant)
+		else
+			itemTransmogInfo = ItemUtil.CreateItemTransmogInfo(data[3] or 0, 0, 0)
+		end
+
+		itemTransmogInfoList[slotID] = itemTransmogInfo
+	end
+
+	return itemTransmogInfoList
+end
