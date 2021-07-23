@@ -599,11 +599,9 @@ function BetterWardrobeOutfitMixin:LoadOutfit(outfitID)
 	if ( not outfitID ) then
 		return;
 	end
-print(outfitID)
 	--if addon.IsDefaultSet(outfitID) then
 		--C_Transmog.LoadOutfit(outfitID - 5000)
 	--else
-		--print(outfitID)
 		BetterWardrobeCollectionFrame.SetsTransmogFrame:LoadSet(outfitID)
 	--end
 end
@@ -634,7 +632,7 @@ function BetterWardrobeOutfitMixin:OnSelectOutfit(outfitID)
 		for specIndex = 1, GetNumSpecializations() do
 			if GetCVar("lastTransmogOutfitIDSpec"..specIndex) == "" then
 				SetCVar("lastTransmogOutfitIDSpec"..specIndex, value);
-				addon.OutfitDB.char.lastTransmogOutfitIDSpec[specIndex] = ""
+				addon.OutfitDB.char.lastTransmogOutfitIDSpec[specIndex] = outfitID
 			end
 		end
 	else
@@ -650,13 +648,14 @@ end
 
 --TODO U{PDATE}
 function BetterWardrobeOutfitMixin:GetLastOutfitID()
+
 	local specIndex = GetSpecialization();
-	if not specIndex then return end
-	if addon.OutfitDB.char.lastTransmogOutfitIDSpec[specIndex] then 
+	--if not specIndex then return end
+	--if addon.OutfitDB.char.lastTransmogOutfitIDSpec[specIndex] then 
 		return addon.OutfitDB.char.lastTransmogOutfitIDSpec[specIndex]
-	else
-		return tonumber(GetCVar("lastTransmogOutfitIDSpec"..specIndex)+5000);
-	end
+	--else
+		--return tonumber(GetCVar("lastTransmogOutfitIDSpec"..specIndex));
+	--end
 end
 
 
@@ -1371,6 +1370,32 @@ function BetterWardrobeCollectionFrameMixin:OnEvent(event, ...)
 	end
 end
 
+
+local setCollected,setUncollected,setPvE,setPvP
+local function clearFilters()
+	setCollected = C_TransmogSets.GetBaseSetsFilter(LE_TRANSMOG_SET_FILTER_COLLECTED)
+	setUncollected = C_TransmogSets.GetBaseSetsFilter(LE_TRANSMOG_SET_FILTER_UNCOLLECTED)
+	setPvE = C_TransmogSets.GetBaseSetsFilter(LE_TRANSMOG_SET_FILTER_PVE);
+	setPvP =	C_TransmogSets.GetBaseSetsFilter(LE_TRANSMOG_SET_FILTER_PVP);
+
+	C_TransmogSets.SetBaseSetsFilter(LE_TRANSMOG_SET_FILTER_UNCOLLECTED, true);
+	C_TransmogSets.SetBaseSetsFilter(LE_TRANSMOG_SET_FILTER_COLLECTED, true);
+	C_TransmogSets.SetBaseSetsFilter(LE_TRANSMOG_SET_FILTER_PVE, true);
+	C_TransmogSets.SetBaseSetsFilter(LE_TRANSMOG_SET_FILTER_PVP, true);
+	RefreshLists()
+
+	--WardrobeCollectionFrame:SetTab(1);
+	--WardrobeCollectionFrame:SetTab(2);
+end
+
+local function resetFilters()
+	C_TransmogSets.SetBaseSetsFilter(LE_TRANSMOG_SET_FILTER_UNCOLLECTED, setUncollected);
+	C_TransmogSets.SetBaseSetsFilter(LE_TRANSMOG_SET_FILTER_COLLECTED, setCollected);
+	C_TransmogSets.SetBaseSetsFilter(LE_TRANSMOG_SET_FILTER_PVE, setPvE);
+	C_TransmogSets.SetBaseSetsFilter(LE_TRANSMOG_SET_FILTER_PVP, setPvP);
+	RefreshLists()
+end
+
 function BetterWardrobeCollectionFrameMixin:OnShow()
 	_,playerClass, classID = UnitClass("player")
 	CollectionsJournal:SetPortraitToAsset("Interface\\Icons\\inv_chest_cloth_17");
@@ -1959,6 +1984,7 @@ function BetterWardrobeItemsCollectionMixin:CheckHelpTip()
 	end
 end
 
+
 function BetterWardrobeItemsCollectionMixin:OnShow()
 	self:RegisterEvent("TRANSMOGRIFY_UPDATE");
 	self:RegisterEvent("PLAYER_EQUIPMENT_CHANGED");
@@ -1995,7 +2021,7 @@ function BetterWardrobeItemsCollectionMixin:OnShow()
 	self:UpdateSlotButtons();
 
 	-- tab tutorial
-	SetCVarBitfield("closedInfoFrames", LE_FRAME_TUTORIAL_TRANSMOG_JOURNAL_TAB, true);
+	--SetCVarBitfield("closedInfoFrames", LE_FRAME_TUTORIAL_TRANSMOG_JOURNAL_TAB, true);
 	--self:CheckHelpTip();
 end
 
@@ -3333,7 +3359,6 @@ end
 
 
 function addon:SetFavoriteItem(visualID, set)
-	--print(addon.favoritesDB.profile.item[visualID])
 	if addon.favoritesDB.profile.item[visualID] then
 		addon.favoritesDB.profile.item[visualID] = nil
 	else
@@ -3355,7 +3380,6 @@ function BetterWardrobeCollectionFrameModelDropDown_SetFavorite(visualID, value,
 	if ( set and not confirmed ) then
 		local allSourcesConditional = true;
 		local collected = false
-		--print(visualID)
 		local sources = C_TransmogCollection.GetAppearanceSources(44770);
 		for i, sourceInfo in ipairs(sources) do
 			local info = C_TransmogCollection.GetAppearanceInfoBySource(sourceInfo.sourceID);
@@ -5043,6 +5067,7 @@ function BetterWardrobeSetsCollectionMixin:Refresh()
 end
 
 function BetterWardrobeSetsCollectionMixin:DisplaySet(setID)
+	if not setID then return end
 	local setInfo = addon.C_TransmogSets.GetSetInfo(setID) 
 					or nil;
 	if ( not setInfo ) then
@@ -6221,6 +6246,9 @@ function BetterWardrobeSetsTransmogMixin:OnLoad()
 	self.SELECTED_SOURCE_INDEX = 3;
 end
 
+
+
+
 function BetterWardrobeSetsTransmogMixin:OnShow()
 	self:RegisterEvent("TRANSMOGRIFY_UPDATE");
 	self:RegisterEvent("TRANSMOGRIFY_SUCCESS");
@@ -6228,7 +6256,7 @@ function BetterWardrobeSetsTransmogMixin:OnShow()
 	self:RegisterEvent("TRANSMOG_COLLECTION_UPDATED");
 	self:RegisterEvent("PLAYER_EQUIPMENT_CHANGED");
 	self:RegisterEvent("TRANSMOG_SETS_UPDATE_FAVORITE");
-
+	--clearFilters()
 	addon.SetsDataProvider:ClearSets();
 
 	self:RefreshCameras();
@@ -6237,6 +6265,7 @@ function BetterWardrobeSetsTransmogMixin:OnShow()
 	WardrobeCollectionFrame.progressBar:Show();
 	self:UpdateProgressBar();
 	self.sourceQualityTable = { };
+
 
 	----if HelpTip:IsShowing(WardrobeCollectionFrame, TRANSMOG_SETS_VENDOR_TUTORIAL) then
 		----HelpTip:Hide(WardrobeCollectionFrame, TRANSMOG_SETS_VENDOR_TUTORIAL);
@@ -6253,10 +6282,12 @@ function BetterWardrobeSetsTransmogMixin:OnHide()
 	self:UnregisterEvent("TRANSMOG_SETS_UPDATE_FAVORITE");
 	self.loadingSetID = nil;
 	----SetsDataProvider:ClearSets();
+	----resetFilters()
 	self:GetParent():ClearSearch(Enum.TransmogSearchType.UsableSets);
 	self.sourceQualityTable = nil;
 	addon.ViewDelay = 3
 	----self:SetTab(1)
+	
 
 end
 
@@ -6378,20 +6409,20 @@ function BetterWardrobeSetsTransmogMixin:UpdateSets()
 	 
 				local setInfo = C_TransmogSets.GetSetInfo(set.setID)
 				if setInfo then 
-								model.Favorite.Icon:SetShown(C_TransmogSets.GetIsFavorite(set.setID))
-								model.setID = set.setID
+					model.Favorite.Icon:SetShown(C_TransmogSets.GetIsFavorite(set.setID))
+					model.setID = set.setID
 
-								local isHidden = addon.HiddenAppearanceDB.profile.set[set.setID]
-								model.CollectionListVisual.Hidden.Icon:SetShown(isHidden)
+					local isHidden = addon.HiddenAppearanceDB.profile.set[set.setID]
+					model.CollectionListVisual.Hidden.Icon:SetShown(isHidden)
 
 
-								local isInList = addon.CollectionList:IsInList(set.setID, "set")
-								model.CollectionListVisual.Collection.Collection_Icon:SetShown(isInList)
-								model.CollectionListVisual.Collection.Collected_Icon:SetShown(isInList and C_TransmogSets.IsBaseSetCollected(set.setID))
+					local isInList = addon.CollectionList:IsInList(set.setID, "set")
+					model.CollectionListVisual.Collection.Collection_Icon:SetShown(isInList)
+					model.CollectionListVisual.Collection.Collected_Icon:SetShown(isInList and C_TransmogSets.IsBaseSetCollected(set.setID))
 
-								model.SetInfo.setName:SetText((addon.Profile.ShowNames and setInfo["name"].."\n"..(setInfo["description"] or "")) or "")
-								model.SetInfo.progress:SetText((addon.Profile.ShowSetCount and topSourcesCollected.."/".. topSourcesTotal) or "")
-								model.setCollected = topSourcesCollected == topSourcesTotal
+					model.SetInfo.setName:SetText((addon.Profile.ShowNames and setInfo["name"].."\n"..(setInfo["description"] or "")) or "")
+					model.SetInfo.progress:SetText((addon.Profile.ShowSetCount and topSourcesCollected.."/".. topSourcesTotal) or "")
+					model.setCollected = topSourcesCollected == topSourcesTotal
 				end
 
 			else
@@ -6629,7 +6660,7 @@ function BetterWardrobeSetsTransmogMixin:LoadSet(setID)
 		end
 		C_Transmog.LoadOutfit(setID - 5000)
 	else
-		if WardrobeCollectionFrame:CheckTab(2) or setID > 1000000 then
+		if (WardrobeCollectionFrame:CheckTab(2)  and setType ~= "extra") or setID > 1000000 then
 			local setID = setID
 			if setID > 1000000 then
 				setID = setID/100000

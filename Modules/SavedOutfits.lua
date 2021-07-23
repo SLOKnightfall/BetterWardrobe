@@ -301,37 +301,30 @@ function BetterWardrobeOutfitDropDownMixin:IsOutfitDressed()
 
 	if addon.GetSetType(self.selectedOutfitID) == "default" then 
 		local selectedOutfitID = self.selectedOutfitID - 5000
-			local outfitItemTransmogInfoList = C_TransmogCollection.GetOutfitItemTransmogInfoList(selectedOutfitID);
-			if not outfitItemTransmogInfoList then
-				return true;
-			end
+		local outfitItemTransmogInfoList = C_TransmogCollection.GetOutfitItemTransmogInfoList(selectedOutfitID);
+		if not outfitItemTransmogInfoList then
+			return true;
+		end
 
-			local currentItemTransmogInfoList = self:GetItemTransmogInfoList();
-			if not currentItemTransmogInfoList then
-				return true;
-			end
+		local currentItemTransmogInfoList = self:GetItemTransmogInfoList();
+		if not currentItemTransmogInfoList then
+			return true;
+		end
 
-			for slotID, itemTransmogInfo in ipairs(currentItemTransmogInfoList) do
-				if not itemTransmogInfo:IsEqual(outfitItemTransmogInfoList[slotID]) then
-					if itemTransmogInfo.appearanceID ~= Constants.Transmog.NoTransmogID then
-						return false;
-					end
+		for slotID, itemTransmogInfo in ipairs(currentItemTransmogInfoList) do
+			if not itemTransmogInfo:IsEqual(outfitItemTransmogInfoList[slotID]) then
+				if itemTransmogInfo.appearanceID ~= Constants.Transmog.NoTransmogID then
+					return false;
 				end
 			end
-			return true;
-
-
+		end
+		return true;
 	else
 		local outfit = addon.OutfitDB.char.outfits[LookupIndexFromID(self.selectedOutfitID)]
 		if not outfit then
 			return true;
 		end
-		local outfitItemTransmogInfoList = {}
-		--need to itterate a full table as the DressUpSources uses the table size
-		for i = 1, 19  do
-			outfitItemTransmogInfoList[i] = ItemUtil.CreateItemTransmogInfo(outfit[i]);
-		end
-
+		local outfitItemTransmogInfoList = addon.C_TransmogCollection.GetOutfitItemTransmogInfoList(self.selectedOutfitID)
 
 		local currentItemTransmogInfoList = self:GetItemTransmogInfoList();
 		if not currentItemTransmogInfoList then
@@ -641,8 +634,6 @@ function BetterWardrobeOutfitFrameMixin:NameOutfit(newName, outfitID)
 		C_TransmogCollection.RenameOutfit(outfitID, newName);
 	elseif outfitID then 
 		local index = LookupIndexFromID(outfitID)
-		print(outfitID)
-		print(index)
 		addon.OutfitDB.char.outfits[index].name = newName
 	else
 		-- this is a new outfit
@@ -711,34 +702,25 @@ function BetterWardrobeOutfitFrameMixin:ContinueWithSave()
 	-- this is a rename
 		C_TransmogCollection.ModifyOutfit(self.outfitID - 5000, self.itemTransmogInfoList);
 		BetterWardrobeOutfitFrame:ClosePopups()
-	elseif self.outfitID then 
+	elseif self.outfitID then
 			addon.OutfitDB.char.outfits[LookupIndexFromID(self.outfitID)]  = addon.OutfitDB.char.outfits[LookupIndexFromID(self.outfitID)] or {}
 			outfit = addon.OutfitDB.char.outfits[LookupIndexFromID(self.outfitID)]
 			--outfit.itemTransmogInfoList =  self.itemTransmogInfoList or {}
 
+			local itemData = {}
+			for i, data in pairs(self.itemTransmogInfoList) do
+				local sourceInfo = C_TransmogCollection.GetSourceInfo(data.appearanceID)
+				if sourceInfo then
+					local appearanceID = sourceInfo.visualID
+					local itemID = sourceInfo.itemID
+					local itemMod = sourceInfo.itemModID
+					local sourceID = sourceInfo.sourceID
+					----print(invSlot)
+					itemData[i] = {"'"..itemID..":"..itemMod.."'", sourceID, appearanceID}
+				end
+			end
 
-		--local index = LookupIndexFromID(self.outfitID)
-						--local outfit = addon.OutfitDB.char.outfits[index]
-						local set_sources = {}
-						local set_items = {}
-						for i, data in pairs(self.itemTransmogInfoList) do
-							
-							local sourceInfo = C_TransmogCollection.GetSourceInfo(data.appearanceID)
-							if sourceInfo then 
-								local sources  = C_TransmogCollection.GetAppearanceSources(data.appearanceID)
-								--outfit[i] = data.appearanceID
-								set_sources[sourceInfo.itemID] = data.appearanceID
-								set_items[i] = sourceInfo.itemID
-							else
-								set_items[i] = 0
-							end
-
-						--	local sources  = C_TransmogCollection.GetAppearanceSources(data.appearanceID)
-							--outfit[i] = data.appearanceID
-							--set_sources[sourceInfo.itemID] = data.appearanceID
-						end
-						outfit.sources = set_sources
-						outfit.items = set_items
+			outfit.itemData = itemData
 			BetterWardrobeOutfitFrame:ClosePopups()
 	else
 		-- this is a new outfit

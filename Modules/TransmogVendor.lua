@@ -267,8 +267,25 @@ function UI:OptionsDropDown_Initialize(level)
 		info.value = 6
 		BW_UIDropDownMenu_AddButton(info, level)
 
+
+
+		if  WardrobeCollectionFrame:CheckTab(2) or WardrobeCollectionFrame:CheckTab(3) or WardrobeCollectionFrame:CheckTab(4)  then
+			info.checked = 	true
+			info.isNotRadio = true
+			info.func = function(info, arg1, _, value)
+						addon.Profile.HiddenMog = not addon.Profile.HiddenMog
+						WardrobeCollectionFrame.SetsTransmogFrame:OnSearchUpdate()
+				end
+			info.hasArrow = false
+			info.notCheckable = false
+			info.checked = addon.Profile.HiddenMog
+			info.text = L["Use Hidden Item for Unavilable Items"]
+			info.value = 7
+			BW_UIDropDownMenu_AddButton(info, level)
+		end
+
 		if  WardrobeCollectionFrame:CheckTab(2) or WardrobeCollectionFrame:CheckTab(3) then 
-				info.text = L["Show Incomplete Sets"]
+			info.text = L["Show Incomplete Sets"]
 			info.value = 1
 			info.func = function(_, _, _, value)
 				addon.Profile.ShowIncomplete = not addon.Profile.ShowIncomplete

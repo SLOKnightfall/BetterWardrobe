@@ -92,6 +92,7 @@ end
 
 
 function addon.C_TransmogSets.GetSetInfo(setID)
+	if not setID then return {} end
 	local setType = DetermineSetType(setID)
 
 	if setType == "set" then
@@ -188,10 +189,8 @@ function addon.C_TransmogSets.GetSetSources(setID)
 
 	--Blizzard Saved Set
 	if SetType == "default" then
-		--print("bigB")
  		local setTransmogInfo = C_TransmogCollection.GetOutfitItemTransmogInfoList(setID - 5000)
  		for slotID, data in ipairs(setTransmogInfo) do
- 			--print(slotID)
  			local sourceInfo = data.appearanceID and C_TransmogCollection.GetSourceInfo(data.appearanceID)
 			local sources =  sourceInfo and C_TransmogCollection.GetAppearanceSources(sourceInfo.visualID)
 			if sources then
@@ -220,7 +219,6 @@ function addon.C_TransmogSets.GetSetSources(setID)
 	--Other Sets
 	else
 		if not setInfo.itemData then 
-			--print(setID)
 		else
 
 		for slotID, sourceData in pairs(setInfo.itemData) do
@@ -461,19 +459,24 @@ function addon.C_TransmogCollection.GetOutfitItemTransmogInfoList(setID)
 	local mainHandEnchant = setData.mainHandEnchant or 0
 	local offHandEnchant = setData.offHandEnchant or 0
 
-	for slotID, data in pairs(setData.itemData) do
+
+	for i = 1, 19 do
+
+
+	--for slotID, data in pairs(setData.itemData) do
 		local itemTransmogInfo
-		if slotID == 3 then
-			itemTransmogInfo = ItemUtil.CreateItemTransmogInfo(data[3] or 0, offShoulder, 0)
-		elseif slotID == 16 then
-			itemTransmogInfo = ItemUtil.CreateItemTransmogInfo(data[3] or 0, 0, mainHandEnchant)
-		elseif slotID == 17 then
-			itemTransmogInfo = ItemUtil.CreateItemTransmogInfo(data[3] or 0, 0, offHandEnchant)
+		local data = setData.itemData[i]
+		if i == 3 then
+			itemTransmogInfo = ItemUtil.CreateItemTransmogInfo((data and data[2]) or 0, offShoulder, 0)
+		elseif i == 16 then
+			itemTransmogInfo = ItemUtil.CreateItemTransmogInfo((data and data[2]) or 0, 0, mainHandEnchant)
+		elseif i == 17 then
+			itemTransmogInfo = ItemUtil.CreateItemTransmogInfo((data and data[2]) or 0, 0, offHandEnchant)
 		else
-			itemTransmogInfo = ItemUtil.CreateItemTransmogInfo(data[3] or 0, 0, 0)
+			itemTransmogInfo = ItemUtil.CreateItemTransmogInfo((data and data[2]) or 0, 0, 0)
 		end
 
-		itemTransmogInfoList[slotID] = itemTransmogInfo
+		itemTransmogInfoList[i] = itemTransmogInfo
 	end
 
 	return itemTransmogInfoList
