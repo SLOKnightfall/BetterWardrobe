@@ -329,9 +329,9 @@ function BW_TransmogVendorExportButton_OnClick(self)
 				local setType = addon.QueueList[1]
 				local setID = addon.QueueList[2]
 				if setType == "set" then
-					WardrobeCollectionFrame.SetsTransmogFrame:LoadSet(setID)
+					BetterWardrobeCollectionFrame.SetsTransmogFrame:LoadSet(setID)
 				elseif setType == "extraset" then
-					WardrobeCollectionFrame.SetsTransmogFrame:LoadSet(setID)
+					BetterWardrobeCollectionFrame.SetsTransmogFrame:LoadSet(setID)
 				end
 			end,
 			isNotRadio = true,

@@ -136,9 +136,9 @@ function UI:CreateButtons()
 	--BW_SlotHideButton:SetScript("OnMouseDown", BW_SlotHideButton.OnMouseDown)
 	--BW_SlotHideButton:SetScript("OnEnter", BW_SlotHideButton.OnEnter)
 
-	local BW_TransmogOptionsDropDown= CreateFrame("Frame", "BW_TransmogOptionsDropDown", WardrobeCollectionFrame, "BW_UIDropDownMenuTemplate")
+	local BW_TransmogOptionsDropDown= CreateFrame("Frame", "BW_TransmogOptionsDropDown", BetterWardrobeCollectionFrame, "BW_UIDropDownMenuTemplate")
 	BW_TransmogOptionsDropDown = BW_TransmogOptionsDropDown
-----	WardrobeCollectionFrame.OptionsDropDown = BW_TransmogOptionsDropDown
+----	BetterWardrobeCollectionFrame.OptionsDropDown = BW_TransmogOptionsDropDown
 BetterWardrobeTransmogVendorOptionsDropDown_OnLoad(BW_TransmogOptionsDropDown)
 
 end
@@ -178,7 +178,7 @@ end
 --[[function UI.OptionsDropDown_Initialize(self)
 	local  f = addon.Frame:Create("SimpleGroup")
 	--UI.SavedSetDropDownFrame = f
-	f.frame:SetParent("WardrobeCollectionFrame")
+	f.frame:SetParent("BetterWardrobeCollectionFrame")
 	f:SetWidth(87)--, 22)
 	f:SetHeight(22)
 
@@ -258,7 +258,7 @@ function UI:OptionsDropDown_Initialize(level)
 		info.isNotRadio = true
 		info.func = function(info, arg1, _, value)
 					addon.Profile.ShowHidden = not addon.Profile.ShowHidden
-					WardrobeCollectionFrame.SetsTransmogFrame:OnSearchUpdate()
+					BetterWardrobeCollectionFrame.SetsTransmogFrame:OnSearchUpdate()
 			end
 		info.hasArrow = false
 		info.notCheckable = false
@@ -269,12 +269,12 @@ function UI:OptionsDropDown_Initialize(level)
 
 
 
-		if  WardrobeCollectionFrame:CheckTab(2) or WardrobeCollectionFrame:CheckTab(3) or WardrobeCollectionFrame:CheckTab(4)  then
+		if  BetterWardrobeCollectionFrame:CheckTab(2) or BetterWardrobeCollectionFrame:CheckTab(3) or BetterWardrobeCollectionFrame:CheckTab(4)  then
 			info.checked = 	true
 			info.isNotRadio = true
 			info.func = function(info, arg1, _, value)
 						addon.Profile.HiddenMog = not addon.Profile.HiddenMog
-						WardrobeCollectionFrame.SetsTransmogFrame:OnSearchUpdate()
+						BetterWardrobeCollectionFrame.SetsTransmogFrame:OnSearchUpdate()
 				end
 			info.hasArrow = false
 			info.notCheckable = false
@@ -284,12 +284,12 @@ function UI:OptionsDropDown_Initialize(level)
 			BW_UIDropDownMenu_AddButton(info, level)
 		end
 
-		if  WardrobeCollectionFrame:CheckTab(2) or WardrobeCollectionFrame:CheckTab(3) then 
+		if  BetterWardrobeCollectionFrame:CheckTab(2) or BetterWardrobeCollectionFrame:CheckTab(3) then 
 			info.text = L["Show Incomplete Sets"]
 			info.value = 1
 			info.func = function(_, _, _, value)
 				addon.Profile.ShowIncomplete = not addon.Profile.ShowIncomplete
-				WardrobeCollectionFrame.SetsTransmogFrame:OnSearchUpdate()
+				BetterWardrobeCollectionFrame.SetsTransmogFrame:OnSearchUpdate()
 			end
 			info.checked = function() return addon.Profile.ShowIncomplete end
 			BW_UIDropDownMenu_AddButton(info, level)
@@ -310,8 +310,8 @@ function UI:OptionsDropDown_Initialize(level)
 			info.value = 4
 			info.func = function(_, _, _, value)
 				addon.Profile.HideMissing = not addon.Profile.HideMissing
-				WardrobeCollectionFrame.SetsTransmogFrame:OnSearchUpdate()
-				WardrobeCollectionFrame.SetsTransmogFrame:UpdateSets()
+				BetterWardrobeCollectionFrame.SetsTransmogFrame:OnSearchUpdate()
+				BetterWardrobeCollectionFrame.SetsTransmogFrame:UpdateSets()
 			end
 			info.checked = function() return addon.Profile.HideMissing end
 			BW_UIDropDownMenu_AddButton(info, level)
@@ -346,9 +346,9 @@ function UI:OptionsDropDown_Initialize(level)
 						for i in pairs(locationDrowpDown) do
 							addon.includeLocation[i] = true
 						end
-						WardrobeCollectionFrame.SetsTransmogFrame:OnSearchUpdate()
+						BetterWardrobeCollectionFrame.SetsTransmogFrame:OnSearchUpdate()
 						--BW_SetsTransmogFrame:OnSearchUpdate()
-						if WardrobeCollectionFrame.selectedTransmogTab == 3 then 
+						if BetterWardrobeCollectionFrame.selectedTransmogTab == 3 then 
 							----BW_WardrobeCollectionFrame_SetTab(2)
 							----BW_WardrobeCollectionFrame_SetTab(3)
 						end
@@ -361,10 +361,10 @@ function UI:OptionsDropDown_Initialize(level)
 						for i in pairs(locationDrowpDown) do
 							addon.includeLocation[i] = false
 						end
-						WardrobeCollectionFrame.SetsTransmogFrame:OnSearchUpdate()
+						BetterWardrobeCollectionFrame.SetsTransmogFrame:OnSearchUpdate()
 						--BW_SetsTransmogFrame:OnSearchUpdate()
 												--BW_SetsTransmogFrame:OnSearchUpdate()
-						if WardrobeCollectionFrame.selectedTransmogTab == 3 then 
+						if BetterWardrobeCollectionFrame.selectedTransmogTab == 3 then 
 						--	--BW_WardrobeCollectionFrame_SetTab(2)
 							----BW_WardrobeCollectionFrame_SetTab(3)
 						end
@@ -384,10 +384,10 @@ function UI:OptionsDropDown_Initialize(level)
 							end
 
 							BW_UIDropDownMenu_Refresh(BW_TransmogOptionsDropDown, 1, 1)
-							WardrobeCollectionFrame.SetsTransmogFrame:OnSearchUpdate()
+							BetterWardrobeCollectionFrame.SetsTransmogFrame:OnSearchUpdate()
 							--BW_SetsTransmogFrame:OnSearchUpdate()
 													--BW_SetsTransmogFrame:OnSearchUpdate()
-							if WardrobeCollectionFrame.selectedTransmogTab == 3 then 
+							if BetterWardrobeCollectionFrame.selectedTransmogTab == 3 then 
 								----BW_WardrobeCollectionFrame_SetTab(2)
 								----BW_WardrobeCollectionFrame_SetTab(3)
 							end
@@ -409,7 +409,7 @@ function UI:OptionsDropDown_Initialize(level)
 				info.func = function(a, b, c, value)
 					addon.Profile.PartialLimit = info.value
 					BW_UIDropDownMenu_Refresh(BW_TransmogOptionsDropDown, 1, 1)
-					WardrobeCollectionFrame.SetsTransmogFrame:OnSearchUpdate()
+					BetterWardrobeCollectionFrame.SetsTransmogFrame:OnSearchUpdate()
 					----BW_SetsTransmogFrame:OnSearchUpdate()
 				end
 			info.checked = 	function() return info.value == addon.Profile.PartialLimit end
@@ -431,7 +431,7 @@ function UI.ExtendTransmogView(reset)
 	if addon.Profile.ExtraLargeTransmogArea then
 		scale = 1.25
 
-        local itemFrameWidth = math.floor(WardrobeCollectionFrame.ItemsCollectionFrame:GetWidth()) + 5
+        local itemFrameWidth = math.floor(BetterWardrobeCollectionFrame.ItemsCollectionFrame:GetWidth()) + 5
 		local screenWidth = addon.Profile.ExtraLargeTransmogAreaMax or math.floor(UIParent:GetWidth())-- 1680 --math.floor(UIParent:GetWidth())
         local frameWidth = screenWidth - itemFrameWidth
         
@@ -599,10 +599,10 @@ function UpdateSlotButtons()
 		addon:SecureHook(button, "OnUserSelect", function(slotButton, fromOnClick) 
 			if slotButton then
 				slotButton:SetSelected(true);
-				if (fromOnClick and WardrobeCollectionFrame.activeFrame ~= WardrobeCollectionFrame.ItemsCollectionFrame) then
-					WardrobeCollectionFrame:ClickTab(WardrobeCollectionFrame.ItemsTab);
+				if (fromOnClick and BetterWardrobeCollectionFrame.activeFrame ~= BetterWardrobeCollectionFrame.ItemsCollectionFrame) then
+					BetterWardrobeCollectionFrame:ClickTab(BetterWardrobeCollectionFrame.ItemsTab);
 				end
-				if ( WardrobeCollectionFrame.activeFrame == WardrobeCollectionFrame.ItemsCollectionFrame ) then
+				if ( BetterWardrobeCollectionFrame.activeFrame == BetterWardrobeCollectionFrame.ItemsCollectionFrame ) then
 					local _, _, selectedSourceID = TransmogUtil.GetInfoForEquippedSlot(slotButton.transmogLocation);
 					local forceGo = slotButton.transmogLocation:IsIllusion();
 					local forTransmog = true;
@@ -610,11 +610,11 @@ function UpdateSlotButtons()
 					if slotButton.transmogLocation:IsEitherHand() then
 						effectiveCategory = C_Transmog.GetSlotEffectiveCategory(slotButton.transmogLocation);
 					end
-					WardrobeCollectionFrame.ItemsCollectionFrame:GoToSourceID(selectedSourceID, slotButton.transmogLocation, forceGo, forTransmog, effectiveCategory);
-					WardrobeCollectionFrame.ItemsCollectionFrame:SetTransmogrifierAppearancesShown(true);
+					BetterWardrobeCollectionFrame.ItemsCollectionFrame:GoToSourceID(selectedSourceID, slotButton.transmogLocation, forceGo, forTransmog, effectiveCategory);
+					BetterWardrobeCollectionFrame.ItemsCollectionFrame:SetTransmogrifierAppearancesShown(true);
 				end
 			else
-				WardrobeCollectionFrame.ItemsCollectionFrame:SetTransmogrifierAppearancesShown(false);
+				BetterWardrobeCollectionFrame.ItemsCollectionFrame:SetTransmogrifierAppearancesShown(false);
 			end
 		end)
 

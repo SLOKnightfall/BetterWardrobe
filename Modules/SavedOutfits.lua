@@ -262,8 +262,8 @@ function BetterWardrobeOutfitDropDownMixin:SelectOutfit(outfitID, loadOutfit)
 	end
 
 	self.selectedOutfitID = outfitID;
-	if WardrobeCollectionFrame then 
-		WardrobeCollectionFrame.SetsTransmogFrame.selectedSetID = outfitID;
+	if BetterWardrobeCollectionFrame then 
+		BetterWardrobeCollectionFrame.SetsTransmogFrame.selectedSetID = outfitID;
 	end
 
 	if ( loadOutfit ) then
@@ -891,8 +891,8 @@ local function SavedOutfitDB_Dropdown_OnClick(self, arg1, arg2, checked)
 		else
 			addon.SelecteSavedList = false
 		end
-		WardrobeCollectionFrame.SetsCollectionFrame:OnSearchUpdate()
-		WardrobeCollectionFrame.SetsTransmogFrame:OnSearchUpdate()
+		BetterWardrobeCollectionFrame.SetsCollectionFrame:OnSearchUpdate()
+		BetterWardrobeCollectionFrame.SetsTransmogFrame:OnSearchUpdate()
 
 		BW_UIDropDownMenu_SetSelectedValue(BW_DBSavedSetDropdown, arg1)
 		--BW_UIDropDownMenu_SetText(BW_DBSavedSetDropdown, arg1)
@@ -919,7 +919,7 @@ end
 --Dropdownmenu for the selection of other character's saved sets
 function addon.Init.SavedSetsDropDown_Initialize(self)
 	--local f = BW_UIDropDownMenu_Create("BW_DBSavedSetDropdown", BW_WardrobeCollectionFrame)
-	BW_DBSavedSetDropdown = CreateFrame("Frame", "BW_DBSavedSetDropdown", WardrobeCollectionFrame, "BW_UIDropDownMenuTemplate")
+	BW_DBSavedSetDropdown = CreateFrame("Frame", "BW_DBSavedSetDropdown", BetterWardrobeCollectionFrame, "BW_UIDropDownMenuTemplate")
 	BW_DBSavedSetDropdown:SetPoint("TOPRIGHT", "BW_SortDropDown", "TOPRIGHT")
 	BW_UIDropDownMenu_SetWidth(BW_DBSavedSetDropdown, 165) -- Use in place of dropDown:SetWidth
 

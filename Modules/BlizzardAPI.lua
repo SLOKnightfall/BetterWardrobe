@@ -26,16 +26,16 @@ local L = LibStub("AceLocale-3.0"):GetLocale(addonName)
 --Determines type of set based on setID
 local function DetermineSetType(setID)
 
-	if WardrobeCollectionFrame:CheckTab(2) then --- or setID > 1000000 then 
+	if BetterWardrobeCollectionFrame:CheckTab(2) then --- or setID > 1000000 then 
 	--Blizzard Set
 
 
 		return "set"
 
 	--Extra Set
-	elseif WardrobeCollectionFrame:CheckTab(3) then 
+	elseif BetterWardrobeCollectionFrame:CheckTab(3) then 
 		return "extraSet"
-	elseif WardrobeCollectionFrame:CheckTab(4) then 
+	elseif BetterWardrobeCollectionFrame:CheckTab(4) then 
 	--Mogit set
 	--Saved Set
 	return "savedset"
@@ -113,9 +113,9 @@ end
 
 function addon.C_TransmogSets.GetBaseSetsCounts()
 
-	if WardrobeCollectionFrame:CheckTab(2) then
+	if BetterWardrobeCollectionFrame:CheckTab(2) then
 		return C_TransmogSets.GetBaseSetsCounts();
-	--elseif WardrobeCollectionFrame:CheckTab(3) then
+	--elseif BetterWardrobeCollectionFrame:CheckTab(3) then
 	else
 		local sets = addon.GetBaseList()
 		local totalSets = #sets or 0
@@ -176,7 +176,7 @@ function addon.C_TransmogSets.GetSetSources(setID)
 	--if SourceDB[setID] then return SourceDB[setID] end
 
 	--Default Blizzard Set
-	if setID  > 100000  or WardrobeCollectionFrame:CheckTab(2) then
+	if setID  > 100000  or BetterWardrobeCollectionFrame:CheckTab(2) then
 		if setID  > 100000 then setID = setID/100000 end
 		return  C_TransmogSets.GetSetSources(setID)
 	end
@@ -269,8 +269,8 @@ function addon:SetFavoriteItem(visualID, set)
 		addon.favoritesDB.profile.item[visualID] = true
 	end
 
-	WardrobeCollectionFrame.ItemsCollectionFrame:RefreshVisualsList()
-	WardrobeCollectionFrame.ItemsCollectionFrame:UpdateItems()
+	BetterWardrobeCollectionFrame.ItemsCollectionFrame:RefreshVisualsList()
+	BetterWardrobeCollectionFrame.ItemsCollectionFrame:UpdateItems()
 end
 
 
@@ -284,11 +284,11 @@ function Sets:ClearHidden(setList)
 if addon.Profile.ShowHidden then return setList end
 
 	local setType = "item"
-	if WardrobeCollectionFrame:CheckTab(2) then
+	if BetterWardrobeCollectionFrame:CheckTab(2) then
 		setType = "set"
-	elseif WardrobeCollectionFrame:CheckTab(3) then
+	elseif BetterWardrobeCollectionFrame:CheckTab(3) then
 		setType = "extraset"
-	elseif WardrobeCollectionFrame:CheckTab(4) then 
+	elseif BetterWardrobeCollectionFrame:CheckTab(4) then 
 		return setList
 	end
 
@@ -307,7 +307,7 @@ end
 local function CheckMissingLocation(setInfo)
 	local filtered = false
 	local missingSelection 
-	if 	WardrobeCollectionFrame:CheckTab(2) then
+	if 	BetterWardrobeCollectionFrame:CheckTab(2) then
 	
 	local invType = {}
 	missingSelection = addon.Filters.Base.missingSelection
@@ -390,7 +390,7 @@ function addon:FilterSets(setList, setType)
 	local xpacSelection = addon.Filters.Base.xpacSelection
 
 
-	if WardrobeCollectionFrame:CheckTab(3) then
+	if BetterWardrobeCollectionFrame:CheckTab(3) then
 		filterCollected = addon.Filters.Extra.filterCollected
 		missingSelection = addon.Filters.Extra.missingSelection
 		filterSelection = addon.Filters.Extra.filterSelection
@@ -403,11 +403,11 @@ function addon:FilterSets(setList, setType)
 		local setData = BetterWardrobeSetsDataProviderMixin:GetSetSourceData(data.setID)
 		local count , total = setData.numCollected, setData.numTotal
 		local expansion = data.expansionID
-		local sourcefilter = (WardrobeCollectionFrame:CheckTab(3) and filterSelection[data.filter])
+		local sourcefilter = (BetterWardrobeCollectionFrame:CheckTab(3) and filterSelection[data.filter])
 		local unavailableFilter = (not unavailable or (addon.Profile.HideUnavalableSets and unavailable))
 
 
-		if WardrobeCollectionFrame:CheckTab(2) then
+		if BetterWardrobeCollectionFrame:CheckTab(2) then
 			expansion = expansion + 1
 			sourcefilter = true
 			unavailableFilter = true

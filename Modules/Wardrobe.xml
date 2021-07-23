@@ -404,7 +404,7 @@
 				</Anchors>
 				<Scripts>
 					<OnClick>
-						WardrobeCollectionFrame:ClickTab(self);
+						BetterWardrobeCollectionFrame:ClickTab(self);
 					</OnClick>
 				</Scripts>
 			</Button>
@@ -439,7 +439,7 @@
 				</Frames>
 				<Scripts>
 					<OnClick>
-						WardrobeCollectionFrame:ClickTab(self);
+						BetterWardrobeCollectionFrame:ClickTab(self);
 					</OnClick>
 				</Scripts>
 			</Button>
@@ -474,7 +474,7 @@
 				</Frames>
 				<Scripts>
 					<OnClick>
-						WardrobeCollectionFrame:ClickTab(self);
+						BetterWardrobeCollectionFrame:ClickTab(self);
 					</OnClick>
 				</Scripts>
 			</Button>
@@ -509,7 +509,7 @@
 				</Frames>
 				<Scripts>
 					<OnClick>
-						WardrobeCollectionFrame:ClickTab(self);
+						BetterWardrobeCollectionFrame:ClickTab(self);
 					</OnClick>
 				</Scripts>
 			</Button>

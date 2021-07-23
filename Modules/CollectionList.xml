@@ -3,7 +3,7 @@
 
 	<Script file="CollectionList.lua"/>
 
-	<Frame name = "BW_ColectionListFrameTemplate" parent = "WardrobeCollectionFrame"  hidden="false" setAllPoints="true" mixin="BetterWardrobeSetsCollectionListMixin" virtual = "true">
+	<Frame name = "BW_ColectionListFrameTemplate" parent = "BetterWardrobeCollectionFrame"  hidden="false" setAllPoints="true" mixin="BetterWardrobeSetsCollectionListMixin" virtual = "true">
 		<Frames>
 			<Frame name = "BW_CollectionListTitle" parentKey="CollectionListTitle" hidden="true" enableMouse="false" >
 				<Anchors>

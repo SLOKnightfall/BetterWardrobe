@@ -28,6 +28,7 @@ local hiddenSet ={
 	["setID"] =  0 ,
 	["name"] =  "Hidden",
 	["items"] = { 134110, 134112, 168659, 168665, 158329, 143539, 168664 },
+	
 	["expansionID"] =  1,
 	["filter"] =  1,
 	["recolor"] =  false,
@@ -652,13 +653,10 @@ end
 
 
 function addon.GetSetType(outfitID)
-	local savedSets = addon.GetSavedList()
-	for i, data in ipairs(savedSets) do
-		if data.setID == outfitID then 
-			return data.setType
-		end
-	end
-	return false
+	local setData = addon.GetSetInfo(outfitID)
+	return setData and setData.setType or nil
+
+
 	--local MAX_DEFAULT_OUTFITS = C_TransmogCollection.GetNumMaxOutfits()
 	----return outfitID < MAX_DEFAULT_OUTFITS  -- #C_TransmogCollection.GetOutfits()--MAX_DEFAULT_OUTFITS 
 end
@@ -856,9 +854,9 @@ end
 
 			addon.Init:BuildDB()
 
-			if WardrobeCollectionFrame.SetsCollectionFrame:IsShown() then  --0--TODO FIX
-				WardrobeCollectionFrame.SetsCollectionFrame:Refresh()
-				WardrobeCollectionFrame.SetsCollectionFrame:OnSearchUpdate()
+			if BetterWardrobeCollectionFrame.SetsCollectionFrame:IsShown() then  --0--TODO FIX
+				BetterWardrobeCollectionFrame.SetsCollectionFrame:Refresh()
+				BetterWardrobeCollectionFrame.SetsCollectionFrame:OnSearchUpdate()
 			end
 			addon.RefreshSubItemData()
 		end
@@ -884,9 +882,9 @@ end
 
 			addon.Init:BuildDB()
 			addon.GetBaseList()
-			if WardrobeCollectionFrame.SetsCollectionFrame:IsShown() then  --0--TODO FIX
-				WardrobeCollectionFrame.SetsCollectionFrame:Refresh()
-				WardrobeCollectionFrame.SetsCollectionFrame:OnSearchUpdate()
+			if BetterWardrobeCollectionFrame.SetsCollectionFrame:IsShown() then  --0--TODO FIX
+				BetterWardrobeCollectionFrame.SetsCollectionFrame:Refresh()
+				BetterWardrobeCollectionFrame.SetsCollectionFrame:OnSearchUpdate()
 			end
 			addon.RefreshSubItemData()
 
