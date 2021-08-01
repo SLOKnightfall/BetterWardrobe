@@ -1272,9 +1272,17 @@ function addon.Init:LoadModules()
 				HideUIPanel(WardrobeFrame);
 				WardrobeCollectionFrame:Hide();
 				BetterWardrobeCollectionFrame:SetContainer(self);
+				if addon.ExtendedTransmogSwap then
+					
+					addon.ExtendedTransmogSwap:Show()
+				end
 			else
 				WardrobeCollectionFrame:Hide();
 				BetterWardrobeCollectionFrame:Hide();
+								if addon.ExtendedTransmogSwap then
+					
+					addon.ExtendedTransmogSwap:Hide()
+				end
 			end
 		end
 	end)
@@ -1293,12 +1301,12 @@ addon:SecureHook(WardrobeTransmogFrame, "SetPendingTransmog", function(self,...)
 addon:SecureHook(WardrobeTransmogFrame, "GetSlotButton", function(self,...) BW_TransmogFrameMixin.GetSlotButton(self,...) end)
 --addon:SecureHook(WardrobeTransmogFrame, "OnTransmogApplied", function(self,...) BW_TransmogFrameMixin.OnTransmogApplied(self,...) end)
 	
-				
  	addon.Init:initCollectionList()
  	addon.Init:BuildCollectionList()
 	addon.Init:BuildTransmogVendorUI()
 	addon.Init.SortDropDown_Initialize()
 	addon:UpdateCanIMogIt()
+	addon:InitExtendedSetsSwap() 
 	addon.Init.SavedSetsDropDown_Initialize()
 end
 

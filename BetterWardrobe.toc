@@ -3,7 +3,7 @@
 ## Version: @project-version@
 ## Author: SLOKnightfall
 ## Notes: 
-## OptionalDeps: MogIt, CanIMogIt, LegionWardrobe, WardrobeEnhanced, Rarity, TransmogOutfits
+## OptionalDeps: MogIt, CanIMogIt, LegionWardrobe, WardrobeEnhanced, Rarity, TransmogOutfits, ExtendedSets
 ## SavedVariables: BetterWardrobe_Options, BetterWardrobe_CharacterData, BetterWardrobe_SavedSetData, BetterWardrobe_SubstituteItemData, BetterWardrobe_ListData, BetterWardrobe_Mogitdata
 
 #Libraries
@@ -73,6 +73,7 @@ Plugins\CanIMogIt.lua
 Plugins\MogIt.lua
 Plugins\WardrobeEnhanced.lua
 Plugins\TransmogOutfits.lua
+Plugins\ExtendedTransmog.lua
 
 
 

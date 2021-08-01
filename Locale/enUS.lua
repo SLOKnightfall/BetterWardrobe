@@ -466,6 +466,9 @@ L["NOTE_110"] = "Shadowlands PvP Set"
 L["NOTE_111"] = "Shadowlands Crafted Set"
 
 
+L["Swap to Better Wardrobe View"] = true
+L["Swap to Extended Transmog Sets View"] = true
+
 L["Mystic's Regalia (Recolor)"] = true
 L["Aboriginal Regalia (Recolor)"] = true
 L["Simple Regalia"] = true
