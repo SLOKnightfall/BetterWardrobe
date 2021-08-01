@@ -726,7 +726,7 @@ local function BW_DressingRoomImportButton_OnClick(self)
 				end
 
 				import = true
-				DressUpSources(sources)
+				--DressUpSources(sources)
 				import = false
 				UpdateDressingRoom()
 			end,
@@ -893,44 +893,31 @@ function BetterDressUpOutfitMixin:LoadOutfit(outfitID)
 		local outfitID = outfitID - 5000
 		DressUpItemTransmogInfoList(C_TransmogCollection.GetOutfitItemTransmogInfoList(outfitID));
 	else
-		outfit = addon.GetSetInfo(outfitID)
+		local outfit = addon.GetSetInfo(outfitID)
 		local itemTransmogInfoList = {}
 
-		if setType == "mogit" or setType == "transmog_outfits" then 
+
+			local itemData = outfit.itemData
+			--itemData[i] = {"'"..itemID..":"..itemMod.."'", sourceID, appearanceID}
 			local items = outfit.items
 			local itemTransmogInfo
-			--for i,s in pairs(items) do
+
+			--for index, data in ipairs(itemData) do
 			for i = 1, 19 do
-				local item = items[i]
+
 				local secondary = (i == 3 and outfit.offShoulder) or 0
-				if item then 
-					local appearanceID, sourceID = C_TransmogCollection.GetItemInfo(item)
+				local sourceID = itemData[i] and itemData[i][2];
+
+				if sourceID then 
 					itemTransmogInfo = ItemUtil.CreateItemTransmogInfo(sourceID or 0, secondary, 0);
 				else
 					itemTransmogInfo = ItemUtil.CreateItemTransmogInfo( 0, 0, 0);
 				end
-					itemTransmogInfoList[i] = itemTransmogInfo
+				itemTransmogInfoList[i] = itemTransmogInfo
 				
 			end
-			
-		elseif setType == "extra" then 
-			local items = outfit.items
-			local itemTransmogInfo
-			--for i,s in pairs(items) do
-			for i = 1, 19 do
-				local item = items[i]
-				local secondary = (i == 3 and outfit.offShoulder) or 0
-				if item then 
-					local appearanceID, sourceID = C_TransmogCollection.GetItemInfo(item)
-					itemTransmogInfo = ItemUtil.CreateItemTransmogInfo(sourceID or 0, secondary, 0);
-				else
-					itemTransmogInfo = ItemUtil.CreateItemTransmogInfo( 0, 0, 0);
-				end
-					itemTransmogInfoList[i] = itemTransmogInfo
-				
-			end
-		end
-DressUpItemTransmogInfoList(itemTransmogInfoList);
+		
+		DressUpItemTransmogInfoList(itemTransmogInfoList);
 	end
 	import = false
 	UpdateDressingRoom()

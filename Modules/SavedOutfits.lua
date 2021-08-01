@@ -552,10 +552,25 @@ function BetterWardrobeOutfitFrameMixin:NewOutfit(name)
 		end
 	end
 
-	local sources = {}
+	local itemData = {}
 	for i, data in pairs(self.itemTransmogInfoList) do
-		sources[i] = data.appearanceID
+		local sourceInfo = C_TransmogCollection.GetSourceInfo(data.appearanceID)
+		if sourceInfo then
+			local appearanceID = sourceInfo.visualID
+			local itemID = sourceInfo.itemID
+			local itemMod = sourceInfo.itemModID
+			local sourceID = sourceInfo.sourceID
+			----print(invSlot)
+			itemData[i] = {"'"..itemID..":"..itemMod.."'", sourceID, appearanceID}
+		end
 	end
+
+
+
+	--[[local sources = {}
+			for i, data in pairs(self.itemTransmogInfoList) do
+				sources[i] = data.appearanceID
+			end]]
 
 	if (outfitID and IsDefaultSet(outfitID)) or (#C_TransmogCollection.GetOutfits() < MAX_DEFAULT_OUTFITS)  then 
 		outfitID = C_TransmogCollection.NewOutfit(name, icon, self.itemTransmogInfoList);
@@ -570,7 +585,8 @@ function BetterWardrobeOutfitFrameMixin:NewOutfit(name)
 		outfit["name"] = name
 		----local icon = select(4, C_TransmogCollection.GetAppearanceSourceInfo(outfit[1]))
 		outfit["icon"] = icon
-		outfit.sources = sources
+		outfit.itemData = itemData
+		--outfit.sources = sources
 		--outfit.itemTransmogInfoList =  self.itemTransmogInfoList or {}
 		--outfitID = index
 	end
