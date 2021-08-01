@@ -359,7 +359,7 @@ function tooltip:ShowTooltip(itemLink)
 			for i, setID in pairs(setIDs) do
 				local setInfo = C_TransmogSets.GetSetInfo(setID)
 				addDoubleLine (self,"|cffffd100"..L["Part of Set:"], " ")
-				local collected, total = 0,0------addon.SetsDataProvider:GetSetSourceCounts(setID)
+				local collected, total = addon.SetsDataProvider:GetSetSourceCounts(setID)
 				local color = YELLOW_FONT_COLOR_CODE
 				if collected == total then
 					color = GREEN_FONT_COLOR_CODE
@@ -389,11 +389,10 @@ function tooltip:ShowTooltip(itemLink)
 				addHeader = true
 				addLine(self, L["HEADERTEXT"])
 			end
-
 			addDoubleLine (self,"|cffffd100"..L["Part of Extra Set:"], " ")
 			for _, data in pairs(setData) do
 				--if not shownSetNames[data.name] then 
-					local collected, total = 0,0 ------addon.ExtraSetsDataProvider:GetSetSourceCounts(data.setID)
+					local collected, total = addon.SetsDataProvider:GetSetSourceCounts(data.setID)
 					local color = YELLOW_FONT_COLOR_CODE
 					if collected == total then
 						color = GREEN_FONT_COLOR_CODE

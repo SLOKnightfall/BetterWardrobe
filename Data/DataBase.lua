@@ -211,12 +211,13 @@ do
 
 
 					for slotID, itemData in ipairs(setData["itemData"]) do
+						local appearanceID = itemData[3]
 
-						--if itemData[3] and setData.sources[item] and setData.sources[item] ~= 0 then 
+						if appearanceID  then --and setData.sources[item] and setData.sources[item] ~= 0 then 
 							--local appearanceID = setData.sources[item]
-							--ItemDB[appearanceID] = ItemDB[appearanceID] or {}
-							--ItemDB[appearanceID][id] = setData
-						--end
+							ItemDB[appearanceID] = ItemDB[appearanceID] or {}
+							ItemDB[appearanceID][id] = setData
+						end
 
 
 

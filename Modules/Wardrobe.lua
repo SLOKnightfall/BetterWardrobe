@@ -2505,7 +2505,7 @@ function BetterWardrobeItemsCollectionMixin:UpdateItems()
 	local changeModel = false;
 	local isAtTransmogrifier = C_Transmog.IsAtTransmogNPC();
 
-	if ( self.transmogLocation:IsIllusion() ) then
+	if ( self.transmogLocation and self.transmogLocation:IsIllusion() ) then
 		-- for enchants we need to get the visual of the item in that slot
 		local appearanceSourceID;
 		appearanceSourceID, appearanceVisualID, appearanceVisualSubclass = self:GetWeaponInfoForEnchant();
@@ -4601,8 +4601,9 @@ function BetterWardrobeSetsDataProviderMixin:GetSetSourceData(setID)
 		self.sourceExtraData = { };
 	end
 	local sourceExtraData = self.sourceExtraData[setID];
-
-	if (BetterWardrobeCollectionFrame:CheckTab(2)) then
+	--print(addon.GetSetType(setID))
+	local setType = addon.GetSetType(setID)
+	if (setType == nil) then
 		if ( not sourceData ) then
 			local primaryAppearances = C_TransmogSets.GetSetPrimaryAppearances(setID);
 			local numCollected = 0;
@@ -4746,7 +4747,9 @@ function BetterWardrobeSetsDataProviderMixin:GetSortedSetSources(setID)
 	local canCharCollectIt = false;
 	local isCollectedChar = false;
 	local sourceData = self:GetSetSourceData(setID);
-	if BetterWardrobeCollectionFrame:CheckTab(2) then
+	local setType = addon.GetSetType(setID)
+	if (setType == nil) then
+	--if BetterWardrobeCollectionFrame:CheckTab(2) then
 		for i, primaryAppearance in ipairs(sourceData.primaryAppearances) do
 			local sourceID = primaryAppearance.appearanceID;
 			local sourceInfo = C_TransmogCollection.GetSourceInfo(sourceID);
