@@ -226,9 +226,9 @@ function addon.BuildClassArtifactAppearanceList()
 				--local sources = WardrobeCollectionFrame_GetSortedAppearanceSources(28656); 28656
 				if itemID == 128860 or itemID == 128821 then 
 					sourceInfo.visualID = sourceInfo.visualID
+					sourceInfo.name = data.name
 				else
-				sourceInfo.name = data.name
-
+					sourceInfo.name = data.name
 				end
 
 				if data.shapeshiftID then 
@@ -286,6 +286,7 @@ end
 
 
 function addon.SetArtifactAppearanceTooltip(contentFrame, sourceInfo, sourceID)
+	print(sourceID)
 	BetterWardrobeCollectionFrame.tooltipContentFrame = contentFrame;
 	BetterWardrobeCollectionFrame.tooltipSourceIndex = 1
 	--local sourceInfo = frame.visualInfo --visualIDIndex[frame.visualInfo.visualID] 

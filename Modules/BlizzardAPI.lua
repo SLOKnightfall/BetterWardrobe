@@ -481,3 +481,62 @@ function addon.C_TransmogCollection.GetOutfitItemTransmogInfoList(setID)
 
 	return itemTransmogInfoList
 end
+
+
+
+function addon:GetSetCounts(setID)
+		if ( not self.sourceData ) then
+		self.sourceData = { };
+	end
+	local sourceData = self.sourceData[setID];
+
+	if ( not self.sourceExtraData ) then
+		self.sourceExtraData = { };
+	end
+	local sourceExtraData = self.sourceExtraData[setID];
+
+	if (BetterWardrobeCollectionFrame:CheckTab(2)) then
+		if ( not sourceData ) then
+			local primaryAppearances = C_TransmogSets.GetSetPrimaryAppearances(setID);
+			local numCollected = 0;
+			local numTotal = 0;
+			local sources = {}
+			for i, primaryAppearance in ipairs(primaryAppearances) do
+				sources[primaryAppearance.appearanceID] = true
+				if primaryAppearance.collected then
+					numCollected = numCollected + 1;
+				end
+				numTotal = numTotal + 1;
+			end
+			sourceData = { numCollected = numCollected, numTotal = numTotal, sources = sources, primaryAppearances = primaryAppearances };
+			self.sourceData[setID] = sourceData;
+		end
+
+		return sourceData
+	else
+		if ( not sourceExtraData ) then
+
+		--elseif BetterWardrobeCollectionFrame:CheckTab(3) then
+			local sources, unavailable = addon.GetSetsources(setID)
+			local numCollected = 0
+			local numTotal = 0
+			if sources then
+				for sourceID, collected in pairs(sources) do
+					if (collected) then
+						numCollected = numCollected + 1
+					end
+					numTotal = numTotal + 1
+				end
+				sourceExtraData = {numCollected = numCollected, numTotal = numTotal, sources = sources, unavailable = unavailable }
+				self.sourceExtraData[setID] = sourceData;
+			end
+		end
+		return sourceExtraData
+	
+	end
+end
+
+--[[function BetterWardrobeSetsDataProviderMixin:GetSetSourceCounts(setID)
+	local sourceData = self:GetSetSourceData(setID);
+	return sourceData.numCollected, sourceData.numTotal;
+end]]

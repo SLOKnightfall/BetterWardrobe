@@ -36,7 +36,36 @@ addon.useAltSet = false
 
 --local Sets = {}
 --addon.Sets = Sets
-
+local inventoryTypes = {
+	["INVTYPE_AMMO"] = INVSLOT_AMMO;
+	["INVTYPE_HEAD"] = INVSLOT_HEAD;
+	["INVTYPE_NECK"] = INVSLOT_NECK;
+	["INVTYPE_SHOULDER"] = INVSLOT_SHOULDER;
+	["INVTYPE_BODY"] = INVSLOT_BODY;
+	["INVTYPE_CHEST"] = INVSLOT_CHEST;
+	["INVTYPE_ROBE"] = INVSLOT_CHEST;
+	["INVTYPE_WAIST"] = INVSLOT_WAIST;
+	["INVTYPE_LEGS"] = INVSLOT_LEGS;
+	["INVTYPE_FEET"] = INVSLOT_FEET;
+	["INVTYPE_WRIST"] = INVSLOT_WRIST;
+	["INVTYPE_HAND"] = INVSLOT_HAND;
+	["INVTYPE_FINGER"] = INVSLOT_FINGER1;
+	["INVTYPE_TRINKET"] = INVSLOT_TRINKET1;
+	["INVTYPE_CLOAK"] = INVSLOT_BACK;
+	["INVTYPE_WEAPON"] = INVSLOT_MAINHAND;
+	["INVTYPE_SHIELD"] = INVSLOT_OFFHAND;
+	["INVTYPE_2HWEAPON"] = INVSLOT_MAINHAND;
+	["INVTYPE_WEAPONMAINHAND"] = INVSLOT_MAINHAND;
+	["INVTYPE_WEAPONOFFHAND"] = INVSLOT_OFFHAND;
+	["INVTYPE_HOLDABLE"] = INVSLOT_OFFHAND;
+	["INVTYPE_RANGED"] = INVSLOT_RANGED;
+	["INVTYPE_THROWN"] = INVSLOT_RANGED;
+	["INVTYPE_RANGEDRIGHT"] = INVSLOT_RANGED;
+	["INVTYPE_RELIC"] = INVSLOT_RANGED;
+	["INVTYPE_TABARD"] = INVSLOT_TABARD;
+	["INVTYPE_BAG"] = CONTAINER_BAG_OFFSET;
+	["INVTYPE_QUIVER"] = CONTAINER_BAG_OFFSET;
+}
 
 local EXCLUSION_CATEGORY_OFFHAND	= 1;
 local EXCLUSION_CATEGORY_MAINHAND	= 2;
@@ -2487,7 +2516,7 @@ function BetterWardrobeItemsCollectionMixin:UpdateItems()
 		end
 	else
 		local _, isWeapon = C_TransmogCollection.GetCategoryInfo(self.activeCategory);
-		isArmor = not isWeapon;
+		isArmor = not isWeapon and not addon:IsWeaponCat();
 	end
 
 	local tutorialAnchorFrame;
@@ -2529,24 +2558,58 @@ function BetterWardrobeItemsCollectionMixin:UpdateItems()
 		if ( visualInfo ) then
 			model:Show();
 
+			local isWeapon
+			if visualInfo.categoryID and visualInfo.categoryID > 11 then 
+				isWeapon = true
+			end
+
 			-- camera
 			if ( self.transmogLocation:IsAppearance() ) then
-				cameraID = C_TransmogCollection.GetAppearanceCameraID(visualInfo.visualID, cameraVariation);
+				if visualInfo.artifact then
+					cameraID = visualInfo.camera
+				else
+					cameraID = C_TransmogCollection.GetAppearanceCameraID(visualInfo.visualID, cameraVariation);
+
+				end
 			end
 			if ( model.cameraID ~= cameraID ) then
 				Model_ApplyUICamera(model, cameraID);
 				model.cameraID = cameraID;
 			end
+			model.zoom = nil
+
+			--Dont really care about useable status for colelction list
+			if BW_CollectionListButton.ToggleState then 
+				visualInfo.isUsable = true
+			end
+
 
 			if ( visualInfo ~= model.visualInfo or changeModel ) then
-				if ( isArmor ) then
+				if ( isArmor and not isWeapon) then
 					local sourceID = self:GetAnAppearanceSourceFromVisual(visualInfo.visualID, nil);
 					model:TryOn(sourceID);
+					model:Show()
+
+				elseif(visualInfo.shapeshiftID) then 
+					model.cameraID = visualInfo.camera
+					Model_ApplyUICamera(model, visualInfo.camera);
+					model:SetDisplayInfo( visualInfo.shapeshiftID );
+					model:MakeCurrentCameraCustom()
+					
+					if model.cameraID == 1602 then 
+						model.zoom =-.75
+						model:SetCameraDistance(-5)
+						model:SetPosition(-13.25,0,-2.447)
+					end 
+					model:Show()
 				elseif ( appearanceVisualID ) then
 					-- appearanceVisualID is only set when looking at enchants
 					model:SetItemAppearance(appearanceVisualID, visualInfo.visualID, appearanceVisualSubclass);
 				else
 					model:SetItemAppearance(visualInfo.visualID);
+					if isWeapon then 
+						model.needsReset = true
+					end
 				end
 			end
 			model.visualInfo = visualInfo;
@@ -4947,36 +5010,7 @@ function BetterWardrobeSetsCollectionMixin:OnHide()
 	self:GetParent():ClearSearch(Enum.TransmogSearchType.BaseSets);
 end
 
-local inventoryTypes = {
-	["INVTYPE_AMMO"] = INVSLOT_AMMO;
-	["INVTYPE_HEAD"] = INVSLOT_HEAD;
-	["INVTYPE_NECK"] = INVSLOT_NECK;
-	["INVTYPE_SHOULDER"] = INVSLOT_SHOULDER;
-	["INVTYPE_BODY"] = INVSLOT_BODY;
-	["INVTYPE_CHEST"] = INVSLOT_CHEST;
-	["INVTYPE_ROBE"] = INVSLOT_CHEST;
-	["INVTYPE_WAIST"] = INVSLOT_WAIST;
-	["INVTYPE_LEGS"] = INVSLOT_LEGS;
-	["INVTYPE_FEET"] = INVSLOT_FEET;
-	["INVTYPE_WRIST"] = INVSLOT_WRIST;
-	["INVTYPE_HAND"] = INVSLOT_HAND;
-	["INVTYPE_FINGER"] = INVSLOT_FINGER1;
-	["INVTYPE_TRINKET"] = INVSLOT_TRINKET1;
-	["INVTYPE_CLOAK"] = INVSLOT_BACK;
-	["INVTYPE_WEAPON"] = INVSLOT_MAINHAND;
-	["INVTYPE_SHIELD"] = INVSLOT_OFFHAND;
-	["INVTYPE_2HWEAPON"] = INVSLOT_MAINHAND;
-	["INVTYPE_WEAPONMAINHAND"] = INVSLOT_MAINHAND;
-	["INVTYPE_WEAPONOFFHAND"] = INVSLOT_OFFHAND;
-	["INVTYPE_HOLDABLE"] = INVSLOT_OFFHAND;
-	["INVTYPE_RANGED"] = INVSLOT_RANGED;
-	["INVTYPE_THROWN"] = INVSLOT_RANGED;
-	["INVTYPE_RANGEDRIGHT"] = INVSLOT_RANGED;
-	["INVTYPE_RELIC"] = INVSLOT_RANGED;
-	["INVTYPE_TABARD"] = INVSLOT_TABARD;
-	["INVTYPE_BAG"] = CONTAINER_BAG_OFFSET;
-	["INVTYPE_QUIVER"] = CONTAINER_BAG_OFFSET;
-}
+
 
 function BetterWardrobeSetsCollectionMixin:OnEvent(event, ...)
 	if ( event == "GET_ITEM_INFO_RECEIVED" ) then
