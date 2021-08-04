@@ -281,8 +281,12 @@ do
 					--end
 					setData.uiOrder = UIID_Counter[setData.expansionID] -- id * 100
 					UIID_Counter[setData.expansionID] = UIID_Counter[setData.expansionID] +1
-					SET_INDEX[id] = setData
-					ArmorDB[armorType][id] = setData
+					setData.oldID =	setData.setID
+					local newID = 10000 + id
+
+					setData.setID = newID
+					SET_INDEX[newID] = setData
+					ArmorDB[armorType][newID] = setData
 				end
 			end
 		end
@@ -337,11 +341,12 @@ do
 						else
 							setData.filter = 5
 						end]]
+						setData.setType = "BlizzardSet"
 
 
 						setData.hiddenUntilCollected = false
 						setData.armorType = armorType
-						setData.setID  = id*100000
+						setData.setID  = id
 						--setData.
 						setData.armorType = Globals.ARMOR_TYPE_ID[armorType]
 

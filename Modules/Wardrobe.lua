@@ -4601,7 +4601,6 @@ function BetterWardrobeSetsDataProviderMixin:GetSetSourceData(setID)
 		self.sourceExtraData = { };
 	end
 	local sourceExtraData = self.sourceExtraData[setID];
-	--print(addon.GetSetType(setID))
 	local setType = addon.GetSetType(setID)
 	if (setType == nil) then
 		if ( not sourceData ) then
@@ -4646,7 +4645,12 @@ end
 
 function BetterWardrobeSetsDataProviderMixin:GetSetSourceCounts(setID)
 	local sourceData = self:GetSetSourceData(setID);
-	return sourceData.numCollected, sourceData.numTotal;
+
+	if sourceData then 
+		return sourceData.numCollected, sourceData.numTotal;
+	else
+		return 0,0
+	end
 end
 
 function BetterWardrobeSetsDataProviderMixin:GetBaseSetData(setID)
@@ -6696,11 +6700,8 @@ function BetterWardrobeSetsTransmogMixin:LoadSet(setID)
 		end
 		C_Transmog.LoadOutfit(setID - 5000)
 	else
-		if (not setType) or setID > 1000000 then
+		if (not setType) or setType == "BlizzardSet"  then
 			local setID = setID
-			if setID > 1000000 then
-				setID = setID/100000
-			end
 			local primaryAppearances = C_TransmogSets.GetSetPrimaryAppearances(setID);
 			for i, primaryAppearance in ipairs(primaryAppearances) do
 				local sourceID = primaryAppearance.appearanceID;

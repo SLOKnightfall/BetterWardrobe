@@ -26,16 +26,22 @@ local L = LibStub("AceLocale-3.0"):GetLocale(addonName)
 --Determines type of set based on setID
 local function DetermineSetType(setID)
 
-	if BetterWardrobeCollectionFrame:CheckTab(2) then --- or setID > 1000000 then 
+	local setType = addon.GetSetType(setID)
+
+
+	--Default Blizzard Set
+	if not setType  or setType == "BlizzardSet"then
+	--if BetterWardrobeCollectionFrame:CheckTab(2) then --- or setID > 1000000 then 
 	--Blizzard Set
-
-
 		return "set"
 
 	--Extra Set
-	elseif BetterWardrobeCollectionFrame:CheckTab(3) then 
+	elseif setType == "ExtraSet" then
+
 		return "extraSet"
-	elseif BetterWardrobeCollectionFrame:CheckTab(4) then 
+
+	else
+	--elseif BetterWardrobeCollectionFrame:CheckTab(4) then 
 	--Mogit set
 	--Saved Set
 	return "savedset"
@@ -175,12 +181,14 @@ end
 function addon.C_TransmogSets.GetSetSources(setID)
 	--if SourceDB[setID] then return SourceDB[setID] end
 
+	local setInfo = addon.GetSetInfo(setID)
+	local SetType = setInfo.setType
+
 	--Default Blizzard Set
-	if setID  > 100000  or BetterWardrobeCollectionFrame:CheckTab(2) then
-		if setID  > 100000 then setID = setID/100000 end
+	if not SetType or SetType == "BlizzardSet" then
 		return  C_TransmogSets.GetSetSources(setID)
 	end
-	 setInfo = addon.GetSetInfo(setID)
+	
 	local setSources = {}
 	local atTransmogrifier = WardrobeFrame_IsAtTransmogrifier()
 	local unavailable = false

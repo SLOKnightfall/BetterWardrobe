@@ -982,120 +982,8 @@ local DB_Defaults = {
 
 
 
-
-
-
-
----Updates Profile after changes
-function addon:RefreshConfig()
-	addon.Profile = self.db.profile
-	Profile = addon.Profile
-end
-
-
----Updates Profile after changes
-function addon:RefreshCharConfig()
-	--addon.Profile = self.db.profile
-	--Profile = addon.Profile
-end
-
-local f = CreateFrame("Frame",nil,UIParent)
-f:SetHeight(1)
-f:SetWidth(1)
-f:SetPoint("TOPLEFT", UIParent, "TOPRIGHT")
-f.model = CreateFrame("DressUpModel",nil), UIParent
-f.model:SetPoint("CENTER", UIParent, "CENTER")
-f.model:SetHeight(1)
-f.model:SetWidth(1)
-f.model:SetModelScale(1)
-f.model:SetAutoDress(false)
-f.model:SetUnit("PLAYER")
-addon.frame = f
-
-
----Ace based addon initilization
-function addon:OnInitialize()
-	--print(string.byte(addon.VisualColors[42592])
-	local DB_Defaults = DB_Defaults
-	BetterWardrobe_ListData = BetterWardrobe_ListData or {}
-	local listDB = BetterWardrobe_ListData
-	listDB.favoritesDB = listDB.favoritesDB or {}
-	listDB.collectionListDB = listDB.collectionListDB or {}
-	listDB.HiddenAppearanceDB = listDB.HiddenAppearanceDB or {}
-	listDB.OutfitDB = listDB.OutfitDB or {}
-
-	UpdateDB()
-
---Create all the profiled DB
-	self.db = LibStub("AceDB-3.0"):New("BetterWardrobe_Options", defaults, true)
-	options.args.settings.args.options = LibStub("AceDBOptions-3.0"):GetOptionsTable(self.db)
-	options.args.settings.args.options.name = L["Options Profiles"]
-	options.args.settings.args.options.order = 2
-
-	self.chardb = LibStub("AceDB-3.0"):New("BetterWardrobe_CharacterData", DB_Defaults.char_defaults)
-	--options.args.list_profiles.args.charprofiles = LibStub("AceDBOptions-3.0"):GetOptionsTable(self.chardb)
-	--options.args.list_profiles.args.charprofiles.name = L["Profiles - Collection Settings"]
-
-	self.setdb = LibStub("AceDB-3.0"):New("BetterWardrobe_SavedSetData", DB_Defaults.savedsets_defaults)
-	self.itemsubdb = LibStub("AceDB-3.0"):New("BetterWardrobe_SubstituteItemData", DB_Defaults.itemsub_defaults, true)
-	self.OutfitDB = LibStub("AceDB-3.0"):New(listDB.OutfitDB, DB_Defaults.charSavedOutfits_defaults)
-
-	self.favoritesDB =  LibStub("AceDB-3.0"):New(listDB.favoritesDB, DB_Defaults.list_defaults)
-	self.collectionListDB =  LibStub("AceDB-3.0"):New(listDB.collectionListDB, DB_Defaults.collectionList_defaults)
-	self.HiddenAppearanceDB =  LibStub("AceDB-3.0"):New(listDB.HiddenAppearanceDB, DB_Defaults.list_defaults)
-	self.char_savedOutfits = LibStub("AceDB-3.0"):New("BetterWardrobe_SavedOutfitData", charSavedOutfits_defaults, true)
-
-	local profile = self.setdb:GetCurrentProfile()
-
-
-	--self.setdb.global[profile] = self.setdb.char
-	addon.SelecteSavedList = false
-	options.args.subitems = itemSub_options
-	options.args.subitems.name = L["Item Substitution"]
-
-	options.args.char_savedOutfits = savedOutfits_options
-	options.args.char_savedOutfits.name = L["Saved Outfits"]
-
-	options.args.subitems.args.options = LibStub("AceDBOptions-3.0"):GetOptionsTable(self.itemsubdb)
-	--options.args.char_savedOutfits.args.profiles = LibStub("AceDBOptions-3.0"):GetOptionsTable(self.char_savedOutfits)
-
-	options.args.list_profiles.args.favoriteLists = LibStub("AceDBOptions-3.0"):GetOptionsTable(self.favoritesDB)
-	options.args.list_profiles.args.favoriteLists.name = L["Favorite Items & Sets"]
-	options.args.list_profiles.args.favoriteLists.order = 2
-
-	options.args.list_profiles.args.collectionLists = LibStub("AceDBOptions-3.0"):GetOptionsTable(self.collectionListDB)
-	options.args.list_profiles.args.collectionLists.name = L["Collection List"]
-	options.args.list_profiles.args.collectionLists.order = 3
-
-
-
-	options.args.list_profiles.args.HiddenAppearanceDB = LibStub("AceDBOptions-3.0"):GetOptionsTable(self.HiddenAppearanceDB)
-	options.args.list_profiles.args.HiddenAppearanceDB.name = L["Hidden Items & Sets"]
-	options.args.list_profiles.args.HiddenAppearanceDB.order = 4
-
-
-
-	LibStub("AceConfigRegistry-3.0"):ValidateOptionsTable(options, addonName)
-	LibStub("AceConfig-3.0"):RegisterOptionsTable(addonName, options)
-
-	self.optionsFrame = LibStub("AceConfigDialog-3.0"):AddToBlizOptions("BetterWardrobe", "BetterWardrobe")
-	self.db.RegisterCallback(addon, "OnProfileChanged", "RefreshConfig")
-	self.db.RegisterCallback(addon, "OnProfileCopied", "RefreshConfig")
-
-
-	self.collectionListDB.RegisterCallback(addon, "OnProfileChanged", "RefreshCollectionListData")
-
-
-	self.itemsubdb.RegisterCallback(addon, "OnProfileReset", "RefreshSubItemData")	
-
-	if firstRun then
-		listDB.lastUpdte = 1
-	end
-
-end
-
 local firstRun = false
-function UpdateDB()
+local function UpdateDB()
 	local characterDB = BetterWardrobe_CharacterData
 	local listDB = BetterWardrobe_ListData
 	local favoriteDB = listDB.favoritesDB or {}
@@ -1201,6 +1089,174 @@ function UpdateDB()
 		listDB.lastUpdte = 1
 	end
 end
+
+--Updates the db to reflect new set indexes
+local function UpdateDB_8_4()
+	BetterWardrobe_Updates = BetterWardrobe_Updates or {}
+
+	if not BetterWardrobe_Updates["8_4"] then 
+
+	local characterDB = BetterWardrobe_CharacterData
+	local listDB = BetterWardrobe_ListData
+	local favoriteDB = listDB.favoritesDB or {}
+	local hiddenDB = listDB.HiddenAppearanceDB or {}
+		for profile, data in pairs(favoriteDB.profiles) do
+			local extraSets = {}
+			if data.extraset then 
+				for setid, value in pairs(data.extraset) do
+					if setid > 100000 then 
+						extraSets[setid / 100000] = value
+					else
+						extraSets[setid + 10000] = value
+					end
+				end
+				data.extraset = extraSets
+			end
+		end
+
+		for profile, data in pairs(hiddenDB.profiles) do
+			local extraSets = {}
+			if data.extraset then 
+				for setid, value in pairs(data.extraset) do
+					if setid > 100000 then 
+						extraSets[setid / 100000] = value
+					else
+						extraSets[setid + 10000] = value
+					end
+				end
+				data.extraset = extraSets
+			end
+		end
+
+		--[[for profile, data in pairs(BetterWardrobe_ListData.collectionListDB.profiles) do
+			local extraSets = {}
+			if data.lists then 
+				for list_index, list_data in pairs(data.lists) do
+					if list_data.set then 
+						for setID, set_data in pairs(list_data.set) do
+							if setid > 100000 then 
+								extraSets[setid / 100000] = value
+							else
+								extraSets[setid + 10000] = value
+							end
+				end
+				data.extraset = extraSets
+			end
+		end]]
+		BetterWardrobe_Updates["8_4"] = true
+	end
+end
+
+---Updates Profile after changes
+function addon:RefreshConfig()
+	addon.Profile = self.db.profile
+	Profile = addon.Profile
+end
+
+
+---Updates Profile after changes
+function addon:RefreshCharConfig()
+	--addon.Profile = self.db.profile
+	--Profile = addon.Profile
+end
+
+local f = CreateFrame("Frame",nil,UIParent)
+f:SetHeight(1)
+f:SetWidth(1)
+f:SetPoint("TOPLEFT", UIParent, "TOPRIGHT")
+f.model = CreateFrame("DressUpModel",nil), UIParent
+f.model:SetPoint("CENTER", UIParent, "CENTER")
+f.model:SetHeight(1)
+f.model:SetWidth(1)
+f.model:SetModelScale(1)
+f.model:SetAutoDress(false)
+f.model:SetUnit("PLAYER")
+addon.frame = f
+
+
+---Ace based addon initilization
+function addon:OnInitialize()
+	--print(string.byte(addon.VisualColors[42592])
+	local DB_Defaults = DB_Defaults
+	BetterWardrobe_ListData = BetterWardrobe_ListData or {}
+	local listDB = BetterWardrobe_ListData
+	listDB.favoritesDB = listDB.favoritesDB or {}
+	listDB.collectionListDB = listDB.collectionListDB or {}
+	listDB.HiddenAppearanceDB = listDB.HiddenAppearanceDB or {}
+	listDB.OutfitDB = listDB.OutfitDB or {}
+
+	UpdateDB()
+	UpdateDB_8_4()
+
+--Create all the profiled DB
+	self.db = LibStub("AceDB-3.0"):New("BetterWardrobe_Options", defaults, true)
+	options.args.settings.args.options = LibStub("AceDBOptions-3.0"):GetOptionsTable(self.db)
+	options.args.settings.args.options.name = L["Options Profiles"]
+	options.args.settings.args.options.order = 2
+
+	self.chardb = LibStub("AceDB-3.0"):New("BetterWardrobe_CharacterData", DB_Defaults.char_defaults)
+	--options.args.list_profiles.args.charprofiles = LibStub("AceDBOptions-3.0"):GetOptionsTable(self.chardb)
+	--options.args.list_profiles.args.charprofiles.name = L["Profiles - Collection Settings"]
+
+	self.setdb = LibStub("AceDB-3.0"):New("BetterWardrobe_SavedSetData", DB_Defaults.savedsets_defaults)
+	self.itemsubdb = LibStub("AceDB-3.0"):New("BetterWardrobe_SubstituteItemData", DB_Defaults.itemsub_defaults, true)
+	self.OutfitDB = LibStub("AceDB-3.0"):New(listDB.OutfitDB, DB_Defaults.charSavedOutfits_defaults)
+
+	self.favoritesDB =  LibStub("AceDB-3.0"):New(listDB.favoritesDB, DB_Defaults.list_defaults)
+	self.collectionListDB =  LibStub("AceDB-3.0"):New(listDB.collectionListDB, DB_Defaults.collectionList_defaults)
+	self.HiddenAppearanceDB =  LibStub("AceDB-3.0"):New(listDB.HiddenAppearanceDB, DB_Defaults.list_defaults)
+	self.char_savedOutfits = LibStub("AceDB-3.0"):New("BetterWardrobe_SavedOutfitData", charSavedOutfits_defaults, true)
+
+	local profile = self.setdb:GetCurrentProfile()
+
+
+	--self.setdb.global[profile] = self.setdb.char
+	addon.SelecteSavedList = false
+	options.args.subitems = itemSub_options
+	options.args.subitems.name = L["Item Substitution"]
+
+	options.args.char_savedOutfits = savedOutfits_options
+	options.args.char_savedOutfits.name = L["Saved Outfits"]
+
+	options.args.subitems.args.options = LibStub("AceDBOptions-3.0"):GetOptionsTable(self.itemsubdb)
+	--options.args.char_savedOutfits.args.profiles = LibStub("AceDBOptions-3.0"):GetOptionsTable(self.char_savedOutfits)
+
+	options.args.list_profiles.args.favoriteLists = LibStub("AceDBOptions-3.0"):GetOptionsTable(self.favoritesDB)
+	options.args.list_profiles.args.favoriteLists.name = L["Favorite Items & Sets"]
+	options.args.list_profiles.args.favoriteLists.order = 2
+
+	options.args.list_profiles.args.collectionLists = LibStub("AceDBOptions-3.0"):GetOptionsTable(self.collectionListDB)
+	options.args.list_profiles.args.collectionLists.name = L["Collection List"]
+	options.args.list_profiles.args.collectionLists.order = 3
+
+
+
+	options.args.list_profiles.args.HiddenAppearanceDB = LibStub("AceDBOptions-3.0"):GetOptionsTable(self.HiddenAppearanceDB)
+	options.args.list_profiles.args.HiddenAppearanceDB.name = L["Hidden Items & Sets"]
+	options.args.list_profiles.args.HiddenAppearanceDB.order = 4
+
+
+
+	LibStub("AceConfigRegistry-3.0"):ValidateOptionsTable(options, addonName)
+	LibStub("AceConfig-3.0"):RegisterOptionsTable(addonName, options)
+
+	self.optionsFrame = LibStub("AceConfigDialog-3.0"):AddToBlizOptions("BetterWardrobe", "BetterWardrobe")
+	self.db.RegisterCallback(addon, "OnProfileChanged", "RefreshConfig")
+	self.db.RegisterCallback(addon, "OnProfileCopied", "RefreshConfig")
+
+
+	self.collectionListDB.RegisterCallback(addon, "OnProfileChanged", "RefreshCollectionListData")
+
+
+	self.itemsubdb.RegisterCallback(addon, "OnProfileReset", "RefreshSubItemData")	
+
+	if firstRun then
+		listDB.lastUpdte = 1
+	end
+
+end
+
+
 
 local inizliaed
 
