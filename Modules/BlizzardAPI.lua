@@ -196,7 +196,7 @@ function addon.C_TransmogSets.GetSetSources(setID)
 	local sources = {}
 
 	--Blizzard Saved Set
-	if SetType == "default" then
+	if SetType == "SavedBlizzard" then
  		local setTransmogInfo = C_TransmogCollection.GetOutfitItemTransmogInfoList(setID - 5000)
  		for slotID, data in ipairs(setTransmogInfo) do
  			local sourceInfo = data.appearanceID and C_TransmogCollection.GetSourceInfo(data.appearanceID)

@@ -4601,7 +4601,10 @@ function BetterWardrobeSetsDataProviderMixin:GetSetSourceData(setID)
 		self.sourceExtraData = { };
 	end
 	local sourceExtraData = self.sourceExtraData[setID];
+	--(addon.GetSetType(setID))
 	local setType = addon.GetSetType(setID)
+	print(setID)
+	print(setType)
 	if (setType == nil) then
 		if ( not sourceData ) then
 			local primaryAppearances = C_TransmogSets.GetSetPrimaryAppearances(setID);
@@ -5364,7 +5367,7 @@ function BetterWardrobeSetsCollectionMixin:DisplaySavedSet(setID)
 
 		local sortedSources = SetsDataProvider:GetSortedSetSources(setID);
 
-	if setType == "default" then
+	if setType == "SavedBlizzard" then
 		--(setID and addon.GetSetInfo(setID)) or nil
 		local sources  = C_TransmogCollection.GetOutfitItemTransmogInfoList(setID - 5000)
 		for slotID, itemTransmogInfo in ipairs(sources) do
@@ -5382,11 +5385,11 @@ function BetterWardrobeSetsCollectionMixin:DisplaySavedSet(setID)
 		end
 		--sortedSources = setInfo.sources
 		
-	elseif setType == "mogit" then
+	elseif setType == "SavedMogIt" then
 		for i, sourceID in pairs(setInfo.sources) do	
 			tinsert(sortedSources, sourceID)
 		end
-	elseif setType == "transmog_outfits"  or setType == "extra" then
+	elseif setType == "SavedTransmogOutfit"  or setType == "SavedExtra" then
 		for i, itemID in pairs(setInfo.items) do
 			if itemID ~= 0 then 
 				local _, sourceID = C_TransmogCollection.GetItemInfo(itemID)
@@ -6506,7 +6509,7 @@ function BetterWardrobeSetsTransmogMixin:UpdateSets()
 			if ( set ) then
 				local setType =  addon.GetSetType(set.setID)
 				model:Show();
-				if setType == "default" then 
+				if setType == "SavedBlizzard" then 
 					local sources  = C_TransmogCollection.GetOutfitItemTransmogInfoList(set.setID - 5000)
 					model:Undress()
 					for slotID, itemTransmogInfo in ipairs(sources) do
@@ -6675,7 +6678,7 @@ function BetterWardrobeSetsTransmogMixin:LoadSet(setID)
 	local offHandEnchant
 	local setData
 	--Default Saved sets
-	if setType == "default" then
+	if setType == "SavedBlizzard" then
 		local setSources = addon.C_TransmogSets.GetSetSources(setID)
 		for sourceID in pairs(setSources) do
 			local sourceInfo = C_TransmogCollection.GetSourceInfo(sourceID);

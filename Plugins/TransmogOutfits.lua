@@ -43,7 +43,8 @@ function TransmogOutfits.GetOutfits()
 		end]]
 
 		data.set = "transmog_outfits"
-		data.label = "TransmogOutfits"
+		data.setType = "SavedTransmogOutfit"
+
 		data.index = i + 7000		
 		data.outfitID = 7000 + i
 		data.set = "transmogoutfits"

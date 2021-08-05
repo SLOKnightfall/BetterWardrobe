@@ -507,7 +507,7 @@ function addon.GetOutfits(character)
 	if addon.SelecteSavedList and not character then 
 		FullList = addon.setdb.global.sets[addon.SelecteSavedList]
 		for i, data in ipairs(FullList) do
-			data.setType = "extra"
+			data.setType = "SavedExtra"
 			data.index = i
 			data.label = L["Extended Saved Set"]
 		end
@@ -519,7 +519,7 @@ function addon.GetOutfits(character)
 		for i, outfitID in ipairs(outfits) do
 			local data = {}
 			local name, icon = C_TransmogCollection.GetOutfitInfo(outfitID);
-			data.setType = "default"
+			data.setType = "SavedBlizzard"
 			data.index = i
 			data.outfitID = outfitID + 5000
 			data.name = name
@@ -533,7 +533,7 @@ function addon.GetOutfits(character)
 			for i, data in ipairs(addon.OutfitDB.char.outfits) do
 
 				data.outfitID = MAX_DEFAULT_OUTFITS + i + 5000
-				data.setType = "extra"
+				data.setType = "SavedExtra"
 				data.index = i
 				data.name = addon.OutfitDB.char.outfits[i].name
 				data.label = L["Extended Saved Set"]
@@ -610,7 +610,6 @@ function addon.GetOutfits(character)
 
 				tinsert(FullList, data)
 				--FullList[#FullList].outfitID = MAX_DEFAULT_OUTFITS + i
-				--data.set = "default"
 			end
 		end
 	end
@@ -648,7 +647,7 @@ end
 function addon.IsDefaultSet(outfitID)
 	local savedSets = addon.GetSavedList()
 	for i, data in ipairs(savedSets) do
-		if data.setID == outfitID and data.setType == "default" then 
+		if data.setID == outfitID and data.setType == "SavedBlizzard" then 
 			return true
 		end
 	end
@@ -700,7 +699,7 @@ end
 
 				info.itemData = data.itemData
 
-				if data.setType == "default" then 
+				if data.setType == "SavedBlizzard" then 
 					local outfitItemTransmogInfoList = C_TransmogCollection.GetOutfitItemTransmogInfoList(data.outfitID - 5000);
 					info.sources = {}
 					for i, data in pairs(outfitItemTransmogInfoList) do

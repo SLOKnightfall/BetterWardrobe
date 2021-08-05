@@ -99,6 +99,7 @@ function MogIt.GetMogitOutfits()
 		data.name = set.name or ""
 		--data.name = "MogIt - " .. set.name or ""
 		data.set = "mogit"
+		data.setType = "SavedMogIt"
 		data.label = L["MogIt Set"]
 		data.index = i + 6000
 		data.outfitID = 6000 + i
