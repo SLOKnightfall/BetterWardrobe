@@ -145,7 +145,7 @@ do
 			ArmorDB[armorType] = {}
 
 			for id, setData in pairs(data) do
-				if (setData.side and setData.side == GetFactionID(playerFaction) or setData.side == nil) and 
+				if (setData.requiredFaction and setData.requiredFaction == GetFactionID(playerFaction) or setData.requiredFaction == nil) and 
 				 	(not data.BuildBlizzSets and (setData.filter ~= 5 and setData.filter ~= 7 and setData.filter ~= 11)) then 
 					--setData.isHeritageArmor = string.find(setData.name, "Heritage")
 
@@ -297,8 +297,7 @@ do
 			for id, setData in pairs(data) do
 
 				if C_TransmogSets.GetBaseSetID(id) ~= id then 
-
-					if setData.requiredFaction and setData.requiredFaction == playerFaction or setData.requiredFaction == nil then 
+					if (setData.requiredFaction and setData.requiredFaction == playerFaction) or setData.requiredFaction == nil then 
 						--setData.name = "BL-" .. setData.name.." - "..(setData.description or "")
 						if not setData.nameUpdate then 
 							setData.name = setData.name.." - "..(setData.description or "")
@@ -307,7 +306,7 @@ do
 						local classInfo = CLASS_INFO[playerClass]
 						local class = (setData.classMask and setData.classMask == 0) or (setData.classMask and bit.band(setData.classMask, classInfo[2])  == classInfo[2]) or not setData.classMask
 						---local className = (setData.classMask and GetClassInfo(getClassMask(setData.classMask))) or nil
-
+print(setData.requiredFaction)
 						--setData.expansionID = setData.expansionID -3
 						setData.isClass = class
 						--setData.className = className

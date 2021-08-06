@@ -361,10 +361,24 @@
 
 			</Layer>
 		</Layers>
+		<Frames>
+			<Frame parentKey="CanUse" mixin = "BetterWardrobeSetsDetailsItemUseabiltiyMixin" >
+			<Size x="25" y="25"/>
 
-
-
-					<Frame parentKey="Favorite" setAllPoints="true">
+			<Anchors>
+				<Anchor point="TOP" relativeKey="$parent" x="0" y = "15"/>
+			</Anchors>
+				<Layers>
+					<Layer level="OVERLAY">
+						<Texture parentKey="Icon" atlas="PlayerRaidBlip" useAtlasSize="false" hidden="false" setAllPoints = "true" />
+					</Layer>
+				</Layers>
+			<Scripts>
+			<OnEnter method="OnEnter"/>
+			<OnLeave method="OnLeave"/>
+		</Scripts>
+			</Frame>
+			<Frame parentKey="Favorite" setAllPoints="true">
 				<Layers>
 					<Layer level="ARTWORK">
 						<Texture parentKey="Icon" atlas="collections-icon-favorites" useAtlasSize="true" hidden="true">
@@ -386,6 +400,7 @@
 					</Layer>
 				</Layers>
 			</Frame>
+		</Frames>
 		<Scripts>
 			<OnEnter method="OnEnter"/>
 			<OnLeave method="OnLeave"/>

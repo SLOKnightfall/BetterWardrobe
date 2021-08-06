@@ -2498,6 +2498,7 @@ function BetterWardrobeItemsCollectionMixin:GetCameraVariation()
 end
 
 function BetterWardrobeItemsCollectionMixin:UpdateItems()
+	if not BetterWardrobeCollectionFrame.ItemsCollectionFrame:IsShown() then return end
 	local isArmor;
 	local cameraID;
 	local appearanceVisualID;	-- for weapon when looking at enchants
@@ -4603,8 +4604,6 @@ function BetterWardrobeSetsDataProviderMixin:GetSetSourceData(setID)
 	local sourceExtraData = self.sourceExtraData[setID];
 	--(addon.GetSetType(setID))
 	local setType = addon.GetSetType(setID)
-	print(setID)
-	print(setType)
 	if (setType == nil) then
 		if ( not sourceData ) then
 			local primaryAppearances = C_TransmogSets.GetSetPrimaryAppearances(setID);
@@ -4748,11 +4747,90 @@ function BetterWardrobeSetsDataProviderMixin:ResetBaseSetNewStatus(baseSetID)
 	end
 end
 
+local ScanTooltip = CreateFrame( "GameTooltip", "BW_ScanGameTooltip", nil, "GameTooltipTemplate" );
+ScanTooltip:SetOwner( WorldFrame, "ANCHOR_NONE" );
+-- Allow tooltip SetX() methods to dynamically add new lines based on these
+ScanTooltip:AddFontStrings(
+	ScanTooltip:CreateFontString( "$parentTextLeft1", nil, "GameTooltipText" ),
+	ScanTooltip:CreateFontString( "$parentTextRight1", nil, "GameTooltipText" ) );
+	
+--Helper function. Makes an invisible tooltip for the item and parses it to see if it has 
+--red error text related to class requirements.
+local classGlobal = strsplit(" ", ITEM_CLASSES_ALLOWED);
+local function CheckClass(itemLink)
+  ScanTooltip:ClearLines();
+  ScanTooltip:SetHyperlink(itemLink);
+  for i = 1,ScanTooltip:NumLines() do
+	local text = _G["BW_ScanGameTooltipTextLeft"..i];
+	
+	if text and text:GetText() then
+	  local r,g,b = text:GetTextColor();
+	  if math.floor(r*256) == 255 and math.floor(g*256) == 32 and math.floor(b*256) == 32 then
+		if string.find(text:GetText(), classGlobal) then
+		  return false;
+		end
+	  end
+	end
+  end
+  return true;
+end
+
+
+
+local function GetCombinedAppearanceSources(appearanceID)
+	local sources = C_TransmogCollection.GetAllAppearanceSources(appearanceID)
+	local sources2 = C_TransmogCollection.GetAppearanceSources(appearanceID)
+
+	if (sources2 and sources) then
+	  for i = 1, #sources2 do
+		local addTosources = true;
+		for j = 1, #sources do
+		  if sources2[i].sourceID == sources[j] then
+			addTosources = false;
+			break;
+		  end
+		end
+		if addTosources then
+		  table.insert(sources, sources2[i].sourceID);
+		end
+	  end
+	elseif sources2 and not sources then
+	  sources = sources2;
+	end
+
+	return sources
+end
+
+local function CheckCollectionStatus(sources)
+	if not sources then return false, false end
+	local characterCollectable = false;
+	local characterUseable = false;
+
+	for _,sourceID in pairs(sources) do
+		local sourceInfo = C_TransmogCollection.GetSourceInfo(sourceID);
+		
+		local link = select(6, C_TransmogCollection.GetAppearanceSourceInfo(sourceInfo.sourceID));
+		local classSet = CheckClass(link)
+		
+		if true and not characterCollectable and classSet then
+			characterCollectable = true;
+		end
+
+		if true and not characterUseable and classSet and sourceInfo.isCollected then
+			characterUseable = true;
+		end
+		
+		if sourceInfo.isCollected and characterCollectable and characterUseable then
+			break;
+		end
+	end
+
+	return characterCollectable, characterUseable
+end
+
 function BetterWardrobeSetsDataProviderMixin:GetSortedSetSources(setID)
 	local returnTable = { };
-	local isCollectedAccount = false;
-	local canCharCollectIt = false;
-	local isCollectedChar = false;
+
 	local sourceData = self:GetSetSourceData(setID);
 	local setType = addon.GetSetType(setID)
 	if (setType == nil) then
@@ -4760,68 +4838,24 @@ function BetterWardrobeSetsDataProviderMixin:GetSortedSetSources(setID)
 		for i, primaryAppearance in ipairs(sourceData.primaryAppearances) do
 			local sourceID = primaryAppearance.appearanceID;
 			local sourceInfo = C_TransmogCollection.GetSourceInfo(sourceID);
-			local appSources = C_TransmogCollection.GetAllAppearanceSources(sourceInfo.visualID);
-				--local appSources2 = C_TransmogCollection.GetAppearanceSources(sourceInfo.visualID);
-			if appSources then
-				  for _,sourceID2 in pairs(appSources) do
-					local sources = C_TransmogCollection.GetSourceInfo(sourceID2);
-					
-					local link = select(6, C_TransmogCollection.GetAppearanceSourceInfo(sources.sourceID));
-					if sources.isCollected then
-					  isCollectedAccount = true;
-					end
-					local isForClass = sourceData.isClass
-					
-					if isPlayerArmorWeight and not canCharCollectIt and isForClass then
-					  canCharCollectIt = true;
-					end
-					if isPlayerArmorWeight and not isCollectedChar and isForClass and sources.isCollected then
-					  isCollectedChar = true;
-					end
-					
-					if isCollectedAccount and canCharCollectIt and isCollectedChar then
-					  break;
-					end
-				end
-			end
+			local sources = GetCombinedAppearanceSources(sourceInfo.visualID);
+			local characterCollectable, characterUseable = CheckCollectionStatus(sources)
 
 			if ( sourceInfo ) then
 				local sortOrder = EJ_GetInvTypeSortOrder(sourceInfo.invType);
-				tinsert(returnTable, { sourceID = sourceID, collected = primaryAppearance.collected, sortOrder = sortOrder, itemID = sourceInfo.itemID, invType = sourceInfo.invType, isCollectedChar = isCollectedChar, canCharCollectIt = canCharCollectIt });
+				tinsert(returnTable, { sourceID = sourceID, collected = primaryAppearance.collected, sortOrder = sortOrder, itemID = sourceInfo.itemID, invType = sourceInfo.invType, characterUseable = characterUseable, characterCollectable = characterCollectable });
 			end
 		end
 	else
 	----elseif BetterWardrobeCollectionFrame:CheckTab(3) then
 		for sourceID, collected in pairs(sourceData.sources) do
 			local sourceInfo = C_TransmogCollection.GetSourceInfo(sourceID)
-			local appSources = C_TransmogCollection.GetAllAppearanceSources(sourceInfo.visualID);
-				--local appSources2 = C_TransmogCollection.GetAppearanceSources(sourceInfo.visualID);
-			if appSources then
-				  for _,sourceID2 in pairs(appSources) do
-					local sources = C_TransmogCollection.GetSourceInfo(sourceID2);
-					
-					local link = select(6, C_TransmogCollection.GetAppearanceSourceInfo(sources.sourceID));
-					if sources.isCollected then
-					  isCollectedAccount = true;
-					end
-					local isForClass = sourceData.isClass
-					
-					if true and not canCharCollectIt and isForClass then
-					  canCharCollectIt = true;
-					end
-					if true and not isCollectedChar and isForClass and sources.isCollected then
-					  isCollectedChar = true;
-					end
-					
-					if isCollectedAccount and canCharCollectIt and isCollectedChar then
-					  break;
-					end
-				end
-			end
+			local sources = GetCombinedAppearanceSources(sourceInfo.visualID);
+			local characterCollectable, characterUseable = CheckCollectionStatus(sources)
 
 			if (sourceInfo) then
 				local sortOrder = EJ_GetInvTypeSortOrder(sourceInfo.invType)
-				tinsert(returnTable, {sourceID = sourceID, collected = collected, sortOrder = sortOrder, itemID = sourceInfo.itemID, invType = sourceInfo.invType, visualID = sourceInfo.visualID, isCollectedChar = isCollectedChar, canCharCollectIt = canCharCollectIt  })
+				tinsert(returnTable, {sourceID = sourceID, collected = collected, sortOrder = sortOrder, itemID = sourceInfo.itemID, invType = sourceInfo.invType, visualID = sourceInfo.visualID, characterUseable = characterUseable, characterCollectable = characterCollectable  })
 			end
 		end
 	end
@@ -5245,24 +5279,21 @@ function BetterWardrobeSetsCollectionMixin:DisplaySet(setID)
 		----end
 
 		if ( sortedSources[i].collected ) then
-			if sortedSources[i].isCollectedChar then
-			itemFrame.itemFrameType = "Collected";
-			else
-				if sortedSources[i].canCharCollectIt then
-				  itemFrame.itemFrameType = "CollectedCharCantUse";
+			if not sortedSources[i].characterUseable then
+				if sortedSources[i].characterCollectable then
+				  itemFrame.itemCollectionStatus = "CollectedCharCantUse";
 				else
-				  itemFrame.itemFrameType = "CollectedCharCantGet";
+				  itemFrame.itemCollectionStatus = "CollectedCharCantGet";
 				end
-		 	end
+			end
 		else
-			if (not sortedSources[i].canCharCollectIt) then
-				itemFrame.itemFrameType = "NotCollectedCharCantGet";
-			  else
-				itemFrame.itemFrameType = "NotCollected";
+			if (not sortedSources[i].characterCollectable) then
+				itemFrame.itemCollectionStatus = "NotCollectedCharCantGet";
 			  end
 		end
 
 		self:SetItemFrameQuality(itemFrame);
+		self:SetItemUseability(itemFrame);
 
 
 		--itemFrame:SetPoint("TOP", self.DetailsFrame, "TOP", xOffset + (i - 1) * BUTTON_SPACE, -94);
@@ -5365,7 +5396,7 @@ function BetterWardrobeSetsCollectionMixin:DisplaySavedSet(setID)
 	local offShoulderindex
 	local offShoulder
 
-		local sortedSources = SetsDataProvider:GetSortedSetSources(setID);
+	local sortedSources = SetsDataProvider:GetSortedSetSources(setID);
 
 	if setType == "SavedBlizzard" then
 		--(setID and addon.GetSetInfo(setID)) or nil
@@ -5507,6 +5538,53 @@ function BetterWardrobeSetsCollectionMixin:SetItemFrameQuality(itemFrame)
 	end
 
 end
+
+function BetterWardrobeSetsCollectionMixin:SetItemUseability(itemFrame)
+	local itemCollectionStatus = itemFrame.itemCollectionStatus
+	if itemCollectionStatus == "CollectedCharCantUse" then
+		itemFrame.CanUse:Show()
+		--itemFrame.Icon:SetDesaturated(false);
+		itemFrame.CanUse.Icon:SetDesaturation(0);
+		itemFrame.CanUse.Icon:SetVertexColor(1,0.8,0);
+		itemFrame.CanUse.Icon:SetAtlas("PlayerRaidBlip");		
+		--itemFrame.Icon:SetAlpha(0.6);
+		itemFrame.CanUse.Icon:SetAlpha(0.5);
+
+	elseif itemCollectionStatus == "CollectedCharCantGet" then
+		itemFrame.CanUse:Show()
+
+		--itemFrame.Icon:SetDesaturated(false);
+		itemFrame.CanUse.Icon:SetDesaturation(0);
+		
+		itemFrame.CanUse.Icon:ClearAllPoints();
+		itemFrame.CanUse.Icon:SetPoint("CENTER",itemFrame,"TOP",0,-3);
+		itemFrame.CanUse.Icon:SetVertexColor(1,0,0);
+		itemFrame.CanUse.Icon:SetAtlas("PlayerRaidBlip");
+		itemFrame.CanUse.Icon:SetSize(25,25);
+		
+		--itemFrame.Icon:SetAlpha(0.6);
+		itemFrame.CanUse.Icon:SetAlpha(0.5);
+		--itemFrame.New:Hide();
+  
+
+	elseif itemCollectionStatus == "NotCollectedCharCantGet" then
+		itemFrame.CanUse:Show()
+		---itemFrame.Icon:SetDesaturated(true);
+		itemFrame.CanUse.Icon:SetDesaturation(0);
+		itemFrame.CanUse.Icon:SetVertexColor(1,0,0);
+		itemFrame.CanUse.Icon:SetAtlas("PlayerDeadBlip")
+		--itemFrame.Icon:SetAlpha(0.3);
+		itemFrame.CanUse.Icon:SetAlpha(0.5);
+		--itemFrame.New:Hide();
+	else
+		itemFrame.CanUse:Hide()
+	end
+end
+
+
+
+
+
 
 function BetterWardrobeSetsCollectionMixin:OnSearchUpdate()
 	if ( self.init ) then
@@ -6160,18 +6238,18 @@ local BW_ItemSubDropDownMenu = CreateFrame("Frame", "BW_ItemSubDropDownMenu", UI
 BW_ItemSubDropDownMenu:SetFrameLevel(500)
 local clickedItemID = nil
 local BW_ItemSubDropDownMenu_Table = {
-    {
-        text = L["Substitue Item"],
-        func = function(self)    		
-          	BetterWardrobeOutfitFrameMixin:ShowPopup("BETTER_WARDROBE_SUBITEM_POPUP")
-        end,
-        notCheckable = 1,
-    },
-    {
-        text = CLOSE,
-        func = function() BW_CloseDropDownMenus() end,
-        notCheckable = 1,
-    },
+	{
+		text = L["Substitue Item"],
+		func = function(self)    		
+			BetterWardrobeOutfitFrameMixin:ShowPopup("BETTER_WARDROBE_SUBITEM_POPUP")
+		end,
+		notCheckable = 1,
+	},
+	{
+		text = CLOSE,
+		func = function() BW_CloseDropDownMenus() end,
+		notCheckable = 1,
+	},
 }
 
 StaticPopupDialogs["BETTER_WARDROBE_SUBITEM_INVALID_POPUP"] = {
@@ -7500,3 +7578,21 @@ end
 	end, true)
 
 
+BetterWardrobeSetsDetailsItemUseabiltiyMixin = { };
+
+function BetterWardrobeSetsDetailsItemUseabiltiyMixin:OnEnter()
+	local status = self:GetParent().itemCollectionStatus
+	local text
+	if status == "CollectedCharCantUse" then
+		text = L["Class cant use appearance. Useable appearance available."]
+	elseif status == "CollectedCharCantGet" or status == "NotCollectedCharCantGet" then 
+		text = L["Class can't collect or use appearance."]
+	end
+
+	GameTooltip:SetOwner(self, "ANCHOR_RIGHT", 0, 0);
+	GameTooltip:SetText(text);
+end
+
+function BetterWardrobeSetsDetailsItemUseabiltiyMixin:OnLeave()
+	GameTooltip:Hide();
+end
