@@ -2,12 +2,9 @@
 --
 --	Better Wardrobe and Collection
 --	Author: SLOKnightfall
-
 --	Wardrobe and Collection: Adds additional functionality and sets to the transmog and collection areas
 --
-
 --
-
 --	///////////////////////////////////////////////////////////////////////////////////////////
 
 local addonName, addon = ...
