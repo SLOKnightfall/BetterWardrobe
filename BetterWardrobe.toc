@@ -3,7 +3,7 @@
 ## Version: @project-version@
 ## Author: SLOKnightfall
 ## Notes: 
-## OptionalDeps: MogIt, CanIMogIt, LegionWardrobe, WardrobeEnhanced, Rarity, TransmogOutfits, ExtendedSets
+## OptionalDeps: MogIt, CanIMogIt, LegionWardrobe, WardrobeEnhanced, Rarity, TransmogOutfits, ExtendedSets, ElvUI
 ## SavedVariables: BetterWardrobe_Options, BetterWardrobe_CharacterData, BetterWardrobe_SavedSetData, BetterWardrobe_SubstituteItemData, BetterWardrobe_ListData, BetterWardrobe_Mogitdata, BetterWardrobe_Updates
 
 #Libraries
@@ -68,7 +68,7 @@ Modules\SortingFunctions.lua
 
 
 #3rd party addon compatability
-#Plugins\ElvUI.lua
+Plugins\ElvUI.lua
 Plugins\CanIMogIt.lua
 Plugins\MogIt.lua
 Plugins\WardrobeEnhanced.lua

@@ -306,7 +306,6 @@ do
 						local classInfo = CLASS_INFO[playerClass]
 						local class = (setData.classMask and setData.classMask == 0) or (setData.classMask and bit.band(setData.classMask, classInfo[2])  == classInfo[2]) or not setData.classMask
 						---local className = (setData.classMask and GetClassInfo(getClassMask(setData.classMask))) or nil
-print(setData.requiredFaction)
 						--setData.expansionID = setData.expansionID -3
 						setData.isClass = class
 						--setData.className = className
