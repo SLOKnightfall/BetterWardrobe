@@ -1371,7 +1371,6 @@ function addon:EventHandler(event, ...)
 	if event == "ADDON_LOADED" and ... == "Blizzard_Collections" then 
 		addon.Init:LoadModules()
 		addon:SendMessage("BW_ADDON_LOADED")
-		print("BWL")
 		addon:UnregisterEvent("ADDON_LOADED")
 	elseif (event == "PLAYER_ENTERING_WORLD") then
 		addon:SendMessage("BW_OnPlayerEnterWorld")

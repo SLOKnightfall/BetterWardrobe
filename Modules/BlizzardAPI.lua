@@ -438,11 +438,10 @@ end
 
 function addon:SearchSets(setList)
 	local searchedSets = {}
-	local searchString = string.lower(WardrobeCollectionFrameSearchBox:GetText())
+	local searchString = string.lower(BetterWardrobeCollectionFrameSearchBox:GetText())
 
 	setList =  Sets:ClearHidden(setList)
 	if searchString == "" then return setList end
-
 	for i, data in ipairs(setList) do
 			 if (searchString and string.find(string.lower(data.name), searchString)) then -- or string.find(baseSet.label, searchString) or string.find(baseSet.description, searchString)then
 			tinsert(searchedSets, data)
