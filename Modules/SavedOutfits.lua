@@ -230,7 +230,6 @@ function BetterWardrobeOutfitDropDownMixin:OnEvent(event)
 			BetterWardrobeOutfitFrame:Update();
 		end
 	end
-	-- don't need to do anything for "TRANSMOGRIFY_UPDATE" beyond updating the save button
 		----if not addon.SelecteSavedList then 
 	-- don't need to do anything for "TRANSMOGRIFY_UPDATE" beyond updating the save button
 	self:UpdateSaveButton()
@@ -240,9 +239,8 @@ end
 
 function BetterWardrobeOutfitDropDownMixin:UpdateSaveButton()
 	if ( self.selectedOutfitID ) then
-		--print(self.selectedOutfitID)
-	--	print(self:IsOutfitDressed())
-		self.SaveButton:SetEnabled(DressUpFrame:IsShown() or not self:IsOutfitDressed());
+	local dressed = self:IsOutfitDressed()
+		self.SaveButton:SetEnabled(DressUpFrame:IsShown() or not dressed);
 	else
 		self.SaveButton:SetEnabled(false);
 	end
@@ -296,6 +294,21 @@ local function IsSourceArtifact(sourceID)
 	return quality == Enum.ItemQuality.Artifact;
 end
 
+local function isHiddenAppearance(appearanceID, set_appearanceID, slotID)
+	if set_appearanceID == 0 then return true end
+	local sourceInfo = C_TransmogCollection.GetSourceInfo(set_appearanceID)
+
+	if sourceInfo then
+		local isCollected = sourceInfo.isCollected
+
+		local isemptyslot = (appearanceID == 0)
+		if not isCollected and isemptyslot then
+			return true
+		end
+	end
+	return false
+end
+
 function BetterWardrobeOutfitDropDownMixin:IsOutfitDressed()
 	if not self.selectedOutfitID then
 		return true;
@@ -321,13 +334,15 @@ function BetterWardrobeOutfitDropDownMixin:IsOutfitDressed()
 			end
 		end
 		return true;
+
 	else
-		local outfit = addon.OutfitDB.char.outfits[LookupIndexFromID(self.selectedOutfitID)]
+
+		local outfit = addon.GetSetInfo(self.selectedOutfitID) --addon.OutfitDB.char.outfits[LookupIndexFromID(self.selectedOutfitID)]
 		if not outfit then
 			return true;
 		end
-		local outfitItemTransmogInfoList = addon.C_TransmogCollection.GetOutfitItemTransmogInfoList(self.selectedOutfitID)
 
+		local outfitItemTransmogInfoList = addon.C_TransmogCollection.GetOutfitItemTransmogInfoList(self.selectedOutfitID)
 		local currentItemTransmogInfoList = self:GetItemTransmogInfoList();
 		if not currentItemTransmogInfoList then
 			return true;
@@ -335,13 +350,16 @@ function BetterWardrobeOutfitDropDownMixin:IsOutfitDressed()
 
 		for slotID, itemTransmogInfo in ipairs(currentItemTransmogInfoList) do
 			if not itemTransmogInfo:IsEqual(outfitItemTransmogInfoList[slotID]) then
-				if itemTransmogInfo.appearanceID ~= Constants.Transmog.NoTransmogID then
-					return false;
+				if itemTransmogInfo.appearanceID ~= Constants.Transmog.NoTransmogID or outfitItemTransmogInfoList[slotID].appearanceID ~= Constants.Transmog.NoTransmogID then
+					if not isHiddenAppearance(itemTransmogInfo.appearanceID, outfitItemTransmogInfoList[slotID].appearanceID, slotID) then
+						return false;
+					end
 				end
+				
 			end
 		end
-		return true;
 
+		return true;
 	end
 end
 
@@ -502,7 +520,6 @@ function BetterWardrobeOutfitFrameMixin:Update()
 		if outfit then
 			local button = GetButton(self, i + 1)
 			button:Show()
-			print(self.dropDown.selectedOutfitID)
 			if (outfit.outfitID == self.dropDown.selectedOutfitID) then
 				button.Check:Show()
 				button.Selection:Show()
@@ -515,7 +532,7 @@ function BetterWardrobeOutfitFrameMixin:Update()
 			button.Icon:SetTexture(outfit.icon)
 			button.outfitID = outfit.outfitID
 
-			if outfit.set == "mogit" then 
+			if outfit.set == "mogit" or outfit.set == "transmog_outfits" then 
 				button.EditButton:Disable()
 				button.EditButton.texture:Hide()
 			else
@@ -567,12 +584,9 @@ function BetterWardrobeOutfitFrameMixin:NewOutfit(name)
 			local itemID = sourceInfo.itemID
 			local itemMod = sourceInfo.itemModID
 			local sourceID = sourceInfo.sourceID
-			----print(invSlot)
 			itemData[i] = {"'"..itemID..":"..itemMod.."'", sourceID, appearanceID}
 		end
 	end
-
-
 
 	--[[local sources = {}
 			for i, data in pairs(self.itemTransmogInfoList) do
@@ -739,7 +753,6 @@ function BetterWardrobeOutfitFrameMixin:ContinueWithSave()
 					local itemID = sourceInfo.itemID
 					local itemMod = sourceInfo.itemModID
 					local sourceID = sourceInfo.sourceID
-					----print(invSlot)
 					itemData[i] = {"'"..itemID..":"..itemMod.."'", sourceID, appearanceID}
 				end
 			end
