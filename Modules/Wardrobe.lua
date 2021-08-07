@@ -6813,35 +6813,36 @@ function BetterWardrobeSetsTransmogMixin:LoadSet(setID)
 			mainHanEnchant = setData.mainHanEnchant or 0
 			offHandEnchant = setData.offHandEnchant or 0
 
-			for slotID, slotData in pairs(setData.itemData) do
-				local sourceID = slotData[2];
-				local sourceInfo = C_TransmogCollection.GetSourceInfo(sourceID);
-				if sourceInfo then 
+			if setData.itemData then 
+				for slotID, slotData in pairs(setData.itemData) do
+					local sourceID = slotData[2];
+					local sourceInfo = C_TransmogCollection.GetSourceInfo(sourceID);
+					if sourceInfo then 
 
-					local appearanceID = slotData[3]
-					local slot = C_Transmog.GetSlotForInventoryType(sourceInfo.invType);
-					if slot then 
-						local sources = sourceInfo and C_TransmogCollection.GetAppearanceSources(sourceInfo.visualID)
+						local appearanceID = slotData[3]
+						local slot = C_Transmog.GetSlotForInventoryType(sourceInfo.invType);
+						if slot then 
+							local sources = sourceInfo and C_TransmogCollection.GetAppearanceSources(sourceInfo.visualID)
 
-						if sources and #sources > 0  then 
-							CollectionWardrobeUtil.SortSources(sources, sourceInfo.visualID);
-							local index = CollectionWardrobeUtil.GetDefaultSourceIndex(sources, sourceID);
-							transmogSources[slot] = sources[index].sourceID;
+							if sources and #sources > 0  then 
+								CollectionWardrobeUtil.SortSources(sources, sourceInfo.visualID);
+								local index = CollectionWardrobeUtil.GetDefaultSourceIndex(sources, sourceID);
+								transmogSources[slot] = sources[index].sourceID;
 
-							for i, slotSourceInfo in ipairs(sources) do
-								if ( not slotSourceInfo.name ) then
-									waitingOnData = true;
+								for i, slotSourceInfo in ipairs(sources) do
+									if ( not slotSourceInfo.name ) then
+										waitingOnData = true;
+									end
 								end
 							end
 						end
 					end
 				end
-			end
 
-			if setData.itemData then 
-				for slotID, data in pairs(setData.itemData) do
+			
+				--for slotID, data in pairs(setData.itemData) do
 					--transmogSources[slotID] = data[2];
-				end
+				--end
 			end
 		end
 

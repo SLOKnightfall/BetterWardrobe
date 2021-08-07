@@ -460,19 +460,21 @@ end
 
 
 function addon.C_TransmogCollection.GetOutfitItemTransmogInfoList(setID)
-	local  setData = addon.GetSetInfo(setID)
+
+
+
+	local setData = addon.GetSetInfo(setID)
 	local itemTransmogInfoList = {}
 	local offShoulder = setData.offShoulder or 0
 	local mainHandEnchant = setData.mainHandEnchant or 0
 	local offHandEnchant = setData.offHandEnchant or 0
+	local itemData = setData.itemData or {}
 
 
 	for i = 1, 19 do
-
-
 	--for slotID, data in pairs(setData.itemData) do
 		local itemTransmogInfo
-		local data = setData.itemData[i]
+		local data = itemData[i]
 		if i == 3 then
 			itemTransmogInfo = ItemUtil.CreateItemTransmogInfo((data and data[2]) or 0, offShoulder, 0)
 		elseif i == 16 then
