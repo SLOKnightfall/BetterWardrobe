@@ -21,6 +21,7 @@ local L = LibStub("AceLocale-3.0"):GetLocale(addonName)
 local Wishlist = mog:GetModule("Wishlist")
 
 local function SetHooks()
+	if addon:IsHooked(Wishlist, "DeleteSet") then return end
 	addon:SecureHook(Wishlist, "DeleteSet", function(self)  addon:SendMessage("BW_TRANSMOG_COLLECTION_UPDATED") end)
 	addon:SecureHook(Wishlist, "RenameSet", function(self) addon:SendMessage("BW_TRANSMOG_COLLECTION_UPDATED") end)
 	addon:SecureHook(Wishlist, "CreateSet", function(self) addon:SendMessage("BW_TRANSMOG_COLLECTION_UPDATED") end)
