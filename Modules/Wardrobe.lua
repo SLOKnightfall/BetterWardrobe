@@ -1199,6 +1199,8 @@ function BetterWardrobeCollectionFrameMixin:SetTab(tabID)
 	self.SetsCollectionFrame:Hide();
 	self.SetsTransmogFrame:Hide();
 
+	BetterWardrobeSetsCollectionVariantSetsButton:SetShown(tabID == TAB_SETS)
+
 	BW_SortDropDown:ClearAllPoints();
 	BW_SortDropDown:SetPoint("TOPRIGHT", BetterWardrobeCollectionFrame.ItemsCollectionFrame, "TOPRIGHT",-30, -10)
 
