@@ -494,7 +494,9 @@ do
 
 local MAX_DEFAULT_OUTFITS = C_TransmogCollection.GetNumMaxOutfits()
 
-
+function addon:GetBlizzID(outfitID)
+	return outfitID - 5000
+end
 
 function addon.GetOutfits(character)
 	local name = UnitName("player")

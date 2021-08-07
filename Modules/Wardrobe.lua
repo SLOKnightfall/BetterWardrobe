@@ -599,15 +599,15 @@ function BetterWardrobeOutfitMixin:OnOutfitApplied(outfitID)
 	addon.OutfitDB.char.lastTransmogOutfitIDSpec = addon.OutfitDB.char.lastTransmogOutfitIDSpec or {}
 
 	if addon.IsDefaultSet(outfitID) then
-		local value = outfitID - 5000 or "";
+		local value = addon:GetBlizzID(outfitID) or "";
 		if GetCVarBool("transmogCurrentSpecOnly") then
 			local specIndex = GetSpecialization();
 			SetCVar("lastTransmogOutfitIDSpec"..specIndex, value);
-			addon.OutfitDB.char.lastTransmogOutfitIDSpec[specIndex] =  ""
+			addon.OutfitDB.char.lastTransmogOutfitIDSpec[specIndex] =  outfitID
 		else
 			for specIndex = 1, GetNumSpecializations() do
 				SetCVar("lastTransmogOutfitIDSpec"..specIndex, value);
-				addon.OutfitDB.char.lastTransmogOutfitIDSpec[specIndex] =  ""
+				addon.OutfitDB.char.lastTransmogOutfitIDSpec[specIndex] = outfitID
 			end
 		end
 	else
@@ -629,7 +629,7 @@ function BetterWardrobeOutfitMixin:LoadOutfit(outfitID)
 		return;
 	end
 	--if addon.IsDefaultSet(outfitID) then
-		--C_Transmog.LoadOutfit(outfitID - 5000)
+		--C_Transmog.LoadOutfit(addon:GetBlizzID(outfitID))
 	--else
 		BetterWardrobeCollectionFrame.SetsTransmogFrame:LoadSet(outfitID)
 	--end
@@ -657,7 +657,7 @@ function BetterWardrobeOutfitMixin:OnSelectOutfit(outfitID)
 	if addon.IsDefaultSet(outfitID) then
 
 		-- outfitID can be 0, so use empty string for none
-		local value = outfitID - 5000 or "";
+		local value = addon:GetBlizzID(outfitID) or "";
 		for specIndex = 1, GetNumSpecializations() do
 			if GetCVar("lastTransmogOutfitIDSpec"..specIndex) == "" then
 				SetCVar("lastTransmogOutfitIDSpec"..specIndex, value);
@@ -677,7 +677,6 @@ end
 
 --TODO U{PDATE}
 function BetterWardrobeOutfitMixin:GetLastOutfitID()
-
 	local specIndex = GetSpecialization();
 	--if not specIndex then return end
 	--if addon.OutfitDB.char.lastTransmogOutfitIDSpec[specIndex] then 
@@ -5314,7 +5313,7 @@ function BetterWardrobeSetsCollectionMixin:DisplaySet(setID)
 	end
 
 	--Check for secondary Shoulder
-	local setTransmogInfo = C_TransmogCollection.GetOutfitItemTransmogInfoList(setID - 5000) or {}
+	local setTransmogInfo = C_TransmogCollection.GetOutfitItemTransmogInfoList(addon:GetBlizzID(setID)) or {}
 	if setTransmogInfo and setTransmogInfo[3] and setTransmogInfo[3].secondaryAppearanceID ~= 0 then
 		local itemTransmogInfo = ItemUtil.CreateItemTransmogInfo(setTransmogInfo[3].appearanceID, setTransmogInfo[3].secondaryAppearanceID, 0)
 		self.Model:SetItemTransmogInfo(itemTransmogInfo, 3, false) 
@@ -5400,7 +5399,7 @@ function BetterWardrobeSetsCollectionMixin:DisplaySavedSet(setID)
 
 	if setType == "SavedBlizzard" then
 		--(setID and addon.GetSetInfo(setID)) or nil
-		local sources  = C_TransmogCollection.GetOutfitItemTransmogInfoList(setID - 5000)
+		local sources  = C_TransmogCollection.GetOutfitItemTransmogInfoList(addon:GetBlizzID(setID))
 		for slotID, itemTransmogInfo in ipairs(sources) do
 			if itemTransmogInfo.appearanceID ~= 0 then 
 				if slotID == 3 and not mainShoulder then
@@ -6588,7 +6587,7 @@ function BetterWardrobeSetsTransmogMixin:UpdateSets()
 				local setType =  addon.GetSetType(set.setID)
 				model:Show();
 				if setType == "SavedBlizzard" then 
-					local sources  = C_TransmogCollection.GetOutfitItemTransmogInfoList(set.setID - 5000)
+					local sources  = C_TransmogCollection.GetOutfitItemTransmogInfoList(addon:GetBlizzID(set.setID))
 					model:Undress()
 					for slotID, itemTransmogInfo in ipairs(sources) do
 						local canRecurse = false
@@ -6779,7 +6778,7 @@ function BetterWardrobeSetsTransmogMixin:LoadSet(setID)
 				end
 			end
 		end
-		C_Transmog.LoadOutfit(setID - 5000)
+		C_Transmog.LoadOutfit(addon:GetBlizzID(setID))
 	else
 		if (not setType) or setType == "BlizzardSet"  then
 			local setID = setID
