@@ -1097,6 +1097,7 @@ local function UpdateDB_8_4()
 	local listDB = BetterWardrobe_ListData
 	local favoriteDB = listDB.favoritesDB or {}
 	local hiddenDB = listDB.HiddenAppearanceDB or {}
+	if not favoriteDB.profiles then BetterWardrobe_Updates["8_4"] = true; return end
 		for profile, data in pairs(favoriteDB.profiles) do
 			local extraSets = {}
 			if data.extraset then 
