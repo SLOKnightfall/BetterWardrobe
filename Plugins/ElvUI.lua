@@ -511,4 +511,4 @@ end
 
 S:AddCallbackForAddon('BetterWardrobe')
 E:RegisterModule(MyPlugin:GetName())  --Register the module with ElvUI. ElvUI will now call MyPlugin:Initialize() when ElvUI is ready to load our plugin.
-addon:RegisterMessage("BW_ADDON_LOADED", function() UpdateFrames() end)
+--addon:RegisterMessage("BW_ADDON_LOADED", function() UpdateFrames() end)
