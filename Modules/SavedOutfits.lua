@@ -510,7 +510,7 @@ function BetterWardrobeOutfitFrameMixin:Update()
 	local outfits = addon.GetOutfits(true)
 	----local mogit_Outfits = addon.GetMogitOutfits()
 	local buttons = self.Buttons;
-	local numButtons = 0;
+	local numButtons = 1;
 	local stringWidth = 0;
 	local minStringWidth = self.dropDown.minMenuStringWidth or OUTFIT_FRAME_MIN_STRING_WIDTH;
 	local maxStringWidth = self.dropDown.maxMenuStringWidth or OUTFIT_FRAME_MAX_STRING_WIDTH;
