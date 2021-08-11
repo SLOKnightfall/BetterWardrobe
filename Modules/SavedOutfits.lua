@@ -617,7 +617,9 @@ function BetterWardrobeOutfitFrameMixin:NewOutfit(name)
 		self.popupDropDown:OnOutfitSaved(outfitID);
 	end
 
-	addon.setdb.global.sets[addon.setdb:GetCurrentProfile()] = addon.GetSavedList()
+	--addon.setdb.global.sets[addon.setdb:GetCurrentProfile()] = addon.GetSavedList()
+	addon.setdb.global.sets[addon.setdb:GetCurrentProfile()] = addon.StoreBlizzardSets()
+
 
 end
 
@@ -649,7 +651,9 @@ function BetterWardrobeOutfitFrameMixin:DeleteOutfit(outfitID)
 		end
 	end]]
 
-	addon.setdb.global.sets[addon.setdb:GetCurrentProfile()] = addon.GetSavedList()
+	--addon.setdb.global.sets[addon.setdb:GetCurrentProfile()] = addon.GetSavedList()
+	addon.setdb.global.sets[addon.setdb:GetCurrentProfile()] = addon.StoreBlizzardSets()
+
 	addon:SendMessage("BW_TRANSMOG_COLLECTION_UPDATED")
 end
 

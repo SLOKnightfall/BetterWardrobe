@@ -169,8 +169,8 @@ do
 					end
 
 					--local baseItem = setData.items[1]
-----local visualID, sourceID = addon.GetItemSource(baseItem)
-----setData.itemAppearance = addon.ItemAppearance[visualID]
+					----local visualID, sourceID = addon.GetItemSource(baseItem)
+					----setData.itemAppearance = addon.ItemAppearance[visualID]
 					setData.armorType = armorType
 					setData.setType = "ExtraSet"
 
@@ -498,6 +498,56 @@ function addon:GetBlizzID(outfitID)
 	return outfitID - 5000
 end
 
+
+
+local profileCache = {}
+
+local function loadAltsSavedSets(profile)
+	if not addon.setdb.global.sets[profile] then return {} end
+
+	if not profileCache[profile] then 
+		local FullList = CopyTable(addon.setdb.global.sets[profile])
+
+		--FullList = addon.setdb.global.sets[addon.SelecteSavedList]
+		for i, data in ipairs(FullList) do
+			data.setType = "SavedExtra"
+			data.outfitID = data.outfitID + 5000
+			data.label = L["Saved Set"]
+
+			if data.sources  then
+				for index, sourceID in pairs(data.sources) do 
+					local sourceInfo = C_TransmogCollection.GetSourceInfo(sourceID)
+
+					if sourceInfo and sourceInfo.invType then  
+						local appearanceID = sourceInfo.visualID
+						local itemID = sourceInfo.itemID
+						local itemMod = sourceInfo.itemModID
+						local sourceID = sourceInfo.sourceID
+						data.itemData = data.itemData or {} 
+						data.itemData[index] = {"'"..itemID..":"..itemMod.."'", sourceID, appearanceID}
+					end
+				end
+			end
+		end
+
+
+		if addon.OutfitDB.sv.char[profile] and addon.OutfitDB.sv.char[profile].outfits  then 
+			local extendeSets = CopyTable(addon.OutfitDB.sv.char[profile].outfits)
+
+			if extendeSets then 
+				for i, data in ipairs(extendeSets) do
+					tinsert(FullList, data)
+				end
+			end
+		end
+
+		profileCache[profile] =  FullList
+	end
+
+	return profileCache[profile]
+
+end
+
 function addon.GetOutfits(character)
 	local name = UnitName("player")
 	local realm = GetRealmName()
@@ -505,13 +555,7 @@ function addon.GetOutfits(character)
 	local FullList = {}
 	local savedOutfits
 	if addon.SelecteSavedList and not character then 
-		FullList = addon.setdb.global.sets[addon.SelecteSavedList]
-		for i, data in ipairs(FullList) do
-			data.setType = "SavedExtra"
-			data.index = i
-			data.label = L["Extended Saved Set"]
-		end
-
+		FullList = loadAltsSavedSets(profile)
 	else
 		--Blizzard Sets
 		local outfits = C_TransmogCollection.GetOutfits();
@@ -618,7 +662,6 @@ function addon.GetOutfits(character)
 	local mogit_Outfits = addon.MogIt.GetMogitOutfits()
 	if mogit_Outfits then 
 		for i, data in ipairs(mogit_Outfits) do
-			--local index = #FullList
 			tinsert(FullList, data)
 		end
 	end
@@ -627,14 +670,6 @@ function addon.GetOutfits(character)
 	local transmogOutfits_Sets = addon.TransmogOutfits.GetOutfits()
 	if transmogOutfits_Sets then 
 		for i, data in ipairs(transmogOutfits_Sets) do
-
-		--[[for sourceID, _ in pairs(data.sources) do
-							if sourceID and sourceID ~= 0  then 
-								local sourceInfo =  C_TransmogCollection.GetSourceInfo(sourceID)
-								data.sources[sourceID] = sourceInfo.visualID
-							end
-						end]]
-			--local index = #FullList
 			tinsert(FullList, data)
 		end
 	end
@@ -665,6 +700,33 @@ function addon.GetSetType(outfitID)
 	--local MAX_DEFAULT_OUTFITS = C_TransmogCollection.GetNumMaxOutfits()
 	----return outfitID < MAX_DEFAULT_OUTFITS  -- #C_TransmogCollection.GetOutfits()--MAX_DEFAULT_OUTFITS 
 end
+
+
+
+function addon.StoreBlizzardSets()
+	local BlizzardSavedSets = {}
+	local outfits = C_TransmogCollection.GetOutfits();
+	for i, outfitID in ipairs(outfits) do
+		local data = {}
+		local name, icon = C_TransmogCollection.GetOutfitInfo(outfitID);
+		data.index = i
+		data.outfitID = outfitID
+		data.name = name
+		data.icon = icon
+
+		local outfitItemTransmogInfoList = C_TransmogCollection.GetOutfitItemTransmogInfoList(outfitID);
+		data.sources = {}
+		for i, list_data in pairs(outfitItemTransmogInfoList) do
+			data.sources[i] = list_data.appearanceID or 0
+		end
+		tinsert(BlizzardSavedSets, data)
+	end
+
+	addon.setdb.global.sets[addon.setdb:GetCurrentProfile()] = BlizzardSavedSets
+	return BlizzardSavedSets
+end
+
+
 
 	function addon.GetSavedList()
 		--if not addon.savedSetCache then 

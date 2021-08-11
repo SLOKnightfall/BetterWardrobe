@@ -628,11 +628,7 @@ function BetterWardrobeOutfitMixin:LoadOutfit(outfitID)
 	if ( not outfitID ) then
 		return;
 	end
-	--if addon.IsDefaultSet(outfitID) then
-		--C_Transmog.LoadOutfit(addon:GetBlizzID(outfitID))
-	--else
-		BetterWardrobeCollectionFrame.SetsTransmogFrame:LoadSet(outfitID)
-	--end
+	addon.C_Transmog.LoadOutfit(outfitID)
 end
 
 
@@ -3445,7 +3441,7 @@ function BetterWardrobeCollectionFrameModelDropDown_SetFavorite(visualID, value,
 	if ( set and not confirmed ) then
 		local allSourcesConditional = true;
 		local collected = false
-		local sources = C_TransmogCollection.GetAppearanceSources(44770);
+		local sources = C_TransmogCollection.GetAppearanceSources(visualID);
 		for i, sourceInfo in ipairs(sources) do
 			local info = C_TransmogCollection.GetAppearanceInfoBySource(sourceInfo.sourceID);
 			if info.isCollected then 
@@ -4368,17 +4364,12 @@ end
 	return not filtered
 end
 
-
-local buildingSets = false
 function BetterWardrobeSetsDataProviderMixin:GetBaseSets(filter)
-	buildingSets = false
 	local filteredSets = {}
 	local useBaseSet = not WardrobeFrame_IsAtTransmogrifier()
 	local atTransmogrifier = C_Transmog.IsAtTransmogNPC()
 	local searchString = string.lower(WardrobeCollectionFrameSearchBox:GetText())
 	local basesets = {}
-
-
 
 	if 	BetterWardrobeCollectionFrame:CheckTab(2) then
 		basesets = self.baseSets
@@ -4421,14 +4412,8 @@ function BetterWardrobeSetsDataProviderMixin:GetBaseSets(filter)
 		return self.baseSavedSets
 	end
 
-
-
-
-
-	buildingSets = false
 	return {}
 end
-
 
 function BetterWardrobeSetsDataProviderMixin:GetBaseSetByID(baseSetID)
 	local baseSets = self:GetBaseSets();
@@ -4440,12 +4425,9 @@ function BetterWardrobeSetsDataProviderMixin:GetBaseSetByID(baseSetID)
 	return nil, nil;
 end
 
-
-
 local buildUseable = false
 function BetterWardrobeSetsDataProviderMixin:GetUsableSets(incVariants)
 	
-		buildUseable = true
 		local atTransmogrifier = WardrobeFrame_IsAtTransmogrifier()
 		local setIDS = {}
 		local Profile = addon.Profile
@@ -4512,7 +4494,6 @@ function BetterWardrobeSetsDataProviderMixin:GetUsableSets(incVariants)
 
 			end
 			
-			buildUseable = false
 			return self.usableSets;
 
 		elseif BetterWardrobeCollectionFrame:CheckTab(3) then
@@ -4556,7 +4537,6 @@ function BetterWardrobeSetsDataProviderMixin:GetUsableSets(incVariants)
 			end
 				
 			
-			buildUseable = false
 			return self.usableExtraSets;
 		elseif BetterWardrobeCollectionFrame:CheckTab(4) then
 			if ( not self.usableSavedSets ) then
@@ -4564,7 +4544,6 @@ function BetterWardrobeSetsDataProviderMixin:GetUsableSets(incVariants)
 				self:SortSets(self.usableSavedSets)
 			end
 			
-			buildUseable = false
 			return self.usableSavedSets;
 		end
 		return {}

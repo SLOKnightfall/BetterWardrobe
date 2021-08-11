@@ -870,11 +870,12 @@ local savedOutfits_options = {
 
 function addon.RefreshOutfitData()
 	local function RemoveCharacterData(name)
-	addon.setdb.global.sets[name] = nil
+		addon.setdb.global.sets[name] = nil
 
-	addon.RefreshOutfitData()
-	--addon.RefreshSaveOutfitDropdown()
+		addon.RefreshOutfitData()
+		--addon.RefreshSaveOutfitDropdown()
 	end
+
 	local args = {} 
 	local i = 1
 	for name, data in pairs(addon.setdb.global.sets) do
@@ -1285,7 +1286,8 @@ function addon:OnEnable()
 	end
 
 	addon:RegisterEvent("PLAYER_ENTERING_WORLD", "EventHandler")
-
+	--Cache any default Blizz Saved Sets
+	addon.StoreBlizzardSets()
 	inizliaed = true
 end
 

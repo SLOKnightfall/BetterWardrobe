@@ -50,9 +50,25 @@ local function DetermineSetType(setID)
 end
 addon.DetermineSetType = DetermineSetType
 
+addon.C_Transmog = {}
+
+
+function addon.C_Transmog.LoadOutfit()
+	--if addon.IsDefaultSet(outfitID) then
+		--C_Transmog.LoadOutfit(addon:GetBlizzID(outfitID))
+	--else
+		BetterWardrobeCollectionFrame.SetsTransmogFrame:LoadSet(outfitID)
+	--end
+end
+
+
+
+
+
 
 addon.C_TransmogSets = {}
 addon.C_TransmogCollection = {}	
+
 
 --C_TransmogSets.GetSetPrimaryAppearances(setID);
 --[[	Name = "GetSetPrimaryAppearances",
