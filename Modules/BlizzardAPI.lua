@@ -194,8 +194,13 @@ function addon.C_TransmogSets.GetBaseSetID(setID)
 end
 
 
+local SourceDB = {}
+function addon.ClearSourceDB()
+	wipe(SourceDB)
+end
+
 function addon.C_TransmogSets.GetSetSources(setID)
-	--if SourceDB[setID] then return SourceDB[setID] end
+	if SourceDB[setID] then return SourceDB[setID][1], SourceDB[setID][2] end
 
 	local setInfo = addon.GetSetInfo(setID)
 	local SetType = setInfo and setInfo.setType
@@ -237,6 +242,7 @@ function addon.C_TransmogSets.GetSetSources(setID)
 				end
 			end
  		end
+		SourceDB[setID] = {setSources, unavailable}
 
 		return setSources, unavailable
 
@@ -260,8 +266,29 @@ function addon.C_TransmogSets.GetSetSources(setID)
 						WardrobeCollectionFrame_SortSources(sources)
 					end
 					setSources[sources[1].sourceID] = sources[1].isCollected--and sourceInfo.isCollected
-				elseif sourceID then 
-					--setSources[sourceID] = false
+				else
+
+					local allSources = C_TransmogCollection.GetAllAppearanceSources(appearanceID)
+					local list = {}
+					for _, sourceID in ipairs(allSources) do
+		
+						local info = C_TransmogCollection.GetSourceInfo(sourceID)
+						if (info and not info.sourceType) and not setInfo.sourceType then 
+							unavailable = true
+						end
+
+						local isCollected = select(5,C_TransmogCollection.GetAppearanceSourceInfo(sourceID))
+						info.isCollected = isCollected
+						tinsert(list, info)
+					end
+
+					if #list >= 1 then
+						WardrobeCollectionFrame_SortSources(list)
+						setSources[list[1].sourceID or sourceID ] = list[1].isCollected or false
+						if not list[1].sourceType and not setInfo.sourceType then 
+							unavailable = true
+						end
+					end
 				end
 			end
 		end
@@ -279,6 +306,8 @@ function addon.C_TransmogSets.GetSetSources(setID)
 			end
 
 	end
+		SourceDB[setID] = {setSources, unavailable}
+
 		return setSources, unavailable
 
 	end

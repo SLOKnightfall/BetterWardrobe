@@ -173,6 +173,10 @@ do
 					----setData.itemAppearance = addon.ItemAppearance[visualID]
 					setData.armorType = armorType
 					setData.setType = "ExtraSet"
+					setData.oldID =	setData.setID
+					local newID = 10000 + id
+
+					setData.setID = newID
 
 					--[[local itemTransmogInfo = {}
 						for item, appearanceID in pairs(setData.sources) do 
@@ -216,7 +220,7 @@ do
 						if appearanceID  then --and setData.sources[item] and setData.sources[item] ~= 0 then 
 							--local appearanceID = setData.sources[item]
 							ItemDB[appearanceID] = ItemDB[appearanceID] or {}
-							ItemDB[appearanceID][id] = setData
+							ItemDB[appearanceID][newID] = setData
 						end
 
 
@@ -281,10 +285,7 @@ do
 					--end
 					setData.uiOrder = UIID_Counter[setData.expansionID] -- id * 100
 					UIID_Counter[setData.expansionID] = UIID_Counter[setData.expansionID] +1
-					setData.oldID =	setData.setID
-					local newID = 10000 + id
 
-					setData.setID = newID
 					SET_INDEX[newID] = setData
 					ArmorDB[armorType][newID] = setData
 				end
@@ -450,12 +451,13 @@ do
 	end
 
 	function addon.Init:BuildAltDB()
+		addon.ClearSourceDB()
 		buildSetSubstitutions()
 		local armorSet = ArmorDB[addon.selectedArmorType]
 		--wipe(SET_INDEX)
-		wipe(ALT_SET_DATA)
-		addArmor(armorSet, ALT_SET_DATA)
-		addArmor(ArmorDB["COSMETIC"], ALT_SET_DATA)
+		wipe(SET_DATA)
+		addArmor(armorSet, SET_DATA)
+		addArmor(ArmorDB["COSMETIC"], SET_DATA)
 		--Add Hidden Set
 		--ALT_SET_INDEX[0] = hiddenSet
 		--tinsert(SET_DATA, hiddenSet)
@@ -511,7 +513,7 @@ local function loadAltsSavedSets(profile)
 		--FullList = addon.setdb.global.sets[addon.SelecteSavedList]
 		for i, data in ipairs(FullList) do
 			data.setType = "SavedExtra"
-			data.outfitID = data.outfitID + 5000
+			data.outfitID = data.outfitID + 50000
 			data.label = L["Saved Set"]
 
 			if data.sources  then
@@ -656,22 +658,24 @@ function addon.GetOutfits(character)
 				--FullList[#FullList].outfitID = MAX_DEFAULT_OUTFITS + i
 			end
 		end
-	end
+	
 
-	--MogIt Sets
-	local mogit_Outfits = addon.MogIt.GetMogitOutfits()
-	if mogit_Outfits then 
-		for i, data in ipairs(mogit_Outfits) do
-			tinsert(FullList, data)
+		--MogIt Sets
+		local mogit_Outfits = addon.MogIt.GetMogitOutfits()
+		if mogit_Outfits then 
+			for i, data in ipairs(mogit_Outfits) do
+				tinsert(FullList, data)
+			end
 		end
-	end
 
-	--TransmogOutfits Sets
-	local transmogOutfits_Sets = addon.TransmogOutfits.GetOutfits()
-	if transmogOutfits_Sets then 
-		for i, data in ipairs(transmogOutfits_Sets) do
-			tinsert(FullList, data)
+		--TransmogOutfits Sets
+		local transmogOutfits_Sets = addon.TransmogOutfits.GetOutfits()
+		if transmogOutfits_Sets then 
+			for i, data in ipairs(transmogOutfits_Sets) do
+				tinsert(FullList, data)
+			end
 		end
+
 	end
 
 	return FullList

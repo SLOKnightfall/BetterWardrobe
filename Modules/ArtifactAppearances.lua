@@ -286,7 +286,6 @@ end
 
 
 function addon.SetArtifactAppearanceTooltip(contentFrame, sourceInfo, sourceID)
-	print(sourceID)
 	BetterWardrobeCollectionFrame.tooltipContentFrame = contentFrame;
 	BetterWardrobeCollectionFrame.tooltipSourceIndex = 1
 	--local sourceInfo = frame.visualInfo --visualIDIndex[frame.visualInfo.visualID] 

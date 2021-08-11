@@ -1331,6 +1331,7 @@ function BetterWardrobeCollectionFrameMixin:OnEvent(event, ...)
 		self:RefreshCameras();
 
 	elseif (event == "TRANSMOG_COLLECTION_SOURCE_ADDED") then
+		addon.ClearSourceDB()
 		if not addon.Profile.ShowCollectionUpdates then return end
 		local sourceID = ...
 		local categoryID, visualID, canEnchant, icon, isCollected, itemLink, transmogLink, _ = C_TransmogCollection.GetAppearanceSourceInfo(sourceID)
@@ -1375,6 +1376,7 @@ function BetterWardrobeCollectionFrameMixin:OnEvent(event, ...)
 		addon:SendMessage("BW_TRANSMOG_COLLECTION_UPDATED")
 
 	elseif (event == "TRANSMOG_COLLECTION_SOURCE_REMOVED") then
+		addon.ClearSourceDB()
 		local sourceID = ...
 		local categoryID, visualID, canEnchant, icon, isCollected, itemLink, transmogLink, _ = C_TransmogCollection.GetAppearanceSourceInfo(sourceID)
 		local setItem = addon.IsSetItem(itemLink)
@@ -4387,9 +4389,10 @@ function BetterWardrobeSetsDataProviderMixin:GetBaseSets(filter)
 
 	elseif 	BetterWardrobeCollectionFrame:CheckTab(3) then
 		basesets = self.baseExtraSets
-		if not self.baseExtraSets then 
+		--if not self.baseExtraSets then 
 			if addon.useAltSet then
-				self.baseExtraSets = addon.GetAltList()
+				addon.refreshData = true
+				self.baseExtraSets = addon.GetBaseList()
 			else
 				self.baseExtraSets = addon.GetBaseList()
 			end
@@ -4398,7 +4401,7 @@ function BetterWardrobeSetsDataProviderMixin:GetBaseSets(filter)
 				self.baseExtraSets = addon:FilterSets(self.baseExtraSets)
 			--end
 			self:SortSets(self.baseExtraSets);
-		end
+		--ZSend
 
 		return self.baseExtraSets
 
