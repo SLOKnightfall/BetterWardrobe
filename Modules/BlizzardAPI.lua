@@ -458,7 +458,8 @@ function addon:FilterSets(setList, setType)
 		local expansion = data.expansionID
 		local sourcefilter = (BetterWardrobeCollectionFrame:CheckTab(3) and filterSelection[data.filter])
 		local unavailableFilter = (not unavailable or (addon.Profile.HideUnavalableSets and unavailable))
-
+		local duplicate = C_TransmogSets.GetBaseSetID(data.setID) == data.setID and not addon.GetSetInfo(data.setID).hiddenUntilCollected and not addon.GetSetInfo(data.setID).collected
+		--print(data.setID)
 
 		if BetterWardrobeCollectionFrame:CheckTab(2) then
 			expansion = expansion + 1
@@ -470,6 +471,7 @@ function addon:FilterSets(setList, setType)
 		if  ((filterCollected[1] and collected) or (filterCollected[2] and not collected)) and
 			CheckMissingLocation(data) and
 			xpacSelection[expansion] and
+			not duplicate and
 			sourcefilter then
 			--(not unavailable or (addon.Profile.HideUnavalableSets and unavailable)) then ----and
 			tinsert(FilterSets, data)
