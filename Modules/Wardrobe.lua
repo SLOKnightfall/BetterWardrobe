@@ -5260,7 +5260,7 @@ function BetterWardrobeSetsCollectionMixin:DisplaySet(setID)
 
 			--itemFrame.Icon:SetColorTexture(0,0,0,.5)
 		----end
-
+		itemFrame.itemCollectionStatus = nil
 		if ( sortedSources[i].collected ) then
 			if not sortedSources[i].characterUseable then
 				if sortedSources[i].characterCollectable then
@@ -5526,12 +5526,14 @@ function BetterWardrobeSetsCollectionMixin:SetItemFrameQuality(itemFrame)
 end
 
 function BetterWardrobeSetsCollectionMixin:SetItemUseability(itemFrame)
+	itemFrame.CanUse:Hide()
 	local itemCollectionStatus = itemFrame.itemCollectionStatus
 	if itemCollectionStatus == "CollectedCharCantUse" then
 		itemFrame.CanUse:Show()
 		--itemFrame.Icon:SetDesaturated(false);
 		itemFrame.CanUse.Icon:SetDesaturation(0);
 		itemFrame.CanUse.Icon:SetVertexColor(1,0.8,0);
+
 		itemFrame.CanUse.Icon:SetAtlas("PlayerRaidBlip");		
 		--itemFrame.Icon:SetAlpha(0.6);
 		itemFrame.CanUse.Icon:SetAlpha(0.5);

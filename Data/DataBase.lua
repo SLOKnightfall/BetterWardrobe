@@ -93,7 +93,10 @@ function BuildBlizzSets()
 
 				local baseSet = C_TransmogSets.GetBaseSetID(data.setID)
 				--Create Bizzard sets not being shown on sets tab
-				--if baseSet == data.setID and not BlizzardBaseSets[data.setID] then 
+				data.duplicate = true
+				if not BlizzardBaseSets[baseSet]  or (BlizzardBaseSets[baseSet] and data.hiddenUntilCollected and not data.collected) then 
+					data.duplicate = false
+				end
 					if isPVP(data.setID) then data.PvP = true end
 					WowSets[Globals.ARMOR_TYPE[armor]][data.setID] = data
 					--break
@@ -324,7 +327,7 @@ do
 			ArmorDB[armorType] = ArmorDB[armorType] or {}
 			for id, setData in pairs(data) do
 
-				--if  ( C_TransmogSets.GetBaseSetID(id) == id and setData.hiddenUntilCollected) then
+			if  ( not setData.duplicate) then --(C_TransmogSets.GetBaseSetID(id) == id and setData.hiddenUntilCollected and not setData.collected)) then
 					if (setData.requiredFaction and setData.requiredFaction == playerFaction) or setData.requiredFaction == nil then 
 						--setData.name = "BL-" .. setData.name.." - "..(setData.description or "")
 						if not setData.nameUpdate and setData.description then 
@@ -392,7 +395,7 @@ do
 						SET_INDEX[setData.setID] = setData
 						ArmorDB[armorType][setData.setID] = setData
 					end
-				--end
+				end
 			end
 		end
 	end
