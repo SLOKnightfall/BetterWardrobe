@@ -503,6 +503,7 @@ end
 
 
 local profileCache = {}
+local savedSetID = 50000
 
 local function loadAltsSavedSets(profile)
 	if not addon.setdb.global.sets[profile] then return {} end
@@ -513,7 +514,8 @@ local function loadAltsSavedSets(profile)
 		--FullList = addon.setdb.global.sets[addon.SelecteSavedList]
 		for i, data in ipairs(FullList) do
 			data.setType = "SavedExtra"
-			data.outfitID = data.outfitID + 50000
+			savedSetID = savedSetID + 1
+			data.outfitID = savedSetID
 			data.label = L["Saved Set"]
 
 			if data.sources  then
