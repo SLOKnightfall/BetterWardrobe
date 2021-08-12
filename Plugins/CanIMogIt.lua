@@ -30,8 +30,8 @@ local function CIMI_AddToFrameSets(parentFrame)
             	local have, total = addon.GetSetSourceCounts(parentFrame.setID)
    				local ratioText = CanIMogIt:_GetRatioTextColor(have, total)
     			ratioText = ratioText ..  have .. "/" .. total
-                frame.CanIMogItSetText:SetShown(WardrobeCollectionFrame.selectedCollectionTab == 2 or WardrobeCollectionFrame.selectedCollectionTab == 3)
-    			if WardrobeCollectionFrame.selectedCollectionTab == 2  then
+                frame.CanIMogItSetText:SetShown(BetterWardrobeCollectionFrame.selectedCollectionTab == 2 or BetterWardrobeCollectionFrame.selectedCollectionTab == 3)
+    			if BetterWardrobeCollectionFrame.selectedCollectionTab == 2  then
                     frame.CanIMogItSetText:SetText(CanIMogIt:GetSetsVariantText(parentFrame.setID) or "")
 
                 else

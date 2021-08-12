@@ -53,7 +53,7 @@ addon.DetermineSetType = DetermineSetType
 addon.C_Transmog = {}
 
 
-function addon.C_Transmog.LoadOutfit()
+function addon.C_Transmog.LoadOutfit(outfitID)
 	--if addon.IsDefaultSet(outfitID) then
 		--C_Transmog.LoadOutfit(addon:GetBlizzID(outfitID))
 	--else
