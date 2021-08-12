@@ -5306,12 +5306,15 @@ function BetterWardrobeSetsCollectionMixin:DisplaySet(setID)
 		self.Model:SetItemTransmogInfo(itemTransmogInfo, 3, false)
 	end
 
-	if setInfo.mainHanEnchant or setInfo.offHandEnchant then 
-			local itemTransmogInfo = ItemUtil.CreateItemTransmogInfo(mainHand, 0, setInfo.mainHanEnchant)
+	if setInfo.mainHandEnchant or setInfo.offHandEnchant then 
+		if mainHand then 
+			local itemTransmogInfo = ItemUtil.CreateItemTransmogInfo(mainHand, 0, setInfo.mainHandEnchant)
 			self.Model:SetItemTransmogInfo(itemTransmogInfo,16, false) 
-
+		end
+		if offHand then 
 			itemTransmogInfo = ItemUtil.CreateItemTransmogInfo(offHand, 0, setInfo.offHandEnchant)
 			self.Model:SetItemTransmogInfo(itemTransmogInfo,17, false) 
+		end
 	elseif  setTransmogInfo and setTransmogInfo[16] or setTransmogInfo[17] then 
 
 		if setTransmogInfo and setTransmogInfo[16] and setTransmogInfo[16].illusionID then
@@ -6735,7 +6738,7 @@ function BetterWardrobeSetsTransmogMixin:LoadSet(setID)
 	local transmogSources = { };
 	local setType = addon.GetSetType(setID)
 	local offShoulder
-	local mainHanEnchant
+	local mainHandEnchant
 	local offHandEnchant
 	local setData
 	--Default Saved sets
@@ -6792,7 +6795,7 @@ function BetterWardrobeSetsTransmogMixin:LoadSet(setID)
 
 			setData = addon.GetSetInfo(setID)
 			offShoulder = setData.offShoulder or 0
-			mainHanEnchant = setData.mainHanEnchant or 0
+			mainHandEnchant = setData.mainHandEnchant or 0
 			offHandEnchant = setData.offHandEnchant or 0
 
 			if setData.itemData then 
@@ -6849,8 +6852,10 @@ function BetterWardrobeSetsTransmogMixin:LoadSet(setID)
 					local secondaryPendingInfo = TransmogUtil.CreateTransmogPendingInfo(Enum.TransmogPendingType.Apply, offShoulder or Constants.Transmog.NoTransmogID);
 					C_Transmog.SetPending(secondaryTransmogLocation, secondaryPendingInfo);
 				else 
-					local pendingInfo = TransmogUtil.CreateTransmogPendingInfo(Enum.TransmogPendingType.ToggleOff);
-					C_Transmog.SetPending(secondaryTransmogLocation, pendingInfo);
+					--	local pendingInfo = TransmogUtil.CreateTransmogPendingInfo(Enum.TransmogPendingType.ToggleOff);
+					--C_Transmog.SetPending(secondaryTransmogLocation, pendingInfo);
+					C_Transmog.ClearPending(secondaryTransmogLocation);
+
 				end
 			end
 

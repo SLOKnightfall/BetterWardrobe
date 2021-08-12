@@ -214,14 +214,39 @@ do
 					--setData.sources = setData.sources or {}
 
 
-					for slotID, itemData in ipairs(setData["itemData"]) do
-						local appearanceID = itemData[3]
 
-						if appearanceID  then --and setData.sources[item] and setData.sources[item] ~= 0 then 
-							--local appearanceID = setData.sources[item]
-							ItemDB[appearanceID] = ItemDB[appearanceID] or {}
-							ItemDB[appearanceID][newID] = setData
+					--if not data.itemData then
+					setData.itemData = setData.itemData or {}
+				--Check for data in the main table
+					for slotID = 1, 19 do
+						local sourceID = setData[slotID]
+						if sourceID  and sourceID ~= NO_TRANSMOG_SOURCE_ID and sourceID ~= 0 then 
+							local sourceInfo = C_TransmogCollection.GetSourceInfo(sourceID)
+						 			
+							if sourceInfo and sourceInfo.invType then 
+								local slot = C_Transmog.GetSlotForInventoryType(sourceInfo.invType);
+								local appearanceID = sourceInfo.visualID
+								local itemID = sourceInfo.itemID
+								local itemMod = sourceInfo.itemModID
+								setData.itemData = setData.itemData or {}
+								setData.itemData[slot] = {"'"..itemID..":"..itemMod.."'", sourceID, appearanceID}
+
+
+								if appearanceID  then --and setData.sources[item] and setData.sources[item] ~= 0 then 
+									--local appearanceID = setData.sources[item]
+									ItemDB[appearanceID] = ItemDB[appearanceID] or {}
+									ItemDB[appearanceID][newID] = setData
+								end
+							end
 						end
+					end
+				--end
+
+
+					for slotID, itemData in ipairs(setData["itemData"]) do
+					--	local appearanceID = itemData[3]
+
+
 
 
 
@@ -297,7 +322,7 @@ do
 			ArmorDB[armorType] = ArmorDB[armorType] or {}
 			for id, setData in pairs(data) do
 
-				if C_TransmogSets.GetBaseSetID(id) ~= id then 
+				--if C_TransmogSets.GetBaseSetID(id) ~= id then 
 					if (setData.requiredFaction and setData.requiredFaction == playerFaction) or setData.requiredFaction == nil then 
 						--setData.name = "BL-" .. setData.name.." - "..(setData.description or "")
 						if not setData.nameUpdate then 
@@ -342,7 +367,6 @@ do
 						end]]
 						setData.setType = "BlizzardSet"
 
-
 						setData.hiddenUntilCollected = false
 						setData.armorType = armorType
 						setData.setID  = id
@@ -367,7 +391,7 @@ do
 						SET_INDEX[setData.setID] = setData
 						ArmorDB[armorType][setData.setID] = setData
 					end
-				end
+				--end
 			end
 		end
 	end
@@ -518,6 +542,8 @@ local function loadAltsSavedSets(profile)
 			data.outfitID = savedSetID
 			data.label = L["Saved Set"]
 
+
+
 			if data.sources  then
 				for index, sourceID in pairs(data.sources) do 
 					local sourceInfo = C_TransmogCollection.GetSourceInfo(sourceID)
@@ -579,89 +605,99 @@ function addon.GetOutfits(character)
 	--Extended Sets
 		if addon.OutfitDB.char.outfits then 
 			for i, data in ipairs(addon.OutfitDB.char.outfits) do
-
 				data.outfitID = MAX_DEFAULT_OUTFITS + i + 5000
-				data.setType = "SavedExtra"
 				data.index = i
 				data.name = addon.OutfitDB.char.outfits[i].name
-				data.label = L["Extended Saved Set"]
 				local sourceInfo
 
-				--convert to new data tables
-				if data.sources and (not data.itemData or #data.itemData == 0)  then
-					for item_data, source_data in pairs(data.sources) do 
-						--print(source_data)
-						--itemlink, appearance pairs
-						if string.find(item_data, "item:") then 
-							local _, sourceID = C_TransmogCollection.GetItemInfo(item_data)
-							sourceInfo = C_TransmogCollection.GetSourceInfo(sourceID)
+				--data.itemData should hold the most current set data
+				if data.itemData and #data.itemData ~= 0 then
+					for i=1, 19 do
+						local source
+						local setInfo = data.itemData[i]
+						if setInfo then
+							data[i] = setInfo[2]
+						else 
+							data[i] = 0
+						end
+					end
 
-						--itemID, appearance/source pairs.  Checking for both to catch all possible saved types
-						else
-							local appearanceID, sourceID = C_TransmogCollection.GetItemInfo(item_data)
-							if appearanceID and appearanceID == source_data then 
-							elseif appearanceID then 
-								for itemMod = 1, 10 do
-									appearanceID, sourceID = C_TransmogCollection.GetItemInfo(item_data, itemMod)
-									if appearanceID == source_data then 
-										break
+
+				elseif (not data.itemData or #data.itemData == 0) then
+
+					if data.itemTransmogInfoList then
+						for i=1, 19 do
+							local source = (data.itemTransmogInfoList[i] and data.itemTransmogInfoList[i].appearanceID) or 0
+							local illusionID = (data.itemTransmogInfoList[i] and data.itemTransmogInfoList[i].illusionID) or 0
+							local offShoulder = (data.itemTransmogInfoList[i] and data.itemTransmogInfoList[i].secondaryAppearanceID) or 0
+							data[i] = source
+
+							if i == 3 then
+								data.offShoulder = offShoulder
+							elseif i == 16 then
+								data.mainHandEnchant  = illusionID
+							elseif i == 17 then
+								data.offHandEnchant  = illusionID
+							end
+						end
+						data.sources = nil
+						data.itemTransmogInfoList = nil
+						data.items = nil
+
+					elseif data.sources and  #data.sources ~= 0 then
+						for item_data, source_data in pairs(data.sources) do 
+							--print(source_data)
+							--itemlink, appearance pairs
+							if string.find(item_data, "item:") then 
+								local _, sourceID = C_TransmogCollection.GetItemInfo(item_data)
+								sourceInfo = C_TransmogCollection.GetSourceInfo(sourceID)
+
+							--itemID, appearance/source pairs.  Checking for both to catch all possible saved types
+							else
+								local appearanceID, sourceID = C_TransmogCollection.GetItemInfo(item_data)
+								if appearanceID and appearanceID == source_data then 
+								elseif appearanceID then 
+									for itemMod = 1, 10 do
+										appearanceID, sourceID = C_TransmogCollection.GetItemInfo(item_data, itemMod)
+										if appearanceID == source_data then 
+											break
+										end
+									end
+								end
+
+								sourceInfo = sourceID and C_TransmogCollection.GetSourceInfo(sourceID)
+								--value returned info and the itemID matches, so its was an appearanceID
+								if sourceInfo and sourceInfo.itemID == item_data then 
+
+								else
+								--value returned info and the itemID matches, so its was an sourceID
+									sourceInfo = C_TransmogCollection.GetSourceInfo(source_data)
+									if sourceInfo and sourceInfo.itemID == item_data then 
+									else
+										sourceInfo = nil
 									end
 								end
 							end
 
-							sourceInfo = sourceID and C_TransmogCollection.GetSourceInfo(sourceID)
-							--value returned info and the itemID matches, so its was an appearanceID
-							if sourceInfo and sourceInfo.itemID == item_data then 
-
-							else
-							--value returned info and the itemID matches, so its was an sourceID
-								sourceInfo = C_TransmogCollection.GetSourceInfo(source_data)
-								if sourceInfo and sourceInfo.itemID == item_data then 
-								else
-									sourceInfo = nil
-								end
-							end
-						end
-
-						if sourceInfo and sourceInfo.invType then  
-							local slot = C_Transmog.GetSlotForInventoryType(sourceInfo.invType);
-							local appearanceID = sourceInfo.visualID
-							local itemID = sourceInfo.itemID
-							local itemMod = sourceInfo.itemModID
-							local sourceID = sourceInfo.sourceID
-							data.itemData = data.itemData or {} 
-							data.itemData[slot] = {"'"..itemID..":"..itemMod.."'", sourceID, appearanceID}
-						end
-					end
-				end
-
-
-				if not data.itemData then
-
-				--Check for data in the main table
-					for slotID = 1, 19 do
-						local sourceID = data[slotID]
-						if sourceID  and sourceID ~= NO_TRANSMOG_SOURCE_ID and sourceID ~= 0 then 
-							local sourceInfo = C_TransmogCollection.GetSourceInfo(sourceID)
-						 			
-							if sourceInfo and sourceInfo.invType then 
+							if sourceInfo and sourceInfo.invType then  
 								local slot = C_Transmog.GetSlotForInventoryType(sourceInfo.invType);
-								local appearanceID = sourceInfo.visualID
-								local itemID = sourceInfo.itemID
-								local itemMod = sourceInfo.itemModID
-								data.itemData = data.itemData or {}
-								data.itemData[slot] = {"'"..itemID..":"..itemMod.."'", sourceID, appearanceID}
+								local sourceID = sourceInfo.sourceID
+								data[slot] = sourceID
 							end
 						end
 					end
 				end
 
+				--Clear older junk
+				data.sources = nil
+				data.itemTransmogInfoList = nil
+				data.items = nil
+				data.itemData = nil
+		
 				tinsert(FullList, data)
-				--FullList[#FullList].outfitID = MAX_DEFAULT_OUTFITS + i
 			end
 		end
 	
-
 		--MogIt Sets
 		local mogit_Outfits = addon.MogIt.GetMogitOutfits()
 		if mogit_Outfits then 
@@ -745,25 +781,24 @@ end
 				info.sources = data.sources or {}
 				info.collected = true
 				info.name = data.name
-				------print(info.name)
+				info.setType = data.setType
+				info.label = data.label
 				info.description = ""
 				info.expansionID = 1
 				info.favorite = false
 				info.hiddenUtilCollected = false
-
-				info.label = data.label
-				--info.set  = data.set
 				info.limitedTimeSet = false
 				info.patchID = ""
 				info.setID = data.setID or (data.outfitID)
-
 				info.uiOrder = data.uiOrder or (data.index * 100)
 				info.icon = data.icon
 				info.isClass = true
-				info.setType = data.setType
-				info.mainShoulder = data.mainShoulder or 0
+				info.mainShoulder = data[3] or 0
 				info.offShoulder = data.offShoulder or 0
 				info.itemTransmogInfoList = data.itemTransmogInfoList
+
+				info.mainHandEnchant = data.mainHandEnchant
+				info.offHandEnchant = data.offHandEnchant
 
 				info.itemData = data.itemData
 
@@ -773,6 +808,43 @@ end
 					for i, data in pairs(outfitItemTransmogInfoList) do
 						info.sources[i] = data.appearanceID
 					end
+
+				elseif data.setType == "SavedExtra" then
+					local ItemTransmogInfoList = {}
+					info.sources = {}
+					for slotID = 1, 19 do
+						local sourceID = data[slotID]
+						info.sources[slotID] = data[slotID] or 0
+						if sourceID  and sourceID ~= NO_TRANSMOG_SOURCE_ID and sourceID ~= 0 then 
+							local sourceInfo = C_TransmogCollection.GetSourceInfo(sourceID)
+						 			
+							if sourceInfo and sourceInfo.invType then 
+								local slot = C_Transmog.GetSlotForInventoryType(sourceInfo.invType);
+								local appearanceID = sourceInfo.visualID
+								local itemID = sourceInfo.itemID
+								local itemMod = sourceInfo.itemModID
+								info.itemData = info.itemData or {}
+								info.itemData[slot] = {"'"..itemID..":"..itemMod.."'", sourceID, appearanceID}
+							end
+						end
+
+							--[[local illusionID
+																					if slotID == 16 then 
+																						illusionID = data["mainHandEnchant"] or 0
+																					elseif slotID == 17 then 
+																						illusionID = data["offHandEnchant"] or 0
+																					else
+																						illusionID = 0
+																					end
+																					ItemTransmogInfoList[slotID] = ItemUtil.CreateItemTransmogInfo(data[slotID] or 0, 0, illusionID);]]
+					end
+
+
+
+
+
+
+
 					----info.sources = C_TransmogCollection.GetOutfitSources(data.outfitID)
 				--elseif  #info.sources == 0 then 
 					--for i = 1, 19 do  ----was 16?

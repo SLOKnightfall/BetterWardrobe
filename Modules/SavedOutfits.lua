@@ -563,7 +563,7 @@ end
 
 function BetterWardrobeOutfitFrameMixin:NewOutfit(name)
 	local outfitID = LookupOutfitIDFromName(name) --or  ((#C_TransmogCollection.GetOutfits() <= MAX_DEFAULT_OUTFITS) and #C_TransmogCollection.GetOutfits() -1 ) -- or #GetOutfits()-1
-	local icon
+	local icon = QUESTION_MARK_ICON
 	local outfit
 
 	for slotID, itemTransmogInfo in ipairs(self.itemTransmogInfoList) do
@@ -573,18 +573,6 @@ function BetterWardrobeOutfitFrameMixin:NewOutfit(name)
 			if icon then
 				break;
 			end
-		end
-	end
-
-	local itemData = {}
-	for i, data in pairs(self.itemTransmogInfoList) do
-		local sourceInfo = C_TransmogCollection.GetSourceInfo(data.appearanceID)
-		if sourceInfo then
-			local appearanceID = sourceInfo.visualID
-			local itemID = sourceInfo.itemID
-			local itemMod = sourceInfo.itemModID
-			local sourceID = sourceInfo.sourceID
-			itemData[i] = {"'"..itemID..":"..itemMod.."'", sourceID, appearanceID}
 		end
 	end
 
@@ -606,7 +594,20 @@ function BetterWardrobeOutfitFrameMixin:NewOutfit(name)
 		outfit["name"] = name
 		----local icon = select(4, C_TransmogCollection.GetAppearanceSourceInfo(outfit[1]))
 		outfit["icon"] = icon
-		outfit.itemData = itemData
+		--outfit.itemData = itemData
+
+		local itemData = {}
+		for i, data in pairs(self.itemTransmogInfoList) do
+			outfit[i] = data.appearanceID
+			if i == 3 then
+				outfit["offShoulder"] = data.secondaryAppearanceID or 0
+			elseif i == 16 then 
+				outfit["mainHandEnchant"] = data.illusionID or 0
+			elseif i == 17 then 
+				outfit["offHandEnchant"] = data.illusionID or 0
+			end
+		end
+
 		--outfit.sources = sources
 		--outfit.itemTransmogInfoList =  self.itemTransmogInfoList or {}
 		--outfitID = index
