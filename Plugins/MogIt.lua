@@ -59,16 +59,16 @@ local function UpdateFrames()
 		end
 	end
 
-	local orig_OnMouseDown = WardrobeCollectionFrame.ItemsCollectionFrame.Models[1]:GetScript("OnMouseDown")
+	local orig_OnMouseDown = BetterWardrobeCollectionFrame.ItemsCollectionFrame.Models[1]:GetScript("OnMouseDown")
 
 
-	for i, model in ipairs(WardrobeCollectionFrame.ItemsCollectionFrame.Models) do
+	for i, model in ipairs(BetterWardrobeCollectionFrame.ItemsCollectionFrame.Models) do
 		model:SetScript("OnMouseDown", function(self, button)
 			if IsControlKeyDown() and button == "RightButton" then
 				local link
 				local sources = WardrobeCollectionFrame_GetSortedAppearanceSources(self.visualInfo.visualID)
-				if WardrobeCollectionFrame.tooltipSourceIndex then
-					local index = WardrobeUtils_GetValidIndexForNumSources(WardrobeCollectionFrame.tooltipSourceIndex, #sources)
+				if BetterWardrobeCollectionFrame.tooltipSourceIndex then
+					local index = WardrobeUtils_GetValidIndexForNumSources(BetterWardrobeCollectionFrame.tooltipSourceIndex, #sources)
 					link = select(6, C_TransmogCollection.GetAppearanceSourceInfo(sources[index].sourceID))
 				end
 				mog:AddToPreview(link)
@@ -203,8 +203,8 @@ function MogIt.UpdateWishlistItem(type, typeID, add)
 				mog:BuildList(nil, "Wishlist")
 			end
 			print(add and L["Appearance added."] or L["Appearance removed."] )
-			WardrobeCollectionFrame.ItemsCollectionFrame:RefreshVisualsList()
-			WardrobeCollectionFrame.ItemsCollectionFrame:UpdateItems()
+			BetterWardrobeCollectionFrame.ItemsCollectionFrame:RefreshVisualsList()
+			BetterWardrobeCollectionFrame.ItemsCollectionFrame:UpdateItems()
 		end
 	else
 		local sources

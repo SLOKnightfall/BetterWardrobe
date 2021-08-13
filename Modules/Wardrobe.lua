@@ -4761,8 +4761,8 @@ end
 
 
 local function GetCombinedAppearanceSources(appearanceID)
-	local sources = C_TransmogCollection.GetAllAppearanceSources(appearanceID)
-	local sources2 = C_TransmogCollection.GetAppearanceSources(appearanceID)
+	local sources = C_TransmogCollection.GetAllAppearanceSources(appearanceID) or {}
+	local sources2 = C_TransmogCollection.GetAppearanceSources(appearanceID) or {}
 
 	if (sources2 and sources) then
 	  for i = 1, #sources2 do
@@ -4821,7 +4821,7 @@ function BetterWardrobeSetsDataProviderMixin:GetSortedSetSources(setID)
 		for i, primaryAppearance in ipairs(sourceData.primaryAppearances) do
 			local sourceID = primaryAppearance.appearanceID;
 			local sourceInfo = C_TransmogCollection.GetSourceInfo(sourceID);
-			local sources = GetCombinedAppearanceSources(sourceInfo.visualID);
+			local sources = (sourceInfo and GetCombinedAppearanceSources(sourceInfo.visualID)) or {}
 			local characterCollectable, characterUseable = CheckCollectionStatus(sources)
 
 			if ( sourceInfo ) then
@@ -4833,7 +4833,7 @@ function BetterWardrobeSetsDataProviderMixin:GetSortedSetSources(setID)
 	----elseif BetterWardrobeCollectionFrame:CheckTab(3) then
 		for sourceID, collected in pairs(sourceData.sources) do
 			local sourceInfo = C_TransmogCollection.GetSourceInfo(sourceID)
-			local sources = GetCombinedAppearanceSources(sourceInfo.visualID);
+			local sources = (sourceInfo and GetCombinedAppearanceSources(sourceInfo.visualID)) or {}
 			local characterCollectable, characterUseable = CheckCollectionStatus(sources)
 
 			if (sourceInfo) then
@@ -5151,16 +5151,18 @@ function BetterWardrobeSetsCollectionMixin:DisplaySet(setID)
 	end
 
 	self.DetailsFrame.Label:SetText((setInfo.label or "")..((not setInfo.isClass and setInfo.className) and " -"..setInfo.className.."-" or "") )
-	self.DetailsFrame.LimitedSet:SetShown(setInfo.limitedTimeSet);
-
+	--self.DetailsFrame.LimitedSet:SetShown(setInfo.limitedTimeSet);
+self.DetailsFrame.LimitedSet:Show()
 	if setInfo.limitedTimeSet then
 		self.DetailsFrame.LimitedSet.Text:SetText(TRANSMOG_SET_LIMITED_TIME_SET)
+		
 		--self.DetailsFrame.LimitedSet.Text:SetText(TRANSMOG_SET_LIMITED_TIME_SET)--factionNames.opposingFaction)--.." only")
 	elseif setInfo.noLongerObtainable then
 		self.DetailsFrame.LimitedSet.Icon:SetAtlas("transmog-icon-remove")
 		self.DetailsFrame.LimitedSet.Text:SetText(L["No Longer Obtainable"])
+		self.DetailsFrame.LimitedSet:Show()
 	else
-		self.DetailsFrame.LimitedSet:Hide()
+		--self.DetailsFrame.LimitedSet:Hide()
 	end
 
 	local newSourceIDs = C_TransmogSets.GetSetNewSources(setID) or addon.GetSetNewSources(setID);
