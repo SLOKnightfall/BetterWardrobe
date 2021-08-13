@@ -615,6 +615,9 @@ function addon.GetOutfits(character)
 				data.index = i
 				data.name = addon.OutfitDB.char.outfits[i].name
 				local sourceInfo
+				data.setType = "SavedExtra"
+				data.label= L["Extended Saved Set"]
+
 
 				--data.itemData should hold the most current set data
 				if data.itemData and #data.itemData ~= 0 then
@@ -627,6 +630,7 @@ function addon.GetOutfits(character)
 							data[i] = 0
 						end
 					end
+
 
 
 				elseif (not data.itemData or #data.itemData == 0) then

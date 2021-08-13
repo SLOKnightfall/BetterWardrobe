@@ -328,6 +328,7 @@ L["Item No Longer Available"] = true
 --------------------------------------------------------------------------
 
 L["Saved Set"] = true
+L["Extended Saved Set"] = true
 L["COLLECTIONLIST_TEXT"] = "%s - %s"
 L["SHOPPINGLIST_TEXT"] = "%s - %s: %s"
 
