@@ -5129,7 +5129,9 @@ end
 
 function BetterWardrobeSetsCollectionMixin:DisplaySet(setID)
 	if not setID then return end
-	local setInfo = addon.C_TransmogSets.GetSetInfo(setID) 
+ setInfo = addon.C_TransmogSets.GetSetInfo(setID) 
+ 	local buildID = (select(4, GetBuildInfo()))
+
 					or nil;
 	if ( not setInfo ) then
 		self.DetailsFrame:Hide();
@@ -5152,17 +5154,23 @@ function BetterWardrobeSetsCollectionMixin:DisplaySet(setID)
 
 	self.DetailsFrame.Label:SetText((setInfo.label or "")..((not setInfo.isClass and setInfo.className) and " -"..setInfo.className.."-" or "") )
 	--self.DetailsFrame.LimitedSet:SetShown(setInfo.limitedTimeSet);
-self.DetailsFrame.LimitedSet:Show()
+
+	if (setInfo.description == ELITE) and setInfo.patchID < buildID then
+		setInfo.noLongerObtainable = true
+		setInfo.limitedTimeSet = nil
+	end
+
 	if setInfo.limitedTimeSet then
 		self.DetailsFrame.LimitedSet.Text:SetText(TRANSMOG_SET_LIMITED_TIME_SET)
-		
+		self.DetailsFrame.LimitedSet:Show()
+
 		--self.DetailsFrame.LimitedSet.Text:SetText(TRANSMOG_SET_LIMITED_TIME_SET)--factionNames.opposingFaction)--.." only")
 	elseif setInfo.noLongerObtainable then
 		self.DetailsFrame.LimitedSet.Icon:SetAtlas("transmog-icon-remove")
 		self.DetailsFrame.LimitedSet.Text:SetText(L["No Longer Obtainable"])
 		self.DetailsFrame.LimitedSet:Show()
 	else
-		--self.DetailsFrame.LimitedSet:Hide()
+		self.DetailsFrame.LimitedSet:Hide()
 	end
 
 	local newSourceIDs = C_TransmogSets.GetSetNewSources(setID) or addon.GetSetNewSources(setID);
