@@ -19,6 +19,7 @@ local LE_ALPHABETIC = 3
 local LE_COLOR = 4
 local LE_EXPANSION = 5
 local LE_ITEM_SOURCE = 6
+local LE_ARTIFACT = 7
 
 local TAB_ITEMS = 1
 local TAB_SETS = 2
@@ -263,7 +264,7 @@ local Sort = {
 
 	[TAB_ITEMS] = {
 		[LE_DEFAULT] = function(self)
-		if not self then return end
+			if not self then return end
 
 			local comparison = function(source1, source2)
 			if (source1.isCollected ~= source2.isCollected) then
@@ -358,6 +359,18 @@ local Sort = {
 		[LE_EXPANSION] = function(self)
 			--C_Timer.After(0, function()	sort(Wardrobe:GetFilteredVisualsList(), addon.Sort.SortItemByExpansion) end )
 			sort(self.filteredVisualsList, addon.Sort.SortItemByExpansion) -- Runs twice because some times the first run does not return item info
+		end,
+
+		[LE_ARTIFACT] = function(self)
+			local artifactList = {}
+			for i, data in ipairs(self.filteredVisualsList) do
+				local sourceID = BetterWardrobeCollectionFrame.ItemsCollectionFrame:GetAnAppearanceSourceFromVisual(data.visualID)
+				local sourceInfo = C_TransmogCollection.GetSourceInfo(sourceID)
+				if sourceInfo and sourceInfo.quality == 6 then
+					tinsert(artifactList,data)
+				end
+			end
+			self.filteredVisualsList =  artifactList
 		end,
 	},
 

@@ -1551,6 +1551,8 @@ function BetterWardrobeCollectionFrameMixin:SetAppearanceTooltip(contentFrame, s
 	headerSourceID = sources[headerIndex].sourceID;
 
 	local name, nameColor = self:GetAppearanceNameTextAndColor(sources[headerIndex]);
+	if not name then return end
+
 	local sourceText, sourceColor = self:GetAppearanceSourceTextAndColor(sources[headerIndex]);
 	GameTooltip:SetText(name, nameColor:GetRGB());
 
@@ -2546,7 +2548,7 @@ function BetterWardrobeItemsCollectionMixin:UpdateItems()
 		end
 	end
 
-	local matchesCategory = not effectiveCategory or effectiveCategory == self.activeCategory or self.transmogLocation:IsIllusion();
+	local matchesCategory = not effectiveCategory or effectiveCategory == self.activeCategory or self.transmogLocation:IsIllusion() or self.activeCategory == Enum.TransmogCollectionType.Paired;
 	local cameraVariation = self:GetCameraVariation();
 
 	local pendingTransmogModelFrame = nil;
@@ -2751,13 +2753,35 @@ function BetterWardrobeItemsCollectionMixin:UpdateProgressBar()
 	self:GetParent():UpdateProgressBar(collected, total);
 end
 
+local offspecartifact = {}
 function BetterWardrobeItemsCollectionMixin:RefreshVisualsList()
 	if self.transmogLocation:IsIllusion() then
 		self.visualsList = C_TransmogCollection.GetIllusions();
 
 	else
 		if self:GetActiveCategory() == Enum.TransmogCollectionType.Paired and not C_Transmog.IsAtTransmogNPC() then 
-				self.visualsList = addon.GetClassArtifactAppearanceList() 
+			self.visualsList = addon.GetClassArtifactAppearanceList() 
+		elseif self:GetActiveCategory() == Enum.TransmogCollectionType.Paired and C_Transmog.IsAtTransmogNPC() then 
+			self.visualsList = C_TransmogCollection.GetCategoryAppearances(Enum.TransmogCollectionType.Paired);
+			offspecartifact = {}
+			for i, data in ipairs(self.visualsList)do
+
+				local sourceID = BetterWardrobeCollectionFrame.ItemsCollectionFrame:GetAnAppearanceSourceFromVisual(data.visualID)
+				local sourceInfo = C_TransmogCollection.GetSourceInfo(sourceID)
+				local invType = sourceInfo.invType
+
+				local transmogLocation = WardrobeTransmogFrame:GetSelectedTransmogLocation();
+				local appliedSourceID, _, selectedSourceID = TransmogUtil.GetInfoForEquippedSlot(transmogLocation);
+				local selecteSourceInfo =  C_TransmogCollection.GetSourceInfo(appliedSourceID)
+				local selectedInvType = selecteSourceInfo.invType
+
+				if invType == selectedInvType then
+					if not data.isUsable then 
+						data.isUsable = true
+						offspecartifact[data.visualID] = true
+					end
+				end 
+			end
 		else
 			self.visualsList = C_TransmogCollection.GetCategoryAppearances(self.activeCategory);
 		end
@@ -2826,11 +2850,29 @@ function BetterWardrobeItemsCollectionMixin:SelectVisual(visualID)
 			end
 		end
 	end
+
+	local activeCategory = self.activeCategory
+
+	if offspecartifact[visualID] and self.activeCategory == Enum.TransmogCollectionType.Paired then 
+		local transmogLocation = WardrobeTransmogFrame:GetSelectedTransmogLocation();
+		C_Transmog.ClearPending(transmogLocation);
+
+		local offhandTransmogLocation = TransmogUtil.GetTransmogLocation(INVSLOT_OFFHAND, Enum.TransmogType.Appearance, Enum.TransmogModification.Main);
+		--Clears offhand if artifact was a paired set
+		if C_Transmog.GetSlotEffectiveCategory(offhandTransmogLocation) == Enum.TransmogCollectionType.None then
+			local actor = WardrobeTransmogFrame.ModelScene:GetPlayerActor()
+			actor:UndressSlot(INVSLOT_OFFHAND)
+		end
+		local effectiveCategory = transmogLocation and C_Transmog.GetSlotEffectiveCategory(transmogLocation) or Enum.TransmogCollectionType.None;
+		self.activeCategory = effectiveCategory 	 
+	end
+
 	-- artifacts from other specs will not have something valid
 	if sourceID ~= Constants.Transmog.NoTransmogID then
 		WardrobeTransmogFrame:SetPendingTransmog(sourceID, self.activeCategory);
 		PlaySound(SOUNDKIT.UI_TRANSMOG_ITEM_CLICK);
 	end
+	self.activeCategory = activeCategory
 end
 
 function BetterWardrobeItemsCollectionMixin:GoToSourceID(sourceID, transmogLocation, forceGo, forTransmog, overrideCategoryID)
@@ -2955,12 +2997,17 @@ function BetterWardrobeItemsCollectionMixin:OnSearchUpdate(category)
 end
 
 function BetterWardrobeItemsCollectionMixin:IsAppearanceUsableForActiveCategory(appearanceInfo)
+	y = appearanceInfo
 	if not appearanceInfo.useErrorType then
 		return true;
 	end
 	if appearanceInfo.useErrorType == Enum.TransmogUseErrorType.ArtifactSpec then
-		-- artifact appearances don't need to match spec when in normal weapon categories
-		return not TransmogUtil.IsCategoryLegionArtifact(self.activeCategory);
+		-- artifact appearances don't need to match spec when in normal weapon categories.
+		if Enum.TransmogCollectionType.Paired == self.activeCategory then 
+			return true
+		else
+			return not TransmogUtil.IsCategoryLegionArtifact(self.activeCategory);
+		end
 	end
 	return false;
 end
@@ -7459,7 +7506,7 @@ local LE_ALPHABETIC = addon.Globals.LE_ALPHABETIC
 local LE_ITEM_SOURCE = addon.Globals.LE_ITEM_SOURCE
 local LE_EXPANSION = addon.Globals.LE_EXPANSION
 local LE_COLOR = addon.Globals.LE_COLOR
-
+local LE_ARTIFACT = 7
 local TAB_ITEMS = addon.Globals.TAB_ITEMS
 local TAB_SETS = addon.Globals.TAB_SETS
 local TAB_EXTRASETS = addon.Globals.TAB_EXTRASETS
@@ -7490,34 +7537,43 @@ function addon.Init.SortDropDown_Initialize()
 		local selectedValue = BW_UIDropDownMenu_GetSelectedValue(self)
 
 		info.func = function(self)
-			db.sortDropdown = self.value
-									BW_UIDropDownMenu_SetSelectedValue(BW_SortDropDown, self.value)
-									BW_UIDropDownMenu_SetText(BW_SortDropDown, COMPACT_UNIT_FRAME_PROFILE_SORTBY.." "..L[self.value])
-									db.reverse = IsModifierKeyDown()
-									addon.SetSortOrder(db.reverse)
-									local tabID = addon.GetTab()
-									if tabID == 1 then
-										--Wardrobe:OnShow()
-												Wardrobe:RefreshVisualsList()
-										Wardrobe:UpdateItems()
-										Wardrobe:UpdateWeaponDropDown()
-									elseif tabID == 2 then
-										RefreshLists()
-									elseif tabID == 3 then
-										RefreshLists()
+				db.sortDropdown = self.value
+				BW_UIDropDownMenu_SetSelectedValue(BW_SortDropDown, self.value)
+				BW_UIDropDownMenu_SetText(BW_SortDropDown, COMPACT_UNIT_FRAME_PROFILE_SORTBY.." "..L[self.value])
+				db.reverse = IsModifierKeyDown()
+				addon.SetSortOrder(db.reverse)
+				local tabID = addon.GetTab()
+				if tabID == 1 then
+					--Wardrobe:OnShow()
+					Wardrobe:RefreshVisualsList()
+					Wardrobe:UpdateItems()
+					Wardrobe:UpdateWeaponDropDown()
+				elseif tabID == 2 then
+					RefreshLists()
+				elseif tabID == 3 then
+					RefreshLists()
 
-									end
-								end
-						
-								for _, id in pairs(dropdownOrder) do
-									if id == LE_ITEM_SOURCE and (tabID == 2 or tabID == 3) then
-									else
-										info.value, info.text = id, L[id]
-										info.checked = (id == selectedValue)
-										BW_UIDropDownMenu_AddButton(info)
-									end
-								end
-	end)
+				end
+			end
+
+			for _, id in pairs(dropdownOrder) do
+				if id == LE_ITEM_SOURCE and (tabID == 2 or tabID == 3) then
+				else
+					info.value, info.text = id, L[id]
+					info.checked = (id == selectedValue)
+					BW_UIDropDownMenu_AddButton(info)
+				end
+			end
+
+			local tabID = addon.GetTab()
+			if tabID == 1 and( Wardrobe.activeCategory and Wardrobe.activeCategory >= 13) then
+				info.value = LE_ARTIFACT
+				info.text = L[LE_ARTIFACT]
+				info.checked = (7 == selectedValue)
+				BW_UIDropDownMenu_AddButton(info)
+			end
+
+		end)
 
 	BW_UIDropDownMenu_SetSelectedValue(BW_SortDropDown, db.sortDropdown)
 	-----BW_UIDropDownMenu_SetText(BW_SortDropDown, COMPACT_UNIT_FRAME_PROFILE_SORTBY.." "..L[db.sortDropdown])
