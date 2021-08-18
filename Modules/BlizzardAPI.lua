@@ -595,3 +595,10 @@ end
 	local sourceData = self:GetSetSourceData(setID);
 	return sourceData.numCollected, sourceData.numTotal;
 end]]
+
+
+function a()
+local link = gsub(C_TradeSkillUI.GetTradeSkillListLink(), "\124", "\124\124")
+local _,_,current, max,_ = strsplit(":", link, 5)
+DEFAULT_CHAT_FRAME:AddMessage(current..":"..max)
+end

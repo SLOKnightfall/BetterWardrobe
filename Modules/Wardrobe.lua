@@ -2263,7 +2263,7 @@ function BetterWardrobeItemsCollectionMixin:SetActiveSlot(transmogLocation, cate
 		self:ChangeModelsSlot(transmogLocation, previousTransmogLocation);
 	end
 	-- set only if category is different or slot is different
-	if ( category ~= self.activeCategory or slotChanged ) then
+	if (( category ~= self.activeCategory and self.activeCategory ~= Enum.TransmogCollectionType.Paired) or slotChanged ) then
 		CloseDropDownMenus();
 		self:SetActiveCategory(category);
 	end
@@ -2304,6 +2304,9 @@ end
 function BetterWardrobeItemsCollectionMixin:SetActiveCategory(category)
 	local previousCategory = self.activeCategory;
 	self.activeCategory = category;
+	if previousCategory == Enum.TransmogCollectionType.Paired then 
+		--self.activeCategory = previousCategory
+	end
 	if previousCategory ~= category and self.transmogLocation:IsAppearance() then
 		C_TransmogCollection.SetSearchAndFilterCategory(category);
 		local name, isWeapon = C_TransmogCollection.GetCategoryInfo(category);
@@ -2363,6 +2366,7 @@ function BetterWardrobeItemsCollectionMixin:ResetPage()
 			self.jumpToLatestAppearanceID = nil;
 		end
 	end
+
 	if ( selectedVisualID and selectedVisualID ~= NO_TRANSMOG_VISUAL_ID ) then
 		local visualsList = self:GetFilteredVisualsList();
 		for i = 1, #visualsList do
@@ -2506,6 +2510,7 @@ function BetterWardrobeItemsCollectionMixin:UpdateItems()
 	local appearanceVisualSubclass;
 	local changeModel = false;
 	local isAtTransmogrifier = C_Transmog.IsAtTransmogNPC();
+----print(self.activeCategory)
 
 	if ( self.transmogLocation and self.transmogLocation:IsIllusion() ) then
 		-- for enchants we need to get the visual of the item in that slot
@@ -2771,14 +2776,17 @@ function BetterWardrobeItemsCollectionMixin:RefreshVisualsList()
 				local invType = sourceInfo.invType
 
 				local transmogLocation = WardrobeTransmogFrame:GetSelectedTransmogLocation();
-				local appliedSourceID, _, selectedSourceID = TransmogUtil.GetInfoForEquippedSlot(transmogLocation);
-				local selecteSourceInfo =  C_TransmogCollection.GetSourceInfo(appliedSourceID)
+				local baseSourceID, baseVisualID, appliedSourceID, appliedVisualID, pendingSourceID, pendingVisualID, hasPendingUndo, _, itemSubclass = C_Transmog.GetSlotVisualInfo(transmogLocation);
+				--local appliedSourceID, _, selectedSourceID = TransmogUtil.GetInfoForEquippedSlot(transmogLocation);
+				local selecteSourceInfo =  C_TransmogCollection.GetSourceInfo(baseSourceID)
 				local selectedInvType = selecteSourceInfo.invType
 
 				if invType == selectedInvType then
 					if not data.isUsable then 
 						data.isUsable = true
 						offspecartifact[data.visualID] = true
+					else
+						offspecartifact[data.visualID] = false
 					end
 				end 
 			end
@@ -2851,20 +2859,29 @@ function BetterWardrobeItemsCollectionMixin:SelectVisual(visualID)
 		end
 	end
 
+	local transmogLocation = WardrobeTransmogFrame:GetSelectedTransmogLocation();
 	local activeCategory = self.activeCategory
+	local offhandTransmogLocation = TransmogUtil.GetTransmogLocation(INVSLOT_OFFHAND, Enum.TransmogType.Appearance, Enum.TransmogModification.Main);
+	--Clears offhand if artifact was a paired set
+	if C_Transmog.GetSlotEffectiveCategory(offhandTransmogLocation) == Enum.TransmogCollectionType.None then
+		local actor = WardrobeTransmogFrame.ModelScene:GetPlayerActor()
+		actor:UndressSlot(INVSLOT_OFFHAND)
+	end
 
-	if offspecartifact[visualID] and self.activeCategory == Enum.TransmogCollectionType.Paired then 
-		local transmogLocation = WardrobeTransmogFrame:GetSelectedTransmogLocation();
-		C_Transmog.ClearPending(transmogLocation);
-
-		local offhandTransmogLocation = TransmogUtil.GetTransmogLocation(INVSLOT_OFFHAND, Enum.TransmogType.Appearance, Enum.TransmogModification.Main);
-		--Clears offhand if artifact was a paired set
-		if C_Transmog.GetSlotEffectiveCategory(offhandTransmogLocation) == Enum.TransmogCollectionType.None then
-			local actor = WardrobeTransmogFrame.ModelScene:GetPlayerActor()
-			actor:UndressSlot(INVSLOT_OFFHAND)
-		end
-		local effectiveCategory = transmogLocation and C_Transmog.GetSlotEffectiveCategory(transmogLocation) or Enum.TransmogCollectionType.None;
-		self.activeCategory = effectiveCategory 	 
+	if self.activeCategory == Enum.TransmogCollectionType.Paired then
+		if offspecartifact[visualID] then
+			C_Transmog.ClearPending(transmogLocation);
+			local baseSourceID, baseVisualID, appliedSourceID, appliedVisualID, pendingSourceID, pendingVisualID, hasPendingUndo, _, itemSubclass = C_Transmog.GetSlotVisualInfo(transmogLocation);
+			if appliedVisualID == visualID then 
+				self.activeCategory = Enum.TransmogCollectionType.Paired
+			else
+				local appliedSourceID, _, selectedSourceID = TransmogUtil.GetInfoForEquippedSlot(transmogLocation);
+				local selecteSourceInfo =  C_TransmogCollection.GetSourceInfo(baseSourceID)
+				self.activeCategory = selecteSourceInfo.categoryID 
+			end
+		else
+			self.activeCategory = Enum.TransmogCollectionType.Paired
+		end	 
 	end
 
 	-- artifacts from other specs will not have something valid
@@ -2873,6 +2890,12 @@ function BetterWardrobeItemsCollectionMixin:SelectVisual(visualID)
 		PlaySound(SOUNDKIT.UI_TRANSMOG_ITEM_CLICK);
 	end
 	self.activeCategory = activeCategory
+
+	if self.activeCategory == Enum.TransmogCollectionType.Paired then 
+		self.jumpToVisualID = visualID
+		C_Timer.After(0, function() BetterWardrobeCollectionFrame.ItemsCollectionFrame:ResetPage() end)
+	end
+
 end
 
 function BetterWardrobeItemsCollectionMixin:GoToSourceID(sourceID, transmogLocation, forceGo, forTransmog, overrideCategoryID)
