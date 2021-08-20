@@ -362,6 +362,8 @@ local Sort = {
 		end,
 
 		[LE_ARTIFACT] = function(self)
+			if not self then return end
+
 			local artifactList = {}
 			for i, data in ipairs(self.filteredVisualsList) do
 				local sourceID = BetterWardrobeCollectionFrame.ItemsCollectionFrame:GetAnAppearanceSourceFromVisual(data.visualID)

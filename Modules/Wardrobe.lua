@@ -2769,6 +2769,7 @@ function BetterWardrobeItemsCollectionMixin:RefreshVisualsList()
 		elseif self:GetActiveCategory() == Enum.TransmogCollectionType.Paired and C_Transmog.IsAtTransmogNPC() then 
 			self.visualsList = C_TransmogCollection.GetCategoryAppearances(Enum.TransmogCollectionType.Paired);
 			offspecartifact = {}
+
 			for i, data in ipairs(self.visualsList)do
 
 				local sourceID = BetterWardrobeCollectionFrame.ItemsCollectionFrame:GetAnAppearanceSourceFromVisual(data.visualID)
@@ -3020,7 +3021,6 @@ function BetterWardrobeItemsCollectionMixin:OnSearchUpdate(category)
 end
 
 function BetterWardrobeItemsCollectionMixin:IsAppearanceUsableForActiveCategory(appearanceInfo)
-	y = appearanceInfo
 	if not appearanceInfo.useErrorType then
 		return true;
 	end
