@@ -172,7 +172,7 @@
 			<OnLeave function="GameTooltip_Hide"/>
 		</Scripts>
 	</Button>
-	<Button name="BetterWardrobeSmallSlotButtonTemplate" parentArray="Buttons" mixin="BetterWardrobeItemsCollectionSlotButtonMixin" frameLevel="10" virtual="true">
+	<Button name="BetterWardrobeSmallSlotButtonTemplate" parentArray="Buttons" mixin="BetterWardrobeItemsCollectionSlotButtonMixin" frameLevel="20" virtual="true">
 		<KeyValues>
 			<KeyValue key="isSmallButton" value="true" type="boolean"/>
 		</KeyValues>
@@ -410,7 +410,7 @@
 
 	<Frame name="BetterWardrobeCollectionFrameTemplate" parent="CollectionsJournal" mixin="BetterWardrobeCollectionFrameMixin" setAllPoints="true" hidden="true" virtual="true">
 		<Frames>
-			<Button name="$parentTab1" parentKey="ItemsTab" inherits="TabButtonTemplate" text="WARDROBE_ITEMS" id="1" frameLevel="4" parentArray="Tabs">
+			<Button name="$parentTab1" parentKey="ItemsTab" inherits="TabButtonTemplate" text="WARDROBE_ITEMS" id="1" frameLevel="40" parentArray="Tabs">
 				<KeyValues>
 					<KeyValue key="minWidth" value="57" type="number"/>
 				</KeyValues>
@@ -423,7 +423,7 @@
 					</OnClick>
 				</Scripts>
 			</Button>
-			<Button name="$parentTab2" parentKey="SetsTab" inherits="TabButtonTemplate" text="WARDROBE_SETS" id="2" frameLevel="4" parentArray="Tabs">
+			<Button name="$parentTab2" parentKey="SetsTab" inherits="TabButtonTemplate" text="WARDROBE_SETS" id="2" frameLevel="40" parentArray="Tabs">
 				<KeyValues>
 					<KeyValue key="minWidth" value="57" type="number"/>
 				</KeyValues>
@@ -458,7 +458,7 @@
 					</OnClick>
 				</Scripts>
 			</Button>
-			<Button name="$parentTab3" parentKey="ExtraSetsTab" inherits="TabButtonTemplate" text="Extra" id="3" frameLevel="4" parentArray="Tabs">
+			<Button name="$parentTab3" parentKey="ExtraSetsTab" inherits="TabButtonTemplate" text="Extra" id="3" frameLevel="40" parentArray="Tabs">
 				<KeyValues>
 					<KeyValue key="minWidth" value="57" type="number"/>
 				</KeyValues>
@@ -493,7 +493,7 @@
 					</OnClick>
 				</Scripts>
 			</Button>
-			<Button name="$parentTab4" parentKey="SavedSetsTab" inherits="TabButtonTemplate" text="Saved" id="4" parentArray="Tabs">
+			<Button name="$parentTab4" parentKey="SavedSetsTab" inherits="TabButtonTemplate" text="Saved" id="4" frameLevel="40" parentArray="Tabs">
 				<KeyValues>
 					<KeyValue key="minWidth" value="57" type="number"/>
 				</KeyValues>
@@ -1194,7 +1194,7 @@
 							<OnModelLoaded method="OnModelLoaded"/>
 						</Scripts>
 					</DressUpModel>
-					<Frame parentKey="DetailsFrame" frameLevel="5">
+					<Frame parentKey="DetailsFrame" frameLevel="50">
 						<Anchors>
 							<Anchor point="TOPLEFT" relativeKey="$parent.RightInset" x="0" y="-3"/>
 							<Anchor point="BOTTOMRIGHT" relativeKey="$parent.RightInset" x="-3" y="2"/>
@@ -1276,7 +1276,7 @@
 									<OnLeave function="GameTooltip_Hide"/>
 								</Scripts>
 							</Frame>
-							<DropDownToggleButton name="BetterWardrobeSetsCollectionVariantSetsButton" parentKey="VariantSetsButton" inherits="UIMenuButtonStretchTemplate" frameLevel="6">
+							<DropDownToggleButton name="BetterWardrobeSetsCollectionVariantSetsButton" parentKey="VariantSetsButton" inherits="UIMenuButtonStretchTemplate" frameLevel="60">
 								<Size x="108" y="22"/>
 								<Anchors>
 									<Anchor point="TOPRIGHT" x="-6" y="-6"/>
@@ -1581,7 +1581,7 @@
 		</Scripts>
 	</Frame>
 	
-	<Button name="BetterWardrobeTransmogButtonTemplate" motionScriptsWhileDisabled="true" mixin="TransmogSlotButtonMixin" frameLevel="10" virtual="true">
+	<Button name="BetterWardrobeTransmogButtonTemplate" motionScriptsWhileDisabled="true" mixin="TransmogSlotButtonMixin" frameLevel="20" virtual="true">
 		<KeyValues>
 			<KeyValue key="transmogType" value="Enum.TransmogType.Appearance" type="global"/>
 			<KeyValue key="modification" value="Enum.TransmogModification.Main" type="global"/>
@@ -1768,7 +1768,7 @@
 		</HighlightTexture>
 	</Button>
 
-	<Button name="BetterWardrobeTransmogEnchantButtonTemplate" motionScriptsWhileDisabled="true" mixin="TransmogSlotButtonMixin" frameLevel="20" virtual="true">
+	<Button name="BetterWardrobeTransmogEnchantButtonTemplate" motionScriptsWhileDisabled="true" mixin="TransmogSlotButtonMixin" frameLevel="30" virtual="true">
 		<KeyValues>
 			<KeyValue key="transmogType" value="Enum.TransmogType.Illusion" type="global"/>
 			<KeyValue key="modification" value="Enum.TransmogModification.Main" type="global"/>

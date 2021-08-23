@@ -1427,6 +1427,9 @@ end
 function BetterWardrobeCollectionFrameMixin:OnShow()
 	_,playerClass, classID = UnitClass("player")
 	CollectionsJournal:SetPortraitToAsset("Interface\\Icons\\inv_chest_cloth_17");
+	local level = CollectionsJournal:GetFrameLevel()
+	--BetterWardrobeCollectionFrame:SetFrameLevel(level+10)
+	--CollectionsJournal.NineSlice:SetFrameLevel(level-1)
 
 	self:RegisterEvent("TRANSMOG_COLLECTION_ITEM_UPDATE");
 	self:RegisterUnitEvent("UNIT_MODEL_CHANGED", "player");
