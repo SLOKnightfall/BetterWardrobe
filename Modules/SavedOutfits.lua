@@ -159,6 +159,7 @@ StaticPopupDialogs["BW_TRANSMOG_OUTFIT_SOME_INVALID_APPEARANCES"] = {
 	whileDead = 1,
 }
 
+local overwriteID
 StaticPopupDialogs["BW_CONFIRM_OVERWRITE_TRANSMOG_OUTFIT"] = {
 	preferredIndex = 3,
 	text = TRANSMOG_OUTFIT_CONFIRM_OVERWRITE,
@@ -166,7 +167,10 @@ StaticPopupDialogs["BW_CONFIRM_OVERWRITE_TRANSMOG_OUTFIT"] = {
 	button2 = NO,
 	OnAccept = function (self) 
 		local name = self.data;
-		BetterWardrobeOutfitFrame:SaveOutfit(self.data)
+		BetterWardrobeOutfitFrame:DeleteOutfit(overwriteID)
+		overwriteID = nil
+		BetterWardrobeOutfitFrame:NewOutfit(self.data)
+		--BetterWardrobeOutfitFrame:SaveOutfit(self.data)
 		--if DressUpFrame:IsShown() then --todo fix
 			--BW_DressingRoomOutfitFrameMixin:SaveOutfit(self.data)
 		--else
@@ -671,6 +675,7 @@ function BetterWardrobeOutfitFrameMixin:NameOutfit(newName, outfitID)
 			if (outfitID) then
 				UIErrorsFrame:AddMessage(TRANSMOG_OUTFIT_ALREADY_EXISTS, 1.0, 0.1, 0.1, 1.0)
 			else
+				overwriteID = outfits[i].outfitID
 				BetterWardrobeOutfitFrame:ShowPopup("BW_CONFIRM_OVERWRITE_TRANSMOG_OUTFIT", newName, nil, newName)
 			end
 			return
