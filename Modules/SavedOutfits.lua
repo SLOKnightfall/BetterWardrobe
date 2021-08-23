@@ -446,10 +446,9 @@ function BetterWardrobeOutfitFrameMixin:Toggle(dropDown)
 		self.dropDown = dropDown;
 		self:Show();
 		self:SetPoint("TOPLEFT", self.dropDown, "BOTTOMLEFT", 8, -3);
-		self:Update();
-        if((self:GetTop() - self:GetBottom() + 5) >= UIParent:GetHeight() - self:GetTop() )  then
-            self:SetPoint("BOTTOM", UIParent, "BOTTOM", 0, 5);
-        end
+		--if((self:GetTop() - self:GetBottom() + 5) >= UIParent:GetHeight() - self:GetTop() )  then
+		 --  self:SetPoint("BOTTOM", UIParent, "BOTTOM", 0, 5);
+		--end
 		self:Update();
 	end
 end
@@ -558,7 +557,14 @@ function BetterWardrobeOutfitFrameMixin:Update()
 	stringWidth = max(stringWidth, minStringWidth);
 	stringWidth = min(stringWidth, maxStringWidth);
 	self:SetWidth(stringWidth + OUTFIT_FRAME_ADDED_PIXELS);
-	self:SetHeight(30 + numButtons * 20);
+	if numButtons > 32 then 
+		self:SetHeight(30 + 32 * 20);
+
+	else
+		self:SetHeight(30 + numButtons * 20);
+
+	end
+	--self:SetHeight(30 + numButtons * 20);
 end
 
 function BetterWardrobeOutfitFrameMixin:NewOutfit(name)
