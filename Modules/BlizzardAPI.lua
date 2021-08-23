@@ -358,6 +358,7 @@ end
 
 
 local function CheckMissingLocation(setInfo)
+	yy = setInfo
 	local filtered = false
 	local missingSelection 
 	if 	BetterWardrobeCollectionFrame:CheckTab(2) then
@@ -382,52 +383,54 @@ local function CheckMissingLocation(setInfo)
 			end
 		end
 
-	for type, value in pairs(missingSelection) do
-		if value and invType[type] then
-			filtered = true
-		end
-	end
-else
-	 missingSelection = addon.Filters.Extra.missingSelection
-
-	for type, value in pairs(missingSelection) do
-		if value then
-			filtered = true
-			break
-		end
-	end
-	--no need to filter if nothing is selected
-	if not filtered then return true end
-	
-	local invType = {}
-	if not setInfo.items then
-		local sources = C_TransmogSets.GetSetSources(setInfo.setID)
-		for sourceID in pairs(sources) do
-			local isCollected = Sets.isMogKnown(sourceID) 
-			if missingSelection[sourceInfo.invType] and not isCollected then		
-				return true
-			elseif missingSelection[sourceInfo.invType] then 
+		for type, value in pairs(missingSelection) do
+			if value and invType[type] then
 				filtered = true
 			end
 		end
 	else
-		local setSources = addon.GetSetsources(setInfo.setID)
-		for sourceID, isCollected in pairs(setSources) do
-			local sourceInfo = C_TransmogCollection.GetSourceInfo(sourceID)
-			if missingSelection[sourceInfo.invType] and not isCollected then
-				return true
-			elseif missingSelection[sourceInfo.invType] then 
-				filtered = true 
+		local missingSelection = addon.Filters.Extra.missingSelection
+
+		for type, value in pairs(missingSelection) do
+			if value then
+				filtered = true
+				break
+			end
+		end
+		--no need to filter if nothing is selected
+		if not filtered then return true end
+		
+		local invType = {}
+		if not setInfo.itemData then
+			local sources = C_TransmogSets.GetSetSources(setInfo.setID)
+			for sourceID in pairs(sources) do
+				local sourceInfo = C_TransmogCollection.GetSourceInfo(sourceID)
+
+				local isCollected = Sets.isMogKnown(sourceID) 
+				if missingSelection[sourceInfo.invType] and not isCollected then		
+					return true
+				elseif missingSelection[sourceInfo.invType] then 
+					filtered = true
+				end
+			end
+		else
+			local setSources = addon.GetSetsources(setInfo.setID)
+			for sourceID, isCollected in pairs(setSources) do
+				local sourceInfo = C_TransmogCollection.GetSourceInfo(sourceID)
+				if missingSelection[sourceInfo.invType] and not isCollected then
+					return true
+				elseif missingSelection[sourceInfo.invType] then 
+					filtered = true 
+				end
+			end
+		end
+
+		for type, value in pairs(missingSelection) do
+			if value and invType[type] then
+				filtered = true
 			end
 		end
 	end
-
-	for type, value in pairs(missingSelection) do
-		if value and invType[type] then
-			filtered = true
-		end
-	end
-end
 	return not filtered
 end
 
