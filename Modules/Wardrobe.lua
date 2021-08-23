@@ -6610,7 +6610,20 @@ function BetterWardrobeSetsTransmogMixin:UpdateSets()
 					model.CollectionListVisual.Collection.Collection_Icon:SetShown(isInList)
 					model.CollectionListVisual.Collection.Collected_Icon:SetShown(isInList and C_TransmogSets.IsBaseSetCollected(set.setID))
 
-					model.SetInfo.setName:SetText((addon.Profile.ShowNames and setInfo["name"].."\n"..(setInfo["description"] or "")) or "")
+					--model.SetInfo.setName:SetText((addon.Profile.ShowNames and setInfo["name"].."\n"..(setInfo["description"] or "")) or "")
+
+					local name = setInfo["name"]
+					local description = "\n"..(setInfo["description"] or "")
+					
+					--local description = (setInfo["description"] and "\n-"..setInfo["description"].."-") or ""
+					--local classname = (setInfo.className and "\n ("..setInfo.className..")") or ""
+					if addon.Profile.ShowNames then 
+						model.SetInfo.setName:Show()
+						model.SetInfo.setName:SetText(("%s%s"):format(name, description))
+					else
+						model.SetInfo.setName:Hide()
+					end
+
 					model.SetInfo.progress:SetText((addon.Profile.ShowSetCount and topSourcesCollected.."/".. topSourcesTotal) or "")
 					model.setCollected = topSourcesCollected == topSourcesTotal
 				end
@@ -6768,7 +6781,14 @@ function BetterWardrobeSetsTransmogMixin:UpdateSets()
 
 				--local description = (setInfo["description"] and "\n-"..setInfo["description"].."-") or ""
 				local classname = (setInfo.className and "\n ("..setInfo.className..")") or ""
-				model.SetInfo.setName:SetText(("%s%s%s"):format(name, description, classname or ""))
+
+				if addon.Profile.ShowNames then 
+					model.SetInfo.setName:Show()
+					model.SetInfo.setName:SetText(("%s%s%s"):format(name, description, classname or ""))
+				else
+					model.SetInfo.setName:Hide()
+				end
+
 				if BetterWardrobeCollectionFrame:CheckTab(4) then
 					model.SetInfo.progress:Hide()
 				else
