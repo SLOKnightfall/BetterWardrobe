@@ -320,6 +320,8 @@
 				self.CollectionListVisual.Collection:SetPoint("BOTTOMRIGHT", self.Icon, "BOTTOMRIGHT", 2, -3)
 				self.CollectionListVisual.Unavailable:ClearAllPoints()
 				self.CollectionListVisual.Unavailable:SetPoint("TOPRIGHT", self.Icon, "TOPRIGHT", 5, 3)
+				self.CollectionListVisual.UnavailableItems:ClearAllPoints()
+				self.CollectionListVisual.UnavailableItems:SetPoint("TOPRIGHT", self.Icon, "TOPRIGHT", 5, 3)
 			</OnLoad>
 		</Scripts>
 	</Frame>

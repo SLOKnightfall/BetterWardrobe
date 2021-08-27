@@ -40,7 +40,7 @@
 		</Anchors>
 		<Layers>
 			<Layer level="OVERLAY">
-				<Texture parentKey="InvalidTexture" atlas="transmog-set-border-unusable" hidden="true">
+				<Texture parentKey="InvalidTexture" atlas="transmog-set-border-unusable" hidden="true" >
 					<Anchors>
 						<Anchor point="TOPLEFT" x="-11" y = "3"/>
 						<Anchor point="BOTTOMRIGHT" x = "8" y = "-2"/>
@@ -49,14 +49,30 @@
 			</Layer>
 		</Layers>
 		<Frames>
-			<Frame parentKey="Unavailable"  mixin="BW_SetIconMixin">
+			<Frame parentKey="Unavailable" mixin="BW_SetIconMixin" id = "1" hidden="true">
 			<Size x="17" y="17"/>
 				<Anchors>
-					<Anchor point="TOPRIGHT" x="5" y="10	"/>
+					<Anchor point="TOPRIGHT" x="5" y="10"/>
 				</Anchors>
 				<Layers>
 					<Layer level="ARTWORK">
-						<Texture parentKey="Icon" file="Interface\Minimap\Minimap_skull_normal" setAllPoints="true" hidden="true">
+						<Texture parentKey="Icon" atlas ="transmog-icon-remove" setAllPoints="true" >
+						</Texture>
+					</Layer>
+				</Layers>
+				<Scripts>
+					<OnEnter method="OnEnter" /> 
+					<OnLeave function="GameTooltip_Hide"/>
+				</Scripts>
+			</Frame>
+			<Frame parentKey="UnavailableItems"  mixin="BW_SetIconMixin" id = "2" hidden="true">
+			<Size x="17" y="17"/>
+				<Anchors>
+					<Anchor point="TOPRIGHT" x="5" y="10"/>
+				</Anchors>
+				<Layers>
+					<Layer level="ARTWORK">
+						<Texture parentKey="Icon" file="Interface\Minimap\Minimap_skull_normal" setAllPoints="true" >
 						</Texture>
 					</Layer>
 				</Layers>

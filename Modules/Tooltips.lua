@@ -339,7 +339,10 @@ function tooltip:ShowTooltip(itemLink)
 		if addon.Profile.ShowCollectionListTooltips and inList then
 			if not addHeader then
 				addHeader = true
-				addLine(self, L["HEADERTEXT"])
+				--addLine(self, L["HEADERTEXT"])
+				addLine(self, " ")
+				GameTooltip:AddTexture("Interface\\DialogFrame\\UI-DialogBox-Divider.blp",{width = self:GetWidth()+25, height = 15})
+
 			end
 
 			addDoubleLine (self,"|cff87aaff"..L["-Appearance in %d Collection List-"]:format(count), " ")
@@ -351,9 +354,12 @@ function tooltip:ShowTooltip(itemLink)
 		if addon.Profile.ShowSetTooltips and #setIDs > 0 then
 			if not addHeader then
 				addHeader = true
-				addLine(self, L["HEADERTEXT"])
-				---addLine(self, "..")
-				--GameTooltip:AddTexture("Interface\\QUESTFRAME\\UI-HorizontalBreak.blp",{width = 150, height = 32})
+				--addLine(self, L["HEADERTEXT"])
+				addLine(self, " ")
+				
+				GameTooltip:AddTexture("Interface\\DialogFrame\\UI-DialogBox-Divider.blp",{width = self:GetWidth()+25, height = 15})
+
+				--GameTooltip:AddTexture("Interface\\QUESTFRAME\\UI-HorizontalBreak.blp",{width = self:GetWidth()-10, height = 15})
 			end
 
 			for i, setID in pairs(setIDs) do
@@ -387,7 +393,9 @@ function tooltip:ShowTooltip(itemLink)
 		if addon.Profile.ShowExtraSetsTooltips and setData then
 			if not addHeader then
 				addHeader = true
-				addLine(self, L["HEADERTEXT"])
+				--addLine(self, L["HEADERTEXT"])
+								addLine(self, " ")
+				GameTooltip:AddTexture("Interface\\DialogFrame\\UI-DialogBox-Divider.blp",{width = self:GetWidth()+25, height = 15})
 			end
 			addDoubleLine (self,"|cffffd100"..L["Part of Extra Set:"], " ")
 			for _, data in pairs(setData) do
@@ -418,7 +426,9 @@ function tooltip:ShowTooltip(itemLink)
 		end
 
 		if addHeader then
-			addLine(self, L["HEADERTEXT"])
+			--addLine(self, L["HEADERTEXT"])
+			addLine(self, " ")
+			GameTooltip:AddTexture("Interface\\DialogFrame\\UI-DialogBox-Divider.blp",{width = self:GetWidth()+25, height = 15})
 		end
 		self:Show()
 	end

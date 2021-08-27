@@ -494,10 +494,15 @@ end
 		end
 ]]
 function CollectionList:ListCount(type)
-	local list = CollectionList:CurrentList()[type]
+	local list = CollectionList:CurrentList()
 	local counter = 0
+	if not list then return counter end
+
+	type = type or "item"
+	list = list[type]
+	
 	for i in pairs(list) do
-		counter = counter +1
+		counter = counter + 1
 	end
 	return counter
 end

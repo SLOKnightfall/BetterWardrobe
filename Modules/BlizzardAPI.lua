@@ -248,12 +248,16 @@ function addon.C_TransmogSets.GetSetSources(setID)
 
 	--Other Sets
 	else
+
 		if not setInfo.itemData then 
+
 		else
+
 
 		for slotID, sourceData in pairs(setInfo.itemData) do
 			local sourceID = sourceData[2]
 			local appearanceID = sourceData[3]
+
 			if sourceID ~= 0 then 
 				--local sourceInfo = sourceID and C_TransmogCollection.GetSourceInfo(sourceID)
 				local sources =  appearanceID and C_TransmogCollection.GetAppearanceSources(appearanceID)
@@ -266,14 +270,14 @@ function addon.C_TransmogSets.GetSetSources(setID)
 						WardrobeCollectionFrame_SortSources(sources)
 					end
 					setSources[sources[1].sourceID] = sources[1].isCollected--and sourceInfo.isCollected
-				else
+				else			
 
 					local allSources = C_TransmogCollection.GetAllAppearanceSources(appearanceID)
 					local list = {}
 					for _, sourceID in ipairs(allSources) do
 		
 						local info = C_TransmogCollection.GetSourceInfo(sourceID)
-						if (info and not info.sourceType) and not setInfo.sourceType then 
+						if (info and not info.sourceType) then --and not setInfo.sourceType then 
 							unavailable = true
 						end
 
@@ -284,8 +288,9 @@ function addon.C_TransmogSets.GetSetSources(setID)
 
 					if #list >= 1 then
 						WardrobeCollectionFrame_SortSources(list)
+
 						setSources[list[1].sourceID or sourceID ] = list[1].isCollected or false
-						if not list[1].sourceType and not setInfo.sourceType then 
+						if not list[1].sourceType then --and not setInfo.sourceType then 
 							unavailable = true
 						end
 					end

@@ -23,6 +23,49 @@ local BE_Frames = {}
 local WE_HideFrames = {}
 local old_FilterVisuals
 
+local tonumber, GetItemCount, strtrim, bit_band, type = tonumber, GetItemCount, strtrim, bit.band, type
+
+local Addon = _G.LTA
+
+--local ItemsCheckBonuses = LTS.ItemsCheckBonuses
+--local ZonesFilterList = LTS.ZonesFilterList
+
+local AllData
+local AllDataAll
+local Visuals
+local ItemSource
+local VendorNames
+local InstanceList
+local BossList
+local DiffList
+local ItemCost
+local QuestToZone
+local ZonesNames
+local ZoneToDataID
+local DiffToDataID
+local QuestZoneToDataID
+local QuestZoneToDataIDModern
+local NPCToZone
+local NPCReact
+local InstanceToEJ
+local BossToEJ
+local SetsAllData
+local Sets
+local Recolors
+local HaveRecolors
+local VisualColors
+
+local VLTW
+
+local _,playerClass = UnitClass'player'
+local playerFaction = UnitFactionGroup'player'
+
+local realmKey = GetRealmName() or ""
+local charName = UnitName'player' or ""
+realmKey = realmKey:gsub(" ","")
+local charKey = charName .. "-" .. realmKey
+local charKeyFind = charKey:gsub("%-","%%%-")
+
 	
 local function FilterVisuals(self)
 	if FilterInstance or filteredRecolors or FilterColor then
@@ -162,36 +205,7 @@ function addon.Init:UpdateWardrobeEnhanced()
 			local onLeave = WE_Frames.ColorButton:GetScript("OnLeave")
 			WE_Frames.ColorButton:SetParent(f)
 
-			local colorSelectButton = CreateFrame("Button", nil, WardrobeCollectionFrame)
 
-			colorSelectButton:SetSize(20, 20)
-			colorSelectButton:SetScript("OnClick",onClick)
-			colorSelectButton:SetScript("OnEnter",onEnter)
-			colorSelectButton:SetScript("OnLeave",onLeave)
-			colorSelectButton:SetScript("OnShow",function()
-					colorSelectButton:ClearAllPoints()
-
-					if WardrobeFrame_IsAtTransmogrifier() then
-						for _,but in pairs(WE_HideFrames) do
-							but:Hide()
-						end
-						colorSelectButton:SetPoint("TOPRIGHT", BW_SortDropDown, -15, 23)
-					else
-						for _,but in pairs(WE_HideFrames) do
-							but:Show()
-						end
-						colorSelectButton:SetPoint("RIGHT", WE_Frames.OptionsButton, "LEFT", -7, 0)
-					end
-					
-				end)
-			colorSelectButton.tooltip = "Select color"
-			
-			colorSelectButton.Texture = colorSelectButton:CreateTexture(nil,"ARTWORK")
-			colorSelectButton.Texture:SetPoint("CENTER")
-			colorSelectButton.Texture:SetSize(22,22)
-			colorSelectButton.Texture:SetTexture([[Interface\AddOns\LegionWardrobe\wheeltexture]])
-
-			WE_Frames.ColorButton = colorSelectButton
 			tinsert(WE_HideFrames, WE_Frames.ModelsButton)
 			completed = completed + 1
 
@@ -230,6 +244,7 @@ function addon.Init:UpdateWardrobeEnhanced()
 		end
 	end
 
+	WE_Frames.ResetButton:SetParent(BetterWardrobeCollectionFrame)
 	WE_Frames.ResetButton:ClearAllPoints()
 	WE_Frames.ResetButton:SetPoint("RIGHT", WE_Frames.ColorButton, "LEFT", -3, 0)
 	--WE_Frames.ResetButton:Hide()
@@ -238,24 +253,26 @@ function addon.Init:UpdateWardrobeEnhanced()
 
 	WE_Frames.ColorButton:ClearAllPoints()
 	if isAtTransmogrifier then
-		WE_Frames.ColorButton:SetPoint("TOPRIGHT", WardrobeCollectionFrameWeaponDropDown, -190, -3)
+		WE_Frames.ColorButton:SetPoint("TOPRIGHT", BetterWardrobeCollectionFrameWeaponDropDown, -190, -3)
 	else  
 		WE_Frames.ColorButton:SetPoint("RIGHT", WE_Frames.OptionsButton, "LEFT", -7, 0)
 	end
 	--WE_Frames.ColorButton:SetPoint("RIGHT", WE_Frames.OptionsButton, "LEFT", -7, 0)
 	--WE_Frames.ColorButton:SetScript("OnShow", function()  end)
 	--WE_Frames.ColorButton:Hide()
-
+	WE_Frames.OptionsButton:SetParent(BetterWardrobeCollectionFrame)
 	WE_Frames.OptionsButton:ClearAllPoints()
 	WE_Frames.OptionsButton:SetPoint("RIGHT", WE_Frames.ModelsButton, "LEFT", -3, 0)
 	--WE_Frames.OptionsButton:Hide()
+	WE_Frames.ModelsButton:SetParent(BetterWardrobeCollectionFrame)
 
 	WE_Frames.ModelsButton:ClearAllPoints()
 	WE_Frames.ModelsButton:SetPoint("RIGHT", WE_Frames.SetsButton, "LEFT", 0, 0)
 	--WE_Frames.ModelsButton:Hide()
+	WE_Frames.SetsButton:SetParent(BetterWardrobeCollectionFrame)
 
 	WE_Frames.SetsButton:ClearAllPoints()
-	WE_Frames.SetsButton:SetPoint("TOPRIGHT", WardrobeCollectionFrameWeaponDropDown, -15, 23)
+	WE_Frames.SetsButton:SetPoint("TOPRIGHT", BetterWardrobeCollectionFrameWeaponDropDown, -15, 23)
 	--WE_Frames.SetsButton:Hide()
 
 
@@ -275,7 +292,7 @@ function addon.Init:UpdateWardrobeEnhanced()
 		WE_Frames.ResetButton:Hide()
 	end)
 
-if WE_Frames.WatcherFrame then 
+	if WE_Frames.WatcherFrame then 
 		WE_Frames.WatcherFrame:Show()
 	end
 
@@ -286,40 +303,78 @@ if WE_Frames.WatcherFrame then
 		return
 	end
 
+	LoadAddOn("LegionWardrobeData")
+print("ppppp")
+	local WE = _G.LTA
+	local LTS = _G.LTSData
+	local Recolors = _G.LTSData.Recolors
+
+	local FilteringRecolors
+
+
+	local VLTW = _G.VLTW
+
+
+
+
+----TODO:  Soruce Window on click
+--Big Model
+
+--[[C_Timer.NewTimer(2,function()
+						for i=1,3 do
+							for j=1,6 do
+								local  frame = BetterWardrobeCollectionFrame.ItemsCollectionFrame["ModelR"..i.."C"..j]
+								--frame.posID = "ModelR"..i.."C"..j
+								--local frame2 = WardrobeCollectionFrame.ItemsCollectionFrame["ModelR"..i.."C"..j]
+		
+								local oldFunc = frame:GetScript("OnMouseDown")
+								--local oldFunc2 = frame2:GetScript("OnMouseDown")
+		
+								frame:SetScript("OnMouseDown",function(self,button,...)
+
+									if oldFunc then
+	
+										oldFunc(self,button,...)
+									end
+		
+									if IsModifiedClick("CHATLINK") or IsModifiedClick("DRESSUP") or WardrobeFrame_IsAtTransmogrifier() or not BetterWardrobeCollectionFrame.ItemsCollectionFrame.activeCategory then
+										return
+									end
+
+									if button == "LeftButton" then
+										--WardrobeCollectionFrame.ItemsCollectionFrame[self.posID]:OnMouseDown(WardrobeCollectionFrame.ItemsCollectionFrame[self.posID],button,...)
+										--frame2.visualInfo = self.visualInfo
+										--oldFunc2(frame2,button,...)
+										print("CC")
+										addon.CollectionList:GenerateSourceListView(self.visualInfo.visualID)
+									visualInfo = self.visualInfo
+
+										return
+									end
+									visualInfo = self.visualInfo
+									--LoadData()
+									--UpdateModel(models[1], visualInfo.visualID, visualInfo.isCollected, visualInfo)
+									--Model_OnClick(models[1],"LeftButton")
+									
+								end)
+							end
+						end
+					end)]]
+
+
+
+--mainFrame.models
 LoadAddOn("LegionWardrobeData")
 
-local WE = _G.LTA
-local LTS = _G.LTSData
-local Recolors = _G.LTSData.Recolors
-
-local FilteringRecolors
-
-if LegionWardrobeSourcesFrame.Recolors then 
-	LegionWardrobeSourcesFrame.Recolors:SetScript( "OnClick", function()
-		--addon.FilteringRecolors = true
-		local self = LegionWardrobeSourcesFrame.Recolors
-		local visualID = self:GetParent().modelFrom.visualID
-		for i=1,#Recolors do
-			local t = Recolors[i]
-			for j=1,#t do
-				if t[j] == visualID then
-					filteredRecolors = t
-					--Addon:ReloadCategory()
-					ReloadCategory()
-					return
-				end
-			end
-		end
-		print("<Wardrobe Enhanced>: Can't find any recolors")
-	end)
+	---old_FilterVisuals = BetterWardrobeCollectionFrame.ItemsCollectionFrame.FilterVisuals
+	---BetterWardrobeCollectionFrame.ItemsCollectionFrame.FilterVisuals = FilterVisuals
+	--BetterWardrobeCollectionFrame.ItemsCollectionFrame.FilterVisuals
+	--FilterRecolorVisual()
+				local LTS = _G.LTSData
+			
+				AllData = LTS.AllData
+				Visuals = LTS.Visuals
+				ItemSource = _G.LTSData.ItemSource
 end
 
 
-
-
-old_FilterVisuals = BetterWardrobeCollectionFrame.ItemsCollectionFrame.FilterVisuals
-BetterWardrobeCollectionFrame.ItemsCollectionFrame.FilterVisuals = FilterVisuals
---BetterWardrobeCollectionFrame.ItemsCollectionFrame.FilterVisuals
---FilterRecolorVisual()
-
-end

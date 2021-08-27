@@ -1175,7 +1175,6 @@ addon.frame = f
 
 ---Ace based addon initilization
 function addon:OnInitialize()
-	--print(string.byte(addon.VisualColors[42592])
 	local DB_Defaults = DB_Defaults
 	BetterWardrobe_ListData = BetterWardrobe_ListData or {}
 	local listDB = BetterWardrobe_ListData
@@ -1275,14 +1274,15 @@ function addon:OnEnable()
 	--addon.Init.LoadCollectionListModule()
 	--BW_ColectionListFrameTemplate
 	addon.Init:BuildTooltips()
-
+	
+	addon:RegisterEvent("TRANSMOG_COLLECTION_SOURCE_REMOVED", "EventHandler")
+	addon:RegisterEvent("TRANSMOG_COLLECTION_SOURCE_ADDED", "EventHandler")
 	if IsAddOnLoaded("Blizzard_Collections") then 
 		--BetterWardrobeCollectionFrame = WardrobeCollectionFrame
 		C_Timer.After(0.5, function() addon.Init:LoadModules() end)
 	else
 		addon:RegisterEvent("ADDON_LOADED", "EventHandler")
-		addon:RegisterEvent("TRANSMOG_COLLECTION_SOURCE_REMOVED", "EventHandler")
-		addon:RegisterEvent("TRANSMOG_COLLECTION_SOURCE_ADDED", "EventHandler")
+
 	end
 
 	addon:RegisterEvent("PLAYER_ENTERING_WORLD", "EventHandler")
