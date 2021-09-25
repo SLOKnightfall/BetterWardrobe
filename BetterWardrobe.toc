@@ -43,7 +43,7 @@ Data\ColorData.lua
 Data\CameraData.lua
 Data\AppearanceData.lua
 Data\ArtifactData.lua
-#Data\SourceData.lua
+Data\SourceData.lua
 
 Data\DataBase.lua
 Data\CLOTH.lua
