@@ -81,9 +81,9 @@ local inspectScantip = CreateFrame("GameTooltip", addonName.."ScanningTooltip", 
 inspectScantip:SetOwner(UIParent, "ANCHOR_NONE")
 local needsRefresh = {}
 local function GetQuestnfo(questData)
-	for i = 1, #questData do
+	--for i = 1, #questData do
 		local sourceData
-		local questID = questData[i]
+		local questID = questData
 		local questName
 		local link = "quest:"..questID
 		inspectScantip:SetHyperlink("quest:"..questID)
@@ -118,7 +118,7 @@ local function GetQuestnfo(questData)
 			end
 			--GameTooltip:AddLine(zoneName.."Quest: "..questID)
 		end
-	end
+	--end
 end
 
 local function GetDropInfo(dropData)
@@ -158,12 +158,10 @@ local function GetSourceInfo(itemID)
 
 				--for sourceID in string.gmatch(dropData, '(%a:%-?%d+:-),') do
 
-		for sourceID in string.gmatch(dropData, '(%a:%-?%d+:-[%s%w]-),') do
+		for sourceID in string.gmatch(dropData, '(%a:%-?%d+:-"-[%s%w]-"-),') do
 			if string.match(sourceID, "p:") then
-				print(sourceID)
 				--sourceID = string.gsub(tostring(sourceID),"p","")
 				for id, pr in string.gmatch(sourceID, 'p:(%w+):(.+)') do
-					print(id, pr)
 					table.insert(professionList, {id,pr})
 				end
 
@@ -181,8 +179,10 @@ local function GetSourceInfo(itemID)
 				end
 
 			elseif string.match(sourceID, "v:") then
-				sourceID = string.gsub(tostring(sourceID),"v:","")
-				table.insert(vendorList, tonumber(sourceID))
+				for id, pr in string.gmatch(sourceID, 'v:(%w+):(.+)') do
+					table.insert(vendorList, {id,pr})
+				end
+				--table.insert(vendorList, tonumber(sourceID))
 
 			elseif string.match(sourceID, "a:") then 
 				sourceID = string.gsub(tostring(sourceID),"a:","")
@@ -308,21 +308,91 @@ end
 
 local AceGUI = LibStub("AceGUI-3.0")
 
-local function AddAdditional(parent)
+local function AddAdditional(parent, index, data)
 	local f = {}
 	local Collected = AceGUI:Create("Icon")
 	Collected:SetImageSize(20,20)
-	Collected:SetWidth(25)
+	Collected:SetWidth(30)
 	parent:AddChild(Collected)
 
-	local icon = AceGUI:Create("Icon")
-	icon:SetImageSize(20,20)
-	parent:AddChild(icon)
-	icon:SetWidth(25)
+	local SourceInfo = AceGUI:Create("InteractiveLabel")
+	SourceInfo:SetFont(SourceInfo.label:GetFont(),12)
+	SourceInfo:SetHeight(20)
+	local link, sourceName
 
-	local CheckBox = AceGUI:Create("InteractiveLabel")
-	CheckBox:SetFont(CheckBox.label:GetFont(),12)
-	CheckBox:SetHeight(25)
+	if index == 0 then 
+		sourceName = data
+		transmogSource = _G["TRANSMOG_SOURCE_1"] or ""
+		SourceInfo:SetText(("-%s: %s"):format(transmogSource, sourceName or L["No Data Available"]))
+
+	elseif index == 1 then
+		sourceName = data
+		transmogSource = _G["TRANSMOG_SOURCE_4"] or ""
+		local zoneList = ""
+		for index, zone in ipairs(data) do
+			if addon.locationDB[zone] then 
+				zoneList = zoneList .. (addon.locationDB[zone])..", "
+			end
+		end
+		SourceInfo:SetText(("-%s: %s"):format(transmogSource, zoneList))
+
+	elseif index == 2 then 
+
+		local item = Item:CreateFromItemID(tonumber(data))
+		item:ContinueOnItemLoad(function()
+			local name = item:GetItemName() 
+			SourceInfo:SetText(("-%s: %s"):format(L["Created by"], name))
+		end)
+	elseif index == 3 then 
+		local item = Item:CreateFromItemID(tonumber(data))
+		item:ContinueOnItemLoad(function()
+			local name = item:GetItemName() 
+			SourceInfo:SetText(("-%s: %s"):format(L["Conatined in"], name))
+		end)
+
+	elseif index == 4 then 
+		sourceName, zoneName, link = GetQuestnfo(data)
+		--data.questName = sourceName
+		--sourceDB = questList
+		transmogSource = _G["TRANSMOG_SOURCE_2"] or ""
+		sourceName = ACHIEVEMENT_COLOR_CODE..sourceName..L.ENDCOLOR
+
+		if zoneName then
+			--SourceInfo:SetText(("    %s: %s - %s: [%s]"):format(L["Zone"], zoneName or "?", transmogSource, sourceName or L["No Data Available"]))
+			SourceInfo:SetText(("-%s: %s - [%s] "):format(transmogSource, zoneName, sourceName or L["No Data Available"]))
+		else
+			SourceInfo:SetText(("-%s: [%s] "):format(transmogSource, sourceName or L["No Data Available"]))
+		end
+
+	elseif index == 5 then 
+		local id, name, points = GetAchievementInfo(data)
+		sourceName = name
+		link = GetAchievementLink(id)
+		transmogSource = _G["TRANSMOG_SOURCE_5"] or ""
+		sourceName = ACHIEVEMENT_COLOR_CODE..sourceName..L.ENDCOLOR
+		SourceInfo:SetText(("    %s: [%s]"):format(transmogSource, sourceName))
+
+	elseif index == 6 then 
+		spellID = data[1]
+		profession = data[2]
+		link = GetSpellLink(spellID)
+
+		local name, rank, icon, castTime, minRange, maxRange, spellId = GetSpellInfo(spellID)
+		--local id, name, points = GetAchievementInfo(sourceName)
+		sourceName = name
+		sourceName = ACHIEVEMENT_COLOR_CODE..sourceName..L.ENDCOLOR
+		SourceInfo:SetText(("    %s: [%s]"):format(L[profession], sourceName or L["No Data Available"]))
+
+	elseif index == 7 then 
+		sourceName = data[1]
+		vendorName = data[2]
+		transmogSource = _G["TRANSMOG_SOURCE_3"] or ""
+		SourceInfo:SetText(("    %s: %s - %s: %s"):format( transmogSource, L[vendorName] or L["No Data Available"], L["Zone"], zoneName or "?"))
+
+
+	else
+		SourceInfo:SetText(("    %s"):format(L["No Data Available"]))
+	end
 
 
 
@@ -331,58 +401,37 @@ local function AddAdditional(parent)
 		Heading:SetFullWidth(true)
 		parent:AddChild(Heading)
 	end]]
-	CheckBox:SetCallback("OnClick", function()
-		if ( IsModifiedClick("CHATLINK") ) then
-				if ( itemLink ) then
-					HandleModifiedItemClick(itemLink)
-				end
-		elseif ( IsModifiedClick("DRESSUP") ) then
-			DressUpVisual(data.sourceID)
-		end
-	end)
 
-	CheckBox:SetCallback("OnEnter", function()
+	SourceInfo:SetCallback("OnEnter", function()
 		GameTooltip:SetOwner(UIParent, "ANCHOR_CURSOR", 0, 0)
-		if (itemLink) then 
-			GameTooltip:SetHyperlink(itemLink)
+		if (link) then 
+			GameTooltip:SetHyperlink(link)
 			GameTooltip:Show()
 		end
 	end)
 	
-	CheckBox:SetCallback("OnLeave", function()
+	SourceInfo:SetCallback("OnLeave", function()
 		GameTooltip:Hide()
 	end)
 
-	CheckBox:SetRelativeWidth(.25)
-	parent:AddChild(CheckBox)
+	SourceInfo:SetRelativeWidth(.86)
+	parent:AddChild(SourceInfo)
 
-	local LinkButton = AceGUI:Create("Button")
-	LinkButton:SetText("Link")
+	local LinkButton = AceGUI:Create("InteractiveLabel")
+	--LinkButton:SetText("Link")
 	LinkButton:SetWidth(60)
-	LinkButton:SetHeight(25)
+	LinkButton:SetHeight(20)
 
 
-	LinkButton:SetCallback("OnClick", function()
-		Export(data.itemID, parent)
-	end)
+	--LinkButton:SetCallback("OnClick", function()
+		--Export(data.itemID, parent)
+	--end)
 	parent:AddChild(LinkButton)
 	local sourceName = ""
 	local zoneName, questlink
 
 	--Export
 	--
-
-	local SourceInfo = AceGUI:Create("InteractiveLabel")
-	SourceInfo:SetFont(SourceInfo.label:GetFont(),12)
-	SourceInfo:SetHeight(40)
-
-	SourceInfo:SetRelativeWidth(.50)
-	parent:AddChild(SourceInfo)
-
-	local Additionals = AceGUI:Create("InteractiveLabel")
-	Additionals:SetWidth(55)
-	parent:AddChild(Additionals)
-
 
 
 end
@@ -394,12 +443,13 @@ function CollectionList:GenerateSourceListView(visualID)
 
 	-- Create a container frame
 	local f = AceGUI:Create("Window")
+	--f:SetStatusText("") 
 	f:SetCallback("OnClose",function(widget) AceGUI:Release(widget) end)
 	f:SetCallback("OnHide",function(widget) AceGUI:Release(widget) end)
 
 	f:SetTitle(L["Sources"])
 	f:SetStatusText("Status Bar")
-	f:SetLayout("Flow")
+	f:SetLayout("LIST")
 	--f:SetAutoAdjustHeight(true)
 	f:EnableResize(false)
 	_G["BetterWardrobeCollectionListWindow"] = f.frame
@@ -408,9 +458,23 @@ function CollectionList:GenerateSourceListView(visualID)
 
 	local scrollcontainer = AceGUI:Create("SimpleGroup")
 	scrollcontainer:SetFullWidth(true)
-	scrollcontainer:SetHeight(f.frame:GetHeight()-75)
+	scrollcontainer:SetHeight(f.frame:GetHeight()-45)
 	scrollcontainer:SetLayout("Fill") -- important!
 	f:AddChild(scrollcontainer)
+
+	local MultiLineEditBox = AceGUI:Create("MultiLineEditBox")
+	--MultiLineEditBox:SetFullHeight(true)
+	MultiLineEditBox:SetFullWidth(true)
+	MultiLineEditBox:SetLabel("")
+	MultiLineEditBox.button:Hide()
+	MultiLineEditBox.scrollBar:Hide()
+	MultiLineEditBox:SetHeight(25)
+	f:AddChild(MultiLineEditBox)
+
+
+
+	--MultiLineEditBox.frame:ClearAllPoints()
+	--MultiLineEditBox:SetPoint("BOTOMLEFT", f, "BOTTOMLEFT")
 
 	local scroll = AceGUI:Create("ScrollFrame")
 	scroll:SetLayout("Flow")
@@ -489,7 +553,7 @@ function CollectionList:GenerateSourceListView(visualID)
 				GameTooltip:Hide()
 			end)
 
-			CheckBox:SetRelativeWidth(.25)
+			CheckBox:SetRelativeWidth(.83)
 			scroll:AddChild(CheckBox)
 
 			local LinkButton = AceGUI:Create("Button")
@@ -499,162 +563,39 @@ function CollectionList:GenerateSourceListView(visualID)
 
 
 			LinkButton:SetCallback("OnClick", function()
-				Export(data.itemID, scroll)
+				local url = "https://www.wowhead.com/item="
+				MultiLineEditBox:SetText(url..data.itemID) 
+				--Export(data.itemID, scroll)
 			end)
 			scroll:AddChild(LinkButton)
 			local sourceName = ""
 			local zoneName, questlink
 
-			--Export
-			--
-
-			local zonelist, objectlist, containerlist, questList, achievementList, professionList, vendorList = GetSourceInfo(data.itemID)
-			local profession, link, sourceDB
-
-			local SourceInfo = AceGUI:Create("InteractiveLabel")
-			SourceInfo:SetFont(SourceInfo.label:GetFont(),12)
-			SourceInfo:SetHeight(40)
-
-			SourceInfo:SetRelativeWidth(.50)
-			scroll:AddChild(SourceInfo)
-
-			local Additionals = AceGUI:Create("InteractiveLabel")
-			Additionals:SetWidth(55)
-			scroll:AddChild(Additionals)
-			--dungeon
-
-
-			if data.sourceType then
 				if data.sourceType and data.sourceType == 1 then
 					sourceName = GetBossInfo(data.sourceID)
-					SourceInfo:SetText(("    %s: %s"):format(transmogSource, sourceName or L["No Data Available"]))
+					AddAdditional(scroll, 0, sourceName)
 
-
-				--quest
-				--TODO: fix data loading issue
-				--elseif data.sourceType and data.sourceType == 2 then
-				elseif #questList > 0 then 
-					sourceName, zoneName, link = GetQuestnfo(questList)
-					data.questName = sourceName
-					sourceDB = questList
-					transmogSource = _G["TRANSMOG_SOURCE_2"] or ""
-					sourceName = ACHIEVEMENT_COLOR_CODE..sourceName..L.ENDCOLOR
-
-					if zoneName then
-						--SourceInfo:SetText(("    %s: %s - %s: [%s]"):format(L["Zone"], zoneName or "?", transmogSource, sourceName or L["No Data Available"]))
-						SourceInfo:SetText(("    %s: %s - [%s] "):format(transmogSource, zoneName, sourceName or L["No Data Available"]))
-					else
-						SourceInfo:SetText(("    %s: [%s] "):format(transmogSource, sourceName or L["No Data Available"]))
-					end
-
-
-					
-				--Vendor
-				--TODO:  ADD vendor info
-
-				--elseif data.sourceType and data.sourceType == 3 then
-				elseif #vendorList > 0 then 
-					sourceName = vendorList[1]
-					sourceDB = vendorList
-					transmogSource = _G["TRANSMOG_SOURCE_3"] or ""
-
-					SourceInfo:SetText(("    %s: %s - %s: [%s]"):format( L["Zone"], zoneName or "?", transmogSource, sourceName or L["No Data Available"]))
-
-					--local  id, name, points = GetAchievementInfo(sourceName)
-					--sourceName = name
-				
-				--World Drop
-				--elseif data.sourceType and data.sourceType == 4 then
-				elseif #zonelist > 0 then 
-
-						sourceName = zonelist[1]
-						--zonelist, objectlist, containerlist = GetDropInfo(data.sourceData)
-						sourceDB = zonelist
-						transmogSource = _G["TRANSMOG_SOURCE_4"] or ""
-
-						SourceInfo:SetText(("    %s: %s"):format(transmogSource, addon.locationDB[zonelist[1]] or zonelist[1]))
-
-					
-				--Achievement  Done
-				--elseif data.sourceType and data.sourceType == 5 then
-				elseif #achievementList > 0 then
-					sourceName = achievementList[1]
-					local id, name, points = GetAchievementInfo(sourceName)
-					sourceName = name
-					sourceDB = achievementList
-					link = GetAchievementLink(id)
-					transmogSource = _G["TRANSMOG_SOURCE_5"] or ""
-					SourceInfo:SetText(("    %s: %s"):format(transmogSource, name))
-
-				--professionList  Done
-				elseif #professionList > 0 then
-					spellID = professionList[1][1]
-					profession = professionList[1][2]
-					link = GetSpellLink(spellID)
-					sourceDB = professionList
-
-					local name, rank, icon, castTime, minRange, maxRange, spellId = GetSpellInfo(spellID)
-					--local id, name, points = GetAchievementInfo(sourceName)
-					sourceName = name
-					sourceName = ACHIEVEMENT_COLOR_CODE..sourceName..L.ENDCOLOR
-
-					SourceInfo:SetText(("    %s: [%s]"):format(L[profession], sourceName or L["No Data Available"]))
+					--SourceInfo:SetText(("    %s: %s"):format(transmogSource, sourceName or L["No Data Available"]))
 				end
+
+			local zonelist, objectlist, containerlist, questList, achievementList, professionList, vendorList = GetSourceInfo(data.itemID)
+
+			if #zonelist > 1 then
+				AddAdditional(scroll, 1, zonelist)
 			end
 
-			if containerlist and #containerlist > 0 then
-				local item = Item:CreateFromItemID(tonumber(containerlist[1]))
-				item:ContinueOnItemLoad(function()
-					local name = item:GetItemName() 
-					SourceInfo:SetText(("    %s: %s"):format(L["Conatined in"], name))
-				end)
-			end
-
-			local total_count = #zonelist + #objectlist + #containerlist + #questList + #achievementList + #professionList + #vendorList
-			local DB_List = {zonelist ,objectlist,containerlist,questList,achievementList ,professionList,vendorList}
-			if total_count > 1 then
-
-				for _,list in ipairs(DB_List) do
+			local DB_List = {objectlist,containerlist,questList,achievementList ,professionList,vendorList}
+				for index, list in ipairs(DB_List) do
 					--if #list > 2 then
 						for _, data in ipairs(list) do
-							AddAdditional(scroll)
+							AddAdditional(scroll, index+1, data)
 						end 
 					--end
 				end
-					--AddAdditional(parent)
---
-				--Additionals:SetFont("GameFontHighlightSmall",12)
+			--Export
+			--
 
-				--Additionals:SetText(("+%s More"):format(total_count-1))
-			end
-
-			if data.sourceType ~=1 and total_count == 0 then 
-					SourceInfo:SetText(("    %s"):format(L["No Data Available"]))
-
-			end
-							
-			local itemID = tonumber(itemLink:match("item:(%d+)"))
-				
-			SourceInfo:SetCallback("OnEnter", function(self)
-				--SourcesFrame_SourceData_OnEnter(data)
-				GameTooltip:SetOwner(UIParent, "ANCHOR_CURSOR", 0, 0)
-				if (link) then 
-					GameTooltip:SetHyperlink(link)
-					GameTooltip:Show()
-				end
-			end)
 			
-			SourceInfo:SetCallback("OnLeave", function()
-				GameTooltip:Hide()
-			end)
-
-			if refresh then
-				refresh = false
-				do
-					local vis = visualID
-					C_Timer.After(0, function() CollectionList:GenerateSourceListView(vis) end)
-				end
-			end
 		end
 	end
 end
