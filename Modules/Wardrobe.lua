@@ -3523,8 +3523,8 @@ function BetterWardrobeCollectionFrameRightClickDropDown_Init(self)
 	
 	info.notCheckable = true;
 	info.func = function(_, visualID, value)  
-										addon.CollectionList:GenerateSourceListView(visualID)
-end;
+			addon.CollectionList:GenerateSourceListView(visualID)
+	end;
 	BW_UIDropDownMenu_AddButton(info);
 
 
@@ -6463,10 +6463,36 @@ local BW_ItemSubDropDownMenu = CreateFrame("Frame", "BW_ItemSubDropDownMenu", UI
 BW_ItemSubDropDownMenu:SetFrameLevel(500)
 local clickedItemID = nil
 local BW_ItemSubDropDownMenu_Table = {
+
+	{
+	text = L["View Sources"],
+		func = function(self)   
+		 	local appearanceID, sourceID = C_TransmogCollection.GetItemInfo(clickedItemID)	
+			addon.CollectionList:GenerateSourceListView(appearanceID)
+
+		end,
+		notCheckable = 1,
+	},
+	{
+		text = CLOSE,
+		func = function() BW_CloseDropDownMenus() end,
+		notCheckable = 1,
+	},
+}
+local BW_ExtraItemSubDropDownMenu_Table = {
 	{
 		text = L["Substitue Item"],
 		func = function(self)    		
 			BetterWardrobeOutfitFrameMixin:ShowPopup("BETTER_WARDROBE_SUBITEM_POPUP")
+		end,
+		notCheckable = 1,
+	},
+		{
+	text = L["View Sources"],
+		func = function(self)   
+		 	local appearanceID, sourceID = C_TransmogCollection.GetItemInfo(clickedItemID)	
+			addon.CollectionList:GenerateSourceListView(appearanceID)
+
 		end,
 		notCheckable = 1,
 	},
@@ -6576,10 +6602,13 @@ function BetterWardrobeSetsDetailsItemMixin:OnMouseDown(button)
 	elseif ( IsModifiedClick("DRESSUP") ) then
 		DressUpVisual(self.sourceID);
 
+	elseif button == "RightButton"  and BetterWardrobeCollectionFrame.selectedCollectionTab == 2 then ---TODO review
+		clickedItemID = self.itemID
+		BW_EasyMenu(BW_ItemSubDropDownMenu_Table, BW_ItemSubDropDownMenu, self, 0, 0, "MENU", 10)
 
 	elseif button == "RightButton"  and BetterWardrobeCollectionFrame.selectedCollectionTab == 3 then ---TODO review
 		clickedItemID = self.itemID
-		BW_EasyMenu(BW_ItemSubDropDownMenu_Table, BW_ItemSubDropDownMenu, self, 0, 0, "MENU", 10)
+		BW_EasyMenu(BW_ExtraItemSubDropDownMenu_Table, BW_ItemSubDropDownMenu, self, 0, 0, "MENU", 10)
 	end
 end
 
