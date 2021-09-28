@@ -10,50 +10,8 @@ CollectionList.showAll = true
 
 local MogItLoaded = false
 local refresh = false
-local  LISTWINDOW
-local LISTWINDOW2
-
-
-local function Export(itemString, parent)
-	if  LISTWINDOW2 then LISTWINDOW2:Hide() end
-
-	for _, listPopup in pairs(BetterWardrobeOutfitFrameMixin.popups) do
-		StaticPopup_Hide(listPopup)
-	end
-	local url = "https://www.wowhead.com/item="
-	local f = AceGUI:Create("Window")
-	
-	--f:SetBackdrop(	BACKDROP_DIALOG_32_32 )
-	f:SetCallback("OnClose",function(f) AceGUI:Release(f) end)
-	f:SetCallback("onHide",function(f)print("OC") ;AceGUI:Release(f) end)
-
-	f:SetTitle("WowHead Link")
-	f:SetLayout("Fill")
-	--f:SetAutoAdjustHeight(true)
-	f:EnableResize(false)
-	f:SetHeight(100)
-	f:SetWidth(450)
-
-		f.frame:SetParent(parent.frame)
-		f.frame:SetPoint("CENTER", parent.frame, "CENTER")
-	
-	--CollectionList.LISTWINDOW
-	_G["BetterWardrobeExportWindow"] = f.frame
-	--Mixin(f.frame, BackdropTemplateMixin )
-	--f.UISpecialFrames:SetBackdrop(	BACKDROP_DIALOG_32_32 )
-	LISTWINDOW2 = f
-	tinsert(UISpecialFrames, "BetterWardrobeExportWindow")
-
-	local MultiLineEditBox = AceGUI:Create("MultiLineEditBox")
-	MultiLineEditBox:SetFullHeight(true)
-	MultiLineEditBox:SetFullWidth(true)
-	MultiLineEditBox:SetLabel("")
-	--MultiLineEditBox:DisableButton(button)
-	f:AddChild(MultiLineEditBox)
-
-	--MultiLineEditBox:SetText(url..itemString or "")
-end
-
+local LISTWINDOW
+ 
 local function GetBossInfo(itemID)
 	local drops = C_TransmogCollection.GetAppearanceSourceDrops(itemID)
 	local sourceText = ""
@@ -155,10 +113,9 @@ local function GetSourceInfo(itemID)
 	local dropData = addon.sourceDB[tonumber(itemID)]
 
 	if dropData then  
-
 				--for sourceID in string.gmatch(dropData, '(%a:%-?%d+:-),') do
 
-		for sourceID in string.gmatch(dropData, '(%a:%-?%d+:-"-[%s%w]-"-),') do
+		for sourceID in string.gmatch(dropData, '(%a:%-?%d+:-"-[%s%w%p]-"-),') do
 			if string.match(sourceID, "p:") then
 				--sourceID = string.gsub(tostring(sourceID),"p","")
 				for id, pr in string.gmatch(sourceID, 'p:(%w+):(.+)') do
@@ -260,55 +217,38 @@ local function GetZoneName(zone)
 	-- body
 end
 
-local function SourcesFrame_SourceData_OnEnter(data)
-	local FirstLine = _G["TRANSMOG_SOURCE_"..(data.sourceType)]
-	local sourceType = data.sourceType
+local function GetPrice(itemID)
+	local data = addon.itemCostDB[tonumber(itemID)] or "NoData"
+	local prices, item, currency = 0, {}, {}
 
-	if not sourceType then 
-		if FirstLine then
-				GameTooltip:SetOwner(UIParent, "ANCHOR_CURSOR", 0, 0)
-			GameTooltip:AddLine(FirstLine)
-			GameTooltip:Show()
-		end
-		return 
-	end
-		
-				GameTooltip:SetOwner(UIParent, "ANCHOR_CURSOR", 0, 0)
-	if sourceType == 2 then
-		if FirstLine then
-			GameTooltip:AddLine(FirstLine)
-		end
+	local index = 0
+	for price in string.gmatch(data, '([%d,]-):') do
+		index = index + 1
+		if index == 1 then
+			prices = price
 
-		GameTooltip:AddLine(data.sourceType)
-		local sourceData = data.sourceData[2]
-		for i = 1, #sourceData do
-			local questID = sourceData[i]
-			local questName
-			inspectScantip:SetHyperlink("quest:"..questID)
-
-			if inspectScantip:NumLines() > 0 then
-				local tooltipLine = _G[addonName.."ScanningTooltipTextLeft1"]
-				local text = tooltipLine:GetText()
-				if text and text ~= "" then
-					questName = text
+		elseif index == 2 then
+			for itemID, cost in string.gmatch(price, '(%d+),(%d+)') do
+				if tonumber(itemID) ~= 0 then 
+					table.insert(currency, tonumber(itemID))
+					table.insert(currency, tonumber(cost))
 				end
 			end
-			inspectScantip:ClearLines()
-			local zoneName = ("%s: "):format(addon.questlocationDB[questID][1] or "")
-			--local zoneName = GetZoneName(QuestToZone[questID],"%s: ")
-			if questName then
-				GameTooltip:AddLine(zoneName..questName)
-			else
-				GameTooltip:AddLine(zoneName.."Quest: "..questID)
+
+		elseif index == 3 then
+			for itemID, cost in string.gmatch(price, '(%d+),(%d+)') do
+				if tonumber(itemID) ~= 0 then 
+					table.insert(item, tonumber(itemID))
+					table.insert(item, cost)
+				end
 			end
 		end
 	end
-	GameTooltip:Show()
-end	
+	return prices, currency, item
+end
 
-local AceGUI = LibStub("AceGUI-3.0")
 
-local function AddAdditional(parent, index, data)
+local function AddAdditional(parent, index, data, itemID)
 	local f = {}
 	local Collected = AceGUI:Create("Icon")
 	Collected:SetImageSize(20,20)
@@ -355,7 +295,7 @@ local function AddAdditional(parent, index, data)
 		--data.questName = sourceName
 		--sourceDB = questList
 		transmogSource = _G["TRANSMOG_SOURCE_2"] or ""
-		sourceName = ACHIEVEMENT_COLOR_CODE..sourceName..L.ENDCOLOR
+		sourceName = ACHIEVEMENT_COLOR_CODE..(sourceName or "?")..L.ENDCOLOR
 
 		if zoneName then
 			--SourceInfo:SetText(("    %s: %s - %s: [%s]"):format(L["Zone"], zoneName or "?", transmogSource, sourceName or L["No Data Available"]))
@@ -387,8 +327,44 @@ local function AddAdditional(parent, index, data)
 		sourceName = data[1]
 		vendorName = data[2]
 		transmogSource = _G["TRANSMOG_SOURCE_3"] or ""
-		SourceInfo:SetText(("    %s: %s - %s: %s"):format( transmogSource, L[vendorName] or L["No Data Available"], L["Zone"], zoneName or "?"))
+		prices, currency, items = GetPrice(itemID)
+		price_text = ""
+		local goldCost = tonumber(prices)
+		if goldCost > 0 then
+			price_text = price_text .. GetCoinTextureString(goldCost).."   "
+			SourceInfo:SetText(("    %s: %s - %s: %s - Price: %s"):format( transmogSource, L[vendorName] or L["No Data Available"], L["Zone"], zoneName or "?", price_text))
+		end
 
+		for i=1, #currency, 2 do
+			if currency[i] then 
+				local currencyInfo = C_CurrencyInfo.GetCurrencyInfo(tonumber(currency[i]))
+				local name = currencyInfo.name
+				local icon = currencyInfo.iconFileID
+				local cost = currency[i+1] or 0
+
+				local text = price_text
+				price_text = price_text..cost.." |T"..icon..":0|t ".."["..name.."] "
+				SourceInfo:SetText(("    %s: %s - %s: %s - Price: %s"):format( transmogSource, L[vendorName] or L["No Data Available"], L["Zone"], zoneName or "?", price_text))
+
+			end
+		end
+
+		for i=1,#items, 2 do
+			if items[i] then 
+				local item = Item:CreateFromItemID(tonumber(items[i]))
+				local cost = items[i+1]
+				item:ContinueOnItemLoad(function()
+					local name = item:GetItemName()
+					local icon = item:GetItemIcon()
+					local text = price_text
+					text = text..cost.." |T"..icon..":0|t ".."["..name.."] "
+					SourceInfo:SetText(("    %s: %s - %s: %s - Price: %s"):format( transmogSource, L[vendorName] or L["No Data Available"], L["Zone"], zoneName or "?", text))
+
+				end)
+
+			end
+		end
+		--SourceInfo:SetText(("    %s: %s - %s: %s - Price: %s"):format( transmogSource, L[vendorName] or L["No Data Available"], L["Zone"], zoneName or "?", price_text))
 
 	else
 		SourceInfo:SetText(("    %s"):format(L["No Data Available"]))
@@ -496,6 +472,7 @@ function CollectionList:GenerateSourceListView(visualID)
 			end
 
 			local itemName, _, itemQuality = GetItemInfo(itemLink)
+			--local itemID =GetItemInfoFromHyperlink(itemLink)
 			local nameColor = ITEM_QUALITY_COLORS[itemQuality] or ""
 			local transmogSource = data.sourceType and _G["TRANSMOG_SOURCE_"..(data.sourceType)] or ""
 			local bossInfo = ""
@@ -587,8 +564,8 @@ function CollectionList:GenerateSourceListView(visualID)
 			local DB_List = {objectlist,containerlist,questList,achievementList ,professionList,vendorList}
 				for index, list in ipairs(DB_List) do
 					--if #list > 2 then
-						for _, data in ipairs(list) do
-							AddAdditional(scroll, index+1, data)
+						for _, db_data in ipairs(list) do
+							AddAdditional(scroll, index+1, db_data, data.itemID)
 						end 
 					--end
 				end
