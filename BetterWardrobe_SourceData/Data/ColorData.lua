@@ -1,5 +1,5 @@
 local addonName, addon = ...
-addon = LibStub("AceAddon-3.0"):GetAddon(addonName)
+_G.BetterWardrobeData = addon
 
 addon.ColorTable = {
 	[155]={{69,77,59,},{68,72,54,197,156,109,146,104,65,97,153,145,74,132,123,125,180,173,},},

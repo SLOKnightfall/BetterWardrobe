@@ -11,6 +11,8 @@ CollectionList.showAll = true
 local MogItLoaded = false
 local refresh = false
 local LISTWINDOW
+local vendorDB = {}
+local locationDB = {}
  
 local function GetBossInfo(itemID)
 	local drops = C_TransmogCollection.GetAppearanceSourceDrops(itemID)
@@ -58,10 +60,10 @@ local function GetQuestnfo(questData)
 
 		end
 		inspectScantip:ClearLines()
-		--local zoneName = ("%s: "):format(addon.locationDB[questID][1]) --GetZoneName(QuestToZone[questID],"%s: ").
+		--local zoneName = ("%s: "):format(locationDB[questID][1]) --GetZoneName(QuestToZone[questID],"%s: ").
 		local zoneid = addon.questlocationDB[tonumber(questID)]
 		local zoneid = zoneid and zoneid[1] or 0
-		local zoneName = addon.locationDB[zoneid] --GetZoneName(QuestToZone[questID],"%s: ")
+		local zoneName = locationDB[zoneid] --GetZoneName(QuestToZone[questID],"%s: ")
 
 		if questName then
 			return questName or "", zoneName, link
@@ -110,7 +112,8 @@ local function GetSourceInfo(itemID)
 	local achievementList = {}
 	local professionList = {}
 	local vendorList = {}
-	local dropData = addon.sourceDB[tonumber(itemID)]
+	local itemSourceDB = (_G.BetterWardrobeData and _G.BetterWardrobeData.sourceDB )or {}
+	local dropData = itemSourceDB[tonumber(itemID)]
 
 	if dropData then  
 				--for sourceID in string.gmatch(dropData, '(%a:%-?%d+:-),') do
@@ -172,8 +175,8 @@ local function GetSourceInfo(itemID)
 					end
 				end
 				inspectScantip:ClearLines()
-				--local zoneName = ("%s: "):format(addon.locationDB[questID][1]) --GetZoneName(QuestToZone[questID],"%s: ")
-				local zoneName = addon.locationDB[questID][1] or "" --GetZoneName(QuestToZone[questID],"%s: ")
+				--local zoneName = ("%s: "):format(locationDB[questID][1]) --GetZoneName(QuestToZone[questID],"%s: ")
+				local zoneName = locationDB[questID][1] or "" --GetZoneName(QuestToZone[questID],"%s: ")
 		
 				if questName then
 					return questName or "", zoneName
@@ -185,7 +188,13 @@ local function GetSourceInfo(itemID)
 end
 
 local function buildsourcelist(visualID)
-	local itemSourceDB = addon.sourceDB or {}
+	if not IsAddOnLoaded("BetterWardrobe_SourceData") then
+		LoadAddOn("BetterWardrobe_SourceData")
+		vendorDB = (_G.BetterWardrobeData and _G.BetterWardrobeData.vendorDB) or {}
+		locationDB = (_G.BetterWardrobeData and _G.BetterWardrobeData.locationDB) or {}
+	end
+
+	local itemSourceDB =( _G.BetterWardrobeData and _G.BetterWardrobeData.sourceDB) or {}
 
 	local sources = C_TransmogCollection.GetAllAppearanceSources(visualID)
 	local sourceID = sources and sources.sourceID
@@ -220,7 +229,8 @@ local function GetZoneName(zone)
 end
 
 local function GetPrice(itemID)
-	local data = addon.itemCostDB[tonumber(itemID)] or "NoData"
+	local itemCostDB = (_G.BetterWardrobeData and _G.BetterWardrobeData.itemCostDB) or {}
+	local data = itemCostDB[tonumber(itemID)] or "NoData"
 	local prices, item, currency = 0, {}, {}
 
 	local index = 0
@@ -272,8 +282,8 @@ local function AddAdditional(parent, index, data, itemID)
 		transmogSource = _G["TRANSMOG_SOURCE_4"] or ""
 		local zoneList = ""
 		for index, zone in ipairs(data) do
-			if addon.locationDB[zone] then 
-				zoneList = zoneList .. (addon.locationDB[zone])..", "
+			if locationDB[zone] then 
+				zoneList = zoneList .. (locationDB[zone])..", "
 			end
 		end
 		SourceInfo:SetText(("-%s: %s"):format(transmogSource, zoneList))
@@ -328,11 +338,11 @@ local function AddAdditional(parent, index, data, itemID)
 	elseif index == 7 then 
 		sourceName = data[1]
 		vendorName = data[2]
-		local zonedata = addon.vendorDB[tonumber(sourceName)] or {}
+		local zonedata = vendorDB[tonumber(sourceName)] or {}
 		local zones = ""
 		for i, zondID in ipairs(zonedata) do
-			if addon.locationDB[tonumber(zondID)] then 
-				zones = zones..addon.locationDB[tonumber(zondID)]..","
+			if locationDB[tonumber(zondID)] then 
+				zones = zones..locationDB[tonumber(zondID)]..","
 			end
 		end
 		transmogSource = _G["TRANSMOG_SOURCE_3"] or ""

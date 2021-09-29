@@ -3534,7 +3534,11 @@ function BetterWardrobeCollectionFrameRightClickDropDown_Init(self)
 	
 	info.notCheckable = true;
 	info.func = function(_, visualID, value)  
-	local Recolors = addon.ItemRecolors
+	if not IsAddOnLoaded("BetterWardrobe_SourceData") then
+		LoadAddOn("BetterWardrobe_SourceData")
+	end
+	local Recolors = (_G.BetterWardrobeData and _G.BetterWardrobeData.ItemRecolors) or {}
+
 		for i = 1, #Recolors do
 			local visualList = Recolors[i]
 			for j = 1, #visualList do

@@ -1,7 +1,5 @@
 -- https://github.com/Ketho/WoWtoolsParser/blob/master/examples/ItemAppearance.lua
 local addonName, addon = ...
---addon = LibStub("AceAddon-3.0"):NewAddon(addon, addonName, "AceEvent-3.0", "AceConsole-3.0", "AceHook-3.0")
-addon = LibStub("AceAddon-3.0"):GetAddon(addonName)
 
 local ItemAppearance = {
 	[155]="stave_2h_long_a_01teal",

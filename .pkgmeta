@@ -26,3 +26,6 @@ ignore:
     - Libs/test.txt
     - Libs/LibArmorToken-1.0/LibArmorToken-1.0.toc
     - Libs/LibArmorToken-1.0/LibStub.lua
+
+move-folders:
+    BetterWardrobe/BetterWardrobe_SourceData: BetterWardrobe_SourceData

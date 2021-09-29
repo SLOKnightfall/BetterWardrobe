@@ -220,8 +220,12 @@ local Sort = {
 
 	["SortColor"] = function(sets, reverseUIOrder)
 		local comparison = function(source1, source2)
-			local file1 = source1.itemAppearance or addon.ColorTable[source1.visualID]
-			local file2 = source2.itemAppearance or addon.ColorTable[source2.visualID]
+			if not IsAddOnLoaded("BetterWardrobe_SourceData") then
+				LoadAddOn("BetterWardrobe_SourceData")
+			end
+			local ColorTable = (_G.BetterWardrobeData and _G.BetterWardrobeData.ColorTable) or {}
+			local file1 = source1.itemAppearance or ColorTable[source1.visualID]
+			local file2 = source2.itemAppearance or ColorTable[source2.visualID]
 			if file1 and file2 then
 				local c = 1
 				local labA, labB, labC = rgb2lab(1, 1, 1)
@@ -353,8 +357,12 @@ local Sort = {
 		
 		[LE_APPEARANCE] = function(self)
 			sort(self.filteredVisualsList, function(source1, source2)
-				if addon.ItemAppearance[source1.visualID] and addon.ItemAppearance[source2.visualID] then
-					return SortOrder(addon.ItemAppearance[source1.visualID], addon.ItemAppearance[source2.visualID])
+				if not IsAddOnLoaded("BetterWardrobe_SourceData") then
+					LoadAddOn("BetterWardrobe_SourceData")
+				end
+				local ItemAppearance = (_G.BetterWardrobeData and _G.BetterWardrobeData.ItemAppearance) or {}
+				if ItemAppearance[source1.visualID] and ItemAppearance[source2.visualID] then
+					return SortOrder(ItemAppearance[source1.visualID], ItemAppearance[source2.visualID])
 				else
 					return SortOrder(source1.uiOrder, source2.uiOrder)
 				end
@@ -395,8 +403,12 @@ local Sort = {
 						end
 					end
 				else
-					if addon.ItemAppearance[source1.visualID] and addon.ItemAppearance[source2.visualID] then
-						return SortOrder(addon.ItemAppearance[source1.visualID], addon.ItemAppearance[source2.visualID])
+					if not IsAddOnLoaded("BetterWardrobe_SourceData") then
+						LoadAddOn("BetterWardrobe_SourceData")
+					end
+					local ItemAppearance = (_G.BetterWardrobeData and _G.BetterWardrobeData.ItemAppearance) or {}
+					if ItemAppearance[source1.visualID] and ItemAppearance[source2.visualID] then
+						return SortOrder(ItemAppearance[source1.visualID], ItemAppearance[source2.visualID])
 					end
 				end
 			else
@@ -457,8 +469,12 @@ local Sort = {
 			end]]
 
 			sort(sets, function(source1, source2)
-					if addon.ItemAppearance[source1.visualID] and addon.ItemAppearance[source2.visualID] then
-						return SortOrder(addon.ItemAppearance[source1.visualID], addon.ItemAppearance[source2.visualID])
+					if not IsAddOnLoaded("BetterWardrobe_SourceData") then
+						LoadAddOn("BetterWardrobe_SourceData")
+					end
+					local ItemAppearance = (_G.BetterWardrobeData and _G.BetterWardrobeData.ItemAppearance) or {}
+					if ItemAppearance[source1.visualID] and ItemAppearance[source2.visualID] then
+						return SortOrder(ItemAppearance[source1.visualID], ItemAppearance[source2.visualID])
 					else
 						return SortOrder(source1.uiOrder, source2.uiOrder)
 					end

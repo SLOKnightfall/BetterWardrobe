@@ -111,6 +111,11 @@ end
 
 local prevR, prevG, prevB, prevCat
 local function SelectColor()
+
+	if not IsAddOnLoaded("BetterWardrobe_SourceData") then
+		LoadAddOn("BetterWardrobe_SourceData")
+	end
+	local ColorTable = (_G.BetterWardrobeData and _G.BetterWardrobeData.ColorTable) or {}
 	ColorPickerFrame.hasOpacity = false
 	local function ColorPickerCallback()
 		local ItemsCollectionFrame = BetterWardrobeCollectionFrame.ItemsCollectionFrame
@@ -136,7 +141,7 @@ local function SelectColor()
 		local labA, labB, labC = ConvertRGB_to_LAB(newR, newG, newB)
 
 		for i = #visualsList, 1, -1 do
-			colors = addon.ColorTable[visualsList[i].visualID]
+			colors = ColorTable[visualsList[i].visualID]
 			local isValid
 			if colors then
 				for c = 1, #colors, 3 do

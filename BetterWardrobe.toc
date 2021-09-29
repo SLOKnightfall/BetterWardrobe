@@ -39,11 +39,11 @@ Modules\Templates.xml
 Modules\Core.lua
 
 #Data files
-Data\ColorData.lua
+#Data\ColorData.lua
 Data\CameraData.lua
-Data\AppearanceData.lua
+#Data\AppearanceData.lua
 Data\ArtifactData.lua
-Data\SourceData.lua
+#Data\SourceData.lua
 
 Data\DataBase.lua
 Data\CLOTH.lua
