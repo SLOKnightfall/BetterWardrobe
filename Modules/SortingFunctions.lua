@@ -45,7 +45,6 @@ local function labDiff(Ar, Ag, Ab, Br, Bg, Bb)
 	return i < 0 and 0 or math.sqrt(i);
 end
 
-
 local nameVisuals, nameCache = {}, {}
 local catCompleted, itemLevels = {}, {}
 local unknown = {-1}
@@ -220,10 +219,10 @@ local Sort = {
 
 	["SortColor"] = function(sets, reverseUIOrder)
 		local comparison = function(source1, source2)
-			if not IsAddOnLoaded("BetterWardrobe_SourceData") then
-				LoadAddOn("BetterWardrobe_SourceData")
-			end
-			local ColorTable = (_G.BetterWardrobeData and _G.BetterWardrobeData.ColorTable) or {}
+			--if not IsAddOnLoaded("BetterWardrobe_SourceData") then
+				--LoadAddOn("BetterWardrobe_SourceData")
+			--end
+			local ColorTable = {}--(_G.BetterWardrobeData and _G.BetterWardrobeData.ColorTable) or {}
 			local file1 = source1.itemAppearance or ColorTable[source1.visualID]
 			local file2 = source2.itemAppearance or ColorTable[source2.visualID]
 			if file1 and file2 then
@@ -266,7 +265,6 @@ local Sort = {
 				--end
 				return SortOrder(color1diff, color2diff)
 			
-
 
 			else
 				return SortOrder(source1.uiOrder, source2.uiOrder)
@@ -357,10 +355,12 @@ local Sort = {
 		
 		[LE_APPEARANCE] = function(self)
 			sort(self.filteredVisualsList, function(source1, source2)
-				if not IsAddOnLoaded("BetterWardrobe_SourceData") then
-					LoadAddOn("BetterWardrobe_SourceData")
-				end
-				local ItemAppearance = (_G.BetterWardrobeData and _G.BetterWardrobeData.ItemAppearance) or {}
+				--if not IsAddOnLoaded("BetterWardrobe_SourceData") then
+					--LoadAddOn("BetterWardrobe_SourceData")
+				--end
+				--local ItemAppearance = (_G.BetterWardrobeData and _G.BetterWardrobeData.ItemAppearance) or {}
+				local ItemAppearance = addon.ItemAppearance or {}
+
 				if ItemAppearance[source1.visualID] and ItemAppearance[source2.visualID] then
 					return SortOrder(ItemAppearance[source1.visualID], ItemAppearance[source2.visualID])
 				else
@@ -403,10 +403,12 @@ local Sort = {
 						end
 					end
 				else
-					if not IsAddOnLoaded("BetterWardrobe_SourceData") then
-						LoadAddOn("BetterWardrobe_SourceData")
-					end
-					local ItemAppearance = (_G.BetterWardrobeData and _G.BetterWardrobeData.ItemAppearance) or {}
+					--if not IsAddOnLoaded("BetterWardrobe_SourceData") then
+						--LoadAddOn("BetterWardrobe_SourceData")
+					--end
+					--local ItemAppearance = (_G.BetterWardrobeData and _G.BetterWardrobeData.ItemAppearance) or {}
+					local ItemAppearance = addon.ItemAppearance or {}
+
 					if ItemAppearance[source1.visualID] and ItemAppearance[source2.visualID] then
 						return SortOrder(ItemAppearance[source1.visualID], ItemAppearance[source2.visualID])
 					end
@@ -469,10 +471,12 @@ local Sort = {
 			end]]
 
 			sort(sets, function(source1, source2)
-					if not IsAddOnLoaded("BetterWardrobe_SourceData") then
-						LoadAddOn("BetterWardrobe_SourceData")
-					end
-					local ItemAppearance = (_G.BetterWardrobeData and _G.BetterWardrobeData.ItemAppearance) or {}
+					--if not IsAddOnLoaded("BetterWardrobe_SourceData") then
+						--LoadAddOn("BetterWardrobe_SourceData")
+					--end
+					--local ItemAppearance = (_G.BetterWardrobeData and _G.BetterWardrobeData.ItemAppearance) or {}
+					local ItemAppearance = addon.ItemAppearance or {}
+
 					if ItemAppearance[source1.visualID] and ItemAppearance[source2.visualID] then
 						return SortOrder(ItemAppearance[source1.visualID], ItemAppearance[source2.visualID])
 					else

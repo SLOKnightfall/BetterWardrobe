@@ -1274,7 +1274,6 @@ function addon:OnEnable()
 	--addon.Init.LoadCollectionListModule()
 	--BW_ColectionListFrameTemplate
 	addon.Init:BuildTooltips()
-	
 	addon:RegisterEvent("TRANSMOG_COLLECTION_SOURCE_REMOVED", "EventHandler")
 	addon:RegisterEvent("TRANSMOG_COLLECTION_SOURCE_ADDED", "EventHandler")
 	if IsAddOnLoaded("Blizzard_Collections") then 
@@ -1282,7 +1281,6 @@ function addon:OnEnable()
 		C_Timer.After(0.5, function() addon.Init:LoadModules() end)
 	else
 		addon:RegisterEvent("ADDON_LOADED", "EventHandler")
-
 	end
 
 	addon:RegisterEvent("PLAYER_ENTERING_WORLD", "EventHandler")

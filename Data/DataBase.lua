@@ -205,22 +205,6 @@ do
 									--local appearanceID = setData.sources[item]
 									ItemDB[appearanceID] = ItemDB[appearanceID] or {}
 									ItemDB[appearanceID][newID] = setData
-
-
-									local sources = C_TransmogCollection.GetAppearanceSources(appearanceID) or {} --Can return nil if no longer in game
-									local baseSource 
-									if (#sources == 0) then
-										-- can happen if a slot only has HiddenUntilCollected sources
-										
-										sources = {C_TransmogCollection.GetSourceInfo(sourceID)}
-										if not sources[1].sourceType then --and not setData.sourceType then 
-											setData.unavailable = true
-										end
-									end
-
-
-
-
 								end
 							end
 						end
@@ -376,13 +360,13 @@ do
 	local function addArmor(armorSet, set)
 		local defaultSet = set or SET_DATA 
 		for id, setData in pairs(armorSet) do
-			if  (setData.isClass or addon.Profile.IgnoreClassRestrictions)
+			if  (setData.isClass or addon.Profile.IgnoreClassRestrictions) then 
 					--(addon.Profile.IgnoreClassRestrictions and ((setData.filter == 6 or setData.filter == 7) and addon.Profile.IgnoreClassLookalikeRestrictions)) or 
 					--(addon.Profile.IgnoreClassRestrictions and not addon.Profile.IgnoreClassLookalikeRestrictions)) 
 				--and not (setData.oldnote == 6 or setData.oldnote == 8 or setData.oldnote == 16 )
 				--and not setData.isFactionLocked then 
 				--and not setData.isHeritageArmor then 
-				and (not setData.unavailable or (addon.Profile.HideUnavalableSets and setData.unavailable)) then
+				--and (not setData.unavailable or (addon.Profile.HideUnavalableSets and setData.unavailable)) then
 
 --[[				for index, item in ipairs( setData["items"]) do
 					--if addon.setdb.global.itemSubstitute[item] then 
@@ -1069,7 +1053,6 @@ end
 
 
 function addon.GetSetsources(setID)
-
 	return addon.C_TransmogSets.GetSetSources(setID)
 end
 

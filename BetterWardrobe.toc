@@ -4,7 +4,7 @@
 ## Author: SLOKnightfall
 ## Notes: 
 ## OptionalDeps: MogIt, CanIMogIt, LegionWardrobe, WardrobeEnhanced, Rarity, TransmogOutfits, ExtendedSets, ElvUI
-## SavedVariables: BetterWardrobe_Options, BetterWardrobe_CharacterData, BetterWardrobe_SavedSetData, BetterWardrobe_SubstituteItemData, BetterWardrobe_ListData, BetterWardrobe_Mogitdata, BetterWardrobe_Updates, BetterWardrobe_Temp
+## SavedVariables: BetterWardrobe_Options, BetterWardrobe_CharacterData, BetterWardrobe_SavedSetData, BetterWardrobe_SubstituteItemData, BetterWardrobe_ListData, BetterWardrobe_Mogitdata, BetterWardrobe_Updates
 
 #Libraries
 Libs\LibStub\LibStub.lua
@@ -23,7 +23,6 @@ Libs\LibAppropriateitems-1.0\lib.xml
 #Libs\LibDataBroker-1.1\LibDataBroker-1.1.lua
 #Libs\LibTextDump-1.0\LibTextDump-1.0.lua
 Libs\UIDropDownMenu\UIDropDownMenu.xml
-#Libs\LibCompress\LibCompress.lua
 
 #Locale
 Locale\enUS.lua
@@ -41,7 +40,7 @@ Modules\Core.lua
 #Data files
 #Data\ColorData.lua
 Data\CameraData.lua
-#Data\AppearanceData.lua
+Data\AppearanceData.lua
 Data\ArtifactData.lua
 #Data\SourceData.lua
 
@@ -58,11 +57,11 @@ Modules\ArtifactAppearances.lua
 Modules\SavedOutfits.xml
 Modules\DressingRoom.xml
 Modules\Wardrobe.xml
-Modules\ColorFilter.lua
+#Modules\ColorFilter.lua
 
 
 Modules\CollectionList.xml
-Modules\Sources.lua
+#Modules\Sources.lua
 
 Modules\TransmogVendor.xml
 

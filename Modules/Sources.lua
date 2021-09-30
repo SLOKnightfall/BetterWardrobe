@@ -189,9 +189,9 @@ end
 
 local function buildsourcelist(visualID)
 	if not IsAddOnLoaded("BetterWardrobe_SourceData") then
-		LoadAddOn("BetterWardrobe_SourceData")
-		vendorDB = (_G.BetterWardrobeData and _G.BetterWardrobeData.vendorDB) or {}
-		locationDB = (_G.BetterWardrobeData and _G.BetterWardrobeData.locationDB) or {}
+		--LoadAddOn("BetterWardrobe_SourceData")
+		--vendorDB = (_G.BetterWardrobeData and _G.BetterWardrobeData.vendorDB) or {}
+		--locationDB = (_G.BetterWardrobeData and _G.BetterWardrobeData.locationDB) or {}
 	end
 
 	local itemSourceDB =( _G.BetterWardrobeData and _G.BetterWardrobeData.sourceDB) or {}

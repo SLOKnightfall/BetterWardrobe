@@ -4,6 +4,7 @@
 ## Author: SLOKnightfall
 ## Notes: 
 ## LoadOnDemand: 1
+## DefaultState: disabled
 
 
 #Data files

@@ -303,78 +303,8 @@ function addon.Init:UpdateWardrobeEnhanced()
 		return
 	end
 
-	LoadAddOn("LegionWardrobeData")
-print("ppppp")
-	local WE = _G.LTA
-	local LTS = _G.LTSData
-	local Recolors = _G.LTSData.Recolors
+	--LoadAddOn("LegionWardrobeData")
 
-	local FilteringRecolors
-
-
-	local VLTW = _G.VLTW
-
-
-
-
-----TODO:  Soruce Window on click
---Big Model
-
---[[C_Timer.NewTimer(2,function()
-						for i=1,3 do
-							for j=1,6 do
-								local  frame = BetterWardrobeCollectionFrame.ItemsCollectionFrame["ModelR"..i.."C"..j]
-								--frame.posID = "ModelR"..i.."C"..j
-								--local frame2 = WardrobeCollectionFrame.ItemsCollectionFrame["ModelR"..i.."C"..j]
-		
-								local oldFunc = frame:GetScript("OnMouseDown")
-								--local oldFunc2 = frame2:GetScript("OnMouseDown")
-		
-								frame:SetScript("OnMouseDown",function(self,button,...)
-
-									if oldFunc then
-	
-										oldFunc(self,button,...)
-									end
-		
-									if IsModifiedClick("CHATLINK") or IsModifiedClick("DRESSUP") or WardrobeFrame_IsAtTransmogrifier() or not BetterWardrobeCollectionFrame.ItemsCollectionFrame.activeCategory then
-										return
-									end
-
-									if button == "LeftButton" then
-										--WardrobeCollectionFrame.ItemsCollectionFrame[self.posID]:OnMouseDown(WardrobeCollectionFrame.ItemsCollectionFrame[self.posID],button,...)
-										--frame2.visualInfo = self.visualInfo
-										--oldFunc2(frame2,button,...)
-										print("CC")
-										addon.CollectionList:GenerateSourceListView(self.visualInfo.visualID)
-									visualInfo = self.visualInfo
-
-										return
-									end
-									visualInfo = self.visualInfo
-									--LoadData()
-									--UpdateModel(models[1], visualInfo.visualID, visualInfo.isCollected, visualInfo)
-									--Model_OnClick(models[1],"LeftButton")
-									
-								end)
-							end
-						end
-					end)]]
-
-
-
---mainFrame.models
-LoadAddOn("LegionWardrobeData")
-
-	---old_FilterVisuals = BetterWardrobeCollectionFrame.ItemsCollectionFrame.FilterVisuals
-	---BetterWardrobeCollectionFrame.ItemsCollectionFrame.FilterVisuals = FilterVisuals
-	--BetterWardrobeCollectionFrame.ItemsCollectionFrame.FilterVisuals
-	--FilterRecolorVisual()
-				local LTS = _G.LTSData
-			
-				AllData = LTS.AllData
-				Visuals = LTS.Visuals
-				ItemSource = _G.LTSData.ItemSource
 end
 
 
