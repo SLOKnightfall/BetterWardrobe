@@ -1263,6 +1263,7 @@ function addon:OnEnable()
 	addon.Profile = self.db.profile
 	Profile = addon.Profile
 
+	addon.Init:InitDB()
 	--addon.Init:BuildTooltips()
 
 
@@ -1371,9 +1372,6 @@ function addon:EventHandler(event, ...)
 		addon:UnregisterEvent("ADDON_LOADED")
 	elseif (event == "PLAYER_ENTERING_WORLD") then
 		addon:SendMessage("BW_OnPlayerEnterWorld")
-		C_Timer.After(1, function() addon.Init:InitDB() end)
-
-			
 	elseif (event == "TRANSMOG_COLLECTION_SOURCE_ADDED") then
 		local x = ...
 		BetterWardrobeCollectionFrameMixin:OnEvent(event, x)
