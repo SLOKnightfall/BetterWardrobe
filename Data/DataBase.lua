@@ -187,39 +187,38 @@ do
 
 					setData.itemData = setData.itemData or {}
 				--Check for data in the main table
-					for slotID = 1, 19 do
-						local sourceID = setData.itemData[slotID] and setData.itemData[slotID][2]
-						if sourceID  and sourceID ~= NO_TRANSMOG_SOURCE_ID and sourceID ~= 0 then 
-							local sourceInfo = C_TransmogCollection.GetSourceInfo(sourceID)
-						 			
-							if sourceInfo and sourceInfo.invType then 
-								local slot = C_Transmog.GetSlotForInventoryType(sourceInfo.invType);
-								local appearanceID = sourceInfo.visualID
-								local itemID = sourceInfo.itemID
-								local itemMod = sourceInfo.itemModID
-								setData.itemData = setData.itemData or {}
-								setData.itemData[slot] = {"'"..itemID..":"..itemMod.."'", sourceID, appearanceID}
-
-
-								if appearanceID  then --and setData.sources[item] and setData.sources[item] ~= 0 then 
-									--local appearanceID = setData.sources[item]
-									ItemDB[appearanceID] = ItemDB[appearanceID] or {}
-									ItemDB[appearanceID][newID] = setData
-								end
-							end
-						end
-					end
+					--[[for slotID = 1, 19 do
+																local sourceID = setData.itemData[slotID] and setData.itemData[slotID][2]
+																if sourceID  and sourceID ~= NO_TRANSMOG_SOURCE_ID and sourceID ~= 0 then 
+																	local sourceInfo = C_TransmogCollection.GetSourceInfo(sourceID)
+																 			
+																	if sourceInfo and sourceInfo.invType then 
+																		local slot = C_Transmog.GetSlotForInventoryType(sourceInfo.invType);
+																		local appearanceID = sourceInfo.visualID
+																		local itemID = sourceInfo.itemID
+																		local itemMod = sourceInfo.itemModID
+																		setData.itemData = setData.itemData or {}
+																		setData.itemData[slot] = {"'"..itemID..":"..itemMod.."'", sourceID, appearanceID}
+										
+										
+																		if appearanceID  then --and setData.sources[item] and setData.sources[item] ~= 0 then 
+																			--local appearanceID = setData.sources[item]
+																			ItemDB[appearanceID] = ItemDB[appearanceID] or {}
+																			ItemDB[appearanceID][newID] = setData
+																		end
+																	end
+																end
+															end]]
 				--end
 
 
-					for slotID, itemData in ipairs(setData["itemData"]) do
-					--	local appearanceID = itemData[3]
-
-
-
-
-
-
+					for slotID, itemData in pairs(setData.itemData) do
+						local appearanceID = itemData[3]
+						if appearanceID  then --and setData.sources[item] and setData.sources[item] ~= 0 then 
+							--local appearanceID = setData.sources[item]
+							ItemDB[appearanceID] = ItemDB[appearanceID] or {}
+							ItemDB[appearanceID][newID] = setData
+						end
 					end
 
 					--for index, item in ipairs(setData["items"]) do
