@@ -307,18 +307,18 @@ do
 						setData.sources = {}
 						setData.sources = C_TransmogSets.GetSetSources(id)
 	
-						for sourceID in pairs(setData.sources) do
-							local sourceInfo = C_TransmogCollection.GetSourceInfo(sourceID)
-							if sourceInfo  then 
-								local appearanceID = sourceInfo.visualID
-
-								if appearanceID  then --and setData.sources[item] and setData.sources[item] ~= 0 then 
-									--local appearanceID = setData.sources[item]
-									ItemDB[appearanceID] = ItemDB[appearanceID] or {}
-									ItemDB[appearanceID][id] = setData
-								end
-							end
-						end
+						--[[for sourceID in pairs(setData.sources) do
+																			local sourceInfo = C_TransmogCollection.GetSourceInfo(sourceID)
+																			if sourceInfo  then 
+																				local appearanceID = sourceInfo.visualID
+												
+																				if appearanceID  then --and setData.sources[item] and setData.sources[item] ~= 0 then 
+																					--local appearanceID = setData.sources[item]
+																					ItemDB[appearanceID] = ItemDB[appearanceID] or {}
+																					ItemDB[appearanceID][id] = setData
+																				end
+																			end
+																		end]]
 
 						setData.setType = "BlizzardSet"
 						setData.setID  = id
@@ -352,20 +352,18 @@ do
 			end
 		end
 	end
- function a()
- 	return SET_INDEX[899]
- end
+
 
 	local function addArmor(armorSet, set)
 		local defaultSet = set or SET_DATA 
 		for id, setData in pairs(armorSet) do
-			if  (setData.isClass or addon.Profile.IgnoreClassRestrictions) then 
+			if  (setData.isClass or addon.Profile.IgnoreClassRestrictions) 
 					--(addon.Profile.IgnoreClassRestrictions and ((setData.filter == 6 or setData.filter == 7) and addon.Profile.IgnoreClassLookalikeRestrictions)) or 
 					--(addon.Profile.IgnoreClassRestrictions and not addon.Profile.IgnoreClassLookalikeRestrictions)) 
 				--and not (setData.oldnote == 6 or setData.oldnote == 8 or setData.oldnote == 16 )
 				--and not setData.isFactionLocked then 
 				--and not setData.isHeritageArmor then 
-				--and (not setData.unavailable or (addon.Profile.HideUnavalableSets and setData.unavailable)) then
+				and (not setData.unavailable or (addon.Profile.HideUnavalableSets and setData.unavailable)) then
 
 --[[				for index, item in ipairs( setData["items"]) do
 					--if addon.setdb.global.itemSubstitute[item] then 
