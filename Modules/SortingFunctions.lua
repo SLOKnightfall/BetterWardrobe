@@ -219,54 +219,90 @@ local Sort = {
 
 	["SortColor"] = function(sets, reverseUIOrder)
 		local comparison = function(source1, source2)
-			--if not IsAddOnLoaded("BetterWardrobe_SourceData") then
-				--LoadAddOn("BetterWardrobe_SourceData")
-			--end
-			local ColorTable = {}--(_G.BetterWardrobeData and _G.BetterWardrobeData.ColorTable) or {}
-			local file1 = source1.itemAppearance or ColorTable[source1.visualID]
-			local file2 = source2.itemAppearance or ColorTable[source2.visualID]
+			if not IsAddOnLoaded("BetterWardrobe_SourceData") then
+				EnableAddOn("BetterWardrobe_SourceData")
+				LoadAddOn("BetterWardrobe_SourceData")
+			end
+			local ColorTable = (_G.BetterWardrobeData and _G.BetterWardrobeData.ColorTable) or {}
+			local color1 = ColorTable[source1.visualID]
+			local color2 = ColorTable[source2.visualID]
+			local file1 = source1.itemAppearance or addon.ItemAppearance[source1.visualID]
+			local file2 = source2.itemAppearance or addon.ItemAppearance[source2.visualID]
+			local index1, index2
 			if file1 and file2 then
-				local c = 1
-				local labA, labB, labC = rgb2lab(1, 1, 1)
-				local index1 = #colors+1
-				local baseColor1 = file1[1]
-
-					local cR = baseColor1[c+0]
-					local cG = baseColor1[c+1]
-					local cB = baseColor1[c+2]
-					if cR and cG and cB then
-						local color1diff = labDiff(labA, labB, labC, rgb2lab(cR, cG, cB))
-				--[[for k, v in pairs(colors) do
-													if strfind(file1, v) then
-														index1 = k
-														break
-													end]]
+				index1 = #colors+1
+				for k, v in pairs(colors) do
+					if strfind(file1, v) then
+						index1 = k
+						break
 					end
+				end
 				
-				local index2 = #colors+1
-				local baseColor2 = file2[1]
-
-					local cR = baseColor2[c+0]
-					local cG = baseColor2[c+1]
-					local cB = baseColor2[c+2]
-					if cR and cG and cB then
-						local color2diff = labDiff(labA, labB, labC, rgb2lab(cR, cG, cB))
-				--[[for k, v in pairs(colors) do
-													if strfind(file2, v) then
-														index2 = k
-														break
-													end]]
+				index2 = #colors+1
+				for k, v in pairs(colors) do
+					if strfind(file2, v) then
+						index2 = k
+						break
 					end
-				
-				--if index1 == index2 then
-					--return SortOrder(file1, file2)
-				--else
-					--return SortOrder(index1, index2)
-				--end
-				return SortOrder(color1diff, color2diff)
+				end
 			
+			end
+
+			--[[if color1 and color2 then
+										local c = 1
+										local labA, labB, labC = rgb2lab(0, 0, 0)
+										local index1 = #colors+1
+										--local baseColor1 = color1[1]
+										local _, colors = addon:Deserialize(color1)
+										local baseColor1 = colors[1]
+										local color1diff, color2diff
+						
+											local cR = baseColor1[c+0]
+											local cG = baseColor1[c+1]
+											local cB = baseColor1[c+2]
+											if cR and cG and cB then
+												color1diff = labDiff(labA, labB, labC, rgb2lab(cR, cG, cB))
+										
+											end
+										
+										local index2 = #colors+1
+										--local baseColor2 = color2[1]
+										local _, colors = addon:Deserialize(color2)
+										local baseColor2 = colors[1]
+						
+											local cR = baseColor2[c+0]
+											local cG = baseColor2[c+1]
+											local cB = baseColor2[c+2]
+											if cR and cG and cB then
+												color2diff = labDiff(labA, labB, labC, rgb2lab(cR, cG, cB))
+										
+											end
+										
+										--if index1 == index2 then
+											--return SortOrder(color1, color2)
+										--else
+											--return SortOrder(index1, index2)
+										--end
+						
+										--if color1diff == index2 then
+											--return SortOrder(color1, color2)
+										--else
+											--return SortOrder(index1, index2)
+										--end
+									
+									end]]
+
+			if index1 then
+				if index1 == index2 then
+					return SortOrder(file1, file2)
+				else
+					return SortOrder(index1, index2)
+				end
+			--elseif color1diff then
+				--return SortOrder(color1diff, color2diff)
 
 			else
+				--print("XXXXZ")
 				return SortOrder(source1.uiOrder, source2.uiOrder)
 			end
 		end
@@ -355,11 +391,12 @@ local Sort = {
 		
 		[LE_APPEARANCE] = function(self)
 			sort(self.filteredVisualsList, function(source1, source2)
-				--if not IsAddOnLoaded("BetterWardrobe_SourceData") then
-					--LoadAddOn("BetterWardrobe_SourceData")
-				--end
-				--local ItemAppearance = (_G.BetterWardrobeData and _G.BetterWardrobeData.ItemAppearance) or {}
-				local ItemAppearance = addon.ItemAppearance or {}
+				if not IsAddOnLoaded("BetterWardrobe_SourceData") then
+					LoadAddOn("BetterWardrobe_SourceData")
+					EnableAddOn("BetterWardrobe_SourceData")
+				end
+				local ItemAppearance = (_G.BetterWardrobeData and _G.BetterWardrobeData.ItemAppearance) or {}
+				--local ItemAppearance = addon.ItemAppearance or {}
 
 				if ItemAppearance[source1.visualID] and ItemAppearance[source2.visualID] then
 					return SortOrder(ItemAppearance[source1.visualID], ItemAppearance[source2.visualID])
@@ -403,11 +440,12 @@ local Sort = {
 						end
 					end
 				else
-					--if not IsAddOnLoaded("BetterWardrobe_SourceData") then
-						--LoadAddOn("BetterWardrobe_SourceData")
-					--end
-					--local ItemAppearance = (_G.BetterWardrobeData and _G.BetterWardrobeData.ItemAppearance) or {}
-					local ItemAppearance = addon.ItemAppearance or {}
+					if not IsAddOnLoaded("BetterWardrobe_SourceData") then
+						EnableAddOn("BetterWardrobe_SourceData")
+						LoadAddOn("BetterWardrobe_SourceData")
+					end
+					local ItemAppearance = (_G.BetterWardrobeData and _G.BetterWardrobeData.ItemAppearance) or {}
+					--local ItemAppearance = addon.ItemAppearance or {}
 
 					if ItemAppearance[source1.visualID] and ItemAppearance[source2.visualID] then
 						return SortOrder(ItemAppearance[source1.visualID], ItemAppearance[source2.visualID])
@@ -471,11 +509,12 @@ local Sort = {
 			end]]
 
 			sort(sets, function(source1, source2)
-					--if not IsAddOnLoaded("BetterWardrobe_SourceData") then
-						--LoadAddOn("BetterWardrobe_SourceData")
-					--end
-					--local ItemAppearance = (_G.BetterWardrobeData and _G.BetterWardrobeData.ItemAppearance) or {}
-					local ItemAppearance = addon.ItemAppearance or {}
+					if not IsAddOnLoaded("BetterWardrobe_SourceData") then
+						EnableAddOn("BetterWardrobe_SourceData")
+						LoadAddOn("BetterWardrobe_SourceData")
+					end
+					local ItemAppearance = (_G.BetterWardrobeData and _G.BetterWardrobeData.ItemAppearance) or {}
+					--local ItemAppearance = addon.ItemAppearance or {}
 
 					if ItemAppearance[source1.visualID] and ItemAppearance[source2.visualID] then
 						return SortOrder(ItemAppearance[source1.visualID], ItemAppearance[source2.visualID])

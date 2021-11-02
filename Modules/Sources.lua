@@ -61,7 +61,8 @@ local function GetQuestnfo(questData)
 		end
 		inspectScantip:ClearLines()
 		--local zoneName = ("%s: "):format(locationDB[questID][1]) --GetZoneName(QuestToZone[questID],"%s: ").
-		local zoneid = addon.questlocationDB[tonumber(questID)]
+		local questlocationDB = _G.BetterWardrobeData.questlocationDB or {}
+		local zoneid = questlocationDB[tonumber(questID)]
 		local zoneid = zoneid and zoneid[1] or 0
 		local zoneName = locationDB[zoneid] --GetZoneName(QuestToZone[questID],"%s: ")
 
@@ -189,9 +190,10 @@ end
 
 local function buildsourcelist(visualID)
 	if not IsAddOnLoaded("BetterWardrobe_SourceData") then
-		--LoadAddOn("BetterWardrobe_SourceData")
-		--vendorDB = (_G.BetterWardrobeData and _G.BetterWardrobeData.vendorDB) or {}
-		--locationDB = (_G.BetterWardrobeData and _G.BetterWardrobeData.locationDB) or {}
+		EnableAddOn("BetterWardrobe_SourceData")
+		LoadAddOn("BetterWardrobe_SourceData")
+		vendorDB = (_G.BetterWardrobeData and _G.BetterWardrobeData.vendorDB) or {}
+		locationDB = (_G.BetterWardrobeData and _G.BetterWardrobeData.locationDB) or {}
 	end
 
 	local itemSourceDB =( _G.BetterWardrobeData and _G.BetterWardrobeData.sourceDB) or {}

@@ -565,6 +565,33 @@ function BW_DressingRoomFrameMixin:OnLoad()
 	self:RegisterEvent("ADDON_LOADED")
 	hooksecurefunc("DressUpVisual", UpdateDressingRoom)
 	hooksecurefunc("DressUpCollectionAppearance", UpdateDressingRoom)
+
+	DressUpFrame.LinkButton:ClearAllPoints()
+	DressUpFrame.LinkButton:SetPoint("LEFT",BW_DressingRoomFrame.BW_DressingRoomUndressButton, "RIGHT",-6,0)
+	DressUpFrame.LinkButton:SetText("")
+	
+	DressUpFrame.LinkButton.Left:Hide()
+	DressUpFrame.LinkButton.Right:Hide()
+	DressUpFrame.LinkButton.Middle:Hide()
+	DressUpFrame.LinkButton:SetSize(32,32)
+	DressUpFrame.LinkButton:SetFrameLevel(BW_DressingRoomFrame.BW_DressingRoomUndressButton:GetFrameLevel()+5)
+	DressUpFrame.LinkButton:SetNormalTexture("Interface\\Buttons\\UI-SquareButton-Up")
+
+	DressUpFrame.LinkButton:SetHighlightTexture("Interface\\Buttons\\UI-Common-MouseHilight","ADD")
+	--DressUpFrame.LinkButtonHighlight:ClearAllPoints()
+	DressUpFrame.LinkButton:SetHitRectInsets(0, 0, 0, 0);
+	DressUpFrame.LinkButton.Icon = DressUpFrame.LinkButton:CreateTexture(nil, "OVERLAY")
+	DressUpFrame.LinkButton.Icon:SetTexture("Interface\\CHATFRAME\\UI-ChatWhisperIcon")
+	DressUpFrame.LinkButton.Icon:SetWidth(13)
+	DressUpFrame.LinkButton.Icon:SetHeight(13)
+	DressUpFrame.LinkButton.Icon:SetPoint("CENTER")
+	local highlight = DressUpFrame.LinkButton:GetHighlightTexture()
+	highlight:ClearAllPoints()
+	highlight:SetPoint("TOPLEFT",DressUpFrame.LinkButton, "TOPLEFT",-3,-1 )
+	highlight:SetPoint("BOTTOMRIGHT",DressUpFrame.LinkButton, "BOTTOMRIGHT",-8,5 )
+
+--DressUpFrame.LinkButton:GetHighlightTexture():SetAllPoints(DressUpFrame.LinkButton)
+
 end
 
 
@@ -795,6 +822,8 @@ function BW_DressingRoomButtonMixin:OnMouseDown()
 		text =  RESET
 	elseif button == "Undress" then
 		BW_DressingRoomHideArmorButton_OnClick(self)
+	elseif button == "Link" then
+		DressUpModelFrameLinkButtonMixin:OnClick()
 	end
 end
 
@@ -820,6 +849,8 @@ function BW_DressingRoomButtonMixin.OnEnter(self)
 		text = L["Undress"]
 	elseif button == "HideSlot" then
 		text = L["Hide Armor Slots"]
+	elseif button == "Link" then
+		text = LINK_TRANSMOG_OUTFIT_HELPTIP
 	end
 
 	GameTooltip:SetOwner(self, "ANCHOR_RIGHT")

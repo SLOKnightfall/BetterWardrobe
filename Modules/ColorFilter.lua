@@ -113,6 +113,7 @@ local prevR, prevG, prevB, prevCat
 local function SelectColor()
 
 	if not IsAddOnLoaded("BetterWardrobe_SourceData") then
+		EnableAddOn("BetterWardrobe_SourceData")
 		LoadAddOn("BetterWardrobe_SourceData")
 	end
 	local ColorTable = (_G.BetterWardrobeData and _G.BetterWardrobeData.ColorTable) or {}
@@ -141,9 +142,10 @@ local function SelectColor()
 		local labA, labB, labC = ConvertRGB_to_LAB(newR, newG, newB)
 
 		for i = #visualsList, 1, -1 do
-			colors = ColorTable[visualsList[i].visualID]
+			local item_colors = ColorTable[visualsList[i].visualID]
 			local isValid
-			if colors then
+			if item_colors then
+				local _, colors = addon:Deserialize(item_colors)
 				for c = 1, #colors, 3 do
 				--local cR = colors:byte(c+0)
 				--local cG = colors:byte(c+1)
@@ -253,4 +255,23 @@ function addon.Init:InitFilterButtons()
 	local texture = revert:CreateTexture(nil, "OVERLAY")
 	texture:SetAtlas("transmog-icon-revert-small")
 	texture:SetAllPoints()
+end
+
+
+
+function xxx()
+local ColorTable = (_G.BetterWardrobeData and _G.BetterWardrobeData.ColorTable2) or {}
+BTT = {}
+--AceSerializer:Embed(addon) 
+for index, data in pairs(ColorTable) do
+
+local temp =addon:Serialize(data)
+BTT[index]= temp
+end
+end
+
+function yy()
+	BTT = nil
+	local ColorTable = (_G.BetterWardrobeData and _G.BetterWardrobeData.ColorTable) or {}
+  _,temp =addon:Deserialize(ColorTable[156])
 end

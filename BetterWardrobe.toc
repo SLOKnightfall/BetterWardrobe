@@ -1,10 +1,10 @@
-﻿## Interface: 90100
+﻿## Interface: 90105
 ## Title: BetterWardrobe (@project-version@)
 ## Version: @project-version@
 ## Author: SLOKnightfall
 ## Notes: 
 ## OptionalDeps: MogIt, CanIMogIt, LegionWardrobe, WardrobeEnhanced, Rarity, TransmogOutfits, ExtendedSets, ElvUI
-## SavedVariables: BetterWardrobe_Options, BetterWardrobe_CharacterData, BetterWardrobe_SavedSetData, BetterWardrobe_SubstituteItemData, BetterWardrobe_ListData, BetterWardrobe_Mogitdata, BetterWardrobe_Updates
+## SavedVariables: BetterWardrobe_Options, BetterWardrobe_CharacterData, BetterWardrobe_SavedSetData, BetterWardrobe_SubstituteItemData, BetterWardrobe_ListData, BetterWardrobe_Mogitdata, BetterWardrobe_Updates, BTT
 
 #Libraries
 Libs\LibStub\LibStub.lua
@@ -23,6 +23,7 @@ Libs\LibAppropriateitems-1.0\lib.xml
 #Libs\LibDataBroker-1.1\LibDataBroker-1.1.lua
 #Libs\LibTextDump-1.0\LibTextDump-1.0.lua
 Libs\UIDropDownMenu\UIDropDownMenu.xml
+Libs\AceSerializer-3.0\AceSerializer-3.0.xml
 
 #Locale
 Locale\enUS.lua
@@ -57,11 +58,11 @@ Modules\ArtifactAppearances.lua
 Modules\SavedOutfits.xml
 Modules\DressingRoom.xml
 Modules\Wardrobe.xml
-#Modules\ColorFilter.lua
+Modules\ColorFilter.lua
 
 
 Modules\CollectionList.xml
-#Modules\Sources.lua
+Modules\Sources.lua
 
 Modules\TransmogVendor.xml
 

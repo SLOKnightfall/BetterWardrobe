@@ -21,7 +21,7 @@ local playerInv_DB
 local Profile
 local playerNme
 local realmName
-local playerClass, classID,_
+local playerClass, classID, _
 
 local L = LibStub("AceLocale-3.0"):GetLocale(addonName)
 
@@ -1199,10 +1199,10 @@ function BetterWardrobeCollectionFrameMixin:SetTab(tabID)
 
 	BW_SortDropDown:ClearAllPoints();
 	BW_SortDropDown:SetPoint("TOPRIGHT", BetterWardrobeCollectionFrame.ItemsCollectionFrame, "TOPRIGHT",-30, -10)
-	----addon.ColorFilterFrame:Hide()
+	addon.ColorFilterFrame:Hide()
 	if tabID == TAB_ITEMS then
 		BetterWardrobeVisualToggle:Hide()
-		----addon.ColorFilterFrame:Show()
+		addon.ColorFilterFrame:Show()
 
 		BW_ColectionListFrame:SetShown(BetterWardrobeCollectionFrame:IsShown() and not atTransmogrifier)
 		self.activeFrame = self.ItemsCollectionFrame;
@@ -1979,7 +1979,7 @@ function BetterWardrobeItemsCollectionMixin:OnLoad()
 
 	BW_UIDropDownMenu_Initialize(self.RightClickDropDown, nil, "MENU");
 	self.RightClickDropDown.initialize = BetterWardrobeCollectionFrameRightClickDropDown_Init;
-	--addon.Init:InitFilterButtons()
+	addon.Init:InitFilterButtons()
 
 	self:RegisterEvent("TRANSMOG_COLLECTION_UPDATED");
 
@@ -2415,7 +2415,7 @@ function BetterWardrobeItemsCollectionMixin:FilterVisuals()
 
 	local filteredVisualsList = { };
 
---[[	if self.recolors then
+	if self.recolors then
 		local recolorList = {}
 		for _, id in pairs(self.recolors) do recolorList[id] = true end
 		
@@ -2457,7 +2457,7 @@ function BetterWardrobeItemsCollectionMixin:FilterVisuals()
 
 		self.filteredVisualsList = filteredVisualsList
 		return
-	end]]
+	end
 
 	local slotID = self.transmogLocation.slotID;
 	for i, visualInfo in ipairs(visualsList) do
@@ -3522,7 +3522,7 @@ function BetterWardrobeCollectionFrameRightClickDropDown_Init(self)
 				end,
 		})
 
-	--[[info.text = L["View Sources"];
+	info.text = L["View Sources"];
 			info.arg1 = appearanceID;
 			info.arg2 = 1;
 			
@@ -3539,7 +3539,11 @@ function BetterWardrobeCollectionFrameRightClickDropDown_Init(self)
 			
 			info.notCheckable = true;
 			info.func = function(_, visualID, value)  
-			local Recolors = addon.ItemRecolors
+			if not IsAddOnLoaded("BetterWardrobe_SourceData") then
+				EnableAddOn("BetterWardrobe_SourceData")
+				LoadAddOn("BetterWardrobe_SourceData")
+			end
+			local Recolors = _G.BetterWardrobeData.ItemRecolors or {}
 				for i = 1, #Recolors do
 					local visualList = Recolors[i]
 					for j = 1, #visualList do
@@ -3557,7 +3561,7 @@ function BetterWardrobeCollectionFrameRightClickDropDown_Init(self)
 				print(L["No Recolors Found"])
 		
 			end;
-			BW_UIDropDownMenu_AddButton(info);]]
+			BW_UIDropDownMenu_AddButton(info);
 
 	-- Cancel
 
@@ -5932,8 +5936,7 @@ function BetterWardrobeSetsCollectionMixin:GetSelectedSetID()
 		return self.selectedExtraSetID;
 	elseif BetterWardrobeCollectionFrame.selectedCollectionTab == 4 then
 		return self.selectedSavedSetID;
-	end
-	
+	end	
 end
 
 function BetterWardrobeSetsCollectionMixin:SetAppearanceTooltip(frame)
@@ -6467,7 +6470,7 @@ local BW_ItemSubDropDownMenu = CreateFrame("Frame", "BW_ItemSubDropDownMenu", UI
 BW_ItemSubDropDownMenu:SetFrameLevel(500)
 local clickedItemID = nil
 local BW_ItemSubDropDownMenu_Table = {
---[[	{
+	{
 	text = L["View Sources"],
 		func = function(self)   
 		 	local appearanceID, sourceID = C_TransmogCollection.GetItemInfo(clickedItemID)	
@@ -6475,7 +6478,7 @@ local BW_ItemSubDropDownMenu_Table = {
 
 		end,
 		notCheckable = 1,
-	},]]
+	},
 	{
 		text = CLOSE,
 		func = function() BW_CloseDropDownMenus() end,
@@ -6490,7 +6493,7 @@ local BW_ExtraItemSubDropDownMenu_Table = {
 		end,
 		notCheckable = 1,
 	},
---[[	{
+	{
 	text = L["View Sources"],
 		func = function(self)   
 		 	local appearanceID, sourceID = C_TransmogCollection.GetItemInfo(clickedItemID)	
@@ -6498,7 +6501,7 @@ local BW_ExtraItemSubDropDownMenu_Table = {
 
 		end,
 		notCheckable = 1,
-	},]]
+	},
 	{
 		text = CLOSE,
 		func = function() BW_CloseDropDownMenus() end,
@@ -6607,7 +6610,7 @@ function BetterWardrobeSetsDetailsItemMixin:OnMouseDown(button)
 
 	elseif button == "RightButton"  and BetterWardrobeCollectionFrame.selectedCollectionTab == 2 then ---TODO review
 		clickedItemID = self.itemID
-		--BW_EasyMenu(BW_ItemSubDropDownMenu_Table, BW_ItemSubDropDownMenu, self, 0, 0, "MENU", 10)
+		BW_EasyMenu(BW_ItemSubDropDownMenu_Table, BW_ItemSubDropDownMenu, self, 0, 0, "MENU", 10)
 
 	elseif button == "RightButton"  and BetterWardrobeCollectionFrame.selectedCollectionTab == 3 then ---TODO review
 		clickedItemID = self.itemID

@@ -1,5 +1,5 @@
 local addonName, addon = ...
-addon = LibStub("AceAddon-3.0"):NewAddon(addon, addonName, "AceEvent-3.0", "AceConsole-3.0", "AceHook-3.0")
+addon = LibStub("AceAddon-3.0"):NewAddon(addon, addonName, "AceEvent-3.0", "AceConsole-3.0", "AceHook-3.0", "AceSerializer-3.0")
 local L = LibStub("AceLocale-3.0"):GetLocale(addonName)
 
 local Globals = {}

@@ -253,6 +253,7 @@
 					<OnLeave method="OnLeave" />
 				</Scripts>
 			</Button>
+
 					<Frame parentKey="BW_OutfitDropDown"  name="BetterWardrobeDressUpFrameDropDown" inherits="BetterWardrobeOutfitDropDownTemplate" mixin="BetterDressUpOutfitMixin" >
 			<KeyValues>
 				<KeyValue key="width" value="163" type="number"/>
@@ -272,7 +273,6 @@
 			<OnEvent method="OnEvent" />
 			<OnHide method="OnHide" />
 		</Scripts>
-
 	</Frame>
 
 

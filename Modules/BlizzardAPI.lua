@@ -157,6 +157,7 @@ end
 
 
 function addon.C_TransmogSets.SetHasNewSources(setID)
+	print("NewSo")
 	local setType = DetermineSetType(setID)
 
 	if setType == "set" then
