@@ -233,7 +233,12 @@ function addon.BuildClassArtifactAppearanceList()
 
 				if data.shapeshiftID then 
 					sourceInfo.shapeshiftID = data.shapeshiftID
-					sourceInfo.camera = data.cameraID or 48
+					if data.shapeshiftID == 74269 or data.shapeshiftID == 74270 or data.shapeshiftID == 74271 or data.shapeshiftID == 74272 then
+						sourceInfo.camera = 200--data.cameraID or 48
+					else
+						sourceInfo.camera = data.cameraID or 48
+					end
+					
 				end
 
 

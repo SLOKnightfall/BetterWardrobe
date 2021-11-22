@@ -606,3 +606,34 @@ local link = gsub(C_TradeSkillUI.GetTradeSkillListLink(), "\124", "\124\124")
 local _,_,current, max,_ = strsplit(":", link, 5)
 DEFAULT_CHAT_FRAME:AddMessage(current..":"..max)
 end
+
+
+
+
+function addon.Model_ApplyUICamera(self, uiCameraID)
+	local posX, posY, posZ, yaw, pitch, roll, animId, animVariation, animFrame, centerModel = GetUICameraInfo(uiCameraID);
+	if posX and posY and posZ and yaw and pitch and roll then
+		self:MakeCurrentCameraCustom();
+	if uiCameraID == 200 then
+				self:SetPosition(-8.5, 0, -2.677635);
+	else
+				self:SetPosition(posX, posY, posZ);
+
+	end
+		self:SetFacing(yaw);
+		self:SetPitch(pitch);
+		self:SetRoll(roll);
+		self:UseModelCenterToTransform(centerModel);
+
+		local cameraX, cameraY, cameraZ = self:TransformCameraSpaceToModelSpace(MODELFRAME_UI_CAMERA_POSITION.x, MODELFRAME_UI_CAMERA_POSITION.y, MODELFRAME_UI_CAMERA_POSITION.z);
+		local targetX, targetY, targetZ = self:TransformCameraSpaceToModelSpace(MODELFRAME_UI_CAMERA_TARGET.x, MODELFRAME_UI_CAMERA_TARGET.y, MODELFRAME_UI_CAMERA_TARGET.z);
+
+		self:SetCameraPosition(cameraX, cameraY, cameraZ);
+		self:SetCameraTarget(targetX, targetY, targetZ);
+	end
+	if( animId and animFrame ~= -1 and animId ~= -1 ) then
+		self:FreezeAnimation(animId, animVariation, animFrame);
+	else
+		self:SetAnimation(0, 0);
+	end
+end

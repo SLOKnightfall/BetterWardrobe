@@ -2038,7 +2038,7 @@ function BetterWardrobeItemsCollectionMixin:RefreshCameras()
 		for i, model in ipairs(self.Models) do
 			model:RefreshCamera();
 			if ( model.cameraID ) then
-				Model_ApplyUICamera(model, model.cameraID);
+				addon.Model_ApplyUICamera(model, model.cameraID);
 			end
 		end
 	end
@@ -2488,7 +2488,7 @@ function BetterWardrobeItemsCollectionMixin:UpdateItems()
 				end
 			end
 			if ( model.cameraID ~= cameraID ) then
-				Model_ApplyUICamera(model, cameraID);
+				addon.Model_ApplyUICamera(model, cameraID);
 				model.cameraID = cameraID;
 			end
 			model.zoom = nil
@@ -2507,7 +2507,7 @@ function BetterWardrobeItemsCollectionMixin:UpdateItems()
 
 				elseif(visualInfo.shapeshiftID) then 
 					model.cameraID = visualInfo.camera
-					Model_ApplyUICamera(model, visualInfo.camera);
+					addon.Model_ApplyUICamera(model, visualInfo.camera);
 					model:SetDisplayInfo( visualInfo.shapeshiftID );
 					model:MakeCurrentCameraCustom()
 					
@@ -2516,6 +2516,7 @@ function BetterWardrobeItemsCollectionMixin:UpdateItems()
 						model:SetCameraDistance(-5)
 						model:SetPosition(-13.25,0,-2.447)
 					end 
+
 					model:Show()
 				elseif ( appearanceVisualID ) then
 					-- appearanceVisualID is only set when looking at enchants
@@ -2965,7 +2966,7 @@ end
 
 function BetterWardrobeItemsModelMixin:OnModelLoaded()
 	if ( self.cameraID ) then
-		Model_ApplyUICamera(self, self.cameraID);
+		addon.Model_ApplyUICamera(self, self.cameraID);
 	end
 end
 
@@ -3216,7 +3217,7 @@ end
 
 function BetterWardrobeSetsTransmogModelMixin:OnModelLoaded()
 	if ( self.cameraID ) then
-		Model_ApplyUICamera(self, self.cameraID);
+		addon.Model_ApplyUICamera(self, self.cameraID);
 	end
 end
 
@@ -5663,7 +5664,7 @@ function BetterWardrobeSetsCollectionMixin:RefreshCameras()
 		local detailsCameraID, transmogCameraID = C_TransmogSets.GetCameraIDs();
 		local model = self.Model;
 		self.Model:RefreshCamera();
-		Model_ApplyUICamera(self.Model, detailsCameraID);
+		addon.Model_ApplyUICamera(self.Model, detailsCameraID);
 		if ( model.cameraID ~= detailsCameraID ) then
 			model.cameraID = detailsCameraID;
 			model.defaultPosX, model.defaultPosY, model.defaultPosZ, model.yaw = GetUICameraInfo(detailsCameraID);
@@ -6256,7 +6257,7 @@ end
 
 function BetterWardrobeSetsDetailsModelMixin:OnModelLoaded()
 	if ( self.cameraID ) then
-		Model_ApplyUICamera(self, self.cameraID);
+		addon.Model_ApplyUICamera(self, self.cameraID);
 	end
 end
 
@@ -7091,7 +7092,7 @@ function BetterWardrobeSetsTransmogMixin:RefreshCameras()
 		for i, model in ipairs(self.Models) do
 			model.cameraID = transmogCameraID;
 			model:RefreshCamera();
-			Model_ApplyUICamera(model, transmogCameraID);
+			addon.Model_ApplyUICamera(model, transmogCameraID);
 		end
 	end
 end
