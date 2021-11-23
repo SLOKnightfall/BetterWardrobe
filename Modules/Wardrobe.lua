@@ -136,7 +136,7 @@ function BW_TransmogFrameMixin:OnLoad()
 	self:RegisterEvent("TRANSMOGRIFY_UPDATE");
 	self:RegisterEvent("TRANSMOGRIFY_ITEM_UPDATE");
 	self:RegisterEvent("TRANSMOGRIFY_SUCCESS");
-
+print("XXXXXXXX")
 	-- set up dependency links
 	self.MainHandButton.dependentSlot = self.MainHandEnchantButton;
 	self.MainHandEnchantButton.dependencySlot = self.MainHandButton;
@@ -1305,6 +1305,7 @@ function BetterWardrobeCollectionFrameMixin:OnLoad()
 	self.selectedTransmogTab = TAB_ITEMS;
 
 	CollectionsJournal:SetPortraitToAsset("Interface\\Icons\\inv_misc_enggizmos_19");
+
 
 	-- TODO: Remove this at the next deprecation reset
 	self.searchBox = self.SearchBox;
@@ -6457,6 +6458,7 @@ function BetterWardrobeSetsTransmogMixin:OnLoad()
 	self.PAGE_SIZE = self.NUM_ROWS * self.NUM_COLS;
 	self.APPLIED_SOURCE_INDEX = 1;
 	self.SELECTED_SOURCE_INDEX = 3;
+
 end
 
 
