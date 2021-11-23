@@ -6984,15 +6984,15 @@ function BetterWardrobeSetsTransmogMixin:LoadSet(setID)
 				end
 			end
 
-			if setData then
-				local TransmogLocation = TransmogUtil.CreateTransmogLocation(16, Enum.TransmogType.Illusion, Enum.TransmogModification.Main);
-				local pendingInfo = TransmogUtil.CreateTransmogPendingInfo(Enum.TransmogPendingType.Apply, setData.mainHandEnchant or 0);
-				C_Transmog.SetPending(TransmogLocation, pendingInfo);
-
-				local TransmogLocation = TransmogUtil.CreateTransmogLocation(17, Enum.TransmogType.Illusion, Enum.TransmogModification.Main);
-				local pendingInfo = TransmogUtil.CreateTransmogPendingInfo(Enum.TransmogPendingType.Apply, setData.offHandEnchant or 0);
-				C_Transmog.SetPending(TransmogLocation, pendingInfo);
-			end
+			--[[if setData then
+										local TransmogLocation = TransmogUtil.CreateTransmogLocation(16, Enum.TransmogType.Illusion, Enum.TransmogModification.Main);
+										local pendingInfo = TransmogUtil.CreateTransmogPendingInfo(Enum.TransmogPendingType.Apply, setData.mainHandEnchant or 0);
+										C_Transmog.SetPending(TransmogLocation, pendingInfo);
+						
+										local TransmogLocation = TransmogUtil.CreateTransmogLocation(17, Enum.TransmogType.Illusion, Enum.TransmogModification.Main);
+										local pendingInfo = TransmogUtil.CreateTransmogPendingInfo(Enum.TransmogPendingType.Apply, setData.offHandEnchant or 0);
+										C_Transmog.SetPending(TransmogLocation, pendingInfo);
+									end]]
 		end
 	end
 	local emptySlotData = Sets:GetEmptySlots()
