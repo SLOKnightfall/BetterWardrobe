@@ -510,15 +510,24 @@ function tooltip.HideItem(self)
 end
 
 tooltip.check = CreateFrame("Frame")
+	tooltip.check:ClearAllPoints()
+	tooltip.check:SetPoint("TOPRIGHT",100, 100)
+	tooltip.check:SetSize(1,1)
 tooltip.check:Hide()
 
 tooltip.rotate = CreateFrame("Frame",nil,tooltip)
+	tooltip.rotate:ClearAllPoints()
+	tooltip.rotate:SetPoint("TOPRIGHT",100, 100)
+	tooltip.rotate:SetSize(1,1)
 tooltip.rotate:Hide()
 tooltip.rotate:SetScript("OnUpdate",function(self,elapsed)
 	tooltip.model:SetFacing(tooltip.model:GetFacing() + elapsed)
 end)
 
 tooltip.repos = CreateFrame("Frame")
+	tooltip.repos:ClearAllPoints()
+	tooltip.repos:SetPoint("TOPRIGHT",100, 100)
+	tooltip.repos:SetSize(1,1)
 tooltip.repos:Hide()
 tooltip.repos:SetScript("OnShow", function(self)
 	self.elapsed = TOOLTIP_UPDATE_TIME
