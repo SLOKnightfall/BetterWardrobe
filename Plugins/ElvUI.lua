@@ -451,6 +451,16 @@ local function applySkins ()
 	BW_DressingRoomFrame.BW_DressingRoomUndressButton:SetSize(25,25)
 	BW_DressingRoomFrame.BW_DressingRoomUndressButton:SetPoint("LEFT", BW_DressingRoomFrame.BW_DressingRoomGearButton, "RIGHT" )
 
+	DressUpFrame.LinkButton:ClearAllPoints()
+	DressUpFrame.LinkButton:SetSize(25,25)
+	DressUpFrame.LinkButton:SetPoint("LEFT", BW_DressingRoomFrame.BW_DressingRoomUndressButton, "RIGHT" , 00)
+
+
+	DressUpFrameOutfitDropDown:ClearAllPoints()
+	DressUpFrameOutfitDropDown:SetSize(1,1)
+	DressUpFrameOutfitDropDown:SetPoint("RIGHT", 100,100)
+
+
 	for index, button in pairs(BW_DressingRoomFrame.PreviewButtonFrame.Slots) do
 		S:HandleItemButton(button)
 		--button.IconBorder:SetColorTexture(1, 1, 1, 0.1)
@@ -494,7 +504,7 @@ local function applySkins ()
 
 	if not IsAddOnLoaded("Blizzard_Collections") then
 		LoadAddOn("Blizzard_Collections")
-		C_Timer.After(0.1, UpdateCollectionFrames)
+		C_Timer.After(2, UpdateCollectionFrames)
 
 	end
 end
