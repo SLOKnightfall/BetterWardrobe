@@ -4252,8 +4252,8 @@ function BetterWardrobeTransmogFrameSpecDropDown_Initialize()
 	BW_UIDropDownMenu_AddButton(info, BW_UIDROPDOWNMENU_MENU_LEVEL);
 
 	local spec = GetSpecialization();
-	local _, name = GetSpecializationInfo(spec);
-	info.text = format(PARENS_TEMPLATE, name);
+	local _, name = spec and GetSpecializationInfo(spec);
+	info.text = format(PARENS_TEMPLATE, name or "");
 	info.leftPadding = 16;
 	info.notCheckable = true;
 	info.notClickable = true;
@@ -4968,7 +4968,6 @@ function BetterWardrobeSetsCollectionMixin:OnLoad()
 	self.RightInset.BGCornerTopLeft:Hide();
 	self.RightInset.BGCornerTopRight:Hide();
 
-	self.DetailsFrame.Name:SetFontObjectsToTry(Fancy24Font, Fancy20Font, Fancy16Font);
 	self.DetailsFrame.itemFramesPool = CreateFramePool("FRAME", self.DetailsFrame, "BetterWardrobeSetsDetailsItemFrameTemplate");
 
 	self.selectedVariantSets = { };
@@ -5383,13 +5382,23 @@ function BetterWardrobeSetsCollectionMixin:DisplaySet(setID)
 
 	if BetterWardrobeCollectionFrame.selectedCollectionTab == 2 then 
 	-- variant sets
+		local showVariantSetsButton = false;
 		local baseSetID = C_TransmogSets.GetBaseSetID(setID);
 		local variantSets = SetsDataProvider:GetVariantSets(baseSetID);
-		if ( #variantSets == 0 )  then
-			self.DetailsFrame.VariantSetsButton:Hide();
-		else
+		if variantSets then
+			local numVisibleSets = 0;
+			for i, set in ipairs(variantSets) do
+				if not set.hiddenUntilCollected or set.collected then
+					numVisibleSets = numVisibleSets + 1;
+				end
+			end
+			showVariantSetsButton = numVisibleSets > 1;
+		end
+		if showVariantSetsButton then
 			self.DetailsFrame.VariantSetsButton:Show();
 			self.DetailsFrame.VariantSetsButton:SetText(setInfo.description);
+		else
+			self.DetailsFrame.VariantSetsButton:Hide();
 		end
 	elseif BetterWardrobeCollectionFrame.selectedCollectionTab == 3 then
 		self.DetailsFrame.VariantSetsButton:Hide();
@@ -5683,17 +5692,20 @@ function BetterWardrobeSetsCollectionMixin:OpenVariantSetsDropDown()
 	local variantSets = SetsDataProvider:GetVariantSets(baseSetID);
 	for i = 1, #variantSets do
 		local variantSet = variantSets[i];
-		local numSourcesCollected, numSourcesTotal = SetsDataProvider:GetSetSourceCounts(variantSet.setID);
-		local colorCode = IN_PROGRESS_FONT_COLOR_CODE;
-		if ( numSourcesCollected == numSourcesTotal ) then
-			colorCode = NORMAL_FONT_COLOR_CODE;
-		elseif ( numSourcesCollected == 0 ) then
-			colorCode = GRAY_FONT_COLOR_CODE;
+		if not variantSet.hiddenUntilCollected or variantSet.collected then
+
+			local numSourcesCollected, numSourcesTotal = SetsDataProvider:GetSetSourceCounts(variantSet.setID);
+			local colorCode = IN_PROGRESS_FONT_COLOR_CODE;
+			if ( numSourcesCollected == numSourcesTotal ) then
+				colorCode = NORMAL_FONT_COLOR_CODE;
+			elseif ( numSourcesCollected == 0 ) then
+				colorCode = GRAY_FONT_COLOR_CODE;
+			end
+			info.text = format(ITEM_SET_NAME, variantSet.description..colorCode, numSourcesCollected, numSourcesTotal);
+			info.checked = (variantSet.setID == selectedSetID);
+			info.func = function() self:SelectSet(variantSet.setID); end;
+			BW_UIDropDownMenu_AddButton(info);
 		end
-		info.text = format(ITEM_SET_NAME, variantSet.description..colorCode, numSourcesCollected, numSourcesTotal);
-		info.checked = (variantSet.setID == selectedSetID);
-		info.func = function() self:SelectSet(variantSet.setID); end;
-		BW_UIDropDownMenu_AddButton(info);
 	end
 end
 
@@ -6111,7 +6123,25 @@ function BetterWardrobeSetsCollectionScrollFrameMixin:Update()
 				isHidden = addon.HiddenAppearanceDB.profile.extraset[baseSet.setID]
 			end
 
+
+			local displaySet = baseSet;
+
+			-- if the base set is hiddenUntilCollected and not collected, it's showing up because one of its variant sets is collected
+			-- in that case use any variant set to populate the info in the list
+			if baseSet.hiddenUntilCollected and not baseSet.collected and BetterWardrobeCollectionFrame.selectedCollectionTab == 2 then
+				local variantSets = C_TransmogSets.GetVariantSets(baseSet.setID);
+				if variantSets then
+					-- variant sets are already filtered for visibility (won't get a hiddenUntilCollected one unless it's collected)
+					-- any set will do so just picking first one
+					displaySet = variantSets[1];
+				end
+			end
 			button:Show();
+			button.Name:SetText(displaySet.name);
+			local topSourcesCollected, topSourcesTotal = SetsDataProvider:GetSetSourceTopCounts(displaySet.setID);
+			local setCollected = displaySet.collected;
+
+
 
 			local classIcon = ""
 			--if baseSet.classTag then 
@@ -6119,11 +6149,13 @@ function BetterWardrobeSetsCollectionScrollFrameMixin:Update()
 			--classIcon ="|A:"..classIcon..":16:16|a"
 			--end
 				--button.Name:SetText(baseSet.name or "")
-			button.Name:SetText(baseSet.name..((baseSet.className) and " ("..baseSet.className..")" or "") )
+			button.Name:SetText(displaySet.name..((baseSet.className) and " ("..baseSet.className..")" or "") )
 			----button.Name:SetText(baseSet.name);
 
-			local topSourcesCollected, topSourcesTotal = addon.GetSetSourceCounts(baseSet.setID)  --SetsDataProvider:GetSetSourceTopCounts(baseSet.setID);
-			local setCollected = topSourcesCollected == topSourcesTotal --baseSet.collected -- C_TransmogSets.IsBaseSetCollected(baseSet.setID)
+			-----local topSourcesCollected, topSourcesTotal = addon.GetSetSourceCounts(baseSet.setID)  --SetsDataProvider:GetSetSourceTopCounts(baseSet.setID);
+			-----local setCollected = topSourcesCollected == topSourcesTotal --baseSet.collected -- C_TransmogSets.IsBaseSetCollected(baseSet.setID)
+			local topSourcesCollected, topSourcesTotal = SetsDataProvider:GetSetSourceTopCounts(displaySet.setID);
+			local setCollected = displaySet.collected;
 			----local setCollected = C_TransmogSets.IsBaseSetCollected(baseSet.setID);
 			local color = IN_PROGRESS_FONT_COLOR;
 			if ( setCollected ) then
@@ -6134,8 +6166,10 @@ function BetterWardrobeSetsCollectionScrollFrameMixin:Update()
 
 			button.setCollected = setCollected
 			button.Name:SetTextColor(color.r, color.g, color.b);
-			button.Label:SetText(baseSet.label) --(L["NOTE_"..(baseSet.label or 0)] and L["NOTE_"..(baseSet.label or 0)]) or "")--((L["NOTE_"..baseSet.label] or "X"))
-			button.Icon:SetTexture(baseSet.icon or SetsDataProvider:GetIconForSet(baseSet.setID))
+			button.Label:SetText(displaySet.label) --(L["NOTE_"..(baseSet.label or 0)] and L["NOTE_"..(baseSet.label or 0)]) or "")--((L["NOTE_"..baseSet.label] or "X"))
+			button.Icon:SetTexture(baseSet.icon or SetsDataProvider:GetIconForSet(displaySet.setID));
+
+			-----button.Icon:SetTexture(baseSet.icon or SetsDataProvider:GetIconForSet(baseSet.setID))
 			button.Icon:SetDesaturation((baseSet.collected and 0) or ((topSourcesCollected == 0) and 1) or 0)
 			button.SelectedTexture:SetShown(baseSet.setID == selectedBaseSetID);
 			button.Favorite:SetShown(isFavorite)

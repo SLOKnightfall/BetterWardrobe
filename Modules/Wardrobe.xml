@@ -621,11 +621,6 @@
 										<Anchors>
 											<Anchor point="RIGHT" relativeKey="$parent.Text" relativePoint="LEFT" x="4"/>
 										</Anchors>
-										<Scripts>
-											<OnLoad>
-												self.Anim:Play();
-											</OnLoad>
-										</Scripts>
 									</Frame>
 								</Frames>
 							</Frame>
@@ -1219,7 +1214,10 @@
 								</Texture>
 							</Layer>
 							<Layer level="ARTWORK">
-								<FontString parentKey="Name" inherits="Fancy24Font" maxLines="1" mixin="ShrinkUntilTruncateFontStringMixin">
+								<FontString parentKey="Name" inherits="Fancy24Font" maxLines="1" mixin="AutoScalingFontStringMixin">
+									<KeyValues>
+										<KeyValue key="minLineHeight" value="16" type="number"/>
+									</KeyValues>
 									<Size x="380" y="0"/>
 									<Anchors>
 										<Anchor point="TOP" x="0" y="-37"/>

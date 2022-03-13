@@ -57,6 +57,7 @@ local LE_COLOR = 4
 local LE_EXPANSION = 5
 local LE_ITEM_SOURCE = 6
 local LE_ARTIFACT = 7
+local LE_ILEVEL = 8
 
 local TAB_ITEMS = 1
 local TAB_SETS = 2
@@ -310,22 +311,37 @@ local Sort = {
 		table.sort(sets, comparison)
 	end,
 
-	["SortItemByExpansion"] = function(source1, source2)
+	["SortItemByILevel"] = function(source1, source2)
 		local item1 = WardrobeCollectionFrame_GetSortedAppearanceSources(source1.visualID)[1] or {}
 		local item2 = WardrobeCollectionFrame_GetSortedAppearanceSources(source2.visualID)[1] or {}
 		item1.itemID = item1.itemID or 0
 		item2.itemID = item2.itemID or 0
-		item1.expansionID = select(15,  GetItemInfo(item1.itemID)) or -1
-		item2.expansionID = select(15,  GetItemInfo(item2.itemID)) or -1
+		item1.ilevel = select(4,  GetItemInfo(item1.itemID)) or -1
+		item2.ilevel = select(4,  GetItemInfo(item2.itemID)) or -1
 
-		if ( item1.expansionID ~= item2.expansionID ) then
-			return SortOrder(item1.expansionID, item2.expansionID)
-		end
-
-		if item1.name  and item2.name then 
-			return SortOrder(item1.name, item2.name)
+		if ( item1.ilevel ~= item2.ilevel ) then
+			return SortOrder(item1.ilevel, item2.ilevel)
+		else
+			return SortOrder(source1.uiOrder, source2.uiOrder)
 		end
 	end,
+
+	["SortItemByExpansion"] = function(source1, source2)
+				local item1 = WardrobeCollectionFrame_GetSortedAppearanceSources(source1.visualID)[1] or {}
+				local item2 = WardrobeCollectionFrame_GetSortedAppearanceSources(source2.visualID)[1] or {}
+				item1.itemID = item1.itemID or 0
+				item2.itemID = item2.itemID or 0
+				item1.expansionID = select(15,  GetItemInfo(item1.itemID)) or -1
+				item2.expansionID = select(15,  GetItemInfo(item2.itemID)) or -1
+		
+				if ( item1.expansionID ~= item2.expansionID ) then
+					return SortOrder(item1.expansionID, item2.expansionID)
+				end
+		
+				if item1.name  and item2.name then 
+					return SortOrder(item1.name, item2.name)
+				end
+			end,
 
 	["SortSetByExpansion"] = function(sets, reverseUIOrder, ignorePatchID) 
 		local comparison = function(set1, set2)
@@ -406,6 +422,8 @@ local Sort = {
 			end)
 		end,
 		
+		
+
 		[LE_ALPHABETIC] = function(self)
 			if catCompleted[self:GetActiveCategory()] then
 				addon.Sort.SortItemAlphabetic()
@@ -469,6 +487,9 @@ local Sort = {
 			sort(self.filteredVisualsList, addon.Sort.SortItemByExpansion) -- Runs twice because some times the first run does not return item info
 		end,
 
+		[LE_ILEVEL] = function(self)
+			sort(self.filteredVisualsList, addon.Sort.SortItemByILevel) 
+		end,
 		[LE_ARTIFACT] = function(self)
 			if not self then return end
 
