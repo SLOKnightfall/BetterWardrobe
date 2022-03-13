@@ -401,7 +401,6 @@ L["NOTE_84"] = "Argus Questing Set"
 L["NOTE_92"] = "BFA Questing Set"
 L["NOTE_97"] = "Nazjatar Questing Set"
 L["NOTE_101"] = "Shadowlands Questing Set"
-
 --Dungeon Sets
 
 L["NOTE_45"] = "Classic Dungeon Set"
@@ -484,6 +483,7 @@ L["NOTE_110"] = "Shadowlands PvP Set"
 L["NOTE_111"] = "Shadowlands Crafted Set"
 L["NOTE_115"] = "Shadowlands Callings Set"
 L["NOTE_116"] = "Shadowlands Korthia Set"
+L["NOTE_117"] = "Shadowlands Zereth Mortis Set"
 
 L["Swap to Better Wardrobe View"] = true
 L["Swap to Extended Transmog Sets View"] = true
