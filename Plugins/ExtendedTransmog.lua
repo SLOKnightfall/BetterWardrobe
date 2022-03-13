@@ -6,6 +6,12 @@ local L = LibStub("AceLocale-3.0"):GetLocale(addonName)
 function addon:InitExtendedSetsSwap() 
 end
 
+function addon:ResetSetsCollectionFrame()
+end
+--local oldScrollToSet =  WardrobeCollectionFrame.SetsCollectionFrame.ScrollToSet
+--local oldDisplaySet =  WardrobeCollectionFrame.SetsCollectionFrame.DisplaySet
+--SetsDataProvider = CreateFromMixins(WardrobeSetsDataProviderMixin);
+
 if not IsAddOnLoaded("ExtendedSets") then return end
 
 function addon:InitExtendedSetsSwap() 
@@ -37,3 +43,11 @@ function addon:InitExtendedSetsSwap()
 	button:SetScript("OnEnter", function(button) GameTooltip:SetOwner(button, "ANCHOR_RIGHT"); GameTooltip:SetText(button.tooltip);end)
 	button:SetScript("OnLeave", function(button) GameTooltip:Hide() end)
 end
+
+--Overwrites changes to WardrobeCollectionFrame functions by ExtendedSets
+function addon:ResetSetsCollectionFrame()
+	Mixin(WardrobeCollectionFrame.SetsCollectionFrame, WardrobeSetsCollectionMixin);
+	WardrobeCollectionFrame.SetsCollectionFrame.SetsDataProvider= CreateFromMixins(WardrobeSetsDataProviderMixin);
+	WardrobeCollectionFrame.GoToSet = WardrobeCollectionFrameMixin.GoToSet
+end
+

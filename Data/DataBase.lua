@@ -78,47 +78,49 @@ function BuildBlizzSets()
 
 	local allSets = C_TransmogSets.GetAllSets()
 	for i, data in ipairs(allSets) do
-		data.expansionID  = data.expansionID + 1
-		data.BuildBlizzSets = true
-		data.setType = "Blizzard"
+		if not (data.name == "PH") then
+			data.expansionID  = data.expansionID + 1
+			data.BuildBlizzSets = true
+			data.setType = "Blizzard"
 
-		if data.classMask and Globals.CLASS_MASK_TO_ID[data.classMask] then 
-			data.classID = Globals.CLASS_MASK_TO_ID[data.classMask]
-			data.className, data.classTag = GetClassInfo(data.classID);
-		end
-		
-		for armor, mask in ipairs(armorMask) do 
-			--if bit.band(data.classMask, mask) == mask  then
-			if bit.bor(mask, data.classMask) == mask then
-
-				local baseSet = C_TransmogSets.GetBaseSetID(data.setID)
-				--Create Bizzard sets not being shown on sets tab
-				data.duplicate = true
-				if not BlizzardBaseSets[baseSet]  or (BlizzardBaseSets[baseSet] and data.hiddenUntilCollected and not data.collected) then 
-					data.duplicate = false
-				end
-					if isPVP(data.setID) then data.PvP = true end
-					WowSets[Globals.ARMOR_TYPE[armor]][data.setID] = data
-					--break
-
-				--Create Variants List
-				--elseif baseSet =~ data.setID and not BlizzardBaseSets[data.setID] then 
-				--end
-			elseif data.classMask == 0 then 
-				WowSets["COSMETIC"][data.setID] = data
+			if data.classMask and Globals.CLASS_MASK_TO_ID[data.classMask] then 
+				data.classID = Globals.CLASS_MASK_TO_ID[data.classMask]
+				data.className, data.classTag = GetClassInfo(data.classID);
 			end
-		end
-		--PvP Sets
-		if data.PvP then 
-			data.filter = 7
-		--Covenant Sets
-		elseif data.setID <=2221 and data.setID >= 2015   then 
-			data.filter = 11
-		--Raid Sets
-		elseif data.description then 
-			data.filter = 5
-		else
-			data.filter = 1
+			
+			for armor, mask in ipairs(armorMask) do 
+				--if bit.band(data.classMask, mask) == mask  then
+				if bit.bor(mask, data.classMask) == mask then
+
+					local baseSet = C_TransmogSets.GetBaseSetID(data.setID)
+					--Create Bizzard sets not being shown on sets tab
+					data.duplicate = true
+					if not BlizzardBaseSets[baseSet]  or (BlizzardBaseSets[baseSet] and data.hiddenUntilCollected and not data.collected) then 
+						data.duplicate = false
+					end
+						if isPVP(data.setID) then data.PvP = true end
+						WowSets[Globals.ARMOR_TYPE[armor]][data.setID] = data
+						--break
+
+					--Create Variants List
+					--elseif baseSet =~ data.setID and not BlizzardBaseSets[data.setID] then 
+					--end
+				elseif data.classMask == 0 then 
+					WowSets["COSMETIC"][data.setID] = data
+				end
+			end
+			--PvP Sets
+			if data.PvP then 
+				data.filter = 7
+			--Covenant Sets
+			elseif data.setID <=2221 and data.setID >= 2015   then 
+				data.filter = 11
+			--Raid Sets
+			elseif data.description then 
+				data.filter = 5
+			else
+				data.filter = 1
+			end
 		end
 	end
 end

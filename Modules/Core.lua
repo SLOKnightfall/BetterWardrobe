@@ -1288,6 +1288,7 @@ function addon:OnEnable()
 	end
 
 	addon:RegisterEvent("PLAYER_ENTERING_WORLD", "EventHandler")
+
 	--Cache any default Blizz Saved Sets
 	addon.StoreBlizzardSets()
 	inizliaed = true
@@ -1379,9 +1380,11 @@ function addon:EventHandler(event, ...)
 		WardrobeTransmogFrame.ToggleSecondaryAppearanceCheckbox:ClearAllPoints()
 		WardrobeTransmogFrame.ToggleSecondaryAppearanceCheckbox.Label:SetPoint("RIGHT", BetterWardrobeCollectionFrame.ItemsCollectionFrame.PagingFrame.PageText, "LEFT", -30, 0);
 		WardrobeTransmogFrame.ToggleSecondaryAppearanceCheckbox:SetPoint("RIGHT", WardrobeTransmogFrame.ToggleSecondaryAppearanceCheckbox.Label, "LEFT", 0, 0);
+		
 
 	elseif (event == "PLAYER_ENTERING_WORLD") then
 		addon:SendMessage("BW_OnPlayerEnterWorld")
+		C_Timer.After(1, function() addon:ResetSetsCollectionFrame() end )
 	elseif (event == "TRANSMOG_COLLECTION_SOURCE_ADDED") then
 		local x = ...
 		BetterWardrobeCollectionFrameMixin:OnEvent(event, x)

@@ -112,7 +112,6 @@ end
 addon:SecureHook("TransmogOutfitRemoveYes", function(self) addon:SendMessage("BW_TRANSMOG_COLLECTION_UPDATED") end)
 addon:SecureHook("TransmogOutfitRenameDone", function(self) addon:SendMessage("BW_TRANSMOG_COLLECTION_UPDATED") end)
 
-
 --Tweaks original function to allow changes via the BW saved set list
 function TransmogOutfitSearchOutfit()
 	local blizzardOutfits = C_TransmogCollection.GetOutfits()

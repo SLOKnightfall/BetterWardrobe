@@ -1541,6 +1541,7 @@ function BetterWardrobeCollectionFrameMixin:OpenTransmogLink(link)
 		end)
 
 		local setID = tonumber(id);
+		print(setID)
 		local setInfo = addon.GetSetInfo(setID)
 		local armorType = setInfo.armorType
 		if armorType ~= addon.selectedArmorType then 
@@ -7692,13 +7693,19 @@ end
 
 
 
+addon:RawHook("SetItemRef", function(link, ...) 
+    if not IsAddOnLoaded("Blizzard_Collections") then
+      LoadAddOn("Blizzard_Collections")
+    end
+--function addon:SetItemRef(link)
 
-	addon:SecureHook("SetItemRef", function(link) 
+    -- do stuff here
+
+	--addon:SecureHook("SetItemRef", function(link) 
 		--if InCombatLockdown() then return end
 		--if ( not CollectionsJournal:IsVisible() or not BetterWardrobeCollectionFrame:IsVisible() ) then
 			--securecall(function() ToggleCollectionsJournal(5) end)
 		--end
-
 		local linkType, id = strsplit(":", link);
 
 		if ( linkType == "transmogappearance" ) then
@@ -7714,8 +7721,11 @@ end
 				BetterWardrobeCollectionFrame:OpenTransmogLink(link);
 				return
 
-		end
-	end, true)
+		  else
+    		addon.hooks.SetItemRef(link,...)
+  		end
+end, true)
+
 
 BetterWardrobeSetsDetailsItemUseabiltiyMixin = { };
 
