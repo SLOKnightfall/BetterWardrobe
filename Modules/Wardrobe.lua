@@ -6176,8 +6176,14 @@ function BetterWardrobeSetsCollectionScrollFrameMixin:Update()
 			button:Show();
 			button.Name:SetText(displaySet.name);
 			local topSourcesCollected, topSourcesTotal = SetsDataProvider:GetSetSourceTopCounts(displaySet.setID);
-			local setCollected = displaySet.collected;
 
+
+			local setCollected = displaySet.collected;
+			if displaySet.collected then 
+				setCollected = displaySet.collected
+			else
+				setCollected = topSourcesCollected == topSourcesTotal
+			end
 
 
 			local classIcon = ""
@@ -6191,8 +6197,7 @@ function BetterWardrobeSetsCollectionScrollFrameMixin:Update()
 
 			-----local topSourcesCollected, topSourcesTotal = addon.GetSetSourceCounts(baseSet.setID)  --SetsDataProvider:GetSetSourceTopCounts(baseSet.setID);
 			-----local setCollected = topSourcesCollected == topSourcesTotal --baseSet.collected -- C_TransmogSets.IsBaseSetCollected(baseSet.setID)
-			local topSourcesCollected, topSourcesTotal = SetsDataProvider:GetSetSourceTopCounts(displaySet.setID);
-			local setCollected = displaySet.collected;
+			----local setCollected = displaySet.collected;
 			----local setCollected = C_TransmogSets.IsBaseSetCollected(baseSet.setID);
 			local color = IN_PROGRESS_FONT_COLOR;
 			if ( setCollected ) then
