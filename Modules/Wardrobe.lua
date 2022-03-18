@@ -136,7 +136,6 @@ function BW_TransmogFrameMixin:OnLoad()
 	self:RegisterEvent("TRANSMOGRIFY_UPDATE");
 	self:RegisterEvent("TRANSMOGRIFY_ITEM_UPDATE");
 	self:RegisterEvent("TRANSMOGRIFY_SUCCESS");
-print("XXXXXXXX")
 	-- set up dependency links
 	self.MainHandButton.dependentSlot = self.MainHandEnchantButton;
 	self.MainHandEnchantButton.dependencySlot = self.MainHandButton;
@@ -1535,13 +1534,15 @@ function BetterWardrobeCollectionFrameMixin:OpenTransmogLink(link)
 		self.SetsCollectionFrame:SelectSet(setID);
 
 	elseif ( linkType == "transmogset-extra") then
+		local setID = tonumber(id);
+
 		addon:RegisterMessage("BW_TRANSMOG_EXTRASETSHOWN", function(self) 
 			addon:UnregisterMessage("BW_TRANSMOG_EXTRASETSHOWN")
-			----BetterWardrobeCollectionFrame.SetsCollectionFrame:DisplaySet(setID)
+			BetterWardrobeCollectionFrame.SetsCollectionFrame:DisplaySet(setID)
 		end)
 
-		local setID = tonumber(id);
-		print(setID)
+		
+		--print(setID)
 		local setInfo = addon.GetSetInfo(setID)
 		local armorType = setInfo.armorType
 		if armorType ~= addon.selectedArmorType then 
@@ -1553,7 +1554,7 @@ function BetterWardrobeCollectionFrameMixin:OpenTransmogLink(link)
 		end
 		self.SetsCollectionFrame:SelectSet(setID);
 
-		--C_Timer.After(0.7, function() BetterWardrobeCollectionFrame:SetTab(TAB_EXTRASETS) end)
+		C_Timer.After(0.7, function() BetterWardrobeCollectionFrame:SetTab(TAB_EXTRASETS) end)
 		
 	end
 end
@@ -1565,6 +1566,8 @@ function BetterWardrobeCollectionFrameMixin:GoToItem(sourceID)
 	local transmogLocation = TransmogUtil.GetTransmogLocation(slot, Enum.TransmogType.Appearance, Enum.TransmogModification.Main);
 	self.ItemsCollectionFrame:GoToSourceID(sourceID, transmogLocation);
 end
+
+
 function BetterWardrobeCollectionFrameMixin:GoToSet(setID)
 	self:SetTab(TAB_SETS);
 	self.SetsCollectionFrame:SelectSet(setID);
@@ -5013,10 +5016,10 @@ function BetterWardrobeSetsCollectionMixin:OnShow()
 			self.selectedSavedSetID = savedSets[1].setID
 		end
 	else
-		local selectedSetID = self:GetSelectedSetID();
-		if ( not selectedSetID or not C_TransmogSets.IsSetVisible(selectedSetID) ) then
-			self:SelectSet(defaultSetID);
-		end
+		---local selectedSetID = self:GetSelectedSetID();
+		---if ( not selectedSetID or not C_TransmogSets.IsSetVisible(selectedSetID) ) then
+			---self:SelectSet(defaultSetID);
+		---end
 		self:Refresh();
 	end
 
