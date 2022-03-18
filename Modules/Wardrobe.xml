@@ -1276,10 +1276,37 @@
 									<OnLeave function="GameTooltip_Hide"/>
 								</Scripts>
 							</Frame>
+							<Button parentKey="BW_LinkSetButton" inherits="SquareIconButtonTemplate" >
+								<Size x="32" y="32"/>
+								<Anchors>
+									<Anchor point="TOPRIGHT" x="-6" y="-6"/>
+								</Anchors>					
+								<Layers>
+									<Layer level="ARTWORK" textureSubLevel="5">
+										<Texture parentKey="Icon" atlas="poi-transmogrifier" useAtlasSize="false">
+											<Size x="16" y="20"/>
+											<Anchors>
+												<Anchor point="CENTER" />
+											</Anchors>
+										</Texture>
+									</Layer>
+								</Layers>
+								<Scripts>
+									<OnShow> 
+
+									</OnShow>
+									<OnEnter>
+									</OnEnter>
+									<OnClick>
+										self:GetParent():GetParent():LinkSetInChat(self.setID)
+									</OnClick>
+
+								</Scripts>
+							</Button>
 							<DropDownToggleButton name="BetterWardrobeSetsCollectionVariantSetsButton" parentKey="VariantSetsButton" inherits="UIMenuButtonStretchTemplate" frameLevel="60">
 								<Size x="108" y="22"/>
 								<Anchors>
-									<Anchor point="TOPRIGHT" x="-6" y="-6"/>
+									<Anchor point="TOPRIGHT" x="-38" y="-6"/>
 								</Anchors>
 								<Layers>
 									<Layer level="ARTWORK">

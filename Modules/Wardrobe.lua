@@ -5172,8 +5172,8 @@ end
 
 function BetterWardrobeSetsCollectionMixin:DisplaySet(setID)
 	if not setID then return end
- setInfo = addon.C_TransmogSets.GetSetInfo(setID) 
- 	local buildID = (select(4, GetBuildInfo()))
+	setInfo = addon.C_TransmogSets.GetSetInfo(setID) 
+	local buildID = (select(4, GetBuildInfo()))
 
 					or nil;
 	if ( not setInfo ) then
@@ -5184,6 +5184,8 @@ function BetterWardrobeSetsCollectionMixin:DisplaySet(setID)
 		self.DetailsFrame:Show();
 		self.Model:Show();
 	end
+
+	self.DetailsFrame.BW_LinkSetButton.setID = setID
 
 	self.DetailsFrame.Name:SetText(setInfo.name);
 	if ( self.DetailsFrame.Name:IsTruncated() ) then
@@ -5896,6 +5898,30 @@ function BetterWardrobeSetsCollectionMixin:ScrollToSet(setID)
 	end
 end
 
+function BetterWardrobeSetsCollectionMixin:LinkSetInChat(setID)
+	local itemTransmogInfoList = TransmogUtil.GetEmptyItemTransmogInfoList();
+
+	local emptySlotData = Sets:GetEmptySlots()
+
+	for i=1,19 do
+		itemTransmogInfoList[i].secondaryAppearanceID = 0;
+		local _, source = addon.GetItemSource(emptySlotData[i] or 0)
+		itemTransmogInfoList[i].appearanceID = source or 0;
+		itemTransmogInfoList[i].illusionID = 0;
+	end
+
+	local sortedSources = SetsDataProvider:GetSortedSetSources(setID);
+	for i=1,#sortedSources do
+		local slot = C_Transmog.GetSlotForInventoryType(sortedSources[i].invType)
+		itemTransmogInfoList[slot].appearanceID = sortedSources[i].sourceID;
+	end
+
+	local hyperlink = C_TransmogCollection.GetOutfitHyperlinkFromItemTransmogInfoList(itemTransmogInfoList);
+	if not ChatEdit_InsertLink(hyperlink) then
+		ChatFrame_OpenChat(hyperlink);
+	end
+end
+
 do
 	local function OpenVariantSetsDropDown(self)
 		self:GetParent():GetParent():OpenVariantSetsDropDown();
@@ -5936,6 +5962,13 @@ local function BetterWardrobeSetsCollectionScrollFrame_FavoriteDropDownInit(self
 	local info = BW_UIDropDownMenu_CreateInfo()
 	info.notCheckable = true;
 	info.disabled = nil;
+
+
+	BW_UIDropDownMenu_AddButton({
+		notCheckable = true,
+		text = TRANSMOG_OUTFIT_POST_IN_CHAT,
+		func = function() BetterWardrobeSetsCollectionMixin:LinkSetInChat(self.baseSetID) end,
+	})
 
 	local isFavorite = (type == "set" and C_TransmogSets.GetIsFavorite(self.baseSetID)) or addon.favoritesDB.profile.extraset[self.baseSetID]
 	if (isFavorite) then
@@ -6074,7 +6107,7 @@ end
 
 local function CheckSetAvailability2(setID)
 	local  setData = addon.C_TransmogSets.GetSetInfo(setID) 
- 	local buildID = (select(4, GetBuildInfo()))
+	local buildID = (select(4, GetBuildInfo()))
 		if ((setData.description == ELITE) and setData.patchID < buildID) or (setID <= 1446 and setID >=1436) then
 
 		return true
@@ -6343,7 +6376,7 @@ local BW_ItemSubDropDownMenu_Table = {
 	{
 	text = L["View Sources"],
 		func = function(self)   
-		 	local appearanceID, sourceID = C_TransmogCollection.GetItemInfo(clickedItemID)	
+			local appearanceID, sourceID = C_TransmogCollection.GetItemInfo(clickedItemID)	
 			addon.CollectionList:GenerateSourceListView(appearanceID)
 
 		end,
@@ -6366,7 +6399,7 @@ local BW_ExtraItemSubDropDownMenu_Table = {
 	{
 	text = L["View Sources"],
 		func = function(self)   
-		 	local appearanceID, sourceID = C_TransmogCollection.GetItemInfo(clickedItemID)	
+			local appearanceID, sourceID = C_TransmogCollection.GetItemInfo(clickedItemID)	
 			addon.CollectionList:GenerateSourceListView(appearanceID)
 
 		end,
@@ -7697,12 +7730,12 @@ end
 
 
 addon:RawHook("SetItemRef", function(link, ...) 
-    if not IsAddOnLoaded("Blizzard_Collections") then
-      LoadAddOn("Blizzard_Collections")
-    end
+	if not IsAddOnLoaded("Blizzard_Collections") then
+	  LoadAddOn("Blizzard_Collections")
+	end
 --function addon:SetItemRef(link)
 
-    -- do stuff here
+	-- do stuff here
 
 	--addon:SecureHook("SetItemRef", function(link) 
 		--if InCombatLockdown() then return end
@@ -7725,8 +7758,8 @@ addon:RawHook("SetItemRef", function(link, ...)
 				return
 
 		  else
-    		addon.hooks.SetItemRef(link,...)
-  		end
+			addon.hooks.SetItemRef(link,...)
+		end
 end, true)
 
 
@@ -7750,3 +7783,6 @@ end
 function BetterWardrobeSetsDetailsItemUseabiltiyMixin:OnLeave()
 	GameTooltip:Hide();
 end
+
+
+
