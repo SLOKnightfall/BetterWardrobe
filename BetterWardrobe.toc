@@ -60,7 +60,7 @@ Modules\DressingRoom.xml
 Modules\Wardrobe.xml
 Modules\ColorFilter.lua
 
-Modules\PreviewWindows.lua
+#Modules\PreviewWindows.lua
 
 
 Modules\CollectionList.xml
