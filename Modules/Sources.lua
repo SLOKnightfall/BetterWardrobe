@@ -13,6 +13,8 @@ local refresh = false
 local LISTWINDOW
 local vendorDB = {}
 local locationDB = {}
+
+local RetrievingDataText =  RED_FONT_COLOR_CODE..RETRIEVING_ITEM_INFO
  
 local function GetBossInfo(itemID)
 	local drops = C_TransmogCollection.GetAppearanceSourceDrops(itemID)
@@ -39,25 +41,27 @@ end
 
 local inspectScantip = CreateFrame("GameTooltip", addonName.."ScanningTooltip", nil, "GameTooltipTemplate")
 inspectScantip:SetOwner(UIParent, "ANCHOR_NONE")
-local needsRefresh = {}
+local needsRefresh
+local refreshData
 local function GetQuestnfo(questData)
 	--for i = 1, #questData do
 		local sourceData
 		local questID = questData
 		local questName
 		local link = "quest:"..questID
-		inspectScantip:SetHyperlink("quest:"..questID)
+		inspectScantip:SetHyperlink("quest:"..questID)	
 		--local link = "\124cffffff00\124Hquest:%s\124h[%s]\124h\124r"
 
-
 		if inspectScantip:NumLines() > 0 then
+			needsRefresh = nil
 			local tooltipLine = _G[addonName.."ScanningTooltipTextLeft1"]
 			local text = tooltipLine:GetText()
 			if text and text ~= "" then
 				questName = text
 				--link = link:format(questID,questName)
 			end
-
+		else
+			needsRefresh = true
 		end
 		inspectScantip:ClearLines()
 		--local zoneName = ("%s: "):format(locationDB[questID][1]) --GetZoneName(QuestToZone[questID],"%s: ").
@@ -66,20 +70,8 @@ local function GetQuestnfo(questData)
 		local zoneid = zoneid and zoneid[1] or 0
 		local zoneName = locationDB[zoneid] --GetZoneName(QuestToZone[questID],"%s: ")
 
-		if questName then
-			return questName or "", zoneName, link
-			--GameTooltip:AddLine(zoneName..questName)
-		else
-			needsRefresh[questID] = needsRefresh[questID] or 0
-			if needsRefresh[questID] <20 then
-				needsRefresh[questID] = needsRefresh[questID] + 1
-				refresh = true
-			else
-				refresh = false
-			end
-			--GameTooltip:AddLine(zoneName.."Quest: "..questID)
-		end
-	--end
+		return questName, zoneName, questID, link
+
 end
 
 local function GetDropInfo(dropData)
@@ -188,7 +180,7 @@ local function GetSourceInfo(itemID)
 			end]]
 end
 
-local function buildsourcelist(visualID)
+local function BuildSourceList(visualID)
 	if not IsAddOnLoaded("BetterWardrobe_SourceData") then
 		EnableAddOn("BetterWardrobe_SourceData")
 		LoadAddOn("BetterWardrobe_SourceData")
@@ -201,6 +193,7 @@ local function buildsourcelist(visualID)
 	local sources = C_TransmogCollection.GetAllAppearanceSources(visualID)
 	local sourceID = sources and sources.sourceID
 	local data = {}
+	local data_index = 1
 	if sources then
 		for i=1,#sources do
 			local sourceInfo = C_TransmogCollection.GetSourceInfo(sources[i])
@@ -210,14 +203,17 @@ local function buildsourcelist(visualID)
 				itemID = tonumber(itemID)
 				local sourceData = itemID and itemSourceDB[itemID] or sourceInfo
 				local sourceType = sourceInfo.sourceType
-
-				data[i] = {
-					["itemID"] = itemID ,
-					["itemLink"] = itemLink,
-					["sourceType"] = sourceType,
-					["sourceData"] = sourceData,
-					["sourceID"] = sources[i],
-				}
+				--Don't want to list items with hidden sources
+				if sourceType then 
+					data[data_index] = {
+						["itemID"] = itemID ,
+						["itemLink"] = itemLink,
+						["sourceType"] = sourceType,
+						["sourceData"] = sourceData,
+						["sourceID"] = sources[i],
+					}
+					data_index = data_index + 1
+				end
 			end
 		end
 	end
@@ -261,7 +257,7 @@ local function GetPrice(itemID)
 	return prices, currency, item
 end
 
-
+local refresh_count = 0
 local function AddAdditional(parent, index, data, itemID)
 	local f = {}
 	local Collected = AceGUI:Create("Icon")
@@ -274,11 +270,13 @@ local function AddAdditional(parent, index, data, itemID)
 	SourceInfo:SetHeight(20)
 	local link, sourceName
 
+	--Boss Drop
 	if index == 0 then 
 		sourceName = data
 		transmogSource = _G["TRANSMOG_SOURCE_1"] or ""
 		SourceInfo:SetText(("-%s: %s"):format(transmogSource, sourceName or L["No Data Available"]))
 
+	--World Drop
 	elseif index == 1 then
 		sourceName = data
 		transmogSource = _G["TRANSMOG_SOURCE_4"] or ""
@@ -290,8 +288,8 @@ local function AddAdditional(parent, index, data, itemID)
 		end
 		SourceInfo:SetText(("-%s: %s"):format(transmogSource, zoneList))
 
+	--Container
 	elseif index == 2 then 
-
 		local item = Item:CreateFromItemID(tonumber(data))
 		item:ContinueOnItemLoad(function()
 			local name = item:GetItemName() 
@@ -304,20 +302,32 @@ local function AddAdditional(parent, index, data, itemID)
 			SourceInfo:SetText(("-%s: %s"):format(L["Conatined in"], name))
 		end)
 
+	--Quest
 	elseif index == 4 then 
-		sourceName, zoneName, link = GetQuestnfo(data)
+		sourceName, zoneName, questID, link = GetQuestnfo(data)
+		--if not sourceName then AddAdditional(parent, index, data, itemID) return end
 		--data.questName = sourceName
 		--sourceDB = questList
 		transmogSource = _G["TRANSMOG_SOURCE_2"] or ""
-		sourceName = ACHIEVEMENT_COLOR_CODE..(sourceName or "?")..L.ENDCOLOR
+
+		if sourceName then 
+		sourceName = ACHIEVEMENT_COLOR_CODE..sourceName..L.ENDCOLOR
+		else
+			if refresh_count < 100 then
+			sourceName = RetrievingDataText..L.ENDCOLOR
+			else
+
+		end
+	end
 
 		if zoneName then
 			--SourceInfo:SetText(("    %s: %s - %s: [%s]"):format(L["Zone"], zoneName or "?", transmogSource, sourceName or L["No Data Available"]))
-			SourceInfo:SetText(("-%s: %s - [%s] "):format(transmogSource, zoneName, sourceName or L["No Data Available"]))
+			SourceInfo:SetText(("-%s: %s - [%s] "):format(transmogSource, zoneName, sourceName or L["No Data Available"].." (QuestID:"..questID..")"))
 		else
-			SourceInfo:SetText(("-%s: [%s] "):format(transmogSource, sourceName or L["No Data Available"]))
+			SourceInfo:SetText(("-%s: [%s] "):format(transmogSource, sourceName or "Quest"..questID))
 		end
 
+	--Achievement
 	elseif index == 5 then 
 		local id, name, points = GetAchievementInfo(data)
 		sourceName = name
@@ -326,6 +336,7 @@ local function AddAdditional(parent, index, data, itemID)
 		sourceName = ACHIEVEMENT_COLOR_CODE..sourceName..L.ENDCOLOR
 		SourceInfo:SetText(("-%s: [%s]"):format(transmogSource, sourceName))
 
+	--Profession
 	elseif index == 6 then 
 		spellID = data[1]
 		profession = data[2]
@@ -337,6 +348,7 @@ local function AddAdditional(parent, index, data, itemID)
 		sourceName = ACHIEVEMENT_COLOR_CODE..sourceName..L.ENDCOLOR
 		SourceInfo:SetText(("-%s: [%s]"):format(L[profession], sourceName or L["No Data Available"]))
 
+	--Vendor
 	elseif index == 7 then 
 		sourceName = data[1]
 		vendorName = data[2]
@@ -388,7 +400,16 @@ local function AddAdditional(parent, index, data, itemID)
 		--SourceInfo:SetText(("    %s: %s - %s: %s - Price: %s"):format( transmogSource, L[vendorName] or L["No Data Available"], L["Zone"], zoneName or "?", price_text))
 
 	else
+
+		if data then 
+			transmogSource = _G["TRANSMOG_SOURCE_"..data] or ""
+		SourceInfo:SetText(("-%s: %s"):format(transmogSource,L["No Data Available"]))
+
+		else
 		SourceInfo:SetText(("-%s"):format(L["No Data Available"]))
+
+		end
+
 	end
 
 
@@ -433,6 +454,8 @@ local function AddAdditional(parent, index, data, itemID)
 
 end
 
+local refresh_VisID
+
 function CollectionList:GenerateSourceListView(visualID)
 	if self.LISTWINDOW then self.LISTWINDOW:Hide() end
 	-- Create a container frame
@@ -472,7 +495,7 @@ function CollectionList:GenerateSourceListView(visualID)
 	scroll:SetFullHeight(true)
 	scrollcontainer:AddChild(scroll)	
 
-	local list = buildsourcelist(visualID)
+	local list = BuildSourceList(visualID)
 	for i, data in ipairs(list) do
 			--cal itemID, itemType, itemSubType, itemEquipLoc, icon, itemClassID, itemSubClassID = GetItemInfoInstant(data.itemID)
 		if data then
@@ -564,6 +587,7 @@ function CollectionList:GenerateSourceListView(visualID)
 				datafound = true
 			end
 
+
 			local zonelist, objectlist, containerlist, questList, achievementList, professionList, vendorList = GetSourceInfo(data.itemID)
 
 			if #zonelist > 0 then
@@ -580,13 +604,22 @@ function CollectionList:GenerateSourceListView(visualID)
 						end 
 				end
 			if not datafound then 
-				AddAdditional(scroll, 10)
-
+				AddAdditional(scroll, 10, data.sourceType, data.itemID)
 			end
 		end
 	end
 
 	MultiLineEditBox.frame:SetPoint("BOTTOM",f.frame,"BOTTOM", 0,-15)
+	if needsRefresh and refresh_count <100 then
+		--print(refresh_count)
+		refresh_VisID = visualID
+		refresh_count = refresh_count + 1
+		C_Timer.After(0, function() CollectionList:GenerateSourceListView(refresh_VisID)
+		end)
+	else
+		refresh_VisID = nil
+		refresh_count = 0	
+	end
 
 end
 
