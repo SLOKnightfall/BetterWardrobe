@@ -3132,7 +3132,7 @@ function BetterWardrobeSetsTransmogModelMixin:RefreshTooltip()
 		local totalQuality = 0
 		local numTotalSlots = 0
 		local waitingOnQuality = false
-		local sourceQualityTable = self:GetParent().sourceQualityTable;
+		local sourceQualityTable = self:GetParent().sourceQualityTable or {};
 	
 
 	if BetterWardrobeCollectionFrame:CheckTab(4) then
@@ -4757,11 +4757,12 @@ function BetterWardrobeSetsDataProviderMixin:ResetBaseSetNewStatus(baseSetID)
 end
 
 local ScanTooltip = CreateFrame( "GameTooltip", "BW_ScanGameTooltip", nil, "GameTooltipTemplate" );
-ScanTooltip:SetOwner( WorldFrame, "ANCHOR_NONE" );
+ScanTooltip:SetOwner( UIParent, "ANCHOR_NONE" );
 -- Allow tooltip SetX() methods to dynamically add new lines based on these
 ScanTooltip:AddFontStrings(
 	ScanTooltip:CreateFontString( "$parentTextLeft1", nil, "GameTooltipText" ),
-	ScanTooltip:CreateFontString( "$parentTextRight1", nil, "GameTooltipText" ) );
+	ScanTooltip:CreateFontString( "$parentTextRight1", nil, "GameTooltipText" ) 
+	);
 	
 --Helper function. Makes an invisible tooltip for the item and parses it to see if it has 
 --red error text related to class requirements.
