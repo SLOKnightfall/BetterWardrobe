@@ -3129,14 +3129,14 @@ function BetterWardrobeSetsTransmogModelMixin:OnEnter()
 end
 
 function BetterWardrobeSetsTransmogModelMixin:RefreshTooltip()
-		local totalQuality = 0
-		local numTotalSlots = 0
-		local waitingOnQuality = false
-		local sourceQualityTable = self:GetParent().sourceQualityTable or {};
+	local totalQuality = 0
+	local numTotalSlots = 0
+	local waitingOnQuality = false
+	local sourceQualityTable = self:GetParent().sourceQualityTable or {};
 	
-
 	if BetterWardrobeCollectionFrame:CheckTab(4) then
 		return
+
 	elseif BetterWardrobeCollectionFrame:CheckTab(2) then
 
 		local primaryAppearances = C_TransmogSets.GetSetPrimaryAppearances(self.setID);
@@ -3172,8 +3172,8 @@ function BetterWardrobeSetsTransmogModelMixin:RefreshTooltip()
 				GameTooltip:Show()
 			end
 		end
-	elseif BetterWardrobeCollectionFrame:CheckTab(3) then
 
+	elseif BetterWardrobeCollectionFrame:CheckTab(3) then
 		local sources = addon.GetSetsources(self.setID)
 		for sourceID in pairs(sources) do
 			numTotalSlots = numTotalSlots + 1

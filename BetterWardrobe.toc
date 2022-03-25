@@ -62,7 +62,6 @@ Modules\ColorFilter.lua
 
 #Modules\PreviewWindows.lua
 
-
 Modules\CollectionList.xml
 Modules\Sources.lua
 
