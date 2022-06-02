@@ -128,11 +128,11 @@ local function SelectColor()
 
 		local visualsList
 		if (ItemsCollectionFrame.transmogLocation:IsMainHand()) then
-			visualsList = C_TransmogCollection.GetCategoryAppearances(ItemsCollectionFrame.activeCategory, 2)
+			visualsList = C_TransmogCollection.GetCategoryAppearances(ItemsCollectionFrame.activeCategory, ItemsCollectionFrame.transmogLocation)
 		elseif (ItemsCollectionFrame.transmogLocation:IsOffHand()) then
-			visualsList = C_TransmogCollection.GetCategoryAppearances(ItemsCollectionFrame.activeCategory, 1)
+			visualsList = C_TransmogCollection.GetCategoryAppearances(ItemsCollectionFrame.activeCategory, ItemsCollectionFrame.transmogLocation)
 		else
-			visualsList = C_TransmogCollection.GetCategoryAppearances(ItemsCollectionFrame.activeCategory)
+			visualsList = C_TransmogCollection.GetCategoryAppearances(ItemsCollectionFrame.activeCategory,  ItemsCollectionFrame.transmogLocation)
 		end
 
 		addon.ColorFilterButton.colorSwatch:Show()

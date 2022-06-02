@@ -140,7 +140,9 @@ local function CacheHeaders()
 
 	for k in pairs(nameCache) do
 		-- oh my god so much wasted tables
-		local appearances = WardrobeCollectionFrame_GetSortedAppearanceSources(k)[1] or {}
+		--print(k)
+		local _, visualID, _, _, _, itemLink = C_TransmogCollection.GetAppearanceSourceInfo(k)	
+		local appearances = (itemLink and WardrobeCollectionFrame_GetSortedAppearanceSources(k,addon.GetItemCategory(k), addon.GetTransmogLocation(itemLink))[1]) or {}
 		if appearances.name then
 			nameVisuals[k] = appearances.name
 			nameCache[k] = nil
@@ -312,8 +314,12 @@ local Sort = {
 	end,
 
 	["SortItemByILevel"] = function(source1, source2)
-		local item1 = WardrobeCollectionFrame_GetSortedAppearanceSources(source1.visualID)[1] or {}
-		local item2 = WardrobeCollectionFrame_GetSortedAppearanceSources(source2.visualID)[1] or {}
+		local _, visualID, _, _, _, itemLink = C_TransmogCollection.GetAppearanceSourceInfo(source1.visualID)	
+		local item1 = (itemLink and WardrobeCollectionFrame_GetSortedAppearanceSources(source1.visualID,addon.GetItemCategory(source1.visualID), addon.GetTransmogLocation(itemLink))[1]) or {}
+
+		local _, visualID, _, _, _, itemLink = C_TransmogCollection.GetAppearanceSourceInfo(source2.visualID)	
+		local item2 = (itemLink and WardrobeCollectionFrame_GetSortedAppearanceSources(source2.visualID,addon.GetItemCategory(source2.visualID), addon.GetTransmogLocation(itemLink))[1]) or {}
+
 		item1.itemID = item1.itemID or 0
 		item2.itemID = item2.itemID or 0
 		item1.ilevel = select(4,  GetItemInfo(item1.itemID)) or -1
@@ -327,8 +333,11 @@ local Sort = {
 	end,
 
 	["SortItemByExpansion"] = function(source1, source2)
-				local item1 = WardrobeCollectionFrame_GetSortedAppearanceSources(source1.visualID)[1] or {}
-				local item2 = WardrobeCollectionFrame_GetSortedAppearanceSources(source2.visualID)[1] or {}
+		local _, visualID, _, _, _, itemLink = C_TransmogCollection.GetAppearanceSourceInfo(source1.visualID)	
+		local item1 = (itemLink and WardrobeCollectionFrame_GetSortedAppearanceSources(source1.visualID,addon.GetItemCategory(source1.visualID), addon.GetTransmogLocation(itemLink))[1]) or {}
+
+		local _, visualID, _, _, _, itemLink = C_TransmogCollection.GetAppearanceSourceInfo(source2.visualID)	
+		local item2 = (itemLink and WardrobeCollectionFrame_GetSortedAppearanceSources(source2.visualID,addon.GetItemCategory(source2.visualID), addon.GetTransmogLocation(itemLink))[1]) or {}
 				item1.itemID = item1.itemID or 0
 				item2.itemID = item2.itemID or 0
 				item1.expansionID = select(15,  GetItemInfo(item1.itemID)) or -1
@@ -437,8 +446,11 @@ local Sort = {
 		
 		[LE_ITEM_SOURCE] = function(self)
 			sort(self.filteredVisualsList, function(source1, source2)
-			local item1 = WardrobeCollectionFrame_GetSortedAppearanceSources(source1.visualID)[1] or {}
-			local item2 = WardrobeCollectionFrame_GetSortedAppearanceSources(source2.visualID)[1] or {}
+			local _, visualID, _, _, _, itemLink = C_TransmogCollection.GetAppearanceSourceInfo(source1.visualID)	
+			local item1 = (itemLink and WardrobeCollectionFrame_GetSortedAppearanceSources(source1.visualID,addon.GetItemCategory(source1.visualID), addon.GetTransmogLocation(itemLink))[1]) or {}
+
+			local _, visualID, _, _, _, itemLink = C_TransmogCollection.GetAppearanceSourceInfo(source2.visualID)	
+			local item2 = (itemLink and WardrobeCollectionFrame_GetSortedAppearanceSources(source2.visualID,addon.GetItemCategory(source2.visualID), addon.GetTransmogLocation(itemLink))[1]) or {}
 			item1.sourceType = item1.sourceType or 7
 			item2.sourceType = item2.sourceType or 7
 			
