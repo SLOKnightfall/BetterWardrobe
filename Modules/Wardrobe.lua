@@ -2683,7 +2683,7 @@ function BetterWardrobeItemsCollectionMixin:RefreshVisualsList()
 		if self:GetActiveCategory() == Enum.TransmogCollectionType.Paired and not C_Transmog.IsAtTransmogNPC() then 
 			self.visualsList = addon.GetClassArtifactAppearanceList() 
 		elseif self:GetActiveCategory() == Enum.TransmogCollectionType.Paired and C_Transmog.IsAtTransmogNPC() then 
-			self.visualsList = C_TransmogCollection.GetCategoryAppearances(Enum.TransmogCollectionType.Paired);
+			self.visualsList = C_TransmogCollection.GetCategoryAppearances(Enum.TransmogCollectionType.Paired, self.transmogLocation);
 			offspecartifact = {}
 
 			for i, data in ipairs(self.visualsList)do
