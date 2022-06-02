@@ -2708,7 +2708,7 @@ function BetterWardrobeItemsCollectionMixin:RefreshVisualsList()
 				end 
 			end
 		else
-			self.visualsList = C_TransmogCollection.GetCategoryAppearances(self.activeCategory);
+			self.visualsList = C_TransmogCollection.GetCategoryAppearances(self.activeCategory, self.transmogLocation);
 		end
 
 	end
@@ -2729,7 +2729,7 @@ function BetterWardrobeItemsCollectionMixin:GetAnAppearanceSourceFromVisual(visu
 	if ( sourceID == Constants.Transmog.NoTransmogID ) then
 		local isArtifact = addon.GetArtifactSourceInfo(visualID)
 		if isArtifact then return isArtifact.sourceID end
-		local sources = CollectionWardrobeUtil.GetSortedAppearanceSources(visualID, self.activeCategory);
+		local sources = CollectionWardrobeUtil.GetSortedAppearanceSources(visualID, self.activeCategory, self.transmogLocation);
 		for i = 1, #sources do
 			-- first 1 if it doesn't have to be usable
 			if ( not mustBeUsable or self:IsAppearanceUsableForActiveCategory(sources[i]) ) then
@@ -2858,7 +2858,7 @@ function BetterWardrobeItemsCollectionMixin:RefreshAppearanceTooltip()
 	if ( not self.tooltipVisualID ) then
 		return;
 	end
-	local sources = CollectionWardrobeUtil.GetSortedAppearanceSources(self.tooltipVisualID, self.activeCategory);
+	local sources = CollectionWardrobeUtil.GetSortedAppearanceSources(self.tooltipVisualID, self.activeCategory, self.transmogLocation);
 	local chosenSourceID = self:GetChosenVisualSource(self.tooltipVisualID);
 	self:GetParent():SetAppearanceTooltip(self, sources, chosenSourceID);
 end
@@ -2983,7 +2983,7 @@ function BetterWardrobeItemsModelMixin:OnMouseDown(button)
 			local name;
 			name, link = C_TransmogCollection.GetIllusionStrings(self.visualInfo.sourceID);
 		else
-			local sources = CollectionWardrobeUtil.GetSortedAppearanceSources(self.visualInfo.visualID, itemsCollectionFrame:GetActiveCategory());
+			local sources = CollectionWardrobeUtil.GetSortedAppearanceSources(self.visualInfo.visualID, itemsCollectionFrame:GetActiveCategory(), itemsCollectionFrame.transmogLocation);
 			if ( BetterWardrobeCollectionFrame.tooltipSourceIndex ) then
 				local index = CollectionWardrobeUtil.GetValidIndexForNumSources(BetterWardrobeCollectionFrame.tooltipSourceIndex, #sources);
 				link = BetterWardrobeCollectionFrame:GetAppearanceItemHyperlink(sources[index]);
@@ -3238,17 +3238,14 @@ function BetterWardrobeItemsCollectionMixin:ValidateChosenVisualSources()
 	for visualID, sourceID in pairs(self.chosenVisualSources) do
 		if ( sourceID ~= Constants.Transmog.NoTransmogID ) then
 			local keep = false;
-			local sources = C_TransmogCollection.GetAppearanceSources(visualID, self.activeCategory);
-			if ( sources ) then
-				for i = 1, #sources do
-					if ( sources[i].sourceID == sourceID ) then
-						if ( sources[i].isCollected and not sources[i].useError ) then
-							keep = true;
-						end
-						break;
-					end
+			local sourceInfo = C_TransmogCollection.GetSourceInfo(sourceID);
+
+			if sourceInfo then
+				if sourceInfo.isCollected and not sourceInfo.useError then
+					keep = true;
 				end
 			end
+
 			if ( not keep ) then
 				self.chosenVisualSources[visualID] = Constants.Transmog.NoTransmogID;
 			end
@@ -3404,7 +3401,7 @@ function BetterWardrobeCollectionFrameRightClickDropDown_Init(self)
 	BW_UIDropDownMenu_AddButton(info);
 
 	local headerInserted = false;
-	local sources = CollectionWardrobeUtil.GetSortedAppearanceSources(appearanceID, WardrobeCollectionFrame.ItemsCollectionFrame:GetActiveCategory());
+	local sources = CollectionWardrobeUtil.GetSortedAppearanceSources(appearanceID, WardrobeCollectionFrame.ItemsCollectionFrame:GetActiveCategory(), WardrobeCollectionFrame.ItemsCollectionFrame.transmogLocation);
 	local chosenSourceID = BetterWardrobeCollectionFrame.ItemsCollectionFrame:GetChosenVisualSource(appearanceID);
 	info.func = WardrobeCollectionFrameModelDropDown_SetSource;
 	for i = 1, #sources do
@@ -3469,7 +3466,7 @@ function BetterWardrobeCollectionFrameModelDropDown_SetFavorite(visualID, value,
 	if ( set and not confirmed ) then
 		local allSourcesConditional = true;
 		local collected = false
-		local sources = C_TransmogCollection.GetAppearanceSources(visualID, WardrobeCollectionFrame.ItemsCollectionFrame:GetActiveCategory());
+		local sources = C_TransmogCollection.GetAppearanceSources(visualID, WardrobeCollectionFrame.ItemsCollectionFrame:GetActiveCategory(), WardrobeCollectionFrame.ItemsCollectionFrame.transmogLocation);
 		for i, sourceInfo in ipairs(sources) do
 			local info = C_TransmogCollection.GetAppearanceInfoBySource(sourceInfo.sourceID);
 			if info.isCollected then 
@@ -3725,6 +3722,9 @@ function BetterWardrobeFilterDropDown_Initialize(self, level)
 	end
 end
 
+--TODO 9.2.5 Updates
+
+
 function BetterWardrobeFilterDropDown_InitializeItems(self, level)
 	local info = BW_UIDropDownMenu_CreateInfo()
 	info.keepShownOnClick = true;
@@ -3784,7 +3784,7 @@ function BetterWardrobeFilterDropDown_InitializeItems(self, level)
 				info.func = function(_, _, _, value)
 							C_TransmogCollection.SetSourceTypeFilter(i, value);
 						end
-				info.checked = function() return not C_TransmogCollection.IsSourceTypeFilterChecked(i) end;
+				info.checked = function() return C_TransmogCollection.IsSourceTypeFilterChecked(i) end;
 				BW_UIDropDownMenu_AddButton(info, level);
 			end
 		end
@@ -4328,7 +4328,8 @@ local function CheckMissingLocation(setInfo)
 if not sources then return end
 		for sourceID in pairs(sources) do
 			local sourceInfo = C_TransmogCollection.GetSourceInfo(sourceID)
-			local sources = sourceInfo and C_TransmogCollection.GetAppearanceSources(sourceInfo.visualID)
+			local _, visualID, _, _, _, itemLink = C_TransmogCollection.GetAppearanceSourceInfo(sourceInfo.visualID)	
+			local sources = sourceInfo and itemLink and C_TransmogCollection.GetAppearanceSources(sourceInfo.visualID, addon.GetItemCategory(sourceInfo.visualID), addon.GetTransmogLocation(itemLink))
 			if sources then
 				if #sources > 1 then
 					WardrobeCollectionFrame_SortSources(sources)
@@ -4788,8 +4789,10 @@ end
 
 
 local function GetCombinedAppearanceSources(appearanceID)
+	local categoryID, visualID, canEnchant, icon, isCollected, itemLink, transmogLink, unknown1, itemSubTypeIndex = C_TransmogCollection.GetAppearanceSourceInfo(appearanceID)
 	local sources = C_TransmogCollection.GetAllAppearanceSources(appearanceID) or {}
-	local sources2 = C_TransmogCollection.GetAppearanceSources(appearanceID) or {}
+
+	local sources2 = (appearanceID and itemLink and C_TransmogCollection.GetAppearanceSources(appearanceID, addon.GetItemCategory(appearanceID), addon.GetTransmogLocation(itemLink)) )or {}
 
 	if (sources2 and sources) then
 	  for i = 1, #sources2 do
@@ -5158,9 +5161,9 @@ function BetterWardrobeSetsCollectionMixin:Refresh()
 end
 
 local function isAvailableItem(sourceID,setID)
-	local _, visualID = C_TransmogCollection.GetAppearanceSourceInfo(sourceID)		
-	local sources = C_TransmogCollection.GetAppearanceSources(visualID) or {} --Can return nil if no longer in game
-
+	local _, visualID, _, _, _, itemLink = C_TransmogCollection.GetAppearanceSourceInfo(sourceID)	
+	local sources = (sourceID and itemLink and C_TransmogCollection.GetAppearanceSources(sourceID, addon.GetItemCategory(sourceID), addon.GetTransmogLocation(itemLink)) ) or {} --Can return nil if no longer in game
+ 
 	if (#sources == 0) then
 		local sourceInfo = C_TransmogCollection.GetSourceInfo(sourceID)
 		local setInfo = addon.GetSetInfo(setID)
@@ -5817,8 +5820,10 @@ function BetterWardrobeSetsCollectionMixin:RefreshAppearanceTooltip()
 		----elseif BetterWardrobeCollectionFrame.selectedCollectionTab == 3 then
 		local sourceInfo = C_TransmogCollection.GetSourceInfo(self.tooltipPrimarySourceID)
 		local visualID = sourceInfo.visualID
-		local sources = C_TransmogCollection.GetAppearanceSources(visualID) or {} --Can return nil if no longer in game
-		
+		--local sources = C_TransmogCollection.GetAppearanceSources(visualID) or {} --Can return nil if no longer in game
+		local _, visualID, _, _, _, itemLink = C_TransmogCollection.GetAppearanceSourceInfo(self.tooltipPrimarySourceID)	
+		local sources = (self.tooltipPrimarySourceID and itemLink and C_TransmogCollection.GetAppearanceSources(self.tooltipPrimarySourceID, addon.GetItemCategory(self.tooltipPrimarySourceID), addon.GetTransmogLocation(itemLink)) ) or {} --Can return nil if no longer in game
+ 
 		if (#sources == 0) then
 			-- can happen if a slot only has HiddenUntilCollected sources
 			local sourceInfo = C_TransmogCollection.GetSourceInfo(self.tooltipPrimarySourceID)
@@ -6498,8 +6503,10 @@ function BetterWardrobeSetsDetailsItemMixin:OnMouseDown(button)
 		local sourceInfo = C_TransmogCollection.GetSourceInfo(self.sourceID);
 		local slot = C_Transmog.GetSlotForInventoryType(sourceInfo.invType);
 		----local sources = C_TransmogSets.GetSourcesForSlot(self:GetParent():GetParent():GetSelectedSetID(), slot);
-		local sources = C_TransmogCollection.GetAppearanceSources(sourceInfo.visualID)
-
+		--local sources = C_TransmogCollection.GetAppearanceSources(sourceInfo.visualID)
+		local _, visualID, _, _, _, itemLink = C_TransmogCollection.GetAppearanceSourceInfo(sourceInfo.visualID)	
+		local sources = (sourceInfo and itemLink and C_TransmogCollection.GetAppearanceSources(sourceInfo.visualID, addon.GetItemCategory(sourceInfo.visualID, sourceInfo.visualID), addon.GetTransmogLocation(itemLink)) ) or {}
+ 
 		if ( #sources == 0 ) then
 			-- can happen if a slot only has HiddenUntilCollected sources
 			sources = sources or {}
@@ -6879,7 +6886,8 @@ function BetterWardrobeSetsTransmogMixin:UpdateSets()
 				--model.CollectionListVisual.Collection.Collected_Icon:SetShown(false)
 				model.setID = set.setID
 				local name = setInfo["name"]
-				local description = "\n"..set.label or ""
+				--local description = "\n"..set and set.label or ""
+				local description =  ""
 
 				--local description = (setInfo["description"] and "\n-"..setInfo["description"].."-") or ""
 				local classname = (setInfo.className and "\n ("..setInfo.className..")") or ""
@@ -6954,7 +6962,9 @@ function BetterWardrobeSetsTransmogMixin:LoadSet(setID)
 				local appearanceID = sourceInfo.visualID
 				local slot = C_Transmog.GetSlotForInventoryType(sourceInfo.invType);
 				if slot then 
-					local sources = sourceInfo and C_TransmogCollection.GetAppearanceSources(appearanceID)
+					local _, visualID, _, _, _, itemLink = C_TransmogCollection.GetAppearanceSourceInfo(appearanceID)	
+					local sources = (sourceInfo and itemLink and C_TransmogCollection.GetAppearanceSources(appearanceID, addon.GetItemCategory(appearanceID), addon.GetTransmogLocation(itemLink)) )
+					--local sources = sourceInfo and C_TransmogCollection.GetAppearanceSources(appearanceID)
 					if sources and #sources > 0  then 
 						CollectionWardrobeUtil.SortSources(sources, appearanceID);
 						local index = CollectionWardrobeUtil.GetDefaultSourceIndex(sources, sourceID);
@@ -7011,7 +7021,9 @@ function BetterWardrobeSetsTransmogMixin:LoadSet(setID)
 						local appearanceID = slotData[3]
 						local slot = C_Transmog.GetSlotForInventoryType(sourceInfo.invType);
 						if slot then 
-							local sources = sourceInfo and C_TransmogCollection.GetAppearanceSources(sourceInfo.visualID)
+							local _, visualID, _, _, _, itemLink = C_TransmogCollection.GetAppearanceSourceInfo(sourceInfo.visualID)	
+							local sources = (sourceInfo and itemLink and C_TransmogCollection.GetAppearanceSources(sourceInfo.visualID, addon.GetItemCategory(sourceInfo.visualID), addon.GetTransmogLocation(itemLink)) )
+							--local sources = sourceInfo and C_TransmogCollection.GetAppearanceSources(sourceInfo.visualID)
 
 							if sources and #sources > 0  then 
 								CollectionWardrobeUtil.SortSources(sources, sourceInfo.visualID);
@@ -7572,7 +7584,9 @@ function addon.Sets:GetLocationBasedCount(setInfo)
 
 	for sourceID in pairs(sources) do
 		local sourceInfo = C_TransmogCollection.GetSourceInfo(sourceID)
-		local appearanceSources = sourceInfo and C_TransmogCollection.GetAppearanceSources(sourceInfo.visualID)
+		--local appearanceSources = sourceInfo and C_TransmogCollection.GetAppearanceSources(sourceInfo.visualID)
+		local _, visualID, _, _, _, itemLink = C_TransmogCollection.GetAppearanceSourceInfo(sourceInfo.visualID)	
+		local appearanceSources = (sourceInfo and itemLink and C_TransmogCollection.GetAppearanceSources(sourceInfo.visualID, addon.GetItemCategory(sourceInfo.visualID), addon.GetTransmogLocation(itemLink)) )
 		if appearanceSources then
 			if #appearanceSources > 1 then
 				WardrobeCollectionFrame_SortSources(appearanceSources)

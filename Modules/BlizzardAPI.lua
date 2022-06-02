@@ -23,6 +23,47 @@ addon.Sets = Sets
 --local SetsDataProvider = addon.SetsDataProvider
 local L = LibStub("AceLocale-3.0"):GetLocale(addonName)
 
+local itemSlots = {
+	INVTYPE_HEAD = "HEADSLOT",
+	INVTYPE_SHOULDER = "SHOULDERSLOT",
+	INVTYPE_CLOAK = "BACKSLOT",
+	INVTYPE_CHEST = "CHESTSLOT",
+	INVTYPE_ROBE = "CHESTSLOT",
+	INVTYPE_TABARD = "TABARDSLOT",
+	INVTYPE_BODY = "SHIRTSLOT",
+	INVTYPE_WRIST = "WRISTSLOT",
+	INVTYPE_HAND = "HANDSSLOT",
+	INVTYPE_WAIST = "WAISTSLOT",
+	INVTYPE_LEGS = "LEGSSLOT",
+	INVTYPE_FEET = "FEETSLOT",
+	INVTYPE_WEAPON = "MAINHANDSLOT",
+	INVTYPE_RANGED = "MAINHANDSLOT",
+	INVTYPE_RANGEDRIGHT = "MAINHANDSLOT",
+	INVTYPE_THROWN = "MAINHANDSLOT",
+	INVTYPE_SHIELD = "SECONDARYHANDSLOT",
+	INVTYPE_2HWEAPON = "MAINHANDSLOT",
+	INVTYPE_WEAPONMAINHAND = "MAINHANDSLOT",
+	INVTYPE_WEAPONOFFHAND = "SECONDARYHANDSLOT",
+	INVTYPE_HOLDABLE = "SECONDARYHANDSLOT",
+}
+
+
+
+local function GetItemSlot(itemLinkOrID)
+	local _, _, _, slot = GetItemInfoInstant(itemLinkOrID)
+	if not slot then return end
+	return itemSlots[slot]
+end
+addon.GetItemSlot = GetItemSlot
+
+local function GetItemCategory(appearanceID)
+	return (appearanceID and C_TransmogCollection.GetCategoryForItem(appearanceID)) or  0
+end
+addon.GetItemCategory = GetItemCategory
+local function GetTransmogLocation(itemLinkOrID)
+	return TransmogUtil.GetTransmogLocation(GetItemSlot(itemLinkOrID), Enum.TransmogType.Appearance, Enum.TransmogModification.Main)
+end
+addon.GetTransmogLocation = GetTransmogLocation
 --Determines type of set based on setID
 local function DetermineSetType(setID)
 
@@ -155,6 +196,15 @@ function addon.C_TransmogSets.GetBaseSetsCounts()
 	end
 end
 
+function addon.C_TransmogSets.GetSourcesForSlot(setID, slot)
+	if BetterWardrobeCollectionFrame:CheckTab(2) then
+		return C_TransmogSets.GetSourcesForSlot(setID, slot)
+	else
+	local categoryID, visualID, canEnchant, icon, isCollected, itemLink, transmogLink, unknown1, itemSubTypeIndex = C_TransmogCollection.GetAppearanceSourceInfo(sourceID)
+	end
+
+end
+
 
 function addon.C_TransmogSets.SetHasNewSources(setID)
 	print("NewSo")
@@ -216,13 +266,12 @@ function addon.C_TransmogSets.GetSetSources(setID)
 	local unavailable = false
 	local SetType = setInfo.setType
 	local sources = {}
-
 	--Blizzard Saved Set
 	if SetType == "SavedBlizzard" then
  		local setTransmogInfo = C_TransmogCollection.GetOutfitItemTransmogInfoList(addon:GetBlizzID(setID))
  		for slotID, data in ipairs(setTransmogInfo) do
  			local sourceInfo = data.appearanceID and C_TransmogCollection.GetSourceInfo(data.appearanceID)
-			local sources =  sourceInfo and C_TransmogCollection.GetAppearanceSources(sourceInfo.visualID)
+			local sources =  sourceInfo and C_TransmogCollection.GetAppearanceSources(sourceInfo.visualID, GetItemCategory(sourceInfo.visualID), GetTransmogLocation(sourceInfo.itemID))
 			if sources then
 				--items[sources.itemID] = true
 				if #sources > 1 then
@@ -233,7 +282,7 @@ function addon.C_TransmogSets.GetSetSources(setID)
 
 			if slotID == 3 and data.secondaryAppearanceID then
 				local sourceInfo = C_TransmogCollection.GetSourceInfo(data.secondaryAppearanceID)
-				local sources =  sourceInfo and C_TransmogCollection.GetAppearanceSources(sourceInfo.visualID)
+				local sources =  sourceInfo and C_TransmogCollection.GetAppearanceSources(sourceInfo.visualID, GetItemCategory(sourceInfo.visualID), GetTransmogLocation(sourceInfo.itemID))
 				if sources then
 					--items[sources.itemID] = true
 					if #sources > 1 then
@@ -256,8 +305,11 @@ function addon.C_TransmogSets.GetSetSources(setID)
 			local sourceID = sourceData[2]
 			local appearanceID = sourceData[3]
 			if sourceID ~= 0 then 
-				--local sourceInfo = sourceID and C_TransmogCollection.GetSourceInfo(sourceID)
-				local sources =  appearanceID and C_TransmogCollection.GetAppearanceSources(appearanceID)
+				local sourceInfo = sourceID and C_TransmogCollection.GetSourceInfo(sourceID)
+				--local sources =  appearanceID and C_TransmogCollection.GetAppearanceSources(appearanceID)
+
+				local sources =  appearanceID and C_TransmogCollection.GetAppearanceSources(appearanceID, GetItemCategory(appearanceID), GetTransmogLocation(sourceInfo.itemID))
+
 						--if (sourceInfo and not sourceInfo.sourceType) and not setInfo.sourceType then 
 							--unavailable = true
 					--	end
@@ -296,7 +348,9 @@ function addon.C_TransmogSets.GetSetSources(setID)
 
 			if setInfo.itemData[3] and setInfo.offShoulder then
 				local sourceInfo = C_TransmogCollection.GetSourceInfo(setInfo.offShoulder)
-				local sources =  sourceInfo and C_TransmogCollection.GetAppearanceSources(sourceInfo.visualID)
+				--local sources =  sourceInfo and C_TransmogCollection.GetAppearanceSources(sourceInfo.visualID)
+				local sources =  sourceInfo and C_TransmogCollection.GetAppearanceSources(sourceInfo.visualID, GetItemCategory(sourceInfo.visualID), GetTransmogLocation(sourceInfo.itemID))
+
 				if sources then
 					--items[sources.itemID] = true
 					if #sources > 1 then
@@ -359,7 +413,6 @@ end
 
 
 local function CheckMissingLocation(setInfo)
-	yy = setInfo
 	local filtered = false
 	local missingSelection 
 	if 	BetterWardrobeCollectionFrame:CheckTab(2) then
@@ -370,7 +423,9 @@ local function CheckMissingLocation(setInfo)
 	if not sources then return end
 		for sourceID in pairs(sources) do
 			local sourceInfo = C_TransmogCollection.GetSourceInfo(sourceID)
-			local sources = sourceInfo and C_TransmogCollection.GetAppearanceSources(sourceInfo.visualID)
+			--local sources = sourceInfo and C_TransmogCollection.GetAppearanceSources(sourceInfo.visualID)
+			local sources =  sourceInfo and C_TransmogCollection.GetAppearanceSources(sourceInfo.visualID, GetItemCategory(sourceInfo.visualID), GetTransmogLocation(sourceInfo.itemID))
+
 			if sources then
 				if #sources > 1 then
 					WardrobeCollectionFrame_SortSources(sources)

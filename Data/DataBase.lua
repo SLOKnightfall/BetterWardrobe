@@ -188,30 +188,6 @@ do
 
 
 					setData.itemData = setData.itemData or {}
-				--Check for data in the main table
-					--[[for slotID = 1, 19 do
-																local sourceID = setData.itemData[slotID] and setData.itemData[slotID][2]
-																if sourceID  and sourceID ~= NO_TRANSMOG_SOURCE_ID and sourceID ~= 0 then 
-																	local sourceInfo = C_TransmogCollection.GetSourceInfo(sourceID)
-																 			
-																	if sourceInfo and sourceInfo.invType then 
-																		local slot = C_Transmog.GetSlotForInventoryType(sourceInfo.invType);
-																		local appearanceID = sourceInfo.visualID
-																		local itemID = sourceInfo.itemID
-																		local itemMod = sourceInfo.itemModID
-																		setData.itemData = setData.itemData or {}
-																		setData.itemData[slot] = {"'"..itemID..":"..itemMod.."'", sourceID, appearanceID}
-										
-										
-																		if appearanceID  then --and setData.sources[item] and setData.sources[item] ~= 0 then 
-																			--local appearanceID = setData.sources[item]
-																			ItemDB[appearanceID] = ItemDB[appearanceID] or {}
-																			ItemDB[appearanceID][newID] = setData
-																		end
-																	end
-																end
-															end]]
-				--end
 
 
 					for slotID, itemData in pairs(setData.itemData) do
@@ -223,61 +199,7 @@ do
 						end
 					end
 
-					--for index, item in ipairs(setData["items"]) do
-						--[[
-						setData.numTotal = setData.numTotal + 1
-						local mod = setData.mod or 0
-						local appearanceID, sourceID = C_TransmogCollection.GetItemInfo(item, mod)
-						if not appearanceID then
-							for i = 0, 10 do
-								appearanceID, sourceID = C_TransmogCollection.GetItemInfo(item, i)
-								if appearanceID then
-									break
-								end
-							end
-						end
-
-						if appearanceID then 
-							setData.sources[item] = appearanceID
-							local sources = C_TransmogCollection.GetAppearanceSources(appearanceID) or {} --Can return nil if no longer in game
-							local baseSource 
-							if (#sources == 0) then
-								-- can happen if a slot only has HiddenUntilCollected sources
-								
-								sources = {C_TransmogCollection.GetSourceInfo(sourceID)}
-								if not sources[1].sourceType and not setData.sourceType then 
-									setData.unavailable = true
-								end
-
-							else
-								WardrobeCollectionFrame_SortSources(sources)
-							end
-
-							local _, _, canEnchant, _, isCollected  = C_TransmogCollection.GetAppearanceSourceInfo(sourceID)
-							if sources[1].isCollected then 
-								setData.setSources[sourceID] = true
-								setData.numCollected = setData.numCollected + 1
-							else
-								setData.setSources[sourceID] = false
-							end
-						else
-							--end
-						end]]
-
-
-						--if setData.sources and setData.sources[item] and setData.sources[item] ~= 0 then 
-							--local appearanceID = setData.sources[item]
-							--ItemDB[appearanceID] = ItemDB[appearanceID] or {}
-							--ItemDB[appearanceID][id] = setData
-						--end
-
-						--[[local setMod =  setData.mod or 0
-																	local visualID, sourceID = C_TransmogCollection.GetItemInfo(item, setMod)
-																	if sourceID then
-																		addon.ArmorSetModCache[item] = {}
-																		addon.ArmorSetModCache[item][setMod] = {visualID, sourceID}
-																	end]]
-					--end
+			
 					setData.uiOrder = UIID_Counter[setData.expansionID] -- id * 100
 					UIID_Counter[setData.expansionID] = UIID_Counter[setData.expansionID] +1
 					SET_INDEX[newID] = setData
@@ -403,6 +325,8 @@ do
 		if not addon.itemsubdb.profile.items then return end
 		for itemID, sub_data in pairs(addon.itemsubdb.profile.items) do
 			local appearanceID, sourceID = C_TransmogCollection.GetItemInfo(itemID)
+			local _, visualID, _, _, _, itemLink = C_TransmogCollection.GetAppearanceSourceInfo(appearanceID)	
+			local appearanceSources = (sourceInfo and itemLink and C_TransmogCollection.GetAppearanceSources(appearanceID, addon.GetItemCategory(appearanceID), addon.GetTransmogLocation(itemLink)) )
 			local sources = C_TransmogCollection.GetAppearanceSources(appearanceID)
 			if sources then 
 				for i, data in ipairs(sources) do

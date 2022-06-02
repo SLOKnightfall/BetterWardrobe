@@ -51,8 +51,10 @@ end
 
 
 
-local function AddSlotAppearances(slotID, categoryID)
-	for _, appearance in ipairs(C_TransmogCollection.GetCategoryAppearances(categoryID)) do
+local function AddSlotAppearances(slotID, categoryID, transmogLocation)
+
+	if not transmogLocation then return end
+	for _, appearance in ipairs(C_TransmogCollection.GetCategoryAppearances(categoryID, transmogLocation)) do
 		if appearance.isUsable and appearance.isCollected then
 			tinsert(AppearanceList[slotID], appearance.visualID)
 		end
@@ -77,7 +79,7 @@ function BW_RandomizeButtonMixin:BuildAppearanceList()
 		if canTransmogrify or cannotTransmogrifyReason == 0 then
 			local sourceID = C_Transmog.GetSlotVisualInfo(transmogLocation)
 			local categoryID = slotInfo.armorCategoryID or C_TransmogCollection.GetAppearanceSourceInfo(sourceID)
-			AddSlotAppearances(slotID, categoryID)
+			AddSlotAppearances(slotID, categoryID, transmogLocation)
 
 			for weaponCategoryID = FIRST_TRANSMOG_COLLECTION_WEAPON_TYPE, LAST_TRANSMOG_COLLECTION_WEAPON_TYPE do
 				local name, isWeapon, _, canMainHand, canOffHand = C_TransmogCollection.GetCategoryInfo(weaponCategoryID)
@@ -103,7 +105,8 @@ local function RandomizeBySlot(slotID)
 	local visualCount = #slotVisualList
 	if visualCount > 0 then
 		local appearanceID = slotVisualList[random(visualCount)]
-		local sourceList = appearanceID and C_TransmogCollection.GetAppearanceSources(appearanceID)
+		local _, visualID, _, _, _, itemLink = C_TransmogCollection.GetAppearanceSourceInfo(appearanceID)	
+		local sourceList = appearanceID and itemLink and C_TransmogCollection.GetAppearanceSources(appearanceID, addon.GetItemCategory(appearanceID), addon.GetTransmogLocation(itemLink))
 		if sourceList then
 			for _, source in pairs(sourceList) do
 				if source.isCollected then

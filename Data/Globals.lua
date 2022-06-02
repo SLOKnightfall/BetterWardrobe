@@ -86,6 +86,7 @@ Globals.locationDrowpDown = {
   [21] = INVTYPE_ROBE,--handr
 }
 
+
 Globals.INVENTORY_SLOT_NAMES = {
   [1]  = "HEADSLOT",
   [3]  = "SHOULDERSLOT",
@@ -101,6 +102,8 @@ Globals.INVENTORY_SLOT_NAMES = {
   [17] = "SECONDARYHANDSLOT",
   [18] = "MAINHANDSLOT",
   [19] = "TABARDSLOT",
+
+       
   
   ["HEADSLOT"]          = 1,
   ["SHOULDERSLOT"]      = 3,
