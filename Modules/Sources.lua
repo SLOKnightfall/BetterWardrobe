@@ -299,7 +299,7 @@ local function AddAdditional(parent, index, data, itemID)
 		local item = Item:CreateFromItemID(tonumber(data))
 		item:ContinueOnItemLoad(function()
 			local name = item:GetItemName() 
-			SourceInfo:SetText(("-%s: %s"):format(L["Conatined in"], name))
+			SourceInfo:SetText(("-%s: %s"):format(L["Contained in"], name))
 		end)
 
 	--Quest
