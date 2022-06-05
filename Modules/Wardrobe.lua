@@ -3257,7 +3257,8 @@ local function ToggleHidden(model, isHidden)
 	local tabID = addon.GetTab()
 	if tabID == 1 then
 		local visualID = model.visualInfo.visualID
-		local source = WardrobeCollectionFrame_GetSortedAppearanceSources(visualID)[1]
+		local _, _, _, _, _, itemLink = C_TransmogCollection.GetAppearanceSourceInfo(visualID)	
+		local source = WardrobeCollectionFrame_GetSortedAppearanceSources(visualID, addon.GetItemCategory(visualID), addon.GetTransmogLocation(itemLink))[1]
 		local name, link = GetItemInfo(source.itemID)
 		addon.HiddenAppearanceDB.profile.item[visualID] = not isHidden and name
 		--self:UpdateWardrobe()
@@ -3401,7 +3402,7 @@ function BetterWardrobeCollectionFrameRightClickDropDown_Init(self)
 	BW_UIDropDownMenu_AddButton(info);
 
 	local headerInserted = false;
-	local sources = CollectionWardrobeUtil.GetSortedAppearanceSources(appearanceID, WardrobeCollectionFrame.ItemsCollectionFrame:GetActiveCategory(), WardrobeCollectionFrame.ItemsCollectionFrame.transmogLocation);
+	local sources = CollectionWardrobeUtil.GetSortedAppearanceSources(appearanceID, BetterWardrobeCollectionFrame.ItemsCollectionFrame:GetActiveCategory(), BetterWardrobeCollectionFrame.ItemsCollectionFrame.transmogLocation);
 	local chosenSourceID = BetterWardrobeCollectionFrame.ItemsCollectionFrame:GetChosenVisualSource(appearanceID);
 	info.func = WardrobeCollectionFrameModelDropDown_SetSource;
 	for i = 1, #sources do
@@ -3466,7 +3467,7 @@ function BetterWardrobeCollectionFrameModelDropDown_SetFavorite(visualID, value,
 	if ( set and not confirmed ) then
 		local allSourcesConditional = true;
 		local collected = false
-		local sources = C_TransmogCollection.GetAppearanceSources(visualID, WardrobeCollectionFrame.ItemsCollectionFrame:GetActiveCategory(), WardrobeCollectionFrame.ItemsCollectionFrame.transmogLocation);
+		local sources = C_TransmogCollection.GetAppearanceSources(visualID, BetterWardrobeCollectionFrame.ItemsCollectionFrame:GetActiveCategory(), BetterWardrobeCollectionFrame.ItemsCollectionFrame.transmogLocation);
 		for i, sourceInfo in ipairs(sources) do
 			local info = C_TransmogCollection.GetAppearanceInfoBySource(sourceInfo.sourceID);
 			if info.isCollected then 

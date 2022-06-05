@@ -326,8 +326,7 @@ do
 		for itemID, sub_data in pairs(addon.itemsubdb.profile.items) do
 			local appearanceID, sourceID = C_TransmogCollection.GetItemInfo(itemID)
 			local _, visualID, _, _, _, itemLink = C_TransmogCollection.GetAppearanceSourceInfo(appearanceID)	
-			local appearanceSources = (sourceInfo and itemLink and C_TransmogCollection.GetAppearanceSources(appearanceID, addon.GetItemCategory(appearanceID), addon.GetTransmogLocation(itemLink)) )
-			local sources = C_TransmogCollection.GetAppearanceSources(appearanceID)
+			local sources = (itemLink and C_TransmogCollection.GetAppearanceSources(appearanceID, addon.GetItemCategory(appearanceID), addon.GetTransmogLocation(itemLink)) )
 			if sources then 
 				for i, data in ipairs(sources) do
 					subitemlist[data.itemID] = sub_data.subID
