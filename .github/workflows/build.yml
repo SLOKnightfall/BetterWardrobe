@@ -22,9 +22,10 @@ jobs:
       - name: Package and Release
         uses: BigWigsMods/packager@master # https://github.com/BigWigsMods/packager
         env:
-          # API tokens stored in your GH repo will be stored here. These will fail if nothing is set.
+          # API tokens stored in your GH repo will be stored here (https://github.com/SLOKnightfall/BetterWardrobe/settings/secrets/actions). These will do nothing if not set.
           # Review https://github.com/BigWigsMods/packager#uploading for more info!
-          GITHUB_OAUTH: ${{ secrets.GITHUB_TOKEN }} # "GITHUB_TOKEN" is a secret always provided to the workflow
+          GITHUB_OAUTH: ${{ secrets.GITHUB_TOKEN }} # "GITHUB_TOKEN" is a secret always provided to the workflow. 
+          # Workflow permissions need to be set to Read/Write in https://github.com/SLOKnightfall/BetterWardrobe/settings/actions
           CF_API_KEY: ${{ secrets.CF_API_KEY }}
           WOWI_API_TOKEN: ${{ secrets.WOWI_API_TOKEN }}
           WAGO_API_TOKEN: ${{ secrets.WAGO_API_TOKEN }}
