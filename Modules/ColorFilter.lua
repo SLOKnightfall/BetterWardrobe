@@ -184,10 +184,12 @@ end
 
 function addon.Init:InitFilterButtons()
 	local frame = CreateFrame("Button", nil, BetterWardrobeCollectionFrame)
+	local atTransmogrifier = C_Transmog.IsAtTransmogNPC();
+
 	frame:SetSize(25, 25)
 	frame:SetScript("OnShow",function()
 			frame:ClearAllPoints()
-			if WardrobeFrame_IsAtTransmogrifier() then
+			if atTransmogrifier then
 			frame:SetPoint("TOPRIGHT", BW_SortDropDown, 5, 23)
 			else
 			frame:SetPoint("TOPRIGHT", BW_SortDropDown, 15, 23)

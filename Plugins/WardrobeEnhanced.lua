@@ -75,7 +75,7 @@ local function FilterVisuals(self)
 	end
 
 
-	if not WardrobeFrame_IsAtTransmogrifier() and BetterWardrobeCollectionFrame.ItemsCollectionFrame.activeCategory and filteredRecolors then
+	if not C_Transmog.IsAtTransmogNPC() and BetterWardrobeCollectionFrame.ItemsCollectionFrame.activeCategory and filteredRecolors then
 		local filteredVisualsList = { }
 		local tmp = {}
 		for q,w in pairs(filteredRecolors) do tmp[w] = true end

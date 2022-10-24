@@ -144,7 +144,6 @@ function addon.C_TransmogSets.GetSetPrimaryAppearances(setID)
 		local setSources = addon.GetSetsources(setID)
 		local primaryAppearances = {}
 		for appearanceID, collected in pairs(setSources) do
-		--	print(appearanceID)
 			local data = {["appearanceID"] = appearanceID, ["collected"] = collected}
 			tinsert(primaryAppearances, data)
 		end
@@ -186,8 +185,8 @@ function addon.C_TransmogSets.GetBaseSetsCounts()
 		local SetsDataProvider = addon.SetsDataProvider
 
 		for i, data in ipairs(sets) do
-			local sourceData = SetsDataProvider:GetSetSourceData(data.setID)
-			local topSourcesCollected, topSourcesTotal = sourceData.numCollected,sourceData.numTotal
+			local sourceData = addon.SetsDataProvider:GetSetSourceData(data.setID)
+			local topSourcesCollected, topSourcesTotal = (sourceData and sourceData.numCollected) or 0, (sourceData and sourceData.numTotal) or 0
 			if topSourcesCollected == topSourcesTotal then
 				collectedSets = collectedSets + 1
 			end
@@ -207,7 +206,7 @@ end
 
 
 function addon.C_TransmogSets.SetHasNewSources(setID)
-	print("NewSo")
+	--print("NewSo")
 	local setType = DetermineSetType(setID)
 
 	if setType == "set" then
@@ -250,19 +249,31 @@ function addon.ClearSourceDB()
 	wipe(SourceDB)
 end
 
+
+	function addon.GetSetSources(setID)
+		local setAppearances = C_TransmogSets.GetSetPrimaryAppearances(setID);
+		if not setAppearances then
+			return nil;
+		end
+		local lookupTable = { };
+		for i, appearanceInfo in ipairs(setAppearances) do
+			lookupTable[appearanceInfo.appearanceID] = appearanceInfo.collected;
+		end
+		return lookupTable;
+	end
+
 function addon.C_TransmogSets.GetSetSources(setID)
 	if SourceDB[setID] then return SourceDB[setID][1], SourceDB[setID][2] end
-
 	local setInfo = addon.GetSetInfo(setID)
 	local SetType = setInfo and setInfo.setType
 
 	--Default Blizzard Set
 	if not SetType or SetType == "BlizzardSet" then
-		return  C_TransmogSets.GetSetSources(setID)
+		return  addon.GetSetSources(setID)
 	end
 	
 	local setSources = {}
-	local atTransmogrifier = WardrobeFrame_IsAtTransmogrifier()
+	local atTransmogrifier = C_Transmog.IsAtTransmogNPC();
 	local unavailable = false
 	local SetType = setInfo.setType
 	local sources = {}
@@ -275,7 +286,7 @@ function addon.C_TransmogSets.GetSetSources(setID)
 			if sources then
 				--items[sources.itemID] = true
 				if #sources > 1 then
-					WardrobeCollectionFrame_SortSources(sources)
+					CollectionWardrobeUtil.SortSources(sources, sources[1].visualID, sourceID); 
 				end
 				setSources[sources[1].sourceID] = sources[1].isCollected--and sourceInfo.isCollected
 			end
@@ -286,7 +297,7 @@ function addon.C_TransmogSets.GetSetSources(setID)
 				if sources then
 					--items[sources.itemID] = true
 					if #sources > 1 then
-						WardrobeCollectionFrame_SortSources(sources)
+						CollectionWardrobeUtil.SortSources(sources, sources[1].visualID, sourceID); 
 					end
 					setSources[sources[1].sourceID] = sources[1].isCollected--and sourceInfo.isCollected
 				end
@@ -300,7 +311,7 @@ function addon.C_TransmogSets.GetSetSources(setID)
 	else
 		if not setInfo.itemData then 
 		else
-
+			
 		for slotID, sourceData in pairs(setInfo.itemData) do
 			local sourceID = sourceData[2]
 			local appearanceID = sourceData[3]
@@ -316,7 +327,7 @@ function addon.C_TransmogSets.GetSetSources(setID)
 				if sources then
 					--items[sources.itemID] = true
 					if #sources > 1 then
-						WardrobeCollectionFrame_SortSources(sources)
+						CollectionWardrobeUtil.SortSources(sources, sources[1].visualID, sourceID); 
 					end
 					setSources[sources[1].sourceID] = sources[1].isCollected--and sourceInfo.isCollected
 				else
@@ -336,7 +347,7 @@ function addon.C_TransmogSets.GetSetSources(setID)
 					end
 
 					if #list >= 1 then
-						WardrobeCollectionFrame_SortSources(list)
+						CollectionWardrobeUtil.SortSources(list, list[1].visualID, sourceID); 
 						setSources[list[1].sourceID or sourceID ] = list[1].isCollected or false
 						if not list[1].sourceType then --and not setInfo.sourceType then 
 							unavailable = true
@@ -354,7 +365,7 @@ function addon.C_TransmogSets.GetSetSources(setID)
 				if sources then
 					--items[sources.itemID] = true
 					if #sources > 1 then
-						WardrobeCollectionFrame_SortSources(sources)
+						CollectionWardrobeUtil.SortSources(sources, sources[1].visualID, sourceID); 
 					end
 					setSources[sources[1].sourceID] = sources[1].isCollected--and sourceInfo.isCollected
 				end
@@ -385,7 +396,6 @@ end
 function addon:IsFavoriteItem(visualID)
 	return addon.favoritesDB.profile.item[visualID]
 end
-
 
 
 function Sets:ClearHidden(setList)
@@ -419,7 +429,7 @@ local function CheckMissingLocation(setInfo)
 	
 	local invType = {}
 	missingSelection = addon.Filters.Base.missingSelection
-	local sources = C_TransmogSets.GetSetSources(setInfo.setID)
+	local sources = addon.GetSetSources(setInfo.setID)
 	if not sources then return end
 		for sourceID in pairs(sources) do
 			local sourceInfo = C_TransmogCollection.GetSourceInfo(sourceID)
@@ -428,7 +438,8 @@ local function CheckMissingLocation(setInfo)
 
 			if sources then
 				if #sources > 1 then
-					WardrobeCollectionFrame_SortSources(sources)
+				CollectionWardrobeUtil.SortSources(sources, sources[1].visualID, sourceID); 
+
 				end
 				if  missingSelection[sourceInfo.invType] and not sources[1].isCollected then
 
@@ -458,7 +469,7 @@ local function CheckMissingLocation(setInfo)
 		
 		local invType = {}
 		if not setInfo.itemData then
-			local sources = C_TransmogSets.GetSetSources(setInfo.setID)
+			local sources = addon.GetSetSources(setInfo.setID)
 			for sourceID in pairs(sources) do
 				local sourceInfo = C_TransmogCollection.GetSourceInfo(sourceID)
 
@@ -517,7 +528,6 @@ function addon:FilterSets(setList, setType)
 		local expansion = data.expansionID
 		local sourcefilter = (BetterWardrobeCollectionFrame:CheckTab(3) and filterSelection[data.filter])
 		local unavailableFilter = (not unavailable or (addon.Profile.HideUnavalableSets and unavailable))
-		--print(data.setID)
 
 		if BetterWardrobeCollectionFrame:CheckTab(2) then
 			expansion = expansion + 1
@@ -680,8 +690,8 @@ function addon.Model_ApplyUICamera(self, uiCameraID)
 		self:SetRoll(roll);
 		self:UseModelCenterToTransform(centerModel);
 
-		local cameraX, cameraY, cameraZ = self:TransformCameraSpaceToModelSpace(MODELFRAME_UI_CAMERA_POSITION.x, MODELFRAME_UI_CAMERA_POSITION.y, MODELFRAME_UI_CAMERA_POSITION.z);
-		local targetX, targetY, targetZ = self:TransformCameraSpaceToModelSpace(MODELFRAME_UI_CAMERA_TARGET.x, MODELFRAME_UI_CAMERA_TARGET.y, MODELFRAME_UI_CAMERA_TARGET.z);
+		local cameraX, cameraY, cameraZ = self:TransformCameraSpaceToModelSpace(MODELFRAME_UI_CAMERA_POSITION):GetXYZ();
+		local targetX, targetY, targetZ = self:TransformCameraSpaceToModelSpace(MODELFRAME_UI_CAMERA_TARGET):GetXYZ();
 
 		self:SetCameraPosition(cameraX, cameraY, cameraZ);
 		self:SetCameraTarget(targetX, targetY, targetZ);

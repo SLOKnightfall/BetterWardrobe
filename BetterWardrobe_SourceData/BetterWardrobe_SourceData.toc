@@ -1,4 +1,4 @@
-﻿## Interface: 90205
+﻿## Interface: 100000
 ## Title: BetterWardrobe_SourceData (@project-version@)
 ## Version: @project-version@
 ## Author: SLOKnightfall

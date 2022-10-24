@@ -60,6 +60,8 @@ local pvpDescriptions = {
     ["Combatant"] = true,
 }
 
+
+
 local armorMask = {400, 3592, 68, 35}
 local WowSets = {{}, {}, {}, {}, {}}
 WowSets["CLOTH"] = WowSets[1]
@@ -93,6 +95,8 @@ function BuildBlizzSets()
 				if bit.bor(mask, data.classMask) == mask then
 
 					local baseSet = C_TransmogSets.GetBaseSetID(data.setID)
+					local variantSets = C_TransmogSets.GetVariantSets(baseSet)
+
 					--Create Bizzard sets not being shown on sets tab
 					data.duplicate = true
 					if not BlizzardBaseSets[baseSet]  or (BlizzardBaseSets[baseSet] and data.hiddenUntilCollected and not data.collected) then 
@@ -101,7 +105,7 @@ function BuildBlizzSets()
 						if isPVP(data.setID) then data.PvP = true end
 						WowSets[Globals.ARMOR_TYPE[armor]][data.setID] = data
 						--break
-
+--if variantSets then data.duplicate = true end
 					--Create Variants List
 					--elseif baseSet =~ data.setID and not BlizzardBaseSets[data.setID] then 
 					--end
@@ -132,7 +136,7 @@ local function getClassMask(mask)
 	end
 end
 
-local UIID_Counter = {1,1150,2000,3390,4580,6200,8000,10110,11000}
+local UIID_Counter = {1,1150,2000,3390,4580,6200,8000,10110,11000,12000}
 
 local function OpposingFaction(faction)
 	local faction = UnitFactionGroup("player")
@@ -212,7 +216,6 @@ do
 		for armorType, data in pairs(WowSets) do
 			ArmorDB[armorType] = ArmorDB[armorType] or {}
 			for id, setData in pairs(data) do
-
 			if  ( not setData.duplicate) then --(C_TransmogSets.GetBaseSetID(id) == id and setData.hiddenUntilCollected and not setData.collected)) then
 					if (setData.requiredFaction and setData.requiredFaction == playerFaction) or setData.requiredFaction == nil then 
 						--setData.name = "BL-" .. setData.name.." - "..(setData.description or "")
@@ -229,7 +232,7 @@ do
 						setData.Blizzard = true
 						setData.items = {}
 						setData.sources = {}
-						setData.sources = C_TransmogSets.GetSetSources(id)
+						setData.sources = C_TransmogSets.GetSetPrimaryAppearances(id)
 	
 						--[[for sourceID in pairs(setData.sources) do
 																			local sourceInfo = C_TransmogCollection.GetSourceInfo(sourceID)
@@ -975,6 +978,7 @@ end
 
 
 function addon.GetSetsources(setID)
+	--return C_TransmogSets.GetSetPrimaryAppearances(setID)
 	return addon.C_TransmogSets.GetSetSources(setID)
 end
 

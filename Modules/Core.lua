@@ -1304,7 +1304,6 @@ local function UpdateTransmogVendor()
 	BetterWardrobeCollectionFrame:SetContainer(WardrobeFrame);
 end
 
- 
 --Loads various modules and builds frames once the Blizzard_Collection addon is loaded
 function addon.Init:LoadModules()
 	--Check to make sure that the addon has completed loading
@@ -1340,7 +1339,7 @@ function addon.Init:LoadModules()
 			else
 				WardrobeCollectionFrame:Hide();
 				BetterWardrobeCollectionFrame:Hide();
-								if addon.ExtendedTransmogSwap then
+				if addon.ExtendedTransmogSwap then
 					
 					addon.ExtendedTransmogSwap:Hide()
 				end

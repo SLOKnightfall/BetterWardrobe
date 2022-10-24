@@ -143,8 +143,8 @@ function addon:DressingRoom_Enable()
 
 	DressUpFrame:SetMovable(true)
 	DressUpFrame:RegisterForDrag("LeftButton")
-	DressUpFrame:SetScript("OnDragStart", DressUpFrame.StartMoving)
-	DressUpFrame:SetScript("OnDragStop", DressUpFrame.StopMovingOrSizing)
+	----DressUpFrame:SetScript("OnDragStart", DressUpFrame.StartMoving)
+	----DressUpFrame:SetScript("OnDragStop", DressUpFrame.StopMovingOrSizing)
 
 	--addon:HookScript(DressUpFrame.MaximizeMinimizeFrame.MaximizeButton,"OnClick", function()  C_Timer.After(0, function() DressingRoom:SetFrameSize() end) end)
 end

@@ -67,6 +67,30 @@ local item_slots = {
     INVTYPE_HOLDABLE = "Offhand",
     INVTYPE_SHIELD = "Shield",
 }
+
+do 
+    LE_ITEM_WEAPON_DAGGER = Enum.ItemWeaponSubclass.Dagger;
+    LE_ITEM_WEAPON_UNARMED = Enum.ItemWeaponSubclass.Unarmed;
+    LE_ITEM_WEAPON_AXE1H = Enum.ItemWeaponSubclass.Axe1H;
+    LE_ITEM_WEAPON_AXE2H = Enum.ItemWeaponSubclass.Axe2H;
+    LE_ITEM_WEAPON_BOWS = Enum.ItemWeaponSubclass.Bows;
+    LE_ITEM_WEAPON_GUNS = Enum.ItemWeaponSubclass.Guns;
+    LE_ITEM_WEAPON_MACE1H = Enum.ItemWeaponSubclass.Mace1H;
+    LE_ITEM_WEAPON_MACE2H = Enum.ItemWeaponSubclass.Mace2H;
+    LE_ITEM_WEAPON_POLEARM = Enum.ItemWeaponSubclass.Polearm;
+    LE_ITEM_WEAPON_SWORD1H = Enum.ItemWeaponSubclass.Sword1H;
+    LE_ITEM_WEAPON_SWORD2H = Enum.ItemWeaponSubclass.Sword2H;
+    LE_ITEM_WEAPON_WARGLAIVE = Enum.ItemWeaponSubclass.Warglaive;
+    LE_ITEM_WEAPON_STAFF = Enum.ItemWeaponSubclass.Staff;
+    LE_ITEM_WEAPON_BEARCLAW = Enum.ItemWeaponSubclass.Bearclaw;
+    LE_ITEM_WEAPON_CATCLAW = Enum.ItemWeaponSubclass.Catclaw;
+    LE_ITEM_WEAPON_GENERIC = Enum.ItemWeaponSubclass.Generic;
+    LE_ITEM_WEAPON_THROWN = Enum.ItemWeaponSubclass.Thrown;
+    LE_ITEM_WEAPON_CROSSBOW = Enum.ItemWeaponSubclass.Crossbow;
+    LE_ITEM_WEAPON_WAND = Enum.ItemWeaponSubclass.Wand;
+    LE_ITEM_WEAPON_FISHINGPOLE = Enum.ItemWeaponSubclass.Fishingpole;
+end
+
 local subclasses = {
     [LE_ITEM_WEAPON_DAGGER] = "Dagger",
     [LE_ITEM_WEAPON_UNARMED] = "FistWeapon",

@@ -105,14 +105,12 @@
 					<Layer level="ARTWORK">
 						<Texture parentKey="Collection_Icon" file="Interface\Minimap\Tracking\Profession" hidden="true" >
 							<Size x="25" y="25"/>
-							<Anchor point="CENTER" />
 						</Texture>
 					</Layer>
 					<Layer level="OVERLAY">
 						<Texture parentKey="Collected_Icon" atlas="ParagonReputation_Checkmark" useAtlasSize="false" hidden="true">
 							<Size x="12" y="12"/>
 							<Anchors>
-								<Anchor point="CENTER" />
 							</Anchors>
 						</Texture>
 
@@ -122,72 +120,6 @@
 		</Frames>
 	</Frame>
 
-	<DressUpModel name="BW_WardrobeSetsTransmogModelTemplate" mixin="BetterWardrobeSetsTransmogModelMixin" virtual="true">
-		<Size x="129" y="186"/>
-		<Layers>
-			<Layer level="BACKGROUND">
-				<Texture setAllPoints="true">
-					<Color r="0" g="0" b="0"/>
-				</Texture>
-			</Layer>
-			<Layer level="OVERLAY" textureSubLevel="-1">
-				<Texture parentKey="Border" atlas="transmog-set-border-collected" useAtlasSize="true">
-					<Anchors>
-						<Anchor point="CENTER" x="0" y="-6"/>
-					</Anchors>
-				</Texture>
-			</Layer>
-			<Layer level="OVERLAY">
-				<Texture parentKey="TransmogStateTexture" atlas="transmog-set-border-selected" useAtlasSize="true" alphaMode="ADD" hidden="true">
-					<Anchors>
-						<Anchor point="CENTER"/>
-					</Anchors>
-				</Texture>
-			</Layer>
-			<Layer level="HIGHLIGHT">
-				<Texture atlas="transmog-set-border-highlighted" alphaMode="ADD" useAtlasSize="true">
-					<Anchors>
-						<Anchor point="CENTER" x="0" y="0"/>
-					</Anchors>
-				</Texture>
-			</Layer>
-		</Layers>
-		<Frames>
-			<Frame parentKey="Favorite" setAllPoints="true">
-				<Layers>
-					<Layer level="ARTWORK">
-						<Texture parentKey="Icon" atlas="collections-icon-favorites" useAtlasSize="true" hidden="false">
-							<Anchors>
-								<Anchor point="TOPLEFT" x="-12" y="13" relativePoint="TOPLEFT"/>
-							</Anchors>
-						</Texture>
-					</Layer>
-				</Layers>
-			</Frame>
-				<Frame inherits="BetterWardrobeIconsTemplate" setAllPoints="true">
-			<Anchors>
-			<Anchor point="BOTTOMRIGHT" x="2" y="-2" relativePoint="BOTTOMRIGHT"/>
-		</Anchors>
-			</Frame>
-		</Frames>
-		<Layer level="OVERLAY">
-			<FontString parentKey="progress" inherits="GameFontNormalMed2" text="+++">
-				<Anchors>
-					<Anchor point="BOTTOM" y="0"/>
-				</Anchors>
-				<Color r="0.804" g="0.725" b="0.616"/>
-			</FontString>
-		</Layer>
-		<Scripts>
-			<OnLoad method="OnLoad"/>
-			<OnEvent method="OnEvent"/>
-			<OnEnter method="OnEnter"/>
-			<OnLeave method="OnLeave"/>
-			<OnHide method="OnHide"/>
-			<OnMouseDown method="OnMouseDown"/>
-			<OnModelLoaded method="OnModelLoaded"/>
-		</Scripts>
-	</DressUpModel>
 
 	<Frame name="BW_WardrobeSetsDetailsItemFrameTemplate" inherits ="WardrobeSetsDetailsItemFrameTemplate" mixin="BW_WardrobeSetsDetailsItemMixin" virtual="true">
 	</Frame>

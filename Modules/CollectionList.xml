@@ -94,7 +94,7 @@
 				self:CreateSlotButtons()
 			</OnLoad>
 			<OnShow>
-				self.CollectionListButton:SetShown(not WardrobeFrame_IsAtTransmogrifier())
+				self.CollectionListButton:SetShown(not 	C_Transmog.IsAtTransmogNPC())
 			</OnShow>
 			<OnHide>
 				self:Toggle(false)

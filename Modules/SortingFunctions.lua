@@ -94,7 +94,7 @@ local colors = {
 
 
 local function GetTab(tab)
-	local atTransmogrifier = WardrobeFrame_IsAtTransmogrifier()
+		local atTransmogrifier = C_Transmog.IsAtTransmogNPC();
 	local tabID
 
 	if ( atTransmogrifier ) then
@@ -110,7 +110,7 @@ addon.GetTab = GetTab
 
 local function CheckTab(tab)
 	local tabID
-	local atTransmogrifier = WardrobeFrame_IsAtTransmogrifier()
+		local atTransmogrifier = C_Transmog.IsAtTransmogNPC();
 
 		if ( atTransmogrifier ) then
 			tabID = BetterWardrobeCollectionFrame.selectedTransmogTab

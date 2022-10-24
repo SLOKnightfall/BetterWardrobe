@@ -181,7 +181,7 @@ function BetterWardrobeSetsCollectionListMixin:Toggle(toggleState)
 	if ( IsShiftKeyDown() ) then
 		CollectionList:GenerateListView()
 	else
-		local atTransmogrifier = WardrobeFrame_IsAtTransmogrifier()
+		local atTransmogrifier = C_Transmog.IsAtTransmogNPC();
 		local transmogLocation = TransmogUtil.GetTransmogLocation("HEADSLOT", Enum.TransmogType.Appearance, Enum.TransmogModification.Main);
 		BetterWardrobeCollectionFrame.ItemsCollectionFrame:SetActiveSlot(transmogLocation);
 		--BetterWardrobeCollectionFrame.ItemsCollectionFrame:SetActiveSlot("HEADSLOT", Enum.TransmogType.Appearance)
