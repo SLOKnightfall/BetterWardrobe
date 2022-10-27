@@ -404,7 +404,7 @@
 
 	<Frame name="BetterWardrobeCollectionFrameTemplate" parent="CollectionsJournal" mixin="BetterWardrobeCollectionFrameMixin" setAllPoints="true" hidden="true" virtual="true">
 		<Frames>
-			<Button name="$parentTab1" parentKey="ItemsTab" inherits="PanelTopTabButtonTemplate" text="WARDROBE_ITEMS" id="1" frameLevel="40">
+			<Button name="$parentTab1" parentKey="ItemsTab" inherits="BW_PanelTopTabButtonTemplate" text="WARDROBE_ITEMS" id="1" frameLevel="40">
 				<KeyValues>
 					<KeyValue key="minWidth" value="57" type="number"/>
 				</KeyValues>
@@ -417,7 +417,7 @@
 					</OnClick>
 				</Scripts>
 			</Button>
-			<Button name="$parentTab2" parentKey="SetsTab" inherits="PanelTopTabButtonTemplate" text="WARDROBE_SETS" id="2" frameLevel="40" >
+			<Button name="$parentTab2" parentKey="SetsTab" inherits="BW_PanelTopTabButtonTemplate" text="WARDROBE_SETS" id="2" frameLevel="40" >
 				<KeyValues>
 					<KeyValue key="minWidth" value="57" type="number"/>
 				</KeyValues>
@@ -452,7 +452,7 @@
 					</OnClick>
 				</Scripts>
 			</Button>
-			<Button name="$parentTab3" parentKey="ExtraSetsTab" inherits="PanelTopTabButtonTemplate" text="Extra" id="3" frameLevel="40" >
+			<Button name="$parentTab3" parentKey="ExtraSetsTab" inherits="BW_PanelTopTabButtonTemplate" text="Extra" id="3" frameLevel="40" >
 				<KeyValues>
 					<KeyValue key="minWidth" value="57" type="number"/>
 				</KeyValues>
@@ -487,7 +487,7 @@
 					</OnClick>
 				</Scripts>
 			</Button>
-			<Button name="$parentTab4" parentKey="SavedSetsTab" inherits="PanelTopTabButtonTemplate" text="Saved" id="4" frameLevel="40" >
+			<Button name="$parentTab4" parentKey="SavedSetsTab" inherits="BW_PanelTopTabButtonTemplate" text="Saved" id="4" frameLevel="40" >
 				<KeyValues>
 					<KeyValue key="minWidth" value="57" type="number"/>
 				</KeyValues>
@@ -2017,17 +2017,7 @@
 							</Layer>
 						</Layers>
 					</Frame>
-					<Frame parentKey="OutfitDropDown" name="XXBetterWardrobeOutfitDropDown" inherits="WardrobeOutfitDropDownTemplate" mixin="BetterWardrobeOutfitMixin">
-						<KeyValues>
-							<KeyValue key="width" value="188" type="number"/>
-							<KeyValue key="minMenuStringWidth" value="152" type="number"/>
-							<KeyValue key="maxMenuStringWidth" value="216" type="number"/>
-							<KeyValue key="replaceInvalidSources" value="false" type="boolean"/>
-						</KeyValues>
-						<Anchors>
-							<Anchor point="TOPLEFT" x="-14" y="28"/>
-						</Anchors>
-					</Frame>
+
 					<ModelScene parentKey="ModelScene" inherits="PanningModelSceneMixinTemplate">
 						<Size x="294" y="488"/>
 						<Anchors>

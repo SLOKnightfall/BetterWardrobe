@@ -6,7 +6,7 @@ addon = LibStub("AceAddon-3.0"):GetAddon(addonName)
 local L = LibStub("AceLocale-3.0"):GetLocale(addonName)
 
 local LAT = LibStub("LibArmorToken-1.0")
---local LAI = LibStub("LibAppropriateItems-1.0")
+local LAI = LibStub("LibAppropriateItems-1.0")
 
 local GetScreenWidth = GetScreenWidth
 local GetScreenHeight = GetScreenHeight
@@ -69,12 +69,18 @@ function addon.Init:BuildTooltips()
 		self:Hide()
 	end)
 
+--Change in DF
 	--TooltipDataProcessor.AddTooltipPostCall(Enum.TooltipDataType.Item, function(self)
 		--local _, itemLink = self:GetItem()
 		--tooltip:ShowTooltip(itemLink)
 	--end)
 	--GameTooltip:HookScript("OnHide", tooltip.HideItem)
 
+	GameTooltip:HookScript("OnTooltipSetItem", function(self)
+		local _, itemLink = self:GetItem()
+		tooltip:ShowTooltip(itemLink)
+	end)
+	GameTooltip:HookScript("OnHide", tooltip.HideItem)
 
 	-- hacks for tooltip where GameTooltip:GetItem() returns a broken link
 	hooksecurefunc(GameTooltip, "SetQuestItem", function(self, itemType, index)
@@ -324,9 +330,9 @@ function tooltip:ShowTooltip(itemLink)
 		end
 	end
 
-	local appropriateItem = false --LAI:IsAppropriate(itemID)
+	local appropriateItem = LAI:IsAppropriate(itemID)
 	if not appropriateItem and addon.Profile.ShowWarningTooltips then 
-		--addLine(self, RED_FONT_COLOR_CODE..L["Class can't use item for transmog"])
+		addLine(self, RED_FONT_COLOR_CODE..L["Class can't use item for transmog"])
 	end
 
 	if addon.Profile.ShowTooltips and not found_tooltipinfo then

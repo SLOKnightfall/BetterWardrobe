@@ -2887,7 +2887,7 @@ function BetterWardrobeItemsCollectionMixin:RefreshAppearanceTooltip()
 	end
 	local sources = CollectionWardrobeUtil.GetSortedAppearanceSources(self.tooltipVisualID, self.activeCategory, self.transmogLocation);
 	local chosenSourceID = self:GetChosenVisualSource(self.tooltipVisualID);
-	local warningString = CollectionWardrobeUtil.GetVisibilityWarning(self.tooltipModel, self.transmogLocation);	
+	local warningString = ""--CollectionWardrobeUtil.GetVisibilityWarning(self.tooltipModel, self.transmogLocation);	
 	self:GetParent():SetAppearanceTooltip(self, sources, chosenSourceID, warningString);
 end
 
@@ -7964,7 +7964,8 @@ function addon.Init.SortDropDown_Initialize()
 end
 
 
-
+----This causes ui editor taint
+--[[
 addon:RawHook("SetItemRef", function(link, ...) 
 	if not IsAddOnLoaded("Blizzard_Collections") then
 	  LoadAddOn("Blizzard_Collections")
@@ -7997,7 +7998,7 @@ addon:RawHook("SetItemRef", function(link, ...)
 			addon.hooks.SetItemRef(link,...)
 		end
 end, true)
-
+]]--
 
 BetterWardrobeSetsDetailsItemUseabiltiyMixin = { };
 
