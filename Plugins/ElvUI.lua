@@ -532,10 +532,9 @@ local function applySkins ()
 
 	if not IsAddOnLoaded("Blizzard_Collections") then
 		LoadAddOn("Blizzard_Collections")
-		C_Timer.After(2, UpdateCollectionFrames)
-
 	end
 end
+		C_Timer.After(2, UpdateCollectionFrames)
 
 
 
