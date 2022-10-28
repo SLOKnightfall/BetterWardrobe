@@ -5973,9 +5973,7 @@ do
 	end
 end
 
-BetterWardrobeSetsCollectionScrollFrameMixin = { };
 local tabType = {"item", "set", "extraset"}
-
 
 local function GetTab(tab)
 	local atTransmogrifier = C_Transmog.IsAtTransmogNPC();
@@ -6004,7 +6002,6 @@ local function BetterWardrobeSetsCollectionScrollFrame_FavoriteDropDownInit(self
 	local info = BW_UIDropDownMenu_CreateInfo()
 	info.notCheckable = true;
 	info.disabled = nil;
-
 
 	BW_UIDropDownMenu_AddButton({
 		notCheckable = true,
@@ -6117,30 +6114,6 @@ if tab ~=4 then
 		end
 end
 
-function BetterWardrobeSetsCollectionScrollFrameMixin:OnLoad()
-	self.scrollBar.trackBG:Show();
-	self.scrollBar.trackBG:SetVertexColor(0, 0, 0, 0.75);
-	self.scrollBar.doNotHide = true;
-	self.update = self.Update;
-	HybridScrollFrame_CreateButtons(self, "BetterWardrobeSetsScrollFrameButtonTemplate", 44, 0);
-	BW_UIDropDownMenu_Initialize(self.FavoriteDropDown, BetterWardrobeSetsCollectionScrollFrame_FavoriteDropDownInit, "MENU");
-end
-
-function BetterWardrobeSetsCollectionScrollFrameMixin:OnShow()
-	self:RegisterEvent("TRANSMOG_SETS_UPDATE_FAVORITE");
-end
-
-function BetterWardrobeSetsCollectionScrollFrameMixin:OnHide()
-	self:UnregisterEvent("TRANSMOG_SETS_UPDATE_FAVORITE");
-end
-
-function BetterWardrobeSetsCollectionScrollFrameMixin:OnEvent(event, ...)
-	if ( event == "TRANSMOG_SETS_UPDATE_FAVORITE" ) then
-		SetsDataProvider:RefreshFavorites();
-		self:Update();
-	end
-end
-
 local function CheckSetAvailability(setID)
 	local setData = SetsDataProvider:GetSetSourceData(setID)
 	return setData.unavailable
@@ -6207,10 +6180,22 @@ function BetterWardrobeSetsScrollFrameButtonMixin:Init(elementData)
 	self.Label:SetText(displayData.label);
 	self.Icon:SetTexture(SetsDataProvider:GetIconForSet(displayData.setID));
 	self.Icon:SetDesaturation((topSourcesCollected == 0) and 1 or 0);
-	self.Favorite:SetShown(elementData.favoriteSetID);
+	self.Favorite:SetShown(displayData.favoriteSetID);
 
-	self.New:SetShown(SetsDataProvider:IsBaseSetNew(elementData.setID));
-	self.setID = elementData.setID;
+	self.New:SetShown(SetsDataProvider:IsBaseSetNew(displayData.setID));
+	self.setID = displayData.setID;
+
+	local setInfo = addon.GetSetInfo(displayData.setID)
+	local isFavorite = 	C_TransmogSets.GetIsFavorite(displayData.setID);
+	local isHidden = addon.HiddenAppearanceDB.profile.set[displayData.setID]
+	local isInList = addon.CollectionList:IsInList(displayData.setID, "set")
+
+	if BetterWardrobeCollectionFrame.selectedCollectionTab == 3 then
+		isInList = addon.CollectionList:IsInList(displayData.setID, "extraset")
+
+		 isFavorite = addon.favoritesDB.profile.extraset[displayData.setID]
+				 isHidden = addon.HiddenAppearanceDB.profile.extraset[displayData.setID]
+	end
 
 	self.Favorite:SetShown(isFavorite)
 	self.CollectionListVisual.Hidden.Icon:SetShown(isHidden)
@@ -6219,10 +6204,7 @@ function BetterWardrobeSetsScrollFrameButtonMixin:Init(elementData)
 	self.CollectionListVisual.InvalidTexture:SetShown(BetterWardrobeCollectionFrame.selectedCollectionTab == 3 and not displayData.isClass)
 
 
-	local isInList = addon.CollectionList:IsInList(displayData.setID, "set")
-	if BetterWardrobeCollectionFrame.selectedCollectionTab == 3 then
-		isInList = addon.CollectionList:IsInList(displayData.setID, "extraset")
-	end
+
 	self.CollectionListVisual.Collection.Collection_Icon:SetShown(isInList)
 	self.CollectionListVisual.Collection.Collected_Icon:SetShown(isInList and setCollected)
 
@@ -6288,7 +6270,7 @@ function BetterWardrobeSetsCollectionContainerMixin:OnLoad()
 		end
 	end, self);
 
-	----UIDropDownMenu_Initialize(self.FavoriteDropDown, WardrobeSetsCollectionScrollFrame_FavoriteDropDownInit, "MENU");
+	BW_UIDropDownMenu_Initialize(self.FavoriteDropDown, BetterWardrobeSetsCollectionScrollFrame_FavoriteDropDownInit, "MENU");
 end
 
 function BetterWardrobeSetsCollectionContainerMixin:OnShow()
@@ -6341,126 +6323,6 @@ function BetterWardrobeSetsCollectionContainerMixin:SelectElementDataMatchingSet
 	end);
 end
 
-
-function BetterWardrobeSetsCollectionScrollFrameMixin:Update()
-	local offset = HybridScrollFrame_GetOffset(self);
-	local buttons = self.buttons;
-	local baseSets = SetsDataProvider:GetBaseSets();
-	local selectedBaseSetID
-
-	-- show the base set as selected
-	if BetterWardrobeCollectionFrame.selectedCollectionTab == 2 then
-		local selectedSetID = self:GetParent():GetSelectedSetID();
-		selectedBaseSetID = selectedSetID and C_TransmogSets.GetBaseSetID(selectedSetID);
-	elseif BetterWardrobeCollectionFrame.selectedCollectionTab == 3 then
-		selectedBaseSetID = self:GetParent():GetSelectedSetID()
-	elseif BetterWardrobeCollectionFrame.selectedCollectionTab == 4 then
-		selectedBaseSetID = self:GetParent():GetSelectedSavedSetID()		
-	end
-
-	if not baseSets then  return  end
-
-	for i = 1, #buttons do
-		local button = buttons[i];
-		local setIndex = i + offset;
-		if ( setIndex <= #baseSets ) then
-			local baseSet = baseSets[setIndex];
-			local isFavorite = baseSet.favorite
-			local isHidden = addon.HiddenAppearanceDB.profile.set[baseSet.setID]
-			if BetterWardrobeCollectionFrame.selectedCollectionTab == 3 then
-				isFavorite = addon.favoritesDB.profile.extraset[baseSet.setID]
-				isHidden = addon.HiddenAppearanceDB.profile.extraset[baseSet.setID]
-			end
-
-
-			local displaySet = baseSet;
-
-			-- if the base set is hiddenUntilCollected and not collected, it's showing up because one of its variant sets is collected
-			-- in that case use any variant set to populate the info in the list
-			if baseSet.hiddenUntilCollected and not baseSet.collected and BetterWardrobeCollectionFrame.selectedCollectionTab == 2 then
-				local variantSets = C_TransmogSets.GetVariantSets(baseSet.setID);
-				if variantSets then
-					-- variant sets are already filtered for visibility (won't get a hiddenUntilCollected one unless it's collected)
-					-- any set will do so just picking first one
-					displaySet = variantSets[1];
-				end
-			end
-			button:Show();
-			button.Name:SetText(displaySet.name);
-			local topSourcesCollected, topSourcesTotal = SetsDataProvider:GetSetSourceTopCounts(displaySet.setID);
-
-
-			local setCollected = displaySet.collected;
-			if displaySet.collected then 
-				setCollected = displaySet.collected
-			else
-				setCollected = topSourcesCollected == topSourcesTotal
-			end
-
-
-			local classIcon = ""
-			--if baseSet.classTag then 
-			--local classIcon = GetClassAtlas(baseSet.classTag)
-			--classIcon ="|A:"..classIcon..":16:16|a"
-			--end
-				--button.Name:SetText(baseSet.name or "")
-			button.Name:SetText(displaySet.name..((baseSet.className) and " ("..baseSet.className..")" or "") )
-			----button.Name:SetText(baseSet.name);
-
-			-----local topSourcesCollected, topSourcesTotal = addon.GetSetSourceCounts(baseSet.setID)  --SetsDataProvider:GetSetSourceTopCounts(baseSet.setID);
-			-----local setCollected = topSourcesCollected == topSourcesTotal --baseSet.collected -- C_TransmogSets.IsBaseSetCollected(baseSet.setID)
-			----local setCollected = displaySet.collected;
-			----local setCollected = C_TransmogSets.IsBaseSetCollected(baseSet.setID);
-			local color = IN_PROGRESS_FONT_COLOR;
-			if ( setCollected ) then
-				color = NORMAL_FONT_COLOR;
-			elseif ( topSourcesCollected == 0 ) then
-				color = GRAY_FONT_COLOR;
-			end
-
-			button.setCollected = setCollected
-			button.Name:SetTextColor(color.r, color.g, color.b);
-			button.Label:SetText(displaySet.label) --(L["NOTE_"..(baseSet.label or 0)] and L["NOTE_"..(baseSet.label or 0)]) or "")--((L["NOTE_"..baseSet.label] or "X"))
-			button.Icon:SetTexture(baseSet.icon or SetsDataProvider:GetIconForSet(displaySet.setID));
-
-			-----button.Icon:SetTexture(baseSet.icon or SetsDataProvider:GetIconForSet(baseSet.setID))
-			button.Icon:SetDesaturation((baseSet.collected and 0) or ((topSourcesCollected == 0) and 1) or 0)
-			button.SelectedTexture:SetShown(baseSet.setID == selectedBaseSetID);
-			button.Favorite:SetShown(isFavorite)
-			button.CollectionListVisual.Hidden.Icon:SetShown(isHidden)
-			button.CollectionListVisual.Unavailable:SetShown(CheckSetAvailability2(baseSet.setID))
-			button.CollectionListVisual.UnavailableItems:SetShown(CheckSetAvailability(baseSet.setID))
-			button.CollectionListVisual.InvalidTexture:SetShown(BetterWardrobeCollectionFrame.selectedCollectionTab == 3 and not baseSet.isClass)
-
-			local isInList = addon.CollectionList:IsInList(baseSet.setID, "set")
-			if BetterWardrobeCollectionFrame.selectedCollectionTab == 3 then
-				isInList = addon.CollectionList:IsInList(baseSet.setID, "extraset")
-			end
-
-			button.CollectionListVisual.Collection.Collection_Icon:SetShown(isInList)
-			button.CollectionListVisual.Collection.Collected_Icon:SetShown(isInList and setCollected)
-
-			button.New:SetShown(SetsDataProvider:IsBaseSetNew(baseSet.setID));
-			button.setID = baseSet.setID;
-
-			button.EditButton:SetShown(BetterWardrobeCollectionFrame:CheckTab(4))
-
-			if ( topSourcesCollected == 0 or setCollected ) then
-				button.ProgressBar:Hide();
-			else
-				button.ProgressBar:Show();
-				button.ProgressBar:SetWidth(SET_PROGRESS_BAR_MAX_WIDTH * topSourcesCollected / topSourcesTotal);
-			end
-			button.IconCover:SetShown(not setCollected);
-		else
-			button:Hide();
-		end
-	end
-
-	local extraHeight = (self.largeButtonHeight and self.largeButtonHeight - BASE_SET_BUTTON_HEIGHT) or 0;
-	local totalHeight = #baseSets * BASE_SET_BUTTON_HEIGHT + extraHeight;
-	HybridScrollFrame_Update(self, totalHeight, self:GetHeight());
-end
 
 BetterWardrobeSetsDetailsModelMixin = { };
 

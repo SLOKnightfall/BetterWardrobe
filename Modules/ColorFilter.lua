@@ -261,7 +261,7 @@ end
 
 
 
-function xxx()
+local function xxx()
 local ColorTable = (_G.BetterWardrobeData and _G.BetterWardrobeData.ColorTable2) or {}
 BTT = {}
 --AceSerializer:Embed(addon) 
@@ -272,7 +272,7 @@ BTT[index]= temp
 end
 end
 
-function yy()
+local function yy()
 	BTT = nil
 	local ColorTable = (_G.BetterWardrobeData and _G.BetterWardrobeData.ColorTable) or {}
   _,temp =addon:Deserialize(ColorTable[156])

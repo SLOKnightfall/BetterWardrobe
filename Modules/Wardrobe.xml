@@ -1701,7 +1701,9 @@
 					</OnLeave>
 					<OnClick>
 						-- same as a right-click on the parent
-						WardrobeTransmogButton_OnClick(self:GetParent(), "RightButton");
+						--WardrobeTransmogButton_OnClick(self:GetParent(), "RightButton");
+						self:GetParent():OnClick("RightButton");
+
 					</OnClick>
 				</Scripts>
 				<HighlightTexture file="Interface\Buttons\UI-Common-MouseHilight" alphaMode="ADD"/>
