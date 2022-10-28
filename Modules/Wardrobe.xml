@@ -1157,7 +1157,7 @@
 						<Frames>
 
 							<Frame parentKey="ScrollBox" setAllPoints="true" inherits="WowScrollBoxList"/>
-							<EventFrame parentKey="ScrollBar" inherits="WowTrimScrollBar">
+							<EventFrame parentKey="ScrollBar" inherits="WowTrimScrollBar" name="BetterWardrobeCollectionFrameScrollFrameScrollBar">
 								<Anchors>
 									<Anchor point="TOPLEFT" relativePoint="TOPRIGHT" x="4" y="20"/>
 									<Anchor point="BOTTOMLEFT" relativePoint="BOTTOMRIGHT" x="4" y="8"/>

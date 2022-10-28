@@ -211,13 +211,41 @@ local function UpdateCollectionFrames()
 	SetsCollectionFrame.RightInset:StripTextures()
 	SetsCollectionFrame.LeftInset:StripTextures()
 	--JournalScrollButtons(SetsCollectionFrame.ScrollFrame)
-	S:HandleScrollBar(SetsCollectionFrame.ScrollFrame.scrollBar)
+	S:HandleTrimScrollBar(SetsCollectionFrame.ListContainer.ScrollBar)
 
 	local DetailsFrame = SetsCollectionFrame.DetailsFrame
 	DetailsFrame.Name:FontTemplate(nil, 16)
 	DetailsFrame.LongName:FontTemplate(nil, 16)
 	S:HandleButton(DetailsFrame.VariantSetsButton)
 
+		hooksecurefunc(SetsCollectionFrame.ListContainer.ScrollBox, 'Update', function(button)
+		for _, child in next, { button.ScrollTarget:GetChildren() } do
+			if not child.IsSkinned then
+				child.Background:Hide()
+				child.HighlightTexture:SetTexture('')
+				child.Icon:SetSize(42, 42)
+				S:HandleIcon(child.Icon)
+				child.IconCover:SetOutside(child.Icon)
+
+				child.SelectedTexture:SetDrawLayer('BACKGROUND')
+				child.SelectedTexture:SetColorTexture(1, 1, 1, .25)
+				child.SelectedTexture:ClearAllPoints()
+				child.SelectedTexture:SetPoint('TOPLEFT', 4, -2)
+				child.SelectedTexture:SetPoint('BOTTOMRIGHT', -1, 2)
+				child.SelectedTexture:CreateBackdrop('Transparent')
+
+				child.IsSkinned = true
+			end
+		end
+	end)
+
+	local DetailsFrame = SetsCollectionFrame.DetailsFrame
+	DetailsFrame.ModelFadeTexture:Hide()
+	DetailsFrame.IconRowBackground:Hide()
+	DetailsFrame.Name:FontTemplate(nil, 16)
+	DetailsFrame.LongName:FontTemplate(nil, 16)
+	S:HandleButton(DetailsFrame.VariantSetsButton)
+	
 	hooksecurefunc(SetsCollectionFrame, 'SetItemFrameQuality', function(_, itemFrame)
 		local icon = itemFrame.Icon
 		if not icon.backdrop then
@@ -265,7 +293,7 @@ local function UpdateCollectionFrames()
 		slotButton.Icon:SetInside(slotButton.backdrop)
 
 		local undo = slotButton.UndoButton
-		if undo then undo:SetHighlightTexture(nil) end
+		if undo then undo:SetHighlightTexture(E.ClearTexture) end
 
 		local pending = slotButton.PendingFrame
 		if pending then

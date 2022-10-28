@@ -16,6 +16,7 @@ function MogIt:RenameSet(setName)
 end
 
 if not IsAddOnLoaded("MogIt") then return end
+if true then return end --TODO remove when updated
 local  mog = _G["MogIt"]
 local L = LibStub("AceLocale-3.0"):GetLocale(addonName)
 local Wishlist = mog:GetModule("Wishlist")

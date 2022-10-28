@@ -64,7 +64,7 @@ function addon:UpdateCanIMogIt()
         end
     end
       -- When the scrollbar moves, update the display.
-    _G["BetterWardrobeCollectionFrameScrollFrameScrollBar"]:HookScript("OnValueChanged", WardrobeCollectionFrame_CIMIOnValueChanged)
+   --- _G["BetterWardrobeCollectionFrameScrollFrameScrollBar"]:HookScript("Update", WardrobeCollectionFrame_CIMIOnValueChanged)
     addon:SecureHook(WardrobeCollectionFrame.SetsCollectionFrame,"Refresh", function() C_Timer.After(.05,WardrobeCollectionFrame_CIMIOnValueChanged) end)
 
     _G["BetterWardrobeCollectionFrameTab2"]:HookScript("OnClick", WardrobeCollectionFrame_CIMIOnValueChanged)

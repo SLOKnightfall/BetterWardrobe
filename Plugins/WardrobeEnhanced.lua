@@ -9,7 +9,7 @@ function addon.Init:UpdateWardrobeEnhanced()
 end
 
 if not IsAddOnLoaded("LegionWardrobe") then return end
-
+if true then return end -- TODO Remove once updated
 local setsButton_tooltip = "Sets"
 local resetFilterButton_tooltip = "Reset filter"
 local colorSelectButton_tooltip = "Select color"
