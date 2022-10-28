@@ -266,7 +266,7 @@ local function AddAdditional(parent, index, data, itemID)
 	parent:AddChild(Collected)
 
 	local SourceInfo = AceGUI:Create("InteractiveLabel")
-	SourceInfo:SetFont(SourceInfo.label:GetFont(),12)
+	--SourceInfo:SetFont(SourceInfo.label:GetFont(),12)
 	SourceInfo:SetHeight(20)
 	local link, sourceName
 
@@ -533,7 +533,7 @@ function CollectionList:GenerateSourceListView(visualID)
 			icon:SetWidth(25)
 
 			local CheckBox = AceGUI:Create("InteractiveLabel")
-			CheckBox:SetFont(CheckBox.label:GetFont(),12)
+			-- 	CheckBox:SetFont(CheckBox.label:GetFont(),12)
 			CheckBox:SetHeight(25)
 			local priceText = ""
 			itemName = itemName and nameColor.hex..itemName..L.ENDCOLOR or ""

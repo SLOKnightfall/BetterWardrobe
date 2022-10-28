@@ -424,6 +424,8 @@ local function UpdateCollectionFrames()
 
 	S:HandleButton(BW_TransmogOptionsButton)
 end
+ 
+addon.UpdateCollectionFrames = UpdateCollectionFrames
 
 local function applySkins ()
 	--Dropdown Menu
@@ -486,9 +488,10 @@ local function applySkins ()
 
 	DressUpFrameOutfitDropDown:ClearAllPoints()
 	DressUpFrameOutfitDropDown:SetSize(1,1)
-	DressUpFrameOutfitDropDown:SetPoint("RIGHT", 100,100)
-
-
+	DressUpFrameOutfitDropDown:SetPoint("LEFT", UIParent, "LEFT", -1000,-1000)
+	DressUpFrameOutfitDropDown:Hide()
+	DressUpFrameOutfitDropDownButton:Hide()
+DressUpFrameOutfitDropDown.SaveButton:Hide()
 	for index, button in pairs(BW_DressingRoomFrame.PreviewButtonFrame.Slots) do
 		S:HandleItemButton(button)
 		--button.IconBorder:SetColorTexture(1, 1, 1, 0.1)
@@ -532,9 +535,11 @@ local function applySkins ()
 
 	if not IsAddOnLoaded("Blizzard_Collections") then
 		LoadAddOn("Blizzard_Collections")
+		C_Timer.After(2, UpdateCollectionFrames)
+		addon.ElvUIInit = true
+
 	end
 end
-		C_Timer.After(2, UpdateCollectionFrames)
 
 
 
