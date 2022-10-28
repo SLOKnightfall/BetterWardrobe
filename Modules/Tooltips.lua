@@ -101,11 +101,10 @@ function addon.Init:BuildTooltips()
 	-- end)
 
 
-	hooksecurefunc(GameTooltip, "SetRecipeReagentItem", function(self, recipeID, reagentIndex)
-		tooltip:ShowTooltip(C_TradeSkillUI.GetRecipeReagentItemLink(recipeID, reagentIndex))
-		GameTooltip:Show()
-	end)
-
+	--hooksecurefunc(GameTooltip, "SetRecipeReagentItem", function(self, recipeID, reagentIndex)
+		--tooltip:ShowTooltip(C_TradeSkillUI.GetRecipeReagentItemLink(recipeID, reagentIndex))
+		--GameTooltip:Show()
+	--end)
 
 
 
