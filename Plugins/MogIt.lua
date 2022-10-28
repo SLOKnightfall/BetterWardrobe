@@ -115,16 +115,18 @@ function MogIt.GetMogitOutfits()
 		--print(itemLink)
 			if itemLink then
 				local appearanceID, sourceID = C_TransmogCollection.GetItemInfo(itemLink)
-				local sourceInfo = C_TransmogCollection.GetSourceInfo(sourceID)
-				local appearanceID = sourceInfo.visualID
-				local itemID = sourceInfo.itemID
-				local itemMod = sourceInfo.itemModID
-				----print(invSlot)
-				data.itemData[slotID] = {"'"..itemID..":"..itemMod.."'", sourceID, appearanceID}
-				if not data.icon then
-					--local categoryID, visualID, canEnchant, icon, isCollected, itemLink, transmogLink, unknown1 = C_TransmogCollection.GetAppearanceSourceInfo(itemLink)
-					local _, _, _, _, icon, _, _ = GetItemInfoInstant(itemLink) 
-					data.icon = icon
+				local sourceInfoSuccess, sourceInfo = pcall(C_TransmogCollection.GetSourceInfo, sourceID)
+				if (sourceInfoSuccess) then
+					local appearanceID = sourceInfo.visualID
+					local itemID = sourceInfo.itemID
+					local itemMod = sourceInfo.itemModID
+					--print(invSlot)
+					data.itemData[slotID] = {"'"..itemID..":"..itemMod.."'", sourceID, appearanceID}
+					if not data.icon then
+						--local categoryID, visualID, canEnchant, icon, isCollected, itemLink, transmogLink, unknown1 = C_TransmogCollection.GetAppearanceSourceInfo(itemLink)
+						local _, _, _, _, icon, _, _ = GetItemInfoInstant(itemLink) 
+						data.icon = icon
+					end
 				end
 			end
 		end
