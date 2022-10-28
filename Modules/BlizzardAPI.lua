@@ -266,7 +266,6 @@ function addon.C_TransmogSets.GetSetSources(setID)
 	if SourceDB[setID] then return SourceDB[setID][1], SourceDB[setID][2] end
 	local setInfo = addon.GetSetInfo(setID)
 	local SetType = setInfo and setInfo.setType
-
 	--Default Blizzard Set
 	if not SetType or SetType == "BlizzardSet" then
 		return  addon.GetSetSources(setID)
@@ -304,7 +303,6 @@ function addon.C_TransmogSets.GetSetSources(setID)
 			end
  		end
 		SourceDB[setID] = {setSources, unavailable}
-
 		return setSources, unavailable
 
 	--Other Sets

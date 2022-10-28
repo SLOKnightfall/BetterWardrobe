@@ -7029,8 +7029,7 @@ function BetterWardrobeSetsTransmogMixin:LoadSet(setID)
 	local setData
 	--Default Saved sets
 	if setType == "SavedBlizzard" then
-		local setSources = addon.GetSetSources(setID)
-		if setSources then
+		local setSources = addon.C_TransmogSets.GetSetSources(setID)
 		for sourceID in pairs(setSources) do
 			local sourceInfo = C_TransmogCollection.GetSourceInfo(sourceID);
 			if sourceInfo then 
@@ -7054,7 +7053,6 @@ function BetterWardrobeSetsTransmogMixin:LoadSet(setID)
 				end
 			end
 		end
-	end
 		C_Transmog.LoadOutfit(addon:GetBlizzID(setID))
 	else
 		if (not setType) or setType == "BlizzardSet"  then
