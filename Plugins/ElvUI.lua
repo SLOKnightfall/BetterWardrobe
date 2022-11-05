@@ -114,7 +114,8 @@ function MyPlugin:Initialize()
 end
 
 
-local function UpdateCollectionFrames()
+local function SkinTransmogFrames()
+
 	-- Appearances Tab
 	local WardrobeCollectionFrame = _G.BetterWardrobeCollectionFrame
 	S:HandleTab(WardrobeCollectionFrame.ItemsTab)
@@ -130,11 +131,11 @@ local function UpdateCollectionFrames()
 	S:HandleEditBox(_G.BetterWardrobeCollectionFrameSearchBox)
 	_G.BetterWardrobeCollectionFrameSearchBox:SetFrameLevel(5)
 
-	WardrobeCollectionFrame.FilterButton:Point('LEFT', WardrobeCollectionFrame.searchBox, 'RIGHT', 2, 0)
 	S:HandleButton(WardrobeCollectionFrame.FilterButton)
+	WardrobeCollectionFrame.FilterButton:Point('LEFT', WardrobeCollectionFrame.searchBox, 'RIGHT', 2, 0)
+	S:HandleCloseButton(WardrobeCollectionFrame.FilterButton.ResetButton)
 	S:HandleDropDownBox(_G.BetterWardrobeCollectionFrameWeaponDropDown)
 	WardrobeCollectionFrame.ItemsCollectionFrame:StripTextures()
-
 
 	for _, Frame in ipairs(BetterWardrobeCollectionFrame.ContentFrames) do
 		if Frame.Models then
@@ -154,13 +155,14 @@ local function UpdateCollectionFrames()
 				if Model.NewGlow then Model.NewGlow:SetParent(border) end
 				if Model.NewString then Model.NewString:SetParent(border) end
 
-				for i=1, Model:GetNumRegions() do
-					local region = select(i, Model:GetRegions())
-					local texture = region:GetTexture()
-					if texture == 1116940 or texture == 1569530 then -- transmogrify.blp (items:1116940 or sets:1569530)
-						region:SetColorTexture(1, 1, 1, 0.3)
-						region:SetBlendMode('ADD')
-						region:SetAllPoints(Model)
+				for _, region in next, { Model:GetRegions() } do
+					if region:IsObjectType('Texture') then -- check for hover glow
+						local texture = region:GetTexture()
+						if texture == 1116940 or texture == 1569530 then -- transmogrify.blp (items:1116940 or sets:1569530)
+							region:SetColorTexture(1, 1, 1, 0.3)
+							region:SetBlendMode('ADD')
+							region:SetAllPoints(Model)
+						end
 					end
 				end
 
@@ -179,7 +181,6 @@ local function UpdateCollectionFrames()
 		end
 
 		local pending = Frame.PendingTransmogFrame
-
 		if pending then
 			local Glowframe = pending.Glowframe
 			Glowframe:SetAtlas(nil)
@@ -191,6 +192,7 @@ local function UpdateCollectionFrames()
 				Glowframe.backdrop:SetBackdropBorderColor(1, 0.7, 1)
 				Glowframe.backdrop:SetBackdropColor(0, 0, 0, 0)
 			end
+
 			for i = 1, 12 do
 				if i < 5 then
 					Frame.PendingTransmogFrame['Smoke'..i]:Hide()
@@ -210,15 +212,9 @@ local function UpdateCollectionFrames()
 	SetsCollectionFrame:SetTemplate('Transparent')
 	SetsCollectionFrame.RightInset:StripTextures()
 	SetsCollectionFrame.LeftInset:StripTextures()
-	--JournalScrollButtons(SetsCollectionFrame.ScrollFrame)
 	S:HandleTrimScrollBar(SetsCollectionFrame.ListContainer.ScrollBar)
 
-	local DetailsFrame = SetsCollectionFrame.DetailsFrame
-	DetailsFrame.Name:FontTemplate(nil, 16)
-	DetailsFrame.LongName:FontTemplate(nil, 16)
-	S:HandleButton(DetailsFrame.VariantSetsButton)
-
-		hooksecurefunc(SetsCollectionFrame.ListContainer.ScrollBox, 'Update', function(button)
+	hooksecurefunc(SetsCollectionFrame.ListContainer.ScrollBox, 'Update', function(button)
 		for _, child in next, { button.ScrollTarget:GetChildren() } do
 			if not child.IsSkinned then
 				child.Background:Hide()
@@ -238,6 +234,7 @@ local function UpdateCollectionFrames()
 			end
 		end
 	end)
+
 
 	local DetailsFrame = SetsCollectionFrame.DetailsFrame
 	DetailsFrame.ModelFadeTexture:Hide()
@@ -331,103 +328,37 @@ local function UpdateCollectionFrames()
 	S:HandleButton(WardrobeOutfitEditFrame.CancelButton)
 	S:HandleButton(WardrobeOutfitEditFrame.DeleteButton)
 
-
-
 	--Items
 	S:HandleDropDownBox(BW_SortDropDown)
-	--S:HandleDropDownBox(BW_WardrobeFilterDropDown)
-
-
-	--S:HandleNextPrevButton(WardrobeTransmogFrame.PagingFrame.NextPageButton)
-	--S:HandleNextPrevButton(WardrobeTransmogFrame.PagingFrame.PrevPageButton)
-	--S:HandleButton(BW_TransmogOptionsButton)
-
-
-
-	--[[local ScrollFrame = BetterWardrobeCollectionFrame.SetsCollectionFrame.ScrollFrame
-			S:HandleScrollBar(ScrollFrame.scrollBar)
-			for i = 1, #ScrollFrame.buttons do
-				local bu = ScrollFrame.buttons[i]
-				S:HandleItemButton(bu)
-				bu.Favorite:SetAtlas("PetJournal-FavoritesIcon", true)
-				bu.Favorite:Point("TOPLEFT", bu.Icon, "TOPLEFT", -8, 8)
-				bu.SelectedTexture:SetColorTexture(1, 1, 1, 0.1)
-				--bu.HideItemVisual.Icon:Point("TOPRIGHT", bu, "TOPRIGHT", -8, -8)
-			end]]
-
-		-- DetailsFrame
-
-
-
-		--SavedSets
-	--addon.SavedSetDropDownFrame.frame.backdrop:Hide()
 	S:HandleDropDownBox(BW_DBSavedSetDropdown)
-	--S:HandleButton(BW_DropDownList1)
-
-	--BW_DBSavedSetDropdown:ClearAllPoints()
-	--BW_DBSavedSetDropdown:SetPoint("TOPRIGHT", "BW_SortDropDown", "TOPRIGHT", -0 , 0)
-	--BW_DBSavedSetDropdown:SetScript("OnShow", function() UIDropDownMenu_SetWidth(BW_DBSavedSetDropdown, 155) end)
-
-	--CollectionList
-	--BW_ColectionListFrame.dropdownFrame.group.frame.backdrop:Hide()
 	S:HandleDropDownBox(BW_ColectionListFrame.dropdownFrame)
 	BW_ColectionListFrame.dropdownFrame:ClearAllPoints()
 	BW_ColectionListFrame.dropdownFrame:SetPoint("BOTTOM", -25, 15)
 
 	S:HandleButton(BW_CollectionListOptionsButton)
 	BW_CollectionListOptionsButton:SetSize(25,25)
-	--BW_CollectionListOptionsButton:SetPoint("BOTTOMLEFT", 2,2)
-
-
-	
-
-
-
-
-	--[[BetterWardrobeOutfitDropDown:StripTextures()
-			BetterWardrobeOutfitDropDown:CreateBackdrop()
-			--BetterWardrobeOutfitDropDown:Set
-			BetterWardrobeOutfitDropDown:SetWidth(150)
-			BetterWardrobeOutfitDropDown:ClearAllPoints()
-			BetterWardrobeOutfitDropDown:SetPoint("TOPLEFT", WardrobeTransmogFrame, 20, 28)
-			S:HandleNextPrevButton(BetterWardrobeOutfitDropDownButton)
-			BetterWardrobeOutfitDropDownButton:ClearAllPoints()
-			BetterWardrobeOutfitDropDownButton:SetPoint("RIGHT")
-			BetterWardrobeOutfitDropDown.SaveButton:ClearAllPoints()
-			BetterWardrobeOutfitDropDown.SaveButton:SetWidth(75)
-		
-			BetterWardrobeOutfitDropDown.SaveButton:SetPoint("LEFT",BetterWardrobeOutfitDropDown, "RIGHT", 3, 0)]]
-
-	--S:HandleButton(BetterWardrobeOutfitDropDownButton)
-
-	--BetterWardrobeOutfitFrame:StripTextures()
-	--BetterWardrobeOutfitFrame:CreateBackdrop('Transparent')
-
-
 
 	S:HandleButton(BW_LoadQueueButton)
 	BW_LoadQueueButton:ClearAllPoints()
-	BW_LoadQueueButton:Point("TOPLEFT",BetterWardrobeOutfitDropDown, "TOPRIGHT", 80, -2)
+	BW_LoadQueueButton:Point("TOPLEFT",BetterWardrobeOutfitDropDown, "TOPRIGHT", 90, -2)
 
 	S:HandleButton(BW_RandomizeButton)
 	BW_RandomizeButton:ClearAllPoints()
-	BW_RandomizeButton:Point("TOPLEFT",BW_LoadQueueButton, "TOPRIGHT", 0, 0)
+	BW_RandomizeButton:Point("TOPLEFT",BW_LoadQueueButton, "TOPRIGHT", 5, 0)
 
 	S:HandleButton(BW_SlotHideButton)
 	BW_SlotHideButton:ClearAllPoints()
-	BW_SlotHideButton:Point("TOPLEFT",BW_RandomizeButton, "TOPRIGHT", 0, 0)
-
-	S:HandleButton(WardrobeCollectionFrame.BW_SetsHideSlotButton)
-	--BW_SlotHideButton:ClearAllPoints()
-	--:Point("TOPLEFT",BW_RandomizeButton, "TOPRIGHT", 0, 0)
-
+	BW_SlotHideButton:Point("TOPLEFT",BW_RandomizeButton, "TOPRIGHT", 5, 0)
 
 	S:HandleButton(BW_TransmogOptionsButton)
-end
- 
-addon.UpdateCollectionFrames = UpdateCollectionFrames
 
-local function applySkins ()
+end
+
+
+
+
+
+local function UpdateDressingRoom()
 	--Dropdown Menu
 	BetterWardrobeOutfitFrame:StripTextures()
 	BetterWardrobeOutfitFrame:CreateBackdrop('Transparent')
@@ -532,23 +463,28 @@ DressUpFrameOutfitDropDown.SaveButton:Hide()
 	S:HandleButton(WardrobeOutfitEditFrame.AcceptButton)
 	S:HandleButton(WardrobeOutfitEditFrame.CancelButton)
 	S:HandleButton(WardrobeOutfitEditFrame.DeleteButton)
+end
 
-	if not IsAddOnLoaded("Blizzard_Collections") then
-		LoadAddOn("Blizzard_Collections")
-		C_Timer.After(2, UpdateCollectionFrames)
-		addon.ElvUIInit = true
 
-	end
+
+local function applySkins ()
+	if not E.private.skins.blizzard.enable then return end
+
+	if E.private.skins.blizzard.transmogrify then addon.elvuiTransmog = true; SkinTransmogFrames() end
+	if E.private.skins.blizzard.dressingroom then UpdateDressingRoom() end
 end
 
 
 
 function S:BetterWardrobe()
-	if not (E.private.skins.blizzard.enable and E.private.skins.blizzard.collections) then return end
-
+	if not (E.private.skins.blizzard.enable) then return end
 	-- execute this on the next frame to prevent it from executing before OnEnable
 	-- in Core.lua
-	C_Timer.After(0, applySkins)
+	if not IsAddOnLoaded("Blizzard_Collections") then
+		LoadAddOn("Blizzard_Collections")
+	end
+
+	C_Timer.After(2, applySkins)
 end
 
 S:AddCallbackForAddon('BetterWardrobe')

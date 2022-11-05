@@ -681,13 +681,13 @@
 				</Frames>
 			</EditBox>
 			<StatusBar parentKey="progressBar" inherits="CollectionsProgressBarTemplate">
-				<Size x="130" y="13"/>
+				<Size x="110" y="13"/>
 				<Anchors>
-					<Anchor point="TOPLEFT" relativeKey="$parent.ItemsTab" relativePoint="TOPLEFT" x="280" y="-11"/>
+					<Anchor point="TOPLEFT" relativeKey="$parent.SavedSetsTab" relativePoint="TOPRIGHT" x="5" y="-11"/>
 				</Anchors>
 				<Scripts>
 					<OnLoad>
-						self.border:SetWidth(139)
+						self.border:SetWidth(120)
 					</OnLoad>
 				</Scripts>
 			</StatusBar>

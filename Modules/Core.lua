@@ -1368,11 +1368,6 @@ addon:SecureHook(WardrobeTransmogFrame, "GetSlotButton", function(self,...) BW_T
 	addon:UpdateCanIMogIt()
 	addon:InitExtendedSetsSwap() 
 	addon.Init.SavedSetsDropDown_Initialize()
-
-	if  IsAddOnLoaded("ElvUI") and not addon.ElvUIInit then
-		addon.UpdateCollectionFrames()
-		addon.ElvUIInit = true
-	end
 end
 
 

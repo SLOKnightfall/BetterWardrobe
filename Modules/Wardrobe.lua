@@ -1073,7 +1073,7 @@ local TAB_ITEMS = 1;
 local TAB_SETS = 2;
 local TAB_EXTRASETS = addon.Globals.TAB_EXTRASETS
 local TAB_SAVED_SETS = addon.Globals.TAB_SAVED_SETS
-local TABS_MAX_WIDTH = 275 --185;
+local TABS_MAX_WIDTH = 85;
 
 local WARDROBE_MODEL_SETUP = {
 	["HEADSLOT"] 		= { useTransmogSkin = false, useTransmogChoices = false, obeyHideInTransmogFlag = false, slots = { CHESTSLOT = true,  HANDSSLOT = false, LEGSSLOT = false, FEETSLOT = false, HEADSLOT = false } },
@@ -1199,7 +1199,7 @@ end
 
 function BetterWardrobeCollectionFrameMixin:ClickTab(tab)
 	self:SetTab(tab:GetID());
-	PanelTemplates_ResizeTabsToFit(BetterWardrobeCollectionFrame, TABS_MAX_WIDTH);
+	PanelTemplates_ResizeTabsToFit(BetterWardrobeCollectionFrame, 2);
 	PlaySound(SOUNDKIT.IG_MAINMENU_OPTION_CHECKBOX_ON);
 end
 
@@ -1226,9 +1226,6 @@ function BetterWardrobeCollectionFrameMixin:SetTab(tabID)
 	self.SetsTransmogFrame:Hide();
 
 	BetterWardrobeSetsCollectionVariantSetsButton:SetShown(tabID == TAB_SETS)
-
-	BW_SortDropDown:ClearAllPoints();
-	BW_SortDropDown:SetPoint("TOPRIGHT", BetterWardrobeCollectionFrame.ItemsCollectionFrame, "TOPRIGHT",-30, -10)
 	addon.ColorFilterFrame:Hide()
 	if tabID == TAB_ITEMS then
 		BetterWardrobeVisualToggle:Hide()
@@ -1256,15 +1253,18 @@ function BetterWardrobeCollectionFrameMixin:SetTab(tabID)
 			self.TransmogOptionsButton:Show()
 
 			if ElvUI then 
-				BetterWardrobeCollectionFrame.ItemsCollectionFrame.WeaponDropDown:SetPoint("TOPRIGHT", -42, 5);
+				BetterWardrobeCollectionFrame.ItemsCollectionFrame.WeaponDropDown:SetPoint("TOPRIGHT", -42, -10);
+				BW_SortDropDown:SetPoint("TOPLEFT", BetterWardrobeCollectionFrame.ItemsCollectionFrame.WeaponDropDown, "BOTTOMLEFT", 0, 0)
+
 			else 
 				BetterWardrobeCollectionFrame.ItemsCollectionFrame.WeaponDropDown:SetPoint("TOPRIGHT", -30, -7);
+				BW_SortDropDown:SetPoint("TOPLEFT", BetterWardrobeCollectionFrame.ItemsCollectionFrame.WeaponDropDown, "BOTTOMLEFT", -10, 0)
+
 			end
-				BW_SortDropDown:SetPoint("TOPLEFT", BetterWardrobeCollectionFrame.ItemsCollectionFrame.WeaponDropDown, "BOTTOMLEFT", 0, 0)
 		else
 			BetterWardrobeCollectionFrame.ItemsCollectionFrame.WeaponDropDown:SetPoint("TOPRIGHT", -32, -25);
 			if ElvUI then 
-				BW_SortDropDown:SetPoint("TOPLEFT", WardrobeCollectionFrameWeaponDropDown, "BOTTOMLEFT", -5, yOffset)
+				BW_SortDropDown:SetPoint("TOPLEFT", BetterWardrobeCollectionFrame.ItemsCollectionFrame.WeaponDropDown, "BOTTOMLEFT", -55, yOffset)
 			else 
 				BW_SortDropDown:SetPoint("TOPLEFT", BetterWardrobeCollectionFrame.ItemsCollectionFrame.WeaponDropDown, "BOTTOMLEFT", 0, yOffset)
 			end
@@ -1324,7 +1324,8 @@ end
 function BetterWardrobeCollectionFrameMixin:OnLoad()
 	PanelTemplates_SetNumTabs(self, 4);
 	PanelTemplates_SetTab(self, TAB_ITEMS);
-	PanelTemplates_ResizeTabsToFit(self, TABS_MAX_WIDTH);
+	--PanelTemplates_ResizeTabsToFit(self, 50);
+	PanelTemplates_TabResize(BetterWardrobeCollectionFrameTab1, 30);
 	self.selectedCollectionTab = TAB_ITEMS;
 	self.selectedTransmogTab = TAB_ITEMS;
 
@@ -7746,7 +7747,7 @@ local TAB_ITEMS = addon.Globals.TAB_ITEMS
 local TAB_SETS = addon.Globals.TAB_SETS
 local TAB_EXTRASETS = addon.Globals.TAB_EXTRASETS
 local TAB_SAVED_SETS = addon.Globals.TAB_SAVED_SETS
-local TABS_MAX_WIDTH = addon.Globals.TABS_MAX_WIDTH
+--local TABS_MAX_WIDTH = addon.Globals.TABS_MAX_WIDTH
 local dropdownOrder = {LE_DEFAULT, LE_ALPHABETIC, LE_APPEARANCE, LE_COLOR, LE_EXPANSION, LE_ITEM_SOURCE}
 local locationDrowpDown = addon.Globals.locationDrowpDown
 
