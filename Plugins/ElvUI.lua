@@ -114,6 +114,7 @@ function MyPlugin:Initialize()
 end
 
 
+
 local function SkinTransmogFrames()
 
 	-- Appearances Tab
@@ -264,8 +265,8 @@ local function SkinTransmogFrames()
 	_G.BetterWardrobeSetsCollectionVariantSetsButton.Icon:SetRotation(S.ArrowRotation.down)
 
 
-	local WardrobeFrame = _G.WardrobeFrame
-	S:HandlePortraitFrame(WardrobeFrame)
+	--local WardrobeFrame = _G.WardrobeFrame
+	--S:HandlePortraitFrame(WardrobeFrame)
 
 
 	local WardrobeOutfitFrame = _G.BetterWardrobeOutfitFrame
@@ -351,12 +352,7 @@ local function SkinTransmogFrames()
 	BW_SlotHideButton:Point("TOPLEFT",BW_RandomizeButton, "TOPRIGHT", 5, 0)
 
 	S:HandleButton(BW_TransmogOptionsButton)
-
 end
-
-
-
-
 
 local function UpdateDressingRoom()
 	--Dropdown Menu
@@ -394,7 +390,6 @@ local function UpdateDressingRoom()
 	BW_DressingRoomFrame.BW_DressingRoomExportButton:SetSize(25,25)
 	BW_DressingRoomFrame.BW_DressingRoomExportButton:SetPoint("LEFT", BW_DressingRoomFrame.BW_DressingRoomSettingsButton, "RIGHT" )
 
-
 	S:HandleButton(BW_DressingRoomFrame.BW_DressingRoomTargetButton)
 	BW_DressingRoomFrame.BW_DressingRoomTargetButton:SetSize(25,25)
 
@@ -402,11 +397,11 @@ local function UpdateDressingRoom()
 
 	S:HandleButton(BW_DressingRoomFrame.BW_DressingRoomPlayerButton)
 	BW_DressingRoomFrame.BW_DressingRoomPlayerButton:SetSize(25,25)
-		BW_DressingRoomFrame.BW_DressingRoomPlayerButton:SetPoint("LEFT", BW_DressingRoomFrame.BW_DressingRoomTargetButton, "RIGHT" )
+	BW_DressingRoomFrame.BW_DressingRoomPlayerButton:SetPoint("LEFT", BW_DressingRoomFrame.BW_DressingRoomTargetButton, "RIGHT" )
 
 	S:HandleButton(BW_DressingRoomFrame.BW_DressingRoomGearButton)
 	BW_DressingRoomFrame.BW_DressingRoomGearButton:SetSize(25,25)
-		BW_DressingRoomFrame.BW_DressingRoomGearButton:SetPoint("LEFT", BW_DressingRoomFrame.BW_DressingRoomPlayerButton, "RIGHT" )
+	BW_DressingRoomFrame.BW_DressingRoomGearButton:SetPoint("LEFT", BW_DressingRoomFrame.BW_DressingRoomPlayerButton, "RIGHT" )
 
 	S:HandleButton(BW_DressingRoomFrame.BW_DressingRoomUndressButton)
 	BW_DressingRoomFrame.BW_DressingRoomUndressButton:SetSize(25,25)
@@ -416,13 +411,12 @@ local function UpdateDressingRoom()
 	DressUpFrame.LinkButton:SetSize(25,25)
 	DressUpFrame.LinkButton:SetPoint("LEFT", BW_DressingRoomFrame.BW_DressingRoomUndressButton, "RIGHT" , 00)
 
-
 	DressUpFrameOutfitDropDown:ClearAllPoints()
 	DressUpFrameOutfitDropDown:SetSize(1,1)
 	DressUpFrameOutfitDropDown:SetPoint("LEFT", UIParent, "LEFT", -1000,-1000)
 	DressUpFrameOutfitDropDown:Hide()
 	DressUpFrameOutfitDropDownButton:Hide()
-DressUpFrameOutfitDropDown.SaveButton:Hide()
+	DressUpFrameOutfitDropDown.SaveButton:Hide()
 	for index, button in pairs(BW_DressingRoomFrame.PreviewButtonFrame.Slots) do
 		S:HandleItemButton(button)
 		--button.IconBorder:SetColorTexture(1, 1, 1, 0.1)
@@ -466,12 +460,12 @@ DressUpFrameOutfitDropDown.SaveButton:Hide()
 end
 
 
-
-local function applySkins ()
+local eventFrame
+local function applySkins()
 	if not E.private.skins.blizzard.enable then return end
-
 	if E.private.skins.blizzard.transmogrify then addon.elvuiTransmog = true; SkinTransmogFrames() end
 	if E.private.skins.blizzard.dressingroom then UpdateDressingRoom() end
+	eventFrame:UnregisterEvent("ADDON_LOADED")
 end
 
 
@@ -480,13 +474,26 @@ function S:BetterWardrobe()
 	if not (E.private.skins.blizzard.enable) then return end
 	-- execute this on the next frame to prevent it from executing before OnEnable
 	-- in Core.lua
+
+--We can only skin the addon after the Blizzard Collection addon is loaded.  Forcing loading
+--causes elvui to not skin it properly.  We wait until it gets loaded and then set the skin
 	if not IsAddOnLoaded("Blizzard_Collections") then
-		LoadAddOn("Blizzard_Collections")
+		local frame = CreateFrame("Frame");
+		frame:SetScript("OnEvent", function(__, event, arg1)
+		    if (event == "ADDON_LOADED" and arg1 == "Blizzard_Collections") then
+		        	C_Timer.After(.1, applySkins)
+		    end
+		end)
+		frame:RegisterEvent("ADDON_LOADED");
+		eventFrame = frame
 	end
 
-	C_Timer.After(2, applySkins)
+
+
 end
 
+addon.SetElvuiSkin =  S.BetterWardrobe
 S:AddCallbackForAddon('BetterWardrobe')
 E:RegisterModule(MyPlugin:GetName())  --Register the module with ElvUI. ElvUI will now call MyPlugin:Initialize() when ElvUI is ready to load our plugin.
 --addon:RegisterMessage("BW_ADDON_LOADED", function() UpdateFrames() end)
+
