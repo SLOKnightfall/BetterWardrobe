@@ -1294,9 +1294,6 @@ function addon:OnEnable()
 	--Cache any default Blizz Saved Sets
 	addon.StoreBlizzardSets()
 	inizliaed = true
-	if  IsAddOnLoaded("ElvUI") and IsAddOnLoaded("Blizzard_Collections") and not addon.ElvUI_init then
-		C_Timer.After(1, addon.SetElvuiSkin)
-	end
 end
 
 

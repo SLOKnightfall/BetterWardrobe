@@ -464,12 +464,10 @@ local eventFrame
 local function applySkins()
 	addon.ElvUI_init = true
 	if not (E.private.skins.blizzard.enable) then return end
-	print("apply")
 	if not E.private.skins.blizzard.enable then return end
 	if E.private.skins.blizzard.transmogrify then SkinTransmogFrames() end
 	if E.private.skins.blizzard.dressingroom then UpdateDressingRoom() end
-	eventFrame:UnregisterEvent("ADDON_LOADED")
-	
+	eventFrame:UnregisterEvent("PLAYER_ENTERING_WORLD")
 end
 
 
@@ -484,22 +482,15 @@ function S:BetterWardrobe()
 	--if not IsAddOnLoaded("Blizzard_Collections") then
 		local frame = CreateFrame("Frame");
 		frame:SetScript("OnEvent", function(__, event, arg1)
-		    if (event == "ADDON_LOADED" and arg1 == "Blizzard_Collections") then
+		    if (event == "PLAYER_ENTERING_WORLD") then
 		        	C_Timer.After(1, applySkins)
 		    end
 		end)
-		frame:RegisterEvent("ADDON_LOADED");
+		frame:RegisterEvent("PLAYER_ENTERING_WORLD");
 		eventFrame = frame
-	--else
-		
-	--end
-
-
-
 end
 
 addon.SetElvuiSkin =  applySkins
 S:AddCallbackForAddon('BetterWardrobe')
 E:RegisterModule(MyPlugin:GetName())  --Register the module with ElvUI. ElvUI will now call MyPlugin:Initialize() when ElvUI is ready to load our plugin.
 --saddon:RegisterMessage("BW_ADDON_LOADED", function() C_Timer.After(5, applySkins) end)
-
