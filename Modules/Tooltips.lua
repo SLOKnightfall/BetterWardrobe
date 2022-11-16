@@ -25,6 +25,17 @@ tooltip:SetFrameStrata("TOOLTIP")
 GameTooltip:SetClampedToScreen( true )
 
 
+
+	 local function GetTooltipItem(tip)
+		  if _G.TooltipDataProcessor then
+				return TooltipUtil.GetDisplayedItem(tip)
+		  end
+		  return tip:GetItem()
+	 end
+	 local function OnTooltipSetItem(self)
+		  ns:ShowItem(select(2, GetTooltipItem(self)), self)
+	 end
+
 function addon.Init:BuildTooltips()
 	Models.normal:SetUnit("player")
 	Models.modelZoomed:SetUnit("player")
@@ -71,21 +82,16 @@ function addon.Init:BuildTooltips()
 
 --Change in DF
 
-    if _G.TooltipDataProcessor then
-		TooltipDataProcessor.AddTooltipPostCall(Enum.TooltipDataType.Item, function(self)
-		local _, itemLink = self:GetItem()
-			tooltip:ShowTooltip(itemLink)
+	if _G.TooltipDataProcessor then
+		TooltipDataProcessor.AddTooltipPostCall(Enum.TooltipDataType.Item, function(self, data)
+			tooltip:ShowTooltip(select(2, TooltipUtil.GetDisplayedItem(self)))
 		end)
-   else
-   		GameTooltip:HookScript("OnTooltipSetItem", function(self)
-		local _, itemLink = self:GetItem()
-		tooltip:ShowTooltip(itemLink)
-	end)
-
-    end
-
-	--GameTooltip:HookScript("OnHide", tooltip.HideItem)
-
+	else
+		GameTooltip:HookScript("OnTooltipSetItem", function(self)
+			local _, itemLink = self:GetItem()
+			tooltip:ShowTooltip(item)
+		end)
+	end
 
 	GameTooltip:HookScript("OnHide", tooltip.HideItem)
 
@@ -448,7 +454,7 @@ function tooltip:ShowTooltip(itemLink)
 end
 
 function tooltip:ShowPreview(itemLink)
-   if not itemLink or not  C_Item.IsDressableItemByID(itemLink) then 
+	if not itemLink or not  C_Item.IsDressableItemByID(itemLink) then 
 			self:Hide()
 			return 
 		end
