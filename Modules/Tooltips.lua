@@ -6,7 +6,7 @@ addon = LibStub("AceAddon-3.0"):GetAddon(addonName)
 local L = LibStub("AceLocale-3.0"):GetLocale(addonName)
 
 local LAT = LibStub("LibArmorToken-1.0")
-local LAI = LibStub("LibAppropriateItems-1.0")
+local LAI =  false --LibStub("LibAppropriateItems-1.0")
 
 local GetScreenWidth = GetScreenWidth
 local GetScreenHeight = GetScreenHeight
@@ -70,16 +70,12 @@ function addon.Init:BuildTooltips()
 	end)
 
 --Change in DF
-	--TooltipDataProcessor.AddTooltipPostCall(Enum.TooltipDataType.Item, function(self)
-		--local _, itemLink = self:GetItem()
-		--tooltip:ShowTooltip(itemLink)
-	--end)
-	--GameTooltip:HookScript("OnHide", tooltip.HideItem)
-
-	GameTooltip:HookScript("OnTooltipSetItem", function(self)
-		local _, itemLink = self:GetItem()
+	TooltipDataProcessor.AddTooltipPostCall(Enum.TooltipDataType.Item, function(self)
+	local _, itemLink = self:GetItem()
 		tooltip:ShowTooltip(itemLink)
 	end)
+
+
 	GameTooltip:HookScript("OnHide", tooltip.HideItem)
 
 	-- hacks for tooltip where GameTooltip:GetItem() returns a broken link
@@ -316,9 +312,7 @@ function tooltip:ShowTooltip(itemLink)
 	end
 	
 	local tooltip = tooltip
-	if addon.Profile.TooltipPreview_Show and (not addon.Globals.mods[addon.Profile.TooltipPreview_Modifier] or addon.Globals.mods[addon.Profile.TooltipPreview_Modifier]()) then
-		tooltip:ShowPreview(itemLink)
-	end
+
 
 	if addon.Profile.ShowOwnedItemTooltips and addon.Globals.tooltip_slots[slot] and not learned_dupe then
 		local sourceID = GetSourceFromItem(itemLink)
@@ -329,7 +323,7 @@ function tooltip:ShowTooltip(itemLink)
 		end
 	end
 
-	local appropriateItem = LAI:IsAppropriate(itemID)
+	local appropriateItem = false --LAI:IsAppropriate(itemID)
 	if not appropriateItem and addon.Profile.ShowWarningTooltips then 
 		addLine(self, RED_FONT_COLOR_CODE..L["Class can't use item for transmog"])
 	end
@@ -435,12 +429,16 @@ function tooltip:ShowTooltip(itemLink)
 			GameTooltip:AddTexture("Interface\\DialogFrame\\UI-DialogBox-Divider.blp",{width = self:GetWidth()+25, height = 15})
 		end
 		self:Show()
+			if addon.Profile.TooltipPreview_Show and (not addon.Globals.mods[addon.Profile.TooltipPreview_Modifier] or addon.Globals.mods[addon.Profile.TooltipPreview_Modifier]()) then
+		--=--tooltip:ShowPreview(itemLink)
+	end
 	end
 	self.ShowTooltips = true
 	
 end
 
 function tooltip:ShowPreview(itemLink)
+	--if not self:IsShown() then return end
    if not itemLink or not  C_Item.IsDressableItemByID(itemLink) then 
 			self:Hide()
 			return 
@@ -483,7 +481,7 @@ function tooltip:ShowPreview(itemLink)
 				self.model = Models.normal
 				Models:Reset(self.model)
 			end
-
+			print(2)
 			self.model:Show()
 			self:Show()
 			self.repos:Show()
@@ -495,6 +493,7 @@ function tooltip:ShowPreview(itemLink)
 			self.model:TryOn(itemLink)
 			self.previewShown = true
 		else
+			print(3)
 			self:Hide()
 			Models.normal:Hide()
 			Models.modelZoomed:Hide()
@@ -511,6 +510,7 @@ function tooltip.HideItem(self)
 	tooltip.repos:Hide()
 	tooltip.check:Show()
 	tooltip:Hide()
+	tooltip.model:Hide()
 end
 
 tooltip.check = CreateFrame("Frame")

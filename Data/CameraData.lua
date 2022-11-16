@@ -18,6 +18,8 @@ local races = {
     [8] = "Troll",
     [6] = "Tauren",
     [9] = "Goblin",
+    [52] = "Dracthyr",
+
     -- Allied!
     [27] = "Nightborne", -- "Nightborne",
     [28] = "Tauren", -- "HighmountainTauren",
@@ -35,11 +37,17 @@ local genders = {
 }
 
 local raceMap = {
-    ["HighmountainTauren"] = "Tauren",
-    ["VoidElf"] = "BloodElf",
-    ["LightforgedDraenei"] = "Draenei",
-    ["DarkIronDwarf"] = "Dwarf",
-    ["MagharOrc"] = "Orc",
+    ["Nightborne"] = "NightElf", -- Nightborne -> male Blood Elf / female Night Elf
+    ["MagharOrc"] = "Orc", -- Maghar -> Orc
+    ["LightforgedDraenei"] = "Draenei", -- Lightforged -> Draenei
+    ["KulTiran"] = "Human", -- Kul'Tiran -> Human
+    ["HighmountainTauren"] = "Tauren", -- Highmountain -> Tauren
+    ["VoidElf"] = "BloodElf", -- Void Elf -> Blood Elf
+    ["Mechagnome"] = "Gnome", -- Mechagnome -> Gnome
+    ["Vulpera"] = "Goblin", -- Vulpera -> Goblin
+    ["ZandalariTroll"] = "Troll", -- Zandalari -> Troll
+    ["DarkIronDwarf"] = "Dwarf", -- Dark Iron -> Dwarf
+    ["Dracthyr"] = {"BloodElf", "Human"}, -- Dracthyr -> male Draenei / female Human
 }
 
 local slots = {
@@ -69,48 +77,26 @@ local item_slots = {
 }
 
 
-do 
-    LE_ITEM_WEAPON_DAGGER = Enum.ItemWeaponSubclass.Dagger;
-    LE_ITEM_WEAPON_UNARMED = Enum.ItemWeaponSubclass.Unarmed;
-    LE_ITEM_WEAPON_AXE1H = Enum.ItemWeaponSubclass.Axe1H;
-    LE_ITEM_WEAPON_AXE2H = Enum.ItemWeaponSubclass.Axe2H;
-    LE_ITEM_WEAPON_BOWS = Enum.ItemWeaponSubclass.Bows;
-    LE_ITEM_WEAPON_GUNS = Enum.ItemWeaponSubclass.Guns;
-    LE_ITEM_WEAPON_MACE1H = Enum.ItemWeaponSubclass.Mace1H;
-    LE_ITEM_WEAPON_MACE2H = Enum.ItemWeaponSubclass.Mace2H;
-    LE_ITEM_WEAPON_POLEARM = Enum.ItemWeaponSubclass.Polearm;
-    LE_ITEM_WEAPON_SWORD1H = Enum.ItemWeaponSubclass.Sword1H;
-    LE_ITEM_WEAPON_SWORD2H = Enum.ItemWeaponSubclass.Sword2H;
-    LE_ITEM_WEAPON_WARGLAIVE = Enum.ItemWeaponSubclass.Warglaive;
-    LE_ITEM_WEAPON_STAFF = Enum.ItemWeaponSubclass.Staff;
-    LE_ITEM_WEAPON_BEARCLAW = Enum.ItemWeaponSubclass.Bearclaw;
-    LE_ITEM_WEAPON_CATCLAW = Enum.ItemWeaponSubclass.Catclaw;
-    LE_ITEM_WEAPON_GENERIC = Enum.ItemWeaponSubclass.Generic;
-    LE_ITEM_WEAPON_THROWN = Enum.ItemWeaponSubclass.Thrown;
-    LE_ITEM_WEAPON_CROSSBOW = Enum.ItemWeaponSubclass.Crossbow;
-    LE_ITEM_WEAPON_WAND = Enum.ItemWeaponSubclass.Wand;
-    LE_ITEM_WEAPON_FISHINGPOLE = Enum.ItemWeaponSubclass.Fishingpole;
-end
-
+    
 local subclasses = {
-    [LE_ITEM_WEAPON_DAGGER] = "Dagger",
-    [LE_ITEM_WEAPON_UNARMED] = "FistWeapon",
-    [LE_ITEM_WEAPON_AXE1H] = "1HAxe",
-    [LE_ITEM_WEAPON_MACE1H] = "1HMace",
-    [LE_ITEM_WEAPON_SWORD1H] = "1HSword",
-    [LE_ITEM_WEAPON_AXE2H] = "2HAxe",
-    [LE_ITEM_WEAPON_MACE2H] = "2HMace",
-    [LE_ITEM_WEAPON_SWORD2H] = "2HSword",
-    [LE_ITEM_WEAPON_POLEARM] = "Polearm",
-    [LE_ITEM_WEAPON_STAFF] = "Staff",
-    [LE_ITEM_WEAPON_WARGLAIVE] = "Glaive",
-    [LE_ITEM_WEAPON_BOWS] = "Bow",
-    [LE_ITEM_WEAPON_CROSSBOW] = "Crossbow",
-    [LE_ITEM_WEAPON_GUNS] = "Gun",
-    [LE_ITEM_WEAPON_WAND] = "Wand",
+    [Enum.ItemWeaponSubclass.Dagger] = "Dagger",
+    [Enum.ItemWeaponSubclass.Unarmed] = "FistWeapon",
+    [Enum.ItemWeaponSubclass.Axe1H] = "1HAxe",
+    [Enum.ItemWeaponSubclass.Mace1H] = "1HMace",
+    [Enum.ItemWeaponSubclass.Sword1H] = "1HSword",
+    [Enum.ItemWeaponSubclass.Axe2H] = "2HAxe",
+    [Enum.ItemWeaponSubclass.Mace2H] = "2HMace",
+    [Enum.ItemWeaponSubclass.Sword2H] = "2HSword",
+    [Enum.ItemWeaponSubclass.Polearm] = "Polearm",
+    [Enum.ItemWeaponSubclass.Staff] = "Staff",
+    [Enum.ItemWeaponSubclass.Warglaive] = "Glaive",
+    [Enum.ItemWeaponSubclass.Bows] = "Bow",
+    [Enum.ItemWeaponSubclass.Crossbow] = "Crossbow",
+    [Enum.ItemWeaponSubclass.Guns] = "Gun",
+    [Enum.ItemWeaponSubclass.Wand] = "Wand",
     -- Fallbacks
-    [LE_ITEM_WEAPON_FISHINGPOLE] = "Staff",
-    [LE_ITEM_WEAPON_GENERIC] = "1HSword",
+    [Enum.ItemWeaponSubclass.Fishingpole] = "Staff",
+    [Enum.ItemWeaponSubclass.Generic] = "1HSword",
 }
 
 local _, playerRace = UnitRace("player")
@@ -144,6 +130,9 @@ function addon.Camera:GetCameraID(itemLinkOrID, race, gender)
             race = playerRace
             if race == 'Worgen' and select(2, HasAlternateForm()) then
                 race = 'Human'
+            end
+            if race == 'Dracthyr' and not select(2, C_PlayerInfo.GetAlternateFormInfo()) then
+                gender = 'Male'
             end
         end
         if not gender then
@@ -231,6 +220,19 @@ slots_to_cameraids = {
     ["BloodElf-Male-Tabard"] = 459,
     ["BloodElf-Male-Waist"] = 462,
     ["BloodElf-Male-Wrist"] = 460,
+    ["Dracthyr-Male-Back"] = 1706,
+    ["Dracthyr-Male-Back-Backpack"] = 1699,
+    ["Dracthyr-Male-Feet"] = 1705,
+    ["Dracthyr-Male-Hands"] = 1708,
+    ["Dracthyr-Male-Head"] = 1702,
+    ["Dracthyr-Male-Legs"] = 1701,
+    ["Dracthyr-Male-Robe"] = 1698,
+    ["Dracthyr-Male-Shirt"] = 1709,
+    ["Dracthyr-Male-Shoulder"] = 1704,
+    ["Dracthyr-Male-Shoulder-Alt"] = 1703,
+    ["Dracthyr-Male-Tabard"] = 1707,
+    ["Dracthyr-Male-Waist"] = 1700,
+    ["Dracthyr-Male-Wrist"] = 1711,
     ["Draenei-Female-Back"] = 345,
     ["Draenei-Female-Feet"] = 358,
     ["Draenei-Female-Hands"] = 352,
@@ -595,4 +597,54 @@ slot_override = {
     [88271] = "Shoulder-Alt", -- Harlan's Shoulders
     -- Plate
     [140617] = "Shoulder-Alt", -- Rakeesh's Pauldron
+    -- backpacks:
+    [174361] = "Back-Backpack", -- Black Dragonscale Backpack
+    [180939] = "Back-Backpack", -- Mantle of the Forgemaster's Dark Blades
+    [180940] = "Back-Backpack", -- Ebony Crypt Keeper's Mantle
+    [180941] = "Back-Backpack", -- Kael's Dark Sinstone Chain
+    [181286] = "Back-Backpack", -- Halo of the Selfless
+    [181287] = "Back-Backpack", -- Halo of the Reverent
+    [181288] = "Back-Backpack", -- Halo of the Harmonious
+    [181289] = "Back-Backpack", -- Halo of the Discordant
+    [181290] = "Back-Backpack", -- Harmonious Sigil of the Archon
+    [181291] = "Back-Backpack", -- Selfless Sigil of the Archon
+    [181292] = "Back-Backpack", -- Discordant Sigil of the Archon
+    [181293] = "Back-Backpack", -- Reverent Sigil of the Archon
+    [181294] = "Back-Backpack", -- Harmonious Wings of the Ascended
+    [181295] = "Back-Backpack", -- Selfless Wings of the Ascended
+    [181296] = "Back-Backpack", -- Discordant Wings of the Ascended
+    [181297] = "Back-Backpack", -- Reverent Wings of the Ascended
+    [181301] = "Back-Backpack", -- Faewoven Branches
+    [181302] = "Back-Backpack", -- Spirit Tender's Branches
+    [181303] = "Back-Backpack", -- Night Courtier's Branches
+    [181304] = "Back-Backpack", -- Winterwoven Branches
+    [181305] = "Back-Backpack", -- Faewoven Bulb
+    [181306] = "Back-Backpack", -- Spirit Tender's Bulb
+    [181308] = "Back-Backpack", -- Winterwoven Bulb
+    [181309] = "Back-Backpack", -- Faewoven Pack
+    [181310] = "Back-Backpack", -- Spirit Tender's Pack
+    [181312] = "Back-Backpack", -- Winterwoven Pack
+    [181800] = "Back-Backpack", -- Standard of the Blackhound Warband
+    [181801] = "Back-Backpack", -- Standard of the Necrolords
+    [181802] = "Back-Backpack", -- Standard of Death's Chosen
+    [181803] = "Back-Backpack", -- Bladesworn Battle Standard
+    [181804] = "Back-Backpack", -- Trophy of the Reborn Bonelord
+    [181805] = "Back-Backpack", -- Osteowings of the Necrolords
+    [181806] = "Back-Backpack", -- Regrown Osteowings
+    [181807] = "Back-Backpack", -- Barbarous Osteowings
+    [181808] = "Back-Backpack", -- Death Fetish
+    [181809] = "Back-Backpack", -- Tomalin's Seasoning Crystal
+    [181810] = "Back-Backpack", -- Phylactery of the Dead Conniver
+    [181811] = "Back-Backpack", -- Beckoner's Shadowy Crystal
+    [183705] = "Back-Backpack", -- Mantle of Crimson Blades
+    [183706] = "Back-Backpack", -- Mantle of Court Blades
+    [183707] = "Back-Backpack", -- Mantle of Burnished Blades
+    [183708] = "Back-Backpack", -- Glittering Gold Sinstone Chain
+    [183709] = "Back-Backpack", -- Bronze-Bound Sinstone
+    [183710] = "Back-Backpack", -- Burnished Sinstone Chain
+    [183711] = "Back-Backpack", -- Burnished Crypt Keeper's Mantle
+    [183712] = "Back-Backpack", -- Gleaming Crypt Keeper's Mantle
+    [183713] = "Back-Backpack", -- Kassir's Crypt Mantle
+    [184154] = "Back-Backpack", -- Grungy Containment Pack
+    [184156] = "Back-Backpack", -- Pristine Containment Pack
 }

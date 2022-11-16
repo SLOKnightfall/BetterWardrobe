@@ -1,4 +1,4 @@
-﻿## Interface: 100000
+﻿## Interface: 100002
 ## Title: BetterWardrobe (@project-version@)
 ## Version: @project-version@
 ## Author: SLOKnightfall
@@ -22,7 +22,7 @@ Libs\AceEvent-3.0\AceEvent-3.0.xml
 Libs\AceHook-3.0\AceHook-3.0.xml
 Libs\AceLocale-3.0\AceLocale-3.0.xml
 Libs\LibArmorToken-1.0\lib.xml
-Libs\LibAppropriateitems-1.0\lib.xml
+#Libs\LibAppropriateitems-1.0\lib.xml
 #Libs\LibDataBroker-1.1\LibDataBroker-1.1.lua
 #Libs\LibTextDump-1.0\LibTextDump-1.0.lua
 Libs\UIDropDownMenu\UIDropDownMenu.xml
