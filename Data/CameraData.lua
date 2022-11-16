@@ -26,7 +26,7 @@ local races = {
     [29] = "BloodElf", -- "VoidElf",
     [30] = "Draenei", -- "LightforgedDraenei",
     [34] = "Dwarf", -- "DarkIronDwarf",
-    [35] = "Vulpera",
+    [35] = "Vulpera", 
     [36] = "Orc", -- "MagharOrc",
     [37] = "Mechagnome",
 }

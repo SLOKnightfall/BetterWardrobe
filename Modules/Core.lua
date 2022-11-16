@@ -1275,7 +1275,7 @@ function addon:OnEnable()
 	addon.Init:DressingRoom()
 	--addon.Init.LoadCollectionListModule()
 	--BW_ColectionListFrameTemplate
-	addon.Init:BuildTooltips()
+	--addon.Init:BuildTooltips()
 	C_Timer.After(0.5, function()
 		addon.RefreshSubItemData()
 		addon.RefreshOutfitData()
