@@ -81,7 +81,7 @@ function addon.Init:BuildTooltips()
 		local _, itemLink = self:GetItem()
 		tooltip:ShowTooltip(itemLink)
 	end)
-   		
+
     end
 
 	--GameTooltip:HookScript("OnHide", tooltip.HideItem)
@@ -324,7 +324,7 @@ function tooltip:ShowTooltip(itemLink)
 	
 	local tooltip = tooltip
 	if addon.Profile.TooltipPreview_Show and (not addon.Globals.mods[addon.Profile.TooltipPreview_Modifier] or addon.Globals.mods[addon.Profile.TooltipPreview_Modifier]()) then
-		tooltip:ShowPreview(itemLink)
+		----tooltip:ShowPreview(itemLink)
 	end
 
 	if addon.Profile.ShowOwnedItemTooltips and addon.Globals.tooltip_slots[slot] and not learned_dupe then
@@ -336,9 +336,9 @@ function tooltip:ShowTooltip(itemLink)
 		end
 	end
 
-	local appropriateItem = LAI:IsAppropriate(itemID)
+	local appropriateItem = false --LAI:IsAppropriate(itemID)
 	if not appropriateItem and addon.Profile.ShowWarningTooltips then 
-		addLine(self, RED_FONT_COLOR_CODE..L["Class can't use item for transmog"])
+		--addLine(self, RED_FONT_COLOR_CODE..L["Class can't use item for transmog"])
 	end
 
 	if addon.Profile.ShowTooltips and not found_tooltipinfo then
