@@ -1377,7 +1377,7 @@ function BetterWardrobeCollectionFrameMixin:OnEvent(event, ...)
 		if setIDs and not setItem and addon.Profile.ShowSetCollectionUpdates then 
 			for i, setID in pairs(setIDs) do 
 				local setInfo = C_TransmogSets.GetSetInfo(setID)
-				print((YELLOW_FONT_COLOR_CODE..L["Added missing appearances of: \124cffff7fff\124H%s:%s\124h[%s]\124h\124r"]):format("transmogset", setID, setInfo.name))
+				print((YELLOW_FONT_COLOR_CODE..L["Added missing appearances of: \124cffff7fff\124H%s:%s\124h[%s]\124h\124r"]):format("BW_transmogset", setID, setInfo.name))
 				return
 			end
 		end
@@ -1401,7 +1401,7 @@ function BetterWardrobeCollectionFrameMixin:OnEvent(event, ...)
 					newTransmogInfo["latestSource"] = setID
 					newTransmogInfo[setID] = newTransmogInfo[setID] or {}
 					newTransmogInfo[setID][itemID] = inventoryTypes[itemEquipLoc]
-					print((YELLOW_FONT_COLOR_CODE..L["Added missing appearances of: \124cffff7fff\124H%s:%s\124h[%s]\124h\124r"]):format("transmogset-extra", setID, setInfo.name))
+					print((YELLOW_FONT_COLOR_CODE..L["Added missing appearances of: \124cffff7fff\124H%s:%s\124h[%s]\124h\124r"]):format("BW_transmogset-extra", setID, setInfo.name))
 				end
 				return
 			end
@@ -1545,7 +1545,7 @@ function BetterWardrobeCollectionFrameMixin:OpenTransmogLink(link)
 
 	local linkType, id = strsplit(":", link);
 
-	if ( linkType == "transmogappearance" ) then
+	if ( linkType == "BW_transmogappearance" ) then
 		local sourceID = tonumber(id);
 		self:SetTab(TAB_ITEMS);
 		-- For links a base appearance is fine
@@ -1554,12 +1554,12 @@ function BetterWardrobeCollectionFrameMixin:OpenTransmogLink(link)
 		local transmogLocation = TransmogUtil.GetTransmogLocation(slot, Enum.TransmogType.Appearance, Enum.TransmogModification.Main);
 		self.ItemsCollectionFrame:GoToSourceID(sourceID, transmogLocation);
 
-	elseif ( linkType == "transmogset") then
+	elseif ( linkType == "BW_transmogset") then
 		local setID = tonumber(id);
 		self:SetTab(TAB_SETS);
 		self.SetsCollectionFrame:SelectSet(setID);
 
-	elseif ( linkType == "transmogset-extra") then
+	elseif ( linkType == "BW_transmogset-extra") then
 		local setID = tonumber(id);
 
 		addon:RegisterMessage("BW_TRANSMOG_EXTRASETSHOWN", function(self) 
@@ -7825,6 +7825,35 @@ function addon.Init.SortDropDown_Initialize()
 end
 
 
+
+addon:SecureHook("SetItemRef", function(link, ...) 
+	if not IsAddOnLoaded("Blizzard_Collections") then
+	  LoadAddOn("Blizzard_Collections")
+	end
+
+	if InCombatLockdown() then return end
+		if ( not CollectionsJournal:IsVisible() or not BetterWardrobeCollectionFrame:IsVisible() ) then
+			securecall(function() ToggleCollectionsJournal(5) end)
+		end
+		local linkType, id = strsplit(":", link);
+
+		if ( linkType == "BW_transmogappearance" ) then
+				BetterWardrobeCollectionFrame:OpenTransmogLink(link);
+				return
+			
+		elseif ( linkType == "BW_transmogset") then
+				BetterWardrobeCollectionFrame:OpenTransmogLink(link);
+				return
+
+
+		elseif ( linkType == "BW_transmogset-extra") then
+				BetterWardrobeCollectionFrame:OpenTransmogLink(link);
+				return
+
+		  else
+			addon.hooks.SetItemRef(link,...)
+		end
+end)
 ----This causes ui editor taint
 --[[
 addon:RawHook("SetItemRef", function(link, ...) 
