@@ -47,9 +47,17 @@ end
 
 local function WardrobeCollectionFrame_CIMIOnValueChanged()
     -- For each button, update the text value
-    for i=1,CanIMogIt.NUM_WARDROBE_COLLECTION_BUTTONS do
-        local frame = _G["BetterWardrobeCollectionFrameScrollFrameButton"..i]
-        if frame and frame.CanIMogItOverlay and frame.setID then
+    if _G["WardrobeCollectionFrame"] == nil then return end
+    local wardrobeSetsScrollFrame = _G["WardrobeCollectionFrame"].SetsCollectionFrame.ListContainer.ScrollBox
+    local setFrames = wardrobeSetsScrollFrame:GetFrames()
+    for i = 1, #setFrames do
+        local frame = setFrames[i]
+        if frame then
+            -- add to frame
+            CIMI_AddToFrameSets(frame)
+        end
+        if frame and frame.CanIMogItOverlay then
+            -- update frame
             frame.CanIMogItOverlay:UpdateText()
         end
     end
@@ -57,7 +65,9 @@ end
 
 
 function addon:UpdateCanIMogIt()
-    for i=1,CanIMogIt.NUM_WARDROBE_COLLECTION_BUTTONS do
+    local wardrobeSetsScrollFrame = _G["WardrobeCollectionFrame"].SetsCollectionFrame.ListContainer.ScrollBox
+    local setFrames = wardrobeSetsScrollFrame:GetFrames()
+    for i = 1, #setFrames do
         local frame = _G["BetterWardrobeCollectionFrameScrollFrameButton"..i]
         if frame then
             CIMI_AddToFrameSets(frame)
