@@ -26,6 +26,7 @@ Globals.CLASS_INFO = {
   SHAMAN = {7, 64, "MAIL"},
   WARLOCK = {9, 256, "CLOTH"},
   WARRIOR = {1, 1, "PLATE"},
+  EVOKER =  {13, 4096, "MAIL"},
 }
 
 

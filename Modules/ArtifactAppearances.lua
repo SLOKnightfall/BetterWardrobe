@@ -29,6 +29,7 @@ end
 ]]
 
 local ClassArtifacts = {
+	EVOKER = {},
 	DEATHKNIGHT = {
 		[128402] = "Maw of the Damned",
 		[128292] = "Blades of the Fallen Prince",
