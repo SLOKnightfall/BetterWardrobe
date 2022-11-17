@@ -142,7 +142,7 @@ local function CacheHeaders()
 		-- oh my god so much wasted tables
 		--print(k)
 		local _, visualID, _, _, _, itemLink = C_TransmogCollection.GetAppearanceSourceInfo(k)	
-		local appearances = (itemLink and WardrobeCollectionFrame_GetSortedAppearanceSources(k,addon.GetItemCategory(k), addon.GetTransmogLocation(itemLink))[1]) or {}
+		local appearances = (itemLink and CollectionWardrobeUtil.GetSortedAppearanceSources(k,addon.GetItemCategory(k), addon.GetTransmogLocation(itemLink))[1]) or {}
 		if appearances.name then
 			nameVisuals[k] = appearances.name
 			nameCache[k] = nil
@@ -315,10 +315,10 @@ local Sort = {
 
 	["SortItemByILevel"] = function(source1, source2)
 		local _, visualID, _, _, _, itemLink = C_TransmogCollection.GetAppearanceSourceInfo(source1.visualID)	
-		local item1 = (itemLink and WardrobeCollectionFrame_GetSortedAppearanceSources(source1.visualID,addon.GetItemCategory(source1.visualID), addon.GetTransmogLocation(itemLink))[1]) or {}
+		local item1 = (itemLink and CollectionWardrobeUtil.GetSortedAppearanceSources(source1.visualID,addon.GetItemCategory(source1.visualID), addon.GetTransmogLocation(itemLink))[1]) or {}
 
 		local _, visualID, _, _, _, itemLink = C_TransmogCollection.GetAppearanceSourceInfo(source2.visualID)	
-		local item2 = (itemLink and WardrobeCollectionFrame_GetSortedAppearanceSources(source2.visualID,addon.GetItemCategory(source2.visualID), addon.GetTransmogLocation(itemLink))[1]) or {}
+		local item2 = (itemLink and CollectionWardrobeUtil.GetSortedAppearanceSources(source2.visualID,addon.GetItemCategory(source2.visualID), addon.GetTransmogLocation(itemLink))[1]) or {}
 
 		item1.itemID = item1.itemID or 0
 		item2.itemID = item2.itemID or 0
@@ -334,10 +334,10 @@ local Sort = {
 
 	["SortItemByExpansion"] = function(source1, source2)
 		local _, visualID, _, _, _, itemLink = C_TransmogCollection.GetAppearanceSourceInfo(source1.visualID)	
-		local item1 = (itemLink and WardrobeCollectionFrame_GetSortedAppearanceSources(source1.visualID,addon.GetItemCategory(source1.visualID), addon.GetTransmogLocation(itemLink))[1]) or {}
+		local item1 = (itemLink and CollectionWardrobeUtil.GetSortedAppearanceSources(source1.visualID,addon.GetItemCategory(source1.visualID), addon.GetTransmogLocation(itemLink))[1]) or {}
 
 		local _, visualID, _, _, _, itemLink = C_TransmogCollection.GetAppearanceSourceInfo(source2.visualID)	
-		local item2 = (itemLink and WardrobeCollectionFrame_GetSortedAppearanceSources(source2.visualID,addon.GetItemCategory(source2.visualID), addon.GetTransmogLocation(itemLink))[1]) or {}
+		local item2 = (itemLink and CollectionWardrobeUtil.GetSortedAppearanceSources(source2.visualID,addon.GetItemCategory(source2.visualID), addon.GetTransmogLocation(itemLink))[1]) or {}
 				item1.itemID = item1.itemID or 0
 				item2.itemID = item2.itemID or 0
 				item1.expansionID = select(15,  GetItemInfo(item1.itemID)) or -1
@@ -447,10 +447,10 @@ local Sort = {
 		[LE_ITEM_SOURCE] = function(self)
 			sort(self.filteredVisualsList, function(source1, source2)
 			local _, visualID, _, _, _, itemLink = C_TransmogCollection.GetAppearanceSourceInfo(source1.visualID)	
-			local item1 = (itemLink and WardrobeCollectionFrame_GetSortedAppearanceSources(source1.visualID,addon.GetItemCategory(source1.visualID), addon.GetTransmogLocation(itemLink))[1]) or {}
+			local item1 = (itemLink and CollectionWardrobeUtil.GetSortedAppearanceSources(source1.visualID,addon.GetItemCategory(source1.visualID), addon.GetTransmogLocation(itemLink))[1]) or {}
 
 			local _, visualID, _, _, _, itemLink = C_TransmogCollection.GetAppearanceSourceInfo(source2.visualID)	
-			local item2 = (itemLink and WardrobeCollectionFrame_GetSortedAppearanceSources(source2.visualID,addon.GetItemCategory(source2.visualID), addon.GetTransmogLocation(itemLink))[1]) or {}
+			local item2 = (itemLink and CollectionWardrobeUtil.GetSortedAppearanceSources(source2.visualID,addon.GetItemCategory(source2.visualID), addon.GetTransmogLocation(itemLink))[1]) or {}
 			item1.sourceType = item1.sourceType or 7
 			item2.sourceType = item2.sourceType or 7
 			

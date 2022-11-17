@@ -7851,7 +7851,7 @@ addon:SecureHook("SetItemRef", function(link, ...)
 				return
 
 		  else
-			addon.hooks.SetItemRef(link,...)
+			--addon.hooks.SetItemRef(link,...)
 		end
 end)
 ----This causes ui editor taint
