@@ -7832,6 +7832,7 @@ addon:SecureHook("SetItemRef", function(link, ...)
 	end
 
 	if InCombatLockdown() then return end
+	if  linkType ~= "BW_transmogappearance" or linkType ~= "BW_transmogset" or  linkType ~= "BW_transmogset-extra" then return end
 		if ( not CollectionsJournal:IsVisible() or not BetterWardrobeCollectionFrame:IsVisible() ) then
 			securecall(function() ToggleCollectionsJournal(5) end)
 		end
