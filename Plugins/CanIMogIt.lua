@@ -32,7 +32,6 @@ local function CIMI_AddToFrameSets(parentFrame)
 
                 frame.CanIMogItSetText:SetShown(BetterWardrobeCollectionFrame.selectedCollectionTab == 2 or BetterWardrobeCollectionFrame.selectedCollectionTab == 3)
     			if BetterWardrobeCollectionFrame.selectedCollectionTab == 2  then
-                    print(parentFrame.setID)
                     frame.CanIMogItSetText:SetText(CanIMogIt:GetSetsVariantText(parentFrame.setID) or "")
                    -- frame.CanIMogItSetText:SetText(ratioText or "")
 

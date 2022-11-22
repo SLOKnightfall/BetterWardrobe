@@ -6,7 +6,7 @@ local GetScreenWidth = GetScreenWidth
 local GetScreenHeight = GetScreenHeight
 
 local LAT = LibStub("LibArmorToken-1.0")
---local LAI = LibStub("LibAppropriateItems-1.0")
+local LAI = LibStub("LibAppropriateItems-1.0")
 
 local IsDressableItem = _G.IsDressableItem or C_Item.IsDressableItemByID
 local appearances_known = {}
@@ -352,11 +352,17 @@ function tooltipAPI:ShowItem(link, for_tooltip)
 	local token = addon.Profile.ShowTokenTooltips and LAT:ItemIsToken(id)
 
 	--No need to update tooltips if item is not token or a mog
-	if not id or id == 0 or (not token and not dressable) then return end
+	if not id or id == 0 or (not token and not dressable) then 
+		tooltip.model:Hide()
+		tooltip.modelZoomed:Hide()
+		tooltip.modelWeapon:Hide()
+		return
+	end
 	local maybelink, _
 
 	local learned_dupe = false
 	local found_tooltipinfo = false
+	local found_systemTooltip = false
 	for i = 1, GameTooltip:NumLines() do
 		local line = _G["GameTooltipTextLeft"..i]
 
@@ -374,17 +380,45 @@ function tooltipAPI:ShowItem(link, for_tooltip)
 
 		if addon.Profile.ShowOwnedItemTooltips and string.find(text_lower, string.lower(TRANSMOGRIFY_TOOLTIP_APPEARANCE_UNKNOWN)) then
 			line:SetText("|TInterface\\RaidFrame\\ReadyCheck-NotReady:0|t "..text)
+			found_systemTooltip = true
 		end
 		--Adds icon to TRANSMOGRIFY_TOOLTIP_ITEM_UNKNOWN_APPEARANCE_KNOWN if found
 		if addon.Profile.ShowOwnedItemTooltips and string.find(text_lower, string.lower(TRANSMOGRIFY_TOOLTIP_ITEM_UNKNOWN_APPEARANCE_KNOWN) ) then
 			line:SetText("|TInterface\\RaidFrame\\ReadyCheck-Ready:0|t "..text)
-
+			found_systemTooltip = true
 		end
 
 		if addon.Profile.ShowItemIDTooltips and string.find(text_lower, string.lower(ITEM_LEVEL) ) then
 			line:SetText(text.."         "..L["Item ID"]..": |cffffffff"..id)
 		end
 	end
+
+	if addon.Profile.ShowOwnedItemTooltips and not 	found_systemTooltip then
+		local hasAppearance, appearanceFromOtherItem = tooltipAPI.PlayerHasAppearance(link)
+
+		local label
+		if not tooltipAPI.CanTransmogItem(link) then
+			label = "|c00ffff00" .. TRANSMOGRIFY_INVALID_DESTINATION
+		else
+			if hasAppearance then
+				if appearanceFromOtherItem then
+					label = "|TInterface\\RaidFrame\\ReadyCheck-Ready:0|t " .. (TRANSMOGRIFY_TOOLTIP_ITEM_UNKNOWN_APPEARANCE_KNOWN):gsub(', ', ',\n')
+				else
+					label = "|TInterface\\RaidFrame\\ReadyCheck-Ready:0|t " .. TRANSMOGRIFY_TOOLTIP_APPEARANCE_KNOWN
+				end
+			else
+				label = "|TInterface\\RaidFrame\\ReadyCheck-NotReady:0|t |cffff0000" .. TRANSMOGRIFY_TOOLTIP_APPEARANCE_UNKNOWN
+			end
+		end
+
+		addDoubleLine(GameTooltip,label,"")
+	end
+
+	local appropriateItem = LAI:IsAppropriate(id)
+
+	if addon.Profile.ShowOwnedItemTooltips and not 	appropriateItem then
+			addDoubleLine(GameTooltip, "|TInterface\\RaidFrame\\ReadyCheck-NotReady:0|t |cffff0000Your class can't transmogrify this item", "")
+		end
 
 	if token then
 		-- It's a set token! Replace the id.
@@ -424,7 +458,7 @@ function tooltipAPI:ShowItem(link, for_tooltip)
 	if addon.Profile.TooltipPreview_Show and (not addon.Globals.mods[addon.Profile.TooltipPreview_Modifier] or addon.Globals.mods[addon.Profile.TooltipPreview_Modifier]()) and tooltip.item ~= id then
 		tooltip.item = id
 
-		local appropriateItem = false --LAI:IsAppropriate(id)
+		local appropriateItem = LAI:IsAppropriate(id)
 
 		if slot_facings[slot] and IsDressableItem(id) then --and (not db.currentClass or appropriateItem) then
 			local model
