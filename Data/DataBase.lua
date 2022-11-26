@@ -211,7 +211,7 @@ do
 				end
 			end
 		end
-		addon.ArmorSets = nil
+		--addon.ArmorSets = nil
 
 		for armorType, data in pairs(WowSets) do
 			ArmorDB[armorType] = ArmorDB[armorType] or {}
