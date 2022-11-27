@@ -7851,9 +7851,7 @@ function addon.Init.SortDropDown_Initialize()
 			end]]
 end
 
-	if not IsAddOnLoaded("Blizzard_Collections") then
-	  LoadAddOn("Blizzard_Collections")
-	end
+
 --addon:SecureHook(WardrobeCollectionFrame, "OpenTransmogLink", function() print("test") end)
 
 addon:SecureHook("SetItemRef", function(link, ...) 
