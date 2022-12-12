@@ -1,0 +1,14 @@
+## Interface: 100000
+## Title: Lib: AppropriateItems-1.0
+## Notes: What items are appropriate for a given class
+## Author: Kemayo
+## Version: 1.0
+## X-Category: Library
+## OptionalDeps: LibStub
+## X-License: BSD
+
+#@no-lib-strip@
+embeds.xml
+#@end-no-lib-strip@
+
+lib.xml
