@@ -1,32 +1,21 @@
 local addonName, addon = ...
 addon = LibStub("AceAddon-3.0"):GetAddon(addonName)
 local L = LibStub("AceLocale-3.0"):GetLocale(addonName)
-local tooltipAPI ={}
-local GetScreenWidth = GetScreenWidth
-local GetScreenHeight = GetScreenHeight
-
+local tooltips ={}
 local LAT = LibStub("LibArmorToken-1.0")
 local LAI = LibStub("LibAppropriateItems-1.0")
-
-local IsDressableItem = _G.IsDressableItem or C_Item.IsDressableItemByID
 local appearances_known = {}
 local tooltips = {}
 
-function tooltipAPI.RegisterTooltip(tip)
-	if not tip or tooltips[tip] then
-		return
+
+tooltips[GameTooltip] = GameTooltip
+tooltips[GameTooltip.ItemTooltip.Tooltip] = GameTooltip.ItemTooltip.Tooltip
+
+TooltipDataProcessor.AddTooltipPostCall(Enum.TooltipDataType.Item, function(self, data)
+	if tooltips[self] then
+		tooltips:ShowTooltip(select(2, TooltipUtil.GetDisplayedItem(self)), self)
 	end
-
-	tooltips[tip] = tip
-end
-
-if TooltipDataProcessor then
-	TooltipDataProcessor.AddTooltipPostCall(Enum.TooltipDataType.Item, function(self, data)
-	end)
-end
-
-tooltipAPI.RegisterTooltip(GameTooltip)
-tooltipAPI.RegisterTooltip(GameTooltip.ItemTooltip.Tooltip)
+end)
 
 ----
 local function addDoubleLine(tooltip, left_text, right_text)
@@ -38,21 +27,19 @@ local function addLine(tooltip, text)
 end
 
 local _, class = UnitClass("player")
-function tooltipAPI:ShowItem(link, for_tooltip)
+function tooltips:ShowTooltip(link, parent)
 	if not link then return end
 
-	for_tooltip = for_tooltip or GameTooltip
+	parent = parent or GameTooltip
 	local id = tonumber(link:match("item:(%d+)"))
 	local dressable = id and C_Item.IsDressableItemByID(id)
 	local token = addon.Profile.ShowTokenTooltips and LAT:ItemIsToken(id)
 
-	--No need to update tooltips if item is not token or a mog
 	if not id or id == 0 or (not token and not dressable) then 
 		return
 	end
 
 	local _, itemLink
-	local learned_dupe = false
 	local found_tooltipinfo = false
 	local found_systemTooltip = false
 	for i = 1, GameTooltip:NumLines() do
@@ -86,10 +73,10 @@ function tooltipAPI:ShowItem(link, for_tooltip)
 	end
 
 	if addon.Profile.ShowOwnedItemTooltips and not 	found_systemTooltip then
-		local hasAppearance, appearanceFromOtherItem = tooltipAPI.PlayerHasAppearance(link)
+		local hasAppearance, appearanceFromOtherItem = tooltips.PlayerHasAppearance(link)
 
 		local label
-		if not tooltipAPI.CanTransmogItem(link) then
+		if not tooltips.CanTransmogItem(link) then
 			label = "|c00ffff00" .. TRANSMOGRIFY_INVALID_DESTINATION
 		else
 			if hasAppearance then
@@ -141,8 +128,8 @@ function tooltipAPI:ShowItem(link, for_tooltip)
 		end
 
 		if found then
-				for_tooltip:AddDoubleLine(ITEM_PURCHASED_COLON, link)
-				for_tooltip:Show()
+				parent:AddDoubleLine(ITEM_PURCHASED_COLON, link)
+				parent:Show()
 		end
 	end
 
@@ -255,7 +242,7 @@ function tooltipAPI:ShowItem(link, for_tooltip)
 end
 
 
-function tooltipAPI.CanTransmogItem(itemLink)
+function tooltips.CanTransmogItem(itemLink)
 	local itemID = GetItemInfoInstant(itemLink)
 	if itemID then
 		local canBeChanged, noChangeReason, canBeSource, noSourceReason = C_Transmog.CanTransmogItem(itemID)
@@ -264,7 +251,7 @@ function tooltipAPI.CanTransmogItem(itemLink)
 end
 
 
-function tooltipAPI.PlayerHasAppearance(itemLinkOrID)
+function tooltips.PlayerHasAppearance(itemLinkOrID)
 	-- hasAppearance, appearanceFromOtherItem
 	local itemID = GetItemInfoInstant(itemLinkOrID)
 	if not itemID then return end
