@@ -34,7 +34,6 @@ Locale\SetNames_enUS.lua
 Locale\deDE.lua
 Locale\zhTW.lua
 
-
 #Core files
 Data\Globals.lua
 Modules\Templates.xml
