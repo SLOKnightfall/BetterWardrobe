@@ -1,21 +1,188 @@
 local addonName, addon = ...
 addon = LibStub("AceAddon-3.0"):GetAddon(addonName)
+
 local L = LibStub("AceLocale-3.0"):GetLocale(addonName)
-local tooltips ={}
 local LAT = LibStub("LibArmorToken-1.0")
 local LAI = LibStub("LibAppropriateItems-1.0")
-local appearances_known = {}
-local tooltips = {}
 
+local collectedAppearances = {}
+local weaponSlots = {"INVTYPE_2HWEAPON", "INVTYPE_WEAPON", "INVTYPE_WEAPONMAINHAND", "INVTYPE_RANGED", "INVTYPE_RANGEDRIGHT", "INVTYPE_THROWN",}
+local offhandSlots = {"INVTYPE_WEAPONOFFHAND", "INVTYPE_SHIELD", "INVTYPE_HOLDABLE",}
 
-tooltips[GameTooltip] = GameTooltip
-tooltips[GameTooltip.ItemTooltip.Tooltip] = GameTooltip.ItemTooltip.Tooltip
+local function IsAppearanceCollected(item)
+	local itemID = GetItemInfoInstant(item)
 
-TooltipDataProcessor.AddTooltipPostCall(Enum.TooltipDataType.Item, function(self, data)
-	if tooltips[self] then
-		tooltips:ShowTooltip(select(2, TooltipUtil.GetDisplayedItem(self)), self)
+	if not itemID then return end
+
+	local appearanceID, sourceID = C_TransmogCollection.GetItemInfo(item)
+	local appearanceID2, sourceID2 = C_TransmogCollection.GetItemInfo(itemID)
+	appearanceID = appearanceID or appearanceID2
+	sourceID = sourceID or sourceID2
+
+	if not appearanceID then return end
+
+	if sourceID and addon:IsCollected(appearanceID) then
+		return true, not C_TransmogCollection.PlayerHasTransmogItemModifiedAppearance(sourceID)
+	end
+
+	local sources = C_TransmogCollection.GetAllAppearanceSources(appearanceID)
+	if sources then
+		for _, sourceID in pairs(sources) do
+			if C_TransmogCollection.PlayerHasTransmogItemModifiedAppearance(sourceID) then
+				if itemID == C_TransmogCollection.GetSourceItemID(sourceID) then
+					return true, true
+				else
+					return true, false
+				end
+			end
+		end
+	end
+
+	return false, false
+end
+
+local function CreateModelFrame()
+	local model = CreateFrame("DressUpModel", nil, preview)
+	model:SetKeepModelOnHide(true)
+	model:ClearAllPoints()
+	model:SetPoint("TOPLEFT", preview, "TOPLEFT", 7, -7)
+	model:SetPoint("BOTTOMRIGHT", preview, "BOTTOMRIGHT", -7, 7)
+
+    model:SetScript("OnModelLoaded", function(self, ...)
+        if self.cameraID then
+            Model_ApplyUICamera(self, self.cameraID)
+        end
+    end)
+
+	function model:Reset()
+		self:RefreshCamera()
+		self:SetUseTransmogSkin(addon.Profile.TooltipPreview_DressingDummy)
+		self:SetModelUnit()
+		self:SetDress()
+	end
+
+	function model:SetModelUnit()
+		--if addon.Profile.TooltipPreview_CustomModel then
+			--self:SetUnit("none")
+			--self:SetCustomRace(addon.Profile.TooltipPreview_CustomRace, addon.Profile.TooltipPreview_CustomGender)
+		
+		--else
+			self:SetUnit("player")
+		--end
+	end
+
+	function model:SetDress()
+		if addon.Profile.TooltipPreview_Dress then
+			self:Dress()
+
+		else
+			self:Undress()
+		end
+	end
+
+	return model
+end
+
+function addon:InitTooltips()
+	TooltipDataProcessor.AddTooltipPostCall(Enum.TooltipDataType.Item, function(self)
+		if self == GameTooltip or self == GameTooltip.ItemTooltip.Tooltip then
+			preview:ShowPreview(select(2, TooltipUtil.GetDisplayedItem(self)), self)
+		end
+	end)
+
+	GameTooltip:HookScript("OnHide", function() 
+		if (AuctionHouseFrame and not AuctionHouseFrame:IsShown()) or not AuctionHouseFrame then 
+			preview:Hide()
+			preview:OnHide2() 
+		end 
+	end)
+
+	preview:SetSize(addon.Profile.TooltipPreview_Width, addon.Profile.TooltipPreview_Height)
+	preview.model = CreateModelFrame()
+	preview.zoom = CreateModelFrame()
+end
+
+preview = CreateFrame("Frame", "BW_ProfileTooltip", UIParent, "TooltipBorderedFrameTemplate")
+addon.preview = preview
+preview:SetFrameStrata("TOOLTIP")
+preview:Hide()
+preview:RegisterEvent("PLAYER_REGEN_DISABLED")
+
+preview:SetScript("OnEvent", function(self, event, ...)
+	if event == PLAYER_REGEN_DISABLED then  
+		ClearOverrideBindings(self) 
 	end
 end)
+
+preview:SetScript("OnUpdate", function(self, elapsed)
+	if (addon.Profile.TooltipPreviewRotate and preview.previewModel and preview.previewModel:IsVisible()) then
+		preview.previewModel:SetFacing(preview.previewModel:GetFacing() + elapsed)
+	end
+
+	self.elapsed = (self.elapsed or 0) + elapsed
+	if self.elapsed >= TOOLTIP_UPDATE_TIME then
+		self.elapsed = 0
+	end
+
+	preview:SetAnchor(preview, preview.parent)
+end)
+
+preview:SetScript("OnShow", function(self)
+	self.elapsed = TOOLTIP_UPDATE_TIME
+	if addon.Profile.TooltipPreview_MouseRotate and not InCombatLockdown() then
+		SetOverrideBinding(self, true, "MOUSEWHEELUP", "BETTERWARDROBE_PREVIEW_SCROLL_UP")
+		SetOverrideBinding(self, true, "MOUSEWHEELDOWN", "BETTERWARDROBE_PREVIEW_SCROLL_DOWN")
+	end
+end)
+
+preview:SetScript("OnHide",function(self)
+	if not InCombatLockdown() then
+		ClearOverrideBindings(self)
+	end
+end)
+
+function preview:SetShown()
+	self:SetParent(self.parent)
+	self:Show()
+	self.model:SetShown(self.previewModel == self.model)
+	self.zoom:SetShown(self.previewModel == self.zoom)
+end
+
+function preview:OnHide2()
+	if not self.parent or not self.parent:IsShown() or not TooltipUtil.GetDisplayedItem(self.parent) then
+		self:Hide()
+		self.item = nil
+		self.previewModel = nil
+	end
+end
+
+function preview:SetAnchor(tooltip, parent)
+	local anchor = addon.db.profile.TooltipPreview_Anchor
+	local relativeAnchor
+	if anchor == "vertical" then 
+		if ((parent:GetBottom() + self:GetHeight()) > GetScreenHeight() - 100) then 
+			anchor = "TOP"
+			relativeAnchor = "BOTTOM"
+
+		else
+			anchor = "BOTTOM"
+			relativeAnchor = "TOP"
+		end
+
+	else
+		if self.parent.shoppingTooltips then
+			comparisonTooltip1, comparisonTooltip2 = unpack(self.parent.shoppingTooltips)
+			parent = comparisonTooltip1
+		end
+
+		anchor = "TOPLEFT"
+		relativeAnchor = "BOTTOMLEFT"
+	end
+
+	self:ClearAllPoints()
+	self:SetPoint(anchor, parent, relativeAnchor)
+end
+
 
 ----
 local function addDoubleLine(tooltip, left_text, right_text)
@@ -26,20 +193,101 @@ local function addLine(tooltip, text)
 	tooltip:AddLine(text, HIGHLIGHT_FONT_COLOR.r, HIGHLIGHT_FONT_COLOR.g, HIGHLIGHT_FONT_COLOR.b, true)
 end
 
-local _, class = UnitClass("player")
-function tooltips:ShowTooltip(link, parent)
-	if not link then return end
+local function addDivider()
+	GameTooltip:AddTexture("Interface\\DialogFrame\\UI-DialogBox-Divider.blp",{width = GameTooltip:GetWidth() + 25, height = 15})
+end
 
+function preview:GetSlotFacing(slot)
+	if tContains ( weaponSlots, slot) then 
+		return 1.5
+
+	elseif tContains ( offhandSlots, slot) then
+		return -.05
+
+	elseif slot == "INVTYPE_CLOAK" then
+		return 3
+
+	else
+		return 0
+	end
+end
+
+local removalList = {
+	INVTYPE_HEAD = {INVSLOT_SHOULDER},
+	INVTYPE_CHEST = {INVSLOT_SHOULDER, INVSLOT_BODY, INVSLOT_TABARD, INVSLOT_WAIST, INVSLOT_OFFHAND,},
+	INVTYPE_BODY = {INVSLOT_SHOULDER, INVSLOT_CHEST, INVSLOT_TABARD, INVSLOT_WAIST, INVSLOT_OFFHAND,},
+	INVTYPE_TABARD = {INVSLOT_WAIST, INVSLOT_OFFHAND,},
+	INVTYPE_WRIST = {INVSLOT_BODY, INVSLOT_CHEST, INVSLOT_HAND, INVSLOT_OFFHAND,},
+	INVTYPE_HAND = {INVSLOT_OFFHAND,},
+	INVTYPE_LEGS = {INVSLOT_TABARD, INVSLOT_CHEST, INVSLOT_WAIST, INVSLOT_FEET, INVSLOT_MAINHAND, INVSLOT_OFFHAND,},
+	INVTYPE_WAIST = {INVSLOT_MAINHAND, INVSLOT_OFFHAND,},
+	INVTYPE_FEET = {INVSLOT_CHEST,},
+	INVTYPE_WEAPON = {INVSLOT_MAINHAND,},
+	INVTYPE_2HWEAPON = {INVSLOT_MAINHAND,},
+}
+
+function preview:RemoveSurrounding(slot)
+	if removalList[slot] or slot == "INVTYPE_WEAPON"  or slot == "INVTYPE_OFFHAND" then 
+		for _, slotid in ipairs(removalList[slot]) do
+			if slotid > 0 then
+				self.previewModel:UndressSlot(slotid)
+			end
+		end
+	end
+end
+
+local exchangeFor = {}
+local function LookUpToken(id)
+	local _, class = UnitClass("player")
+	local itemLink
+	for _, itemID in LAT:IterateItemsForTokenAndClass(id, class) do
+		local item = Item:CreateFromItemID(itemID)
+		item:ContinueOnItemLoad(function()
+			local link = item:GetItemLink()
+
+			if link then
+				tinsert(exchangeFor, link)
+				return 
+			end
+		end)
+	end
+
+	for _, clases in LAT:IterateClassesForToken(id) do
+		for _, itemID in LAT:IterateItemsForTokenAndClass(id, clases) do
+			local item = Item:CreateFromItemID(itemID)
+			item:ContinueOnItemLoad(function()
+				local link = item:GetItemLink()
+				if link then
+					tinsert(exchangeFor, link)
+				end
+			end)
+		end
+	end	
+end
+
+function preview:ShowPreview(itemLink, parent)
+	if not itemLink then self:Hide() return end
+	exchangeFor = {}
 	parent = parent or GameTooltip
-	local id = tonumber(link:match("item:(%d+)"))
+	self.parent = parent
+	local id = tonumber(itemLink:match("item:(%d+)"))
 	local dressable = id and C_Item.IsDressableItemByID(id)
 	local token = addon.Profile.ShowTokenTooltips and LAT:ItemIsToken(id)
-
-	if not id or id == 0 or (not token and not dressable) then 
+	--print((not id or id == 0) or not token and not dressable)
+	if not dressable then 
+		self:Hide()
 		return
 	end
 
-	local _, itemLink
+	if token then
+		LookUpToken(id)
+		if exchangeFor and #exchangeFor > 0 then 
+			local items = exchangeFor[1].."and "..#exchangeFor.. "other items"
+			parent:AddDoubleLine(ITEM_PURCHASED_COLON, items)
+		end
+	end
+
+	local learned_dupe = false
 	local found_tooltipinfo = false
 	local found_systemTooltip = false
 	for i = 1, GameTooltip:NumLines() do
@@ -61,6 +309,7 @@ function tooltips:ShowTooltip(link, parent)
 			line:SetText("|TInterface\\RaidFrame\\ReadyCheck-NotReady:0|t "..text)
 			found_systemTooltip = true
 		end
+
 		--Adds icon to TRANSMOGRIFY_TOOLTIP_ITEM_UNKNOWN_APPEARANCE_KNOWN if found
 		if addon.Profile.ShowOwnedItemTooltips and string.find(text_lower, string.lower(TRANSMOGRIFY_TOOLTIP_ITEM_UNKNOWN_APPEARANCE_KNOWN) ) then
 			line:SetText("|TInterface\\RaidFrame\\ReadyCheck-Ready:0|t "..text)
@@ -72,15 +321,19 @@ function tooltips:ShowTooltip(link, parent)
 		end
 	end
 
-	if addon.Profile.ShowOwnedItemTooltips and not 	found_systemTooltip then
-		local hasAppearance, appearanceFromOtherItem = tooltips.PlayerHasAppearance(link)
+	if addon.Profile.ShowOwnedItemTooltips and not found_systemTooltip then
+		local collected, altCollected = IsAppearanceCollected(itemLink)
+		local label, canTransmog
+		local itemID = GetItemInfoInstant(itemLink)
+		if itemID then
+			canTransmog = select(3, C_Transmog.CanTransmogItem(itemID))
+		end
 
-		local label
-		if not tooltips.CanTransmogItem(link) then
+		if not canTransmog then
 			label = "|c00ffff00" .. TRANSMOGRIFY_INVALID_DESTINATION
 		else
-			if hasAppearance then
-				if appearanceFromOtherItem then
+			if collected then
+				if altCollected then
 					label = "|TInterface\\RaidFrame\\ReadyCheck-Ready:0|t " .. (TRANSMOGRIFY_TOOLTIP_ITEM_UNKNOWN_APPEARANCE_KNOWN):gsub(', ', ',\n')
 				else
 					label = "|TInterface\\RaidFrame\\ReadyCheck-Ready:0|t " .. TRANSMOGRIFY_TOOLTIP_APPEARANCE_KNOWN
@@ -93,47 +346,10 @@ function tooltips:ShowTooltip(link, parent)
 		addDoubleLine(GameTooltip,label,"")
 	end
 
-	local appropriateItem = LAI:IsAppropriate(id)
-
-	if addon.Profile.ShowOwnedItemTooltips and not 	appropriateItem then
+	local isAppropriate = LAI:IsAppropriate(id)
+	if addon.Profile.ShowOwnedItemTooltips and not isAppropriate then
 			addDoubleLine(GameTooltip, "|TInterface\\RaidFrame\\ReadyCheck-NotReady:0|t |cffff0000Your class can't transmogrify this item", "")
 		end
-
-	if token then
-		-- It's a set token! Replace the id.
-		local found
-		for _, itemid in LAT:IterateItemsForTokenAndClass(id, class) do
-				_, itemLink = GetItemInfo(itemid)
-				if itemLink then
-					id = itemid
-					link = itemLink
-					found = true
-					break
-				end
-		end
-
-		if not found then
-			for _, tokenclass in LAT:IterateClassesForToken(id) do
-				for _, itemid in LAT:IterateItemsForTokenAndClass(id, tokenclass) do
-					_, itemLink = GetItemInfo(itemid)
-					if itemLink then
-						id = itemid
-						link = itemLink
-						found = true
-						break
-					end
-				end
-				break
-			end
-		end
-
-		if found then
-				parent:AddDoubleLine(ITEM_PURCHASED_COLON, link)
-				parent:Show()
-		end
-	end
-
-	local slot = select(9, GetItemInfo(id))
 
 	if addon.Profile.ShowTooltips and not found_tooltipinfo then
 		local appearanceID, sourceID = C_TransmogCollection.GetItemInfo(id)
@@ -152,7 +368,6 @@ function tooltips:ShowTooltip(link, parent)
 			addDoubleLine (GameTooltip,"|cff87aaff"..L["-Appearance in %d Collection List-"]:format(count), " ")
 		end
 		
-
 		local setIDs = C_TransmogSets.GetSetsContainingSourceID(sourceID)
 		local shownSetNames = {}
 		if addon.Profile.ShowSetTooltips and #setIDs > 0 then
@@ -161,8 +376,7 @@ function tooltips:ShowTooltip(link, parent)
 				--addLine(self, L["HEADERTEXT"])
 				addLine(GameTooltip, " ")
 				
-				GameTooltip:AddTexture("Interface\\DialogFrame\\UI-DialogBox-Divider.blp",{width = GameTooltip:GetWidth()+25, height = 15})
-
+				GameTooltip:AddTexture("Interface\\DialogFrame\\UI-DialogBox-Divider.blp", {width = GameTooltip:GetWidth() + 25, height = 15})
 				--GameTooltip:AddTexture("Interface\\QUESTFRAME\\UI-HorizontalBreak.blp",{width = self:GetWidth()-10, height = 15})
 			end
 
@@ -199,8 +413,8 @@ function tooltips:ShowTooltip(link, parent)
 			if not addHeader then
 				addHeader = true
 				--addLine(self, L["HEADERTEXT"])
-								addLine(GameTooltip, " ")
-				GameTooltip:AddTexture("Interface\\DialogFrame\\UI-DialogBox-Divider.blp",{width = GameTooltip:GetWidth()+25, height = 15})
+				addLine(GameTooltip, " ")
+				GameTooltip:AddTexture("Interface\\DialogFrame\\UI-DialogBox-Divider.blp", {width = GameTooltip:GetWidth() + 25, height = 15})
 			end
 
 			addDoubleLine (GameTooltip,"|cffffd100"..L["Part of Extra Set:"], " ")
@@ -234,52 +448,64 @@ function tooltips:ShowTooltip(link, parent)
 		if addHeader then
 			--addLine(self, L["HEADERTEXT"])
 			addLine(GameTooltip, " ")
-			GameTooltip:AddTexture("Interface\\DialogFrame\\UI-DialogBox-Divider.blp",{width = GameTooltip:GetWidth()+25, height = 15})
+			GameTooltip:AddTexture("Interface\\DialogFrame\\UI-DialogBox-Divider.blp", {width = GameTooltip:GetWidth() + 25, height = 15})
 		end
 
-		GameTooltip:Show()
-	end
-end
-
-
-function tooltips.CanTransmogItem(itemLink)
-	local itemID = GetItemInfoInstant(itemLink)
-	if itemID then
-		local canBeChanged, noChangeReason, canBeSource, noSourceReason = C_Transmog.CanTransmogItem(itemID)
-		return canBeSource, noSourceReason
-	end
-end
-
-
-function tooltips.PlayerHasAppearance(itemLinkOrID)
-	-- hasAppearance, appearanceFromOtherItem
-	local itemID = GetItemInfoInstant(itemLinkOrID)
-	if not itemID then return end
-	local appearanceID, sourceID = C_TransmogCollection.GetItemInfo(itemLinkOrID)
-	if not appearanceID then
-		appearanceID, sourceID = C_TransmogCollection.GetItemInfo(itemID)
+		--GameTooltip:Show()
 	end
 
-	if not appearanceID then return end
+	local slot = select(9, GetItemInfo(id))
+	if addon.Profile.TooltipPreview_Show and (not addon.Globals.mods[addon.Profile.TooltipPreview_Modifier] or addon.Globals.mods[addon.Profile.TooltipPreview_Modifier]()) and self.item ~= id then
+		self.item = id
+		local slotFacings = self:GetSlotFacing(slot)
+		
+		if C_Item.IsDressableItemByID(id) and slotFacings then
+			local cameraID, itemCamera, zoomPreview
+			if addon.Profile.TooltipPreview_ZoomItem or addon.Profile.TooltipPreview_ZoomWeapon then
+				cameraID, itemCamera = addon.Camera:GetCameraID(id, addon.Profile.TooltipPreview_CustomModel and addon.Profile.TooltipPreview_CustomRace, addon.Profile.TooltipPreview_CustomModel and addon.Profile.TooltipPreview_CustomGender)
+			end
 
-	if sourceID and appearances_known[appearanceID] then
-		return true, not C_TransmogCollection.PlayerHasTransmogItemModifiedAppearance(sourceID)
-	end
+			zoomPreview =  cameraID and (addon.Profile.TooltipPreview_ZoomItem and not itemCamera) or (addon.Profile.TooltipPreview_ZoomWeapon and itemCamera)
+			if zoomPreview and itemCamera then
+				self.previewModel = self.zoom
 
-	local sources = C_TransmogCollection.GetAllAppearanceSources(appearanceID)
-	if sources then
-		local known_any = false
-		for _, id in pairs(sources) do
-				if C_TransmogCollection.PlayerHasTransmogItemModifiedAppearance(id) then
-					known_any = true
-					if itemID == C_TransmogCollection.GetSourceItemID(id) then
-						return true, false
-					end
+				local appearanceID = C_TransmogCollection.GetItemInfo(itemLink)
+				if appearanceID then
+					self.previewModel:SetItemAppearance(appearanceID)
+
+				else
+					self.previewModel:SetItem(id)
 				end
+				self.previewModel.cameraID = cameraID
+				Model_ApplyUICamera(self.previewModel, cameraID)
+				self.previewModel:SetAnimation(0, 0)
+
+
+			elseif zoomPreview and not itemCamera then 
+				self.previewModel = self.zoom
+				self.previewModel:Reset()
+				self.previewModel:SetAnimation(0, 0)
+				Model_ApplyUICamera(self.previewModel, cameraID)
+
+			else
+				self.previewModel = self.model
+				self.previewModel:Reset()
+			end
+
+			if not cameraID then
+				self.previewModel:SetFacing(slotFacings - ((addon.Profile.TooltipPreviewRotate and 1) or 0))
+			end
+
+			self:SetShown()
+
+			self:RemoveSurrounding(slot)
+
+
+			C_Timer.After(0, function()
+				if self.previewModel then 
+					self.previewModel:TryOn(itemLink)
+				end
+			end)
 		end
-
-		return known_any, false
-	end
-
-	return false
+	end 
 end

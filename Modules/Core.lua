@@ -36,13 +36,13 @@ function optionHandler:Setter(info, value)
 	Profile[info[#info]] = value
 
 	if info.arg == "tooltipRotate" then
-		addon.tooltip.rotate:SetShown(value)	
+		--addon.preview.rotate:SetShown(value)	
 
 	elseif info.arg == "tooltipWidth" then
-		addon.tooltip:SetWidth(value)
+		addon.preview:SetWidth(value)
 
 	elseif info.arg == "tooltipHeight" then
-		addon.tooltip:SetHeight(value)
+		addon.preview:SetHeight(value)
 
 	elseif info.arg == "DR_Width" then
 		DressUpFrame:SetWidth(value)
@@ -430,6 +430,7 @@ local options = {
 								type = "toggle",
 								width = "full",
 								desc = L["TooltipPreview_Overlap_Tooltip"],
+								hidden = true,
 							},
 							TooltipPreview_Zoom = {
 								order = 5,
@@ -546,8 +547,8 @@ local options = {
 								order = 15.1,
 								name = L["Reset"],
 								func = function()
-									addon.tooltip:SetWidth(280)
-									addon.tooltip:SetHeight(380)
+									addon.preview:SetWidth(280)
+									addon.preview:SetHeight(380)
 									addon.Profile.TooltipPreview_Width = 280
 									addon.Profile.TooltipPreview_Height = 380
 								end,
@@ -557,7 +558,7 @@ local options = {
 								order = 16,
 								name = L["Use custom model"],
 								width = 1,
-								--hidden = true,
+								hidden = true,
 							},
 							TooltipPreview_CustomWarning = {
 								order = 16.1,
@@ -565,6 +566,8 @@ local options = {
 								type = "description",
 								width = 2,
 								fontSize = "small",
+								hidden = true,
+
 							},
 							TooltipPreview_CustomRace = {
 								type = "select",
@@ -587,7 +590,7 @@ local options = {
 								},
 								disabled = function() return not addon.Profile.TooltipPreview_CustomModel or not addon.Profile.ShowTooltipPreview end,
 								width = 1.2,
-								--hidden = true,
+								hidden = true,
 							},
 							TooltipPreview_CustomGender = {
 								type = "select",
@@ -599,7 +602,7 @@ local options = {
 								},
 								disabled = function() return not addon.Profile.TooltipPreview_CustomModel or not addon.Profile.ShowTooltipPreview end,
 								width = 1.2,
-								--hidden = true,
+								hidden = true,
 							},
 						},
 				},
@@ -1235,7 +1238,7 @@ function addon:OnEnable()
 	--addon.Init.LoadCollectionListModule()
 	--BW_ColectionListFrameTemplate
 	--addon.Init:BuildTooltips()
-
+addon:InitTooltips()
 	C_Timer.After(0.5, function()
 		addon.RefreshSubItemData()
 		addon.RefreshOutfitData()

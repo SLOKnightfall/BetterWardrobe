@@ -145,6 +145,39 @@ Globals.INVENTORY_SLOT_NAMES = {
 }
 
 
+
+Globals.CATEGORYID_TO_NAME = {
+    [Enum.TransmogCollectionType.Head] = "HEADSLOT",
+    [Enum.TransmogCollectionType.Shoulder] = "SHOULDERSLOT",
+    [Enum.TransmogCollectionType.Back] = "BACKSLOT",
+    [Enum.TransmogCollectionType.Chest] = "CHESTSLOT",
+    [Enum.TransmogCollectionType.Shirt] = "SHIRTSLOT",
+    [Enum.TransmogCollectionType.Tabard] = "TABARDSLOT",
+    [Enum.TransmogCollectionType.Wrist] = "WRISTSLOT",
+    [Enum.TransmogCollectionType.Hands] = "HANDSSLOT",
+    [Enum.TransmogCollectionType.Waist] = "WAISTSLOT",
+    [Enum.TransmogCollectionType.Legs] = "LEGSSLOT",
+    [Enum.TransmogCollectionType.Feet] = "FEETSLOT",
+    [Enum.TransmogCollectionType.Wand] = "MAINHANDSLOT",
+    [Enum.TransmogCollectionType.OneHAxe] = "MAINHANDSLOT",
+    [Enum.TransmogCollectionType.OneHSword] = "MAINHANDSLOT",
+    [Enum.TransmogCollectionType.OneHMace] = "MAINHANDSLOT",
+    [Enum.TransmogCollectionType.Dagger] = "MAINHANDSLOT",
+    [Enum.TransmogCollectionType.Fist] = "MAINHANDSLOT",
+    [Enum.TransmogCollectionType.TwoHAxe] = "MAINHANDSLOT",
+    [Enum.TransmogCollectionType.TwoHSword] = "MAINHANDSLOT",
+    [Enum.TransmogCollectionType.TwoHMace] = "MAINHANDSLOT",
+    [Enum.TransmogCollectionType.Staff] = "MAINHANDSLOT",
+    [Enum.TransmogCollectionType.Polearm] = "MAINHANDSLOT",
+    [Enum.TransmogCollectionType.Bow] = "MAINHANDSLOT",
+    [Enum.TransmogCollectionType.Gun] = "MAINHANDSLOT",
+    [Enum.TransmogCollectionType.Crossbow] = "MAINHANDSLOT",
+    [Enum.TransmogCollectionType.Warglaives] = "MAINHANDSLOT",
+    [Enum.TransmogCollectionType.Paired] = "MAINHANDSLOT",
+    [Enum.TransmogCollectionType.Shield] = "SECONDARYHANDSLOT",
+    [Enum.TransmogCollectionType.Holdable] = "SECONDARYHANDSLOT",
+}
+
 Globals.slots = {
   "HeadSlot",
   "ShoulderSlot",
