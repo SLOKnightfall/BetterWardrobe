@@ -8,7 +8,6 @@
 ## X-Curse-Project-ID: 401253
 ## X-Wago-ID: 0mKOzk6x
 
-
 #Libraries
 Libs\LibStub\LibStub.lua
 Libs\CallbackHandler-1.0\CallbackHandler-1.0.lua
