@@ -59,6 +59,7 @@ local function CreateModelFrame()
 		self:SetUseTransmogSkin(addon.Profile.TooltipPreview_DressingDummy)
 		self:SetModelUnit()
 		self:SetDress()
+		self:RefreshCamera()
 	end
 
 	function model:SetModelUnit()
@@ -68,7 +69,9 @@ local function CreateModelFrame()
 		
 		--else
 
-		self:SetUnit("player")
+		self:SetUnit("none", false, false);
+self:SetCustomRace(10,1)
+		--self:SetCustomRace(addon.Profile.TooltipPreview_CustomRace, addon.Profile.TooltipPreview_CustomGender)
 		--end
 	end
 
@@ -352,7 +355,6 @@ function preview:ShowPreview(itemLink, parent)
 
 	if addon.Profile.ShowOwnedItemTooltips and not found_systemTooltip then
 		local collected, altCollected = IsAppearanceCollected(itemLink)
-		print(IsAppearanceCollected(itemLink))
 		local label, canTransmog
 		local itemID = GetItemInfoInstant(itemLink)
 		if itemID then
