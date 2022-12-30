@@ -1379,7 +1379,6 @@ function BetterWardrobeCollectionFrameMixin:OnEvent(event, ...)
 			print((YELLOW_FONT_COLOR_CODE..L["Added appearance in Collection List"]))
 		end
 
-		
 		if setItem and addon.Profile.ShowExtraSetsCollectionUpdates then 
 			--local item = tonumber(itemLink:match("item:(%d+)"))
 		
@@ -3649,7 +3648,7 @@ end
 
 function BetterWardrobeCollectionFrameSearchBoxMixin:OnKeyDown(key, ...)
 	if key == WARDROBE_CYCLE_KEY then
-		WardrobeCollectionFramen:OnKeyDown(key, ...)
+		WardrobeCollectionFrame:OnKeyDown(key, ...)
 	end
 end
 
@@ -6329,7 +6328,8 @@ BetterWardrobeSetsDetailsModelMixin = { }
 
 function BetterWardrobeSetsDetailsModelMixin:OnLoad()
 	self:SetAutoDress(false)
-	self:SetUnit("player")
+	self:SetUnit("player", false, PlayerUtil.ShouldUseNativeFormInModelScene());
+
 	self:UpdatePanAndZoomModelType()
 	local lightValues = { omnidirectional = false, point = CreateVector3D(-1, 0, 0), ambientIntensity = .7, ambientColor = CreateColor(.7, .7, .7), diffuseIntensity = .6, diffuseColor = CreateColor(1, 1, 1) }
 	local enabled = true
@@ -6348,6 +6348,10 @@ function BetterWardrobeSetsDetailsModelMixin:UpdatePanAndZoomModelType()
 		end
 		self.inAlternateForm = inAlternateForm
 	end
+end
+
+function BetterWardrobeSetsDetailsModelMixin:OnShow()
+	self:SetUnit("player", false, PlayerUtil.ShouldUseNativeFormInModelScene());
 end
 
 function BetterWardrobeSetsDetailsModelMixin:GetPanAndZoomLimits()

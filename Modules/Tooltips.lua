@@ -30,9 +30,9 @@ local function IsAppearanceCollected(item)
 		for _, sourceID in pairs(sources) do
 			if C_TransmogCollection.PlayerHasTransmogItemModifiedAppearance(sourceID) then
 				if itemID == C_TransmogCollection.GetSourceItemID(sourceID) then
-					return true, true
-				else
 					return true, false
+				else
+					return true, true
 				end
 			end
 		end
@@ -352,6 +352,7 @@ function preview:ShowPreview(itemLink, parent)
 
 	if addon.Profile.ShowOwnedItemTooltips and not found_systemTooltip then
 		local collected, altCollected = IsAppearanceCollected(itemLink)
+		print(IsAppearanceCollected(itemLink))
 		local label, canTransmog
 		local itemID = GetItemInfoInstant(itemLink)
 		if itemID then
