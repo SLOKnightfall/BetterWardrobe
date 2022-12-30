@@ -1357,8 +1357,11 @@ function BetterWardrobeCollectionFrameMixin:OnEvent(event, ...)
 		addon.ClearSourceDB()
 		if not addon.Profile.ShowCollectionUpdates then return end
 		local sourceID = ...
+		if not sourceID then return end
 		local categoryID, visualID, canEnchant, icon, isCollected, itemLink, transmogLink, _ = C_TransmogCollection.GetAppearanceSourceInfo(sourceID)
+		if not itemLink then return end
 		local itemID, _, _, itemEquipLoc = GetItemInfoInstant(itemLink)
+
 		--print(ExtractHyperlinkString(transmogLink))
 		local setIDs = C_TransmogSets.GetSetsContainingSourceID(sourceID)
 		local setItem = addon.IsSetItem(itemLink)

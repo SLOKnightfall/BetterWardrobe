@@ -37,17 +37,17 @@ local genders = {
 }
 
 local raceMap = {
-    ["Nightborne"] = "NightElf", -- Nightborne -> male Blood Elf / female Night Elf
-    ["MagharOrc"] = "Orc", -- Maghar -> Orc
-    ["LightforgedDraenei"] = "Draenei", -- Lightforged -> Draenei
-    ["KulTiran"] = "Human", -- Kul'Tiran -> Human
-    ["HighmountainTauren"] = "Tauren", -- Highmountain -> Tauren
-    ["VoidElf"] = "BloodElf", -- Void Elf -> Blood Elf
-    ["Mechagnome"] = "Gnome", -- Mechagnome -> Gnome
-    ["Vulpera"] = "Goblin", -- Vulpera -> Goblin
-    ["ZandalariTroll"] = "Troll", -- Zandalari -> Troll
-    ["DarkIronDwarf"] = "Dwarf", -- Dark Iron -> Dwarf
-    ["Dracthyr"] = {"BloodElf", "Human"}, -- Dracthyr -> male Draenei / female Human
+    ["Nightborne"] = "NightElf",
+    ["MagharOrc"] = "Orc",
+    ["LightforgedDraenei"] = "Draenei",
+    ["KulTiran"] = "Human",
+    ["HighmountainTauren"] = "Tauren",
+    ["VoidElf"] = "BloodElf",
+    ["Mechagnome"] = "Gnome",
+    ["Vulpera"] = "Goblin",
+    ["ZandalariTroll"] = "Troll",
+    ["DarkIronDwarf"] = "Dwarf",
+    ["Dracthyr"] = "BloodElf",
 }
 
 local slots = {
@@ -118,7 +118,7 @@ function addon.Camera:GetCameraID(itemLinkOrID, race, gender)
     local itemid, _, _, slot, _, class, subclass = GetItemInfoInstant(itemLinkOrID)
     if item_slots[slot] then
         itemcamera = true
-        if item_slots[slot] == true then
+        if item_slots[slot] then
             key = "Weapon-" .. subclasses[subclass]
         else
             key = "Weapon-" .. item_slots[slot]
@@ -128,11 +128,12 @@ function addon.Camera:GetCameraID(itemLinkOrID, race, gender)
         gender = genders[gender]
         if not race then
             race = playerRace
-            if race == 'Worgen' and select(2, HasAlternateForm()) then
+            if race == 'Worgen' and select(2, C_PlayerInfo.GetAlternateFormInfo()) then
                 race = 'Human'
             end
             if race == 'Dracthyr' and not select(2, C_PlayerInfo.GetAlternateFormInfo()) then
                 gender = 'Male'
+                race = 'BloodElf'
             end
         end
         if not gender then
