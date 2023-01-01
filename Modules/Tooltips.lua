@@ -59,18 +59,18 @@ local function CreateModelFrame()
 		self:SetUseTransmogSkin(addon.Profile.TooltipPreview_DressingDummy)
 		self:SetModelUnit()
 		self:SetDress()
-		self:RefreshCamera()
 	end
 
 	function model:SetModelUnit()
+		self:SetUnit("player")
+
 		--if addon.Profile.TooltipPreview_CustomModel then
 			--self:SetUnit("none")
 			--self:SetCustomRace(addon.Profile.TooltipPreview_CustomRace, addon.Profile.TooltipPreview_CustomGender)
 		
 		--else
 
-		self:SetUnit("none", false, false);
-self:SetCustomRace(10,1)
+
 		--self:SetCustomRace(addon.Profile.TooltipPreview_CustomRace, addon.Profile.TooltipPreview_CustomGender)
 		--end
 	end
