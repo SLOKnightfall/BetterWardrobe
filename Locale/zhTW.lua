@@ -303,7 +303,7 @@ L["Added missing appearances of: \124cffff7fff\124H%s:%s\124h[%s]\124h\124r"] = 
 L["Added appearance in Collection List"] = "在收藏清單中新增外觀"
 
 L["Set Substitution"] = "設定替代品"
-L["Substitue Item"] = "替代品"
+L["Substitute Item"] = "替代品"
 
 L["Item No Longer Available"] = "物品不再可用"
 

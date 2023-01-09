@@ -309,7 +309,7 @@ L["Added missing appearances of: \124cffff7fff\124H%s:%s\124h[%s]\124h\124r"] = 
 L["Added appearance in Collection List"] = "Vorlage in Sammelliste hinzugefügt"
 
 L["Set Substitution"] = "Ersatz festlegen"
-L["Substitue Item"] = "Gegenstand ersetzen"
+L["Substitute Item"] = "Gegenstand ersetzen"
 
 L["Item No Longer Available"] = "Gegenstand nicht länger verfügbar"
 

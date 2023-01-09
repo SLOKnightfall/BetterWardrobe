@@ -327,7 +327,7 @@ L["Added missing appearances of: \124cffff7fff\124H%s:%s\124h[%s]\124h\124r"] = 
 L["Added appearance in Collection List"] = true
 
 L["Set Substitution"] = true
-L["Substitue Item"] = true
+L["Substitute Item"] = true
 
 L["Item No Longer Available"] = true
 
