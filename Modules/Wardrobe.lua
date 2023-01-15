@@ -6477,7 +6477,7 @@ local BW_ItemSubDropDownMenu_Table = {
 }
 local BW_ExtraItemSubDropDownMenu_Table = {
 	{
-		text = L["Substitue Item"],
+		text = L["Substitute Item"],
 		func = function(self)    		
 			BetterWardrobeOutfitFrameMixin:ShowPopup("BETTER_WARDROBE_SUBITEM_POPUP")
 		end,
