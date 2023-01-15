@@ -52,7 +52,7 @@ local raceMap = {
 
 local slots = {
     INVTYPE_BODY = "Shirt",
-    INVTYPE_CHEST = "Chest", -- the game files call this one "shirt" too, but...
+    INVTYPE_CHEST = "Chest",
     INVTYPE_CLOAK = "Back",
     INVTYPE_FEET = "Feet",
     INVTYPE_HAND = "Hands",

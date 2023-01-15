@@ -164,57 +164,31 @@ function preview:SetAnchor(tooltip, parent)
 	local anchor = addon.db.profile.TooltipPreview_Anchor
 	local relativeAnchor
 	local x,y = parent:GetCenter();
+	local yShift = y / GetScreenHeight() > 0.5
+	local xShift =  x / GetScreenWidth() > 0.5
 
 	if anchor == "vertical" then 
 		--if ((parent:GetBottom() + self:GetHeight()) > GetScreenHeight() - 100) then 
-		if y / GetScreenHeight() > 0.5 then
-			anchor = "TOP"
-			relativeAnchor = "BOTTOM"
-		else
-			anchor = "BOTTOM"
-			relativeAnchor = "TOP"
-		end
-
-		if x / GetScreenWidth() > 0.5 then
-				anchor = anchor.."LEFT";
-				relativeAnchor = relativeAnchor.."LEFT";
-			else
-				anchor = anchor.."RIGHT";
-				relativeAnchor = relativeAnchor.."RIGHT";
-			end
-
+		anchor = (yShift and "TOP") or "BOTTOM"
+		relativeAnchor = (yShift and "BOTTOM") or "TOP"
+		anchor = (xShift and anchor.."LEFT") or anchor.."RIGHT"
+		relativeAnchor = (xShift and relativeAnchor.."LEFT") or relativeAnchor.."RIGHT"
 	else
-		--[[
-		if self.parent.shoppingTooltips then
-			local comparisonTooltip1, comparisonTooltip2, comparisonTooltip3  = unpack(self.parent.shoppingTooltips)
-			--parent = comparisonTooltip2
-			anchor = "TOPRIGHT"
-			relativeAnchor = "TOPLEFT"
-		else
-			anchor = "TOPLEFT"
-			relativeAnchor = "TOPRIGHT"
-		end
-]]--
 		--local comparisonTooltip1, comparisonTooltip2, comparisonTooltip3 = parent, parent, parent
 		if self.parent.shoppingTooltips then
 			local comparisonTooltip1, comparisonTooltip2, comparisonTooltip3  = unpack(self.parent.shoppingTooltips)
 			parent = comparisonTooltip1
-
 		end
-		local xShift =  x / GetScreenWidth() > 0.5
-		local yShift = y / GetScreenHeight() > 0.5
 		anchor = (xShift and "RIGHT") or "LEFT"
 		relativeAnchor = (xShift and "LEFT") or "RIGHT"
 
-		anchor = (yShift and "TOP"..anchor) or "BOTTOM"..anchor
-		relativeAnchor = (yShift and "TOP"..relativeAnchor) or "BOTTOM"..relativeAnchor
-
+		anchor = "TOP"..anchor
+		relativeAnchor = "TOP"..relativeAnchor
 	end
 
 	self:ClearAllPoints()
 	self:SetPoint(anchor, parent, relativeAnchor)
 end
-
 
 ----
 local function addDoubleLine(tooltip, left_text, right_text)
