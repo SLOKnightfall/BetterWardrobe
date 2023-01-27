@@ -157,7 +157,7 @@ local function SelectColor()
 					local B = colors[2][i + 2]
 
 					if R and G and B then
-						local colorDifferece = addon:CompareLAB(labA, labB, labC, ConvertRGB_to_LAB(R, G, B))
+						local colorDifferece = addon:CompareLAB(labA, labB, labC, addon:ConvertRGB_to_LAB(R, G, B))
 						
 						if colorDifferece <= 17 then
 							colorMatch = true

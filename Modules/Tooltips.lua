@@ -161,11 +161,29 @@ function preview:OnHide2()
 end
 
 function preview:SetAnchor(tooltip, parent)
+	local primaryTooltip = self.parent.shoppingTooltips[1];
+
+	local leftPos = self.parent:GetLeft()  or 0;
+	local rightPos = self.parent:GetRight()  or 0;
+
+	local rightDist = 0;
+	local screenWidth = GetScreenWidth();
+	rightDist = screenWidth - rightPos;
+
+
 	local anchor = addon.db.profile.TooltipPreview_Anchor
 	local relativeAnchor
 	local x,y = parent:GetCenter();
 	local yShift = y / GetScreenHeight() > 0.5
-	local xShift =  x / GetScreenWidth() > 0.5
+	local xShift
+
+	if rightDist < leftPos then
+		xShift = true
+	else
+		xShift = false;
+	end
+
+local anchorFrame =	TooltipComparisonManager.anchorFrame
 
 	if anchor == "vertical" then 
 		--if ((parent:GetBottom() + self:GetHeight()) > GetScreenHeight() - 100) then 
@@ -174,20 +192,21 @@ function preview:SetAnchor(tooltip, parent)
 		anchor = (xShift and anchor.."LEFT") or anchor.."RIGHT"
 		relativeAnchor = (xShift and relativeAnchor.."LEFT") or relativeAnchor.."RIGHT"
 	else
-		--local comparisonTooltip1, comparisonTooltip2, comparisonTooltip3 = parent, parent, parent
-		if self.parent.shoppingTooltips then
-			local comparisonTooltip1, comparisonTooltip2, comparisonTooltip3  = unpack(self.parent.shoppingTooltips)
-			parent = comparisonTooltip1
-		end
+
 		anchor = (xShift and "RIGHT") or "LEFT"
 		relativeAnchor = (xShift and "LEFT") or "RIGHT"
+
+		if TooltipComparisonManager.anchorFrame.IsEmbedded then
+			anchor = (xShift and "LEFT") or "RIGHT"
+			relativeAnchor = (xShift and "RIGHT") or "LEFT"
+		end
 
 		anchor = "TOP"..anchor
 		relativeAnchor = "TOP"..relativeAnchor
 	end
 
 	self:ClearAllPoints()
-	self:SetPoint(anchor, parent, relativeAnchor)
+	self:SetPoint(anchor, primaryTooltip, relativeAnchor)
 end
 
 ----
