@@ -138,7 +138,7 @@ function CollectionList:UpdateList(type, typeID, add, sourceID)
 	else
 		local sources
 		if type == "set" then
-			sources = C_TransmogSets.GetSetSources(typeID)
+			sources = addon.GetSetSources(typeID)
 			setName = C_TransmogSets.GetSetInfo(typeID).name
 		else
 			setInfo = addon.GetSetInfo(typeID)
