@@ -497,6 +497,8 @@ end
 
 function BetterWardrobeOutfitFrameMixin:Update()
 	local outfits = addon.GetOutfits(true)
+		--local sets = addon.GetSavedList()--addon.setdb.global.sets
+	addon.SortDropdown(outfits)
 	----local mogit_Outfits = addon.GetMogitOutfits()
 	local buttons = self.Buttons
 	local numButtons = 1

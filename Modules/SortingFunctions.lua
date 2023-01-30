@@ -601,10 +601,20 @@ local Sort = {
 				local groupFavorite1 = (addon.favoritesDB.profile.extraset[set1.setID] or set1.favoriteSetID) and true
 				local groupFavorite2 = (addon.favoritesDB.profile.extraset[set2.setID] or set2.favoriteSetID) and true
 				if ( groupFavorite1 ~= groupFavorite2 ) then
-					return groupFavorite1
+					--return groupFavorite1
 				end
 
-				return SortOrder(set2.uiOrder, set1.uiOrder)
+
+				--if ( set1.setType ~= set2.setType ) then
+					--return SortOrder(set2.setType, set1.setType)
+				--end
+
+				return SortOrder(string.lower(set2.name), string.lower(set1.name))
+
+			--else 
+				--return false
+			--end
+			--	return SortOrder(set2.uiOrder, set1.uiOrder)
 			end
 
 			table.sort(sets, comparison)
@@ -642,4 +652,9 @@ function addon.SortSet(sets, reverseUIOrder, ignorePatchID)
 		addon.SetSortOrder()
 		addon.Sort[TAB_SAVED_SETS][LE_DEFAULT](self, sets, reverseUIOrder or IsModifierKeyDown(), ignorePatchID)
 	end
+end
+
+function addon.SortDropdown(sets)
+ 	if not sets  then return end
+	addon.Sort[TAB_SAVED_SETS][LE_DEFAULT](self, sets, false, true)
 end
