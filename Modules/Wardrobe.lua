@@ -7043,7 +7043,7 @@ function BetterWardrobeSetsTransmogMixin:LoadSet(setID)
 				local appearanceID = sourceInfo.visualID;
 				local slot = C_Transmog.GetSlotForInventoryType(sourceInfo.invType)
 				if slot then 
-					local _, visualID, _, _, _, itemLink = C_TransmogCollection.GetAppearanceSourceInfo(appearanceID)	
+					local _, visualID, _, _, _, itemLink = C_TransmogCollection.GetAppearanceSourceInfo(sourceID)	
 					local sources = (sourceInfo and itemLink and C_TransmogCollection.GetAppearanceSources(appearanceID, addon.GetItemCategory(appearanceID), addon.GetTransmogLocation(itemLink)) )
 					--local sources = sourceInfo and C_TransmogCollection.GetAppearanceSources(appearanceID)
 					if sources and #sources > 0  then 
@@ -7102,7 +7102,7 @@ function BetterWardrobeSetsTransmogMixin:LoadSet(setID)
 						local appearanceID = slotData[3]
 						local slot = C_Transmog.GetSlotForInventoryType(sourceInfo.invType)
 						if slot then 
-							local _, visualID, _, _, _, itemLink = C_TransmogCollection.GetAppearanceSourceInfo(sourceInfo.visualID)	
+							local _, visualID, _, _, _, itemLink = C_TransmogCollection.GetAppearanceSourceInfo(sourceID)	
 							local sources = (sourceInfo and itemLink and C_TransmogCollection.GetAppearanceSources(sourceInfo.visualID, addon.GetItemCategory(sourceInfo.visualID), addon.GetTransmogLocation(itemLink)) )
 							--local sources = sourceInfo and C_TransmogCollection.GetAppearanceSources(sourceInfo.visualID)
 
@@ -7667,7 +7667,7 @@ function addon.Sets:GetLocationBasedCount(setInfo)
 		local sourceInfo = C_TransmogCollection.GetSourceInfo(sourceID)
 		if sourceInfo then
 		--local appearanceSources = sourceInfo and C_TransmogCollection.GetAppearanceSources(sourceInfo.visualID)
-			local _, visualID, _, _, _, itemLink = C_TransmogCollection.GetAppearanceSourceInfo(sourceInfo.visualID)	
+			local _, visualID, _, _, _, itemLink = C_TransmogCollection.GetAppearanceSourceInfo(sourceID)	
 			local appearanceSources = (sourceInfo and itemLink and C_TransmogCollection.GetAppearanceSources(sourceInfo.visualID, addon.GetItemCategory(sourceInfo.visualID), addon.GetTransmogLocation(itemLink)) )
 			if appearanceSources then
 				if #appearanceSources > 1 then
