@@ -4,12 +4,12 @@ addon = LibStub("AceAddon-3.0"):GetAddon(addonName)
 local L = LibStub("AceLocale-3.0"):GetLocale(addonName)
 local UI = {}
 
-local LE_DEFAULT = addon.Globals.LE_DEFAULT
-local LE_APPEARANCE = addon.Globals.LE_APPEARANCE
-local LE_ALPHABETIC = addon.Globals.LE_ALPHABETIC
-local LE_ITEM_SOURCE = addon.Globals.LE_ITEM_SOURCE
-local LE_EXPANSION = addon.Globals.LE_EXPANSION
-local LE_COLOR = addon.Globals.LE_COLOR
+local DEFAULT = addon.Globals.DEFAULT
+local APPEARANCE = addon.Globals.APPEARANCE
+local ALPHABETIC = addon.Globals.ALPHABETIC
+local ITEM_SOURCE = addon.Globals.ITEM_SOURCE
+local EXPANSION = addon.Globals.EXPANSION
+local COLOR = addon.Globals.COLOR
 
 local TAB_ITEMS = addon.Globals.TAB_ITEMS
 local TAB_SETS = addon.Globals.TAB_SETS
@@ -23,7 +23,7 @@ local SortOrder
 
 --= {INVTYPE_HEAD, INVTYPE_SHOULDER, INVTYPE_CLOAK, INVTYPE_CHEST, INVTYPE_WAIST, INVTYPE_LEGS, INVTYPE_FEET, INVTYPE_WRIST, INVTYPE_HAND}
 local defaults = {
-	sortDropdown = LE_DEFAULT,
+	sortDropdown = DEFAULT,
 	reverse = false,
 }
 

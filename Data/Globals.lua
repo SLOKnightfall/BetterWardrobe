@@ -251,12 +251,12 @@ Globals.EmptyArmor = {
   [19] = 142504, --tabgaard
 }
 
-Globals.LE_DEFAULT = 1
-Globals.LE_APPEARANCE = 2
-Globals.LE_ALPHABETIC = 3
-Globals.LE_ITEM_SOURCE = 6
-Globals.LE_EXPANSION = 5
-Globals.LE_COLOR = 4
+Globals.DEFAULT = 1
+Globals.APPEARANCE = 2
+Globals.ALPHABETIC = 3
+Globals.ITEM_SOURCE = 6
+Globals.EXPANSION = 5
+Globals.COLOR = 4
 
 Globals.TAB_ITEMS = 1
 Globals.TAB_SETS = 2

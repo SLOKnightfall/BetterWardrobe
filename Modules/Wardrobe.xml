@@ -406,7 +406,7 @@
 		<Frames>
 			<Button name="$parentTab1" parentKey="ItemsTab" inherits="BW_PanelTopTabButtonTemplate" text="WARDROBE_ITEMS" id="1" frameLevel="40">
 				<KeyValues>
-					<KeyValue key="minWidth" value="57" type="number"/>
+					<KeyValue key="minWidth" value="2" type="number"/>
 				</KeyValues>
 				<Anchors>
 					<Anchor point="TOPLEFT" x="58" y="-28"/>
@@ -419,7 +419,7 @@
 			</Button>
 			<Button name="$parentTab2" parentKey="SetsTab" inherits="BW_PanelTopTabButtonTemplate" text="WARDROBE_SETS" id="2" frameLevel="40" >
 				<KeyValues>
-					<KeyValue key="minWidth" value="57" type="number"/>
+					<KeyValue key="minWidth" value="2" type="number"/>
 				</KeyValues>
 				<Anchors>
 					<Anchor point="LEFT" relativeTo="$parentTab1"  relativePoint="RIGHT" x="0" y="0"/>
@@ -454,7 +454,7 @@
 			</Button>
 			<Button name="$parentTab3" parentKey="ExtraSetsTab" inherits="BW_PanelTopTabButtonTemplate" text="Extra" id="3" frameLevel="40" >
 				<KeyValues>
-					<KeyValue key="minWidth" value="57" type="number"/>
+					<KeyValue key="minWidth" value="2" type="number"/>
 				</KeyValues>
 				<Anchors>
 					<Anchor point="LEFT" relativeKey="$parent.SetsTab" relativePoint="RIGHT" x="0" y="0"/>
@@ -489,7 +489,7 @@
 			</Button>
 			<Button name="$parentTab4" parentKey="SavedSetsTab" inherits="BW_PanelTopTabButtonTemplate" text="Saved" id="4" frameLevel="40" >
 				<KeyValues>
-					<KeyValue key="minWidth" value="57" type="number"/>
+					<KeyValue key="minWidth" value="2" type="number"/>
 				</KeyValues>
 				<Anchors>
 					<Anchor point="LEFT" relativeKey="$parent.ExtraSetsTab"  relativePoint="RIGHT" x="0" y="0"/>

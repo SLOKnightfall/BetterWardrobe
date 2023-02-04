@@ -234,7 +234,7 @@ function BetterWardrobeTransmogVendorOptionsDropDown_OnLoad(self)
 	BW_UIDropDownMenu_Initialize(self, UI.OptionsDropDown_Initialize, "MENU")
 end
 
-local dropdownOrder = {LE_DEFAULT, LE_ALPHABETIC, LE_APPEARANCE, LE_COLOR, LE_EXPANSION, LE_ITEM_SOURCE}
+local dropdownOrder = {DEFAULT, ALPHABETIC, APPEARANCE, COLOR, EXPANSION, ITEM_SOURCE}
 local locationDrowpDown = addon.Globals.locationDrowpDown
 
 addon.includeLocation = {}

@@ -2342,11 +2342,12 @@ function BetterWardrobeItemsCollectionMixin:SortVisuals()
 		if BetterWardrobeCollectionFrame.selectedCollectionTab == 1 then 
 
 		if self:GetActiveCategory() and self:GetActiveCategory() ~= Enum.TransmogCollectionType.Paired then
-			addon.Sort[1][addon.sortDB.sortDropdown](self)
+			addon.SortItems(addon.sortDB.sortDropdown,self)
 		elseif self:GetActiveCategory() and self:GetActiveCategory() == Enum.TransmogCollectionType.Paired then
-			addon.Sort[1][1](self)
+			addon.SortItems(1, self)
+
 		else
-			addon.Sort[1][1](self)
+			addon.SortItems(1, self)
 		end
 	end
 	--[[local comparison = function(source1, source2)
@@ -2856,6 +2857,17 @@ function BetterWardrobeItemsCollectionMixin:GoToSourceID(sourceID, transmogLocat
 	end
 end
 
+
+local function GetVisibilityWarning(model, transmogLocation)
+	if transmogLocation and model then
+		local slotID = transmogLocation.slotID;
+		if model:IsGeoReady() and not model:IsSlotAllowed(slotID) and not model:IsSlotVisible(slotID) then
+			return TRANSMOG_DRACTHYR_APPEARANCE_INVISIBLE;
+		end
+	end
+	return nil;
+end
+
 function BetterWardrobeItemsCollectionMixin:SetAppearanceTooltip(frame)
 	GameTooltip:SetOwner(frame, "ANCHOR_RIGHT")
 	self.tooltipModel = frame;
@@ -2878,7 +2890,7 @@ function BetterWardrobeItemsCollectionMixin:RefreshAppearanceTooltip()
 	end
 	local sources = CollectionWardrobeUtil.GetSortedAppearanceSources(self.tooltipVisualID, self.activeCategory, self.transmogLocation)
 	local chosenSourceID = self:GetChosenVisualSource(self.tooltipVisualID)
-	local warningString = CollectionWardrobeUtil.GetVisibilityWarning(self.tooltipModel, self.transmogLocation);	
+	local warningString = GetVisibilityWarning(self.tooltipModel, self.transmogLocation);
 	self:GetParent():SetAppearanceTooltip(self, sources, chosenSourceID, warningString)
 end
 
@@ -5860,7 +5872,9 @@ function BetterWardrobeSetsCollectionMixin:RefreshAppearanceTooltip()
 			tinsert(sources, sourceInfo)
 		end
 		CollectionWardrobeUtil.SortSources(sources, sources[1].visualID, self.tooltipPrimarySourceID)
-		local warningString = CollectionWardrobeUtil.GetVisibilityWarning(self.Model, self.transmogLocation);	
+		local transmogLocation = TransmogUtil.CreateTransmogLocation(self.tooltipTransmogSlot, Enum.TransmogType.Appearance, Enum.TransmogModification.Main);
+
+		local warningString = GetVisibilityWarning(self.Model, transmogLocation);	
 		self:GetParent():SetAppearanceTooltip(self, sources, self.tooltipPrimarySourceID, warningString)
 	else
 		----elseif BetterWardrobeCollectionFrame.selectedCollectionTab == 3 then
@@ -5877,7 +5891,11 @@ function BetterWardrobeSetsCollectionMixin:RefreshAppearanceTooltip()
 		end
 
 		CollectionWardrobeUtil.SortSources(sources, sources[1].visualID, self.tooltipPrimarySourceID)
-		self:GetParent():SetAppearanceTooltip(self, sources, self.tooltipPrimarySourceID)
+		local transmogLocation = TransmogUtil.CreateTransmogLocation(self.tooltipTransmogSlot, Enum.TransmogType.Appearance, Enum.TransmogModification.Main);
+
+		local warningString = GetVisibilityWarning(self.Model, transmogLocation);	
+		self:GetParent():SetAppearanceTooltip(self, sources, self.tooltipPrimarySourceID, warningString)
+		--self:GetParent():SetAppearanceTooltip(self, sources, self.tooltipPrimarySourceID)
 
 		C_Timer.After(.05, function() if needsRefresh then self:RefreshAppearanceTooltip(); needsRefresh = false; end end) --Fix for items that returned retreaving info;
 	end
@@ -7743,24 +7761,24 @@ end
 
 
 local SortOrder;
-local LE_DEFAULT = addon.Globals.LE_DEFAULT;
-local LE_APPEARANCE = addon.Globals.LE_APPEARANCE;
-local LE_ALPHABETIC = addon.Globals.LE_ALPHABETIC;
-local LE_ITEM_SOURCE = addon.Globals.LE_ITEM_SOURCE;
-local LE_EXPANSION = addon.Globals.LE_EXPANSION;
-local LE_COLOR = addon.Globals.LE_COLOR;
-local LE_ARTIFACT = 7;
+local DEFAULT = addon.Globals.DEFAULT;
+local APPEARANCE = addon.Globals.APPEARANCE;
+local ALPHABETIC = addon.Globals.ALPHABETIC;
+local ITEM_SOURCE = addon.Globals.ITEM_SOURCE;
+local EXPANSION = addon.Globals.EXPANSION;
+local COLOR = addon.Globals.COLOR;
+local ARTIFACT = 7;
 local TAB_ITEMS = addon.Globals.TAB_ITEMS;
 local TAB_SETS = addon.Globals.TAB_SETS;
 local TAB_EXTRASETS = addon.Globals.TAB_EXTRASETS;
 local TAB_SAVED_SETS = addon.Globals.TAB_SAVED_SETS;
 --local TABS_MAX_WIDTH = addon.Globals.TABS_MAX_WIDTH;
-local dropdownOrder = {LE_DEFAULT, LE_ALPHABETIC, LE_APPEARANCE, LE_COLOR, LE_EXPANSION, LE_ITEM_SOURCE};
+local dropdownOrder = {DEFAULT, ALPHABETIC, APPEARANCE, COLOR, EXPANSION, ITEM_SOURCE};
 local locationDrowpDown = addon.Globals.locationDrowpDown;
 
 --= {INVTYPE_HEAD, INVTYPE_SHOULDER, INVTYPE_CLOAK, INVTYPE_CHEST, INVTYPE_WAIST, INVTYPE_LEGS, INVTYPE_FEET, INVTYPE_WRIST, INVTYPE_HAND}
 local defaults = {
-	sortDropdown = LE_DEFAULT,
+	sortDropdown = DEFAULT,
 	reverse = false,
 }
 
@@ -7800,7 +7818,7 @@ function addon.Init.SortDropDown_Initialize()
 			end
 
 			for _, id in pairs(dropdownOrder) do
-				if id == LE_ITEM_SOURCE and (tabID == 2 or tabID == 3) then
+				if id == ITEM_SOURCE and (tabID == 2 or tabID == 3) then
 				else
 					info.value, info.text = id, L[id]
 					info.checked = (id == selectedValue)
@@ -7810,8 +7828,8 @@ function addon.Init.SortDropDown_Initialize()
 
 			local tabID = addon.GetTab()
 			if tabID == 1 and( Wardrobe.activeCategory and Wardrobe.activeCategory >= 13) then
-				info.value = LE_ARTIFACT;
-				info.text = L[LE_ARTIFACT]
+				info.value = ARTIFACT;
+				info.text = L[ARTIFACT]
 				info.checked = (7 == selectedValue)
 				BW_UIDropDownMenu_AddButton(info)
 			end

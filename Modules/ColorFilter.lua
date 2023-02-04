@@ -266,15 +266,15 @@ end
 
 
 
---[[local function xxx()
-local ColorTable = (_G.BetterWardrobeData and _G.BetterWardrobeData.ColorTable2) or {}
-BTT = {}
---AceSerializer:Embed(addon)
-for index, data in pairs(ColorTable) do
+--[[local function EncodeColors()
+	local ColorTable = (_G.BetterWardrobeData and _G.BetterWardrobeData.ColorTable2) or {}
+	BTT = {}
+	--AceSerializer:Embed(addon)
+	for index, data in pairs(ColorTable) do
 
-local temp =addon:Serialize(data)
-BTT[index]= temp
-end
+		local temp =addon:Serialize(data)
+		BTT[index]= temp
+	end
 end
 
 local function yy()
