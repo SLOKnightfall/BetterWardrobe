@@ -2481,7 +2481,6 @@ function BetterWardrobeItemsCollectionMixin:UpdateItems()
 			appliedVisualID = nil;
 		end
 	end
-
 	local matchesCategory = not effectiveCategory or effectiveCategory == self.activeCategory or self.transmogLocation:IsIllusion() or self.activeCategory == Enum.TransmogCollectionType.Paired;
 	local cameraVariation = self:GetCameraVariation()
 
@@ -2495,7 +2494,7 @@ function BetterWardrobeItemsCollectionMixin:UpdateItems()
 			model:Show()
 
 			local isWeapon;
-			if visualInfo.categoryID and visualInfo.categoryID > 11 then 
+			if self.activeCategory and self.activeCategory > 11 then 
 				isWeapon = true;
 			end
 
@@ -2504,8 +2503,13 @@ function BetterWardrobeItemsCollectionMixin:UpdateItems()
 				if visualInfo.artifact then
 					cameraID = visualInfo.camera;
 				else
-					cameraID = C_TransmogCollection.GetAppearanceCameraID(visualInfo.visualID, cameraVariation)
+					local inNativeForm = C_UnitAuras.WantsAlteredForm("player");
 
+					if  (inNativeForm and addon.useNativeForm) or (not inNativeForm and not addon.useNativeForm)  or isWeapon then 
+						cameraID = C_TransmogCollection.GetAppearanceCameraID(visualInfo.visualID, cameraVariation)
+					else
+						cameraID = addon.Camera:GetCameraIDBySlot(self.activeCategory)
+					end
 				end
 			end
 			if ( model.cameraID ~= cameraID ) then
@@ -3112,6 +3116,41 @@ function BetterWardrobeItemsModelMixin:Reload(reloadSlot)
 				end
 			end
 		end
+
+		local _, raceFilename = UnitRace("player");
+		local sex = UnitSex("player") 
+		if (raceFilename == "Dracthyr" or raceFilename == "Worgen") then
+			local inNativeForm = C_UnitAuras.WantsAlteredForm("player");
+			self:SetUseTransmogSkin(false)
+				local modelID, altModelID
+				if raceFilename == "Worgen" then
+					if sex == 3 then
+						modelID = 307453
+						altModelID = 1000764
+					else
+						modelID = 307454
+						altModelID = 1011653
+					end
+				elseif raceFilename == "Dracthyr" then
+					if sex == 3 then
+						modelID = 4207724
+						altModelID = 4220448
+					else
+						modelID = 4207724
+						altModelID = 4395382
+					end
+				end
+
+			if inNativeForm and not addon.useNativeForm then
+				self:SetUnit("player", false, false)
+				self:SetModel(altModelID)
+
+			elseif not inNativeForm and addon.useNativeForm then
+				self:SetUnit("player", false, true)
+				self:SetModel( modelID )
+			end
+		end
+
 		self:SetKeepModelOnHide(true)
 		self.cameraID = nil;
 		self.needsReload = nil;

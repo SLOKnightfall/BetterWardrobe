@@ -17,3 +17,109 @@ function BW_SetIconMixin:OnEnter()
 		GameTooltip:Show()
 	end
 end
+
+addon.ShowAltForm = false
+BetterWardrobeAlteredFormSwapButtonMixin = {}
+
+function BetterWardrobeAlteredFormSwapButtonMixin:OnLoad()
+	local _, raceFile = UnitRace("player");
+	if raceFile == "Dracthyr" then
+		--self.Update = self.UpdateShapeshifter;
+		self.Portrait:SetTexture("Interface\\ICONS\\Ability_Evoker_BlessingOfTheBronze.blp")
+
+--self.Portrait:SetTexture("Interface\\CharacterFrame\\TempPortrait")
+
+		self.nativeFormTooltip = L["Switch Form To Visage"];
+		self.alternateFormTooltip = L["Switch Form To Dracthyr"];
+	elseif raceFile == "Worgen" then
+		--self.Update = self.UpdateShapeshifter;
+		self:SetHeight(34);
+		self.Portrait:SetTexture("Interface\\AddOns\\Narcissus\\Art\\Modules\\DressingRoom\\FormButton-Worgen");
+		 self.Portrait:SetTexture("Interface\\ICONS\\Ability_Evoker_BlessingOfTheBronze.blp")
+
+		 --self.Portrait:SetTexture("Interface\\CharacterFrame\\TempPortrait")
+		self.nativeFormTooltip = L["Switch Form To Human"];
+		self.alternateFormTooltip = L["Switch Form To Worgen"];
+	else
+		self:Hide();
+	end
+
+	addon.useNativeForm = C_UnitAuras.WantsAlteredForm("player");
+	self.useNativeForm = addon.useNativeForm
+end
+
+
+
+
+function BetterWardrobeAlteredFormSwapButtonMixin:ShowTooltip()
+	local tooltip = GameTooltip;
+	tooltip:SetOwner(self, "ANCHOR_NONE");
+	tooltip:SetPoint("LEFT", self, "RIGHT", 4, 0);
+	if self.useNativeForm then
+		GameTooltip_SetTitle(tooltip, self.nativeFormTooltip, NORMAL_FONT_COLOR);
+	else
+		GameTooltip_SetTitle(tooltip, self.alternateFormTooltip, NORMAL_FONT_COLOR);
+	end
+	tooltip:Show();
+end
+
+function BetterWardrobeAlteredFormSwapButtonMixin:OnEnter()
+	--FadeFrame(self.InnerHighlight, 0.12, 1);
+	--self:FadeIn();
+	self:ShowTooltip();
+end
+
+function BetterWardrobeAlteredFormSwapButtonMixin:OnShow()
+	addon.useNativeForm = C_UnitAuras.WantsAlteredForm("player");
+	self.useNativeForm = addon.useNativeForm
+	self:Update()
+	local tabID = addon.GetTab()
+	 self:ClearAllPoints()
+		if tabID == 1 then 
+			--print(self:GetParent().WeaponDropDown)
+		self:SetPoint("TOPRIGHT",self:GetParent(), "TOPRIGHT", -18,-50)
+
+		else
+		self:SetPoint("TOPRIGHT",self:GetParent(), "TOPRIGHT", -58,-50)
+		end
+--$parent.BW_LinkSetButton" relativePoint="TOPRIGHT" x="-4" y="-25"/>
+end
+
+function BetterWardrobeAlteredFormSwapButtonMixin:OnLeave()
+	GameTooltip_Hide();
+end
+
+
+function BetterWardrobeAlteredFormSwapButtonMixin:OnClick()
+	addon.useNativeForm = not addon.useNativeForm 
+	self.useNativeForm = not self.useNativeForm
+	self.reverse = not self.reverse;
+
+	self:Update()
+	local tabID = addon.GetTab()
+	if tabID == 1 then
+		local cat = BetterWardrobeCollectionFrame.ItemsCollectionFrame:GetActiveCategory()
+		local slot = BetterWardrobeCollectionFrame.ItemsCollectionFrame:GetActiveSlot()
+		local transmogLocation = TransmogUtil.GetTransmogLocation(slot, Enum.TransmogType.Appearance, Enum.TransmogModification.Main)
+		local ignorePreviousSlot = true;
+		BetterWardrobeCollectionFrame.ItemsCollectionFrame:SetActiveSlot(transmogLocation, cat, ignorePreviousSlot)
+	end
+end
+
+
+function BetterWardrobeAlteredFormSwapButtonMixin:Update()
+	local _, raceFile = UnitRace("player");
+	if raceFile == "Dracthyr" then
+		if self.useNativeForm then 
+			self.Portrait:SetTexture("Interface\\ICONS\\Ability_Racial_Visage.blp")
+		else
+			self.Portrait:SetTexture("Interface\\ICONS\\Ability_Evoker_BlessingOfTheBronze.blp")
+		end
+	else
+		if self.useNativeForm then 
+			self.Portrait:SetTexture("Interface\\ICONS\\Ability_Racial_TwoForms.blp")
+		else
+			self.Portrait:SetTexture("Interface\\ICONS\\Spell_Hunter_LoneWolf.blp")
+		end
+	end
+end

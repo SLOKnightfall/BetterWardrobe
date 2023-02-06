@@ -123,4 +123,26 @@
 
 	<Frame name="BW_WardrobeSetsDetailsItemFrameTemplate" inherits ="WardrobeSetsDetailsItemFrameTemplate" mixin="BW_WardrobeSetsDetailsItemMixin" virtual="true">
 	</Frame>
+
+
+	<Button name="BW_AlteredFormSwapButtonTemplate" mixin="BetterWardrobeAlteredFormSwapButtonMixin" ignoreParentScale="true" virtual = "true">
+		<Size x="20" y="20"/>
+		<Layers>
+			<Layer level="BACKGROUND">
+				<Texture parentKey="Portrait">
+		<Size x="20" y="20"/>
+					<Anchors>
+						<Anchor point="BOTTOM"/>
+					</Anchors>
+				</Texture>
+			</Layer>
+		</Layers>
+		<Scripts>
+			<OnLoad method="OnLoad"/>
+			<OnEnter method="OnEnter"/>
+			<OnLeave method="OnLeave"/>
+			<OnClick method="OnClick"/>
+			<OnShow method="OnShow"/>
+		</Scripts>
+	</Button>
 </Ui>
