@@ -103,6 +103,8 @@ function BetterWardrobeAlteredFormSwapButtonMixin:OnClick()
 		local transmogLocation = TransmogUtil.GetTransmogLocation(slot, Enum.TransmogType.Appearance, Enum.TransmogModification.Main)
 		local ignorePreviousSlot = true;
 		BetterWardrobeCollectionFrame.ItemsCollectionFrame:SetActiveSlot(transmogLocation, cat, ignorePreviousSlot)
+	else
+		BetterWardrobeCollectionFrame.SetsCollectionFrame:OnUnitModelChangedEvent()
 	end
 end
 
@@ -122,4 +124,5 @@ function BetterWardrobeAlteredFormSwapButtonMixin:Update()
 			self.Portrait:SetTexture("Interface\\ICONS\\Spell_Hunter_LoneWolf.blp")
 		end
 	end
+	self:ShowTooltip()
 end

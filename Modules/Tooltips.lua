@@ -62,8 +62,37 @@ local function CreateModelFrame()
 	end
 
 	function model:SetModelUnit()
-		self:SetUnit("player")
+		--self:SetUnit("player")
+		local _, raceFilename = UnitRace("player");
+		local sex = UnitSex("player") 
+		if (raceFilename == "Dracthyr" or raceFilename == "Worgen") then
+				local modelID, altModelID
+				if raceFilename == "Worgen" then
+					if sex == 3 then
+						modelID = 307453
+						altModelID = 1000764
+					else
+						modelID = 307454
+						altModelID = 1011653
+					end
+				elseif raceFilename == "Dracthyr" then
+					if sex == 3 then
+						modelID = 4207724
+						altModelID = 4220448
+					else
+						modelID = 4207724
+						altModelID = 4395382
+					end
+				end
 
+		--	if inNativeForm and not addon.useNativeForm then
+				self:SetUnit("player", false, false)
+				self:SetModel(altModelID)
+end
+			--elseif not inNativeForm and addon.useNativeForm then
+				--self:SetUnit("player", false, true)
+				--self:SetModel( modelID )
+			--end
 		--if addon.Profile.TooltipPreview_CustomModel then
 			--self:SetUnit("none")
 			--self:SetCustomRace(addon.Profile.TooltipPreview_CustomRace, addon.Profile.TooltipPreview_CustomGender)
