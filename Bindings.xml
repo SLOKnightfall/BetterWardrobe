@@ -1,11 +1,11 @@
 <Bindings>
 	<Binding name="BETTERWARDROBE_PREVIEW_SCROLL_UP" hidden="true">
 		local BetterWardrobe = LibStub("AceAddon-3.0"):GetAddon("BetterWardrobe")
-		BetterWardrobe.preview.previewModel:SetFacing(BetterWardrobe.preview.model:GetFacing())
+		BetterWardrobe.preview.previewModel:SetFacing(BetterWardrobe.preview.previewModel:GetFacing() +.1)
 	</Binding>
 	<Binding name="BETTERWARDROBE_PREVIEW_SCROLL_DOWN" hidden="true">
 		local BetterWardrobe = LibStub("AceAddon-3.0"):GetAddon("BetterWardrobe")
-		BetterWardrobe.preview.previewModel:SetFacing(BetterWardrobe.preview.model:GetFacing())
+		BetterWardrobe.preview.previewModel:SetFacing(BetterWardrobe.preview.previewModel:GetFacing() -.1)
 	</Binding>
 
 	<Binding name= "BETTERWARDROBE_BINDING_TOGGLE_DRESSINGROOM" hidden="false" header="BETTERWARDROBE" category="Addons">

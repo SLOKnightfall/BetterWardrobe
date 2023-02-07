@@ -471,7 +471,7 @@ local options = {
 								order = 8.1,
 								name = " ",
 								type = "description",
-								width = 2,
+								width = 1,
 							},
 							TooltipPreview_Dress = {
 								order = 9,
@@ -486,6 +486,29 @@ local options = {
 								type = "toggle",
 								width = 1.6,
 								desc = L["TooltipPreview_DressingDummy"],
+							},
+								TooltipPreview_SwapDefault = {
+								order = 9,
+								name = L["Default to Human Form"],
+								type = "toggle",
+								width = 1.2,
+								desc = L["TooltipPreview_Dress_Tooltip"],
+							},
+								TooltipPreview_SwapModifier = {
+								type = "select",
+								order = 10.1,
+								name = L["Only show if modifier is pressed"],
+								values = function()
+											local tbl = {
+												None = "None",
+											}
+											for k,v in pairs(addon.Globals.mods) do
+												tbl[k] = k
+											end
+											return tbl
+										end,
+								width = 1.2,
+								hidden = false,
 							},
 							TooltipPreviewRotate = {
 								order = 11,

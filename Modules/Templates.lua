@@ -24,20 +24,13 @@ BetterWardrobeAlteredFormSwapButtonMixin = {}
 function BetterWardrobeAlteredFormSwapButtonMixin:OnLoad()
 	local _, raceFile = UnitRace("player");
 	if raceFile == "Dracthyr" then
-		--self.Update = self.UpdateShapeshifter;
 		self.Portrait:SetTexture("Interface\\ICONS\\Ability_Evoker_BlessingOfTheBronze.blp")
-
---self.Portrait:SetTexture("Interface\\CharacterFrame\\TempPortrait")
-
 		self.nativeFormTooltip = L["Switch Form To Visage"];
 		self.alternateFormTooltip = L["Switch Form To Dracthyr"];
 	elseif raceFile == "Worgen" then
-		--self.Update = self.UpdateShapeshifter;
 		self:SetHeight(34);
 		self.Portrait:SetTexture("Interface\\AddOns\\Narcissus\\Art\\Modules\\DressingRoom\\FormButton-Worgen");
 		 self.Portrait:SetTexture("Interface\\ICONS\\Ability_Evoker_BlessingOfTheBronze.blp")
-
-		 --self.Portrait:SetTexture("Interface\\CharacterFrame\\TempPortrait")
 		self.nativeFormTooltip = L["Switch Form To Human"];
 		self.alternateFormTooltip = L["Switch Form To Worgen"];
 	else
@@ -47,8 +40,6 @@ function BetterWardrobeAlteredFormSwapButtonMixin:OnLoad()
 	addon.useNativeForm = C_UnitAuras.WantsAlteredForm("player");
 	self.useNativeForm = addon.useNativeForm
 end
-
-
 
 
 function BetterWardrobeAlteredFormSwapButtonMixin:ShowTooltip()
@@ -64,8 +55,6 @@ function BetterWardrobeAlteredFormSwapButtonMixin:ShowTooltip()
 end
 
 function BetterWardrobeAlteredFormSwapButtonMixin:OnEnter()
-	--FadeFrame(self.InnerHighlight, 0.12, 1);
-	--self:FadeIn();
 	self:ShowTooltip();
 end
 
@@ -74,21 +63,18 @@ function BetterWardrobeAlteredFormSwapButtonMixin:OnShow()
 	self.useNativeForm = addon.useNativeForm
 	self:Update()
 	local tabID = addon.GetTab()
-	 self:ClearAllPoints()
-		if tabID == 1 then 
-			--print(self:GetParent().WeaponDropDown)
-		self:SetPoint("TOPRIGHT",self:GetParent(), "TOPRIGHT", -18,-50)
+ 	self:ClearAllPoints()
 
-		else
+	if tabID == 1 then 
+		self:SetPoint("TOPRIGHT",self:GetParent(), "TOPRIGHT", -18,-50)
+	else
 		self:SetPoint("TOPRIGHT",self:GetParent(), "TOPRIGHT", -58,-50)
-		end
---$parent.BW_LinkSetButton" relativePoint="TOPRIGHT" x="-4" y="-25"/>
+	end
 end
 
 function BetterWardrobeAlteredFormSwapButtonMixin:OnLeave()
 	GameTooltip_Hide();
 end
-
 
 function BetterWardrobeAlteredFormSwapButtonMixin:OnClick()
 	addon.useNativeForm = not addon.useNativeForm 

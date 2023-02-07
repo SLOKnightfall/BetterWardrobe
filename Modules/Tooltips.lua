@@ -62,46 +62,45 @@ local function CreateModelFrame()
 	end
 
 	function model:SetModelUnit()
-		--self:SetUnit("player")
+		self:SetUnit("player", false, true)
 		local _, raceFilename = UnitRace("player");
 		local sex = UnitSex("player") 
+		--if ((raceFilename == "Dracthyr" or raceFilename == "Worgen") and addon.Profile.TooltipPreview_SwapDefault or addon.Globals.mods[addon.Profile.TooltipPreview_SwapModifier]() and  select(2, C_PlayerInfo.GetAlternateFormInfo())) then
+		--local force = (addon.Profile.TooltipPreview_SwapDefault and not addon.Globals.mods[addon.Profile.TooltipPreview_SwapModifier]()) or (not addon.Profile.TooltipPreview_SwapDefault and addon.Globals.mods[addon.Profile.TooltipPreview_SwapModifier]())
+		local force =  addon.Globals.mods[addon.Profile.TooltipPreview_SwapModifier]()
+
+		print(force)
+		local inAltForm = select(2, C_PlayerInfo.GetAlternateFormInfo())
 		if (raceFilename == "Dracthyr" or raceFilename == "Worgen") then
-				local modelID, altModelID
-				if raceFilename == "Worgen" then
-					if sex == 3 then
-						modelID = 307453
-						altModelID = 1000764
-					else
-						modelID = 307454
-						altModelID = 1011653
-					end
-				elseif raceFilename == "Dracthyr" then
-					if sex == 3 then
-						modelID = 4207724
-						altModelID = 4220448
-					else
-						modelID = 4207724
-						altModelID = 4395382
-					end
+			local modelID, altModelID
+			if raceFilename == "Worgen" then
+				if sex == 3 then
+					modelID = 307453
+					altModelID = 1000764
+				else
+					modelID = 307454
+					altModelID = 1011653
 				end
 
-		--	if inNativeForm and not addon.useNativeForm then
+			elseif raceFilename == "Dracthyr" then
+				modelID = 4207724
+
+				if sex == 3 then
+					altModelID = 4220448
+				else
+					altModelID = 4395382
+				end
+			end
+
+			if addon.Profile.TooltipPreview_SwapDefault or ( force and  not inAltForm) or (not force and inAltForm)  then
 				self:SetUnit("player", false, false)
-				self:SetModel(altModelID)
-end
-			--elseif not inNativeForm and addon.useNativeForm then
-				--self:SetUnit("player", false, true)
-				--self:SetModel( modelID )
-			--end
-		--if addon.Profile.TooltipPreview_CustomModel then
-			--self:SetUnit("none")
-			--self:SetCustomRace(addon.Profile.TooltipPreview_CustomRace, addon.Profile.TooltipPreview_CustomGender)
-		
-		--else
+				self:SetModel(altModelID)	
+			else
+				self:SetUnit("player", false, true)
+				self:SetModel(modelID)
+			end
+		end
 
-
-		--self:SetCustomRace(addon.Profile.TooltipPreview_CustomRace, addon.Profile.TooltipPreview_CustomGender)
-		--end
 	end
 
 	function model:SetDress()
@@ -259,7 +258,7 @@ function preview:GetSlotFacing(slot)
 		return -.05
 
 	elseif slot == "INVTYPE_CLOAK" then
-		return 3
+		return 0
 
 	else
 		return 0
@@ -462,7 +461,7 @@ function preview:ShowPreview(itemLink, parent)
 			end
 		end
 
-		local setData = addon.IsSetItem(itemLink)
+		 local setData = addon.IsSetItem(itemLink)
 		if addon.Profile.ShowExtraSetsTooltips and setData then
 			if not addHeader then
 				addHeader = true
@@ -511,55 +510,46 @@ function preview:ShowPreview(itemLink, parent)
 	local slot = select(9, GetItemInfo(id))
 	if addon.Profile.TooltipPreview_Show and (not addon.Globals.mods[addon.Profile.TooltipPreview_Modifier] or addon.Globals.mods[addon.Profile.TooltipPreview_Modifier]()) and self.item ~= id then
 		self.item = id
-		local slotFacings = self:GetSlotFacing(slot)
-		
-		if C_Item.IsDressableItemByID(id) and slotFacings then
-			local cameraID, itemCamera, zoomPreview
+		--local itemFacing = self:GetSlotFacing(slot)
+		if C_Item.IsDressableItemByID(id)  then
+			local cameraID, isWeapon, zoomPreview
 			if addon.Profile.TooltipPreview_ZoomItem or addon.Profile.TooltipPreview_ZoomWeapon then
-				cameraID, itemCamera = addon.Camera:GetCameraID(id, addon.Profile.TooltipPreview_CustomModel and addon.Profile.TooltipPreview_CustomRace, addon.Profile.TooltipPreview_CustomModel and addon.Profile.TooltipPreview_CustomGender)
+				cameraID, isWeapon = addon.Camera:GetCameraID(id)
 			end
+			zoomPreview =  cameraID and (addon.Profile.TooltipPreview_ZoomItem and not isWeapon) or (addon.Profile.TooltipPreview_ZoomWeapon and isWeapon)
 
-			zoomPreview =  cameraID and (addon.Profile.TooltipPreview_ZoomItem and not itemCamera) or (addon.Profile.TooltipPreview_ZoomWeapon and itemCamera)
-			if zoomPreview and itemCamera then
-				self.previewModel = self.zoom
-
-				local appearanceID = C_TransmogCollection.GetItemInfo(itemLink)
-				if appearanceID then
-					self.previewModel:SetItemAppearance(appearanceID)
-
-				else
-					self.previewModel:SetItem(id)
-				end
-				self.previewModel.cameraID = cameraID
-				Model_ApplyUICamera(self.previewModel, cameraID)
-				self.previewModel:SetAnimation(0, 0)
-
-
-			elseif zoomPreview and not itemCamera then 
+			if zoomPreview then
 				self.previewModel = self.zoom
 				self.previewModel:Reset()
-				self.previewModel:SetAnimation(0, 0)
+				if isWeapon then
+					local appearanceID = C_TransmogCollection.GetItemInfo(itemLink)
+					if appearanceID then
+						self.previewModel:SetItemAppearance(appearanceID)
+					else
+						self.previewModel:SetItem(id)
+					end
+				end
 				Model_ApplyUICamera(self.previewModel, cameraID)
-
 			else
 				self.previewModel = self.model
 				self.previewModel:Reset()
 			end
-
-			if not cameraID then
-				self.previewModel:SetFacing(slotFacings - ((addon.Profile.TooltipPreviewRotate and 1) or 0))
+			
+			if cameraID then
+				local itemFacing = self.previewModel:GetFacing()
+				self.previewModel:SetFacing(itemFacing - ((addon.Profile.TooltipPreviewRotate and 1) or 0))
 			end
 
 			self:SetShown()
-
 			self:RemoveSurrounding(slot)
-
 
 			C_Timer.After(0, function()
 				if self.previewModel then 
 					self.previewModel:TryOn(itemLink)
 				end
 			end)
+		else
+			self:Hide()
 		end
 	end 
 end
