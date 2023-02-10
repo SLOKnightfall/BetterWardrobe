@@ -64,17 +64,14 @@ local function CreateModelFrame()
 	function model:SetModelUnit()
 		self:SetUnit("player", false, true)
 		local _, raceFilename = UnitRace("player");
-		local sex = UnitSex("player") 
-		--if ((raceFilename == "Dracthyr" or raceFilename == "Worgen") and addon.Profile.TooltipPreview_SwapDefault or addon.Globals.mods[addon.Profile.TooltipPreview_SwapModifier]() and  select(2, C_PlayerInfo.GetAlternateFormInfo())) then
-		--local force = (addon.Profile.TooltipPreview_SwapDefault and not addon.Globals.mods[addon.Profile.TooltipPreview_SwapModifier]()) or (not addon.Profile.TooltipPreview_SwapDefault and addon.Globals.mods[addon.Profile.TooltipPreview_SwapModifier]())
+		local gender = UnitSex("player") 
 		local force =  addon.Globals.mods[addon.Profile.TooltipPreview_SwapModifier]()
 
-		print(force)
 		local inAltForm = select(2, C_PlayerInfo.GetAlternateFormInfo())
 		if (raceFilename == "Dracthyr" or raceFilename == "Worgen") then
 			local modelID, altModelID
 			if raceFilename == "Worgen" then
-				if sex == 3 then
+				if gender == 3 then
 					modelID = 307453
 					altModelID = 1000764
 				else
@@ -85,7 +82,7 @@ local function CreateModelFrame()
 			elseif raceFilename == "Dracthyr" then
 				modelID = 4207724
 
-				if sex == 3 then
+				if gender == 3 then
 					altModelID = 4220448
 				else
 					altModelID = 4395382
@@ -189,7 +186,8 @@ function preview:OnHide2()
 end
 
 function preview:SetAnchor(tooltip, parent)
-	local primaryTooltip = self.parent.shoppingTooltips[1];
+	local primaryTooltip = self.parent.shoppingTooltips[1] 
+	primaryTooltip =  primaryTooltip:IsShown() and primaryTooltip or parent
 
 	local leftPos = self.parent:GetLeft()  or 0;
 	local rightPos = self.parent:GetRight()  or 0;
@@ -223,10 +221,10 @@ local anchorFrame =	TooltipComparisonManager.anchorFrame
 
 		anchor = (xShift and "RIGHT") or "LEFT"
 		relativeAnchor = (xShift and "LEFT") or "RIGHT"
-
-		if TooltipComparisonManager.anchorFrame.IsEmbedded then
-			anchor = (xShift and "LEFT") or "RIGHT"
-			relativeAnchor = (xShift and "RIGHT") or "LEFT"
+		if TooltipComparisonManager.anchorFrame and TooltipComparisonManager.anchorFrame.IsEmbedded then
+			local primaryAnchor,_,primaryRelativeAnchor = primaryTooltip:GetPoint(2)
+			anchor = ((xShift or primaryAnchor and primaryAnchor == "LEFT") and "LEFT" ) or "RIGHT"
+			relativeAnchor = ((xShift or primaryRelativeAnchor and primaryRelativeAnchor == "RIGHT") and "RIGHT" ) or "LEFT"
 		end
 
 		anchor = "TOP"..anchor
@@ -348,7 +346,7 @@ function preview:ShowPreview(itemLink, parent)
 
 		local text = line:GetText() or " "
 		local text_lower = string.lower(line:GetText() or " " )
-		--Check to see if another addon added appearance known text
+
 		if string.find(text_lower, string.lower(TRANSMOGRIFY_TOOLTIP_APPEARANCE_KNOWN)) or
 			string.find(text_lower, "item id") then
 			learned_dupe = true
@@ -375,34 +373,42 @@ function preview:ShowPreview(itemLink, parent)
 	end
 
 	if addon.Profile.ShowOwnedItemTooltips and not found_systemTooltip then
-		local collected, altCollected = IsAppearanceCollected(itemLink)
-		local label, canTransmog
+		local apperanceKnownText, canTransmog
 		local itemID = GetItemInfoInstant(itemLink)
 		if itemID then
 			canTransmog = select(3, C_Transmog.CanTransmogItem(itemID))
 		end
+		local collected, altCollected = IsAppearanceCollected(itemLink)
 
 		if not canTransmog then
-			label = "|c00ffff00" .. TRANSMOGRIFY_INVALID_DESTINATION
+			apperanceKnownText = "|c00ffff00" .. TRANSMOGRIFY_INVALID_DESTINATION
 		else
+			local check = "Ready"
+			local warning = ""
+			local color = ""
+
 			if collected then
 				if altCollected then
-					label = "|TInterface\\RaidFrame\\ReadyCheck-Ready:0|t " .. (TRANSMOGRIFY_TOOLTIP_ITEM_UNKNOWN_APPEARANCE_KNOWN):gsub(', ', ',\n')
+					warning = TRANSMOGRIFY_TOOLTIP_ITEM_UNKNOWN_APPEARANCE_KNOWN
 				else
-					label = "|TInterface\\RaidFrame\\ReadyCheck-Ready:0|t " .. TRANSMOGRIFY_TOOLTIP_APPEARANCE_KNOWN
+					warning = TRANSMOGRIFY_TOOLTIP_APPEARANCE_KNOWN
 				end
 			else
-				label = "|TInterface\\RaidFrame\\ReadyCheck-NotReady:0|t |cffff0000" .. TRANSMOGRIFY_TOOLTIP_APPEARANCE_UNKNOWN
+				warning = TRANSMOGRIFY_TOOLTIP_APPEARANCE_UNKNOWN
+				check = "NotReady"
+				color = "|cffff0000"
 			end
+
+			apperanceKnownText = ("|TInterface\\RaidFrame\\ReadyCheck-%s:0|t %s%s"):format(check, color, warning)
 		end
 
-		addDoubleLine(GameTooltip,label,"")
+		addDoubleLine(GameTooltip, apperanceKnownText,"")
 	end
 
 	local isAppropriate = LAI:IsAppropriate(id)
 	if addon.Profile.ShowOwnedItemTooltips and not isAppropriate then
-			addDoubleLine(GameTooltip, "|TInterface\\RaidFrame\\ReadyCheck-NotReady:0|t |cffff0000Your class can't transmogrify this item", "")
-		end
+		addDoubleLine(GameTooltip, L["|TInterface\\RaidFrame\\ReadyCheck-NotReady:0|t %s%s"]:format("|cffff0000", L["Your class can't transmogrify this item"]))	
+	end
 
 	if addon.Profile.ShowTooltips and not found_tooltipinfo then
 		local appearanceID, sourceID = C_TransmogCollection.GetItemInfo(id)
@@ -415,7 +421,7 @@ function preview:ShowPreview(itemLink, parent)
 				addHeader = true
 				--addLine(self, L["HEADERTEXT"])
 				addLine(GameTooltip, " ")
-				GameTooltip:AddTexture("Interface\\DialogFrame\\UI-DialogBox-Divider.blp",{width = GameTooltip:GetWidth()+25, height = 15})
+				GameTooltip:AddTexture("Interface\\DialogFrame\\UI-DialogBox-Divider.blp", {width = GameTooltip:GetWidth() + 25, height = 15})
 			end
 
 			addDoubleLine (GameTooltip,"|cff87aaff"..L["-Appearance in %d Collection List-"]:format(count), " ")

@@ -1255,8 +1255,9 @@ function BetterWardrobeCollectionFrameMixin:SetTab(tabID)
 				BW_SortDropDown:SetPoint("TOPLEFT", BetterWardrobeCollectionFrame.ItemsCollectionFrame.WeaponDropDown, "BOTTOMLEFT", 0, yOffset)
 			end
 		end
-BetterWardrobeCollectionFrame.AlteredFormSwapButton:ClearAllPoints()
-		BetterWardrobeCollectionFrame.AlteredFormSwapButton:SetPoint("TOPRIGHT",self:GetParent(), "TOPRIGHT", -18,-50)
+
+		BetterWardrobeCollectionFrame.AlteredFormSwapButton:ClearAllPoints()
+		BetterWardrobeCollectionFrame.AlteredFormSwapButton:SetPoint("TOPRIGHT",self:GetParent(), "TOPRIGHT", -18,-45)
 
 	elseif tabID == TAB_SETS or tabID == TAB_EXTRASETS or tabID == TAB_SAVED_SETS then
 		BetterWardrobeVisualToggle:Show()
@@ -2516,6 +2517,7 @@ function BetterWardrobeItemsCollectionMixin:UpdateItems()
 					end
 				end
 			end
+
 			if ( model.cameraID ~= cameraID ) then
 				addon.Model_ApplyUICamera(model, cameraID)
 				model.cameraID = cameraID;

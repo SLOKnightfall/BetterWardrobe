@@ -398,8 +398,8 @@ function DressingRoom:UpdateModel(unit)
 	end
 
 	if refresh then
-		local modelInfo = C_ModelInfo.GetModelSceneActorInfoByID(483)
-		C_Timer.After(0.1, function() DressUpFrame.ModelScene:InitializeActor(actor, modelInfo) end)
+		--local modelInfo = C_ModelInfo.GetModelSceneActorInfoByID(483)
+		--C_Timer.After(0.1, function() DressUpFrame.ModelScene:InitializeActor(actor, modelInfo) end)
 	end
 end
 

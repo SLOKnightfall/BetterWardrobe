@@ -1,4 +1,3 @@
-local myname, ns = ...
 local addonName, addon = ...
 ---addon = LibStub("AceAddon-3.0"):NewAddon(addon, addonName, "AceEvent-3.0", "AceConsole-3.0", "AceHook-3.0")
 addon = LibStub("AceAddon-3.0"):GetAddon(addonName)
@@ -12,42 +11,44 @@ local genders = {
 }
 local gender = genders[UnitSex("player")]
 
-function Camera:GetCameraID(itemLinkOrID, force)
-	local key, isWeapon, cameraID
-	local itemid, _, _, slot, _, class, subclass = GetItemInfoInstant(itemLinkOrID)
+function Camera:GetCameraID(item, force)
+	local cameraType, isWeapon, cameraID
+	local itemid, _, _, slot, _, class, subclass = GetItemInfoInstant(item)
+	slot = addon.Globals.INVENTORY_SLOT_NAMES[slot]
+	slot = addon.Globals.INVENTORY_SLOT_NAMES[slot]
 
-	if addon.Globals.CAMERAS[class][subclass] then
+	if addon.Globals.CAMERAS[class][subclass] and not Camera.lookupItems[slot] then
 		isWeapon = true
-		key = addon.Globals.CAMERAS[class][subclass]
+		cameraID = addon.Globals.CAMERAS[class][subclass]
+		
 	else
-		local itemAppearanceID, itemModifiedAppearanceID = C_TransmogCollection.GetItemInfo(itemLinkOrID)
-		cameraID = C_TransmogCollection.GetAppearanceCameraID(itemAppearanceID, cameraVariation)
-		race = playerRace
-		--local force = (addon.Profile.TooltipPreview_SwapDefault and not addon.Globals.mods[addon.Profile.TooltipPreview_SwapModifier]()) or (not addon.Profile.TooltipPreview_SwapDefault and addon.Globals.mods[addon.Profile.TooltipPreview_SwapModifier]())
+		local race = playerRace
 		local force =  addon.Globals.mods[addon.Profile.TooltipPreview_SwapModifier]()
 
 		local inAltForm = select(2, C_PlayerInfo.GetAlternateFormInfo())
 
-		if race == 'Worgen' and addon.Profile.TooltipPreview_SwapDefault or ( force and  not inAltForm) or (not force and inAltForm) then
+		if race == 'Worgen' and addon.Profile.TooltipPreview_SwapDefault or (force and  not inAltForm) or (not force and inAltForm) then
 			race = 'WorgenAlt'
 		end
 
-		if race == 'Dracthyr' and addon.Profile.TooltipPreview_SwapDefault or ( force and  not inAltForm) or (not force and inAltForm)  then
+		if race == 'Dracthyr' and addon.Profile.TooltipPreview_SwapDefault or (force and  not inAltForm) or (not force and inAltForm) then
 			race = 'DracthyrAlt'
 		end
-		
-		slot = addon.Globals.INVENTORY_SLOT_NAMES[slot]
-		slot = addon.Globals.INVENTORY_SLOT_NAMES[slot]
-		key = ("%s-%s-%s"):format(race, gender, slot or "-")
+
+		local cameraItem = Camera.lookupItems[slot]
+		local itemAppearanceID, itemModifiedAppearanceID = C_TransmogCollection.GetItemInfo(cameraItem)
+		cameraID = C_TransmogCollection.GetAppearanceCameraID(itemAppearanceID)
+
+		cameraType = ("%s-%s-%s"):format(race, gender, slot)
 	end
 
-	return Camera.raceCameraIDs[key] or cameraID, isWeapon
+	return Camera.raceCameraIDs[cameraType] or cameraID, isWeapon
 end
 
 function Camera:GetCameraIDBySlot(slotID, force)
 	local slot = addon.Globals.CATEGORYID_TO_NAME[slotID]
-	local key
-	race = playerRace
+	local cameraType
+	local race = playerRace
 
 	if not addon.useNativeForm or force then
 		if race == 'Worgen' then
@@ -59,17 +60,33 @@ function Camera:GetCameraIDBySlot(slotID, force)
 		end
 	end
 
-	key = ("%s-%s-%s"):format(race, gender, slot or "-")
-	return Camera.raceCameraIDs[key] or cameraID, false
+	cameraType = ("%s-%s-%s"):format(race, gender, slot)
+
+	local cameraItem = Camera.lookupItems[slot]
+	local itemAppearanceID, itemModifiedAppearanceID = C_TransmogCollection.GetItemInfo(cameraItem)
+	local cameraID = C_TransmogCollection.GetAppearanceCameraID(itemAppearanceID)
+	return Camera.raceCameraIDs[cameraType] or cameraID, false
 end
 
-addon.Globals.CAMERAS = {[2]={243,251,252,244,245,247,238,239,624,246,248,241,253,253,241,253,247,253,240,818,[0] = 242}, [4] = {[0] = 250, [6]=249}}
+addon.Globals.CAMERAS = {[2]={243,251,252,244,245,247,238,239,624,246,248,241,253,253,241,253,247,253,240,818,[0] = 242}, [4] = { [0] = 250, [6]=249}} --
 
+Camera.lookupItems={
+	["HEADSLOT"] = 191616,
+	["SHOULDERSLOT"] = 191620,
+	["BACKSLOT"] = 200763,
+	["CHESTSLOT"] = 191617,
+	["SHIRTSLOT"] = 6833,
+	["TABARDSLOT"] = 142504,
+	["WRISTSLOT"] = 200687,
+	["HANDSSLOT"] = 191774,
+	["WAISTSLOT"] = 191621,
+	["LEGSSLOT"] = 191618,
+	["FEETSLOT"] = 191622,
+}
 
 Camera.raceCameraIDs = {
 	["Dracthyr-Female-HEADSLOT"] = 1702,
 	["Dracthyr-Female-SHOULDERSLOT"] = 1704,
-	["Dracthyr-Female-SHOULDERSLOT-Alt"] = 1703,
 	["Dracthyr-Female-BACKSLOT"] = 1706,
 	["Dracthyr-Female-CHESTSLOT"] = 1698,
 	["Dracthyr-Female-SHIRTSLOT"] = 1709,
@@ -82,7 +99,6 @@ Camera.raceCameraIDs = {
 
 	["DracthyrAlt-Female-HEADSLOT"] = 274,
 	["DracthyrAlt-Female-SHOULDERSLOT"] = 275,
-	["DracthyrAlt-Female-SHOULDERSLOT-Alt"] = 724,
 	["DracthyrAlt-Female-BACKSLOT"] = 276,
 	["DracthyrAlt-Female-CHESTSLOT"] = 278,
 	["DracthyrAlt-Female-SHIRTSLOT"] = 278,
@@ -95,7 +111,6 @@ Camera.raceCameraIDs = {
 
 	["Dracthyr-Male-HEADSLOT"] = 1702,
 	["Dracthyr-Male-SHOULDERSLOT"] = 1704,
-	["Dracthyr-Male-SHOULDERSLOT-Alt"] = 1703,
 	["Dracthyr-Male-BACKSLOT"] = 1706,
 	["Dracthyr-Male-CHESTSLOT"] = 1698,
 	["Dracthyr-Male-SHIRTSLOT"] = 1709,
@@ -108,7 +123,6 @@ Camera.raceCameraIDs = {
 
 	["DracthyrAlt-Male-HEADSLOT"] = 1713,
 	["DracthyrAlt-Male-SHOULDERSLOT"] = 455,
-	["DracthyrAlt-Male-SHOULDERSLOT-Alt"] = 1713,
 	["DracthyrAlt-Male-BACKSLOT"] = 1714,
 	["DracthyrAlt-Male-CHESTSLOT"] = 457,
 	["DracthyrAlt-Male-SHIRTSLOT"] = 458,
@@ -121,7 +135,6 @@ Camera.raceCameraIDs = {
 
 	["Worgen-Male-HEADSLOT"] = 309,
 	["Worgen-Male-SHOULDERSLOT"] = 310,
-	["Worgen-Male-SHOULDERSLOT-Alt"] = 309,
 	["Worgen-Male-BACKSLOT"] = 311,
 	["Worgen-Male-CHESTSLOT"] = 312,
 	["Worgen-Male-SHIRTSLOT"] = 313,
@@ -134,7 +147,6 @@ Camera.raceCameraIDs = {
 
 	["WorgenAlt-Male-HEADSLOT"] = 236,
 	["WorgenAlt-Male-SHOULDERSLOT"] = 221,
-	["WorgenAlt-Male-SHOULDERSLOT-Alt"] = 236,
 	["WorgenAlt-Male-BACKSLOT"] = 235,
 	["WorgenAlt-Male-CHESTSLOT"] = 674,
 	["WorgenAlt-Male-SHIRTSLOT"] = 229,
@@ -147,7 +159,6 @@ Camera.raceCameraIDs = {
 
 	["Worgen-Female-HEADSLOT"] = 320,
 	["Worgen-Female-SHOULDERSLOT"] = 321,
-	["Worgen-Female-SHOULDERSLOT-Alt"] = 320,
 	["Worgen-Female-BACKSLOT"] = 322,
 	["Worgen-Female-CHESTSLOT"] = 324,
 	["Worgen-Female-SHIRTSLOT"] = 324,
@@ -160,7 +171,6 @@ Camera.raceCameraIDs = {
 
 	["WorgenAlt-Female-HEADSLOT"] = 274,
 	["WorgenAlt-Female-SHOULDERSLOT"] = 275,
-	["WorgenAlt-Female-SHOULDERSLOT-Alt"] = 724,
 	["WorgenAlt-Female-BACKSLOT"] = 276,
 	["WorgenAlt-Female-CHESTSLOT"] = 278,
 	["WorgenAlt-Female-SHIRTSLOT"] = 278,

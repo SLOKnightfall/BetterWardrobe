@@ -33,6 +33,7 @@ function addon.Init:BuildUI()
 	local level = BW_SetsCollectionFrame.Model:GetFrameLevel()
 	BW_WardrobeCollectionFrame.BW_SetsHideSlotButton:SetFrameLevel(level + 5)
 	UI.CreateOptionsDropdown()
+	UI.CreateItemAltFormButton()
 	addon.Init:CreateRightClickDropDown()
 end
 
@@ -94,12 +95,4 @@ function UI:JournalHideSlotMenu_OnClick(parent)
 	end
 	BW_UIDropDownMenu_SetAnchor(addon.ContextMenu, 0, 0, "BOTTOMLEFT", parent, "BOTTOMLEFT")
 	BW_EasyMenu(contextMenuData, addon.ContextMenu, addon.ContextMenu, 0, 0, "MENU")
-end
-
-
-function 	UI.CreateOptionsDropdown()
-	local BW_TransmogOptionsDropDown= CreateFrame("Frame", "BW_TransmogOptionsDropDown", BW_WardrobeCollectionFrame, "BW_UIDropDownMenuTemplate")
-	BW_TransmogOptionsDropDown = BW_TransmogOptionsDropDown
-	BW_WardrobeCollectionFrame.OptionsDropDown = BW_TransmogOptionsDropDown
-	BW_WardrobeTransmogVendorOptionsDropDown_OnLoad(BW_TransmogOptionsDropDown)
 end
