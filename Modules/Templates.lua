@@ -62,6 +62,10 @@ function BetterWardrobeAlteredFormSwapButtonMixin:OnShow()
 	addon.useNativeForm = C_UnitAuras.WantsAlteredForm("player");
 	self.useNativeForm = addon.useNativeForm
 	self:Update()
+
+	if DressUpFrame:IsShown() then
+	else
+	
 	local tabID = addon.GetTab()
  	self:ClearAllPoints()
 
@@ -71,26 +75,34 @@ function BetterWardrobeAlteredFormSwapButtonMixin:OnShow()
 		self:SetPoint("TOPRIGHT",self:GetParent(), "TOPRIGHT", -58,-50)
 	end
 end
+end
 
 function BetterWardrobeAlteredFormSwapButtonMixin:OnLeave()
 	GameTooltip_Hide();
 end
 
+
+
 function BetterWardrobeAlteredFormSwapButtonMixin:OnClick()
 	addon.useNativeForm = not addon.useNativeForm 
 	self.useNativeForm = not self.useNativeForm
-	self.reverse = not self.reverse;
 
 	self:Update()
-	local tabID = addon.GetTab()
-	if tabID == 1 then
-		local cat = BetterWardrobeCollectionFrame.ItemsCollectionFrame:GetActiveCategory()
-		local slot = BetterWardrobeCollectionFrame.ItemsCollectionFrame:GetActiveSlot()
-		local transmogLocation = TransmogUtil.GetTransmogLocation(slot, Enum.TransmogType.Appearance, Enum.TransmogModification.Main)
-		local ignorePreviousSlot = true;
-		BetterWardrobeCollectionFrame.ItemsCollectionFrame:SetActiveSlot(transmogLocation, cat, ignorePreviousSlot)
+	if DressUpFrame:IsShown() then
+
+addon:DressinRoomFormSwap()
+
 	else
-		BetterWardrobeCollectionFrame.SetsCollectionFrame:OnUnitModelChangedEvent()
+		local tabID = addon.GetTab()
+		if tabID == 1 then
+			local cat = BetterWardrobeCollectionFrame.ItemsCollectionFrame:GetActiveCategory()
+			local slot = BetterWardrobeCollectionFrame.ItemsCollectionFrame:GetActiveSlot()
+			local transmogLocation = TransmogUtil.GetTransmogLocation(slot, Enum.TransmogType.Appearance, Enum.TransmogModification.Main)
+			local ignorePreviousSlot = true;
+			BetterWardrobeCollectionFrame.ItemsCollectionFrame:SetActiveSlot(transmogLocation, cat, ignorePreviousSlot)
+		else
+			BetterWardrobeCollectionFrame.SetsCollectionFrame:OnUnitModelChangedEvent()
+		end
 	end
 end
 

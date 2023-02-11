@@ -254,6 +254,13 @@
 					<OnLeave method="OnLeave" />
 				</Scripts>
 			</Button>
+			<Button parentKey="BW_DressingRoomSwapFormButton" inherits="BW_AlteredFormSwapButtonTemplate" >
+				<Anchors>
+					<Anchor point="BOTTOMRIGHT" relativeKey="$parent" relativePoint="BOTTOMRIGHT" x="-15" y="50"/>
+				</Anchors>	
+				<Scripts>
+				</Scripts>				
+			</Button>
 			<Frame parentKey="BW_OutfitDropDown"  name="BetterWardrobeDressUpFrameDropDown" inherits="BetterWardrobeOutfitDropDownTemplate" mixin="BetterDressUpOutfitMixin" >
 				<KeyValues>
 					<KeyValue key="width" value="163" type="number"/>
