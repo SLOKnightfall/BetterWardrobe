@@ -75,6 +75,8 @@ function addon:DressingRoom_Enable()
 
 	if DressUpFrame.MaximizeMinimizeFrame then
 		DressUpFrame.MaximizeMinimizeFrame:SetOnMaximizedCallback(function(self)
+			DressUpFrameOutfitDropDown:Hide()
+
 			if Profile.DR_ResizeWindow then
 				DressUpFrame.MaximizeMinimizeFrame:GetParent():SetSize(Profile.DR_Width, Profile.DR_Height) 
 			else
@@ -82,6 +84,12 @@ function addon:DressingRoom_Enable()
 			end
 			UpdateUIPanelPositions(DressUpFrame.MaximizeMinimizeFrame)
 		end)
+			
+
+
+		addon:Hook(DressUpFrame.MaximizeMinimizeFrame, "minimizedCallback", function() DressUpFrameOutfitDropDown:Hide() end, true)
+
+
 	end
 
 	DressUpFrame:SetMovable(true)
@@ -102,6 +110,8 @@ function addon:DressingRoom_Disable()
 			DressUpFrame.MaximizeMinimizeFrame:GetParent():SetSize(defaultWidth, defaultHeight)
 			UpdateUIPanelPositions(DressUpFrame.MaximizeMinimizeFrame)
 		end)
+
+		addon:Unhook(DressUpFrame.MaximizeMinimizeFrame, "minimizedCallback")
 	end
 end
 
@@ -483,7 +493,6 @@ function BW_DressingRoomFrameMixin:OnEvent(event, ...)
 
 	elseif event == "ADDON_LOADED" and arg1 == "Narcissus" then
 		BW_DressingRoomFrame.BW_DressingRoomSwapFormButton:Hide()
-	
 	end
 end
 

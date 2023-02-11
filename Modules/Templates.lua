@@ -62,19 +62,7 @@ function BetterWardrobeAlteredFormSwapButtonMixin:OnShow()
 	addon.useNativeForm = C_UnitAuras.WantsAlteredForm("player");
 	self.useNativeForm = addon.useNativeForm
 	self:Update()
-
-	if DressUpFrame:IsShown() then
-	else
 	
-	local tabID = addon.GetTab()
- 	self:ClearAllPoints()
-
-	if tabID == 1 then 
-		self:SetPoint("TOPRIGHT",self:GetParent(), "TOPRIGHT", -18,-50)
-	else
-		self:SetPoint("TOPRIGHT",self:GetParent(), "TOPRIGHT", -58,-50)
-	end
-end
 end
 
 function BetterWardrobeAlteredFormSwapButtonMixin:OnLeave()
@@ -89,9 +77,7 @@ function BetterWardrobeAlteredFormSwapButtonMixin:OnClick()
 
 	self:Update()
 	if DressUpFrame:IsShown() then
-
-addon:DressinRoomFormSwap()
-
+		addon:DressinRoomFormSwap()
 	else
 		local tabID = addon.GetTab()
 		if tabID == 1 then
@@ -102,6 +88,7 @@ addon:DressinRoomFormSwap()
 			BetterWardrobeCollectionFrame.ItemsCollectionFrame:SetActiveSlot(transmogLocation, cat, ignorePreviousSlot)
 		else
 			BetterWardrobeCollectionFrame.SetsCollectionFrame:OnUnitModelChangedEvent()
+			BetterWardrobeCollectionFrame.SetsTransmogFrame:OnUnitModelChangedEvent()
 		end
 	end
 end

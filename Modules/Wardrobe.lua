@@ -1247,6 +1247,9 @@ function BetterWardrobeCollectionFrameMixin:SetTab(tabID)
 				BW_SortDropDown:SetPoint("TOPLEFT", BetterWardrobeCollectionFrame.ItemsCollectionFrame.WeaponDropDown, "BOTTOMLEFT", -10, 0)
 
 			end
+
+			BetterWardrobeCollectionFrame.AlteredFormSwapButton:ClearAllPoints()
+			BetterWardrobeCollectionFrame.AlteredFormSwapButton:SetPoint("TOPRIGHT",self:GetParent(), "TOPRIGHT", -62,-50)
 		else
 			BetterWardrobeCollectionFrame.ItemsCollectionFrame.WeaponDropDown:SetPoint("TOPRIGHT", -32, -25)
 			if ElvUI then 
@@ -1254,10 +1257,12 @@ function BetterWardrobeCollectionFrameMixin:SetTab(tabID)
 			else 
 				BW_SortDropDown:SetPoint("TOPLEFT", BetterWardrobeCollectionFrame.ItemsCollectionFrame.WeaponDropDown, "BOTTOMLEFT", 0, yOffset)
 			end
+
+			BetterWardrobeCollectionFrame.AlteredFormSwapButton:ClearAllPoints()
+			BetterWardrobeCollectionFrame.AlteredFormSwapButton:SetPoint("TOPRIGHT",self:GetParent(), "TOPRIGHT", -9,-45)
 		end
 
-		BetterWardrobeCollectionFrame.AlteredFormSwapButton:ClearAllPoints()
-		BetterWardrobeCollectionFrame.AlteredFormSwapButton:SetPoint("TOPRIGHT",self:GetParent(), "TOPRIGHT", -18,-45)
+
 
 	elseif tabID == TAB_SETS or tabID == TAB_EXTRASETS or tabID == TAB_SAVED_SETS then
 		BetterWardrobeVisualToggle:Show()
@@ -1274,6 +1279,8 @@ function BetterWardrobeCollectionFrameMixin:SetTab(tabID)
 			----self.SearchBox:SetWidth(115)
 			self.FilterButton:Hide()
 			BW_SortDropDown:SetPoint("TOPRIGHT", BetterWardrobeCollectionFrame.ItemsCollectionFrame, "TOPRIGHT",-30, -10)
+			BetterWardrobeCollectionFrame.AlteredFormSwapButton:ClearAllPoints()
+			BetterWardrobeCollectionFrame.AlteredFormSwapButton:SetPoint("TOPRIGHT",BetterWardrobeCollectionFrame.SetsCollectionFrame.DetailsFrame, "TOPRIGHT", -5 ,10)
 
 		else
 			self.activeFrame = self.SetsCollectionFrame;
@@ -1283,13 +1290,14 @@ function BetterWardrobeCollectionFrameMixin:SetTab(tabID)
 			self.FilterButton:SetEnabled(true)
 			BW_SortDropDown:SetPoint("TOPLEFT", BetterWardrobeVisualToggle, "TOPRIGHT", 5, 0)
 			self.BW_SetsHideSlotButton:Show()
+			BetterWardrobeCollectionFrame.AlteredFormSwapButton:ClearAllPoints()
+			BetterWardrobeCollectionFrame.AlteredFormSwapButton:SetPoint("TOPRIGHT",BetterWardrobeCollectionFrame.SetsCollectionFrame.DetailsFrame, "TOPRIGHT", -35,13)
+
 		end
 		self.SearchBox:SetEnabled(true)
 		self.SetsCollectionFrame:SetShown(not atTransmogrifier)
 		self.SetsTransmogFrame:SetShown(atTransmogrifier)
-		BetterWardrobeCollectionFrame.AlteredFormSwapButton:ClearAllPoints()
-		BetterWardrobeCollectionFrame.AlteredFormSwapButton:SetPoint("TOPLEFT",BetterWardrobeCollectionFrame.SetsCollectionFrame.DetailsFrame, "TOPLEFT", 10,10)
-		if tabID == TAB_SAVED_SETS then 
+			if tabID == TAB_SAVED_SETS then 
 			BW_DBSavedSetDropdown:Show()
 			--BW_SortDropDown:SetPoint("TOPLEFT", BetterWardrobeVisualToggle, "TOPRIGHT", 5, 0)
 
@@ -5822,41 +5830,47 @@ function BetterWardrobeSetsCollectionMixin:OnUnitModelChangedEvent()
 	end
 end
 
-function BetterWardrobeSetsCollectionMixin:RefreshCameras()
-	if ( self:IsShown() ) then
-		local detailsCameraID, transmogCameraID = C_TransmogSets.GetCameraIDs()
-		local inNativeForm = C_UnitAuras.WantsAlteredForm("player");
-		local _, raceFilename = UnitRace("player");
-		local sex = UnitSex("player") 
-		local inNativeForm = C_UnitAuras.WantsAlteredForm("player");
+local function GetFormCameraInfo()
+	local detailsCameraID, transmogCameraID = C_TransmogSets.GetCameraIDs()
 
-		if  (not inNativeForm and addon.useNativeForm) then
-			if raceFilename == "Worgen" then
-				if sex == 3 then
-					detailsCameraID, transmogCameraID = 1020, 1045
-				else
-					detailsCameraID, transmogCameraID = 1021, 1024
-				end
-			elseif raceFilename == "Dracthyr" then
-				detailsCameraID, transmogCameraID = 1712, 1710
+	local inNativeForm = C_UnitAuras.WantsAlteredForm("player");
+	local _, raceFilename = UnitRace("player");
+	local sex = UnitSex("player") 
+
+	if  (not inNativeForm and addon.useNativeForm) then
+		if raceFilename == "Worgen" then
+			if sex == 3 then
+				detailsCameraID, transmogCameraID = 1020, 1045
+			else
+				detailsCameraID, transmogCameraID = 1021, 1024
+			end
+		elseif raceFilename == "Dracthyr" then
+			detailsCameraID, transmogCameraID = 1712, 1710
+		end
+
+	elseif inNativeForm and not addon.useNativeForm then 
+		if raceFilename == "Worgen" then
+			if sex == 3 then
+				detailsCameraID, transmogCameraID = 997, 1022
+			else
+				detailsCameraID, transmogCameraID = 995, 996
 			end
 
-		elseif inNativeForm and not addon.useNativeForm then 
-			if raceFilename == "Worgen" then
-				if sex == 3 then
-					detailsCameraID, transmogCameraID = 997, 1022
-				else
-					detailsCameraID, transmogCameraID = 995, 996
-				end
-
-			elseif raceFilename == "Dracthyr" then
-				if sex == 3 then
-					detailsCameraID, transmogCameraID = 997, 1022
-				else
-					detailsCameraID, transmogCameraID = 998, 1024
-				end
+		elseif raceFilename == "Dracthyr" then
+			if sex == 3 then
+				detailsCameraID, transmogCameraID = 997, 1022
+			else
+				detailsCameraID, transmogCameraID = 998, 1024
 			end
 		end
+	end
+	return detailsCameraID, transmogCameraID
+end
+
+
+function BetterWardrobeSetsCollectionMixin:RefreshCameras()
+	if ( self:IsShown() ) then
+		local detailsCameraID, transmogCameraID = GetFormCameraInfo()
 
 		local model = self.Model;
 		self.Model:RefreshCamera()
@@ -6881,6 +6895,47 @@ function BetterWardrobeSetsTransmogMixin:Refresh(resetSelection)
 	--end
 end
 
+
+local function SetModelUnit(model)
+		model:SetUnit("player", false, true)
+		local _, raceFilename = UnitRace("player");
+		local gender = UnitSex("player") 
+		local force =  addon.Globals.mods[addon.Profile.TooltipPreview_SwapModifier]()
+
+		local inAltForm = select(2, C_PlayerInfo.GetAlternateFormInfo())
+		if (raceFilename == "Dracthyr" or raceFilename == "Worgen") then
+			local modelID, altModelID
+			if raceFilename == "Worgen" then
+				if gender == 3 then
+					modelID = 307453
+					altModelID = 1000764
+				else
+					modelID = 307454
+					altModelID = 1011653
+				end
+
+			elseif raceFilename == "Dracthyr" then
+				modelID = 4207724
+
+				if gender == 3 then
+					altModelID = 4220448
+				else
+					altModelID = 4395382
+				end
+			end
+
+			if not addon.useNativeForm then
+				model:SetUnit("player", false, false)
+				model:SetModel(altModelID)	
+			else
+				model:SetUnit("player", false, true)
+				model:SetModel(modelID)
+			end
+		end
+
+		local detailsCameraID, transmogCameraID = GetFormCameraInfo()
+
+	end
 function BetterWardrobeSetsTransmogMixin:UpdateSets()
 	if BetterWardrobeCollectionFrame:CheckTab(2) then
 		local usableSets = SetsDataProvider:GetUsableSets(true)
@@ -6893,6 +6948,7 @@ function BetterWardrobeSetsTransmogMixin:UpdateSets()
 			local set = usableSets[index]
 
 			if (set) then
+				SetModelUnit(model)
 				model:Show()
 
 				--if (model.setID ~= set.setID) then
@@ -6997,6 +7053,8 @@ function BetterWardrobeSetsTransmogMixin:UpdateSets()
 				set = usableSets[index]
 			if ( set ) then
 				local setType =  addon.GetSetType(set.setID)
+				SetModelUnit(model)
+
 				model:Show()
 				if setType == "SavedBlizzard" then 
 					local sources  = C_TransmogCollection.GetOutfitItemTransmogInfoList(addon:GetBlizzID(set.setID))
@@ -7400,7 +7458,8 @@ end
 
 function BetterWardrobeSetsTransmogMixin:RefreshCameras()
 	if ( self:IsShown() ) then
-		local detailsCameraID, transmogCameraID = C_TransmogSets.GetCameraIDs()
+		local detailsCameraID, transmogCameraID = GetFormCameraInfo()--C_TransmogSets.GetCameraIDs()
+
 		for i, model in ipairs(self.Models) do
 			model.cameraID = transmogCameraID;
 			model:RefreshCamera()
