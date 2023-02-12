@@ -948,6 +948,7 @@ local defaults = {
 		TooltipPreviewRotate = false,
 		TooltipPreview_Modifier = L["None"],
 		TooltipPreview_ZoomItemModifier = L["None"],
+		TooltipPreview_SwapModifier = L["None"],
 		TooltipPreview_CustomRace = 1,
 		TooltipPreview_CustomGender = 0,
 		TooltipPreview_DressingDummy = false,

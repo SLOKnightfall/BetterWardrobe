@@ -3,6 +3,7 @@ local addonName, addon = ...
 addon = LibStub("AceAddon-3.0"):GetAddon(addonName)
 local Camera = {}
 addon.Camera = Camera
+local L = LibStub("AceLocale-3.0"):GetLocale(addonName)
 
 local _, playerRace, playerRaceID = UnitRace("player")
 local genders = {
@@ -23,7 +24,7 @@ function Camera:GetCameraID(item, force)
 		
 	else
 		local race = playerRace
-		local force =  addon.Globals.mods[addon.Profile.TooltipPreview_SwapModifier]()
+		local force =  addon.Profile.TooltipPreview_SwapModifier ~= L["None"] and addon.Globals.mods[addon.Profile.TooltipPreview_SwapModifier]()
 
 		local inAltForm = select(2, C_PlayerInfo.GetAlternateFormInfo())
 

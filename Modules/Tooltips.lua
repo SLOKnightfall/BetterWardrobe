@@ -65,7 +65,7 @@ local function CreateModelFrame()
 		self:SetUnit("player", false, true)
 		local _, raceFilename = UnitRace("player");
 		local gender = UnitSex("player") 
-		local force =  addon.Globals.mods[addon.Profile.TooltipPreview_SwapModifier]()
+		local force =  addon.Profile.TooltipPreview_SwapModifier ~= L["None"] and addon.Globals.mods[addon.Profile.TooltipPreview_SwapModifier]()
 
 		local inAltForm = select(2, C_PlayerInfo.GetAlternateFormInfo())
 		if (raceFilename == "Dracthyr" or raceFilename == "Worgen") then
