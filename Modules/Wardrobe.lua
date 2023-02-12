@@ -1241,28 +1241,27 @@ function BetterWardrobeCollectionFrameMixin:SetTab(tabID)
 			if ElvUI then 
 				BetterWardrobeCollectionFrame.ItemsCollectionFrame.WeaponDropDown:SetPoint("TOPRIGHT", -42, -10)
 				BW_SortDropDown:SetPoint("TOPLEFT", BetterWardrobeCollectionFrame.ItemsCollectionFrame.WeaponDropDown, "BOTTOMLEFT", 0, 0)
-
+				BetterWardrobeCollectionFrame.AlteredFormSwapButton:ClearAllPoints()
+				BetterWardrobeCollectionFrame.AlteredFormSwapButton:SetPoint("TOPRIGHT",self:GetParent(), "TOPRIGHT", -50,-50)
 			else 
 				BetterWardrobeCollectionFrame.ItemsCollectionFrame.WeaponDropDown:SetPoint("TOPRIGHT", -30, -7)
 				BW_SortDropDown:SetPoint("TOPLEFT", BetterWardrobeCollectionFrame.ItemsCollectionFrame.WeaponDropDown, "BOTTOMLEFT", -10, 0)
-
+				BetterWardrobeCollectionFrame.AlteredFormSwapButton:ClearAllPoints()
+				BetterWardrobeCollectionFrame.AlteredFormSwapButton:SetPoint("TOPRIGHT",self:GetParent(), "TOPRIGHT", -62,-50)
 			end
 
-			BetterWardrobeCollectionFrame.AlteredFormSwapButton:ClearAllPoints()
-			BetterWardrobeCollectionFrame.AlteredFormSwapButton:SetPoint("TOPRIGHT",self:GetParent(), "TOPRIGHT", -62,-50)
 		else
 			BetterWardrobeCollectionFrame.ItemsCollectionFrame.WeaponDropDown:SetPoint("TOPRIGHT", -32, -25)
 			if ElvUI then 
 				BW_SortDropDown:SetPoint("TOPLEFT", BetterWardrobeCollectionFrame.ItemsCollectionFrame.WeaponDropDown, "BOTTOMLEFT", -55, yOffset)
+				BetterWardrobeCollectionFrame.AlteredFormSwapButton:ClearAllPoints()
+				BetterWardrobeCollectionFrame.AlteredFormSwapButton:SetPoint("TOPRIGHT",self:GetParent(), "TOPRIGHT", -15,-45)
 			else 
 				BW_SortDropDown:SetPoint("TOPLEFT", BetterWardrobeCollectionFrame.ItemsCollectionFrame.WeaponDropDown, "BOTTOMLEFT", 0, yOffset)
+				BetterWardrobeCollectionFrame.AlteredFormSwapButton:ClearAllPoints()
+				BetterWardrobeCollectionFrame.AlteredFormSwapButton:SetPoint("TOPRIGHT",self:GetParent(), "TOPRIGHT", -19,-45)
 			end
-
-			BetterWardrobeCollectionFrame.AlteredFormSwapButton:ClearAllPoints()
-			BetterWardrobeCollectionFrame.AlteredFormSwapButton:SetPoint("TOPRIGHT",self:GetParent(), "TOPRIGHT", -9,-45)
 		end
-
-
 
 	elseif tabID == TAB_SETS or tabID == TAB_EXTRASETS or tabID == TAB_SAVED_SETS then
 		BetterWardrobeVisualToggle:Show()
@@ -1279,9 +1278,17 @@ function BetterWardrobeCollectionFrameMixin:SetTab(tabID)
 			----self.SearchBox:SetWidth(115)
 			self.FilterButton:Hide()
 			BW_SortDropDown:SetPoint("TOPRIGHT", BetterWardrobeCollectionFrame.ItemsCollectionFrame, "TOPRIGHT",-30, -10)
-			BetterWardrobeCollectionFrame.AlteredFormSwapButton:ClearAllPoints()
-			BetterWardrobeCollectionFrame.AlteredFormSwapButton:SetPoint("TOPRIGHT",BetterWardrobeCollectionFrame.SetsCollectionFrame.DetailsFrame, "TOPRIGHT", -5 ,10)
 
+
+			if ElvUI then 
+				BetterWardrobeCollectionFrame.AlteredFormSwapButton:ClearAllPoints()
+				BetterWardrobeCollectionFrame.AlteredFormSwapButton:SetPoint("TOPRIGHT",BetterWardrobeCollectionFrame.SetsCollectionFrame.DetailsFrame, "TOPRIGHT", 0 ,-5)
+
+			else 
+				BetterWardrobeCollectionFrame.AlteredFormSwapButton:ClearAllPoints()
+				BetterWardrobeCollectionFrame.AlteredFormSwapButton:SetPoint("TOPRIGHT",BetterWardrobeCollectionFrame.SetsCollectionFrame.DetailsFrame, "TOPRIGHT", -5 ,10)
+
+			end
 		else
 			self.activeFrame = self.SetsCollectionFrame;
 			self.SearchBox:SetPoint("TOPLEFT", 19, -69)
@@ -1291,7 +1298,7 @@ function BetterWardrobeCollectionFrameMixin:SetTab(tabID)
 			BW_SortDropDown:SetPoint("TOPLEFT", BetterWardrobeVisualToggle, "TOPRIGHT", 5, 0)
 			self.BW_SetsHideSlotButton:Show()
 			BetterWardrobeCollectionFrame.AlteredFormSwapButton:ClearAllPoints()
-			BetterWardrobeCollectionFrame.AlteredFormSwapButton:SetPoint("TOPRIGHT",BetterWardrobeCollectionFrame.SetsCollectionFrame.DetailsFrame, "TOPRIGHT", -35,13)
+			BetterWardrobeCollectionFrame.AlteredFormSwapButton:SetPoint("TOPRIGHT",BetterWardrobeCollectionFrame.SetsCollectionFrame.DetailsFrame, "TOPRIGHT", -5, -20)
 
 		end
 		self.SearchBox:SetEnabled(true)
@@ -6897,12 +6904,9 @@ end
 
 
 local function SetModelUnit(model)
-		model:SetUnit("player", false, true)
 		local _, raceFilename = UnitRace("player");
 		local gender = UnitSex("player") 
-		local force =  addon.Globals.mods[addon.Profile.TooltipPreview_SwapModifier]()
 
-		local inAltForm = select(2, C_PlayerInfo.GetAlternateFormInfo())
 		if (raceFilename == "Dracthyr" or raceFilename == "Worgen") then
 			local modelID, altModelID
 			if raceFilename == "Worgen" then
@@ -6931,11 +6935,11 @@ local function SetModelUnit(model)
 				model:SetUnit("player", false, true)
 				model:SetModel(modelID)
 			end
+		else
+			model:SetUnit("player", false, true)
 		end
-
-		local detailsCameraID, transmogCameraID = GetFormCameraInfo()
-
 	end
+
 function BetterWardrobeSetsTransmogMixin:UpdateSets()
 	if BetterWardrobeCollectionFrame:CheckTab(2) then
 		local usableSets = SetsDataProvider:GetUsableSets(true)
@@ -7749,8 +7753,8 @@ end
 				end
 
 				if tab == 4 then
-					local savedCount = #addon.GetSavedList()
-					WardrobeCollectionFrame_UpdateProgressBar(savedCount, savedCount)
+					local savedCount = #addon.GetSavedList() or 0
+					--WardrobeCollectionFrame_UpdateProgressBar(savedCount, savedCount)
 				end
 			end
 		end

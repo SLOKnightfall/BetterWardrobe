@@ -315,6 +315,10 @@ local function SkinTransmogFrames()
 	WardrobeCollectionFrame.ItemsCollectionFrame:StripTextures()
 	WardrobeCollectionFrame.ItemsCollectionFrame:SetTemplate('Transparent')
 
+	S:HandleButton(BetterWardrobeCollectionFrame.AlteredFormSwapButton)
+	BetterWardrobeCollectionFrame.AlteredFormSwapButton:SetSize(20,20)
+	BetterWardrobeCollectionFrame.AlteredFormSwapButton.Portrait:SetSize(20,20)
+
 	WardrobeCollectionFrame.SetsTransmogFrame:StripTextures()
 	WardrobeCollectionFrame.SetsTransmogFrame:SetTemplate('Transparent')
 	S:HandleNextPrevButton(WardrobeCollectionFrame.SetsTransmogFrame.PagingFrame.NextPageButton)
@@ -422,7 +426,9 @@ local function UpdateDressingRoom()
 		--button.IconBorder:SetColorTexture(1, 1, 1, 0.1)
 	end
 
-
+	S:HandleButton(BW_DressingRoomFrame.BW_DressingRoomSwapFormButton)
+	BW_DressingRoomFrame.BW_DressingRoomSwapFormButton:SetSize(20,20)
+	BW_DressingRoomFrame.BW_DressingRoomSwapFormButton.Portrait:SetSize(20,20)
 
 --Need to redo
 	--[[hooksecurefunc(addon, 'DressingRoom_SetItemFrameQuality', function(_, itemFrame)
