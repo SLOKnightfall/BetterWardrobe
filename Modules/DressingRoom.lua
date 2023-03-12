@@ -94,6 +94,8 @@ function addon:DressingRoom_Enable()
 
 	DressUpFrame:SetMovable(true)
 	DressUpFrame:RegisterForDrag("LeftButton")
+	DressUpFrame:SetScript("OnDragStart", DressUpFrame.StartMoving)
+	DressUpFrame:SetScript("OnDragStop", DressUpFrame.StopMovingOrSizing)
 end
 
 function addon:DressingRoom_Disable()

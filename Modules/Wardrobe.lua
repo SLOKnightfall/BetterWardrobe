@@ -1270,6 +1270,7 @@ function BetterWardrobeCollectionFrameMixin:SetTab(tabID)
 		self.ItemsCollectionFrame:Hide()
 		self.SearchBox:ClearAllPoints()
 		BW_SortDropDown:Show()
+		self.SearchBox:Show()
 		BW_SortDropDown:ClearAllPoints()
 		if ( atTransmogrifier )  then
 			self.TransmogOptionsButton:Show()
@@ -1304,12 +1305,16 @@ function BetterWardrobeCollectionFrameMixin:SetTab(tabID)
 		self.SearchBox:SetEnabled(true)
 		self.SetsCollectionFrame:SetShown(not atTransmogrifier)
 		self.SetsTransmogFrame:SetShown(atTransmogrifier)
-			if tabID == TAB_SAVED_SETS then 
+		if tabID == TAB_SAVED_SETS then 
 			BW_DBSavedSetDropdown:Show()
 			--BW_SortDropDown:SetPoint("TOPLEFT", BetterWardrobeVisualToggle, "TOPRIGHT", 5, 0)
+			BW_SortDropDown:ClearAllPoints()
+			BW_SortDropDown:SetPoint("TOPRIGHT", self.SearchBox, "TOPRIGHT",20, 0)
+			BW_SortDropDown:Show()
+			self.FilterButton:Hide()
+			self.SearchBox:Hide()
 
-
-			BW_SortDropDown:Hide()
+			--BW_SortDropDown:Hide()
 			local savedCount = #addon.GetSavedList()
 			--WardrobeCollectionFrame_UpdateProgressBar(savedCount, savedCount)
 
@@ -3763,7 +3768,7 @@ end
 
 -- ***** FILTER
 
-local FILTER_SOURCES = {L["MISC"], L["Classic Set"], L["Quest Set"], L["Dungeon Set"], L["Raid Set"], L["Recolor"], L["PvP"],L["Garrison"], L["Island Expedition"], L["Warfronts"], L["Covenants"]}
+local FILTER_SOURCES = {L["MISC"], L["Classic Set"], L["Quest Set"], L["Dungeon Set"], L["Raid Set"], L["Recolor"], L["PvP"],L["Garrison"], L["Island Expedition"], L["Warfronts"], L["Covenants"], L["Trading Post"]}
 local EXPANSIONS = {EXPANSION_NAME0, EXPANSION_NAME1, EXPANSION_NAME2, EXPANSION_NAME3, EXPANSION_NAME4, EXPANSION_NAME5, EXPANSION_NAME6, EXPANSION_NAME7, EXPANSION_NAME8, EXPANSION_NAME9}
 
 
@@ -7983,12 +7988,27 @@ function addon.Init.SortDropDown_Initialize()
 		local selectedValue = BW_UIDropDownMenu_GetSelectedValue(self)
 
 		info.func = function(self)
-				db.sortDropdown = self.value;
-				BW_UIDropDownMenu_SetSelectedValue(BW_SortDropDown, self.value)
-				BW_UIDropDownMenu_SetText(BW_SortDropDown, COMPACT_UNIT_FRAME_PROFILE_SORTBY.." "..L[self.value])
+				local tabID = addon.GetTab()
+				--print(tabID)
+				local sortValue
+				if tabID ==4 then
+					--print(4)
+					addon.setdb.profile.sorting = self.value
+					sortValue = addon.setdb.profile.sorting
+
+				else
+					
+					db.sortDropdown = self.value;
+					sortValue = db.sortDropdown
+				end
+				
+				--print (self.value)
+				--print(sortValue)
+				BW_UIDropDownMenu_SetSelectedValue(BW_SortDropDown, sortValue)
+				BW_UIDropDownMenu_SetText(BW_SortDropDown, COMPACT_UNIT_FRAME_PROFILE_SORTBY.." "..L[sortValue])
 				db.reverse = IsModifierKeyDown()
 				addon.SetSortOrder(db.reverse)
-				local tabID = addon.GetTab()
+
 				if tabID == 1 then
 					--Wardrobe:OnShow()
 					Wardrobe:RefreshVisualsList()
@@ -7998,20 +8018,26 @@ function addon.Init.SortDropDown_Initialize()
 					RefreshLists()
 				elseif tabID == 3 then
 					RefreshLists()
+				elseif tabID == 4 then
+					--RefreshLists()
+										
+
+					BetterWardrobeCollectionFrame:SetTab(3)
+					BetterWardrobeCollectionFrame:SetTab(4)
 
 				end
 			end
 
-			for _, id in pairs(dropdownOrder) do
+			local tabID = addon.GetTab()
+			for index, id in pairs(dropdownOrder) do
 				if id == ITEM_SOURCE and (tabID == 2 or tabID == 3) then
-				else
+				elseif (tabID == 4 and index <= 2) or tabID ~= 4 then 
 					info.value, info.text = id, L[id]
 					info.checked = (id == selectedValue)
 					BW_UIDropDownMenu_AddButton(info)
 				end
 			end
 
-			local tabID = addon.GetTab()
 			if tabID == 1 and( Wardrobe.activeCategory and Wardrobe.activeCategory >= 13) then
 				info.value = ARTIFACT;
 				info.text = L[ARTIFACT]
@@ -8020,8 +8046,16 @@ function addon.Init.SortDropDown_Initialize()
 			end
 
 		end)
-
-	BW_UIDropDownMenu_SetSelectedValue(BW_SortDropDown, db.sortDropdown)
+	local tabID = addon.GetTab()
+	local sortValue
+	print(tabID)
+	if tabID ==4 then
+		sortValue = addon.setdb.profile.sorting
+	else
+		sortValue = db.sortDropdown
+	end
+	print(sortValue)
+	BW_UIDropDownMenu_SetSelectedValue(BW_SortDropDown, sortValue)
 	-----BW_UIDropDownMenu_SetText(BW_SortDropDown, COMPACT_UNIT_FRAME_PROFILE_SORTBY.." "..L[db.sortDropdown])
 
 	--[[--Repositions sort dropown if Legion Wardrobe is loaded;

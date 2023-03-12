@@ -970,8 +970,9 @@ local DB_Defaults = {
 	},
 
 	savedsets_defaults = {
-		profile = {autoHideSlot = {},},
+		profile = {autoHideSlot = {}, sorting = 1,},
 		global = {sets={}, itemsubstitute = {}, outfits = {}, updates = {},},
+
 	},
 
 	collectionList_defaults = {	
@@ -999,6 +1000,10 @@ local DB_Defaults = {
 			lastTransmogOutfitIDSpec = {},
 			listUpdate = false,
 		}
+	},
+	collection_cache_defaults = {
+		global = {sets={}, },
+
 	},
 }
 
@@ -1211,6 +1216,9 @@ function addon:OnInitialize()
 	self.collectionListDB =  LibStub("AceDB-3.0"):New(listDB.collectionListDB, DB_Defaults.collectionList_defaults)
 	self.HiddenAppearanceDB =  LibStub("AceDB-3.0"):New(listDB.HiddenAppearanceDB, DB_Defaults.list_defaults)
 	self.char_savedOutfits = LibStub("AceDB-3.0"):New("BetterWardrobe_SavedOutfitData", charSavedOutfits_defaults, true)
+
+	self.collectionCache = LibStub("AceDB-3.0"):New("BetterWardrobe_CollectionCache", collection_cache_defaults, true)
+
 
 	local profile = self.setdb:GetCurrentProfile()
 	--self.setdb.global[profile] = self.setdb.char
