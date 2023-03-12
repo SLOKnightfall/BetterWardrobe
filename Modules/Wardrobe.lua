@@ -2889,6 +2889,10 @@ end
 
 
 local function GetVisibilityWarning(model, transmogLocation)
+	local _, raceFilename = UnitRace("player");
+	
+	if not (raceFilename == "Dracthyr" ) then return nil end
+	
 	if transmogLocation and model then
 		local slotID = transmogLocation.slotID;
 		if model:IsGeoReady() and not model:IsSlotAllowed(slotID) and not model:IsSlotVisible(slotID) then
