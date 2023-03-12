@@ -1578,7 +1578,6 @@ function BetterWardrobeCollectionFrameMixin:OpenTransmogLink(link)
 
 	elseif ( linkType == "BW_transmogset-extra") then
 		local setID = tonumber(id)
-
 		addon:RegisterMessage("BW_TRANSMOG_EXTRASETSHOWN", function(self) 
 			addon:UnregisterMessage("BW_TRANSMOG_EXTRASETSHOWN")
 			BetterWardrobeCollectionFrame.SetsCollectionFrame:DisplaySet(setID)
@@ -1588,15 +1587,21 @@ function BetterWardrobeCollectionFrameMixin:OpenTransmogLink(link)
 		local setInfo = addon.GetSetInfo(setID)
 		local armorType = setInfo.armorType;
 		if armorType ~= addon.selectedArmorType then 
-			addon.selectedArmorType = armorType;
 			self:SetTab(TAB_EXTRASETS)
+			addon.selectedArmorType = armorType;
+
 		else 
 			self:SetTab(TAB_ITEMS)
 			self:SetTab(TAB_EXTRASETS)
 		end
 		self.SetsCollectionFrame:SelectSet(setID)
 
-		C_Timer.After(0.7, function() BetterWardrobeCollectionFrame:SetTab(TAB_EXTRASETS) end)
+		C_Timer.After(0.7, function() 
+			--BetterWardrobeCollectionFrame:SetTab(TAB_EXTRASETS);
+			--BetterWardrobeCollectionFrame.SetsCollectionFrame:SelectSet(setID);
+			--BetterWardrobeCollectionFrame.SetsCollectionFrame:DisplaySet(setID)
+			--BetterWardrobeCollectionFrame.SetsCollectionFrame:ScrollToSet(setID)
+		end)
 		
 	end
 end
