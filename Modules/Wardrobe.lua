@@ -1242,12 +1242,12 @@ function BetterWardrobeCollectionFrameMixin:SetTab(tabID)
 				BetterWardrobeCollectionFrame.ItemsCollectionFrame.WeaponDropDown:SetPoint("TOPRIGHT", -42, -10)
 				BW_SortDropDown:SetPoint("TOPLEFT", BetterWardrobeCollectionFrame.ItemsCollectionFrame.WeaponDropDown, "BOTTOMLEFT", 0, 0)
 				BetterWardrobeCollectionFrame.AlteredFormSwapButton:ClearAllPoints()
-				BetterWardrobeCollectionFrame.AlteredFormSwapButton:SetPoint("TOPRIGHT",self:GetParent(), "TOPRIGHT", -50,-50)
+				BetterWardrobeCollectionFrame.AlteredFormSwapButton:SetPoint("TOPRIGHT",self:GetParent(), "TOPRIGHT", -17,-45)
 			else 
 				BetterWardrobeCollectionFrame.ItemsCollectionFrame.WeaponDropDown:SetPoint("TOPRIGHT", -30, -7)
-				BW_SortDropDown:SetPoint("TOPLEFT", BetterWardrobeCollectionFrame.ItemsCollectionFrame.WeaponDropDown, "BOTTOMLEFT", -10, 0)
+				BW_SortDropDown:SetPoint("TOPLEFT", BetterWardrobeCollectionFrame.ItemsCollectionFrame.WeaponDropDown, "BOTTOMLEFT", 0, 0)
 				BetterWardrobeCollectionFrame.AlteredFormSwapButton:ClearAllPoints()
-				BetterWardrobeCollectionFrame.AlteredFormSwapButton:SetPoint("TOPRIGHT",self:GetParent(), "TOPRIGHT", -62,-50)
+				BetterWardrobeCollectionFrame.AlteredFormSwapButton:SetPoint("TOPRIGHT",self:GetParent(), "TOPRIGHT", -12,-50)
 			end
 
 		else
@@ -1255,11 +1255,11 @@ function BetterWardrobeCollectionFrameMixin:SetTab(tabID)
 			if ElvUI then 
 				BW_SortDropDown:SetPoint("TOPLEFT", BetterWardrobeCollectionFrame.ItemsCollectionFrame.WeaponDropDown, "BOTTOMLEFT", -55, yOffset)
 				BetterWardrobeCollectionFrame.AlteredFormSwapButton:ClearAllPoints()
-				BetterWardrobeCollectionFrame.AlteredFormSwapButton:SetPoint("TOPRIGHT",self:GetParent(), "TOPRIGHT", -15,-45)
+				BetterWardrobeCollectionFrame.AlteredFormSwapButton:SetPoint("TOPRIGHT",self:GetParent(), "TOPRIGHT", -13,-55)
 			else 
 				BW_SortDropDown:SetPoint("TOPLEFT", BetterWardrobeCollectionFrame.ItemsCollectionFrame.WeaponDropDown, "BOTTOMLEFT", 0, yOffset)
 				BetterWardrobeCollectionFrame.AlteredFormSwapButton:ClearAllPoints()
-				BetterWardrobeCollectionFrame.AlteredFormSwapButton:SetPoint("TOPRIGHT",self:GetParent(), "TOPRIGHT", -19,-45)
+				BetterWardrobeCollectionFrame.AlteredFormSwapButton:SetPoint("TOPRIGHT",self:GetParent(), "TOPRIGHT", -19,-65)
 			end
 		end
 

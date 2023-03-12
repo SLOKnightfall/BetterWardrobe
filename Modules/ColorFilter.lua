@@ -194,10 +194,12 @@ function addon.Init:InitFilterButtons()
 	frame:SetSize(25, 25)
 	frame:SetScript("OnShow",function()
 			frame:ClearAllPoints()
+			local atTransmogrifier = C_Transmog.IsAtTransmogNPC();
+
 			if atTransmogrifier then
-			frame:SetPoint("TOPRIGHT", BW_SortDropDown, 5, 23)
+				addon.ColorFilterFrame:SetPoint("TOPRIGHT", BW_SortDropDown, 20, 0)
 			else
-			frame:SetPoint("TOPRIGHT", BW_SortDropDown, 15, 23)
+				addon.ColorFilterFrame:SetPoint("TOPRIGHT", BW_SortDropDown, 15, 0)
 			end
 		end)
 
