@@ -239,7 +239,7 @@ function addon.GetSetSources(setID)
 	end
 	return lookupTable
 end
-
+local counter = 0
 function addon.C_TransmogSets.GetSetSources(setID)
 	if SourceDB[setID] then return SourceDB[setID][1], SourceDB[setID][2] end
 	local setInfo = addon.GetSetInfo(setID)
@@ -288,7 +288,8 @@ function addon.C_TransmogSets.GetSetSources(setID)
 	else
 		if not setInfo.itemData then
 		else
-			
+			--print("Lookup "..counter)
+			counter = counter+1
 			for slotID, sourceData in pairs(setInfo.itemData) do
 				local sourceID = sourceData[2]
 				local appearanceID = sourceData[3]
@@ -571,7 +572,7 @@ function addon.C_TransmogCollection.GetOutfitItemTransmogInfoList(setID)
 
 	return itemTransmogInfoList
 end
-
+--[[  TODO: Remove
 function addon:GetSetCounts(setID)
 		if ( not self.sourceData ) then
 		self.sourceData = { }
@@ -623,7 +624,7 @@ function addon:GetSetCounts(setID)
 		return sourceExtraData
 	end
 end
-
+]]
 --[[function BetterWardrobeSetsDataProviderMixin:GetSetSourceCounts(setID)
 	local sourceData = self:GetSetSourceData(setID)
 	return sourceData.numCollected, sourceData.numTotal

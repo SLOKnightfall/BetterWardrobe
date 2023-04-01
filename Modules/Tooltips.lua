@@ -370,8 +370,12 @@ function preview:ShowPreview(itemLink, parent)
 		if addon.Profile.ShowItemIDTooltips and string.find(text_lower, string.lower(ITEM_LEVEL) ) then
 			line:SetText(text.."         "..L["Item ID"]..": |cffffffff"..id)
 		end
-	end
 
+	end
+	
+	if addon.Profile.ShowItemIDTooltips  then
+			addDoubleLine(GameTooltip,L["Item Visual ID"]..": |cffffffff"..id, "")
+	end
 	if addon.Profile.ShowOwnedItemTooltips and not found_systemTooltip then
 		local apperanceKnownText, canTransmog
 		local itemID = GetItemInfoInstant(itemLink)

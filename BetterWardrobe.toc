@@ -26,6 +26,8 @@ Libs\LibAppropriateitems-1.0\lib.xml
 #Libs\LibTextDump-1.0\LibTextDump-1.0.lua
 Libs\UIDropDownMenu\UIDropDownMenu.xml
 Libs\AceSerializer-3.0\AceSerializer-3.0.xml
+Libs\Poncho-2.0\Poncho-2.0.xml
+Libs\Sushi-3.1\Sushi-3.1.xml
 
 #Locale
 Locale\enUS.lua
@@ -44,6 +46,7 @@ Data\CameraData.lua
 Data\AppearanceData.lua
 Data\ArtifactData.lua
 #Data\SourceData.lua
+Patrons.lua
 
 Data\DataBase.lua
 Data\CLOTH.lua

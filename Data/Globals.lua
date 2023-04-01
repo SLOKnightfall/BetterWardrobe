@@ -262,3 +262,29 @@ Globals.TAB_ITEMS = 1
 Globals.TAB_SETS = 2
 Globals.TAB_EXTRASETS = 3
 Globals.TAB_SAVED_SETS = 4
+
+Globals.colors = {
+  ["red"] = {255, 0, 0},
+  ["crimson"] = {255, 0, 63},
+  ["maroon"] = {128, 0, 0},
+  ["pink"] = {255, 192, 203},
+  ["lavender"] = {230, 230, 250},
+  ["purple"] = {128, 0, 128},
+  ["indigo"] = {75, 0, 130},
+  
+  ["blue"] = {0, 0, 255},
+  ["teal"] = {0, 128, 128},
+  ["cyan"] = {0, 255, 255},
+  
+  ["green"] = {0, 255, 0},
+  ["yellow"] = {255, 255, 0},
+  ["gold"] = {255, 215, 0},
+  ["orange"] = {255, 128, 0},
+  ["brown"] = {128, 64, 0},
+  
+  ["black"] = {0, 0, 0},
+  ["gray"] = {128, 128, 128},
+  ["grey"] = {128, 128, 128},
+  ["silver"] = {192, 192, 192},
+  ["white"] = {255, 255, 255},
+}

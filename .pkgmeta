@@ -19,6 +19,8 @@ externals:
     Libs/AceSerializer-3.0: https://repos.wowace.com/wow/ace3/trunk/AceSerializer-3.0
     Libs/LibArmorToken-1.0: https://repos.curseforge.com/wow/libarmortoken-1-0
     #Libs/LibAppropriateitems-1.0: https://repos.curseforge.com/wow/libappropriateitems-1-0
+    Libs/Sushi-3.1: https://github.com/Jaliborc/Sushi-3.1.git
+    Libs/Poncho-2.0: https://github.com/Jaliborc/Poncho-2.0.git
     
 enable-nolib-creation: no
 

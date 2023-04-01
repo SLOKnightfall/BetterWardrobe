@@ -959,7 +959,9 @@ end
 function addon.Init.SavedSetsDropDown_Initialize(self)
 	--local f = BW_UIDropDownMenu_Create("BW_DBSavedSetDropdown", BW_WardrobeCollectionFrame)
 	BW_DBSavedSetDropdown = CreateFrame("Frame", "BW_DBSavedSetDropdown", BetterWardrobeCollectionFrame, "BW_UIDropDownMenuTemplate")
-	BW_DBSavedSetDropdown:SetPoint("TOPRIGHT", "BW_SortDropDown", "TOPRIGHT")
+	--BW_DBSavedSetDropdown:SetPoint("TOPRIGHT", "BW_SortDropDown", "TOPRIGHT")
+	BW_DBSavedSetDropdown:SetPoint("TOPLEFT", BetterWardrobeVisualToggle, "TOPRIGHT", -15, 0)
+
 	BW_UIDropDownMenu_SetWidth(BW_DBSavedSetDropdown, 165) -- Use in place of dropDown:SetWidth
 
 	BW_UIDropDownMenu_Initialize(BW_DBSavedSetDropdown, SavedOutfitDB_Dropdown_Menu)
