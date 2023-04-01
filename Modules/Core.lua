@@ -353,6 +353,12 @@ local options = {
 							type = "toggle",
 							width = "full",
 						},
+						ShowILevelTooltips = {
+							order = 7.1,
+							name = L["Show ILevel"],
+							type = "toggle",
+							width = "full",
+						},
 						ShowOwnedItemTooltips = {
 							order = 8,
 							name = L["Show if appearance is known"],

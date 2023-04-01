@@ -1,6 +1,6 @@
 function bo()
 BetterWardrobe_Temp = {}
-print("clear")
+--print("clear")
 for index, colors in pairs(addon.VisualColors) do
 	local colorlist = ""
 			if colors then

@@ -9,6 +9,10 @@ local ALPHABETIC = 3
 local ITEM_SOURCE = 6
 local EXPANSION = 5
 local ARTIFACT = 7
+local ILEVEL = 8
+local ITEMID = 9
+
+
 local COLOR = 4
 local TAB_ITEMS = 1
 local TAB_SETS = 2
@@ -21,6 +25,9 @@ L[ITEM_SOURCE] = SOURCE:gsub("[:：]", "")
 L[COLOR] = _G["COLOR"]
 L[EXPANSION] = "Expansion"
 L[ARTIFACT] = ITEM_QUALITY6_DESC
+
+L[ILEVEL] = "ILevel"
+L[ITEMID] = "ItemID"
 
 L.OM_GOLD = "|c00FFD200"
 L.ENDCOLOR = "|r"

@@ -6,23 +6,25 @@ addon = LibStub("AceAddon-3.0"):GetAddon(addonName)
 
 local f = addon.frame
 local nameCache = {}
+local ilevelCache = {}
 local categoryCached = {}
-
+local categoryilevelCached = {}
 local DEFAULT = 1
 local APPEARANCE = 2
 local ALPHABETIC = 3
 local COLOR = 4
 local EXPANSION = 5
 local ITEM_SOURCE = 6
-local ARTIFACT = 7
+
 local ILEVEL = 8
+local ITEMID = 9
+local ARTIFACT = 7
 
 local TAB_ITEMS = 1
 local TAB_SETS = 2
 local TAB_EXTRASETS = 3
 local TAB_SAVED_SETS = 4
 
-local dropdownOrder = {DEFAULT, ALPHABETIC, APPEARANCE, COLOR, EXPANSION, ITEM_SOURCE}
 
 local function GetTab(tab)
 		local atTransmogrifier = C_Transmog.IsAtTransmogNPC();
@@ -54,9 +56,9 @@ addon.CheckTab = CheckTab
 local function SortOrder(a, b)
 	if not a or not b then return end
 	if IsModifierKeyDown() then 
-		return a < b
-	else
 		return a > b
+	else
+		return a < b
 	end
 end
 
@@ -175,7 +177,7 @@ local function SortItemAlphabetic(self)
 		if BetterWardrobeCollectionFrame.ItemsCollectionFrame:IsVisible() then
 			C_Timer.After(.0, function()
 					local comparison = function(source1, source2)
-						return SortOrder(nameCache[source2.visualID], nameCache[source1.visualID])
+						return SortOrder(nameCache[source1.visualID], nameCache[source2.visualID])
 					end
 				table.sort(BetterWardrobeCollectionFrame.ItemsCollectionFrame:GetFilteredVisualsList(), comparison)
 
@@ -202,7 +204,47 @@ local function SortItemAlphabetic(self)
 end
 
 
-local function SortItemByILevel(source1, source2)
+local function SortItemByILevel(self)
+		if categoryilevelCached[self:GetActiveCategory()] then
+		if BetterWardrobeCollectionFrame.ItemsCollectionFrame:IsVisible() then
+			C_Timer.After(.0, function()
+				local comparison = function(source1, source2)
+					--return SortOrder(ilevelCache[source1.visualID], ilevelCache[source2.visualID])
+					local itemLevel1 = ilevelCache[source1.visualID]
+					local itemLevel2 = ilevelCache[source2.visualID]
+
+					if itemLevel1 ~= itemLevel2 then
+						return SortOrder(itemLevel1, itemLevel2)
+					else
+						return SortOrder(source1.uiOrder, source2.uiOrder)
+					end
+				end
+				table.sort(BetterWardrobeCollectionFrame.ItemsCollectionFrame:GetFilteredVisualsList(), comparison)
+
+				BetterWardrobeCollectionFrame.ItemsCollectionFrame:UpdateItems()
+			end)
+		end
+
+	else
+		local Wardrobe = BetterWardrobeCollectionFrame.ItemsCollectionFrame
+		for _, data in pairs(self.filteredVisualsList) do
+			local id = data.visualID
+			local sources =  C_TransmogCollection.GetAppearanceSources(id)
+			local sourceInfo = C_TransmogCollection.GetSourceInfo(sources[1].sourceID)
+			local item = Item:CreateFromItemID(sourceInfo.itemID)
+			item:ContinueOnItemLoad(function()
+				local ilevel = item:GetCurrentItemLevel() 
+				ilevelCache[id] = ilevel
+			end)
+		end
+	
+		categoryilevelCached[Wardrobe:GetActiveCategory()] = true
+		SortItemByILevel(self)
+	end
+end
+
+
+local function SortItemByItemID(source1, source2)
 	local _, visualID, _, _, _, itemLink = C_TransmogCollection.GetAppearanceSourceInfo(source1.visualID)	
 	local item1 = (itemLink and CollectionWardrobeUtil.GetSortedAppearanceSources(source1.visualID,addon.GetItemCategory(source1.visualID), addon.GetTransmogLocation(itemLink))[1]) or {}
 
@@ -211,11 +253,9 @@ local function SortItemByILevel(source1, source2)
 
 	item1.itemID = item1.itemID or 0
 	item2.itemID = item2.itemID or 0
-	item1.ilevel = select(4,  GetItemInfo(item1.itemID)) or -1
-	item2.ilevel = select(4,  GetItemInfo(item2.itemID)) or -1
 
-	if ( item1.ilevel ~= item2.ilevel ) then
-		return SortOrder(item1.ilevel, item2.ilevel)
+	if ( item1.itemID ~= item2.itemID ) then
+		return SortOrder(item1.itemID, item2.itemID)
 	else
 		return SortOrder(source1.uiOrder, source2.uiOrder)
 	end
@@ -338,7 +378,11 @@ local ITEM_SORTING = {
 	end,
 
 	[ILEVEL] = function(self)
-		sort(self.filteredVisualsList, SortItemByILevel) 
+		SortItemByILevel(self) 
+	end,
+
+	[ITEMID] = function(self)
+		sort(self.filteredVisualsList, SortItemByItemID) 
 	end,
 
 	[ARTIFACT] = function(self)
@@ -378,7 +422,7 @@ local function SortSavedSetsAlphabetical(self, sets)
 			return groupFavorite1
 		end
 
-		return SortOrder(string.lower(set2.name), string.lower(set1.name))
+		return SortOrder(string.lower(set1.name), string.lower(set2.name))
 	end
 
 	table.sort(sets, comparison)
@@ -417,7 +461,7 @@ local function SortSetAlphabetic(sets)
 			return set1.favorite
 		end
 
-		return SortOrder(set2.name, set1.name)
+		return SortOrder(set1.name, set2.name)
 	end
 
 	table.sort(sets, comparison)

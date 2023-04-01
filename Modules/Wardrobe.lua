@@ -1649,7 +1649,7 @@ function BetterWardrobeCollectionFrameMixin:SetAppearanceTooltip(contentFrame, s
 	if selectedIndex then
 		index = selectedIndex - 1
 	end 
-
+zz = sources
 	local itemID = sources[index] and sources[index].itemID
 	local visualID = sources[index] and sources[index].visualID
 	self.tooltipSourceIndex, self.tooltipCycle = CollectionWardrobeUtil.SetAppearanceTooltip(GameTooltip, sources, primarySourceID, selectedIndex, showUseError, inLegionArtifactCategory, subheaderString, warningString);	
@@ -1661,6 +1661,12 @@ function BetterWardrobeCollectionFrameMixin:SetAppearanceTooltip(contentFrame, s
 
 	if addon.Profile.ShowVisualIDTooltips and visualID then
 		GameTooltip_AddNormalLine(GameTooltip, "VisualID: " .. visualID);
+		GameTooltip:Show()
+	end
+
+	if addon.Profile.ShowILevelTooltips and itemID then 
+	local ilvl = select(4, GetItemInfo(itemID))
+		GameTooltip_AddNormalLine(GameTooltip, "ILevel: " .. ilvl);
 		GameTooltip:Show()
 	end
 end
@@ -2028,7 +2034,7 @@ end
 
 function BetterWardrobeItemsCollectionMixin:OnMouseWheel(delta)
 	self.PagingFrame:OnMouseWheel(delta)
-	
+
 end
 
 function BetterWardrobeItemsCollectionMixin:CanHandleKey(key)
@@ -8005,13 +8011,17 @@ local ALPHABETIC = addon.Globals.ALPHABETIC;
 local ITEM_SOURCE = addon.Globals.ITEM_SOURCE;
 local EXPANSION = addon.Globals.EXPANSION;
 local COLOR = addon.Globals.COLOR;
+local ILEVEL = 8
+local ITEMID = 9
 local ARTIFACT = 7;
 local TAB_ITEMS = addon.Globals.TAB_ITEMS;
 local TAB_SETS = addon.Globals.TAB_SETS;
 local TAB_EXTRASETS = addon.Globals.TAB_EXTRASETS;
 local TAB_SAVED_SETS = addon.Globals.TAB_SAVED_SETS;
 --local TABS_MAX_WIDTH = addon.Globals.TABS_MAX_WIDTH;
-local dropdownOrder = {DEFAULT, ALPHABETIC, APPEARANCE, COLOR, EXPANSION, ITEM_SOURCE};
+--local dropdownOrder = {DEFAULT, ALPHABETIC, APPEARANCE, COLOR, EXPANSION, ITEM_SOURCE};
+local dropdownOrder = {DEFAULT, ALPHABETIC, APPEARANCE, COLOR, EXPANSION, ITEM_SOURCE, ILEVEL, ITEMID}
+
 local locationDrowpDown = addon.Globals.locationDrowpDown;
 
 --= {INVTYPE_HEAD, INVTYPE_SHOULDER, INVTYPE_CLOAK, INVTYPE_CHEST, INVTYPE_WAIST, INVTYPE_LEGS, INVTYPE_FEET, INVTYPE_WRIST, INVTYPE_HAND}
@@ -8040,12 +8050,10 @@ function addon.Init.SortDropDown_Initialize()
 				--print(tabID)
 				local sortValue
 				if tabID ==4 then
-					print(4)
 					addon.setdb.profile.sorting = self.value
 					sortValue = addon.setdb.profile.sorting
 
 				else
-					
 					db.sortDropdown = self.value;
 					sortValue = db.sortDropdown
 				end
