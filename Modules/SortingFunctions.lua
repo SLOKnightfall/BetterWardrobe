@@ -5,7 +5,7 @@ local addonName, addon = ...
 addon = LibStub("AceAddon-3.0"):GetAddon(addonName)
 
 local f = addon.frame
-local nameCache = {}
+local itemCache = {}
 local ilevelCache = {}
 local categoryCached = {}
 local categoryilevelCached = {}
@@ -56,9 +56,9 @@ addon.CheckTab = CheckTab
 local function SortOrder(a, b)
 	if not a or not b then return end
 	if IsModifierKeyDown() then 
-		return a > b
-	else
 		return a < b
+	else
+		return a > b
 	end
 end
 
@@ -112,7 +112,7 @@ local function SortColor(sets)
 			index2 = FindColorInFile(file2)
 
 			if index1 ~= index2 then
-				return SortOrder(index1, index2)
+				return SortOrder(index2, index1)
 			end
 		end
 
@@ -122,12 +122,12 @@ local function SortColor(sets)
 			local color2diff = GetColor2Diff(color2)
 
 			if color1diff ~= color2diff then
-				return SortOrder(color1, color2)
+				return SortOrder(color2, color1)
 			end
 		end
 
 		if (source1.uiOrder and source2.uiOrder) then
-			return SortOrder(source1.uiOrder, source2.uiOrder)
+			return SortOrder(source2.uiOrder, source1.uiOrder)
 		end
 	end
 
@@ -172,92 +172,93 @@ local function SortItemDefault(self)
 	table.sort(self.filteredVisualsList, comparison)
 end
 
+
+local function CacheCategory(self)
+	local Wardrobe = BetterWardrobeCollectionFrame.ItemsCollectionFrame
+	for _, data in pairs(self.filteredVisualsList) do
+		local id = data.visualID
+		local sources =  CollectionWardrobeUtil.GetSortedAppearanceSources(id) --C_TransmogCollection.GetAppearanceSources(id)
+		local itemID = sources[1].itemID
+		local item = Item:CreateFromItemID(itemID)
+
+		item:ContinueOnItemLoad(function()
+			local name = item:GetItemName() 
+			local ilevel = item:GetCurrentItemLevel() 
+			local itemID = item:GetItemID()
+			itemCache[id] = {["name"] = name, ["ilevel"] = ilevel, ["itemID"] = itemID}
+		end)
+	end
+	categoryCached[Wardrobe:GetActiveCategory()] = true
+end
+
+
 local function SortItemAlphabetic(self)
-	if categoryCached[self:GetActiveCategory()] then
-		if BetterWardrobeCollectionFrame.ItemsCollectionFrame:IsVisible() then
-			C_Timer.After(.0, function()
-					local comparison = function(source1, source2)
-						return SortOrder(nameCache[source1.visualID], nameCache[source2.visualID])
+	if not categoryCached[self:GetActiveCategory()] then
+		CacheCategory(self)
+	end
+
+	if BetterWardrobeCollectionFrame.ItemsCollectionFrame:IsVisible() then
+		C_Timer.After(.0, function()
+				local comparison = function(source1, source2)
+					local item1 = itemCache[source1.visualID].name
+					local item2 = itemCache[source2.visualID].name
+					if item1 and item2 then
+						return SortOrder(item2, item1)
+					else
+						return SortOrder(source2.uiOrder, source1.uiOrder)
 					end
-				table.sort(BetterWardrobeCollectionFrame.ItemsCollectionFrame:GetFilteredVisualsList(), comparison)
+				end
+			table.sort(BetterWardrobeCollectionFrame.ItemsCollectionFrame:GetFilteredVisualsList(), comparison)
 
-				BetterWardrobeCollectionFrame.ItemsCollectionFrame:UpdateItems()
-			end)
-		end
-
-	else
-		local Wardrobe = BetterWardrobeCollectionFrame.ItemsCollectionFrame
-		for _, data in pairs(self.filteredVisualsList) do
-			local id = data.visualID
-			local sources =  C_TransmogCollection.GetAppearanceSources(id)
-			local sourceInfo = C_TransmogCollection.GetSourceInfo(sources[1].sourceID)
-			local item = Item:CreateFromItemID(sourceInfo.itemID)
-			item:ContinueOnItemLoad(function()
-				local name = item:GetItemName() 
-				nameCache[id] = name
-			end)
-		end
-	
-		categoryCached[Wardrobe:GetActiveCategory()] = true
-		SortItemAlphabetic(self)
+			BetterWardrobeCollectionFrame.ItemsCollectionFrame:UpdateItems()
+		end)
 	end
 end
 
 
 local function SortItemByILevel(self)
-		if categoryilevelCached[self:GetActiveCategory()] then
-		if BetterWardrobeCollectionFrame.ItemsCollectionFrame:IsVisible() then
-			C_Timer.After(.0, function()
-				local comparison = function(source1, source2)
-					--return SortOrder(ilevelCache[source1.visualID], ilevelCache[source2.visualID])
-					local itemLevel1 = ilevelCache[source1.visualID]
-					local itemLevel2 = ilevelCache[source2.visualID]
+	if not categoryCached[self:GetActiveCategory()] then
+		CacheCategory(self)
+	end
 
-					if itemLevel1 ~= itemLevel2 then
-						return SortOrder(itemLevel1, itemLevel2)
-					else
-						return SortOrder(source1.uiOrder, source2.uiOrder)
-					end
+	if BetterWardrobeCollectionFrame.ItemsCollectionFrame:IsVisible() then
+		C_Timer.After(.0, function()
+			local comparison = function(source1, source2)
+				local itemLevel1 = itemCache[source1.visualID].ilevel
+				local itemLevel2 = itemCache[source2.visualID].ilevel
+
+				if itemLevel1 ~= itemLevel2 then
+					return SortOrder(itemLevel1, itemLevel2)
+				else
+					return SortOrder(source1.uiOrder, source2.uiOrder)
 				end
-				table.sort(BetterWardrobeCollectionFrame.ItemsCollectionFrame:GetFilteredVisualsList(), comparison)
+			end
+			table.sort(BetterWardrobeCollectionFrame.ItemsCollectionFrame:GetFilteredVisualsList(), comparison)
 
-				BetterWardrobeCollectionFrame.ItemsCollectionFrame:UpdateItems()
-			end)
-		end
-
-	else
-		local Wardrobe = BetterWardrobeCollectionFrame.ItemsCollectionFrame
-		for _, data in pairs(self.filteredVisualsList) do
-			local id = data.visualID
-			local sources =  C_TransmogCollection.GetAppearanceSources(id)
-			local sourceInfo = C_TransmogCollection.GetSourceInfo(sources[1].sourceID)
-			local item = Item:CreateFromItemID(sourceInfo.itemID)
-			item:ContinueOnItemLoad(function()
-				local ilevel = item:GetCurrentItemLevel() 
-				ilevelCache[id] = ilevel
-			end)
-		end
-	
-		categoryilevelCached[Wardrobe:GetActiveCategory()] = true
-		SortItemByILevel(self)
+			BetterWardrobeCollectionFrame.ItemsCollectionFrame:UpdateItems()
+		end)
 	end
 end
 
+local function SortItemByItemID(self)
+	if not categoryCached[self:GetActiveCategory()] then
+		CacheCategory(self)
+	end
 
-local function SortItemByItemID(source1, source2)
-	local _, visualID, _, _, _, itemLink = C_TransmogCollection.GetAppearanceSourceInfo(source1.visualID)	
-	local item1 = (itemLink and CollectionWardrobeUtil.GetSortedAppearanceSources(source1.visualID,addon.GetItemCategory(source1.visualID), addon.GetTransmogLocation(itemLink))[1]) or {}
+	if BetterWardrobeCollectionFrame.ItemsCollectionFrame:IsVisible() then
+		C_Timer.After(.1, function()
+			local comparison = function(source1, source2)
+				local item1 = itemCache[source1.visualID].itemID
+				local item2 = itemCache[source2.visualID].itemID
 
-	local _, visualID, _, _, _, itemLink = C_TransmogCollection.GetAppearanceSourceInfo(source2.visualID)	
-	local item2 = (itemLink and CollectionWardrobeUtil.GetSortedAppearanceSources(source2.visualID,addon.GetItemCategory(source2.visualID), addon.GetTransmogLocation(itemLink))[1]) or {}
+				if item1 ~= item2 then
+					return SortOrder(item1, item2)
+				end
+			end
+			table.sort(BetterWardrobeCollectionFrame.ItemsCollectionFrame:GetFilteredVisualsList(), comparison)
 
-	item1.itemID = item1.itemID or 0
-	item2.itemID = item2.itemID or 0
-
-	if ( item1.itemID ~= item2.itemID ) then
-		return SortOrder(item1.itemID, item2.itemID)
-	else
-		return SortOrder(source1.uiOrder, source2.uiOrder)
+			BetterWardrobeCollectionFrame.ItemsCollectionFrame:UpdateItems()
+		end)
 	end
 end
 
@@ -270,11 +271,17 @@ local function SortItemByExpansion(sets)
 		local item2 = (itemLink and CollectionWardrobeUtil.GetSortedAppearanceSources(source2.visualID,addon.GetItemCategory(source2.visualID), addon.GetTransmogLocation(itemLink))[1]) or {}
 		item1.itemID = item1.itemID or 0
 		item2.itemID = item2.itemID or 0
-		item1.expansionID = select(15,  GetItemInfo(item1.itemID)) or -1
-		item2.expansionID = select(15,  GetItemInfo(item2.itemID)) or -1
+		C_Item.RequestLoadItemDataByID(item1.itemID)
+		C_Item.RequestLoadItemDataByID(item2.itemID)
+		item1.expansionID = select(15,  GetItemInfo(item1.itemID)) 
+		item2.expansionID = select(15,  GetItemInfo(item2.itemID))
 
-		if ( item1.expansionID ~= item2.expansionID ) then
-			return SortOrder(item1.expansionID, item2.expansionID)
+		if item1.expansionID and item1.expansionID then
+			if ( item1.expansionID ~= item2.expansionID ) then
+				return SortOrder(item2.expansionID, item1.expansionID)
+			end
+		else
+			return SortOrder(source1.uiOrder, source2.uiOrder)
 		end
 
 		if item1.name  and item2.name then 
@@ -382,7 +389,7 @@ local ITEM_SORTING = {
 	end,
 
 	[ITEMID] = function(self)
-		sort(self.filteredVisualsList, SortItemByItemID) 
+		SortItemByItemID(self)
 	end,
 
 	[ARTIFACT] = function(self)
@@ -448,7 +455,7 @@ local function SortDefault(sets)
 			return SortOrder(set1.uiOrder, set2.uiOrder)
 		end
 
-		return SortOrder(set2.name, set1.name)
+		return SortOrder(set1.name, set2.name)
 	end
 
 	table.sort(sets, comparison)
@@ -461,7 +468,7 @@ local function SortSetAlphabetic(sets)
 			return set1.favorite
 		end
 
-		return SortOrder(set1.name, set2.name)
+		return SortOrder(set2.name, set1.name)
 	end
 
 	table.sort(sets, comparison)
@@ -556,10 +563,17 @@ end
 function addon.SortSet(sets)
  	if not sets  then return end
  --	if DropDownList1:IsShown() then return end
- 	if CheckTab(TAB_ITEMS) then 
+ 	if CheckTab(TAB_ITEMS) then
+ 		if not ITEM_SORTING[addon.sortDB.sortDropdown] then
+ 			addon.sortDB.sortDropdown = 1
+ 		end
+
 		ITEM_SORTING[addon.sortDB.sortDropdown](sets)
 
  	elseif CheckTab(TAB_SETS) or CheckTab(TAB_EXTRASETS) then 
+ 		if not SET_SORTING[addon.sortDB.sortDropdown] then
+ 			addon.sortDB.sortDropdown = 1
+ 		end
 		SET_SORTING[addon.sortDB.sortDropdown](sets)
 
 	elseif CheckTab(TAB_SAVED_SETS) then

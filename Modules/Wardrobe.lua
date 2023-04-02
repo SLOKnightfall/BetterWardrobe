@@ -1664,11 +1664,13 @@ function BetterWardrobeCollectionFrameMixin:SetAppearanceTooltip(contentFrame, s
 		GameTooltip:Show()
 	end
 
-	--if addon.Profile.ShowILevelTooltips and itemID then 
-	--local ilvl = select(4, GetItemInfo(itemID))
-		--GameTooltip_AddNormalLine(GameTooltip, "ILevel: " .. ilvl);
-		--GameTooltip:Show()
-	--end
+	if addon.Profile.ShowILevelTooltips and itemID then 
+	local ilevel = select(4, GetItemInfo(itemID))
+		if ilevel then 
+			GameTooltip_AddNormalLine(GameTooltip, "ILevel: " .. ilevel);
+			GameTooltip:Show()
+		end
+	end
 end
 
 function BetterWardrobeCollectionFrameMixin:HideAppearanceTooltip()
@@ -2658,7 +2660,7 @@ function BetterWardrobeItemsCollectionMixin:UpdateItems()
 				model.NewGlow:Hide()
 			end
 			-- favorite
-			local isFavorite = addon:IsFavoriteItem(visualInfo.visualID)
+			local isFavorite = visualInfo.isFavorite or addon:IsFavoriteItem(visualInfo.visualID)
 			model.Favorite.Icon:SetShown(isFavorite)
 			-- hide visual option
 			model.HideVisual.Icon:SetShown(isAtTransmogrifier and visualInfo.isHideVisual)
@@ -3462,15 +3464,11 @@ local function ToggleHidden(model, isHidden)
 			--self:UpdateWardrobe()
 end
 
-
-
 function BetterWardrobeCollectionFrameRightClickDropDown_Init(self)
 	local appearanceID = self.activeFrame.visualInfo.visualID;
 	local info = BW_UIDropDownMenu_CreateInfo()
 	-- Set Favorite
-	--if ( C_TransmogCollection.GetIsAppearanceFavorite(appearanceID) ) then
-	if ( addon:IsFavoriteItem(appearanceID) ) then
-
+	if ( C_TransmogCollection.GetIsAppearanceFavorite(appearanceID) or addon:IsFavoriteItem(appearanceID) ) then
 		info.text = BATTLE_PET_UNFAVORITE;
 		info.arg1 = appearanceID;
 		info.arg2 = 0;
@@ -8020,7 +8018,7 @@ local TAB_EXTRASETS = addon.Globals.TAB_EXTRASETS;
 local TAB_SAVED_SETS = addon.Globals.TAB_SAVED_SETS;
 --local TABS_MAX_WIDTH = addon.Globals.TABS_MAX_WIDTH;
 --local dropdownOrder = {DEFAULT, ALPHABETIC, APPEARANCE, COLOR, EXPANSION, ITEM_SOURCE};
-local dropdownOrder = {DEFAULT, ALPHABETIC, APPEARANCE, COLOR, EXPANSION, ITEM_SOURCE, ILEVEL, ITEMID}
+local dropdownOrder = {DEFAULT, ALPHABETIC, APPEARANCE, COLOR, EXPANSION, ITEM_SOURCE}
 
 local locationDrowpDown = addon.Globals.locationDrowpDown;
 
@@ -8091,6 +8089,19 @@ function addon.Init.SortDropDown_Initialize()
 					info.checked = (id == selectedValue)
 					BW_UIDropDownMenu_AddButton(info)
 				end
+			end
+
+
+			if tabID == 1 then
+				info.value = ILEVEL;
+				info.text = L[ILEVEL]
+				info.checked = (8 == selectedValue)
+				BW_UIDropDownMenu_AddButton(info)
+
+				info.value = ITEMID;
+				info.text = L[ITEMID]
+				info.checked = (9 == selectedValue)
+				BW_UIDropDownMenu_AddButton(info)
 			end
 
 			if tabID == 1 and( Wardrobe.activeCategory and Wardrobe.activeCategory >= 13) then
