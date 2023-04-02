@@ -1649,7 +1649,7 @@ function BetterWardrobeCollectionFrameMixin:SetAppearanceTooltip(contentFrame, s
 	if selectedIndex then
 		index = selectedIndex - 1
 	end 
-zz = sources
+
 	local itemID = sources[index] and sources[index].itemID
 	local visualID = sources[index] and sources[index].visualID
 	self.tooltipSourceIndex, self.tooltipCycle = CollectionWardrobeUtil.SetAppearanceTooltip(GameTooltip, sources, primarySourceID, selectedIndex, showUseError, inLegionArtifactCategory, subheaderString, warningString);	
@@ -1664,11 +1664,11 @@ zz = sources
 		GameTooltip:Show()
 	end
 
-	if addon.Profile.ShowILevelTooltips and itemID then 
-	local ilvl = select(4, GetItemInfo(itemID))
-		GameTooltip_AddNormalLine(GameTooltip, "ILevel: " .. ilvl);
-		GameTooltip:Show()
-	end
+	--if addon.Profile.ShowILevelTooltips and itemID then 
+	--local ilvl = select(4, GetItemInfo(itemID))
+		--GameTooltip_AddNormalLine(GameTooltip, "ILevel: " .. ilvl);
+		--GameTooltip:Show()
+	--end
 end
 
 function BetterWardrobeCollectionFrameMixin:HideAppearanceTooltip()
