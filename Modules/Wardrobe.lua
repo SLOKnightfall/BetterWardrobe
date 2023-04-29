@@ -4769,15 +4769,14 @@ function BetterWardrobeSetsDataProviderMixin:GetSetSourceData(setID)
 	if ( not self.sourceData ) then
 		self.sourceData = { }
 	end
-	local sourceData = self.sourceData[setID]
 
 	if ( not self.sourceExtraData ) then
 		self.sourceExtraData = { }
 	end
-	local sourceExtraData = self.sourceExtraData[setID]
-	--(addon.GetSetType(setID))
+
 	local setType = addon.GetSetType(setID)
-	if (setType == nil) then
+	if (setType == nil or setType == "BlizzardSet") then
+		local sourceData = self.sourceData[setID]
 		if ( not sourceData ) then
 			local primaryAppearances = C_TransmogSets.GetSetPrimaryAppearances(setID)
 			local numCollected = 0;
@@ -4794,11 +4793,11 @@ function BetterWardrobeSetsDataProviderMixin:GetSetSourceData(setID)
 			self.sourceData[setID] = sourceData;
 		end
 
-		return sourceData;
-	else
-		if ( not sourceExtraData ) then
+		return sourceData
 
-		--elseif BetterWardrobeCollectionFrame:CheckTab(3) then
+	else
+		local sourceExtraData = self.sourceExtraData[setID]
+		if ( not sourceExtraData ) then
 			local sources, unavailable = addon.GetSetsources(setID)
 			local numCollected = 0;
 			local numTotal = 0;
@@ -4809,8 +4808,8 @@ function BetterWardrobeSetsDataProviderMixin:GetSetSourceData(setID)
 					end
 					numTotal = numTotal + 1;
 				end
-				sourceExtraData = {numCollected = numCollected, numTotal = numTotal, sources = sources, unavailable = unavailable }
-				self.sourceExtraData[setID] = sourceData;
+				sourceExtraData = { numCollected = numCollected, numTotal = numTotal, sources = sources, unavailable = unavailable }
+				self.sourceExtraData[setID] = sourceExtraData
 			end
 		end
 		return sourceExtraData;
@@ -4818,14 +4817,9 @@ function BetterWardrobeSetsDataProviderMixin:GetSetSourceData(setID)
 	end
 end
 
-local sourceCounts = {}
 function BetterWardrobeSetsDataProviderMixin:GetSetSourceCounts(setID)
-	local sourceData = sourceCounts[setID] or self:GetSetSourceData(setID)
-
+	local sourceData = self:GetSetSourceData(setID);
 	if sourceData then 
-		if not sourceCounts[setID] then
-			sourceCounts[setID] = {numCollected = sourceData.numCollected, numTotal = sourceData.numTotal }
-		end
 		return sourceData.numCollected, sourceData.numTotal;
 	else
 		return 0,0;
@@ -4836,11 +4830,13 @@ function BetterWardrobeSetsDataProviderMixin:GetBaseSetData(setID)
 	if ( not self.baseSetsData ) then
 		self.baseSetsData = { }
 	end
+
 	if ( not self.baseExtraSetsData ) then
 		self.baseExtraSetsData = { }
 	end
 	
-	if (BetterWardrobeCollectionFrame:CheckTab(2)) then
+	local setType = addon.GetSetType(setID)
+	if (setType == nil or setType == "BlizzardSet") then
 		if ( not self.baseSetsData[setID] ) then
 			local baseSetID = C_TransmogSets.GetBaseSetID(setID)
 			if ( baseSetID ~= setID ) then
@@ -4859,7 +4855,7 @@ function BetterWardrobeSetsDataProviderMixin:GetBaseSetData(setID)
 			self.baseSetsData[setID] = setInfo;
 		end
 		return self.baseSetsData[setID]
-	----elseif BetterWardrobeCollectionFrame:CheckTab(3) then
+
 	else	
 		if ( not self.baseExtraSetsData[setID] ) then
 			local baseSetID = setID;
@@ -4868,7 +4864,7 @@ function BetterWardrobeSetsDataProviderMixin:GetBaseSetData(setID)
 			end
 			local topCollected, topTotal = self:GetSetSourceCounts(setID)
 			local setInfo = {topCollected = topCollected, topTotal = topTotal, completed = (topCollected == topTotal) }
-			self.baseSetsData[setID] = setInfo;
+			self.baseExtraSetsData[setID] = setInfo;
 		end
 		return self.baseExtraSetsData[setID]
 	end
@@ -4878,10 +4874,7 @@ end
 local setsByExpansion = {}
 local setsByFilter = {}
 local filterinprogress = false;
-counter = 0
 function BetterWardrobeSetsDataProviderMixin:GetSetSourceTopCounts(setID)
-	counter = counter + 1
-	--print("GetCount "..counter)
 	local baseSetData = self:GetBaseSetData(setID)
 	if ( baseSetData ) then
 		return baseSetData.topCollected, baseSetData.topTotal;
