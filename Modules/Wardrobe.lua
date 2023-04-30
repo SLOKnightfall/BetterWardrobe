@@ -18,7 +18,7 @@ local playerInv_DB;
 local Profile;
 local playerNme;
 local realmName;
-local playerClass, classID, _;
+local playerClass, classID, playerClassName;
 
 local L = LibStub("AceLocale-3.0"):GetLocale(addonName);
 
@@ -1486,7 +1486,7 @@ local function resetFilters()
 end
 
 function BetterWardrobeCollectionFrameMixin:OnShow()
-	_,playerClass, classID = UnitClass("player")
+	playerClassName,playerClass, classID = UnitClass("player")
 	CollectionsJournal:SetPortraitToAsset("Interface\\Icons\\inv_chest_cloth_17")
 	local level = CollectionsJournal:GetFrameLevel()
 	--BetterWardrobeCollectionFrame:SetFrameLevel(level+10)
@@ -4919,34 +4919,38 @@ function BetterWardrobeSetsDataProviderMixin:ResetBaseSetNewStatus(baseSetID)
 	end
 end
 
-local ScanTooltip = CreateFrame( "GameTooltip", "BW_ScanGameTooltip", nil, "GameTooltipTemplate" )
-ScanTooltip:SetOwner( UIParent, "ANCHOR_NONE" )
--- Allow tooltip SetX() methods to dynamically add new lines based on these
-ScanTooltip:AddFontStrings(
-	ScanTooltip:CreateFontString( "$parentTextLeft1", nil, "GameTooltipText" ),
-	ScanTooltip:CreateFontString( "$parentTextRight1", nil, "GameTooltipText" ) 
-	)
-	
---Helper function. Makes an invisible tooltip for the item and parses it to see if it has 
---red error text related to class requirements.
 local classGlobal = strsplit(" ", ITEM_CLASSES_ALLOWED)
+local ClassSetCache = {}
 local function CheckClass(itemLink)
-  ScanTooltip:ClearLines()
-  ScanTooltip:SetHyperlink(itemLink)
-  for i = 1,ScanTooltip:NumLines() do
-	local text = _G["BW_ScanGameTooltipTextLeft"..i]
-	
-	if text and text:GetText() then
-	  local r,g,b = text:GetTextColor()
-	  if math.floor(r*256) == 255 and math.floor(g*256) == 32 and math.floor(b*256) == 32 then
-		if string.find(text:GetText(), classGlobal) then
-		  return false;
+	local itemID = GetItemInfoInstant(itemLink) 
+	if not ClassSetCache[itemID] then
+		--Calls twice since the first time usually does not contain actual data
+		local tooltipData = C_TooltipInfo.GetHyperlink(itemLink) 
+		tooltipData = C_TooltipInfo.GetHyperlink(itemLink) 
+
+		TooltipUtil.SurfaceArgs(tooltipData)
+
+		for _, line in ipairs(tooltipData.lines) do
+			TooltipUtil.SurfaceArgs(line)
 		end
-	  end
+
+		for i=1,#tooltipData.lines do  
+			local text = tooltipData.lines[i].leftText
+			if text and string.find(text, classGlobal) and not string.find(text, playerClassName) then
+				ClassSetCache[itemID] = false
+				break
+			elseif text and string.find(text, classGlobal) and string.find(text, playerClassName) then
+ 				ClassSetCache[itemID] = true
+ 				break
+			end
+		end
+
+		ClassSetCache[itemID] = true
 	end
-  end
-  return true;
+
+	return ClassSetCache[itemID]
 end
+
 
 
 
@@ -4987,11 +4991,11 @@ local function CheckCollectionStatus(sources)
 		local link = select(6, C_TransmogCollection.GetAppearanceSourceInfo(sourceInfo.sourceID))
 		local classSet = CheckClass(link)
 		
-		if true and not characterCollectable and classSet then
+		if not characterCollectable and classSet then
 			characterCollectable = true;
 		end
 
-		if true and not characterUseable and classSet and sourceInfo.isCollected then
+		if not characterUseable and classSet and sourceInfo.isCollected then
 			characterUseable = true;
 		end
 		
