@@ -10,6 +10,7 @@ addon.Patrons = {
     "Dejoblue ",
     "Evan Hardin",
     "Ines Tan",
+    "James Leadbetter-Brown",
     "Jason Harper",
     "Joe Romubio",
     "Joshua Hall",
@@ -25,6 +26,8 @@ addon.Patrons = {
     "Peter Portela",
     "Randy Ramirez",
     "Ray Patronson",
+    "Somarlane ",
     "Toumaz",
+    "marilyn lewis",
     "toast042"
 }
