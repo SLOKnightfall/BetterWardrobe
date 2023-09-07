@@ -7,6 +7,8 @@
 
 --	///////////////////////////////////////////////////////////////////////////////////////////
 
+BW_TRANSMOG_SHAPESHIFT_MIN_ZOOM = -0.3;
+
 local addonName, addon = ...;
 ---addon = LibStub("AceAddon-3.0"):NewAddon(addon, addonName, "AceEvent-3.0", "AceConsole-3.0", "AceHook-3.0");
 addon = LibStub("AceAddon-3.0"):GetAddon(addonName);
@@ -62,7 +64,7 @@ local function GetAdjustedDisplayIndexFromKeyPress(contentFrame, index, numEntri
 	elseif ( key == WARDROBE_DOWN_VISUAL_KEY ) then
 		local newIndex = index + contentFrame.NUM_COLS;
 		if ( newIndex > numEntries ) then
-			-- If you're at the last entry, wrap back around otherwise go to the last entry.
+			-- If you're at the last entry, wrap back around; otherwise go to the last entry.
 			index = index == numEntries and 1 or numEntries;
 		else
 			index = newIndex;
@@ -70,7 +72,7 @@ local function GetAdjustedDisplayIndexFromKeyPress(contentFrame, index, numEntri
 	elseif ( key == WARDROBE_UP_VISUAL_KEY ) then
 		local newIndex = index - contentFrame.NUM_COLS;
 		if ( newIndex < 1 ) then
-			-- If you're at the first entry, wrap back around otherwise go to the first entry.
+			-- If you're at the first entry, wrap back around; otherwise go to the first entry.
 			index = index == 1 and numEntries or 1;
 		else
 			index = newIndex;
@@ -169,13 +171,21 @@ function BW_TransmogFrameMixin:OnEvent(event, ...)
 		end
 	elseif ( event == "UNIT_FORM_CHANGED" ) then
 		local unit = ...;
-		if ( unit == "player" and IsUnitModelReadyForUI("player") ) then
-			local hasAlternateForm, inAlternateForm = C_PlayerInfo.GetAlternateFormInfo();
-			if ( self.inAlternateForm ~= inAlternateForm ) then
-				self.inAlternateForm = inAlternateForm;
-				self:RefreshPlayerModel();
-			end
+				if ( unit == "player" ) then
+			self:HandleFormChanged();
 		end
+	end
+end
+
+function BW_TransmogFrameMixin:HandleFormChanged()
+	self.needsFormChangedHandling = true;
+	if IsUnitModelReadyForUI("player") then
+		local hasAlternateForm, inAlternateForm = C_PlayerInfo.GetAlternateFormInfo();
+		if ( self.inAlternateForm ~= inAlternateForm ) then
+			self.inAlternateForm = inAlternateForm;
+			self:RefreshPlayerModel();
+			self.needsFormChangedHandling = false;
+		end	
 	end
 end
 
@@ -213,6 +223,10 @@ end
 function BW_TransmogFrameMixin:OnUpdate()
 	if self.dirty then
 		self:Update();
+		end
+
+	if self.needsFormChangedHandling then
+		self:HandleFormChanged();
 	end
 end
 
@@ -1275,7 +1289,13 @@ function BetterWardrobeCollectionFrameMixin:SetTab(tabID)
 		if ( atTransmogrifier )  then
 			self.TransmogOptionsButton:Show()
 			self.activeFrame = self.SetsTransmogFrame;
-			self.SearchBox:SetPoint("TOPRIGHT", -97, -35)
+
+			if tabID == TAB_SAVED_SETS then 
+				self.SearchBox:SetPoint("TOPRIGHT", -57, -75)
+			else
+				self.SearchBox:SetPoint("TOPRIGHT", -97, -35)
+			end
+
 			----self.SearchBox:SetWidth(115)
 			self.FilterButton:Hide()
 			BW_SortDropDown:SetPoint("TOPRIGHT", BetterWardrobeCollectionFrame.ItemsCollectionFrame, "TOPRIGHT",-30, -10)
@@ -1310,7 +1330,7 @@ function BetterWardrobeCollectionFrameMixin:SetTab(tabID)
 			BW_DBSavedSetDropdown:Show()
 			--BW_SortDropDown:SetPoint("TOPLEFT", BetterWardrobeVisualToggle, "TOPRIGHT", 5, 0)
 			BW_SortDropDown:ClearAllPoints()
-			BW_SortDropDown:SetPoint("TOPRIGHT", self.SearchBox, "TOPRIGHT",20, 0)
+			BW_SortDropDown:SetPoint("TOPRIGHT", self.SearchBox, "TOPRIGHT", 21, 5)
 			BW_SortDropDown:Show()
 			self.FilterButton:Hide()
 			self.SearchBox:Hide()
@@ -1370,13 +1390,7 @@ function BetterWardrobeCollectionFrameMixin:OnEvent(event, ...)
 			self.ItemsCollectionFrame:ValidateChosenVisualSources()
 		end
 	elseif ( event == "UNIT_FORM_CHANGED" ) then
-		local hasAlternateForm, inAlternateForm = C_PlayerInfo.GetAlternateFormInfo()
-		if ( (self.inAlternateForm ~= inAlternateForm or self.updateOnModelChanged) ) then
-			if ( self.activeFrame:OnUnitModelChangedEvent() ) then
-				self.inAlternateForm = inAlternateForm;
-				self.updateOnModelChanged = nil;
-			end
-		end
+		self:HandleFormChanged()
 	elseif ( event == "PLAYER_LEVEL_UP" or event == "SKILL_LINES_CHANGED" or event == "UPDATE_FACTION" or event == "SPELLS_CHANGED" ) then
 		self:UpdateUsableAppearances()
 	elseif ( event == "TRANSMOG_SEARCH_UPDATED" ) then
@@ -1459,6 +1473,25 @@ function BetterWardrobeCollectionFrameMixin:OnEvent(event, ...)
 	end
 end
 
+function BetterWardrobeCollectionFrameMixin:HandleFormChanged()
+	local hasAlternateForm, inAlternateForm = C_PlayerInfo.GetAlternateFormInfo();
+	self.needsFormChangedHandling = false;
+	if ( self.inAlternateForm ~= inAlternateForm or self.updateOnModelChanged ) then
+		if ( self.activeFrame:OnUnitModelChangedEvent() ) then
+			self.inAlternateForm = inAlternateForm;
+			self.updateOnModelChanged = nil;
+		else
+			self.needsFormChangedHandling = true;
+		end
+	end
+end
+
+
+function BetterWardrobeCollectionFrameMixin:OnUpdate()
+	if self.needsFormChangedHandling then
+		self:HandleFormChanged();
+	end
+end
 
 local setCollected,setUncollected,setPvE,setPvP;
 local function clearFilters()
@@ -1507,15 +1540,22 @@ function BetterWardrobeCollectionFrameMixin:OnShow()
 	local hasAlternateForm, inAlternateForm = C_PlayerInfo.GetAlternateFormInfo()
 	self.inAlternateForm = inAlternateForm;
 
-local selectedtab;
-	if C_Transmog.IsAtTransmogNPC() then
-		 selectedtab = self.selectedTransmogTab;
+	local selectedtab;
+	local isAtTransmogNPC = C_Transmog.IsAtTransmogNPC();
+	--self.InfoButton:SetShown(not isAtTransmogNPC);
+	if isAtTransmogNPC then
+		self:SetTab(self.selectedTransmogTab);
 	else
-		selectedtab = self.selectedCollectionTab;
+		self:SetTab(self.selectedCollectionTab);
 	end
-	self:SetTab(1)
 	self:UpdateTabButtons()
 
+	--if (not GetCVarBitfield("closedInfoFrames", LE_FRAME_TUTORIAL_TRANSMOG_MODEL_CLICK) and WardrobeCollectionFrame.fromSuggestedContent) then
+		--skip showing info tutorial if we came from suggested content and haven't seen the tracking tutorial
+	--elseif (not GetCVarBitfield("closedInfoFrames", LE_FRAME_TUTORIAL_WARDROBE_TRACKING_INTERFACE)) then
+		--HelpTip:Show(WardrobeCollectionFrame.InfoButton, WardrobeCollectionFrame.InfoButton.helpTipInfo);
+		--TrackingInterfaceShortcutsFrame.NewAlert:ValidateIsShown();
+	--end
 	addon.selectedArmorType = addon.Globals.CLASS_INFO[playerClass][3]
 	addon.refreshData = true;
 end
@@ -1638,12 +1678,27 @@ function BetterWardrobeCollectionFrameMixin:UpdateTabButtons()
 	self.SetsTab.FlashFrame:SetShown(C_TransmogSets.GetLatestSource() ~= Constants.Transmog.NoTransmogID and not C_Transmog.IsAtTransmogNPC())
 end
 
+local function IsAnySourceCollected(sources)
+	for i, source in ipairs(sources) do
+		if source.isCollected then
+			return true;
+		end
+	end
+
+	return false;
+end
+
 function BetterWardrobeCollectionFrameMixin:SetAppearanceTooltip(contentFrame, sources, primarySourceID, warningString)
 	self.tooltipContentFrame = contentFrame;
 	local selectedIndex = self.tooltipSourceIndex;
 	local showUseError = true;
 	local inLegionArtifactCategory = TransmogUtil.IsCategoryLegionArtifact(self.ItemsCollectionFrame:GetActiveCategory())
 	local subheaderString = nil;
+	local showTrackingInfo = not IsAnySourceCollected(sources) and not C_Transmog.IsAtTransmogNPC();
+	if BetterWardrobeCollectionFrame.activeFrame == BetterWardrobeCollectionFrame.SetsCollectionFrame then
+		showTrackingInfo = false;
+	end
+	self.tooltipSourceIndex, self.tooltipCycle = CollectionWardrobeUtil.SetAppearanceTooltip(GameTooltip, sources, primarySourceID, selectedIndex, showUseError, inLegionArtifactCategory, subheaderString, warningString, showTrackingInfo);
 
 	local index = 1
 	if selectedIndex then
@@ -1652,7 +1707,6 @@ function BetterWardrobeCollectionFrameMixin:SetAppearanceTooltip(contentFrame, s
 
 	local itemID = sources[index] and sources[index].itemID
 	local visualID = sources[index] and sources[index].visualID
-	self.tooltipSourceIndex, self.tooltipCycle = CollectionWardrobeUtil.SetAppearanceTooltip(GameTooltip, sources, primarySourceID, selectedIndex, showUseError, inLegionArtifactCategory, subheaderString, warningString);	
 	
 	if addon.Profile.ShowItemIDTooltips and itemID then
 		GameTooltip_AddNormalLine(GameTooltip, "ItemID: " .. itemID);
@@ -1768,6 +1822,12 @@ end
 
 function BetterWardrobeCollectionFrameMixin:GetSearchType()
 	return self.activeFrame.searchType;
+end
+
+function BetterWardrobeCollectionFrameMixin:ShowItemTrackingHelptipOnShow()
+	if (not GetCVarBitfield("closedInfoFrames", LE_FRAME_TUTORIAL_TRANSMOG_MODEL_CLICK)) then
+		self.fromSuggestedContent = true;
+	end
 end
 		
 BetterWardrobeItemsCollectionSlotButtonMixin = { }
@@ -1923,6 +1983,10 @@ function BetterWardrobeItemsCollectionMixin:CheckHelpTip()
 			return;
 		end
 
+		if (not GetCVarBitfield("closedInfoFrames", LE_FRAME_TUTORIAL_WARDROBE_TRACKING_INTERFACE)) then
+			return;
+		end
+
 		local sets = C_TransmogSets.GetAllSets()
 		local hasCollected = false;
 		if (sets) then
@@ -1950,7 +2014,7 @@ function BetterWardrobeItemsCollectionMixin:CheckHelpTip()
 			return;
 		end
 
-		if (not GetCVarBitfield("closedInfoFrames", LE_FRAME_TUTORIAL_TRANSMOG_MODEL_CLICK)) then
+		if (not GetCVarBitfield("closedInfoFrames", LE_FRAME_TUTORIAL_WARDROBE_TRACKING_INTERFACE)) then
 			return;
 		end
 
@@ -2001,7 +2065,6 @@ function BetterWardrobeItemsCollectionMixin:OnShow()
 	self:UpdateSlotButtons()
 
 	-- tab tutorial
-	--SetCVarBitfield("closedInfoFrames", LE_FRAME_TUTORIAL_TRANSMOG_JOURNAL_TAB, true)
 	--self:CheckHelpTip()
 end
 
@@ -2122,6 +2185,23 @@ function BetterWardrobeItemsCollectionMixin:ChangeModelsSlot(newTransmogLocation
 		model.visualInfo = nil;
 		end
 	self.illusionWeaponAppearanceID = nil;
+
+	self:EvaluateSlotAllowed();
+end
+
+-- For dracthyr/mechagnome
+function BetterWardrobeItemsCollectionMixin:EvaluateSlotAllowed()
+	local isArmor = self.transmogLocation:GetArmorCategoryID();
+		-- Any model will do, using the 1st
+	local model = self.Models[1];
+	self.slotAllowed = not isArmor or model:IsSlotAllowed(self.transmogLocation:GetSlotID());	
+	if not model:IsGeoReady() then
+		self:MarkGeoDirty();
+	end
+end
+
+function BetterWardrobeItemsCollectionMixin:MarkGeoDirty()
+	self.geoDirty = true;
 end
 
 function BetterWardrobeItemsCollectionMixin:RefreshCameras()
@@ -2502,6 +2582,27 @@ function BetterWardrobeItemsCollectionMixin:GetCameraVariation()
 	return nil;
 end
 
+function BetterWardrobeItemsCollectionMixin:OnUpdate()
+	if self.geoDirty then
+		local model = self.Models[1];
+		if model:IsGeoReady() then
+			self.geoDirty = nil;
+
+			self:EvaluateSlotAllowed();
+			self:UpdateItems();
+		end
+	end
+
+	if (self.trackingModifierDown and not ContentTrackingUtil.IsTrackingModifierDown()) or (not self.trackingModifierDown and ContentTrackingUtil.IsTrackingModifierDown()) then
+		for i, model in ipairs(self.Models) do
+			model:UpdateTrackingDisabledOverlay();
+		end
+
+		self:RefreshAppearanceTooltip();
+	end
+	self.trackingModifierDown = ContentTrackingUtil.IsTrackingModifierDown();
+end
+
 function BetterWardrobeItemsCollectionMixin:UpdateItems()
 	if not BetterWardrobeCollectionFrame.ItemsCollectionFrame:IsShown() then return end
 	local isArmor
@@ -2527,7 +2628,7 @@ function BetterWardrobeItemsCollectionMixin:UpdateItems()
 
 	local tutorialAnchorFrame;
 	local checkTutorialFrame = self.transmogLocation:IsAppearance() and not C_Transmog.IsAtTransmogNPC()
-								and not GetCVarBitfield("closedInfoFrames", LE_FRAME_TUTORIAL_TRANSMOG_MODEL_CLICK)
+								and not GetCVarBitfield("closedInfoFrames", LE_FRAME_TUTORIAL_TRANSMOG_MODEL_CLICK) and BetterWardrobeCollectionFrame.fromSuggestedContent;
 
 	local baseSourceID, baseVisualID, appliedSourceID, appliedVisualID, pendingSourceID, pendingVisualID, hasPendingUndo
 	local effectiveCategory;
@@ -2552,7 +2653,12 @@ function BetterWardrobeItemsCollectionMixin:UpdateItems()
 		end
 	end
 	local matchesCategory = not effectiveCategory or effectiveCategory == self.activeCategory or self.transmogLocation:IsIllusion() or self.activeCategory == Enum.TransmogCollectionType.Paired;
+	--local matchesCategory = not effectiveCategory or effectiveCategory == self.activeCategory or self.transmogLocation:IsIllusion();
+
 	local cameraVariation = self:GetCameraVariation()
+
+	-- for disabled slots (dracthyr)
+	local isHeadSlot = self.transmogLocation:GetArmorCategoryID() == Enum.TransmogCollectionType.Head;
 
 	local pendingTransmogModelFrame = nil;
 	local indexOffset = (self.PagingFrame:GetCurrentPage() - 1) * self.PAGE_SIZE;
@@ -2625,6 +2731,8 @@ function BetterWardrobeItemsCollectionMixin:UpdateItems()
 				end
 			end
 			model.visualInfo = visualInfo;
+			model:UpdateContentTracking();
+			model:UpdateTrackingDisabledOverlay();
 
 			-- state at the transmogrifier
 			local transmogStateAtlas;
@@ -2664,6 +2772,9 @@ function BetterWardrobeItemsCollectionMixin:UpdateItems()
 			model.Favorite.Icon:SetShown(isFavorite)
 			-- hide visual option
 			model.HideVisual.Icon:SetShown(isAtTransmogrifier and visualInfo.isHideVisual)
+			-- slots not allowed
+			model.SlotInvalidTexture:SetShown(not self.slotAllowed);			
+			model:SetDesaturated(isHeadSlot and not self.slotAllowed);
 
 
 		local setID = (model.visualInfo and model.visualInfo.visualID) or model.setID;
@@ -2677,9 +2788,10 @@ function BetterWardrobeItemsCollectionMixin:UpdateItems()
 				model:OnEnter()
 			end
 
-			-- find potential tutorial anchor in the 1st row
+			-- find potential tutorial anchor for trackable item
 			if ( checkTutorialFrame ) then
-				if ( i < self.NUM_COLS and not BetterWardrobeCollectionFrame.tutorialVisualID and visualInfo.isCollected and not visualInfo.isHideVisual ) then
+				if ( not BetterWardrobeCollectionFrame.tutorialVisualID and not visualInfo.isCollected and not visualInfo.isHideVisual and model:HasTrackableSource()) then
+
 					tutorialAnchorFrame = model;
 				elseif ( BetterWardrobeCollectionFrame.tutorialVisualID and BetterWardrobeCollectionFrame.tutorialVisualID == visualInfo.visualID ) then
 					tutorialAnchorFrame = model;
@@ -2714,32 +2826,32 @@ function BetterWardrobeItemsCollectionMixin:UpdateItems()
 	-- progress bar
 	self:UpdateProgressBar()
 	-- tutorial
---[[	if ( checkTutorialFrame ) then
-		if ( C_TransmogCollection.HasFavorites() ) then
-			SetCVarBitfield("closedInfoFrames", LE_FRAME_TUTORIAL_TRANSMOG_MODEL_CLICK, true)
-			tutorialAnchorFrame = nil;
-		elseif ( tutorialAnchorFrame ) then
-			if ( not BetterWardrobeCollectionFrame.tutorialVisualID ) then
-				BetterWardrobeCollectionFrame.tutorialVisualID = tutorialAnchorFrame.visualInfo.visualID;
+--[[if ( checkTutorialFrame ) then
+		if ( tutorialAnchorFrame ) then
+			if ( not WardrobeCollectionFrame.tutorialVisualID ) then
+				WardrobeCollectionFrame.tutorialVisualID = tutorialAnchorFrame.visualInfo.visualID;
 			end
-			if ( BetterWardrobeCollectionFrame.tutorialVisualID ~= tutorialAnchorFrame.visualInfo.visualID ) then
+			if ( WardrobeCollectionFrame.tutorialVisualID ~= tutorialAnchorFrame.visualInfo.visualID ) then
 				tutorialAnchorFrame = nil;
 			end
 		end
 	end
 	if ( tutorialAnchorFrame ) then
 		local helpTipInfo = {
-			text = TRANSMOG_MOUSE_CLICK_TUTORIAL,
+
+			text = WARDROBE_TRACKING_TUTORIAL,
 			buttonStyle = HelpTip.ButtonStyle.Close,
 			cvarBitfield = "closedInfoFrames",
 			bitfieldFlag = LE_FRAME_TUTORIAL_TRANSMOG_MODEL_CLICK,
-			targetPoint = HelpTip.Point.BottomEdgeCenter,
-			onAcknowledgeCallback = function() BetterWardrobeCollectionFrame.ItemsCollectionFrame:CheckHelpTip(); end,
+			targetPoint = HelpTip.Point.RightEdgeCenter,
+			onAcknowledgeCallback = function() WardrobeCollectionFrame.fromSuggestedContent = nil;
+											   WardrobeCollectionFrame.ItemsCollectionFrame:CheckHelpTip(); end,
 			acknowledgeOnHide = true,
-		}
-		HelpTip:Show(self, helpTipInfo, tutorialAnchorFrame)
+		};
+		HelpTip:Show(self, helpTipInfo, tutorialAnchorFrame);
 	else
-		HelpTip:Hide(self, TRANSMOG_MOUSE_CLICK_TUTORIAL)
+
+		HelpTip:Hide(self, WARDROBE_TRACKING_TUTORIAL);
 	end
 ]]
 		if 	#addon.GetBaseList() == 0 then 
@@ -3075,17 +3187,64 @@ function BetterWardrobeItemsModelMixin:OnLoad()
 	local lightValues = { omnidirectional = false, point = CreateVector3D(-1, 1, -1), ambientIntensity = 1.05, ambientColor = CreateColor(1, 1, 1), diffuseIntensity = 0, diffuseColor = CreateColor(1, 1, 1) }
 	local enabled = true;
 	self:SetLight(enabled, lightValues)
+	self.desaturated = false;
 end
 
 function BetterWardrobeItemsModelMixin:OnModelLoaded()
 	if ( self.cameraID ) then
 		addon.Model_ApplyUICamera(self, self.cameraID)
 	end
+	self.desaturated = false;
+end
+
+function BetterWardrobeItemsModelMixin:UpdateContentTracking()
+	self:ClearTrackables();
+
+	if ( self.visualInfo ) then
+		local itemsCollectionFrame = self:GetParent();
+		if ( not itemsCollectionFrame.transmogLocation:IsIllusion() ) then
+			local sources = CollectionWardrobeUtil.GetSortedAppearanceSources(self.visualInfo.visualID, itemsCollectionFrame:GetActiveCategory(), itemsCollectionFrame.transmogLocation);
+			for i, sourceInfo in ipairs(sources) do
+				self:AddTrackable(Enum.ContentTrackingType.Appearance, sourceInfo.sourceID);
+			end
+		end
+	end
+
+	self:UpdateTrackingCheckmark();
+end
+
+function BetterWardrobeItemsModelMixin:UpdateTrackingDisabledOverlay()
+	if ( not ContentTrackingUtil.IsContentTrackingEnabled() ) then
+		return;
+	end
+
+	local isCollected = self.visualInfo and self.visualInfo.isCollected;
+	local showDisabled = ContentTrackingUtil.IsTrackingModifierDown() and (isCollected or not self:HasTrackableSource());
+	self.DisabledOverlay:SetShown(showDisabled);
+end
+
+function BetterWardrobeItemsModelMixin:GetSourceInfoForTracking()
+	if ( not self.visualInfo ) then
+		return nil;
+	end
+
+	local itemsCollectionFrame = self:GetParent();
+	if ( itemsCollectionFrame.transmogLocation:IsIllusion() ) then
+		return nil;
+	else
+		local sourceIndex = WardrobeCollectionFrame.tooltipSourceIndex or 1;
+		local sources = CollectionWardrobeUtil.GetSortedAppearanceSources(self.visualInfo.visualID, itemsCollectionFrame:GetActiveCategory(), itemsCollectionFrame.transmogLocation);
+		local index = CollectionWardrobeUtil.GetValidIndexForNumSources(sourceIndex, #sources);
+		return sources[index];
+	end
+
+	return nil;
 end
 
 function BetterWardrobeItemsModelMixin:OnMouseDown(button)
 	local itemsCollectionFrame = self:GetParent()
-	if ( IsModifiedClick("CHATLINK") ) then
+	local isChatLinkClick = IsModifiedClick("CHATLINK");
+	if ( isChatLinkClick ) then
 		local link;
 		if ( itemsCollectionFrame.transmogLocation:IsIllusion() ) then
 			local name;
@@ -3098,11 +3257,27 @@ function BetterWardrobeItemsModelMixin:OnMouseDown(button)
 			end
 		end
 		if ( link ) then
-			HandleModifiedItemClick(link)
+			if ( HandleModifiedItemClick(link) ) then
+				return;
+			end
 		end
-		return;
 	elseif ( IsModifiedClick("DRESSUP") ) then
 		itemsCollectionFrame:DressUpVisual(self.visualInfo)
+		return;
+	end
+
+	if ( self.visualInfo and not self.visualInfo.isCollected ) then
+		local sourceInfo = self:GetSourceInfoForTracking();
+		if ( sourceInfo ) then
+			if ( self:CheckTrackableClick(button, Enum.ContentTrackingType.Appearance, sourceInfo.sourceID) ) then
+				self:UpdateContentTracking();
+				itemsCollectionFrame:RefreshAppearanceTooltip();
+				return;
+			end
+		end
+	end
+
+	if ( isChatLinkClick ) then
 		return;
 	end
 
@@ -3173,6 +3348,13 @@ function BetterWardrobeItemsModelMixin:OnUpdate()
 		if self:IsGeoReady() then
 			self:GetParent():SetAppearanceTooltip(self)
 		end
+	end
+end
+
+function BetterWardrobeItemsModelMixin:SetDesaturated(desaturated)
+	if self.desaturated ~= desaturated then
+		self.desaturated = desaturated;
+		self:SetDesaturation((desaturated and 1) or 0);
 	end
 end
 
@@ -3653,6 +3835,50 @@ function BetterWardrobeCollectionFrameModelDropDown_SetFavorite(visualID, value,
 		--HelpTip:Hide(BetterWardrobeCollectionFrame.ItemsCollectionFrame, TRANSMOG_MOUSE_CLICK_TUTORIAL)
 	--end
 end
+
+-- ***** TUTORIAL
+BetterWardrobeCollectionTutorialMixin = { }
+--[[
+function BetterWardrobeCollectionTutorialMixin:OnLoad()
+
+	self.helpTipInfo = {
+		text = WARDROBE_SHORTCUTS_TUTORIAL_1,
+		buttonStyle = HelpTip.ButtonStyle.None,
+		targetPoint = HelpTip.Point.BottomEdgeLeft,
+		alignment = HelpTip.Alignment.Left,
+		offsetX = 32,
+		offsetY = 16,
+		appendFrame = TrackingInterfaceShortcutsFrame,
+		appendFrameYOffset = 15,
+	};
+
+end
+
+function BetterWardrobeCollectionTutorialMixin:OnEnter()
+	HelpTip:Show(self, self.helpTipInfo);
+	TrackingInterfaceShortcutsFrame.NewAlert:ValidateIsShown();
+end
+
+function BetterWardrobeCollectionTutorialMixin:OnLeave()
+	HelpTip:Hide(self, WARDROBE_SHORTCUTS_TUTORIAL_1);
+	TrackingInterfaceShortcutsFrame.NewAlert:ClearAlert();
+end
+]]--
+
+BW_AlertTrackingFeatureMixin = CreateFromMixins(NewFeatureLabelMixin);
+
+function BW_AlertTrackingFeatureMixin:ClearAlert()
+	NewFeatureLabelMixin.ClearAlert(self);
+	SetCVarBitfield("closedInfoFrames", LE_FRAME_TUTORIAL_WARDROBE_TRACKING_INTERFACE, true);
+	CollectionsMicroButton_SetAlertShown(false);
+end
+
+function BW_AlertTrackingFeatureMixin:ValidateIsShown()
+	self:SetShown(not GetCVarBitfield("closedInfoFrames", LE_FRAME_TUTORIAL_WARDROBE_TRACKING_INTERFACE));
+end
+
+
+
 
 -- ***** WEAPON DROPDOWN
 
@@ -6576,28 +6802,35 @@ function BetterWardrobeSetsDetailsModelMixin:GetPanAndZoomLimits()
 end
 
 function BetterWardrobeSetsDetailsModelMixin:OnUpdate(elapsed)
-	if ( self.rotating ) then
-		local x = GetCursorPosition()
-		local diff = (x - self.rotateStartCursorX) * MODELFRAME_DRAG_ROTATION_CONSTANT;
-		self.rotateStartCursorX = GetCursorPosition()
-		self.yaw = self.yaw + diff;
-		if ( self.yaw < 0 ) then
-			self.yaw = self.yaw + (2 * PI)
+	if ( IsUnitModelReadyForUI("player") ) then
+
+		if ( self.rotating ) then
+			if ( self.yaw ) then
+				local x = GetCursorPosition()
+				local diff = (x - self.rotateStartCursorX) * MODELFRAME_DRAG_ROTATION_CONSTANT;
+				self.rotateStartCursorX = GetCursorPosition()
+				self.yaw = self.yaw + diff;
+				if ( self.yaw < 0 ) then
+					self.yaw = self.yaw + (2 * PI)
+				end
+				if ( self.yaw > (2 * PI) ) then
+					self.yaw = self.yaw - (2 * PI)
+				end
+				self:SetRotation(self.yaw, false)
+			end
+		elseif ( self.panning ) then
+			if ( self.defaultPosX ) then
+				local cursorX, cursorY = GetCursorPosition()
+				local modelX = self:GetPosition()
+				local panSpeedModifier = 100 * sqrt(1 + modelX - self.defaultPosX)
+				local modelY = self.panStartModelY + (cursorX - self.panStartCursorX) / panSpeedModifier;
+				local modelZ = self.panStartModelZ + (cursorY - self.panStartCursorY) / panSpeedModifier;
+				local limits = self:GetPanAndZoomLimits()
+				modelY = Clamp(modelY, limits.panMaxLeft, limits.panMaxRight)
+				modelZ = Clamp(modelZ, limits.panMaxBottom, limits.panMaxTop)
+				self:SetPosition(modelX, modelY, modelZ)
+			end
 		end
-		if ( self.yaw > (2 * PI) ) then
-			self.yaw = self.yaw - (2 * PI)
-		end
-		self:SetRotation(self.yaw, false)
-	elseif ( self.panning ) then
-		local cursorX, cursorY = GetCursorPosition()
-		local modelX = self:GetPosition()
-		local panSpeedModifier = 100 * sqrt(1 + modelX - self.defaultPosX)
-		local modelY = self.panStartModelY + (cursorX - self.panStartCursorX) / panSpeedModifier;
-		local modelZ = self.panStartModelZ + (cursorY - self.panStartCursorY) / panSpeedModifier;
-		local limits = self:GetPanAndZoomLimits()
-		modelY = Clamp(modelY, limits.panMaxLeft, limits.panMaxRight)
-		modelZ = Clamp(modelZ, limits.panMaxBottom, limits.panMaxTop)
-		self:SetPosition(modelX, modelY, modelZ)
 	end
 end
 
@@ -8149,7 +8382,7 @@ addon:SecureHook("SetItemRef", function(link, ...)
 		end
 
 		if not CollectionsJournal:IsVisible() or not BetterWardrobeCollectionFrame:IsVisible() then
-			securecall(function() ToggleCollectionsJournal(5) end)
+			ToggleCollectionsJournal(5) --Why does this taint?
 		end
 
 		BetterWardrobeCollectionFrame:OpenTransmogLink(link)

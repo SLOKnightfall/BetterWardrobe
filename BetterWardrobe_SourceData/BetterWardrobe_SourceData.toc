@@ -6,6 +6,7 @@
 ## LoadOnDemand: 1
 ## DefaultState: enabled
 
+## IconTexture: Interface\AddOns\BetterWardrobe\Images\DerectoryIcon
 
 #Data files
 Data\ColorData.lua
