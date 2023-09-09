@@ -99,7 +99,7 @@
 			<Frame parentKey="Collection" hidden="false">
 				<Size x="20" y="20"/>
 				<Anchors>
-					<Anchor point="BOTTOMRIGHT" x="0" y="0" relativePoint="BOTTOMRIGHT"/>
+					<Anchor point="BOTTOMRIGHT" x="20" y="3" relativePoint="BOTTOMLEFT"/>
 				</Anchors>
 				<Layers>
 					<Layer level="ARTWORK">
@@ -109,6 +109,22 @@
 					</Layer>
 					<Layer level="OVERLAY">
 						<Texture parentKey="Collected_Icon" atlas="ParagonReputation_Checkmark" useAtlasSize="false" hidden="true">
+							<Size x="12" y="12"/>
+							<Anchors>
+							</Anchors>
+						</Texture>
+
+					</Layer>
+				</Layers>
+			</Frame>
+			<Frame parentKey="Set" hidden="false">
+				<Size x="20" y="20"/>
+				<Anchors>
+					<Anchor point="BOTTOMRIGHT" x="20" y="3" relativePoint="BOTTOMLEFT"/>
+				</Anchors>
+				<Layers>
+					<Layer level="ARTWORK">
+						<Texture parentKey="Set_Icon" atlas="ParagonReputation_Checkmark" useAtlasSize="false" hidden="true">
 							<Size x="12" y="12"/>
 							<Anchors>
 							</Anchors>
