@@ -125,7 +125,7 @@
 			</Frame>
 			<Button name ="BW_DressingRoomSettingsButton" parentKey="BW_DressingRoomSettingsButton" inherits="SquareIconButtonTemplate" mixin="BW_DressingRoomButtonMixin"> 
 				<Anchors>
-					<Anchor point="BOTTOMLEFT" relativeTo="$parent" relativePoint="BOTTOMLEFT" x="2" y="-2"/>
+					<Anchor point="BOTTOMLEFT" relativeTo="$parent" relativePoint="BOTTOMLEFT" x="5" y="27"/>
 				</Anchors>
 				<Layers>
 					<Layer level="ARTWORK" textureSubLevel="5">
@@ -436,7 +436,7 @@
 					<OnClick method="OnClick"/>
 				</Scripts>
 				<Frames>
-					<Frame parentKey="DropDown" inherits="UIDropDownMenuTemplate"/>
+					<Frame parentKey="DropDown" inherits="BW_UIDropDownMenuTemplate"/>
 				</Frames>
 			</DropDownToggleButton>	
 		</Frames>

@@ -313,8 +313,10 @@ function DressingRoom:Update(...)
 				reset = false
 			end
 
-			if viewedLink and forceView then 
+
+			if viewedLink and viewedLink.sourceID and forceView then 
 				sharedActor:TryOn(viewedLink)
+				print("here")
 				forceView = false
 				DressingRoom:Update()
 			end
@@ -420,7 +422,7 @@ function BW_DressingRoomFrameMixin:OnLoad()
 	self:RegisterEvent("ADDON_LOADED")
 	hooksecurefunc("DressUpVisual", DressingRoom.Update)
 	hooksecurefunc("DressUpCollectionAppearance", DressingRoom.Update)
-
+--[[
 	DressUpFrame.LinkButton:ClearAllPoints()
 	DressUpFrame.LinkButton:SetPoint("LEFT",BW_DressingRoomFrame.BW_DressingRoomUndressButton, "RIGHT",-6,0)
 	DressUpFrame.LinkButton:SetText("")
@@ -443,7 +445,7 @@ function BW_DressingRoomFrameMixin:OnLoad()
 	highlight:ClearAllPoints()
 	highlight:SetPoint("TOPLEFT",DressUpFrame.LinkButton, "TOPLEFT",-3,-1 )
 	highlight:SetPoint("BOTTOMRIGHT",DressUpFrame.LinkButton, "BOTTOMRIGHT",-8,5 )
-
+--]]
 	if IsAddOnLoaded("Narcissus") then
 		BW_DressingRoomFrame.BW_DressingRoomSwapFormButton:Hide()
 	end
@@ -675,8 +677,8 @@ function BW_DressingRoomButtonMixin:OnMouseDown()
 	elseif button == "Undress" then
 		BW_DressingRoomHideArmorButton_OnClick(self)
 
-	elseif button == "Link" then
-		DressUpModelFrameLinkButtonMixin:OnClick()
+	--elseif button == "Link" then
+		--DressUpModelFrameLinkButtonMixin:OnClick()
 	end
 end
 

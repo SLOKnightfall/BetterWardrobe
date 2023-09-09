@@ -9,6 +9,9 @@ local collectedAppearances = {}
 local weaponSlots = {"INVTYPE_2HWEAPON", "INVTYPE_WEAPON", "INVTYPE_WEAPONMAINHAND", "INVTYPE_RANGED", "INVTYPE_RANGEDRIGHT", "INVTYPE_THROWN",}
 local offhandSlots = {"INVTYPE_WEAPONOFFHAND", "INVTYPE_SHIELD", "INVTYPE_HOLDABLE",}
 
+local preview = CreateFrame("Frame", "BW_ProfileTooltip", UIParent, "TooltipBorderedFrameTemplate")
+addon.preview = preview
+
 local function IsAppearanceCollected(item)
 	local itemID = GetItemInfoInstant(item)
 
@@ -131,8 +134,7 @@ function addon:InitTooltips()
 	preview.zoom = CreateModelFrame()
 end
 
-preview = CreateFrame("Frame", "BW_ProfileTooltip", UIParent, "TooltipBorderedFrameTemplate")
-addon.preview = preview
+
 preview:SetFrameStrata("TOOLTIP")
 preview:Hide()
 preview:RegisterEvent("PLAYER_REGEN_DISABLED")

@@ -594,7 +594,7 @@ addon.ExtendTransmogView = UI.ExtendTransmogView
 
 
 
-function UpdateSlotButtons()
+local function UpdateSlotButtons()
 	for i, button in pairs(WardrobeTransmogFrame.SlotButtons) do
 		addon:SecureHook(button, "OnUserSelect", function(slotButton, fromOnClick) 
 			if slotButton then

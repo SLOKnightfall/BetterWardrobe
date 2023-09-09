@@ -669,9 +669,9 @@ end
 
 
 
-TransmogSlotButtonMixin = { }
+BetterTransmogSlotButtonMixin = { }
 
-function TransmogSlotButtonMixin:OnLoad()
+function BetterTransmogSlotButtonMixin:OnLoad()
 	local slotID, textureName = GetInventorySlotInfo(self.slot)
 	self.slotID = slotID;
 	self.transmogLocation = TransmogUtil.GetTransmogLocation(slotID, self.transmogType, self.modification)
@@ -684,7 +684,7 @@ function TransmogSlotButtonMixin:OnLoad()
 	self:RegisterForClicks("LeftButtonUp", "RightButtonUp")
 end
 
-function TransmogSlotButtonMixin:OnClick(mouseButton)
+function BetterTransmogSlotButtonMixin:OnClick(mouseButton)
 	local isTransmogrified, hasPending, isPendingCollected, canTransmogrify, cannotTransmogrifyReason, hasUndo = C_Transmog.GetSlotInfo(self.transmogLocation)
 	-- save for sound to play on TRANSMOGRIFY_UPDATE event
 	self.hadUndo = hasUndo
@@ -730,12 +730,12 @@ function TransmogSlotButtonMixin:OnClick(mouseButton)
 	self:OnEnter()
 end
 
-function TransmogSlotButtonMixin:OnUserSelect()
+function BetterTransmogSlotButtonMixin:OnUserSelect()
 	local fromOnClick = true;
 	self:GetParent():SelectSlotButton(self, fromOnClick)
 end
 
-function TransmogSlotButtonMixin:OnEnter()
+function BetterTransmogSlotButtonMixin:OnEnter()
 	local isTransmogrified, hasPending, isPendingCollected, canTransmogrify, cannotTransmogrifyReason, hasUndo = C_Transmog.GetSlotInfo(self.transmogLocation)
 
 	if ( self.transmogLocation:IsIllusion() ) then
@@ -795,7 +795,7 @@ function TransmogSlotButtonMixin:OnEnter()
 	self.UpdateTooltip = GenerateClosure(self.OnEnter, self)
 end
 
-function TransmogSlotButtonMixin:OnLeave()
+function BetterTransmogSlotButtonMixin:OnLeave()
 	if ( self.UndoButton and not self.UndoButton:IsMouseOver() ) then
 		self.UndoButton:Hide()
 	end
@@ -804,25 +804,25 @@ function TransmogSlotButtonMixin:OnLeave()
 	self.UpdateTooltip = nil;
 end
 
-function TransmogSlotButtonMixin:OnShow()
+function BetterTransmogSlotButtonMixin:OnShow()
 	self:Update()
 end
 
-function TransmogSlotButtonMixin:OnHide()
+function BetterTransmogSlotButtonMixin:OnHide()
 	self.priorTransmogID = nil;
 end
 
-function TransmogSlotButtonMixin:SetSelected(selected)
+function BetterTransmogSlotButtonMixin:SetSelected(selected)
 	self.SelectedTexture:SetShown(selected)
 end
 
-function TransmogSlotButtonMixin:OnTransmogrifySuccess()
+function BetterTransmogSlotButtonMixin:OnTransmogrifySuccess()
 	self:Animate()
 	self:GetParent():MarkDirty()
 	self.priorTransmogID = nil;	
 end
 
-function TransmogSlotButtonMixin:Animate()
+function BetterTransmogSlotButtonMixin:Animate()
 	-- don't do anything if already animating
 	if self.AnimFrame:IsShown() then
 		return;
@@ -837,12 +837,12 @@ function TransmogSlotButtonMixin:Animate()
 	self.AnimFrame.Anim:Play()
 end
 
-function TransmogSlotButtonMixin:OnAnimFinished()
+function BetterTransmogSlotButtonMixin:OnAnimFinished()
 	self.AnimFrame:Hide()
 	self:Update()
 end
 
-function TransmogSlotButtonMixin:Update()
+function BetterTransmogSlotButtonMixin:Update()
 	if not self:IsShown() then
 		return;
 	end
@@ -951,7 +951,7 @@ function TransmogSlotButtonMixin:Update()
 	end
 end
 
-function TransmogSlotButtonMixin:GetEffectiveTransmogID()
+function BetterTransmogSlotButtonMixin:GetEffectiveTransmogID()
 	if not C_Item.DoesItemExist(self.itemLocation) then
 		return Constants.Transmog.NoTransmogID;
 	end
@@ -980,7 +980,7 @@ function TransmogSlotButtonMixin:GetEffectiveTransmogID()
 	end
 end
 
-function TransmogSlotButtonMixin:RefreshItemModel()
+function BetterTransmogSlotButtonMixin:RefreshItemModel()
 	local actor = WardrobeTransmogFrame.ModelScene:GetPlayerActor()
 	if not actor then
 		return;
@@ -1025,21 +1025,21 @@ function TransmogSlotButtonMixin:RefreshItemModel()
 	end
 end
 
-WardrobeTransmogClearAllPendingButtonMixin = {}
+BetterWardrobeTransmogClearAllPendingButtonMixin = {}
 
-function WardrobeTransmogClearAllPendingButtonMixin:OnClick()
+function BetterWardrobeTransmogClearAllPendingButtonMixin:OnClick()
 	PlaySound(SOUNDKIT.UI_TRANSMOG_REVERTING_GEAR_SLOT)
 	for index, button in ipairs(WardrobeTransmogFrame.SlotButtons) do
 		C_Transmog.ClearPending(button.transmogLocation)
 	end
 end
 
-function WardrobeTransmogClearAllPendingButtonMixin:OnEnter()
+function BetterWardrobeTransmogClearAllPendingButtonMixin:OnEnter()
 	GameTooltip:SetOwner(self, "ANCHOR_RIGHT")
 	GameTooltip:SetText(TRANSMOGRIFY_CLEAR_ALL_PENDING)
 end
 
-function WardrobeTransmogClearAllPendingButtonMixin:OnLeave()
+function BetterWardrobeTransmogClearAllPendingButtonMixin:OnLeave()
 	GameTooltip:Hide()
 end
 
@@ -1379,6 +1379,8 @@ function BetterWardrobeCollectionFrameMixin:OnLoad()
 
 	-- TODO: Remove this at the next deprecation reset
 	self.searchBox = self.SearchBox;
+
+	self.Inset:Hide()
 end
 
 function BetterWardrobeCollectionFrameMixin:OnEvent(event, ...)
@@ -1542,7 +1544,7 @@ function BetterWardrobeCollectionFrameMixin:OnShow()
 
 	local selectedtab;
 	local isAtTransmogNPC = C_Transmog.IsAtTransmogNPC();
-	--self.InfoButton:SetShown(not isAtTransmogNPC);
+	self.InfoButton:SetShown(not isAtTransmogNPC);
 	if isAtTransmogNPC then
 		self:SetTab(self.selectedTransmogTab);
 	else
@@ -1554,7 +1556,7 @@ function BetterWardrobeCollectionFrameMixin:OnShow()
 		--skip showing info tutorial if we came from suggested content and haven't seen the tracking tutorial
 	--elseif (not GetCVarBitfield("closedInfoFrames", LE_FRAME_TUTORIAL_WARDROBE_TRACKING_INTERFACE)) then
 		--HelpTip:Show(WardrobeCollectionFrame.InfoButton, WardrobeCollectionFrame.InfoButton.helpTipInfo);
-		--TrackingInterfaceShortcutsFrame.NewAlert:ValidateIsShown();
+		--BW_TrackingInterfaceShortcutsFrame.NewAlert:ValidateIsShown();
 	--end
 	addon.selectedArmorType = addon.Globals.CLASS_INFO[playerClass][3]
 	addon.refreshData = true;
@@ -1607,8 +1609,7 @@ end
 
 function BetterWardrobeCollectionFrameMixin:OpenTransmogLink(link)
 	if ( not CollectionsJournal:IsVisible() or not self:IsVisible() ) then
-		securecall(function() ToggleCollectionsJournal(5) end)
-		--ToggleCollectionsJournal(5)
+		ToggleCollectionsJournal(5)
 	end
 
 	local linkType, id = strsplit(":", link)
@@ -1737,7 +1738,7 @@ end
 function BetterWardrobeCollectionFrameMixin:UpdateUsableAppearances()
 	if not self.updateUsableAppearances then
 		self.updateUsableAppearances = true;
-		C_Timer.After(0, function() self.updateUsableAppearances = nil; C_TransmogCollection.UpdateUsableAppearances(); end)
+		C_Timer.After(0, function() self.updateUsableAppearances = nil; C_TransmogCollection.UpdateUsableAppearances(); end)  --Causes Taint
 	end
 end
 
@@ -3848,7 +3849,7 @@ function BetterWardrobeCollectionTutorialMixin:OnLoad()
 		alignment = HelpTip.Alignment.Left,
 		offsetX = 32,
 		offsetY = 16,
-		appendFrame = TrackingInterfaceShortcutsFrame,
+		appendFrame = BW_TrackingInterfaceShortcutsFrame,
 		appendFrameYOffset = 15,
 	};
 
@@ -3856,12 +3857,12 @@ end
 
 function BetterWardrobeCollectionTutorialMixin:OnEnter()
 	HelpTip:Show(self, self.helpTipInfo);
-	TrackingInterfaceShortcutsFrame.NewAlert:ValidateIsShown();
+	BW_TrackingInterfaceShortcutsFrame.NewAlert:ValidateIsShown();
 end
 
 function BetterWardrobeCollectionTutorialMixin:OnLeave()
 	HelpTip:Hide(self, WARDROBE_SHORTCUTS_TUTORIAL_1);
-	TrackingInterfaceShortcutsFrame.NewAlert:ClearAlert();
+	BW_TrackingInterfaceShortcutsFrame.NewAlert:ClearAlert();
 end
 ]]--
 
