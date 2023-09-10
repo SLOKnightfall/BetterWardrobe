@@ -1524,6 +1524,8 @@ function BetterWardrobeCollectionFrameMixin:OnShow()
 	playerClassName,playerClass, classID = UnitClass("player")
 	CollectionsJournal:SetPortraitToAsset("Interface\\Icons\\inv_chest_cloth_17")
 	local level = CollectionsJournal:GetFrameLevel()
+	BetterWardrobeCollectionFrame.NineSlice:Hide()
+
 	--BetterWardrobeCollectionFrame:SetFrameLevel(level+10)
 	--CollectionsJournal.NineSlice:SetFrameLevel(level-1)
 
