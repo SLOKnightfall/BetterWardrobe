@@ -1375,8 +1375,8 @@ function BetterWardrobeCollectionFrameMixin:OnLoad()
 	self.selectedTransmogTab = TAB_ITEMS;
 
 	CollectionsJournal:SetPortraitToAsset("Interface\\Icons\\inv_misc_enggizmos_19")
-
-
+	--self.CloseButton:SetScript("OnClick", function() ToggleCollectionsJournal() end)
+	self.CloseButton:Hide()
 	-- TODO: Remove this at the next deprecation reset
 	self.searchBox = self.SearchBox;
 
