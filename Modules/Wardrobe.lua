@@ -1376,11 +1376,11 @@ function BetterWardrobeCollectionFrameMixin:OnLoad()
 
 	CollectionsJournal:SetPortraitToAsset("Interface\\Icons\\inv_misc_enggizmos_19")
 	--self.CloseButton:SetScript("OnClick", function() ToggleCollectionsJournal() end)
-	self.CloseButton:Hide()
+	--self.CloseButton:Hide()
 	-- TODO: Remove this at the next deprecation reset
 	self.searchBox = self.SearchBox;
 
-	self.Inset:Hide()
+	--self.Inset:Hide()
 end
 
 function BetterWardrobeCollectionFrameMixin:OnEvent(event, ...)
@@ -1524,7 +1524,7 @@ function BetterWardrobeCollectionFrameMixin:OnShow()
 	playerClassName,playerClass, classID = UnitClass("player")
 	CollectionsJournal:SetPortraitToAsset("Interface\\Icons\\inv_chest_cloth_17")
 	local level = CollectionsJournal:GetFrameLevel()
-	BetterWardrobeCollectionFrame.NineSlice:Hide()
+	--BetterWardrobeCollectionFrame.NineSlice:Hide()
 
 	--BetterWardrobeCollectionFrame:SetFrameLevel(level+10)
 	--CollectionsJournal.NineSlice:SetFrameLevel(level-1)

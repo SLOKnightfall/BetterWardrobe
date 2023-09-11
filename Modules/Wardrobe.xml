@@ -445,7 +445,7 @@
 		</Frames>
 	</Frame>
 
-	<Frame name="BetterWardrobeCollectionFrameTemplate" parent="CollectionsJournal" inherits="ButtonFrameTemplate" mixin="BetterWardrobeCollectionFrameMixin" setAllPoints="true" hidden="true" virtual="true" frameLevel="50">
+	<Frame name="BetterWardrobeCollectionFrameTemplate" parent="CollectionsJournal" mixin="BetterWardrobeCollectionFrameMixin" setAllPoints="true" hidden="true" virtual="true" frameLevel="50">
 		<Frames>
 			<Button parentKey="InfoButton" inherits="MainHelpPlateButton" mixin="WardrobeCollectionTutorialMixin" hidden="true" frameLevel="75">
 				<Anchors>
