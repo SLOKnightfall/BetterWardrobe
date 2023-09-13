@@ -456,7 +456,7 @@
 					<OnEnter method="OnEnter"/>
 					<OnLeave method="OnLeave"/>
 					<OnShow>
-	    				self:SetFrameLevel(self:GetParent().TitleContainer:GetFrameLevel()+200);
+	    				self:SetFrameLevel(CollectionsJournal.TitleContainer:GetFrameLevel()+200);
 	     			</OnShow>
 				</Scripts>
 			</Button>
