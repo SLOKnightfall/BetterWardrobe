@@ -121,7 +121,7 @@
 			<OnLoad method="OnLoad"/>
 			<OnEvent method="OnEvent"/>
 			<OnShow method="OnShow"/>
-			<OnHide method="OnHide"/>
+			<OnHide method="BetterWardrobeOutfitDropDown_OnHide"/>
 		</Scripts>
 	</Frame>
 

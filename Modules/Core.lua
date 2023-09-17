@@ -109,6 +109,49 @@ function optionHandler:TSM_MarketGetter(info)
 	return optionHandler:Getter(info)
 end
 
+
+
+
+	--local PATRONS = {{},{title = 'Patrons', people = addon.Patrons},}
+
+local Patrons = {
+	name = "Patrons |TInterface/Addons/BetterWardrobe/Images/Patreon:12:12|t",
+	handler = optionHandler,
+	get = "Getter",
+	set = "Setter",
+	type = 'group',
+	childGroups = "tab",
+	inline = false,
+	args = {
+			Patronss_Label = {
+				order = 1,
+				name = function() return addonName .. ' is distributed for free and supported trough donations. A massive thank you to all the supporters on Patreon and Paypal who keep development alive. You can become a patron too at |cFFF96854patreon.com/SLOKnightfall|r.\n\n\n', 'https://www.patreon.com/SLOKnightfall' end,
+				type = "description",
+				width = "full",
+
+			},
+			Patronss_Header = {
+				order = 2,
+				name = "Patrons",
+				type = "header",
+				width = "full",
+			},
+			
+		},
+}
+	
+function addPatrons()
+	for i, namex in ipairs(addon.Patrons) do
+		Patrons.args["name"..i] = {
+				order = i + 2,
+				name = namex,
+				type = "description",
+				width = ".3",
+			}
+	end
+end
+
+
 local screenWidth =  math.floor(UIParent:GetWidth())
 --ACE3 Options Constuctor
 local options = {
@@ -767,7 +810,7 @@ local options = {
 							type = "description",
 						},
 			},
-		},	
+		},
 	},
 }
 local subTextFields={}
@@ -1211,6 +1254,8 @@ function addon:OnInitialize()
 	UpdateDB()
 	UpdateDB_8_4()
 
+
+
 --Create all the profiled DB
 	self.db = LibStub("AceDB-3.0"):New("BetterWardrobe_Options", defaults, true)
 	options.args.settings.args.options = LibStub("AceDBOptions-3.0"):GetOptionsTable(self.db)
@@ -1260,16 +1305,20 @@ function addon:OnInitialize()
 	LibStub("AceConfigRegistry-3.0"):ValidateOptionsTable(options, addonName)
 	LibStub("AceConfig-3.0"):RegisterOptionsTable(addonName, options)
 
+	LibStub("AceConfig-3.0"):RegisterOptionsTable("Patrons", Patrons)
+
+
 	self.optionsFrame = LibStub("AceConfigDialog-3.0"):AddToBlizOptions("BetterWardrobe", "BetterWardrobe")
+	self.patrons = LibStub("AceConfigDialog-3.0"):AddToBlizOptions("Patrons", "Patrons |TInterface/Addons/BetterWardrobe/Images/Patreon:12:12|t","BetterWardrobe")
+
 	self.db.RegisterCallback(addon, "OnProfileChanged", "RefreshConfig")
 	self.db.RegisterCallback(addon, "OnProfileCopied", "RefreshConfig")
 	self.collectionListDB.RegisterCallback(addon, "OnProfileChanged", "RefreshCollectionListData")
 	self.itemsubdb.RegisterCallback(addon, "OnProfileReset", "RefreshSubItemData")	
 
-
-	local PATRONS = {{},{title = 'Patrons', people = addon.Patrons},}
-	local Credits = LibStub('Sushi-3.1').CreditsGroup(self.optionsFrame, PATRONS, 'Patrons |TInterface/Addons/BetterWardrobe/Images/Patreon:12:12|t')
-	Credits:SetSubtitle(addonName .. ' is distributed for free and supported trough donations. A massive thank you to all the supporters on Patreon and Paypal who keep development alive. You can become a patron too at |cFFF96854patreon.com/SLOKnightfall|r.', 'https://www.patreon.com/SLOKnightfall')
+	--local PATRONS = {{},{title = 'Patrons', people = addon.Patrons},}
+	--local Credits = LibStub('Sushi-3.1').CreditsGroup(self.optionsFrame, PATRONS, 'Patrons |TInterface/Addons/BetterWardrobe/Images/Patreon:12:12|t')
+	--Credits:SetSubtitle(addonName .. ' is distributed for free and supported trough donations. A massive thank you to all the supporters on Patreon and Paypal who keep development alive. You can become a patron too at |cFFF96854patreon.com/SLOKnightfall|r.', 'https://www.patreon.com/SLOKnightfall')
 
 	if firstRun then
 		listDB.lastUpdte = 1
@@ -1293,7 +1342,7 @@ addon:InitTooltips()
 		addon.RefreshSubItemData()
 		addon.RefreshOutfitData()
 	end)
-	
+		addPatrons()
 	addon:RegisterEvent("TRANSMOG_COLLECTION_SOURCE_REMOVED", "EventHandler")
 	addon:RegisterEvent("TRANSMOG_COLLECTION_SOURCE_ADDED", "EventHandler")
 	if IsAddOnLoaded("Blizzard_Collections") then

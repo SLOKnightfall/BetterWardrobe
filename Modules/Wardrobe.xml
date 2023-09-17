@@ -151,6 +151,7 @@
 			<OnEvent method="OnEvent"/>
 			<OnEnter method="OnEnter"/>
 			<OnLeave method="OnLeave"/>
+			<OnShow method="OnShow"/>
 			<OnHide method="OnHide"/>
 			<OnMouseDown method="OnMouseDown"/>
 			<OnModelLoaded method="OnModelLoaded"/>
@@ -416,11 +417,11 @@
 			<OnMouseDown method="OnMouseDown"/>
 		</Scripts>
 	</Frame>
-		<Frame name="AlertTrackingFeatureTemplate" inherits="NewFeatureLabelTemplate" mixin="BW_AlertTrackingFeatureMixin" virtual="true">
+		<Frame name="BW_AlertTrackingFeatureTemplate" inherits="NewFeatureLabelTemplate" mixin="BW_AlertTrackingFeatureMixin" virtual="true">
 		<Size x="1" y="1"/>
 	</Frame>
 
-	<Frame name="TrackingInterfaceShortcutsFrame" hidden="true">
+	<Frame name="BW_TrackingInterfaceShortcutsFrame" hidden="true">
 		<Size x="226" y="40"/>
 		<Layers>
 			<Layer level="OVERLAY">
@@ -437,7 +438,7 @@
 			</Layer>
 		</Layers>
 		<Frames>
-			<Frame parentKey="NewAlert" inherits="AlertTrackingFeatureTemplate">
+			<Frame parentKey="NewAlert" inherits="BW_AlertTrackingFeatureTemplate">
 				<Anchors>
 					<Anchor point="LEFT" relativeKey="$parent.HeaderText" relativePoint="RIGHT" x="17"/>
 				</Anchors>
@@ -447,7 +448,7 @@
 
 	<Frame name="BetterWardrobeCollectionFrameTemplate" parent="CollectionsJournal" mixin="BetterWardrobeCollectionFrameMixin" setAllPoints="true" hidden="true" virtual="true" frameLevel="50">
 		<Frames>
-			<Button parentKey="InfoButton" inherits="MainHelpPlateButton" mixin="WardrobeCollectionTutorialMixin" hidden="true" frameLevel="75">
+			<Button parentKey="InfoButton" inherits="MainHelpPlateButton" mixin="BetterWardrobeCollectionTutorialMixin" hidden="true" frameLevel="75">
 				<Anchors>
 					<Anchor point="TOPLEFT" x="43" y="19"/>
 				</Anchors>
@@ -736,7 +737,7 @@
 					</Frame>
 				</Frames>
 			</EditBox>
-			<StatusBar parentKey="progressBar" inherits="CollectionsProgressBarTemplate">
+			<StatusBar parentKey="progressBar" inherits="BW_CollectionsProgressBarTemplate">
 				<Size x="110" y="13"/>
 				<Anchors>
 					<Anchor point="TOPLEFT" relativeKey="$parent.SavedSetsTab" relativePoint="TOPRIGHT" x="5" y="-11"/>
@@ -779,6 +780,9 @@
 			</Button>
 			<DropDownToggleButton parentKey="FilterButton" inherits="UIResettableDropdownButtonTemplate" text="FILTER">
 				<Size x="93" y="22"/>
+				<KeyValues>
+					<KeyValue key="resetFunction" value="BetterWardrobeFilterDropDown_ResetFilters" type="global"/>
+				</KeyValues>
 				<Anchors>
 					<Anchor point="LEFT" relativeKey="$parent.SearchBox" relativePoint="RIGHT" x="2" y="-1"/>
 				</Anchors>
@@ -793,10 +797,10 @@
 					</Layer>
 				</Layers>
 				<Scripts>
-					<OnMouseDown>
-						UIMenuButtonStretchMixin.OnMouseDown(self, button);
+					<OnMouseDown inherit="prepend">
+						--UIMenuButtonStretchMixin.OnMouseDown(self, button);
 						if self:IsEnabled() then
-							PlaySound(SOUNDKIT.IG_MAINMENU_OPTION_CHECKBOX_ON);
+							--PlaySound(SOUNDKIT.IG_MAINMENU_OPTION_CHECKBOX_ON);
 							BW_ToggleDropDownMenu(1, nil, BetterWardrobeFilterDropDown, self, 74, 15);
 						end
 					</OnMouseDown>
@@ -805,6 +809,7 @@
 					</OnEnable>
 					<OnDisable>
 						self.Icon:SetDesaturated(true);
+						self.ResetButton:Hide();
 					</OnDisable>
 				</Scripts>
 			</DropDownToggleButton>
@@ -875,7 +880,7 @@
 
 				</Scripts>
 			</Button>
-			<Frame parentKey="ItemsCollectionFrame" parentArray="ContentFrames" mixin="BetterWardrobeItemsCollectionMixin" inherits="CollectionsBackgroundTemplate">
+			<Frame parentKey="ItemsCollectionFrame" parentArray="ContentFrames" mixin="BetterWardrobeItemsCollectionMixin" inherits="BW_CollectionsBackgroundTemplate">
 				<KeyValues>
 					<KeyValue key="searchType" value="Enum.TransmogSearchType.Items" type="global"/>
 				</KeyValues>
@@ -890,7 +895,7 @@
 					</Layer>
 				</Layers>
 				<Frames>
-					<Frame parentKey="PagingFrame" inherits="CollectionsPagingFrameTemplate">
+					<Frame parentKey="PagingFrame" inherits="BW_CollectionsPagingFrameTemplate">
 						<Anchors>
 							<Anchor point="BOTTOM" x="22" y="38"/>
 						</Anchors>
@@ -1207,7 +1212,7 @@
 							<Anchor point="BOTTOMLEFT"/>
 						</Anchors>
 					</Frame>
-					<Frame parentKey="RightInset" useParentLevel="true" inherits="CollectionsBackgroundTemplate">
+					<Frame parentKey="RightInset" useParentLevel="true" inherits="BW_CollectionsBackgroundTemplate">
 						<Anchors>
 							<Anchor point="TOPLEFT" relativeKey="$parent.LeftInset" relativePoint="TOPRIGHT" x="22" y="0"/>
 							<Anchor point="BOTTOMRIGHT"/>
@@ -1224,8 +1229,8 @@
 							<Frame parentKey="ScrollBox" setAllPoints="true" inherits="WowScrollBoxList"/>
 							<EventFrame parentKey="ScrollBar" inherits="MinimalScrollBar" name="BetterWardrobeCollectionFrameScrollFrameScrollBar">
 								<Anchors>
-									<Anchor point="TOPLEFT" relativePoint="TOPRIGHT" x="4" y="20"/>
-									<Anchor point="BOTTOMLEFT" relativePoint="BOTTOMRIGHT" x="4" y="8"/>
+									<Anchor point="TOPLEFT" relativeKey="$parent.ScrollBox" relativePoint="TOPRIGHT" x="8" y="31"/>
+									<Anchor point="BOTTOMLEFT" relativeKey="$parent.ScrollBox" relativePoint="BOTTOMRIGHT" x="8" y="-1"/>
 								</Anchors>
 							</EventFrame>
 
@@ -1245,6 +1250,7 @@
 						</Anchors>
 						<Scripts>
 							<OnLoad method="OnLoad"/>
+							<OnShow method="OnShow"/>
 							<OnUpdate method="OnUpdate"/>
 							<OnMouseDown method="OnMouseDown"/>
 							<OnMouseUp method="OnMouseUp"/>
@@ -1410,7 +1416,7 @@
 					<OnEvent method="OnEvent"/>
 				</Scripts>
 			</Frame>
-			<Frame parentKey="SetsTransmogFrame" parentArray="ContentFrames" inherits="CollectionsBackgroundTemplate" mixin="BetterWardrobeSetsTransmogMixin" hidden="true">
+			<Frame parentKey="SetsTransmogFrame" parentArray="ContentFrames" inherits="BW_CollectionsBackgroundTemplate" mixin="BetterWardrobeSetsTransmogMixin" hidden="true">
 				<KeyValues>
 					<KeyValue key="searchType" value="Enum.TransmogSearchType.UsableSets" type="global"/>
 				</KeyValues>
@@ -1430,7 +1436,7 @@
 							<OnLoad function="BetterWardrobeSetsTransmogModelRightClickDropDown_OnLoad"/>
 						</Scripts>
 					</Frame>
-					<Frame parentKey="PagingFrame" inherits="CollectionsPagingFrameTemplate">
+					<Frame parentKey="PagingFrame" inherits="BW_CollectionsPagingFrameTemplate">
 						<Anchors>
 							<Anchor point="BOTTOM" x="22" y="38"/>
 						</Anchors>
@@ -1862,7 +1868,7 @@
 		</HighlightTexture>
 	</Button>
 
-	<Button name="BetterWardrobeTransmogEnchantButtonTemplate" motionScriptsWhileDisabled="true" mixin="TransmogSlotButtonMixin" frameLevel="75" virtual="true">
+	<Button name="BetterWardrobeTransmogEnchantButtonTemplate" motionScriptsWhileDisabled="true" mixin="BW_TransmogSlotButtonMixin" frameLevel="75" virtual="true">
 		<KeyValues>
 			<KeyValue key="transmogType" value="Enum.TransmogType.Illusion" type="global"/>
 			<KeyValue key="modification" value="Enum.TransmogModification.Main" type="global"/>
@@ -2112,7 +2118,7 @@
 									<Anchor point="TOP" x="0" y="-10"/>
 								</Anchors>
 							</Frame>
-							<Button parentKey="ClearAllPendingButton" inherits="UIMenuButtonStretchTemplate" hidden="true" mixin="WardrobeTransmogClearAllPendingButtonMixin">
+							<Button parentKey="ClearAllPendingButton" inherits="UIMenuButtonStretchTemplate" hidden="true" mixin="BetterWardrobeTransmogClearAllPendingButtonMixin">
 								<Size x="26" y="26"/>
 								<Anchors>
 									<Anchor point="TOPRIGHT" x="-5" y="-10"/>
@@ -2268,7 +2274,7 @@
 							<Anchor point="CENTER" x="27" y="-203"/>
 						</Anchors>
 					</Button>
-					<Frame parentKey="MoneyFrame" name="WardrobeTransmogMoneyFrame" inherits="SmallMoneyFrameTemplate">
+					<Frame parentKey="MoneyFrame" name="BetterWardrobeTransmogMoneyFrame" inherits="SmallMoneyFrameTemplate">
 						<Anchors>
 							<Anchor point="RIGHT" relativeKey="$parent.MoneyRight" x="6" y="0"/>
 						</Anchors>

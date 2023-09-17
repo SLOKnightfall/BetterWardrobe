@@ -213,7 +213,7 @@ function BetterWardrobeOutfitDropDownMixin:OnShow()
 	self:SelectOutfit(self:GetLastOutfitID(), true)
 end
 
-function BetterWardrobeOutfitDropDownMixin:OnHide()
+function BetterWardrobeOutfitDropDownMixin:BetterWardrobeOutfitDropDown_OnHide()
 	self:UnregisterEvent("TRANSMOG_OUTFITS_CHANGED")
 	self:UnregisterEvent("TRANSMOGRIFY_UPDATE")
 	BetterWardrobeOutfitFrame:ClosePopups(self)
@@ -224,33 +224,43 @@ end
 
 function BetterWardrobeOutfitDropDownMixin:OnEvent(event)
 	if event == "TRANSMOG_OUTFITS_CHANGED" then
+		-- try to reselect the same outfit to update the name
+		-- if it changed or clear the name if it got deleted
 		self:SelectOutfit(self.selectedOutfitID)
 		if ( BetterWardrobeOutfitFrame:IsShown() ) then
 			BetterWardrobeOutfitFrame:Update()
 		end
 	end
-
+	-- don't need to do anything for "TRANSMOGRIFY_UPDATE" beyond updating the save button
 	self:UpdateSaveButton()
 end
 
 function BetterWardrobeOutfitDropDownMixin:UpdateSaveButton()
-	if  self.selectedOutfitID then
-	local dressed = self:IsOutfitDressed()
-		self.SaveButton:SetEnabled(DressUpFrame:IsShown() or not dressed)
+	if ( self.selectedOutfitID ) then
+		self.SaveButton:SetEnabled(not self:IsOutfitDressed());
 	else
-		self.SaveButton:SetEnabled(false)
+		self.SaveButton:SetEnabled(false);
 	end
 end
 
 function BetterWardrobeOutfitDropDownMixin:OnOutfitSaved(outfitID)
+	if self:ShouldReplaceInvalidSources() then
+		self:LoadOutfit(outfitID);
+	end
+end
+
+function BetterWardrobeOutfitDropDownMixin:OnOutfitModified(outfitID)
+	if self:ShouldReplaceInvalidSources() then
+		self:LoadOutfit(outfitID);
+	end
 end
 
 function BetterWardrobeOutfitDropDownMixin:SelectOutfit(outfitID, loadOutfit)
 	local name
-	if outfitID then
+	if ( outfitID ) then
 		name = GetOutfitName(outfitID)
 	end
-	if name then
+	if ( name ) then
 		BW_UIDropDownMenu_SetText(self, name)
 	else
 		outfitID = nil
@@ -262,7 +272,7 @@ function BetterWardrobeOutfitDropDownMixin:SelectOutfit(outfitID, loadOutfit)
 		BetterWardrobeCollectionFrame.SetsTransmogFrame.selectedSetID = outfitID
 	end
 
-	if loadOutfit then
+	if ( loadOutfit ) then
 		self:LoadOutfit(outfitID)
 	end
 	self:UpdateSaveButton()
@@ -272,11 +282,12 @@ end
 function BetterWardrobeOutfitDropDownMixin:LoadOutfit(outfitID)
 end
 
-function BetterWardrobeOutfitDropDownMixin:OnSelectOutfit(outfitID)
+function WardrobeOutfitDropDownMixin:OnSelectOutfit(outfitID)
+	-- nothing to see here
 end
 
-function BetterWardrobeOutfitDropDownMixin:GetLastOutfitID()
-	return
+function WardrobeOutfitDropDownMixin:GetLastOutfitID()
+	return nil;
 end
 
 local function IsSourceArtifact(sourceID)
@@ -403,6 +414,10 @@ end
 
 function BetterWardrobeOutfitDropDownMixin:IsDefaultSet(outfitID)
 		return addon.IsDefaultSet(outfitID)
+end
+
+function BetterWardrobeOutfitDropDownMixin:ShouldReplaceInvalidSources()
+	return self.replaceInvalidSources;
 end
 
 --===================================================================================================================================

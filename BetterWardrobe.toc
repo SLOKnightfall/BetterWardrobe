@@ -9,8 +9,6 @@
 ## X-Wago-ID: 0mKOzk6x
 ## IconTexture: Interface\GossipFrame\transmogrifyGossipIcon.blp
 
-
-
 #Libraries
 Libs\LibStub\LibStub.lua
 Libs\CallbackHandler-1.0\CallbackHandler-1.0.lua
@@ -29,8 +27,6 @@ Libs\LibAppropriateitems-1.0\lib.xml
 #Libs\LibTextDump-1.0\LibTextDump-1.0.lua
 Libs\UIDropDownMenu\UIDropDownMenu.xml
 Libs\AceSerializer-3.0\AceSerializer-3.0.xml
-Libs\Poncho-2.0\Poncho-2.0.xml
-Libs\Sushi-3.1\Sushi-3.1.xml
 Libs\TaintLess\TaintLess.xml
 
 #Locale
@@ -41,6 +37,7 @@ Locale\zhTW.lua
 
 #Core files
 Data\Globals.lua
+Modules\CollectionTemplates.xml
 Modules\Templates.xml
 Modules\Core.lua
 
