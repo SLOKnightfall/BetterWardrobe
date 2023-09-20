@@ -34,7 +34,7 @@
 		</Scripts>
 	</Button>
 
-	<Button name="BW_DressingRoomOutfitFrameButtonTemplate" inherits="WardrobeOutfitButtonTemplate" virtual="true" mixin="BW_DressingRoomOutfitButtonMixin"/>
+	<Button name="BW_DressingRoomOutfitFrameButtonTemplate" inherits="BetterWardrobeOutfitButtonTemplate" virtual="true" mixin="BW_DressingRoomOutfitButtonMixin"/>
 	
 
 	<Frame name="BW_DressingRoomFrameTemplate" mixin="BW_DressingRoomFrameMixin" virtual="true">

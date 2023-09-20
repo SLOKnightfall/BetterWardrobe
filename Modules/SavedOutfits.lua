@@ -282,11 +282,12 @@ end
 function BetterWardrobeOutfitDropDownMixin:LoadOutfit(outfitID)
 end
 
-function WardrobeOutfitDropDownMixin:OnSelectOutfit(outfitID)
+function BetterWardrobeOutfitDropDownMixin:OnSelectOutfit(outfitID)
 	-- nothing to see here
 end
 
-function WardrobeOutfitDropDownMixin:GetLastOutfitID()
+function BetterWardrobeOutfitDropDownMixin:GetLastOutfitID()
+	
 	return nil;
 end
 
