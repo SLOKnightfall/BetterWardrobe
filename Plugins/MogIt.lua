@@ -62,12 +62,11 @@ local function UpdateFrames()
 
 	local orig_OnMouseDown = BetterWardrobeCollectionFrame.ItemsCollectionFrame.Models[1]:GetScript("OnMouseDown")
 
-
 	for i, model in ipairs(BetterWardrobeCollectionFrame.ItemsCollectionFrame.Models) do
 		model:SetScript("OnMouseDown", function(self, button)
 			if IsControlKeyDown() and button == "RightButton" then
 				local link
-				local sources = WardrobeCollectionFrame_GetSortedAppearanceSources(self.visualInfo.visualID)
+				local sources = CollectionWardrobeUtil.GetSortedAppearanceSources(self.visualInfo.visualID)
 				if BetterWardrobeCollectionFrame.tooltipSourceIndex then
 					local index = WardrobeUtils_GetValidIndexForNumSources(BetterWardrobeCollectionFrame.tooltipSourceIndex, #sources)
 					link = select(6, C_TransmogCollection.GetAppearanceSourceInfo(sources[index].sourceID))
@@ -78,16 +77,11 @@ local function UpdateFrames()
 			orig_OnMouseDown(self, button)
 		end)
 	end
-
-
-
-	
 end
 
 addon:RegisterMessage("BW_ADDON_LOADED", function() UpdateFrames() end)
 
 addon:RegisterMessage("BW_OnPlayerEnterWorld", function() SetHooks() end)
-
 
 
 function MogIt.GetMogitOutfits() 

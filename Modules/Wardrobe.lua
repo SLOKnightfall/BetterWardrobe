@@ -3206,7 +3206,7 @@ function BetterWardrobeItemsModelMixin:UpdateContentTracking()
 
 	if ( self.visualInfo ) then
 		local itemsCollectionFrame = self:GetParent();
-		if ( not itemsCollectionFrame.transmogLocation:IsIllusion() ) then
+		if ( not itemsCollectionFrame.transmogLocation:IsIllusion()  and not itemsCollectionFrame == Enum.TransmogCollectionType.Paired) then
 			local sources = CollectionWardrobeUtil.GetSortedAppearanceSources(self.visualInfo.visualID, itemsCollectionFrame:GetActiveCategory(), itemsCollectionFrame.transmogLocation);
 			for i, sourceInfo in ipairs(sources) do
 				self:AddTrackable(Enum.ContentTrackingType.Appearance, sourceInfo.sourceID);
@@ -3233,7 +3233,7 @@ function BetterWardrobeItemsModelMixin:GetSourceInfoForTracking()
 	end
 
 	local itemsCollectionFrame = self:GetParent();
-	if ( itemsCollectionFrame.transmogLocation:IsIllusion() ) then
+	if ( itemsCollectionFrame.transmogLocation:IsIllusion() or itemsCollectionFrame == Enum.TransmogCollectionType.Paired) then
 		return nil;
 	else
 		local sourceIndex = WardrobeCollectionFrame.tooltipSourceIndex or 1;
@@ -3603,7 +3603,7 @@ local function ToggleHidden(model, isHidden)
 	if tabID == 1 then
 		local visualID = model.visualInfo.visualID;
 		local _, _, _, _, _, itemLink = C_TransmogCollection.GetAppearanceSourceInfo(visualID)	
-		local source = WardrobeCollectionFrame_GetSortedAppearanceSources(visualID, addon.GetItemCategory(visualID), addon.GetTransmogLocation(itemLink))[1]
+		local source = CollectionWardrobeUtil.GetSortedAppearanceSources(visualID, addon.GetItemCategory(visualID), addon.GetTransmogLocation(itemLink))[1]
 		local name, link = GetItemInfo(source.itemID)
 		addon.HiddenAppearanceDB.profile.item[visualID] = not isHidden and name;
 		--self:UpdateWardrobe()
