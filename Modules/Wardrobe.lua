@@ -5239,7 +5239,8 @@ function BetterWardrobeSetsDataProviderMixin:GetSortedSetSources(setID)
 
 	local sourceData = self:GetSetSourceData(setID)
 	local setType = addon.GetSetType(setID)
-	if (setType == nil) then
+
+	if (setType == nil or setType == "BlizzardSet")  then
 	--if BetterWardrobeCollectionFrame:CheckTab(2) then
 		for i, primaryAppearance in ipairs(sourceData.primaryAppearances) do
 			local sourceID = primaryAppearance.appearanceID;
@@ -5252,6 +5253,8 @@ function BetterWardrobeSetsDataProviderMixin:GetSortedSetSources(setID)
 				tinsert(returnTable, { sourceID = sourceID, collected = primaryAppearance.collected, sortOrder = sortOrder, itemID = sourceInfo.itemID, invType = sourceInfo.invType, characterUseable = characterUseable, characterCollectable = characterCollectable })
 			end
 		end
+
+
 	else
 	----elseif BetterWardrobeCollectionFrame:CheckTab(3) then
 		for sourceID, collected in pairs(sourceData.sources) do
