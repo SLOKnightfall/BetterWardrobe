@@ -55,6 +55,10 @@ Data\LEATHER.lua
 Data\MAIL.lua
 Data\PLATE.lua
 Data\COSMETIC.lua
+#@debug@
+Data\test.lua
+#@end-debug@
+
 
 #Modules
 Modules\BlizzardAPI.lua

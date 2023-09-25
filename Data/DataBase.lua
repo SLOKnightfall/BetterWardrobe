@@ -158,6 +158,9 @@ do
 		local playerFaction, _ = UnitFactionGroup('player')
 		local buildID = (select(4, GetBuildInfo()))
 		BuildBlizzSets()
+		--@debug@ 
+		addon:AddTestSets()
+		--@end-debug@
 		for armorType, data in pairs(addon.ArmorSets) do
 			ArmorDB[armorType] = {}
 
@@ -200,7 +203,7 @@ do
 
 
 					for slotID, itemData in pairs(setData.itemData) do
-						local appearanceID = itemData[3]
+						local appearanceID = itemData[2]
 						if appearanceID  then --and setData.sources[item] and setData.sources[item] ~= 0 then 
 							--local appearanceID = setData.sources[item]
 							ItemDB[appearanceID] = ItemDB[appearanceID] or {}
@@ -286,7 +289,7 @@ do
 	end
 
 
-	local function addArmor(armorSet, set)
+	local function addArmor(armorSet, set,t)
 		local defaultSet = set or SET_DATA 
 		for id, setData in pairs(armorSet) do
 			if  (setData.isClass or addon.Profile.IgnoreClassRestrictions) 
@@ -310,6 +313,8 @@ do
 						setData.sources[replacementID] = appearanceID
 					end
 				end]]
+					--if t then print(setData.name) end
+
 				tinsert(set, setData)	
 			end
 		end

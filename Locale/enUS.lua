@@ -215,6 +215,7 @@ L["Garrison"] = true
 L["Island Expedition"] = true
 L["Warfronts"] = true
 L["Covenants"] = true
+L["Holiday"] = true
 
 L["Use Hidden Item for Unavilable Items"] = true
 L["View Recolors"] = true

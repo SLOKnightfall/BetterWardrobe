@@ -325,6 +325,10 @@ function DressingRoom:Update(...)
 	end
 end
 
+function addon:UpdateDressingRoom(...)
+	DressingRoom:Update()
+end
+
 function DressingRoom:GetSource(mainHandEnchant, offHandEnchant)
 	local enchantID
 	wipe(newSet.items)

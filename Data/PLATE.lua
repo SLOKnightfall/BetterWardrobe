@@ -2921,16 +2921,15 @@ addon.ArmorSets["PLATE"] ={
 		["sourceType"] =  0 ,
 	},
 	[50212]={
-		["armorType"] =  1 ,
+		["armorType"] =  4 ,
 		["label"] =  118 ,
 		["setID"] =  50212,
 		["expansionID"] =  10 ,
-		["filter"] =  12 ,
+		["filter"] =  3 ,
 		["name"] =  "Plate of the Light Avenger" ,
 		["mod"] =  0 ,
-		["itemData"] = {[1] = {'208161:0',189594,81737},[3] = {'208162:0',189595,81738},[6] = {'208163:0',189596,81739},},
-		["sourceType"] =  3 ,
 		["classMask"] = 2 ,
+		["itemData"] = {[1] = {'208161:0',189594,81737},[3] = {'208162:0',189595,81738},[6] = {'208163:0',189596,81739},},
+		["sourceType"] =  0 ,
 	},
-
 }
