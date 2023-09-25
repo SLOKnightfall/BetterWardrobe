@@ -11,10 +11,12 @@ addon.Patrons = {
     "Evan Hardin",
     "Ines Tan",
     "James Leadbetter-Brown",
+    "Jason Fox",
     "Jason Harper",
     "Joe Romubio",
     "Joshua Hall",
     "Kai Olsen ",
+    "Lucky Phil",
     "MangoSentinelEX",
     "Matthew Dine",
     "Michael and Jon Baglivo-Zarin",
@@ -27,7 +29,7 @@ addon.Patrons = {
     "Randy Ramirez",
     "Ray Patronson",
     "Somarlane ",
-    "Toumaz",
+    "Tou",
     "marilyn lewis",
     "toast042"
 }
