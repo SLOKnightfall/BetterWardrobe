@@ -55,6 +55,7 @@ Data\LEATHER.lua
 Data\MAIL.lua
 Data\PLATE.lua
 Data\COSMETIC.lua
+Data\SetOverrides.lua
 #@debug@
 Data\test.lua
 #@end-debug@

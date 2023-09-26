@@ -5003,9 +5003,11 @@ function BetterWardrobeSetsDataProviderMixin:GetSetSourceData(setID)
 
 	local setType = addon.GetSetType(setID)
 	if (setType == nil or setType == "BlizzardSet") then
+		--	sourceData = addon:CheckForExtraItems(setID, sourceData)
 		local sourceData = self.sourceData[setID]
 		if ( not sourceData ) then
 			local primaryAppearances = C_TransmogSets.GetSetPrimaryAppearances(setID)
+			primaryAppearances = addon:CheckForExtraItems(setID, primaryAppearances)
 			local numCollected = 0;
 			local numTotal = 0;
 			local sources = {}
@@ -5239,6 +5241,10 @@ function BetterWardrobeSetsDataProviderMixin:GetSortedSetSources(setID)
 
 	local sourceData = self:GetSetSourceData(setID)
 	local setType = addon.GetSetType(setID)
+
+
+
+
 
 	if (setType == nil or setType == "BlizzardSet")  then
 	--if BetterWardrobeCollectionFrame:CheckTab(2) then

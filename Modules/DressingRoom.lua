@@ -203,9 +203,10 @@ function BW_DressingRoomItemButtonMixin:OnEnter()
 	end
 
 	GameTooltip:Show()
-	ShoppingTooltip1:Hide()
-	ShoppingTooltip2:Hide()
-	if ShoppingTooltip3 then ShoppingTooltip3:Hide() end
+	--ShoppingTooltip1:Hide()
+	--ShoppingTooltip2:Hide()
+	--if ShoppingTooltip3 then ShoppingTooltip3:Hide() end
+	GameTooltip_ClearMoney()
 end
 
 function BW_DressingRoomItemButtonMixin:OnLeave()
