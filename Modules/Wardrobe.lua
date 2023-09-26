@@ -1319,7 +1319,7 @@ function BetterWardrobeCollectionFrameMixin:SetTab(tabID)
 			BW_SortDropDown:SetPoint("TOPLEFT", BetterWardrobeVisualToggle, "TOPRIGHT", 5, 0)
 			self.BW_SetsHideSlotButton:Show()
 			BetterWardrobeCollectionFrame.AlteredFormSwapButton:ClearAllPoints()
-			BetterWardrobeCollectionFrame.AlteredFormSwapButton:SetPoint("TOPRIGHT",BetterWardrobeCollectionFrame.SetsCollectionFrame.DetailsFrame, "TOPRIGHT", -5, -20)
+			BetterWardrobeCollectionFrame.AlteredFormSwapButton:SetPoint("TOPRIGHT",BetterWardrobeCollectionFrame.SetsCollectionFrame.DetailsFrame, "TOPRIGHT", 2, -15)
 
 		end
 		self.SearchBox:SetEnabled(true)
@@ -4040,7 +4040,7 @@ end
 
 -- ***** FILTER
 
-local FILTER_SOURCES = {L["MISC"], L["Classic Set"], L["Quest Set"], L["Dungeon Set"], L["Raid Set"], L["Recolor"], L["PvP"],L["Garrison"], L["Island Expedition"], L["Warfronts"], L["Covenants"], L["Trading Post"], L["Holiday"], L["NOTE_119"],L["NOTE_120"]}
+local FILTER_SOURCES = {L["MISC"], L["Classic Set"], L["Quest Set"], L["Dungeon Set"], L["Raid Set"], L["Recolor"], L["PvP"],L["Garrison"], L["Island Expedition"], L["Warfronts"], L["Covenants"], L["Trading Post"], L["Holiday"], L["NOTE_119"],L["NOTE_120/fstqa"]}
 local EXPANSIONS = {EXPANSION_NAME0, EXPANSION_NAME1, EXPANSION_NAME2, EXPANSION_NAME3, EXPANSION_NAME4, EXPANSION_NAME5, EXPANSION_NAME6, EXPANSION_NAME7, EXPANSION_NAME8, EXPANSION_NAME9}
 
 
@@ -6029,7 +6029,13 @@ end
 function BetterWardrobeSetsCollectionMixin:SetItemFrameQuality(itemFrame)
 	if ( itemFrame.collected ) then
 		local quality = C_TransmogCollection.GetSourceInfo(itemFrame.sourceID).quality;
-		if ( quality == Enum.ItemQuality.Uncommon ) then
+			itemFrame.IconBorder:Show()
+		if ( quality == Enum.ItemQuality.Poor ) then
+			itemFrame.IconBorder:Hide()
+			--itemFrame.IconBorder:SetAtlas("dressingroom-itemborder-gray", true)
+		elseif ( quality == Enum.ItemQuality.Common ) then
+			itemFrame.IconBorder:SetAtlas("loottab-set-itemborder-white", true)
+		elseif ( quality == Enum.ItemQuality.Uncommon ) then
 			itemFrame.IconBorder:SetAtlas("loottab-set-itemborder-green", true)
 		elseif ( quality == Enum.ItemQuality.Rare ) then
 			itemFrame.IconBorder:SetAtlas("loottab-set-itemborder-blue", true)
