@@ -4040,7 +4040,7 @@ end
 
 -- ***** FILTER
 
-local FILTER_SOURCES = {L["MISC"], L["Classic Set"], L["Quest Set"], L["Dungeon Set"], L["Raid Set"], L["Recolor"], L["PvP"],L["Garrison"], L["Island Expedition"], L["Warfronts"], L["Covenants"], L["Trading Post"], L["Holiday"]}
+local FILTER_SOURCES = {L["MISC"], L["Classic Set"], L["Quest Set"], L["Dungeon Set"], L["Raid Set"], L["Recolor"], L["PvP"],L["Garrison"], L["Island Expedition"], L["Warfronts"], L["Covenants"], L["Trading Post"], L["Holiday"], L["NOTE_119"],L["NOTE_120"]}
 local EXPANSIONS = {EXPANSION_NAME0, EXPANSION_NAME1, EXPANSION_NAME2, EXPANSION_NAME3, EXPANSION_NAME4, EXPANSION_NAME5, EXPANSION_NAME6, EXPANSION_NAME7, EXPANSION_NAME8, EXPANSION_NAME9}
 
 

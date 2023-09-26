@@ -494,6 +494,9 @@ L["NOTE_116"] = "Shadowlands Korthia Set"
 L["NOTE_117"] = "Shadowlands Zereth Mortis Set"
 
 L["NOTE_118"] = "Trading Post"
+L["NOTE_119"] = "Grey Item Set"
+L["NOTE_120"] = "White Item Set"
+
 
 L["Swap to Better Wardrobe View"] = true
 L["Swap to Extended Transmog Sets View"] = true

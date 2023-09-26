@@ -203,7 +203,7 @@ do
 
 
 					for slotID, itemData in pairs(setData.itemData) do
-						local appearanceID = itemData[2]
+						local appearanceID = itemData[3]
 						if appearanceID  then --and setData.sources[item] and setData.sources[item] ~= 0 then 
 							--local appearanceID = setData.sources[item]
 							ItemDB[appearanceID] = ItemDB[appearanceID] or {}
