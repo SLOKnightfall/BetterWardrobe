@@ -14,6 +14,7 @@ local useCharacterSources = true
 local defaultWidth, defaultHeight = 450, 545
 local Buttons
 local Profile
+local itemhistory = {}
 
 -------Create Mogit List-------
 local newSet = {items = {}}
@@ -206,7 +207,7 @@ function BW_DressingRoomItemButtonMixin:OnEnter()
 	--ShoppingTooltip1:Hide()
 	--ShoppingTooltip2:Hide()
 	--if ShoppingTooltip3 then ShoppingTooltip3:Hide() end
-	GameTooltip_ClearMoney()
+	--GameTooltip_ClearMoney()
 end
 
 function BW_DressingRoomItemButtonMixin:OnLeave()
@@ -295,7 +296,6 @@ function DressingRoom:Update(...)
 			end
 
 			if not inspectView and (HideWeaponOnShow or HideTabardOnShow or HideShirtOnShow or HideArmorOnShow)  then
-			zzz=Buttons 
 				for _, button in pairs(Buttons) do
 					local slot = button:GetID()
 					if ((HideWeaponOnShow and (slot == INVSLOT_MAINHAND or slot == INVSLOT_OFFHAND)) or
@@ -459,6 +459,9 @@ end
 
 
 function BW_DressingRoomFrameMixin:OnShow()
+	itemhistory = {}
+	BW_DressingRoomFrame.BW_DressingRoomUndoButton:Hide()
+	addon:StoreItems()
 	if not Profile.DR_OptionsEnable then return end
 
 	BW_DressingRoomFrame.PreviewButtonFrame:SetShown(addon.Profile.DR_ShowItemButtons)
@@ -755,7 +758,7 @@ end
 
 
 
-local itemhistory = {}
+
 function addon:StoreItems()
 	local playerActor = DressUpFrame.ModelScene:GetPlayerActor();
 	local itemTransmogInfoList = playerActor and playerActor:GetItemTransmogInfoList();
@@ -763,7 +766,7 @@ function addon:StoreItems()
 	slashCommand = string.gsub(slashCommand, "/outfit ", "")
 	tinsert(itemhistory, slashCommand)
 
-	if  #itemhistory >2 then
+	if  #itemhistory > 1 then
 		BW_DressingRoomFrame.BW_DressingRoomUndoButton:Show()
 	end
 

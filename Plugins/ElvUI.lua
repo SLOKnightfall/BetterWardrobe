@@ -243,7 +243,15 @@ local function SkinTransmogFrames()
 	DetailsFrame.Name:FontTemplate(nil, 16)
 	DetailsFrame.LongName:FontTemplate(nil, 16)
 	S:HandleButton(DetailsFrame.VariantSetsButton)
-	
+
+	S:HandleButton(DetailsFrame.BW_LinkSetButton)
+	S:HandleButton(DetailsFrame.BW_OpenDressingRoomButton)
+	DetailsFrame.BW_LinkSetButton:SetSize(20,20)
+
+	DetailsFrame.BW_OpenDressingRoomButton:SetSize(20,20)
+
+	--S:HandleButton(SetsCollectionFrame.BW_SetsHideSlotButton)
+
 	hooksecurefunc(SetsCollectionFrame, 'SetItemFrameQuality', function(_, itemFrame)
 		local icon = itemFrame.Icon
 		if not icon.backdrop then
@@ -356,6 +364,8 @@ local function SkinTransmogFrames()
 	BW_SlotHideButton:Point("TOPLEFT",BW_RandomizeButton, "TOPRIGHT", 5, 0)
 
 	S:HandleButton(BW_TransmogOptionsButton)
+	S:HandleCheckBox(WardrobeCollectionFrame.ItemsCollectionFrame.ApplyOnClickCheckbox)
+
 end
 
 local function UpdateDressingRoom()
@@ -388,7 +398,7 @@ local function UpdateDressingRoom()
 
 	S:HandleButton(BW_DressingRoomFrame.BW_DressingRoomSettingsButton)
 	BW_DressingRoomFrame.BW_DressingRoomSettingsButton:SetSize(25,25)
-	BW_DressingRoomFrame.BW_DressingRoomSettingsButton:SetPoint("BOTTOMLEFT", 2,2)
+	BW_DressingRoomFrame.BW_DressingRoomSettingsButton:SetPoint("BOTTOMLEFT", 8, 31)
 
 	S:HandleButton(BW_DressingRoomFrame.BW_DressingRoomExportButton)
 	BW_DressingRoomFrame.BW_DressingRoomExportButton:SetSize(25,25)
@@ -411,9 +421,13 @@ local function UpdateDressingRoom()
 	BW_DressingRoomFrame.BW_DressingRoomUndressButton:SetSize(25,25)
 	BW_DressingRoomFrame.BW_DressingRoomUndressButton:SetPoint("LEFT", BW_DressingRoomFrame.BW_DressingRoomGearButton, "RIGHT" )
 
-	DressUpFrame.LinkButton:ClearAllPoints()
-	DressUpFrame.LinkButton:SetSize(25,25)
-	DressUpFrame.LinkButton:SetPoint("LEFT", BW_DressingRoomFrame.BW_DressingRoomUndressButton, "RIGHT" , 00)
+	S:HandleButton(BW_DressingRoomFrame.BW_DressingRoomUndoButton)
+	BW_DressingRoomFrame.BW_DressingRoomUndoButton:SetSize(25,25)
+	BW_DressingRoomFrame.BW_DressingRoomUndoButton:SetPoint("LEFT", BW_DressingRoomFrame.BW_DressingRoomUndressButton, "RIGHT" )
+
+	--DressUpFrame.LinkButton:ClearAllPoints()
+	--DressUpFrame.LinkButton:SetSize(25,25)
+	--DressUpFrame.LinkButton:SetPoint("LEFT", BW_DressingRoomFrame.BW_DressingRoomUndressButton, "RIGHT" , 00)
 
 	DressUpFrameOutfitDropDown:ClearAllPoints()
 	DressUpFrameOutfitDropDown:SetSize(1,1)
