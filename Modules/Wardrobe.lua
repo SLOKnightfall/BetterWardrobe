@@ -3265,7 +3265,8 @@ function BetterWardrobeItemsModelMixin:OnMouseDown(button)
 				return;
 			end
 		end
-	elseif ( IsModifiedClick("DRESSUP") ) then
+	elseif ( IsModifiedClick("DRESSUP") ) or (addon.Profile.AutoApply and not C_Transmog.IsAtTransmogNPC() and button == "LeftButton") then
+		addon:StoreItems()
 		itemsCollectionFrame:DressUpVisual(self.visualInfo)
 		return;
 	end
@@ -8517,3 +8518,12 @@ function BetterWardrobeSetsDetailsItemUseabiltiyMixin:OnLeave()
 end
 
 
+BW_ApplyOnClickCheckboxMixin = {}
+function BW_ApplyOnClickCheckboxMixin:OnClick()
+	addon.Profile.AutoApply = not addon.Profile.AutoApply
+	self:SetChecked(addon.Profile.AutoApply)
+end
+
+function BW_ApplyOnClickCheckboxMixin:OnLoad()
+	self:SetChecked(addon.Profile.AutoApply)
+end

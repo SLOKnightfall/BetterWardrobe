@@ -1011,6 +1011,7 @@ local defaults = {
 		IgnoreClassRestrictions = false,
 		ExtraLargeTransmogArea = false,
 		ExtraLargeTransmogAreaMax = screenWidth,
+		AutoApply = false,
 	}
 }
 local DB_Defaults = {

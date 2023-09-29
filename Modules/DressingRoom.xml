@@ -254,6 +254,28 @@
 					<OnLeave method="OnLeave" />
 				</Scripts>
 			</Button>
+			<Button parentKey="BW_DressingRoomUndoButton" inherits="SquareIconButtonTemplate" mixin="BW_DressingRoomButtonMixin" hidden="true">
+				<Size x="32" y="32"/>
+				<Anchors>
+					<Anchor point="LEFT" relativeKey="$parent.BW_DressingRoomUndressButton" relativePoint="RIGHT" x="-5" y="0"/>
+				</Anchors>					
+				<Layers>
+					<Layer level="ARTWORK" textureSubLevel="5">
+						<Texture parentKey="Icon" atlas="transmog-icon-revert-small" useAtlasSize="false" >
+							<Size x="16" y="16"/>
+							<Anchors>
+								<Anchor point="CENTER" />
+							</Anchors>
+						</Texture>
+					</Layer>
+				</Layers>
+				<Scripts>
+					<OnLoad> self.buttonID = "Undo" </OnLoad>
+					<OnMouseDown method="OnMouseDown" />
+					<OnClick method="OnEnter" />
+					<OnLeave method="OnLeave" />
+				</Scripts>
+			</Button>
 			<Button parentKey="BW_DressingRoomSwapFormButton" inherits="BW_AlteredFormSwapButtonTemplate" >
 				<Anchors>
 					<Anchor point="BOTTOMRIGHT" relativeKey="$parent" relativePoint="BOTTOMRIGHT" x="-15" y="50"/>
