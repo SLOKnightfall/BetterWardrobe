@@ -369,6 +369,8 @@
 					</Animations>
 				</Texture>
 
+
+
 			</Layer>
 		</Layers>
 		<Frames>
@@ -388,6 +390,37 @@
 					<OnLeave method="OnLeave"/>
 				</Scripts>
 			</Frame>
+
+			<Frame parentKey="AltItem" mixin = "BetterWardrobeSetsDetailsAltItemMixin" hidden="true">
+				<Size x="25" y="10"/>
+
+				<Anchors>
+					<Anchor point="BOTTOM" relativeKey="$parent" x="0" y = "-5"/>
+				</Anchors>
+					<Layers>
+						<Layer level="OVERLAY">
+							
+						<Texture parentKey="AltIconRight" file="Interface\BUTTONS\UI-SpellbookIcon-NextPage-Up" >
+							<Size x="15" y="15"/>
+							<Anchors>
+								<Anchor point="BOTTOMRIGHT" relativeKey="$parent.Icon" relativePoint="BOTTOMRIGHT" X='0' Y='-5'/>
+							</Anchors>
+
+						</Texture>
+							<Texture parentKey="AltIconLeft" file="Interface\BUTTONS\UI-SpellbookIcon-PrevPage-Up" >
+							<Size x="15" y="15"/>
+							<Anchors>
+								<Anchor point="BOTTOMLEFT" relativeKey="$parent.Icon" relativePoint="BOTTOMLEFT" X='0' Y='-5'/>
+							</Anchors>
+
+						</Texture>
+						</Layer>
+					</Layers>
+				<Scripts>
+					<OnMouseDown method="OnMouseDown"/>
+				</Scripts>
+			</Frame>
+
 			<Frame parentKey="Favorite" setAllPoints="true">
 				<Layers>
 					<Layer level="ARTWORK">

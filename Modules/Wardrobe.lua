@@ -5707,7 +5707,34 @@ function BetterWardrobeSetsCollectionMixin:DisplaySet(setID)
 		itemFrame.itemID = sortedSources[i].itemID;
 		itemFrame.collected = sortedSources[i].collected;
 		itemFrame.invType = sortedSources[i].invType;
+		itemFrame.setID = setID
 		local slot = C_Transmog.GetSlotForInventoryType(itemFrame.invType)
+		local altid = addon:CheckAltItem(itemFrame.sourceID)
+		if altid and type(altid) ~= "table" then
+			altid = {altid}
+		end
+
+		if altid then
+			itemFrame.AltItem:Show()
+			itemFrame.AltItem.baseId = itemFrame.sourceID
+			itemFrame.AltItem.altid = altid
+			--itemFrame.AltItem.useAlt = false
+			itemFrame.AltItem.setID = setID
+			itemFrame.AltItem.index = itemFrame.AltItem.index or 0
+
+
+		else
+			itemFrame.AltItem:Hide()
+			itemFrame.AltItem.baseId = nil
+			itemFrame.AltItem.altid = nil
+			itemFrame.AltItem.useAlt = false
+			itemFrame.AltItem.setID = nil
+			itemFrame.AltItem.index = nil
+		end
+
+		if itemFrame.AltItem.useAlt then 
+			itemFrame.sourceID = altid[itemFrame.AltItem.index]
+		end
 
 		if slot == 3 and not mainShoulder then 
 			mainShoulder = itemFrame.sourceID;
@@ -5720,6 +5747,9 @@ function BetterWardrobeSetsCollectionMixin:DisplaySet(setID)
 		-----itemFrame.visualID = sortedSources[i].visualID   ---TODO:ISNEEDEd?
 		local texture = C_TransmogCollection.GetSourceIcon(sortedSources[i].sourceID)
 
+		if itemFrame.AltItem.useAlt then 
+			texture = C_TransmogCollection.GetSourceIcon(itemFrame.sourceID)
+		end
 		----TODO: FIX Unavailable;
 
 		--[[if not itemFrame.unavailable then 
@@ -5752,6 +5782,8 @@ function BetterWardrobeSetsCollectionMixin:DisplaySet(setID)
 			itemFrame.IconBorder:SetAlpha(0.3)
 			itemFrame.New:Hide()
 		end
+
+
 
 	----TODO: FIX Unavailable;
 
@@ -5798,7 +5830,11 @@ function BetterWardrobeSetsCollectionMixin:DisplaySet(setID)
 
 		if invType  == 20 then invType = 5 end
 		if not addon.setdb.profile.autoHideSlot.toggle or ( addon.setdb.profile.autoHideSlot.toggle and not addon.setdb.profile.autoHideSlot[invType]) then
-			self.Model:TryOn(sortedSources[i].sourceID)
+			if itemFrame.AltItem.useAlt then 
+				self.Model:TryOn(itemFrame.AltItem.altid[itemFrame.AltItem.index])
+			else
+				self.Model:TryOn(sortedSources[i].sourceID)
+			end
 		end
 	end
 
@@ -8526,4 +8562,23 @@ end
 
 function BW_ApplyOnClickCheckboxMixin:OnLoad()
 	self:SetChecked(addon.Profile.AutoApply)
+end
+
+BetterWardrobeSetsDetailsAltItemMixin = {}
+
+function BetterWardrobeSetsDetailsAltItemMixin:OnMouseDown()
+	local sourceID
+	if self.index < #self.altid then
+		self.index = self.index + 1
+		self.useAlt = true
+		sourceID = self.altid[self.index]
+	elseif self.index >= #self.altid then
+		self.index = 0
+		self.useAlt = false
+		sourceID = self.baseId
+	end
+
+	sourceInfo = C_TransmogCollection.GetSourceInfo(sourceID)
+	--print(sourceInfo.name)
+	BetterWardrobeCollectionFrame.SetsCollectionFrame:DisplaySet(self.setID)
 end
