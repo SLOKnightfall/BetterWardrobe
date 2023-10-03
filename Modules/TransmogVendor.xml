@@ -22,4 +22,29 @@
 		</Scripts>
 	</Button>
 
+
+	<Frame name="AltItemtemplate" mixin = "BetterWardrobeSetsDetailsAltItemMixin" hidden="true" virtual="true">
+		<Size x="25" y="25"/>
+
+		<Anchors>
+			<Anchor point="BOTTOMRIGHT" relativeKey="$parent" relativePoint="TOPRIGHT" X='15' Y='-15'/>
+		</Anchors>
+			<Layers>
+				<Layer level="OVERLAY">
+					
+				<Texture parentKey="AltIconRight" file="Interface\FriendsFrame\UI-Toast-ChatInviteIcon" >
+					<Size x="25" y="25"/>
+					<Anchors>
+						<Anchor point="CENTER" X='0' Y='0'/>
+					</Anchors>
+
+				</Texture>
+			</Layer>
+
+			</Layers>
+		<Scripts>
+			<OnMouseDown method="OnMouseDown"/>
+		</Scripts>
+	</Frame>
+
 </Ui>

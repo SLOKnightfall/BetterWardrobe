@@ -7341,6 +7341,8 @@ function BetterWardrobeSetsTransmogMixin:UpdateSets()
 			local model = self.Models[i]
 			local index = i + indexOffset;
 			local set = usableSets[index]
+			local hasAlternateForm = false
+
 
 			if (set) then
 				SetModelUnit(model)
@@ -7355,6 +7357,14 @@ function BetterWardrobeSetsTransmogMixin:UpdateSets()
 						if (not addon.Profile.HideMissing and (not BetterWardrobeVisualToggle.VisualMode or (Sets.isMogKnown(sourceID) and BetterWardrobeVisualToggle.VisualMode))) or 
 							(addon.Profile.HideMissing and (BetterWardrobeVisualToggle.VisualMode or Sets.isMogKnown(sourceID))) then 
 							model:TryOn(sourceID)
+						end
+						if not hasAlternateForm and addon:CheckAltItem(sourceID) then
+							hasAlternateForm = true
+						end
+						if hasAlternateForm then
+							model.AltItemtems:Show()--local f = CreateFrame("Frame", "112cd2", model, "AltItemtemplate")
+						else
+							model.AltItemtems:Hide()
 						end
 					end
 					--end
@@ -7438,6 +7448,7 @@ function BetterWardrobeSetsTransmogMixin:UpdateSets()
 		self.NoValidSetsLabel:SetShown(not C_TransmogSets.HasUsableSets())
 
 	else
+
 		local usableSets = SetsDataProvider:GetUsableSets()
 		self.PagingFrame:SetMaxPages(ceil(#usableSets / self.PAGE_SIZE))
 		local pendingTransmogModelFrame = nil;
@@ -7445,7 +7456,9 @@ function BetterWardrobeSetsTransmogMixin:UpdateSets()
 		for i = 1, self.PAGE_SIZE do
 			local model = self.Models[i]
 			local index = i + indexOffset;
-				set = usableSets[index]
+			local hasAlternateForm = false
+
+			set = usableSets[index]
 			if ( set ) then
 				local setType =  addon.GetSetType(set.setID)
 				SetModelUnit(model)
@@ -7462,7 +7475,10 @@ function BetterWardrobeSetsTransmogMixin:UpdateSets()
 							canRecurse = TransmogUtil.IsCategoryLegionArtifact(mainHandCategoryID)
 						end
 						model:SetItemTransmogInfo(itemTransmogInfo, slotID, canRecurse)
-						end
+
+						model.AltItemtems:Hide()
+
+					end
 				elseif setType then 				
 						--if ( model.setID ~= set.setID ) then
 					model:Undress()
@@ -7478,13 +7494,16 @@ function BetterWardrobeSetsTransmogMixin:UpdateSets()
 							model:TryOn(sourceID)
 						--else
 						end
+
+						if not hasAlternateForm and addon:CheckAltItem(sourceID) then
+							hasAlternateForm = true
+						end
 					end
 				else
 					model:Undress()
 
 					--print("extraset")
 					--local  setData = addon.GetSetInfo(set.setID)
-
 					local sourceData = SetsDataProvider:GetSetSourceData(set.setID)
 					local tab = BetterWardrobeCollectionFrame.selectedTransmogTab;
 					for sourceID in pairs(sourceData.sources) do
@@ -7494,6 +7513,9 @@ function BetterWardrobeSetsTransmogMixin:UpdateSets()
 							--(not addon.Profile.HideMissing and (not BetterWardrobeVisualToggle.VisualMode or (Sets.isMogKnown(sourceID) and BetterWardrobeVisualToggle.VisualMode))) or
 							--(addon.Profile.HideMissing and (BetterWardrobeVisualToggle.VisualMode or Sets.isMogKnown(sourceID))) then
 							--	print(sourceID)
+						if not hasAlternateForm and addon:CheckAltItem(sourceID) then
+							hasAlternateForm = true
+						end
 							model:TryOn(sourceID)
 						--else
 					--	end
@@ -7538,6 +7560,12 @@ function BetterWardrobeSetsTransmogMixin:UpdateSets()
 					model.TransmogStateTexture:Show()
 				else
 					model.TransmogStateTexture:Hide()
+				end
+
+				if hasAlternateForm then
+					model.AltItemtems:Show()
+				else
+					model.AltItemtems:Hide()
 				end
 
 				local topSourcesCollected, topSourcesTotal;
@@ -7665,10 +7693,16 @@ function BetterWardrobeSetsTransmogMixin:LoadSet(setID)
 				if slot then 
 					local slotSources = C_TransmogSets.GetSourcesForSlot(setID, slot)
 					if slotSources and #slotSources > 0  then 
+
 						CollectionWardrobeUtil.SortSources(slotSources, sourceInfo.visualID)
 						local index = CollectionWardrobeUtil.GetDefaultSourceIndex(slotSources, sourceID)
+
+
+
+
 						if slot then
 							transmogSources[slot] = slotSources[index].sourceID;
+
 							for i, slotSourceInfo in ipairs(slotSources) do
 								if ( not slotSourceInfo.name ) then
 									waitingOnData = true;
@@ -7730,6 +7764,12 @@ function BetterWardrobeSetsTransmogMixin:LoadSet(setID)
 				transmogLocation = TransmogUtil.CreateTransmogLocation(slotID, Enum.TransmogType.Appearance, Enum.TransmogModification.Main)
 				pendingInfo = TransmogUtil.CreateTransmogPendingInfo(Enum.TransmogPendingType.Apply, appearanceID)
 				C_Transmog.SetPending(transmogLocation, pendingInfo)
+
+				if  addon:CheckAltItem(appearanceID) and _G["BW_AltIcon"..slotID] then
+					_G["BW_AltIcon"..slotID]:Show()
+				elseif not addon:CheckAltItem(appearanceID) and _G["BW_AltIcon"..slotID] then
+					_G["BW_AltIcon"..slotID]:Hide()
+				end
 			end
 
 			-- for slots that are be split, undo it

@@ -3960,7 +3960,7 @@ addon.ArmorSets["CLOTH"] ={
 		["setID"] =  50297,
 		["expansionID"] =  1 ,
 		["filter"] =  15 ,
-		["name"] =  "Recruit's Armo 2r" ,
+		["name"] =  "Recruit's Armor" ,
 		["mod"] =  0 ,
 		["itemData"] = {[7] = {'23478:0',9298,6197},[5] = {'23479:0',9299,6201},},
 		["sourceType"] =  0 ,
@@ -4163,17 +4163,31 @@ addon.ArmorSets["CLOTH"] ={
 		["itemData"] = {[7] = {'52:0',29,168},[5] = {'52547:0',25762,12837},[7] = {'52680:0',25844,1749},},
 		["sourceType"] =  0 ,
 	},
-
-		[50316]={
+	[50319]={
 		["armorType"] =  1 ,
 		["label"] =  118 ,
-		["setID"] =  50211,
+		["setID"] =  50319,
 		["expansionID"] =  10 ,
 		["filter"] =  12 ,
-		["name"] =  "Silks of the Unnamed Cult (Extended)" ,
+		["name"] =  "Jewels of the Alluring Call" ,
 		["mod"] =  0 ,
-		["classMask"] = 5 ,
-		["itemData"] = {[1] = {'208397:0',189717,81863},[3] = {'208398:0',189718,81864},[6] = {'208399:0',189719,81865},},
+		["classMask"] = 9 ,
+		["itemData"] = {[1] = {'208655:0',189971,82149},[3] = {'208656:0',189972,82150},[6] = {'208657:0',189973,82151},},
 		["sourceType"] =  0 ,
 	},
+	--[[  Data not available in game yet
+	[50324]={
+		["armorType"] =  1 ,
+		["label"] =  118 ,
+		["setID"] =  50324,
+		["expansionID"] =  10 ,
+		["filter"] =  12 ,
+		["name"] =  "Battle Magister's Regalia" ,
+		["mod"] =  0 ,
+		["classMask"] = 8 ,
+		["itemData"] = {[1] = {'208693:0',190086,82129},[3] = {'208694:0',190087,82130},[6] = {'208695:0',190088,82131},},
+		["sourceType"] =  0 ,
+	},
+	]]
+
 }
