@@ -182,7 +182,6 @@ local altitems = {
 	[166171] = 167954, --Priest Chest/Robe (Heroic)
 	[166172] = 167955, --Priest Chest/Robe (Mythic)
 
-
 --DF
 	--Vault of the Incarnates
 	[182772] = 181636, --Shaman,LFR
