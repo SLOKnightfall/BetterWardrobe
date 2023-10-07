@@ -1383,6 +1383,7 @@ function BetterWardrobeCollectionFrameMixin:OnLoad()
 	--self.Inset:Hide()
 end
 
+local addedLink
 function BetterWardrobeCollectionFrameMixin:OnEvent(event, ...)
 	if ( event == "TRANSMOG_COLLECTION_ITEM_UPDATE" ) then
 		if ( self.tooltipContentFrame ) then
@@ -1417,6 +1418,7 @@ function BetterWardrobeCollectionFrameMixin:OnEvent(event, ...)
 		--print(ExtractHyperlinkString(transmogLink))
 		local setIDs = C_TransmogSets.GetSetsContainingSourceID(sourceID)
 		local setItem = addon.IsSetItem(itemLink)
+		addedLink = itemLink
 
 		if setIDs and not setItem and addon.Profile.ShowSetCollectionUpdates then 
 			for i, setID in pairs(setIDs) do 
@@ -1612,9 +1614,10 @@ end
 
 function BetterWardrobeCollectionFrameMixin:OpenTransmogLink(link)
 	if ( not CollectionsJournal:IsVisible() or not self:IsVisible() ) then
-		ToggleCollectionsJournal(5)
+		--ToggleCollectionsJournal(5)
+		WardrobeCollectionFrame:OpenTransmogLink(addedLink)
 	end
-
+	C_Timer.After(0, function() 
 	local linkType, id = strsplit(":", link)
 
 	if ( linkType == "transmogappearance" ) then
@@ -1653,14 +1656,16 @@ function BetterWardrobeCollectionFrameMixin:OpenTransmogLink(link)
 		end
 		self.SetsCollectionFrame:SelectSet(setID)
 
-		C_Timer.After(0.7, function() 
+
 			--BetterWardrobeCollectionFrame:SetTab(TAB_EXTRASETS);
 			--BetterWardrobeCollectionFrame.SetsCollectionFrame:SelectSet(setID);
 			--BetterWardrobeCollectionFrame.SetsCollectionFrame:DisplaySet(setID)
 			--BetterWardrobeCollectionFrame.SetsCollectionFrame:ScrollToSet(setID)
-		end)
+		
 		
 	end
+
+	end)
 end
 
 function BetterWardrobeCollectionFrameMixin:GoToItem(sourceID)
@@ -1913,6 +1918,8 @@ function BetterWardrobeItemsCollectionMixin:CreateSlotButtons()
 end
 
 function BetterWardrobeItemsCollectionMixin:OnEvent(event, ...)
+	print(event)
+	print(...)
 	if ( event == "TRANSMOGRIFY_UPDATE" or event == "TRANSMOGRIFY_SUCCESS" or event == "PLAYER_EQUIPMENT_CHANGED" ) then
 		local slotID = ...
 		if ( slotID and self.transmogLocation:IsAppearance() ) then
@@ -1946,9 +1953,10 @@ function BetterWardrobeItemsCollectionMixin:CheckLatestAppearance(changeTab)
 		self.jumpToLatestAppearanceID = latestAppearanceID;
 		self.jumpToLatestCategoryID = latestAppearanceCategoryID;
 
-		if ( changeTab and not CollectionsJournal:IsShown() ) then
-			securecall(function() CollectionsJournal_SetTab(CollectionsJournal, 5) end)
-		end
+		--Don't call.  Causes taint and it will get get called by the default wadrobe api
+		--if ( changeTab and not CollectionsJournal:IsShown() ) then
+			--CollectionsJournal_SetTab(CollectionsJournal, 5)
+		--end
 	end
 end
 
@@ -1973,7 +1981,9 @@ function BetterWardrobeItemsCollectionMixin:OnLoad()
 	self:CheckLatestAppearance()
 end
 
+--Leave the help tips to the default game
 function BetterWardrobeItemsCollectionMixin:CheckHelpTip()
+	--[[
 	if (C_Transmog.IsAtTransmogNPC()) then
 		if (GetCVarBitfield("closedInfoFrames", LE_FRAME_TUTORIAL_TRANSMOG_SETS_VENDOR_TAB)) then
 			return;
@@ -2031,6 +2041,7 @@ function BetterWardrobeItemsCollectionMixin:CheckHelpTip()
 		}
 		HelpTip:Show(BetterWardrobeCollectionFrame, helpTipInfo, BetterWardrobeCollectionFrame.SetsTab)
 	end
+	--]]
 end
 
 
@@ -8514,63 +8525,18 @@ end
 addon:SecureHook("SetItemRef", function(link, ...) 
 	if InCombatLockdown() then return end
 
-	--print(link)
 	local linkType, id = strsplit(":", link)
-
-	--if  linkType ~= "BW_transmogappearance" or linkType ~= "BW_transmogset" or  linkType ~= "BW_transmogset-extra" then return end
-
 
 	if (linkType == "transmogappearance" or linkType == "transmogset" or linkType == "BW_transmogset" or linkType == "BW_transmogset-extra") then
 		if not IsAddOnLoaded("Blizzard_Collections") then
 			LoadAddOn("Blizzard_Collections")
 		end
 
-		if not CollectionsJournal:IsVisible() or not BetterWardrobeCollectionFrame:IsVisible() then
-			ToggleCollectionsJournal(5) --Why does this taint?
-		end
-
 		BetterWardrobeCollectionFrame:OpenTransmogLink(link)
 				
 		return;
-
 	end
-
 end)
-----This causes ui editor taint;
---[[
-addon:RawHook("SetItemRef", function(link, ...) 
-	if not IsAddOnLoaded("Blizzard_Collections") then
-	  LoadAddOn("Blizzard_Collections")
-	end
---function addon:SetItemRef(link)
-
-	-- do stuff here
-
-	--addon:SecureHook("SetItemRef", function(link) 
-		--if InCombatLockdown() then return end
-		--if (not CollectionsJournal:IsVisible() or not BetterWardrobeCollectionFrame:IsVisible()) then
-			--securecall(function() ToggleCollectionsJournal(5) end)
-		--end
-		local linkType, id = strsplit(":", link)
-
-		if linkType == "transmogappearance" then
-				BetterWardrobeCollectionFrame:OpenTransmogLink(link)
-				return;
-			
-		elseif linkType == "transmogset" then
-				BetterWardrobeCollectionFrame:OpenTransmogLink(link)
-				return;
-
-
-		elseif linkType == "transmogset-extra" then
-				BetterWardrobeCollectionFrame:OpenTransmogLink(link)
-				return;
-
-		  else
-			addon.hooks.SetItemRef(link,...)
-		end
-end, true)
-]]--
 
 BetterWardrobeSetsDetailsItemUseabiltiyMixin = { }
 
