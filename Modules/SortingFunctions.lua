@@ -581,6 +581,44 @@ function addon.SortSet(sets)
 	end
 end
 
+function addon.SortVariantSet(sets, reverseUIOrder, ignorePatchID)
+ 	if not sets  then return end
+
+	local comparison = function(set1, set2)
+		local groupFavorite1 = set1.favoriteSetID and true;
+		local groupFavorite2 = set2.favoriteSetID and true;
+		if ( groupFavorite1 ~= groupFavorite2 ) then
+			return groupFavorite1;
+		end
+		if ( set1.favorite ~= set2.favorite ) then
+			return set1.favorite;
+		end
+		if ( set1.expansionID ~= set2.expansionID ) then
+			return set1.expansionID > set2.expansionID;
+		end
+		if not ignorePatchID then
+			if ( set1.patchID ~= set2.patchID ) then
+				return set1.patchID > set2.patchID;
+			end
+		end
+		if ( set1.uiOrder ~= set2.uiOrder ) then
+			if ( reverseUIOrder ) then
+				return set1.uiOrder < set2.uiOrder;
+			else
+				return set1.uiOrder > set2.uiOrder;
+			end
+		end
+		if reverseUIOrder then
+			return set1.setID < set2.setID;
+		else
+			return set1.setID > set2.setID;
+		end
+	end
+
+	table.sort(sets, comparison);
+
+end
+
 function addon.SortDropdown(sets)
  	if not sets  then return end
 	SortSavedSets(self, sets, false, true)

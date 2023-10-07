@@ -4997,7 +4997,7 @@ function BetterWardrobeSetsDataProviderMixin:GetVariantSets(baseSetID)
 			end
 			local reverseUIOrder = true;
 			local ignorePatchID = true;
-			self:SortSets(variantSets, reverseUIOrder, ignorePatchID)
+			addon.SortVariantSet(variantSets, reverseUIOrder, ignorePatchID)
 		end
 	end
 	return variantSets;
