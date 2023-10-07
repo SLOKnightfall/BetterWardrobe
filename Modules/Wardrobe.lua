@@ -1918,8 +1918,8 @@ function BetterWardrobeItemsCollectionMixin:CreateSlotButtons()
 end
 
 function BetterWardrobeItemsCollectionMixin:OnEvent(event, ...)
-	print(event)
-	print(...)
+	--print(event)
+	--print(...)
 	if ( event == "TRANSMOGRIFY_UPDATE" or event == "TRANSMOGRIFY_SUCCESS" or event == "PLAYER_EQUIPMENT_CHANGED" ) then
 		local slotID = ...
 		if ( slotID and self.transmogLocation:IsAppearance() ) then
