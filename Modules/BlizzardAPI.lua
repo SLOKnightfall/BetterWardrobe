@@ -194,17 +194,24 @@ function addon.C_TransmogSets.SetHasNewSources(setID)
 		return C_TransmogSets.SetHasNewSources(setID)
 
 	elseif setType == "extraset" then
-		if newTransmogInfo and newTransmogInfo[setID] then
-			return true
-		else
-			return false
-		end
+		if addon.newTransmogInfo[setID] then return true end
+
+		return false
 	end
 end
 
-function addon:SetHasNewSources(setID)
-	if newTransmogInfo and newTransmogInfo[setID] then
-		return true
+
+
+function addon.C_TransmogSets.SetHasNewSourcesForSlot(setID, transmogSlot)
+	if (addon.newTransmogInfo[setID]) then 
+		for itemID, inventoryType in pairs(addon.newTransmogInfo[setID]) do
+			if inventoryType == transmogSlot then
+				return true
+			end
+
+		end
+
+		return false
 	else
 		return false
 	end
@@ -665,3 +672,5 @@ function addon.Model_ApplyUICamera(self, uiCameraID)
 		self:SetAnimation(0, 0)
 	end
 end
+
+
