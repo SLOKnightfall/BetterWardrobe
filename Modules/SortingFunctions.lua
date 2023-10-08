@@ -447,8 +447,10 @@ local function SortDefault(sets)
 			return SortOrder(set1.expansionID, set2.expansionID)
 		end
 		
-		if ( set1.expansionID ~= set2.expansionID ) then
-			return SortOrder(set1.expansionID, set2.expansionID)
+		if not ignorePatchID and set1.patchID and set2.patchID then
+			if ( set1.patchID ~= set2.patchID ) then
+				return set1.patchID > set2.patchID;
+			end
 		end
 
 		if ( set1.uiOrder ~= set2.uiOrder ) then
@@ -503,6 +505,12 @@ local function SortSetByExpansion(sets)
 
 		if ( set1.expansionID ~= set2.expansionID ) then
 			return SortOrder(set1.expansionID, set2.expansionID)
+		end
+				
+		if not ignorePatchID and set1.patchID and set2.patchID then
+			if ( set1.patchID ~= set2.patchID ) then
+				return set1.patchID > set2.patchID;
+			end
 		end
 
 		return SortOrder(set2.name, set1.name)

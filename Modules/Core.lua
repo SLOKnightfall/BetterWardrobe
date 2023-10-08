@@ -140,7 +140,7 @@ local Patrons = {
 		},
 }
 	
-function addPatrons()
+local function addPatrons()
 	for i, namex in ipairs(addon.Patrons) do
 		Patrons.args["name"..i] = {
 				order = i + 2,
@@ -1338,7 +1338,7 @@ function addon:OnEnable()
 	--addon.Init.LoadCollectionListModule()
 	--BW_ColectionListFrameTemplate
 	--addon.Init:BuildTooltips()
-addon:InitTooltips()
+	addon:InitTooltips()
 	C_Timer.After(0.5, function()
 		addon.RefreshSubItemData()
 		addon.RefreshOutfitData()
