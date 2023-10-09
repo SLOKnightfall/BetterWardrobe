@@ -2195,7 +2195,7 @@
 							</Layer>
 						</Layers>
 					</Frame>
-					<Frame parentKey="OutfitDropDown" name="BetterWardrobeOutfitDropDown" inherits="BetterWardrobeOutfitDropDownTemplate" mixin="BetterWardrobeOutfitMixin">
+					<Frame parentKey="OutfitDropDown" name="BetterWardrobeOutfitDropDown2" inherits="BetterWardrobeOutfitDropDownTemplate" mixin="BetterWardrobeOutfitMixin">
 						<KeyValues>
 							<KeyValue key="width" value="188" type="number"/>
 							<KeyValue key="minMenuStringWidth" value="152" type="number"/>

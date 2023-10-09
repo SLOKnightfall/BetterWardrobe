@@ -1621,12 +1621,15 @@ function BetterWardrobeCollectionFrameMixin:OnKeyDown(key)
 end
 
 function BetterWardrobeCollectionFrameMixin:OpenTransmogLink(link)
+	local linkType, id = strsplit(":", link)
+
 	if ( not CollectionsJournal:IsVisible() or not self:IsVisible() ) then
 		--ToggleCollectionsJournal(5)
-		WardrobeCollectionFrame:OpenTransmogLink(addedLink)
+		TransmogUtil.OpenCollectionToItem(id);
+
+		--WardrobeCollectionFrame:OpenTransmogLink(addedLink)
 	end
 	C_Timer.After(0, function() 
-	local linkType, id = strsplit(":", link)
 
 	if ( linkType == "transmogappearance" ) then
 		local sourceID = tonumber(id)
@@ -8546,6 +8549,9 @@ addon:SecureHook("SetItemRef", function(link, ...)
 		if not IsAddOnLoaded("Blizzard_Collections") then
 			LoadAddOn("Blizzard_Collections")
 		end
+
+
+
 
 		BetterWardrobeCollectionFrame:OpenTransmogLink(link)
 				
