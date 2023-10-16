@@ -5080,6 +5080,7 @@ function BetterWardrobeSetsDataProviderMixin:GetSetSourceCounts(setID)
 end
 
 function BetterWardrobeSetsDataProviderMixin:GetBaseSetData(setID)
+	if not setID then return {} end
 	if ( not self.baseSetsData ) then
 		self.baseSetsData = { }
 	end
@@ -7027,9 +7028,11 @@ function BetterWardrobeSetsDetailsItemMixin:OnEnter()
 			addon.ClearSetNewSourcesForSlot(setID, transmogSlot)
 		end
 		local baseSetID = C_TransmogSets.GetBaseSetID(setID)
-		SetsDataProvider:ResetBaseSetNewStatus(baseSetID)
-		--BetterWardrobeCollectionFrame.SetsCollectionFrame:Refresh()
-		BetterWardrobeCollectionFrame.SetsCollectionFrame.ListContainer:ReinitializeButtonWithBaseSetID(baseSetID)
+		if baseSetID then 
+			SetsDataProvider:ResetBaseSetNewStatus(baseSetID)
+			--BetterWardrobeCollectionFrame.SetsCollectionFrame:Refresh()
+			BetterWardrobeCollectionFrame.SetsCollectionFrame.ListContainer:ReinitializeButtonWithBaseSetID(baseSetID)
+		end
 
 	end
 end

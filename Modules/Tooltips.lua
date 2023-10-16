@@ -346,14 +346,9 @@ function preview:ShowPreview(itemLink, parent)
 
 
 	local tooltip =  GameTooltip;
-	 tooltipData = tooltip:GetPrimaryTooltipData();
+	local tooltipData = tooltip:GetPrimaryTooltipData();
 
-
-	--for i = 1, GameTooltip:NumLines() do
 	for i, lineData in ipairs(tooltipData.lines) do
-
-		local line = lineData.leftText --_G["GameTooltipTextLeft"..i]
-
 		local text = lineData.leftText or " "
 		local text_lower = string.lower(lineData.leftText or " " )
 
@@ -386,6 +381,7 @@ function preview:ShowPreview(itemLink, parent)
 	if addon.Profile.ShowItemIDTooltips  then
 			addDoubleLine(GameTooltip,L["Item Visual ID"]..": |cffffffff"..id, "")
 	end
+
 	if addon.Profile.ShowOwnedItemTooltips and not found_systemTooltip then
 		local apperanceKnownText, canTransmog
 		local itemID = GetItemInfoInstant(itemLink)
