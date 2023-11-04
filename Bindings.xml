@@ -8,19 +8,19 @@
 		BetterWardrobe.preview.previewModel:SetFacing(BetterWardrobe.preview.previewModel:GetFacing() -.1)
 	</Binding>
 
-	<Binding name= "BETTERWARDROBE_BINDING_TOGGLE_DRESSINGROOM" hidden="false" header="BETTERWARDROBE" category="Addons">
+	<Binding name= "BETTERWARDROBE_BINDING_TOGGLE_DRESSINGROOM" hidden="false" category="BINDING_HEADER_BETTERWARDROBE">
 		BetterWardrobe:ToggleDressingRoom()
 	</Binding>
 
-	<Binding name= "BETTERWARDROBE_BINDING_TARGETGEAR" hidden="false"  category="Addons">
+	<Binding name= "BETTERWARDROBE_BINDING_TARGETGEAR" hidden="false"  category="BINDING_HEADER_BETTERWARDROBE">
 		DressUpFrame_Show(DressUpFrame)
 		BetterWardrobe:SetTargetGear()
 	</Binding>
-	<Binding name= "BETTERWARDROBE_BINDING_TARGETMODEL" hidden="false" category="Addons">
+	<Binding name= "BETTERWARDROBE_BINDING_TARGETMODEL" hidden="false" category="BINDING_HEADER_BETTERWARDROBE">
 		DressUpFrame_Show(DressUpFrame)
 		BetterWardrobe:SetTarget()
 	</Binding>
-	<Binding name= "BETTERWARDROBE_BINDING_PLAYERMODEL" hidden="false" category="Addons">
+	<Binding name= "BETTERWARDROBE_BINDING_PLAYERMODEL" hidden="false" category="BINDING_HEADER_BETTERWARDROBE">
 		DressUpFrame_Show(DressUpFrame)
 		BetterWardrobe:SetTargetGear(true)	
 	</Binding>
