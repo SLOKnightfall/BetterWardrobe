@@ -1446,7 +1446,7 @@
 									</OnEnter>
 									<OnLeave function="GameTooltip_Hide"/>
 									<OnClick>
-										self:GetParent():GetParent():LinkSetInChat(self.setID)
+										self:GetParent():GetParent():LinkSet(self.setID)
 									</OnClick>
 								</Scripts>
 							</Button>

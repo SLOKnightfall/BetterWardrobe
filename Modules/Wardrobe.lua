@@ -1623,12 +1623,7 @@ end
 function BetterWardrobeCollectionFrameMixin:OpenTransmogLink(link)
 	local linkType, id = strsplit(":", link)
 
-	if ( not CollectionsJournal:IsVisible() or not self:IsVisible() ) then
-		--ToggleCollectionsJournal(5)
-		TransmogUtil.OpenCollectionToItem(id);
 
-		--WardrobeCollectionFrame:OpenTransmogLink(addedLink)
-	end
 	C_Timer.After(0, function() 
 
 	if ( linkType == "transmogappearance" ) then
@@ -1710,6 +1705,7 @@ local function IsAnySourceCollected(sources)
 end
 
 function BetterWardrobeCollectionFrameMixin:SetAppearanceTooltip(contentFrame, sources, primarySourceID, warningString)
+	zzz=sources
 	self.tooltipContentFrame = contentFrame;
 	local selectedIndex = self.tooltipSourceIndex;
 	local showUseError = true;
@@ -1728,6 +1724,7 @@ function BetterWardrobeCollectionFrameMixin:SetAppearanceTooltip(contentFrame, s
 
 	local itemID = sources[index] and sources[index].itemID
 	local visualID = sources[index] and sources[index].visualID
+	local sourceID = sources[index] and sources[index].sourceID
 	
 	if addon.Profile.ShowItemIDTooltips and itemID then
 		GameTooltip_AddNormalLine(GameTooltip, "ItemID: " .. itemID);
@@ -1736,6 +1733,11 @@ function BetterWardrobeCollectionFrameMixin:SetAppearanceTooltip(contentFrame, s
 
 	if addon.Profile.ShowVisualIDTooltips and visualID then
 		GameTooltip_AddNormalLine(GameTooltip, "VisualID: " .. visualID);
+		GameTooltip:Show()
+	end
+
+	if addon.Profile.ShowVisualIDTooltips and sourceID then
+		GameTooltip_AddNormalLine(GameTooltip, "SourceID: " .. sourceID);
 		GameTooltip:Show()
 	end
 
@@ -6469,27 +6471,24 @@ function BetterWardrobeSetsCollectionMixin:ScrollToSet(setID, alignment)
 	scrollBox:ScrollToElementDataByPredicate(FindSet, alignment, ScrollBoxConstants.NoScrollInterpolation)
 end
 
-
-
-function BetterWardrobeSetsCollectionMixin:LinkSetInChat(setID)
-	local itemTransmogInfoList = TransmogUtil.GetEmptyItemTransmogInfoList()
-
+function BetterWardrobeSetsCollectionMixin:LinkSet(setID)
 	local emptySlotData = Sets:GetEmptySlots()
+	local itemList = TransmogUtil.GetEmptyItemTransmogInfoList()
 
-	for i=1,19 do
-		itemTransmogInfoList[i].secondaryAppearanceID = 0;
+	for i = 1, 19 do
 		local _, source = addon.GetItemSource(emptySlotData[i] or 0)
-		itemTransmogInfoList[i].appearanceID = source or 0;
-		itemTransmogInfoList[i].illusionID = 0;
+		itemList[i].appearanceID = source or 0;
+		itemList[i].illusionID = 0;
+		itemList[i].secondaryAppearanceID = 0;
 	end
 
 	local sortedSources = SetsDataProvider:GetSortedSetSources(setID)
-	for i=1,#sortedSources do
+	for i = 1, #sortedSources do
 		local slot = C_Transmog.GetSlotForInventoryType(sortedSources[i].invType)
-		itemTransmogInfoList[slot].appearanceID = sortedSources[i].sourceID;
+		itemList[slot].appearanceID = sortedSources[i].sourceID;
 	end
 
-	local hyperlink = C_TransmogCollection.GetOutfitHyperlinkFromItemTransmogInfoList(itemTransmogInfoList)
+	local hyperlink = C_TransmogCollection.GetOutfitHyperlinkFromItemTransmogInfoList(itemList)
 	if not ChatEdit_InsertLink(hyperlink) then
 		ChatFrame_OpenChat(hyperlink)
 	end
@@ -6586,7 +6585,7 @@ local function BetterWardrobeSetsCollectionScrollFrame_FavoriteDropDownInit(self
 	BW_UIDropDownMenu_AddButton({
 		notCheckable = true,
 		text = TRANSMOG_OUTFIT_POST_IN_CHAT,
-		func = function() BetterWardrobeSetsCollectionMixin:LinkSetInChat(self.baseSetID) end,
+		func = function() BetterWardrobeSetsCollectionMixin:LinkSet(self.baseSetID) end,
 	})
 
 	local isFavorite = (type == "set" and C_TransmogSets.GetIsFavorite(self.baseSetID)) or addon.favoritesDB.profile.extraset[self.baseSetID]
@@ -6757,7 +6756,6 @@ function BetterWardrobeSetsScrollFrameButtonMixin:Init(elementData)
 	local classIcon = ""
 
 	self.Name:SetTextColor(color.r, color.g, color.b)
-
 	self.Label:SetText(displayData.label)
 	self.Icon:SetTexture(SetsDataProvider:GetIconForSet(displayData.setID))
 	self.Icon:SetDesaturation((topSourcesCollected == 0) and 1 or 0)
@@ -6776,7 +6774,7 @@ function BetterWardrobeSetsScrollFrameButtonMixin:Init(elementData)
 		isHidden = addon.HiddenAppearanceDB.profile.extraset[displayData.setID]
 	end
 
-	self.Favorite:SetShown(isFavorite)
+	self.Favorite:SetShown(isFavorite or elementData.favoriteSetID)
 	self.CollectionListVisual.Hidden.Icon:SetShown(isHidden)
 	self.CollectionListVisual.Unavailable:SetShown(CheckSetAvailability2(displayData.setID))
 	self.CollectionListVisual.UnavailableItems:SetShown(CheckSetAvailability(displayData.setID))
@@ -8550,11 +8548,16 @@ addon:SecureHook("SetItemRef", function(link, ...)
 
 	if (linkType == "transmogappearance" or linkType == "transmogset" or linkType == "BW_transmogset" or linkType == "BW_transmogset-extra") then
 		if not IsAddOnLoaded("Blizzard_Collections") then
-			LoadAddOn("Blizzard_Collections")
+			--LoadAddOn("Blizzard_Collections")
 		end
 
 
+		if ( not CollectionsJournal:IsVisible() or not self:IsVisible() ) then
+			--ToggleCollectionsJournal(5)
+			TransmogUtil.OpenCollectionToItem(addedLink);
+			--WardrobeCollectionFrame:OpenTransmogLink(addedLink)
 
+		end
 
 		BetterWardrobeCollectionFrame:OpenTransmogLink(link)
 				

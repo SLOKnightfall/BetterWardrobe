@@ -199,10 +199,45 @@ local altitems = {
 	[107808] = 108030, --Goblin, Goggles
 	[107820] = 107821, --Worgen, Chest/Robe
 
-		--Fireplume cosmetic
+	--Fireplume cosmetic
 	[169680] = {169689,169778,169779}, --Fireplume legs
 	[169679] = {169688, 169782}, --Fireplume Chest
 	[169777] = 169681, --Fireplume Gloves
+
+--DF Season 2 Hero
+--Furnace Seraphs Verdict - Priest Helm
+	[186244] = 186248, --LFR
+	[184516] = 186247, --Normal
+	[186245] = 186249, --Heroic
+	[186246] = 186250, --Mythic
+	[186833] = 186251, -- Glad
+	[186834] = 186252, --Elite
+
+
+
+--Ashen Predators' Scaleform - Hunter Shoulder
+	[186069] = 186072, --LFR
+	[184451] = 186073, --Normal
+	[186070] = 186074, --Heroic
+	[186071] = 186075, --Mythic
+	[187033] = 186076, --Glad
+	[187034] = 186077, --Elite
+
+	--Heartfire Sentinel's Authority - Paladin Shoulder
+	[185982] = 185985, --LFR
+	[184424] = 185986, --Normal
+	[185983] = 185987, --Heroic
+	[185984] = 185988, --Mythic
+	[187095] = 185989, --Glad
+	[187096] = 185990, --Elite
+
+	--Heartfire Sentinel's Authority - Paladin Helm
+	[185994] = 185998, --LFR
+	[184426] = 185997, --Normal
+	[185995] = 185999, --Heroic
+	[185996] = 186000, --Mythic
+	[187087] = 186001, --Glad
+	[187088] = 186002, --Elite
 
 }
 
@@ -221,7 +256,7 @@ function addon:CheckForExtraItems(setID, data)
 		end
 	end
 	return data
-	--C_TransmogCollection.GetItemInfo(190064)
+	--C_TransmogCollection.GetItemInfo(202542)
 end
 
 
