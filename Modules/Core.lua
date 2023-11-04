@@ -955,6 +955,22 @@ function addon.RefreshOutfitData()
 		--addon.RefreshSaveOutfitDropdown()
 	end
 
+--[[
+	local function CopyCharacterData(name)
+
+		--need to copy over default blizzard saved sets
+		--print(name)
+		--local profile = addon.setdb:GetCurrentProfile()
+
+		--addon.setdb.global.sets[profile] = CopyTable(addon.setdb.global.sets[name])
+--zx=addon.setdb.global.sets[name]
+		--addon.setdb:CopyProfile(addon.setdb.global.sets[name], silent)
+
+		--addon.RefreshOutfitData()
+		--addon.RefreshSaveOutfitDropdown()
+		--addon:RefreshConfig()
+	end
+]]--
 	local args = {}
 	local i = 1
 	for name, data in pairs(addon.setdb.global.sets) do
@@ -968,14 +984,26 @@ function addon.RefreshOutfitData()
 			disabled = false,
 		}
 
+		--args["CopyButton"..i] = {
+
+			--order = i + .2,
+			--name = L["Copy"],
+			--type = "execute",
+			--width = .5,
+			--func = function()  
+			--		return CopyCharacterData(name) end,
+	--	}
+
 		args["AddButton"..i] = {				
 			order = i + .2,
 			name = L["Remove"],
 			type = "execute",
 			width = .5,
 			func = function()  
-					return RemoveCharacterData(name) end,
+			return RemoveCharacterData(name) end,
 		}	
+
+
 
 		i = i + 1
 	end
@@ -1361,7 +1389,7 @@ end
 
 --Hides default collection window when at transmog vendor
 local function UpdateTransmogVendor()
-	WardrobeCollectionFrame:Hide()
+	--WardrobeCollectionFrame:Hide()
 	BetterWardrobeCollectionFrame:Show()
 	BetterWardrobeCollectionFrame:SetContainer(WardrobeFrame)
 end
@@ -1390,14 +1418,16 @@ function addon.Init:LoadModules()
 		-- don't touch the wardrobe frame if it's used by the transmogrifier
 		if (WardrobeCollectionFrame:GetParent() == self or not WardrobeCollectionFrame:GetParent():IsShown()) then
 			if selected == 5 then
-				HideUIPanel(WardrobeFrame)
-				WardrobeCollectionFrame:Hide()
+				--HideUIPanel(WardrobeFrame)
+				--WardrobeCollectionFrame:Hide()
+				--BetterWardrobeCollectionFrame:Show()
+
 				BetterWardrobeCollectionFrame:SetContainer(self)
 				if addon.ExtendedTransmogSwap then
 					addon.ExtendedTransmogSwap:Show()
 				end
 			else
-				WardrobeCollectionFrame:Hide()
+				--WardrobeCollectionFrame:Hide()
 				BetterWardrobeCollectionFrame:Hide()
 				if addon.ExtendedTransmogSwap then
 					addon.ExtendedTransmogSwap:Hide()
@@ -1426,6 +1456,9 @@ function addon.Init:LoadModules()
 	addon:UpdateCanIMogIt()
 	addon:InitExtendedSetsSwap()
 	addon.Init.SavedSetsDropDown_Initialize()
+			C_Timer.After(1, function()
+	addon:UpdatePetTracker()
+end)
 end
 
 function addon:EventHandler(event, ...)
