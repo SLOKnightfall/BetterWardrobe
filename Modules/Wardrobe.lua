@@ -1705,7 +1705,6 @@ local function IsAnySourceCollected(sources)
 end
 
 function BetterWardrobeCollectionFrameMixin:SetAppearanceTooltip(contentFrame, sources, primarySourceID, warningString)
-	zzz=sources
 	self.tooltipContentFrame = contentFrame;
 	local selectedIndex = self.tooltipSourceIndex;
 	local showUseError = true;
