@@ -992,17 +992,20 @@ local plugin_index
 local function BW_DressingRoomImportButton_OnClicks(outfitID, name, parent)
 	MogItSetName = name
 	MogItSetID = outfitID
-
-	if outfitID >= 7000 then
+	if outfitID >= 70000 then
 		plugin = addon.TransmogOutfits
 		plugin_index = outfitID
-	else
+	elseif IsAddOnLoaded("MogIt") then
 		plugin = addon.MogIt
 		plugin_index = MogItSetName
+	else 
+		plugin = nil
 	end
 
+	if not plugin then return end
+
 	local contextMenuData = {
-		{
+		{	
 			text = L["Create Copy"],
 			func = function()
 				plugin:CopySet(MogItSetID, MogItSetName)

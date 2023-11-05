@@ -1775,7 +1775,7 @@
 				</Anchors>
 			</Frame>
 		</Frames>
-						<Layers>
+		<Layers>
 			<Layer level="BACKGROUND" textureSubLevel="-6">
 				<Texture name="$parentBg" file="Interface\FrameGeneral\UI-Background-Rock" horizTile="true" vertTile="true" parentKey="Bg">
 					<Anchors>
@@ -1784,7 +1784,7 @@
 					</Anchors>
 				</Texture>
 			</Layer>
-			</Layers>
+		</Layers>
 		<Scripts>
 			<OnLoad method="OnLoad"/>
 			<OnEvent method="OnEvent"/>

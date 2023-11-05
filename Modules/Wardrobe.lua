@@ -1239,7 +1239,7 @@ function BetterWardrobeCollectionFrameMixin:SetTab(tabID)
 		self.SearchBox:ClearAllPoints()
 		self.SearchBox:SetPoint("TOPRIGHT", -107, -35)
 		self.SearchBox:SetWidth(115)
-				self.SearchBox:Show()
+		self.SearchBox:Show()
 
 		local enableSearchAndFilter = self.ItemsCollectionFrame.transmogLocation and self.ItemsCollectionFrame.transmogLocation:IsAppearance()
 		self.SearchBox:SetEnabled(enableSearchAndFilter)
@@ -1689,6 +1689,9 @@ function BetterWardrobeCollectionFrameMixin:GoToSet(setID)
 end
 
 function BetterWardrobeCollectionFrameMixin:UpdateTabButtons()
+	--Force Better Wardrobe frames higher than the default one
+	self:SetFrameLevel(WardrobeCollectionFrame:GetFrameLevel()+200);
+
 	-- sets tab
 	self.SetsTab.FlashFrame:SetShown(C_TransmogSets.GetLatestSource() ~= Constants.Transmog.NoTransmogID and not C_Transmog.IsAtTransmogNPC())
 	self.ExtraSetsTab.FlashFrame:SetShown(newTransmogInfo["latestSource"] and (newTransmogInfo["latestSource"] ~= Constants.Transmog.NoTransmogID) and not C_Transmog.IsAtTransmogNPC())
@@ -6785,8 +6788,8 @@ function BetterWardrobeSetsScrollFrameButtonMixin:Init(elementData)
 	self.CollectionListVisual.Collection.Collected_Icon:SetShown(isInList and setCollected)
 
 
+	self.EditButton:SetShown((BetterWardrobeCollectionFrame:CheckTab(4) and self.setID < 50000) or (self.setID >=70000 or IsAddOnLoaded("MogIt")))
 
-	self.EditButton:SetShown(BetterWardrobeCollectionFrame:CheckTab(4))
 
 	if ( topSourcesCollected == 0 or setCollected ) then
 		self.ProgressBar:Hide()

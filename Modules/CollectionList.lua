@@ -121,7 +121,7 @@ function CollectionList:UpdateList(type, typeID, add, sourceID)
 	local setName, setInfo, itemModID
 	local selectedList = CollectionList:SelectedCollectionList()
 	if selectedList == "MOGIT" then
-		--return addon.MogIt.UpdateWishlistItem(type, typeID, add, sourceID)
+		return addon.MogIt.UpdateWishlistItem(type, typeID, add, sourceID)
 	end
 
 	local collectionList = addon.CollectionList:CurrentList()
@@ -201,7 +201,7 @@ function BetterWardrobeSetsCollectionListMixin:SetTitle()
 end
 
 function addon.Init:BuildCollectionList()
-	--CollectionList:AddMogItData()
+	CollectionList:AddMogItData()
 	CollectionList:CreateDropdown()
 end
 

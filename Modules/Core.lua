@@ -1472,7 +1472,11 @@ function addon:EventHandler(event, ...)
 			WardrobeTransmogFrame.ToggleSecondaryAppearanceCheckbox:ClearAllPoints()
 			WardrobeTransmogFrame.ToggleSecondaryAppearanceCheckbox.Label:SetPoint("RIGHT", BetterWardrobeCollectionFrame.ItemsCollectionFrame.PagingFrame.PageText, "LEFT", -30, 0)
 			WardrobeTransmogFrame.ToggleSecondaryAppearanceCheckbox:SetPoint("RIGHT", WardrobeTransmogFrame.ToggleSecondaryAppearanceCheckbox.Label, "LEFT", 0, 0)
+
+			WardrobeTransmogFrame.ToggleSecondaryAppearanceCheckbox:SetFrameLevel(CollectionsJournal.TitleContainer:GetFrameLevel()+200);
+
 		 end)
+
 
 	elseif (event == "PLAYER_ENTERING_WORLD") then
 		addon:SendMessage("BW_OnPlayerEnterWorld")

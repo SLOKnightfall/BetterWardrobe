@@ -213,8 +213,6 @@ local altitems = {
 	[186833] = 186251, -- Glad
 	[186834] = 186252, --Elite
 
-
-
 --Ashen Predators' Scaleform - Hunter Shoulder
 	[186069] = 186072, --LFR
 	[184451] = 186073, --Normal
@@ -238,6 +236,23 @@ local altitems = {
 	[185996] = 186000, --Mythic
 	[187087] = 186001, --Glad
 	[187088] = 186002, --Elite
+
+
+	--Strands of the Autumn Blaze - Druid Helm
+	[186159] = 186163, --LFR
+	[184489] = 186162, --Normal
+	[186148] = 186164, --Heroic
+	[186149] = 186165, --Mythic
+	[186929] = 186166, --Glad
+	[186930] = 186167, --Elite
+
+	--Strands of the Autumn Blaze - Druid Shoulders
+	[186147] = 186150, --LFR
+	[184487] = 186151, --Normal
+	[186160] = 186152, --Heroic
+	[186161] = 186153, --Mythic
+	[186937] = 186154, --Glad
+	[186938] = 186155, --Elite
 
 }
 

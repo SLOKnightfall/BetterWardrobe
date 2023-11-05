@@ -16,7 +16,7 @@ function MogIt:RenameSet(setName)
 end
 
 if not IsAddOnLoaded("MogIt") then return end
-if true then return end --TODO remove when updated
+
 local  mog = _G["MogIt"]
 local L = LibStub("AceLocale-3.0"):GetLocale(addonName)
 local Wishlist = mog:GetModule("Wishlist")
@@ -40,43 +40,46 @@ function MogIt:RenameSet(setName)
 	--addon:SendMessage("BW_TRANSMOG_COLLECTION_UPDATED")
 end
 local function UpdateFrames()
-	local ScrollFrames = {BetterWardrobeCollectionFrameScrollFrame.buttons, WardrobeCollectionFrameScrollFrame.buttons}
 --Hooks into the extra sets scroll frame buttons to allow ctrl-right clicking on the button to generate a mogit preview
-	for index, buttons in ipairs(ScrollFrames) do
-		local orig_OnMouseUp = buttons[1]:GetScript("OnMouseUp")
-		for i = 1, #buttons do
-			local button = buttons[i]
-			button:SetScript("OnMouseUp", function(self, button)
-				if IsControlKeyDown() and button == "RightButton" then
-					local preview = mog:GetPreview()
-					local sources = (index == 1 and C_TransmogSets.GetSetSources(self.setID)) or  addon.GetSetsources(self.setID)
-					for source in pairs(sources) do
-						mog:AddToPreview(select(6, C_TransmogCollection.GetAppearanceSourceInfo(source)), preview)
-					end
-					return
-				end
-				orig_OnMouseUp(self, button)
-			end)
-		end
-	end
-
-	local orig_OnMouseDown = BetterWardrobeCollectionFrame.ItemsCollectionFrame.Models[1]:GetScript("OnMouseDown")
 
 	for i, model in ipairs(BetterWardrobeCollectionFrame.ItemsCollectionFrame.Models) do
 		model:SetScript("OnMouseDown", function(self, button)
 			if IsControlKeyDown() and button == "RightButton" then
-				local link
-				local sources = CollectionWardrobeUtil.GetSortedAppearanceSources(self.visualInfo.visualID)
-				if BetterWardrobeCollectionFrame.tooltipSourceIndex then
-					local index = WardrobeUtils_GetValidIndexForNumSources(BetterWardrobeCollectionFrame.tooltipSourceIndex, #sources)
-					link = select(6, C_TransmogCollection.GetAppearanceSourceInfo(sources[index].sourceID))
+				local itemsCollectionFrame = self:GetParent()
+				if not itemsCollectionFrame.transmogLocation:IsIllusion() then
+					local sources = CollectionWardrobeUtil.GetSortedAppearanceSources(self.visualInfo.visualID, itemsCollectionFrame:GetActiveCategory(), itemsCollectionFrame.transmogLocation)
+					if BetterWardrobeCollectionFrame.tooltipSourceIndex then
+						local index = CollectionWardrobeUtil.GetValidIndexForNumSources(BetterWardrobeCollectionFrame.tooltipSourceIndex, #sources)
+						local link = select(6, C_TransmogCollection.GetAppearanceSourceInfo(sources[index].sourceID))
+						mog:AddToPreview(link)
+						return
+					end
+				else
+					mog:SetPreviewEnchant(mog:GetPreview(mog.activePreview), self.visualInfo.sourceID);
 				end
-				mog:AddToPreview(link)
-				return
 			end
-			orig_OnMouseDown(self, button)
+			self:OnMouseDown(button)
 		end)
 	end
+
+	ScrollUtil.AddInitializedFrameCallback(BetterWardrobeCollectionFrame.SetsCollectionFrame.ListContainer.ScrollBox, function(self, button, elementData)
+		if not button.mogitInit then
+			local orig_OnClick = button:GetScript("OnClick");
+			button:SetScript("OnClick", function(self, button2)
+				if IsControlKeyDown() and button2 == "RightButton" then
+					local preview = mog:GetPreview();
+					local sources = (index == 1 and C_TransmogSets.GetSetSources(self.setID)) or  addon.GetSetsources(self.setID)
+					for source in pairs(sources) do
+						mog:AddToPreview(select(6, C_TransmogCollection.GetAppearanceSourceInfo(source)), preview);
+					end
+					return
+				end
+				orig_OnClick(self, button2);
+			end);
+			button.mogitInit = true;
+		end
+	end, self, true);
+		-- WardrobeCollectionFrame.SetsCollectionFrame.DetailsFrame.itemFramesPool.resetterFunc = function(self, obj) obj:RegisterForDrag("LeftButton", "RightButton") end
 end
 
 addon:RegisterMessage("BW_ADDON_LOADED", function() UpdateFrames() end)
@@ -97,8 +100,8 @@ function MogIt.GetMogitOutfits()
 		data.set = "mogit"
 		data.setType = "SavedMogIt"
 		data.label = L["MogIt Set"]
-		data.index = i + 6000
-		data.outfitID = 6000 + i
+		data.index = i + 60000
+		data.outfitID = 60000 + i
 		data.mainHandEnchant = 0
 		data.offHandEnchant = 0
 		data.offShoulder = 0
@@ -239,7 +242,7 @@ function MogIt:CopySet(outfitID)
 	local outfit
 
 	local itemTransmogInfoList = {}
-	local setdata = addon.GetSetInfo(outfitID)
+	 setdata = addon.GetSetInfo(outfitID)
 	local name = setdata.name.." (Copy)"
 	local icon = setdata.icon
 	local itemlist = setdata.sources
