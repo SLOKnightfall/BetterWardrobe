@@ -55,8 +55,11 @@ end
 BW_UIDropDownCustomMenuEntryMixin = {};
 
 function BW_UIDropDownCustomMenuEntryMixin:GetPreferredEntryWidth()
-	-- NOTE: Only width is currently supported, dropdown menus size vertically based on how many buttons are present.
 	return self:GetWidth();
+end
+
+function BW_UIDropDownCustomMenuEntryMixin:GetPreferredEntryHeight()
+	return self:GetHeight();
 end
 
 function BW_UIDropDownCustomMenuEntryMixin:OnSetOwningButton()
@@ -79,4 +82,11 @@ end
 
 function BW_UIDropDownCustomMenuEntryMixin:GetContextData()
 	return self.contextData;
+end
+
+
+BW_ColorSwatchMixin = {}
+
+function BW_ColorSwatchMixin:SetColor(color)
+	self.Color:SetVertexColor(color:GetRGB());
 end

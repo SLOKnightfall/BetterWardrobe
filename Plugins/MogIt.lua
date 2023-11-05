@@ -82,7 +82,7 @@ local function UpdateFrames()
 		-- WardrobeCollectionFrame.SetsCollectionFrame.DetailsFrame.itemFramesPool.resetterFunc = function(self, obj) obj:RegisterForDrag("LeftButton", "RightButton") end
 end
 
-addon:RegisterMessage("BW_ADDON_LOADED", function() UpdateFrames() end)
+addon:RegisterMessage("BW_ADDON_LOADED", function() 	C_Timer.After(0.5, function()UpdateFrames()end) end)
 
 addon:RegisterMessage("BW_OnPlayerEnterWorld", function() SetHooks() end)
 

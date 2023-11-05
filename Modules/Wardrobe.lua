@@ -1846,7 +1846,7 @@ function BetterWardrobeCollectionFrameMixin:ClearSearch(searchType)
 end
 
 function BetterWardrobeCollectionFrameMixin:GetSearchType()
-	return self.activeFrame.searchType;
+	return self.activeFrame and self.activeFrame.searchType or 1;
 end
 
 function BetterWardrobeCollectionFrameMixin:ShowItemTrackingHelptipOnShow()
@@ -6465,7 +6465,7 @@ end
 function BetterWardrobeSetsCollectionMixin:ScrollToSet(setID, alignment)
 	local scrollBox = self.ListContainer.ScrollBox;
 
-	local baseSetID = C_TransmogSets.GetBaseSetID(setID)
+	local baseSetID = C_TransmogSets.GetBaseSetID(setID) or setID
 	local function FindSet(elementData)
 		return elementData.setID == baseSetID;
 	end
@@ -8554,14 +8554,16 @@ addon:SecureHook("SetItemRef", function(link, ...)
 		end
 
 
-		if ( not CollectionsJournal:IsVisible() or not self:IsVisible() ) then
+		if ( not CollectionsJournal or not CollectionsJournal:IsVisible() or not self:IsVisible() ) then
+			local _, sourceID = strsplit(":", addedLink);
 			--ToggleCollectionsJournal(5)
-			TransmogUtil.OpenCollectionToItem(addedLink);
-			--WardrobeCollectionFrame:OpenTransmogLink(addedLink)
+			--print(addedLink)
+			TransmogUtil.OpenCollectionToItem(sourceID);
+			--WardrobeCollectionFrame:OpenTransmogLink(sourceID)
 
 		end
 
-		BetterWardrobeCollectionFrame:OpenTransmogLink(link)
+			C_Timer.After(0.1, function() BetterWardrobeCollectionFrame:OpenTransmogLink(link) end)
 				
 		return;
 	end

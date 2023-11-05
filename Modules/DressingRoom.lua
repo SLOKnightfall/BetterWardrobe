@@ -38,6 +38,7 @@ local inspectView = false
 local TP = CreateFrame("GameTooltip", "BW_VirtualTooltip", nil, "GameTooltipTemplate")
 TP:SetScript("OnLoad", GameTooltip_OnLoad)
 TP:SetOwner(UIParent, 'ANCHOR_NONE')
+local TP = CreateFrame("GameTooltip", "BW_GameTooltip", nil, "GameTooltipTemplate")
 
 function BetterWardrobe:ToggleDressingRoom()
 		if DressUpFrame:IsShown() then 
@@ -195,15 +196,15 @@ end
 function BW_DressingRoomItemButtonMixin:OnEnter()
 	local slot = INVENTORY_SLOT_NAMES[self:GetID()]
 
-	GameTooltip:SetOwner(self, "ANCHOR_BOTTOMRIGHT", 0, 40)
+	BW_GameTooltip:SetOwner(self, "ANCHOR_BOTTOMRIGHT", 0, 40)
 	
 	if self.itemLink then
-		GameTooltip:SetHyperlink(self.itemLink)
+		BW_GameTooltip:SetHyperlink(self.itemLink)
 	else
-		GameTooltip:AddLine(_G[slot])
+		BW_GameTooltip:AddLine(_G[slot])
 	end
 
-	GameTooltip:Show()
+	BW_GameTooltip:Show()
 	--ShoppingTooltip1:Hide()
 	--ShoppingTooltip2:Hide()
 	--if ShoppingTooltip3 then ShoppingTooltip3:Hide() end
@@ -211,7 +212,7 @@ function BW_DressingRoomItemButtonMixin:OnEnter()
 end
 
 function BW_DressingRoomItemButtonMixin:OnLeave()
-	GameTooltip:Hide()
+	BW_GameTooltip:Hide()
 end
 
 function BW_DressingRoomItemButtonMixin:OnClick()
@@ -237,7 +238,7 @@ end
 
 function BW_DressingRoomItemButtonMixin:OnMouseDown(button)
 	local sharedActor = DressUpFrame.ModelScene:GetPlayerActor()
-	GameTooltip:Hide()
+	BW_GameTooltip:Hide()
 
 	if button == "LeftButton" then
 		if not self.sourceID then return end
@@ -658,7 +659,7 @@ end
 
 BW_DressingRoomButtonMixin = {}
 function BW_DressingRoomButtonMixin:OnMouseDown()
-	GameTooltip:Hide()
+	BW_GameTooltip:Hide()
 	local button = self.buttonID
 	if not button then return end
 	if button == "Settings" then
@@ -726,13 +727,13 @@ function BW_DressingRoomButtonMixin.OnEnter(self)
 		text = LINK_TRANSMOG_OUTFIT_HELPTIP
 	end
 
-	GameTooltip:SetOwner(self, "ANCHOR_RIGHT")
-	GameTooltip:SetText(text)
-	GameTooltip:Show()
+	BW_GameTooltip:SetOwner(self, "ANCHOR_RIGHT")
+	BW_GameTooltip:SetText(text)
+	BW_GameTooltip:Show()
 end
 
 function BW_DressingRoomButtonMixin:OnLeave()
-	GameTooltip:Hide()
+	BW_GameTooltip:Hide()
 end
 
 function DressingRoom:UpdateBackground()

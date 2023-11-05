@@ -1368,7 +1368,7 @@ function addon:OnEnable()
 	--addon.Init:BuildTooltips()
 	addon:InitTooltips()
 	C_Timer.After(0.5, function()
-		addon.RefreshSubItemData()
+		--addon.RefreshSubItemData()
 		addon.RefreshOutfitData()
 	end)
 		addPatrons()
@@ -1449,32 +1449,34 @@ function addon.Init:LoadModules()
 	addon:SecureHook(WardrobeTransmogFrame, "GetSlotButton", function(self,...) BW_TransmogFrameMixin.GetSlotButton(self,...) end)
 	--addon:SecureHook(WardrobeTransmogFrame, "OnTransmogApplied", function(self,...) BW_TransmogFrameMixin.OnTransmogApplied(self,...) end)
 		
- 	addon.Init:initCollectionList()
- 	addon.Init:BuildCollectionList()
-	addon.Init:BuildTransmogVendorUI()
-	addon.Init.SortDropDown_Initialize()
-	addon:UpdateCanIMogIt()
-	addon:InitExtendedSetsSwap()
-	addon.Init.SavedSetsDropDown_Initialize()
-			C_Timer.After(1, function()
-	addon:UpdatePetTracker()
-end)
+
+	C_Timer.After(0, function()
+		addon:UpdatePetTracker()
+		addon.Init:initCollectionList()
+	 	addon.Init:BuildCollectionList()
+		addon.Init:BuildTransmogVendorUI()
+		addon.Init.SortDropDown_Initialize()
+		addon:UpdateCanIMogIt()
+		addon:InitExtendedSetsSwap()
+		addon.Init.SavedSetsDropDown_Initialize()
+		BetterWardrobeCollectionFrame:Show()
+
+	end)
 end
 
 function addon:EventHandler(event, ...)
 	if event == "ADDON_LOADED" and ... == "Blizzard_Collections" then
-		addon.Init:LoadModules()
 		addon:SendMessage("BW_ADDON_LOADED")
 		addon:UnregisterEvent("ADDON_LOADED")
-		
-		C_Timer.After(0.5, function()
+
+		C_Timer.After(0, function()
+			addon.Init:LoadModules()
+
 			WardrobeTransmogFrame.ToggleSecondaryAppearanceCheckbox.Label:ClearAllPoints()
 			WardrobeTransmogFrame.ToggleSecondaryAppearanceCheckbox:ClearAllPoints()
 			WardrobeTransmogFrame.ToggleSecondaryAppearanceCheckbox.Label:SetPoint("RIGHT", BetterWardrobeCollectionFrame.ItemsCollectionFrame.PagingFrame.PageText, "LEFT", -30, 0)
 			WardrobeTransmogFrame.ToggleSecondaryAppearanceCheckbox:SetPoint("RIGHT", WardrobeTransmogFrame.ToggleSecondaryAppearanceCheckbox.Label, "LEFT", 0, 0)
-
 			WardrobeTransmogFrame.ToggleSecondaryAppearanceCheckbox:SetFrameLevel(CollectionsJournal.TitleContainer:GetFrameLevel()+200);
-
 		 end)
 
 

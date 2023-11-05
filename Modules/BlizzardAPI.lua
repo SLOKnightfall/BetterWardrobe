@@ -674,3 +674,62 @@ function addon.Model_ApplyUICamera(self, uiCameraID)
 end
 
 
+
+local function ChatEdit_ActivateChat(editBox)
+	if ( editBox.disableActivate ) then
+		return;
+	end
+
+	ChatFrame_ClearChatFocusOverride();
+	if ( ACTIVE_CHAT_EDIT_BOX and ACTIVE_CHAT_EDIT_BOX ~= editBox ) then
+		ChatEdit_DeactivateChat(ACTIVE_CHAT_EDIT_BOX);
+	end
+	ACTIVE_CHAT_EDIT_BOX = editBox;
+
+	ChatEdit_SetLastActiveWindow(editBox);
+
+	--Stop any sort of fading
+	UIFrameFadeRemoveFrame(editBox);
+
+	editBox:Show();
+	editBox:SetFocus();
+	editBox:SetFrameStrata("DIALOG");
+	editBox:Raise();
+
+	editBox.header:Show();
+	ChatEdit_UpdateNewcomerEditBoxHint(editBox);
+	editBox.focusLeft:Show();
+	editBox.focusRight:Show();
+	editBox.focusMid:Show();
+	editBox:SetAlpha(1.0);
+
+	ChatEdit_UpdateHeader(editBox);
+
+	if ( CHAT_SHOW_IME ) then
+		_G[editBox:GetName().."Language"]:Show();
+	end
+end
+
+function addon.ChatFrame_OpenChat(text, chatFrame, desiredCursorPosition)
+
+	local editBox = ChatEdit_ChooseBoxForSend(chatFrame);
+
+	ChatEdit_ActivateChat(editBox);
+	editBox.desiredCursorPosition = desiredCursorPosition;
+
+	if text then
+		editBox.text = text;
+		editBox.setText = 1;
+	end
+
+	if ( editBox:GetAttribute("chatType") == editBox:GetAttribute("stickyType") ) then
+		if ( (editBox:GetAttribute("stickyType") == "PARTY") and (not IsInGroup(LE_PARTY_CATEGORY_HOME)) or
+		(editBox:GetAttribute("stickyType") == "RAID") and (not IsInRaid(LE_PARTY_CATEGORY_HOME)) or
+		(editBox:GetAttribute("stickyType") == "INSTANCE_CHAT") and (not IsInGroup(LE_PARTY_CATEGORY_INSTANCE))) then
+			editBox:SetAttribute("chatType", "SAY");
+		end
+	end
+
+	ChatEdit_UpdateHeader(editBox);
+	return editBox;
+end

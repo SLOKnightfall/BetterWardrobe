@@ -940,7 +940,7 @@
 				</KeyValues>
 				<Layers>
 					<Layer level="ARTWORK">
-						<FontString parentKey="NoValidItemsLabel" inherits="GameFontNormalMed2" text="TRANSMOG_NO_VALID_ITEMS_EQUIPPED">
+						<FontString parentKey="NoValidItemsLabel" inherits="GameFontNormalMed2" text="TRANSMOG_NO_VALID_ITEMS_EQUIPPED" hidden="true">
 							<Anchors>
 								<Anchor point="CENTER" y="15"/>
 							</Anchors>

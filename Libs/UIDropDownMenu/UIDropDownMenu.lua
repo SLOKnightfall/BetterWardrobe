@@ -1,5 +1,5 @@
 BW_UIDROPDOWNMENU_MAXBUTTONS = 1;
-BW_UIDROPDOWNMENU_MAXLEVELS = 2;
+BW_UIDROPDOWNMENU_MAXLEVELS = 3;
 BW_UIDROPDOWNMENU_BUTTON_HEIGHT = 16;
 BW_UIDROPDOWNMENU_BORDER_HEIGHT = 15;
 -- The current open menu
@@ -14,6 +14,8 @@ BW_UIDROPDOWNMENU_MENU_VALUE = nil;
 BW_UIDROPDOWNMENU_SHOW_TIME = 2;
 -- Default dropdown text height
 BW_UIDROPDOWNMENU_DEFAULT_TEXT_HEIGHT = nil;
+-- Default dropdown width padding
+BW_UIDROPDOWNMENU_DEFAULT_WIDTH_PADDING = 25;
 -- List of open menus
 BW_OPEN_DROPDOWNMENUS = {};
 
@@ -117,6 +119,10 @@ function BW_UIDropDownMenu_SetDisplayMode(frame, displayMode)
 	end
 end
 
+function BW_UIDropDownMenu_SetFrameStrata(frame, frameStrata)
+	frame.listFrameStrata = frameStrata;
+end
+
 function BW_UIDropDownMenu_RefreshDropDownSize(self)
 	self.maxWidth = BW_UIDropDownMenu_GetMaxButtonWidth(self);
 	self:SetWidth(self.maxWidth + 25);
@@ -155,6 +161,9 @@ function BW_UIDropDownMenuButtonInvisibleButton_OnEnter(self)
 			if parent.tooltipWarning then
 				GameTooltip_AddColoredLine(tooltip, parent.tooltipWarning, RED_FONT_COLOR, true);
 			end
+			if parent.tooltipBackdropStyle then
+				SharedTooltip_SetBackdropStyle(tooltip, parent.tooltipBackdropStyle);  ---CHECK
+			end
 			tooltip:Show();
 		end
 	end
@@ -175,13 +184,22 @@ function BW_UIDropDownMenuButton_OnEnter(self)
 		BW_CloseDropDownMenus(self:GetParent():GetID() + 1);
 	end
 	self.Highlight:Show();
-	if ( self.tooltipTitle and not self.noTooltipWhileEnabled ) then
+	if ( self.tooltipTitle and not self.noTooltipWhileEnabled and not BW_UIDropDownMenuButton_ShouldShowIconTooltip(self) ) then
 		if ( self.tooltipOnButton ) then
 			local tooltip = GetAppropriateTooltip();
 			tooltip:SetOwner(self, "ANCHOR_RIGHT");
 			GameTooltip_SetTitle(tooltip, self.tooltipTitle);
+			if self.tooltipInstruction then
+				GameTooltip_AddInstructionLine(tooltip, self.tooltipInstruction);
+			end
 			if self.tooltipText then
 				GameTooltip_AddNormalLine(tooltip, self.tooltipText, true);
+			end
+			if self.tooltipWarning then
+				GameTooltip_AddColoredLine(tooltip, self.tooltipWarning, RED_FONT_COLOR, true);
+			end
+			if self.tooltipBackdropStyle then
+				SharedTooltip_SetBackdropStyle(tooltip, self.tooltipBackdropStyle);
 			end
 			tooltip:Show();
 		end
@@ -210,6 +228,49 @@ function BW_UIDropDownMenuButton_OnLeave(self)
 	GetValueOrCallFunction(self, "funcOnLeave", self);
 end
 
+function BW_UIDropDownMenuButton_ShouldShowIconTooltip(self)
+	if self.Icon and (self.iconTooltipTitle or self.iconTooltipText) and (self.icon or self.mouseOverIcon) then
+		return GetMouseFocus() == self.Icon;
+	end
+	return false;
+end
+
+function BW_UIDropDownMenuButtonIcon_OnEnter(self)
+	local button = self:GetParent();
+	if not button then
+		return;
+	end
+
+	local shouldShowIconTooltip = UIDropDownMenuButton_ShouldShowIconTooltip(button);
+
+	if shouldShowIconTooltip then
+
+		local tooltip = GetAppropriateTooltip();
+		tooltip:SetOwner(button, "ANCHOR_RIGHT");
+		if button.iconTooltipTitle then
+			GameTooltip_SetTitle(tooltip, button.iconTooltipTitle);
+		end
+		if button.iconTooltipText then
+			GameTooltip_AddNormalLine(tooltip, button.iconTooltipText, true);
+		end
+		if button.iconTooltipBackdropStyle then
+			SharedTooltip_SetBackdropStyle(tooltip, button.iconTooltipBackdropStyle);
+		end
+		tooltip:Show();
+	end
+
+	BW_UIDropDownMenuButton_OnEnter(button);
+end
+
+function BW_UIDropDownMenuButtonIcon_OnLeave(self)
+	local button = self:GetParent();
+	if not button then
+		return;
+	end
+
+	BW_UIDropDownMenuButton_OnLeave(button);
+end
+
 --[[
 List of button attributes
 ======================================================
@@ -222,6 +283,7 @@ info.isTitle = [nil, true]  --  If it's a title the button is disabled and the f
 info.disabled = [nil, true]  --  Disable the button and show an invisible button that still traps the mouseover event so menu doesn't time out
 info.tooltipWhileDisabled = [nil, 1] -- Show the tooltip, even when the button is disabled.
 info.hasArrow = [nil, true]  --  Show the expand arrow for multilevel menus
+info.arrowXOffset = [nil, NUMBER] -- Number of pixels to shift the button's icon to the left or right (positive numbers shift right, negative numbers shift left).
 info.hasColorSwatch = [nil, true]  --  Show color swatch or not, for color selection
 info.r = [1 - 255]  --  Red color value of the color swatch
 info.g = [1 - 255]  --  Green color value of the color swatch
@@ -238,20 +300,31 @@ info.owner = [Frame]  --  Dropdown frame that "owns" the current dropdownlist
 info.keepShownOnClick = [nil, 1]  --  Don't hide the dropdownlist after a button is clicked
 info.tooltipTitle = [nil, STRING] -- Title of the tooltip shown on mouseover
 info.tooltipText = [nil, STRING] -- Text of the tooltip shown on mouseover
+info.tooltipWarning = [nil, STRING] -- Warning-style text of the tooltip shown on mouseover
+info.tooltipInstruction = [nil, STRING] -- Instruction-style text of the tooltip shown on mouseover
 info.tooltipOnButton = [nil, 1] -- Show the tooltip attached to the button instead of as a Newbie tooltip.
+info.tooltipBackdropStyle = [nil, TABLE] -- Optional Backdrop style of the tooltip shown on mouseover
 info.justifyH = [nil, "CENTER"] -- Justify button text
 info.arg1 = [ANYTHING] -- This is the first argument used by info.func
 info.arg2 = [ANYTHING] -- This is the second argument used by info.func
 info.fontObject = [FONT] -- font object replacement for Normal and Highlight
-info.menuTable = [TABLE] -- This contains an array of info tables to be displayed as a child menu
+info.menuList = [TABLE] -- This contains an array of info tables to be displayed as a child menu
+info.menuListDisplayMode = [nil, "MENU"] -- If menuList is set, show the sub drop down with an override display mode.
 info.noClickSound = [nil, 1]  --  Set to 1 to suppress the sound when clicking the button. The sound only plays if .func is set.
 info.padding = [nil, NUMBER] -- Number of pixels to pad the text on the right side
+info.topPadding = [nil, NUMBER] -- Extra spacing between buttons.
 info.leftPadding = [nil, NUMBER] -- Number of pixels to pad the button on the left side
 info.minWidth = [nil, NUMBER] -- Minimum width for this line
 info.customFrame = frame -- Allows this button to be a completely custom frame, should inherit from BW_UIDropDownCustomMenuEntryTemplate and override appropriate methods.
 info.icon = [TEXTURE] -- An icon for the button.
+info.iconXOffset = [nil, NUMBER] -- Number of pixels to shift the button's icon to the left or right (positive numbers shift right, negative numbers shift left).
+info.iconTooltipTitle = [nil, STRING] -- Title of the tooltip shown on icon mouseover
+info.iconTooltipText = [nil, STRING] -- Text of the tooltip shown on icon mouseover
+info.iconTooltipBackdropStyle = [nil, TABLE] -- Optional Backdrop style of the tooltip shown on icon mouseover
 info.mouseOverIcon = [TEXTURE] -- An override icon when a button is moused over.
 info.ignoreAsMenuSelection [nil, true] -- Never set the menu text/icon to this, even when this button is checked
+info.registerForRightClick [nil, true] -- Register dropdown buttons for right clicks
+info.registerForAnyClick [nil, true] -- Register dropdown buttons for any clicks
 ]]
 
 function BW_UIDropDownMenu_CreateInfo()
@@ -326,12 +399,12 @@ function BW_UIDropDownMenu_AddSpace(level)
 end
 
 function BW_UIDropDownMenu_AddButton(info, level)
-	--[[
-	Might to uncomment this if there are performance issues
+	
+	--Might to uncomment this if there are performance issues
 	if ( not BW_UIDROPDOWNMENU_OPEN_MENU ) then
 		return;
 	end
-	]]
+	
 	if ( not level ) then
 		level = 1;
 	end
@@ -361,6 +434,14 @@ function BW_UIDropDownMenu_AddButton(info, level)
 	button:SetDisabledFontObject(GameFontDisableSmallLeft);
 	invisibleButton:Hide();
 	button:Enable();
+
+	if ( info.registerForAnyClick ) then
+		button:RegisterForClicks("AnyUp");
+	elseif ( info.registerForRightClick ) then
+		button:RegisterForClicks("LeftButtonUp", "RightButtonUp");
+	else
+		button:RegisterForClicks("LeftButtonUp");
+	end
 
 	-- If not clickable then disable the button and set it white
 	if ( info.notClickable ) then
@@ -398,9 +479,13 @@ function BW_UIDropDownMenu_AddButton(info, level)
 		-- Set icon
 		if ( info.icon or info.mouseOverIcon ) then
 			icon:SetSize(16,16);
-			icon:SetTexture(info.icon);
+			if(info.icon and C_Texture.GetAtlasInfo(info.icon)) then
+				icon:SetAtlas(info.icon);
+			else
+				icon:SetTexture(info.icon);
+			end
 			icon:ClearAllPoints();
-			icon:SetPoint("RIGHT");
+			icon:SetPoint("RIGHT", info.iconXOffset or 0, 0);
 
 			if ( info.tCoordLeft ) then
 				icon:SetTexCoord(info.tCoordLeft, info.tCoordRight, info.tCoordTop, info.tCoordBottom);
@@ -459,22 +544,29 @@ function BW_UIDropDownMenu_AddButton(info, level)
 	button.tooltipText = info.tooltipText;
 	button.tooltipInstruction = info.tooltipInstruction;
 	button.tooltipWarning = info.tooltipWarning;
+	button.tooltipBackdropStyle = info.tooltipBackdropStyle;
 	button.arg1 = info.arg1;
 	button.arg2 = info.arg2;
 	button.hasArrow = info.hasArrow;
+	button.arrowXOffset = info.arrowXOffset;
 	button.hasColorSwatch = info.hasColorSwatch;
 	button.notCheckable = info.notCheckable;
 	button.menuList = info.menuList;
+	button.menuListDisplayMode = info.menuListDisplayMode;
 	button.tooltipWhileDisabled = info.tooltipWhileDisabled;
 	button.noTooltipWhileEnabled = info.noTooltipWhileEnabled;
 	button.tooltipOnButton = info.tooltipOnButton;
 	button.noClickSound = info.noClickSound;
 	button.padding = info.padding;
 	button.icon = info.icon;
+	button.iconTooltipTitle = info.iconTooltipTitle;
+	button.iconTooltipText = info.iconTooltipText;
+	button.iconTooltipBackdropStyle = info.iconTooltipBackdropStyle;
+	button.iconXOffset = info.iconXOffset;
 	button.mouseOverIcon = info.mouseOverIcon;
 	button.ignoreAsMenuSelection = info.ignoreAsMenuSelection;
 
-	if ( info.value ) then
+	if ( info.value ~= nil) then
 		button.value = info.value;
 	elseif ( info.text ) then
 		button.value = info.text;
@@ -483,12 +575,14 @@ function BW_UIDropDownMenu_AddButton(info, level)
 	end
 
 	local expandArrow = _G[listFrameName.."Button"..index.."ExpandArrow"];
+	expandArrow:SetPoint("RIGHT", info.arrowXOffset or 0, 0);
 	expandArrow:SetShown(info.hasArrow);
 	expandArrow:SetEnabled(not info.disabled);
 
 	-- If not checkable move everything over to the left to fill in the gap where the check would be
 	local xPos = 5;
-	local yPos = -((button:GetID() - 1) * BW_UIDROPDOWNMENU_BUTTON_HEIGHT) - BW_UIDROPDOWNMENU_BORDER_HEIGHT;
+	local buttonHeight = (info.topPadding or 0) + BW_UIDROPDOWNMENU_BUTTON_HEIGHT;
+	local yPos = -((button:GetID() - 1) * buttonHeight) - BW_UIDROPDOWNMENU_BORDER_HEIGHT;
 	local displayInfo = normalText;
 	if (info.iconOnly) then
 		displayInfo = icon;
@@ -534,7 +628,7 @@ function BW_UIDropDownMenu_AddButton(info, level)
 			if ( button:GetID() == BW_UIDropDownMenu_GetSelectedID(frame) ) then
 				info.checked = 1;
 			end
-		elseif ( BW_UIDropDownMenu_GetSelectedValue(frame) ) then
+		elseif ( BW_UIDropDownMenu_GetSelectedValue(frame)  ~= nil ) then
 			if ( button.value == BW_UIDropDownMenu_GetSelectedValue(frame) ) then
 				info.checked = 1;
 			end
@@ -625,8 +719,18 @@ function BW_UIDropDownMenu_AddButton(info, level)
 		listFrame.maxWidth = width;
 	end
 
+	local customFrameCount = listFrame.customFrames and #listFrame.customFrames or 0;
+	local height = ((index - customFrameCount) * buttonHeight) + (BW_UIDROPDOWNMENU_BORDER_HEIGHT * 2);
+	for frameIndex = 1, customFrameCount do
+		local frame = listFrame.customFrames[frameIndex];
+		height = height + frame:GetPreferredEntryHeight();
+	end
+
 	-- Set the height of the listframe
-	listFrame:SetHeight((index * BW_UIDROPDOWNMENU_BUTTON_HEIGHT) + (BW_UIDROPDOWNMENU_BORDER_HEIGHT * 2));
+
+	listFrame:SetHeight(height);
+
+	return button;
 end
 
 function BW_UIDropDownMenu_CheckAddCustomFrame(self, button, info)
@@ -867,7 +971,7 @@ function BW_UIDropDownMenu_GetSelectedValue(frame)
 	return frame.selectedValue;
 end
 
-function BW_UIDropDownMenuButton_OnClick(self)
+function BW_UIDropDownMenuButton_OnClick(self, mouseButton)
 	local checked = self.checked;
 	if ( type (checked) == "function" ) then
 		checked = checked(self);
@@ -902,7 +1006,7 @@ function BW_UIDropDownMenuButton_OnClick(self)
 
 	local func = self.func;
 	if ( func ) then
-		func(self, self.arg1, self.arg2, checked);
+		func(self, self.arg1, self.arg2, checked, mouseButton);
 	else
 		return;
 	end
@@ -928,6 +1032,8 @@ function BW_ToggleDropDownMenu(level, value, dropDownFrame, anchorName, xOffset,
 	BW_UIDROPDOWNMENU_MENU_VALUE = value;
 	local listFrameName = "BW_DropDownList"..level;
 	local listFrame = _G[listFrameName];
+	BW_UIDropDownMenu_ClearCustomFrames(listFrame);
+
 	local tempFrame;
 	local point, relativePoint, relativeTo;
 	if ( not dropDownFrame ) then
@@ -1033,7 +1139,7 @@ function BW_ToggleDropDownMenu(level, value, dropDownFrame, anchorName, xOffset,
 			end
 			listFrame:ClearAllPoints();
 			-- If this is a dropdown button, not the arrow anchor it to itself
-			if ( strsub(button:GetParent():GetName(), 0,15) == "BW_DropDownList" and strlen(button:GetParent():GetName()) == 16 ) then
+			if ( strsub(button:GetParent():GetName(), 0,12) == "BW_DropDownList" and strlen(button:GetParent():GetName()) == 16 ) then
 				anchorFrame = button;
 			else
 				anchorFrame = button:GetParent();
@@ -1043,15 +1149,22 @@ function BW_ToggleDropDownMenu(level, value, dropDownFrame, anchorName, xOffset,
 			listFrame:SetPoint(point, anchorFrame, relativePoint, 0, 0);
 		end
 
-		-- Change list box appearance depending on display mode
-		if ( dropDownFrame and dropDownFrame.displayMode == "MENU" ) then
+		if dropDownFrame.hideBackdrops then
 			_G[listFrameName.."Backdrop"]:Hide();
-			_G[listFrameName.."MenuBackdrop"]:Show();
-		else
-			_G[listFrameName.."Backdrop"]:Show();
 			_G[listFrameName.."MenuBackdrop"]:Hide();
+		else
+			-- Change list box appearance depending on display mode
+
+			local displayMode = overrideDisplayMode or (dropDownFrame and dropDownFrame.displayMode) or nil;
+			if ( displayMode == "MENU" ) then
+				_G[listFrameName.."Backdrop"]:Hide();
+				_G[listFrameName.."MenuBackdrop"]:Show();
+			else
+				_G[listFrameName.."Backdrop"]:Show();
+				_G[listFrameName.."MenuBackdrop"]:Hide();
+			end
 		end
-		dropDownFrame.menuList = menuList;
+
 		BW_UIDropDownMenu_Initialize(dropDownFrame, dropDownFrame.initialize, nil, level, menuList);
 		-- If no items in the drop down don't show it
 		if ( listFrame.numButtons == 0 ) then
@@ -1072,6 +1185,11 @@ function BW_ToggleDropDownMenu(level, value, dropDownFrame, anchorName, xOffset,
 
 		listFrame.onHide = dropDownFrame.onHide;
 
+		-- Set the listframe frameStrata
+		if dropDownFrame.listFrameStrata then
+			listFrame.baseFrameStrata = listFrame:GetFrameStrata();
+			listFrame:SetFrameStrata(dropDownFrame.listFrameStrata);
+		end
 
 		--  We just move level 1 enough to keep it on the screen. We don't necessarily change the anchors.
 		if ( level == 1 ) then
@@ -1186,6 +1304,8 @@ function BW_UIDropDownMenu_OnShow(self)
 	if ( self:GetID() > 1 ) then
 		self.parent = _G["BW_DropDownList"..(self:GetID() - 1)];
 	end
+	EventRegistry:TriggerEvent("BW_UIDropDownMenu.Show", self);
+
 end
 
 function BW_UIDropDownMenu_OnHide(self)
@@ -1194,12 +1314,20 @@ function BW_UIDropDownMenu_OnHide(self)
 		self.onHide(id+1);
 		self.onHide = nil;
 	end
+	if ( self.baseFrameStrata ) then
+		self:SetFrameStrata(self.baseFrameStrata);
+		self.baseFrameStrata = nil;
+	end
 	BW_CloseDropDownMenus(id+1);
 	BW_OPEN_DROPDOWNMENUS[id] = nil;
 	if (id == 1) then
 		BW_UIDROPDOWNMENU_OPEN_MENU = nil;
 	end
+	BW_UIDropDownMenu_ClearCustomFrames(self);
+	EventRegistry:TriggerEvent("BW_UIDropDownMenu.Hide");
+end
 
+function BW_UIDropDownMenu_ClearCustomFrames(self)
 	if self.customFrames then
 		for index, frame in ipairs(self.customFrames) do
 			frame:Hide();
@@ -1209,6 +1337,17 @@ function BW_UIDropDownMenu_OnHide(self)
 	end
 end
 
+function BW_UIDropDownMenu_MatchTextWidth(frame, minWidth, maxWidth)
+	local frameName = frame:GetName();
+	local newWidth = GetChild(frame, frameName, "Text"):GetUnboundedStringWidth() + BW_UIDROPDOWNMENU_DEFAULT_WIDTH_PADDING;
+
+	if minWidth or maxWidth then
+		newWidth = Clamp(newWidth, minWidth or newWidth, maxWidth or newWidth);
+	end
+
+	BW_UIDropDownMenu_SetWidth(frame, newWidth);
+end
+
 function BW_UIDropDownMenu_SetWidth(frame, width, padding)
 	local frameName = frame:GetName();
 	GetChild(frame, frameName, "Middle"):SetWidth(width);
@@ -1216,12 +1355,12 @@ function BW_UIDropDownMenu_SetWidth(frame, width, padding)
 	if ( padding ) then
 		frame:SetWidth(width + padding);
 	else
-		frame:SetWidth(width + defaultPadding + defaultPadding);
+		frame:SetWidth(width + BW_UIDROPDOWNMENU_DEFAULT_WIDTH_PADDING + BW_UIDROPDOWNMENU_DEFAULT_WIDTH_PADDING);
 	end
 	if ( padding ) then
 		GetChild(frame, frameName, "Text"):SetWidth(width);
 	else
-		GetChild(frame, frameName, "Text"):SetWidth(width - defaultPadding);
+		GetChild(frame, frameName, "Text"):SetWidth(width - BW_UIDROPDOWNMENU_DEFAULT_WIDTH_PADDING);
 	end
 	frame.noResize = 1;
 end
@@ -1265,18 +1404,18 @@ function BW_UIDropDownMenu_ClearAll(frame)
 	end
 end
 
-function BW_UIDropDownMenu_JustifyText(frame, justification, customXOffset)
+function BW_UIDropDownMenu_JustifyText(frame, justification, customXOffset, customYOffset)
 	local frameName = frame:GetName();
 	local text = GetChild(frame, frameName, "Text");
 	text:ClearAllPoints();
 	if ( justification == "LEFT" ) then
-		text:SetPoint("LEFT", GetChild(frame, frameName, "Left"), "LEFT", customXOffset or 27, 2);
+		text:SetPoint("LEFT", GetChild(frame, frameName, "Left"), "LEFT", customXOffset or 27, customYOffset or 2);
 		text:SetJustifyH("LEFT");
 	elseif ( justification == "RIGHT" ) then
-		text:SetPoint("RIGHT", GetChild(frame, frameName, "Right"), "RIGHT", customXOffset or -43, 2);
+		text:SetPoint("RIGHT", GetChild(frame, frameName, "Right"), "RIGHT", customXOffset or -43, customYOffset or 2);
 		text:SetJustifyH("RIGHT");
 	elseif ( justification == "CENTER" ) then
-		text:SetPoint("CENTER", GetChild(frame, frameName, "Middle"), "CENTER", customXOffset or -5, 2);
+		text:SetPoint("CENTER", GetChild(frame, frameName, "Middle"), "CENTER", customXOffset or -5, customYOffset or 2);
 		text:SetJustifyH("CENTER");
 	end
 end
@@ -1315,11 +1454,20 @@ function BW_UIDropDownMenuButton_OpenColorPicker(self, button)
 end
 
 function BW_UIDropDownMenu_DisableButton(level, id)
-	_G["BW_DropDownList"..level.."Button"..id]:Disable();
+	BW_UIDropDownMenu_SetDropdownButtonEnabled(_G["BW_DropDownList"..level.."Button"..id], false);
+
 end
 
 function BW_UIDropDownMenu_EnableButton(level, id)
-	_G["BW_DropDownList"..level.."Button"..id]:Enable();
+	BW_UIDropDownMenu_SetDropdownButtonEnabled(_G["BW_DropDownList"..level.."Button"..id], true);
+end
+
+function BW_UIDropDownMenu_SetDropdownButtonEnabled(button, enabled)
+	if enabled then
+		button:Enable();
+	else
+		button:Disable();
+	end
 end
 
 function BW_UIDropDownMenu_SetButtonText(level, id, text, colorCode)
@@ -1339,28 +1487,70 @@ function BW_UIDropDownMenu_SetButtonClickable(level, id)
 	_G["BW_DropDownList"..level.."Button"..id]:SetDisabledFontObject(GameFontDisableSmallLeft);
 end
 
-function BW_UIDropDownMenu_DisableDropDown(dropDown)
-	local dropDownName = dropDown:GetName();
-	local label = GetChild(dropDown, dropDownName, "Label");
-	if label then
-		label:SetVertexColor(GRAY_FONT_COLOR:GetRGB());
+
+function BW_UIDropDownMenu_SetDropDownEnabled(dropDown, enabled, disabledtooltip)
+	if enabled then
+		BW_UIDropDownMenu_EnableDropDown(dropDown);
+	else
+		BW_UIDropDownMenu_DisableDropDown(dropDown, disabledtooltip);
 	end
-	GetChild(dropDown, dropDownName, "Icon"):SetVertexColor(GRAY_FONT_COLOR:GetRGB());
-	GetChild(dropDown, dropDownName, "Text"):SetVertexColor(GRAY_FONT_COLOR:GetRGB());
-	GetChild(dropDown, dropDownName, "Button"):Disable();
-	dropDown.isDisabled = 1;
+end
+
+function BW_UIDropDownMenu_DisableDropDown(dropDown, disabledtooltip)
+	BW_UIDropDownMenu_SetDropDownEnabled(dropDown, false, disabledtooltip);
 end
 
 function BW_UIDropDownMenu_EnableDropDown(dropDown)
+	BW_UIDropDownMenu_SetDropDownEnabled(dropDown, true);
+end
+
+function BW_UIDropDownMenu_SetDropDownEnabled(dropDown, enabled, disabledTooltip)
 	local dropDownName = dropDown:GetName();
 	local label = GetChild(dropDown, dropDownName, "Label");
 	if label then
-		label:SetVertexColor(NORMAL_FONT_COLOR:GetRGB());
+		label:SetVertexColor((enabled and NORMAL_FONT_COLOR or GRAY_FONT_COLOR):GetRGB());
 	end
-	GetChild(dropDown, dropDownName, "Icon"):SetVertexColor(HIGHLIGHT_FONT_COLOR:GetRGB());
-	GetChild(dropDown, dropDownName, "Text"):SetVertexColor(HIGHLIGHT_FONT_COLOR:GetRGB());
-	GetChild(dropDown, dropDownName, "Button"):Enable();
-	dropDown.isDisabled = nil;
+
+	local icon = GetChild(dropDown, dropDownName, "Icon");
+	if icon then
+		icon:SetVertexColor((enabled and HIGHLIGHT_FONT_COLOR or GRAY_FONT_COLOR):GetRGB());
+	end
+
+	local text = GetChild(dropDown, dropDownName, "Text");
+	if text then
+		text:SetVertexColor((enabled and HIGHLIGHT_FONT_COLOR or GRAY_FONT_COLOR):GetRGB());
+	end
+
+	local button = GetChild(dropDown, dropDownName, "Button");
+	if button then
+		button:SetEnabled(enabled);
+
+		-- Clear any previously set disabledTooltip (it will be reset below if needed).
+		if button:GetMotionScriptsWhileDisabled() then
+			button:SetMotionScriptsWhileDisabled(false);
+			button:SetScript("OnEnter", nil);
+			button:SetScript("OnLeave", nil);
+		end
+	end
+
+	if enabled then
+		dropDown.isDisabled = nil;
+	else
+		dropDown.isDisabled = 1;
+
+		if button then
+			if disabledTooltip then
+				button:SetMotionScriptsWhileDisabled(true);
+				button:SetScript("OnEnter", function()
+					GameTooltip:SetOwner(button, "ANCHOR_RIGHT");
+					GameTooltip_AddErrorLine(GameTooltip, disabledTooltip);
+					GameTooltip:Show();
+				end);
+
+				button:SetScript("OnLeave", GameTooltip_Hide);
+			end
+		end
+	end
 end
 
 function BW_UIDropDownMenu_IsEnabled(dropDown)
@@ -1393,11 +1583,3 @@ end
 function BW_ColorPicker_GetPreviousValues()
 	return ColorPickerFrame.previousValues.r, ColorPickerFrame.previousValues.g, ColorPickerFrame.previousValues.b;
 end
-
---[[]]
-------------------------------------------------------------------------------------------------------------------------
--- Skins
-------------------------------------------------------------------------------------------------------------------------
-
--- ElvUI skin
-

@@ -139,12 +139,11 @@ function UI:CreateButtons()
 	local BW_TransmogOptionsDropDown= CreateFrame("Frame", "BW_TransmogOptionsDropDown", BetterWardrobeCollectionFrame, "BW_UIDropDownMenuTemplate")
 	BW_TransmogOptionsDropDown = BW_TransmogOptionsDropDown
 ----	BetterWardrobeCollectionFrame.OptionsDropDown = BW_TransmogOptionsDropDown
-BetterWardrobeTransmogVendorOptionsDropDown_OnLoad(BW_TransmogOptionsDropDown)
-
+	BetterWardrobeTransmogVendorOptionsDropDown_OnLoad(BW_TransmogOptionsDropDown)
 
 	local f = CreateFrame("Frame", "BW_AltIcon1", WardrobeTransmogFrame.HeadButton, "AltItemtemplate")
-	local f = CreateFrame("Frame", "BW_AltIcon15", WardrobeTransmogFrame.ShoulderButton, "AltItemtemplate")
-	local f = CreateFrame("Frame", "BW_AltIcon1", WardrobeTransmogFrame.BackButton, "AltItemtemplate")
+	local f = CreateFrame("Frame", "BW_AltIcon3", WardrobeTransmogFrame.ShoulderButton, "AltItemtemplate")
+	local f = CreateFrame("Frame", "BW_AltIcon15", WardrobeTransmogFrame.BackButton, "AltItemtemplate")
 	local f = CreateFrame("Frame", "BW_AltIcon5", WardrobeTransmogFrame.ChestButton, "AltItemtemplate")
 	local f = CreateFrame("Frame", "BW_AltIcon9", WardrobeTransmogFrame.WristButton, "AltItemtemplate")
 	local f = CreateFrame("Frame", "BW_AltIcon10", WardrobeTransmogFrame.HandsButton, "AltItemtemplate")
