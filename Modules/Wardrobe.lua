@@ -6787,8 +6787,7 @@ function BetterWardrobeSetsScrollFrameButtonMixin:Init(elementData)
 	self.CollectionListVisual.Collection.Collected_Icon:SetShown(isInList and setCollected)
 
 
-	self.EditButton:SetShown((BetterWardrobeCollectionFrame:CheckTab(4) and self.setID < 50000) or (self.setID >=70000 or IsAddOnLoaded("MogIt")))
-
+	self.EditButton:SetShown((BetterWardrobeCollectionFrame:CheckTab(4) and (self.setID < 50000 or self.setID >=70000 or IsAddOnLoaded("MogIt"))))
 
 	if ( topSourcesCollected == 0 or setCollected ) then
 		self.ProgressBar:Hide()

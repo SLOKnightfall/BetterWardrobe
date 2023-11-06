@@ -443,10 +443,6 @@ local function SortDefault(sets)
 			return groupFavorite1
 		end
 
-		if ( set1.favorite ~= set2.favorite ) then
-			return set1.favorite;
-		end
-
 		if ( set1.expansionID ~= set2.expansionID ) then
 			return SortOrder(set1.expansionID, set2.expansionID)
 		end
