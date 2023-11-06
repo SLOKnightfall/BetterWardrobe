@@ -392,11 +392,13 @@
 						self:GetParent():ToggleOutfitDetails();
 					</OnClick>
 					<OnEnter>
-						GameTooltip:SetOwner(self, "ANCHOR_RIGHT", -4, -4);
-						GameTooltip_SetTitle(GameTooltip, DRESSING_ROOM_APPEARANCE_LIST);
-						GameTooltip:Show();
+						BW_GameTooltip:SetOwner(self, "ANCHOR_RIGHT", -4, -4);
+						BW_GameTooltip(BW_GameTooltip, DRESSING_ROOM_APPEARANCE_LIST);
+						BW_GameTooltip:Show();
 					</OnEnter>
-					<OnLeave function="GameTooltip_Hide"/>
+					<OnLeave>
+						GameTooltip_Hide();
+					</OnLeave>
 				</Scripts>
 			</Button>
 			<Frame parentKey="OutfitDetailsPanel" mixin="DressUpOutfitDetailsPanelMixin" enableKeyboard="true">

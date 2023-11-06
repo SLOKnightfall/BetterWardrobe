@@ -928,6 +928,9 @@
 					<OnEnter>
 						BW_DressingRoomButtonMixin.OnEnter(self)  
 					</OnEnter>
+					<OnLeave>
+						BW_DressingRoomButtonMixin.OnLeave()
+					</OnLeave>
 					<OnClick>
 						BW_JournalHideSlotMenu_OnClick(self)
 					</OnClick>

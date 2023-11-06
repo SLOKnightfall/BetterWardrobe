@@ -732,7 +732,7 @@ function BW_DressingRoomButtonMixin.OnEnter(self)
 	BW_GameTooltip:Show()
 end
 
-function BW_DressingRoomButtonMixin:OnLeave()
+function BW_DressingRoomButtonMixin.OnLeave()
 	BW_GameTooltip:Hide()
 end
 

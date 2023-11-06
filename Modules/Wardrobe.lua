@@ -5846,9 +5846,12 @@ function BetterWardrobeSetsCollectionMixin:DisplaySet(setID)
 		if isAvailableItem(itemFrame.sourceID, setInfo.setID) then  
 			--itemFrame.unavailable:Hide()
 			--itemFrame.Icon:SetColorTexture(1,0,0,.5)
-		else 
+			itemFrame.itemCollectionStatus = nil
+		else
+			--We don't care if item is collected
+		  if not sortedSources[i].collected then 
 			itemFrame.itemCollectionStatus = "NotCollectedUnavailable"
-
+		end
 		--itemFrame.unavailable:Show()
 
 			--itemFrame.Icon:SetColorTexture(0,0,0,.5)
@@ -6158,6 +6161,7 @@ function BetterWardrobeSetsCollectionMixin:SetItemUseability(itemFrame)
   
 
 	elseif itemCollectionStatus == "NotCollectedCharCantGet" then
+		print(1)
 		itemFrame.CanUse:Show()
 		---itemFrame.Icon:SetDesaturated(true)
 		itemFrame.CanUse.Icon:SetDesaturation(0)
@@ -6168,6 +6172,7 @@ function BetterWardrobeSetsCollectionMixin:SetItemUseability(itemFrame)
 		--itemFrame.New:Hide()
 	elseif itemCollectionStatus ==  "NotCollectedUnavailable"then
 		itemFrame.CanUse:Show()
+		print(2)
 		---itemFrame.Icon:SetDesaturated(true)
 		itemFrame.CanUse.Icon:SetDesaturation(0)
 		itemFrame.CanUse.Icon:SetVertexColor(1,1,1)

@@ -1463,10 +1463,12 @@ function addon.Init:LoadModules()
 		addon:InitExtendedSetsSwap()
 		addon.Init.SavedSetsDropDown_Initialize()
 		BetterWardrobeCollectionFrame:Show()
-		if C_Transmog.IsAtTransmogNPC() then 
-	
-		BetterWardrobeCollectionFrame:SetContainer(WardrobeFrame)
-	end
+		if C_Transmog.IsAtTransmogNPC() then
+			BetterWardrobeCollectionFrame:SetContainer(WardrobeFrame)
+		end
+		if IsAddOnLoaded("ElvUI") then 
+			addon.ApplyElvUISkin()
+		end
 
 	end)
 end

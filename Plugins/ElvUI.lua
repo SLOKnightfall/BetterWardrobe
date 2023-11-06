@@ -261,9 +261,13 @@ local function SkinTransmogFrames()
 		end
 
 		if itemFrame.collected then
-			local quality = C_TransmogCollection_GetSourceInfo(itemFrame.sourceID).quality
-			local color = BAG_ITEM_QUALITY_COLORS[quality or 1]
-			icon.backdrop:SetBackdropBorderColor(color.r, color.g, color.b)
+			local quality = C_TransmogCollection_GetSourceInfo(itemFrame.sourceID).quality or 1
+
+			local color = BAG_ITEM_QUALITY_COLORS[quality]
+			if color then 
+				icon.backdrop:SetBackdropBorderColor(color.r, color.g, color.b)
+			end
+
 		else
 			icon.backdrop:SetBackdropBorderColor(unpack(E.media.bordercolor))
 		end
@@ -482,31 +486,19 @@ end
 addon.ElvUI_init = false
 local eventFrame
 local function applySkins()
-	addon.ElvUI_init = true
 	if not (E.private.skins.blizzard.enable) then return end
 	if not E.private.skins.blizzard.enable then return end
 	if E.private.skins.blizzard.transmogrify then SkinTransmogFrames() end
 	if E.private.skins.blizzard.dressingroom then UpdateDressingRoom() end
-	eventFrame:UnregisterEvent("PLAYER_ENTERING_WORLD")
 end
 
+addon.ApplyElvUISkin = applySkins
 
 
 function S:BetterWardrobe()
 	if not (E.private.skins.blizzard.enable) then return end
+	addon.ElvUI_init = true
 
-		local frame = CreateFrame("Frame");
-		frame:SetScript("OnEvent", function(__, event, arg1)
-		    if (event == "PLAYER_ENTERING_WORLD") then
-		    	if not IsAddOnLoaded("Blizzard_Collections") then
-		    		LoadAddOn("Blizzard_Collections")
-		    	end
-
-		        C_Timer.After(5, applySkins)
-		    end
-		end)
-		frame:RegisterEvent("PLAYER_ENTERING_WORLD");
-		eventFrame = frame
 
 --We can only skin the addon after the Blizzard Collection addon is loaded.  Forcing loading
 --causes elvui to not skin it properly.  We wait until it gets loaded and then set the skin
