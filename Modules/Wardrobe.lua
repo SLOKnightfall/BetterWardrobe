@@ -6159,9 +6159,7 @@ function BetterWardrobeSetsCollectionMixin:SetItemUseability(itemFrame)
 		itemFrame.CanUse.Icon:SetAlpha(0.5)
 		--itemFrame.New:Hide()
   
-
 	elseif itemCollectionStatus == "NotCollectedCharCantGet" then
-		print(1)
 		itemFrame.CanUse:Show()
 		---itemFrame.Icon:SetDesaturated(true)
 		itemFrame.CanUse.Icon:SetDesaturation(0)
@@ -6172,7 +6170,6 @@ function BetterWardrobeSetsCollectionMixin:SetItemUseability(itemFrame)
 		--itemFrame.New:Hide()
 	elseif itemCollectionStatus ==  "NotCollectedUnavailable"then
 		itemFrame.CanUse:Show()
-		print(2)
 		---itemFrame.Icon:SetDesaturated(true)
 		itemFrame.CanUse.Icon:SetDesaturation(0)
 		itemFrame.CanUse.Icon:SetVertexColor(1,1,1)
@@ -6184,11 +6181,6 @@ function BetterWardrobeSetsCollectionMixin:SetItemUseability(itemFrame)
 		itemFrame.CanUse:Hide()
 	end
 end
-
-
-
-
-
 
 function BetterWardrobeSetsCollectionMixin:OnSearchUpdate()
 	if ( self.init ) then
