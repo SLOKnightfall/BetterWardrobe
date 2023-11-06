@@ -1368,7 +1368,7 @@ function addon:OnEnable()
 	--addon.Init:BuildTooltips()
 	addon:InitTooltips()
 	C_Timer.After(0.5, function()
-		--addon.RefreshSubItemData()
+		addon.RefreshSubItemData()
 		addon.RefreshOutfitData()
 	end)
 		addPatrons()
@@ -1390,8 +1390,11 @@ end
 --Hides default collection window when at transmog vendor
 local function UpdateTransmogVendor()
 	--WardrobeCollectionFrame:Hide()
+
+
 	BetterWardrobeCollectionFrame:Show()
 	BetterWardrobeCollectionFrame:SetContainer(WardrobeFrame)
+
 end
 
 --Loads various modules and builds frames once the Blizzard_Collection addon is loaded
@@ -1460,6 +1463,10 @@ function addon.Init:LoadModules()
 		addon:InitExtendedSetsSwap()
 		addon.Init.SavedSetsDropDown_Initialize()
 		BetterWardrobeCollectionFrame:Show()
+		if C_Transmog.IsAtTransmogNPC() then 
+	
+		BetterWardrobeCollectionFrame:SetContainer(WardrobeFrame)
+	end
 
 	end)
 end

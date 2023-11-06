@@ -1556,7 +1556,7 @@ function BetterWardrobeCollectionFrameMixin:OnShow()
 
 	local selectedtab;
 	local isAtTransmogNPC = C_Transmog.IsAtTransmogNPC();
-	self.InfoButton:SetShown(not isAtTransmogNPC);
+	self.InfoButton:SetShown(false);
 	if isAtTransmogNPC then
 		self:SetTab(self.selectedTransmogTab);
 	else
@@ -3872,7 +3872,7 @@ end
 BetterWardrobeCollectionTutorialMixin = { }
 
 function BetterWardrobeCollectionTutorialMixin:OnLoad()
-
+--[[
 	self.helpTipInfo = {
 		text = WARDROBE_SHORTCUTS_TUTORIAL_1,
 		buttonStyle = HelpTip.ButtonStyle.None,
@@ -3883,30 +3883,32 @@ function BetterWardrobeCollectionTutorialMixin:OnLoad()
 		appendFrame = BW_TrackingInterfaceShortcutsFrame,
 		appendFrameYOffset = 15,
 	};
+	]]
+	self:Hide()
 
 end
 
 function BetterWardrobeCollectionTutorialMixin:OnEnter()
-	HelpTip:Show(self, self.helpTipInfo);
-	BW_TrackingInterfaceShortcutsFrame.NewAlert:ValidateIsShown();
+	--HelpTip:Show(self, self.helpTipInfo);
+	--BW_TrackingInterfaceShortcutsFrame.NewAlert:ValidateIsShown();
 end
 
 function BetterWardrobeCollectionTutorialMixin:OnLeave()
-	HelpTip:Hide(self, WARDROBE_SHORTCUTS_TUTORIAL_1);
-	BW_TrackingInterfaceShortcutsFrame.NewAlert:ClearAlert();
+	--HelpTip:Hide(self, WARDROBE_SHORTCUTS_TUTORIAL_1);
+	--BW_TrackingInterfaceShortcutsFrame.NewAlert:ClearAlert();
 end
 
 
-BW_AlertTrackingFeatureMixin = CreateFromMixins(NewFeatureLabelMixin);
+BW_AlertTrackingFeatureMixin = {}--CreateFromMixins(NewFeatureLabelMixin);
 
 function BW_AlertTrackingFeatureMixin:ClearAlert()
-	BW_AlertTrackingFeatureMixin.ClearAlert(self);
-	SetCVarBitfield("closedInfoFrames", LE_FRAME_TUTORIAL_WARDROBE_TRACKING_INTERFACE, true);
-	CollectionsMicroButton_SetAlertShown(false);
+	--AlertTrackingFeatureMixin.ClearAlert(self);
+	--SetCVarBitfield("closedInfoFrames", LE_FRAME_TUTORIAL_WARDROBE_TRACKING_INTERFACE, true);
+	--CollectionsMicroButton_SetAlertShown(false);
 end
 
 function BW_AlertTrackingFeatureMixin:ValidateIsShown()
-	self:SetShown(not GetCVarBitfield("closedInfoFrames", LE_FRAME_TUTORIAL_WARDROBE_TRACKING_INTERFACE));
+	--self:SetShown(not GetCVarBitfield("closedInfoFrames", LE_FRAME_TUTORIAL_WARDROBE_TRACKING_INTERFACE));
 end
 
 -- ***** WEAPON DROPDOWN
