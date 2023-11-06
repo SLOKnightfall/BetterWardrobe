@@ -130,7 +130,7 @@ local function SkinTransmogFrames()
 	E:RegisterStatusBar(WardrobeCollectionFrame.progressBar)
 
 	S:HandleEditBox(_G.BetterWardrobeCollectionFrameSearchBox)
-	_G.BetterWardrobeCollectionFrameSearchBox:SetFrameLevel(5)
+	_G.BetterWardrobeCollectionFrameSearchBox:SetFrameLevel(500)
 
 	S:HandleButton(WardrobeCollectionFrame.FilterButton)
 	WardrobeCollectionFrame.FilterButton:Point('LEFT', WardrobeCollectionFrame.searchBox, 'RIGHT', 2, 0)
