@@ -5004,7 +5004,7 @@ function BetterWardrobeSetsDataProviderMixin:GetVariantSets(baseSetID)
 	end
 
 	local variantSets = self.variantSets[baseSetID]
-	if ( not variantSets ) then
+	if ( not variantSets and baseSetID) then
 		variantSets = C_TransmogSets.GetVariantSets(baseSetID) or {}
 		self.variantSets[baseSetID] = variantSets;
 		if ( #variantSets > 0 ) then
@@ -5915,7 +5915,7 @@ function BetterWardrobeSetsCollectionMixin:DisplaySet(setID)
 
 
 
-	if BetterWardrobeCollectionFrame.selectedCollectionTab == 2 then 
+	--if BetterWardrobeCollectionFrame.selectedCollectionTab == 2 then 
 	-- variant sets
 		local showVariantSetsButton = false;
 		local baseSetID = C_TransmogSets.GetBaseSetID(setID)
@@ -5935,12 +5935,12 @@ function BetterWardrobeSetsCollectionMixin:DisplaySet(setID)
 		else
 			self.DetailsFrame.VariantSetsButton:Hide()
 		end
-	elseif BetterWardrobeCollectionFrame.selectedCollectionTab == 3 then
-		self.DetailsFrame.VariantSetsButton:Hide()
-		self.DetailsFrame.VariantSetsButton:SetText(setInfo.description)
+	--elseif BetterWardrobeCollectionFrame.selectedCollectionTab == 3 then
+	--	self.DetailsFrame.VariantSetsButton:Hide()
+		--self.DetailsFrame.VariantSetsButton:SetText(setInfo.description)
 
 		addon:SendMessage("BW_TRANSMOG_EXTRASETSHOWN")
-	end
+	--end
 end
 ----TODO:CHECK;
 function BetterWardrobeSetsCollectionMixin:DisplaySavedSet(setID)
@@ -6729,18 +6729,41 @@ end
 BetterWardrobeSetsScrollFrameButtonMixin = {}
 
 function BetterWardrobeSetsScrollFrameButtonMixin:Init(elementData)
-	----print("init")
 	local displayData = elementData;
+	if not displayData then return end
 	-- if the base set is hiddenUntilCollected and not collected, it's showing up because one of its variant sets is collected
 	-- in that case use any variant set to populate the info in the list
+	local variantSets = C_TransmogSets.GetVariantSets(elementData.setID) or {}
 	if elementData.hiddenUntilCollected and not elementData.collected and BetterWardrobeCollectionFrame.selectedCollectionTab == 2 then
-		local variantSets = C_TransmogSets.GetVariantSets(elementData.setID)
+		--local variantSets = C_TransmogSets.GetVariantSets(elementData.setID)
 		if variantSets then
 			-- variant sets are already filtered for visibility (won't get a hiddenUntilCollected one unless it's collected)
 			-- any set will do so just picking first one
 			displayData = variantSets[1]
 		end
 	end
+
+		if #variantSets == 0  or IsAddOnLoaded("CanIMogIt") then
+			self.Variants:Hide()
+			self.Variants:SetText(0)
+			self.VariantsIcon:Hide()
+
+
+			--if #variantSets >= 4 then 
+				--self:SetHeight(66)
+			--else
+				--self:SetHeight(46)
+
+			--end
+
+		else
+			self.Variants:Show()
+			self.Variants:SetText(#variantSets + 1)
+			self.VariantsIcon:Show()
+
+		end
+
+
 	--self.Name:SetText(displayData.name)
 	self.Name:SetText(displayData.name..((displayData.className) and " ("..displayData.className..")" or "") )
 

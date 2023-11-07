@@ -269,12 +269,25 @@
 					</Anchors>
 					<Color r="0.329" g="0.329" b="0.329"/>
 				</FontString>
+				<FontString parentKey="Variants" inherits="GameFontDisableSmallLeft" justifyH="CENTER" maxLines="1" text="0">
+					<Size x="20" y="20"/>
+					<Anchors>
+						<Anchor point="TOPRIGHT"  x="-2" y="0"/>
+					</Anchors>
+				</FontString>
 				<Texture parentKey="ProgressBar">
 					<Size x="204" y="2"/>
 					<Anchors>
 						<Anchor point="TOPLEFT" relativeKey="$parent.Background" relativePoint="BOTTOMLEFT" x="2" y="4"/>
 					</Anchors>
 					<Color r="0.0118" g="0.247" b="0.00392" a="1"/>
+				</Texture>
+				<Texture parentKey="VariantsIcon" file="Interface\CHATFRAME\UI-InChatFriendsArrow">
+					<Size x="15" y="15"/>
+					<Anchors>
+						<Anchor point="RIGHT" relativeKey="$parent.Variants" relativePoint="RIGHT" x="7" y="-1"/>
+					</Anchors>
+					
 				</Texture>
 			</Layer>
 			<Layer level="OVERLAY" textureSubLevel="-1">
@@ -1779,14 +1792,7 @@
 			</Frame>
 		</Frames>
 		<Layers>
-			<Layer level="BACKGROUND" textureSubLevel="-6">
-				<Texture name="$parentBg" file="Interface\FrameGeneral\UI-Background-Rock" horizTile="true" vertTile="true" parentKey="Bg">
-					<Anchors>
-						<Anchor point="TOPLEFT" x="2" y="-21"/>
-						<Anchor point="BOTTOMRIGHT" x="-2" y="2"/>
-					</Anchors>
-				</Texture>
-			</Layer>
+
 		</Layers>
 		<Scripts>
 			<OnLoad method="OnLoad"/>

@@ -254,7 +254,39 @@ local altitems = {
 	[186937] = 186154, --Glad
 	[186938] = 186155, --Elite
 
+	--Runes of the Cinderwolf - Shaman Shoulders
+	[186030] = 186033, --LFR
+	[184442] = 186034, --Normal
+	[186031] = 186035, --Heroic
+	[186032] = 186036, --Mythic
+	[187065] = 186037, --Glad
+	[187066] = 186038, --Elite
+
+	--Runes of the Cinderwolf - Shaman Helm
+	[186042] = 186046, --LFR
+	[184444] = 186045, --Normal
+	[186043] = 186047, --Heroic
+	[186044] = 186048, --Mythic
+	[187057] = 186049, --Glad
+	[187058] = 186050, --Elite
+
+	--Irons of the Onyx Crucible - Warrior Helm
+	[185918] = 186311, --LFR
+	[184417] = 186310, --Normal
+	[185920] = 186312, --Heroic
+	[185919] = 186313, --Mythic
+	[187119] = 186314, --Glad
+	[187120] = 186315, --Elite
+
+	--Irons of the Onyx Crucible - Warrior shoulder
+	[186298] = 186301, --LFR
+	[184415] = 186302, --Normal
+	[186299] = 186303, --Heroic
+	[186300] = 186304, --Mythic
+	[187127] = 186305, --Glad
+	[187128] = 186306, --Elite
 }
+
 
 
 --This will check to see if a set has items to add and then adds them
