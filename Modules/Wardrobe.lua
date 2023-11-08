@@ -5620,10 +5620,8 @@ end
 
 function BetterWardrobeSetsCollectionMixin:DisplaySet(setID)
 	if not setID then return end
-	setInfo = addon.C_TransmogSets.GetSetInfo(setID) 
-	local buildID = (select(4, GetBuildInfo()))
-
-					or nil;
+	local setInfo = addon.C_TransmogSets.GetSetInfo(setID) 
+	local buildID = (select(4, GetBuildInfo())) or nil;
 	if ( not setInfo ) then
 		self.DetailsFrame:Hide()
 		self.Model:Hide()
@@ -6726,6 +6724,21 @@ function BetterWardrobeSetsCollectionMixin:GetSelectedSavedSetID()
 end
 
 
+local function variantsTooltip(elementData, variantSets)
+	if not elementData.description then return "" end
+
+	local ratioText = elementData.description..": " 
+	local have, total = addon.SetsDataProvider:GetSetSourceCounts(elementData.setID)
+	ratioText = ratioText..have .. "/" .. total.."\n"
+
+	for i, setdata in ipairs(variantSets)do
+		local have, total = addon.SetsDataProvider:GetSetSourceCounts(setdata.setID)
+		 ratioText =  ratioText..setdata.description..": ".. have .. "/" .. total.."\n"
+	end
+
+	return ratioText
+end
+
 BetterWardrobeSetsScrollFrameButtonMixin = {}
 
 function BetterWardrobeSetsScrollFrameButtonMixin:Init(elementData)
@@ -6743,27 +6756,13 @@ function BetterWardrobeSetsScrollFrameButtonMixin:Init(elementData)
 		end
 	end
 
-		if #variantSets == 0  or IsAddOnLoaded("CanIMogIt") then
-			self.Variants:Hide()
-			self.Variants:SetText(0)
-			self.VariantsIcon:Hide()
-
-
-			--if #variantSets >= 4 then 
-				--self:SetHeight(66)
-			--else
-				--self:SetHeight(46)
-
-			--end
-
-		else
-			self.Variants:Show()
-			self.Variants:SetText(#variantSets + 1)
-			self.VariantsIcon:Show()
-
-		end
-
-
+	if #variantSets == 0  or IsAddOnLoaded("CanIMogIt") then
+		self.Variants:Hide()
+		self.Variants.Count:SetText(0)
+	else
+		self.Variants:Show()
+		self.Variants.Count:SetText(#variantSets + 1)
+	end
 	--self.Name:SetText(displayData.name)
 	self.Name:SetText(displayData.name..((displayData.className) and " ("..displayData.className..")" or "") )
 
@@ -6786,6 +6785,7 @@ function BetterWardrobeSetsScrollFrameButtonMixin:Init(elementData)
 	self.Favorite:SetShown(displayData.favoriteSetID)
 	self.New:SetShown(addon.SetHasNewSources(displayData.setID))
 	self.setID = displayData.setID;
+	self.variantInfo = variantsTooltip(elementData, variantSets)
 
 	local setInfo = addon.GetSetInfo(displayData.setID)
 	local isFavorite = 	C_TransmogSets.GetIsFavorite(displayData.setID)
