@@ -1414,6 +1414,7 @@ function addon.Init:LoadModules()
 	C_Timer.After(0, function() addon.Init:UpdateWardrobeEnhanced() end)
 
 	local f = CreateFrame("Frame", "BetterWardrobeCollectionFrame", UIParent, "BetterWardrobeCollectionFrameTemplate" )
+
 	--Hooks into the colection tabs and sets Better Wardobe when viewing the wardrobe collection
 	addon:SecureHook(nil, "CollectionsJournal_UpdateSelectedTab", function(self)
 		local selected = CollectionsJournal_GetTab(self)
@@ -1430,6 +1431,7 @@ function addon.Init:LoadModules()
 					addon.ExtendedTransmogSwap:Show()
 				end
 			else
+
 				--WardrobeCollectionFrame:Hide()
 				BetterWardrobeCollectionFrame:Hide()
 				if addon.ExtendedTransmogSwap then
@@ -1462,10 +1464,10 @@ function addon.Init:LoadModules()
 		addon:UpdateCanIMogIt()
 		addon:InitExtendedSetsSwap()
 		addon.Init.SavedSetsDropDown_Initialize()
-		BetterWardrobeCollectionFrame:Show()
-		if C_Transmog.IsAtTransmogNPC() then
-			BetterWardrobeCollectionFrame:SetContainer(WardrobeFrame)
-		end
+
+		local selected = CollectionsJournal_GetTab(CollectionsJournal)
+		BetterWardrobeCollectionFrame:SetShown(selected == 5) 
+
 		if IsAddOnLoaded("ElvUI") then 
 			addon.ApplyElvUISkin()
 		end
