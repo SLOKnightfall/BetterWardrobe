@@ -9,6 +9,7 @@ if not IsAddOnLoaded("PetTracker") then return end
 
 --Fixes frame issues when PetTracker is being used
 function addon:UpdatePetTracker()
+	if not PetTrackerRivalsJournalList then  return end
 	PetTrackerRivalsJournalList:HookScript("OnShow",  function() BetterWardrobeCollectionFrame:Hide() end)
 	PetTrackerRivalsJournalList:HookScript("OnHide",  function() 
 		if 	WardrobeCollectionFrame:IsShown() then
