@@ -3,7 +3,7 @@
 ## Version: @project-version@
 ## Author: SLOKnightfall
 ## Notes: 
-## OptionalDeps: MogIt, CanIMogIt, LegionWardrobe, WardrobeEnhanced, Rarity, TransmogOutfits, ExtendedSets, ElvUI, PetTracker
+## OptionalDeps: MogIt, CanIMogIt, LegionWardrobe, WardrobeEnhanced, Rarity, TransmogOutfits, ExtendedSets, ElvUI, PetTracker, PetTrackerJournal
 ## SavedVariables: BetterWardrobe_Options, BetterWardrobe_CharacterData, BetterWardrobe_SavedSetData, BetterWardrobe_SubstituteItemData, BetterWardrobe_ListData, BetterWardrobe_Mogitdata, BetterWardrobe_Updates, BTT
 ## X-Curse-Project-ID: 401253
 ## X-Wago-ID: 0mKOzk6x
@@ -28,6 +28,7 @@ Libs\LibAppropriateitems-1.0\lib.xml
 Libs\UIDropDownMenu\UIDropDownMenu.xml
 Libs\AceSerializer-3.0\AceSerializer-3.0.xml
 Libs\TaintLess\TaintLess.xml
+Libs\LibToast-1.0\lib.xml
 
 #Locale
 Locale\enUS.lua
@@ -40,7 +41,7 @@ Data\Globals.lua
 Modules\CollectionTemplates.xml
 Modules\Templates.xml
 Modules\Core.lua
-
+#Modules\Celebrate.xml
 #Data files
 #Data\ColorData.lua
 Data\CameraData.lua
