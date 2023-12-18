@@ -28,7 +28,6 @@ Libs\LibAppropriateitems-1.0\lib.xml
 Libs\UIDropDownMenu\UIDropDownMenu.xml
 Libs\AceSerializer-3.0\AceSerializer-3.0.xml
 Libs\TaintLess\TaintLess.xml
-Libs\LibToast-1.0\lib.xml
 
 #Locale
 Locale\enUS.lua
