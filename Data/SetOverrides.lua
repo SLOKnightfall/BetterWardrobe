@@ -204,8 +204,60 @@ local altitems = {
 	[169679] = {169688, 169782}, --Fireplume Chest
 	[169777] = 169681, --Fireplume Gloves
 
---DF Season 2 Hero
---Furnace Seraphs Verdict - Priest Helm
+--DF Hero
+
+------ Druid
+--S1 Lost Lancallers Vesture - Druid head
+	[182603] = 184207, --LFR
+	[182604] = 184206, --Normal
+	[182605] = 184208, --Heroic
+	[182606] = 184209,--Mythic
+	[183669] = 184210,--Glad
+	[183670] = 184211,--Elite
+
+--S1 Lost Lancallers Vesture - Shoulder
+	[182612] = 184212, --LFR
+	[182611] = 184213, --Normal
+	[182613] = 184214, --Heroic
+	[182614] = 184215, --Mythic
+	[183677] = 184216, --Glad
+	[183678] = 184217, --Elite
+
+--S2 Strands of the Autumn Blaze - Druid Helm
+	[186159] = 186163, --LFR
+	[184489] = 186162, --Normal
+	[186148] = 186164, --Heroic
+	[186149] = 186165, --Mythic
+	[186929] = 186166, --Glad
+	[186930] = 186167, --Elite
+
+--S2 Strands of the Autumn Blaze - Druid Shoulders
+	[186147] = 186150, --LFR
+	[184487] = 186151, --Normal
+	[186160] = 186152, --Heroic
+	[186161] = 186153, --Mythic
+	[186937] = 186154, --Glad
+	[186938] = 186155, --Elite
+
+
+------ Priest
+	--S1 Draconic Hierophants Finery - Priest head 
+	[182496] = 184260, --LFR
+	[182495] = 184261,--Normal
+	[182497] = 184262, --Heroic
+	[182498] = 184263,--Mythic
+	[183573] = 184264,--Glad
+	[183574] = 184265,--Elite
+
+--Draconic Hierophants Shoulder
+	[182504] = 184266, --LFR
+	[182503] = 184267, --Normal
+	[182505] = 184268, --Heroic
+	[182506] = 184269,--Mythic
+	[183581] = 184270,--Glad
+	[183582] = 184271,--Elite
+
+--S2 Furnace Seraphs Verdict - Priest Helm
 	[186244] = 186248, --LFR
 	[184516] = 186247, --Normal
 	[186245] = 186249, --Heroic
@@ -213,7 +265,33 @@ local altitems = {
 	[186833] = 186251, -- Glad
 	[186834] = 186252, --Elite
 
---Ashen Predators' Scaleform - Hunter Shoulder
+
+--S3 Blessings of Lunar Communion - Priest Helm
+	[190041] = 190046, --LFR
+	[188820] = 190047, --Normal
+	[190042] = 190048, --Heroic
+	[190043] = 190049, --Mythic
+	[190232] = 190050, --Glad
+	[190233] = 190051, --Elite
+
+--===Hunter
+--S1 Stormwing Harriers Camo - Hunter head
+	[182748] = 184230, --LFR
+	[182747] = 184231, --Normal
+	[182749] = 184232, --Heroic
+	[182750] = 184233,--Mythic
+	[183766] = 184235,--Glad
+	[183765] = 184234,--Elite
+
+--S1 Stormwing Harriers Camo - Hunter Shoulder
+	[182756] = 184236, --LFR
+	[182755] = 184237, --Normal
+	[182757] = 184238, --Heroic
+	[182758] = 184239, --Mythic
+	[183773] = 184240, --Glad
+	[183774] = 184241, --Elite
+
+--S2 Ashen Predators' Scaleform - Hunter Shoulder
 	[186069] = 186072, --LFR
 	[184451] = 186073, --Normal
 	[186070] = 186074, --Heroic
@@ -221,7 +299,74 @@ local altitems = {
 	[187033] = 186076, --Glad
 	[187034] = 186077, --Elite
 
-	--Heartfire Sentinel's Authority - Paladin Shoulder
+--S3 Blazing Dremstaker - Hunter Shoulder
+	[193358] = 193361, --LFR
+	[188755] = 193362, --Normal
+	[193359] = 193363, --Heroic
+	[193360] = 193364, --Mythic
+	[190506] = 193764, --Glad
+	[190507] = 193765, --Elite
+
+
+----Mage
+	--S1 Bindings of the Crystal Scholar - Mage Helm
+	[182460] = 183360, --LFR
+	[182459] = 183359, --Normal
+	[182461] = 183361, --Heroic
+	[182462] = 183362, --Mythic
+	[183445] = 184156, --Glad
+	[183446] = 184157, --Elite
+
+	--S1 Bindings of the Crystal Scholar - Mage Shoulder
+	[182468] = 184166, --LFR
+	[182467] = 184167, --Normal
+	[182469] = 184168, --Heroic
+	[182470] = 184169, --Mythic
+	[183453] = 184171, --Glad
+	[183454] = 184170, --Elite
+
+	--S2 Underlight Conjuer's Aurora - Mage Shoulder
+	[186040] = 193361, --LFR
+	[184523] = 193362, --Normal
+	[186341] = 193363, --Heroic
+	[184362] = 193364, --Mythic
+	[186723] = 193764, --Glad
+	[186724] = 193765, --Elite
+
+	--S3 Wayward Chronomancer Clockwork - Mage Helm
+	[189129] = 189134, --LFR
+	[188829] = 189135, --Normal
+	[189130] = 189136, --Heroic
+	[189131] = 189137, --Mythic
+	[190192] = 189138, --Glad
+	[190193] = 189139, --Elite
+
+	--S3 Wayward Chronomancer Clockwork - Mage Shoulder
+	[189107] = 189112, --LFR
+	[189741] = 189113, --Normal
+	[189108] = 189114, --Heroic
+	[189109] = 189115, --Mythic
+	[190202] = 189116, --Glad
+	[190203] = 189117, --Elite
+
+	--S3 Wayward Chronomancer Clockwork - Mage Belt
+	[189096] = 189101, --LFR
+	[188826] = 189102, --Normal
+	[189097] = 189103, --Heroic
+	[189098] = 189104, --Mythic
+	[190206] = 189105, --Glad
+	[190207] = 189106, --Elite
+
+----Paladin
+	--S1 Paladin Shoulder
+	[182864] = 184254, --LFR
+	[182863] = 184255, --Normal
+	[182865] = 184256, --Heroic
+	[182866] = 184257,--Mythic
+	[183835] = 184258,--Glad
+	[183836] = 184259,--Elite
+
+--S2 Heartfire Sentinel's Authority - Paladin Shoulder
 	[185982] = 185985, --LFR
 	[184424] = 185986, --Normal
 	[185983] = 185987, --Heroic
@@ -229,7 +374,7 @@ local altitems = {
 	[187095] = 185989, --Glad
 	[187096] = 185990, --Elite
 
-	--Heartfire Sentinel's Authority - Paladin Helm
+--S2 Heartfire Sentinel's Authority - Paladin Helm
 	[185994] = 185998, --LFR
 	[184426] = 185997, --Normal
 	[185995] = 185999, --Heroic
@@ -238,23 +383,24 @@ local altitems = {
 	[187088] = 186002, --Elite
 
 
-	--Strands of the Autumn Blaze - Druid Helm
-	[186159] = 186163, --LFR
-	[184489] = 186162, --Normal
-	[186148] = 186164, --Heroic
-	[186149] = 186165, --Mythic
-	[186929] = 186166, --Glad
-	[186930] = 186167, --Elite
+---Shaman
+	--S1 Elements of Infused Earth - shaman head 
+	[182783] = 184285, --LFR
+	[182784] = 184284,--Normal
+	[182785] = 184286, --Heroic
+	[182786] = 184287,--Mythic
+	[183797] = 184288,--Glad
+	[183798] = 184289,--Elite
 
-	--Strands of the Autumn Blaze - Druid Shoulders
-	[186147] = 186150, --LFR
-	[184487] = 186151, --Normal
-	[186160] = 186152, --Heroic
-	[186161] = 186153, --Mythic
-	[186937] = 186154, --Glad
-	[186938] = 186155, --Elite
+	--  S1 Elements of Infused Earth - shaman Shoulder
+	[182792] = 184290, --LFR
+	[182791] = 184291, --Normal
+	[182793] = 184292, --Heroic
+	[182794] = 184293,--Mythic
+	[183805] = 184294,--Glad
+	[183806] = 184295,--Elite
 
-	--Runes of the Cinderwolf - Shaman Shoulders
+	--S2 Runes of the Cinderwolf - Shaman Shoulders
 	[186030] = 186033, --LFR
 	[184442] = 186034, --Normal
 	[186031] = 186035, --Heroic
@@ -262,7 +408,7 @@ local altitems = {
 	[187065] = 186037, --Glad
 	[187066] = 186038, --Elite
 
-	--Runes of the Cinderwolf - Shaman Helm
+	--S2 Runes of the Cinderwolf - Shaman Helm
 	[186042] = 186046, --LFR
 	[184444] = 186045, --Normal
 	[186043] = 186047, --Heroic
@@ -270,7 +416,26 @@ local altitems = {
 	[187057] = 186049, --Glad
 	[187058] = 186050, --Elite
 
-	--Irons of the Onyx Crucible - Warrior Helm
+	---Warrior
+
+
+	--S1 Stones of the Walking Mountain - Warrior Head
+	[182892] = 184308, --LFR
+	[182891] = 184309,--Normal
+	[182893] = 184310, --Heroic
+	[182894] = 184311,--Mythic
+	[183859] = 184312,--Glad
+	[183860] = 184313, --Elite
+
+	--  Stones of the Walking Mountain - S1 Warrior Shoulder
+	[182900] = 184314, --LFR
+	[182899] = 184315, --Normal
+	[182901] = 184316, --Heroic
+	[182902] = 184317,--Mythic
+	[183867] = 184318,--Glad
+	[183868] = 184319,--Elite
+
+	--S2 Irons of the Onyx Crucible - Warrior Helm
 	[185918] = 186311, --LFR
 	[184417] = 186310, --Normal
 	[185920] = 186312, --Heroic
@@ -278,7 +443,7 @@ local altitems = {
 	[187119] = 186314, --Glad
 	[187120] = 186315, --Elite
 
-	--Irons of the Onyx Crucible - Warrior shoulder
+	--S2 Irons of the Onyx Crucible - Warrior shoulder
 	[186298] = 186301, --LFR
 	[184415] = 186302, --Normal
 	[186299] = 186303, --Heroic
@@ -286,6 +451,9 @@ local altitems = {
 	[187127] = 186305, --Glad
 	[187128] = 186306, --Elite
 }
+
+
+
 
 
 
