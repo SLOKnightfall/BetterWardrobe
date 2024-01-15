@@ -98,8 +98,7 @@ local altitems = {
 	[71824] = 71775, --Shaman, Chest/Robe (Season 3 Gladiator)
 
 --legion
-	--Vault of the Incarnates
-	[182774] = 181635, --Shaman, Chest/Robe (Mythic)
+
 
 	--Seat of the Triumvirate
 	[89366] = 89232, --Mail, Chest/Robe
@@ -191,7 +190,6 @@ local altitems = {
 
 	-- [180804] = 180831,--Cloth Titan Keeper's Vestments, Dungeon (red)
 	[179945] = 182935,--Cloth Titan Keeper's Vestments, WQ (blue)
-
 	[183080] = 183073 , --Sabellian Set
 
 	--Heritage Armor
@@ -239,6 +237,13 @@ local altitems = {
 	[186937] = 186154, --Glad
 	[186938] = 186155, --Elite
 
+--S2 Strands of the Autumn Blaze - Druid Belt
+	[186138] = 186141, --LFR
+	[184486] = 186142, --Normal
+	[186139] = 186143, --Heroic
+	[186140] = 186144, --Mythic
+	[186941] = 186145, --Glad
+	[186942] = 186146, --Elite
 
 ------ Priest
 	--S1 Draconic Hierophants Finery - Priest head 
@@ -275,7 +280,7 @@ local altitems = {
 	[190233] = 190051, --Elite
 
 --===Hunter
---S1 Stormwing Harriers Camo - Hunter head
+	--S1 Stormwing Harriers Camo - Hunter head
 	[182748] = 184230, --LFR
 	[182747] = 184231, --Normal
 	[182749] = 184232, --Heroic
@@ -283,7 +288,7 @@ local altitems = {
 	[183766] = 184235,--Glad
 	[183765] = 184234,--Elite
 
---S1 Stormwing Harriers Camo - Hunter Shoulder
+	--S1 Stormwing Harriers Camo - Hunter Shoulder
 	[182756] = 184236, --LFR
 	[182755] = 184237, --Normal
 	[182757] = 184238, --Heroic
@@ -291,13 +296,21 @@ local altitems = {
 	[183773] = 184240, --Glad
 	[183774] = 184241, --Elite
 
---S2 Ashen Predators' Scaleform - Hunter Shoulder
+	--S2 Ashen Predators' Scaleform - Hunter Shoulder
 	[186069] = 186072, --LFR
 	[184451] = 186073, --Normal
 	[186070] = 186074, --Heroic
 	[186071] = 186075, --Mythic
 	[187033] = 186076, --Glad
 	[187034] = 186077, --Elite
+
+	--S2 Ashen Predators' Scaleform - Hunter head
+	[186081] = 186085, --LFR
+	[184453] = 186084, --Normal
+	[186082] = 186086, --Heroic
+	[186083] = 186087,--Mythic
+	[187025] = 186088,--Glad
+	[187026] = 186089,--Elite
 
 --S3 Blazing Dremstaker - Hunter Shoulder
 	[193358] = 193361, --LFR
@@ -358,7 +371,7 @@ local altitems = {
 	[190207] = 189106, --Elite
 
 ----Paladin
-	--S1 Paladin Shoulder
+	--S1 Virtuous Silver Cataphract - Paladin Shoulder
 	[182864] = 184254, --LFR
 	[182863] = 184255, --Normal
 	[182865] = 184256, --Heroic
@@ -366,7 +379,16 @@ local altitems = {
 	[183835] = 184258,--Glad
 	[183836] = 184259,--Elite
 
---S2 Heartfire Sentinel's Authority - Paladin Shoulder
+	--S1 Virtuous Silver Cataphract - Paladin Chest
+	[182844] = 184248, --LFR
+	[182843] = 184249, --Normal
+	[182845] = 184250, --Heroic
+	[182846] = 184251,--Mythic
+	[183815] = 184252,--Glad
+	[183816] = 184253,--Elite
+
+
+	--S2 Heartfire Sentinel's Authority - Paladin Shoulder
 	[185982] = 185985, --LFR
 	[184424] = 185986, --Normal
 	[185983] = 185987, --Heroic
@@ -374,14 +396,13 @@ local altitems = {
 	[187095] = 185989, --Glad
 	[187096] = 185990, --Elite
 
---S2 Heartfire Sentinel's Authority - Paladin Helm
+	--S2 Heartfire Sentinel's Authority - Paladin Helm
 	[185994] = 185998, --LFR
 	[184426] = 185997, --Normal
 	[185995] = 185999, --Heroic
 	[185996] = 186000, --Mythic
 	[187087] = 186001, --Glad
 	[187088] = 186002, --Elite
-
 
 ---Shaman
 	--S1 Elements of Infused Earth - shaman head 
@@ -416,9 +437,7 @@ local altitems = {
 	[187057] = 186049, --Glad
 	[187058] = 186050, --Elite
 
-	---Warrior
-
-
+---Warrior
 	--S1 Stones of the Walking Mountain - Warrior Head
 	[182892] = 184308, --LFR
 	[182891] = 184309,--Normal
@@ -450,11 +469,211 @@ local altitems = {
 	[186300] = 186304, --Mythic
 	[187127] = 186305, --Glad
 	[187128] = 186306, --Elite
+
+---voker
+	--S1 Scales of the Awakened -  Evoker head
+	[182712] = 184218, --LFR
+	[182711] = 184219, --Normal
+	[182713] = 184220, --Heroic
+	[182714] = 184221,--Mythic
+	--[183445] = 184222,--Glad
+	--[183446] = 184223,--Elite
+
+	--s1 Scales of the Awakened -  Evoker shoulder
+	[182720] = 184224, --LFR
+	[182719] = 184225, --Normal
+	[182721] = 184226, --Heroic
+	[182722] = 184227, --Mythic
+	--[183453] = 184228, --Glad
+	--[183454] = 184229, --Elite
+
+	--S2 -  Evoker head
+	[186388] = 186392, --LFR
+	[184462] = 186391, --Normal
+	[186389] = 186393, --Heroic
+	[186390] = 186394,--Mythic
+	--[183445] = 186395,--Glad
+	--[183446] = 186396,--Elite
+
+	--s2 -  Evoker shoulder
+	[186376] = 186379, --LFR
+	[184460] = 186380, --Normal
+	[186377] = 186381, --Heroic
+	[186378] = 186382, --Mythic
+	--[183453] = 186383, --Glad
+	--[183454] = 186384, --Elite
+
+	--s2 -  Evoker Belt
+	[186367] = 186370, --LFR
+	[184459] = 186371, --Normal
+	[186368] = 186372, --Heroic
+	[186369] = 186373, --Mythic
+	--[183453] = 186374, --Glad
+	--[183454] = 186375, --Elite
+
+
+
+--- Warlock
+	--S1 Scalesworn Cultists Habit - Warlock Head
+	[182532] = 184296, --LFR
+	[182531] = 184297,--Normal
+	[182533] = 184298, --Heroic
+	[182534] = 184299,--Mythic
+	[183605] = 184300,--Glad
+	[183606] = 184301, --Elite
+
+	--S1 Scalesworn Cultists Habit - Warlock Shoulder
+	[182540] = 184302, --LFR - 
+	[182539] = 184303, --Normal
+	[182541] = 184304, --Heroic
+	[182542] = 184305,--Mythic
+	[183613] = 184306,--Glad
+	[183614] = 184307,--Elite
+
+
+	[182540] = 186192, --LFR - 
+	[182539] = 186193, --Normal
+	[186190] = 186194, --Heroic
+	[186191] = 186195,--Mythic
+	[183613] = 186196,--Glad
+	[183614] = 186197,--Elite
+
+
+	--S2 Sinister Savants Cursethreads - Warlock Head
+	[186204] = 186208, --LFR
+	[184507] = 186207,--Normal
+	[186205] = 186209, --Heroic
+	[186206] = 186210,--Mythic
+	[186865] = 186211,--Glad
+	[186866] = 186212, --Elite
+
+
+	--S2 Sinister Savants Cursethreads - Warlock Shoulder
+	[186189] = 186192, --LFR - 
+	[184505] = 186193, --Normal
+	[182541] = 186194, --Heroic
+	[182542] = 186195,--Mythic
+	[186873] = 186196,--Glad
+	[186874] = 186197,--Elite
+
+
+---Rogue
+	--S1 Vault Delvers Toolkit - Rogue head 
+	[182676] = 184272, --LFR
+	[182675] = 184273,--Normal
+	[182677] = 184274, --Heroic
+	[182678] = 184275,--Mythic
+	[183733] = 184276,--Glad
+	[183734] = 184277,--Elite
+
+	--S1 Vault Delvers Toolkit - Rogue  Shoulder
+	[182684] = 184278, --LFR
+	[182683] = 184279, --Normal
+	[182685] = 184280, --Heroic
+	[182686] = 184281,--Mythic
+	[183741] = 184282,--Glad
+	[183742] = 184283,--Elite
+
+	--S2 lurking Specters shadeweave - Rogue  Shoulder
+	[186108] = 186111, --LFR
+	[184469] = 186112, --Normal
+	[186109] = 186113, --Heroic
+	[186110] = 186114,--Mythic
+	[187001] = 186115,--Glad
+	[187002] = 186116,--Elite
+
+---Monk
+	--S1 Wrappings of the Waking Fist - monk Shoulder
+	[182648] = 184242, --LFR
+	[182647] = 184243, --Normal
+	[182649] = 184244, --Heroic
+	[182650] = 184245,--Mythic
+	[183710] = 184247,--Glad
+	[183709] = 184246,--Elite
+
+	--S1 Fangs of the Vermillion Forge - monk Head
+	[185777] = 187679, --LFR
+	[184480] = 187678, --Normal
+	[185778] = 187680, --Heroic
+	[185779] = 187681,--Mythic
+	[186961] = 187682,--Glad
+	[186962] = 187683,--Elite
+
+	--S2 Fangs of the Vermillion Forge - monk Shoulder
+	[185771] = 187690, --LFR
+	[184478] = 187691, --Normal
+	[185772] = 187692, --Heroic
+	[185773] = 187693,--Mythic
+	[186969] = 187694,--Glad
+	[186970] = 187695,--Elite
+
+--Death Knight
+	--S1 Haunted Frostbrood Remains - DK head
+	[182820] = 184188, --LFR
+	[182819] = 184189, --Normal
+	[182821] = 184190, --Heroic
+	[182822] = 184191, --Mythic
+	[183541] = 184192, --Glad
+	[183542] = 184193, --Elite
+
+	--S1 Haunted Frostbrood Remainsd -DK Shoulder
+	[182828] = 183363, --LFR
+	[182827] = 184183, --Normal
+	[182829] = 184184, --Heroic
+	[182830] = 184185, --Mythic
+	[183549] = 184186, --Glad
+	[183550] = 184187, --Elite
+
+
+	--S2 Lingering Phantoms Encasement - DK head
+	[186279] = 187673, --LFR
+	[184435] = 187672, --Normal
+	[186277] = 187674, --Heroic
+	[186278] = 187675, --Mythic
+	[186802] = 187677, --Glad
+	[186801] = 187676, --Elite
+
+	--S2 Lingering Phantoms Encasement -DK Shoulder
+	[186285] = 187685, --LFR
+	[184433] = 187684, --Normal
+	[186283] = 187686, --Heroic
+	[186284] = 187687, --Mythic
+	[186810] = 187689, --Glad
+	[186809] = 187688, --Elite
+
+--DH
+	--S1 Skybound Avangers Flightware -  DH Shoulder
+	[182576] = 184200, --LFR
+	[182575] = 184201, --Normal
+	[182577] = 184202, --Heroic
+	[182578] = 184203, --Mythic
+	[183645] = 184204, --Glad
+	[183646] = 184205, --Elite
+
+	--S1 Skybound Avangers Flightware -  DH head
+	[182568] = 184194, --LFR
+	[182567] = 184195, --Normal
+	[182569] = 184196, --Heroic
+	[182570] = 184197, --Mythic
+	[183637] = 184198, --Glad
+	[183638] = 184199, --Elite
+
+	--S2  Kinslayers Burdens -  DH head
+	[186427] = 186431, --LFR
+	[184498] = 186430, --Normal
+	[186428] = 186432, --Heroic
+	[186429] = 186433, --Mythic
+	[186897] = 186434, --Glad
+	[186898] = 186435, --Elite
+
+	--S2 Kinslayers Burdens-  DH Shoulder
+	[186415] = 186418, --LFR
+	[184496] = 186419, --Normal
+	[186416] = 186420, --Heroic
+	[186417] = 186421, --Mythic
+	[186905] = 186422, --Glad
+	[186906] = 186423, --Elite
 }
-
-
-
-
 
 
 --This will check to see if a set has items to add and then adds them
