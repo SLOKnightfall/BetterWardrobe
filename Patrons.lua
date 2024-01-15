@@ -2,13 +2,13 @@ local addonName, addon = ...
 addon = LibStub("AceAddon-3.0"):GetAddon(addonName)
 
 addon.Patrons = {
-    "Adam Van Hoosen",
+"Adam Van Hoosen",
     "Chaos",
     "Chris",
     "Chris Ellis",
     "Cody",
     "David LaSelle",
-    "Dejoblue ",
+    "Dejablue",
     "Evan Hardin",
     "Ines Tan",
     "JSON",
@@ -16,6 +16,7 @@ addon.Patrons = {
     "Jason Harper",
     "Joe Romubio",
     "Joshua Hall",
+    "Juliette 🤍",
     "Kai Olsen ",
     "Kroome K.",
     "Lucky Phil",
@@ -34,6 +35,9 @@ addon.Patrons = {
     "Ray Patronson",
     "Somarlane ",
     "Tou",
+    "Vinicius Alencar",
+    "ZaffronStaghelm",
     "marilyn lewis",
+    "sebastian volf",
     "toast042"
 }
