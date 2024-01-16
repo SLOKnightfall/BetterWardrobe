@@ -1217,7 +1217,10 @@ function BetterWardrobeCollectionFrameMixin:SetTab(tabID)
 
 	local ElvUI = IsAddOnLoaded("ElvUI")
 
+if BW_DBSavedSetDropdown then
+	
 	BW_DBSavedSetDropdown:Hide()
+end
 	self.BW_SetsHideSlotButton:Hide()
 	BetterWardrobeVisualToggle.VisualMode = false;
 	self.TransmogOptionsButton:Hide()
@@ -8575,14 +8578,14 @@ addon:SecureHook("SetItemRef", function(link, ...)
 		end
 
 
-		--if ( not CollectionsJournal or not CollectionsJournal:IsVisible() or not self:IsVisible() ) then
+		if ( not CollectionsJournal or not CollectionsJournal:IsVisible() ) then
 			local _, sourceID = strsplit(":", addedLink);
 			--ToggleCollectionsJournal(5)
 			--print(addedLink)
 			TransmogUtil.OpenCollectionToItem(sourceID);
 			--WardrobeCollectionFrame:OpenTransmogLink(sourceID)
 
-		--end
+		end
 
 			C_Timer.After(0.1, function() BetterWardrobeCollectionFrame:OpenTransmogLink(link) end)
 				
