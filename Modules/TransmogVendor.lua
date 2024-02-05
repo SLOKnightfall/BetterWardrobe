@@ -483,8 +483,9 @@ function UI.ExtendTransmogView(reset)
 		WardrobeTransmogFrame.SecondaryHandEnchantButton:ClearAllPoints()
 		WardrobeTransmogFrame.SecondaryHandEnchantButton:SetPoint("BOTTOM", WardrobeTransmogFrame.SecondaryHandButton, "BOTTOM", 0, -20)
 
-        --WardrobeTransmogFrame.ToggleSecondaryAppearanceCheckbox:ClearAllPoints();
-        --WardrobeTransmogFrame.ToggleSecondaryAppearanceCheckbox:SetPoint("BOTTOM", WardrobeTransmogFrame, "BOTTOM", 0, 70)
+        WardrobeTransmogFrame.ToggleSecondaryAppearanceCheckbox:ClearAllPoints();
+        WardrobeTransmogFrame.ToggleSecondaryAppearanceCheckbox:SetPoint("BOTTOM", WardrobeTransmogFrame, "BOTTOMLEFT", 20, 5)
+        WardrobeTransmogFrame.ToggleSecondaryAppearanceCheckbox:SetFrameLevel(4)
 
 		WardrobeTransmogFrame.ModelScene.ClearAllPendingButton:SetPoint("TOPRIGHT", WardrobeTransmogFrame, -20, -20)
 		WardrobeTransmogFrame.ModelScene.ControlFrame:SetPoint("TOP", WardrobeTransmogFrame, "TOP", 0, -4)
@@ -534,7 +535,10 @@ function UI.ExtendTransmogView(reset)
 		WardrobeTransmogFrame.SecondaryHandEnchantButton:ClearAllPoints()
 		WardrobeTransmogFrame.SecondaryHandEnchantButton:SetPoint("BOTTOM", WardrobeTransmogFrame.SecondaryHandButton, "BOTTOM", 0, -20)
 		        
-        
+        WardrobeTransmogFrame.ToggleSecondaryAppearanceCheckbox:ClearAllPoints();
+        WardrobeTransmogFrame.ToggleSecondaryAppearanceCheckbox:SetPoint("BOTTOM", WardrobeTransmogFrame, "BOTTOMLEFT", 20, 5)
+        WardrobeTransmogFrame.ToggleSecondaryAppearanceCheckbox:SetFrameLevel(4)
+
 		BetterWardrobeOutfitDropDown:ClearAllPoints()
 		BetterWardrobeOutfitDropDown:SetPoint("TOPLEFT", WardrobeTransmogFrame, 35, 28)
 		if UIPanelWindows["WardrobeFrame"] then 
@@ -578,6 +582,10 @@ function UI.ExtendTransmogView(reset)
 		WardrobeTransmogFrame.MainHandEnchantButton:SetPoint("BOTTOM", WardrobeTransmogFrame.MainHandButton, "BOTTOM", 0, -20)
 		WardrobeTransmogFrame.SecondaryHandEnchantButton:ClearAllPoints()
 		WardrobeTransmogFrame.SecondaryHandEnchantButton:SetPoint("BOTTOM", WardrobeTransmogFrame.SecondaryHandButton, "BOTTOM", 0, -20)	
+
+        WardrobeTransmogFrame.ToggleSecondaryAppearanceCheckbox:ClearAllPoints();
+        WardrobeTransmogFrame.ToggleSecondaryAppearanceCheckbox:SetPoint("BOTTOM", WardrobeTransmogFrame, "BOTTOMLEFT", 20, 0)
+        WardrobeTransmogFrame.ToggleSecondaryAppearanceCheckbox:SetFrameLevel(4)
 
 		BetterWardrobeOutfitDropDown:ClearAllPoints()
 		BetterWardrobeOutfitDropDown:SetPoint("TOPLEFT", WardrobeTransmogFrame, -14, 28)
