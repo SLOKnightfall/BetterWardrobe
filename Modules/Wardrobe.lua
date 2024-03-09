@@ -1234,7 +1234,9 @@ end
 		BetterWardrobeVisualToggle:Hide()
 		addon.ColorFilterFrame:Show()
 
+	if BW_ColectionListFrame then 
 		BW_ColectionListFrame:SetShown(BetterWardrobeCollectionFrame:IsShown() and not atTransmogrifier)
+	end
 		self.activeFrame = self.ItemsCollectionFrame;
 		self.ItemsCollectionFrame:Show()
 		self.SetsCollectionFrame:Hide()
@@ -1284,8 +1286,9 @@ end
 
 	elseif tabID == TAB_SETS or tabID == TAB_EXTRASETS or tabID == TAB_SAVED_SETS then
 		BetterWardrobeVisualToggle:Show()
-		BW_ColectionListFrame:Hide()
-
+		if BW_ColectionListFrame then 
+			BW_ColectionListFrame:Hide()
+		end
 		self.ItemsCollectionFrame:Hide()
 		self.SearchBox:ClearAllPoints()
 		BW_SortDropDown:Show()
