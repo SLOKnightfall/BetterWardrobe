@@ -127,8 +127,9 @@ local function RandomizeOutfit()
 	local outfits = addon.GetOutfits()
 	local randomOutfitID = outfits[random(#outfits)].outfitID
 
-	BW_WardrobeOutfitDropDown:SelectOutfit(randomOutfitID, true)
+	BetterWardrobeOutfitDropDown:SelectOutfit(randomOutfitID, true)
 end
+
 
 local throttleValue = 0.1
 local currentThrottle = throttleValue

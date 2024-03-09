@@ -124,11 +124,13 @@ local function SelectColor()
 		EnableAddOn("BetterWardrobe_SourceData")
 		LoadAddOn("BetterWardrobe_SourceData")
 	end
-
 	local ColorTable = (_G.BetterWardrobeData and _G.BetterWardrobeData.ColorTable) or {}
 	ColorPickerFrame.hasOpacity = false
+	if not ColorPickerFrame then return end
 
 	local function ColorPickerCallback()
+		if not ColorPickerFrame then return end
+
 		local ItemsCollectionFrame = BetterWardrobeCollectionFrame.ItemsCollectionFrame
 		local R2, G2, B2 = ColorPickerFrame:GetColorRGB()
 		if (R1 == R2) and (G1 == G2) and (B1 == B2) and (cat1 == ItemsCollectionFrame.activeCategory) then
@@ -181,9 +183,9 @@ local function SelectColor()
 		ItemsCollectionFrame:ResetPage()
 	end
 
-	ColorPickerFrame.func = ColorPickerCallback
+	ColorPickerFrame.swatchFunc = ColorPickerCallback
 	ColorPickerFrame.cancelFunc = function() resetFilters() end
-	ColorPickerFrame:SetColorRGB(.64,.64,.64,1)
+	--ColorPickerFrame:SetColorRGB(.64,.64,.64,1)
 	ColorPickerFrame:Show()
 end
 
