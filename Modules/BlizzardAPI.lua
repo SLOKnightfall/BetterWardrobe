@@ -532,11 +532,10 @@ function addon:SearchSets(setList)
 	setList = Sets:ClearHidden(setList)
 	if searchString == "" then return setList end
 	for i, data in ipairs(setList) do
-		if (searchString and string.find(string.lower(data.name), searchString)) or (data.label and string.find(string.lower(data.label), searchString)) or (data.description and string.find(string.lower(data.description), searchString)) then
+		if (searchString and string.find(string.lower(data.name), searchString)) or (data.label and string.find(string.lower(data.label), searchString)) or (data.description and string.find(string.lower(data.description), searchString)) or (data.className and string.find(string.lower(data.className), searchString)) then
 			tinsert(searchedSets, data)
 		end
 	end
-	
 	return searchedSets
 end
 

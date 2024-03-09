@@ -82,7 +82,7 @@ function CollectionList:BuildCollectionList(complete)
 				if searchString then
 					for i, data in pairs(sources) do
 						local source_info = C_TransmogCollection.GetSourceInfo(data)
-						local match = string.find(string.lower(source_info.name or ""), searchString) -- or string.find(baseSet.label, searchString) or string.find(baseSet.description, searchString)
+						local match = string.find(string.lower(source_info.name or ""), searchString) or string.find(string.lower(baseSet.label or ""), searchString) or string.find(string.lower(baseSet.description or ""), searchString)
 						if match then
 							tinsert(list, source_info)
 							break
