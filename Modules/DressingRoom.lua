@@ -39,7 +39,10 @@ local TP = CreateFrame("GameTooltip", "BW_VirtualTooltip", nil, "GameTooltipTemp
 TP:SetScript("OnLoad", GameTooltip_OnLoad)
 TP:SetOwner(UIParent, 'ANCHOR_NONE')
 local TP = CreateFrame("GameTooltip", "BW_GameTooltip", nil, "GameTooltipTemplate")
-
+TP:SetScript("OnLoad", GameTooltip_OnLoad)
+--BW_GameTooltip.Text:SetFontObject(GameTooltipTextSmall)
+local TP = GameTooltip
+BW_GameTooltip = GameTooltip
 function BetterWardrobe:ToggleDressingRoom()
 		if DressUpFrame:IsShown() then 
 			HideUIPanel(DressUpFrame)
