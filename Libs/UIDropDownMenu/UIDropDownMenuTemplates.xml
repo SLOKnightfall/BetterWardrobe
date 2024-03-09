@@ -126,7 +126,7 @@
 		</Frames>
 		<Scripts>
 			<OnLoad>
-				self:SetFrameLevel(self:GetParent():GetFrameLevel()+2);
+				--self:SetFrameLevel(self:GetParent():GetFrameLevel()+2);
 			</OnLoad>
 			<OnClick>
 				BW_UIDropDownMenuButton_OnClick(self, button, down);
