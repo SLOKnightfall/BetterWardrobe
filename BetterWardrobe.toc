@@ -8,6 +8,7 @@
 ## X-Curse-Project-ID: 401253
 ## X-Wago-ID: 0mKOzk6x
 ## IconTexture: Interface\GossipFrame\transmogrifyGossipIcon.blp
+## AddonCompartmentFunc: BetterWardrobe_OnAddonCompartmentClick
 
 #Libraries
 Libs\LibStub\LibStub.lua

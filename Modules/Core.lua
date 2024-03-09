@@ -1511,3 +1511,7 @@ f:SetPoint("TOPRIGHT", 100, 100)
 f:SetSize(1, 1)
 f:Hide()
 addon.prisonFrame = f
+
+function BetterWardrobe_OnAddonCompartmentClick(addonName, buttonName, menuButtonFrame)
+      ToggleCollectionsJournal(5)
+ end
