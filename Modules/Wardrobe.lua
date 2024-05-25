@@ -119,7 +119,9 @@ function BW_TransmogFrameMixin:OnLoad()
 	self.ShoulderButton.dependentSlot = self.SecondaryShoulderButton;
 	self.SecondaryShoulderButton.dependencySlot = self.ShoulderButton;
 
-	WardrobeTransmogFrame.ToggleSecondaryAppearanceCheckbox.Label:SetPoint("RIGHT", WardrobeCollectionFrame.ItemsCollectionFrame.PagingFrame.PageText, "LEFT", -40, 0);
+
+	--self.ToggleSecondaryAppearanceCheckbox.Label:ClearAllPoints()
+	--self.ToggleSecondaryAppearanceCheckbox.Label:SetPoint("RIGHT", WardrobeCollectionFrame.ItemsCollectionFrame.PagingFrame.PageText, "LEFT", 500, 0);
 
 end
 
@@ -414,10 +416,16 @@ end
 
 function BW_TransmogFrameMixin:EvaluateSecondaryAppearanceCheckbox()
 	local showToggleCheckbox = false;
-	if self.selectedSlotButton and BetterWardrobeCollectionFrame.activeFrame == BetterWardrobeCollectionFrame.ItemsCollectionFrame then
+	if self.selectedSlotButton and (BetterWardrobeCollectionFrame.activeFrame == BetterWardrobeCollectionFrame.ItemsCollectionFrame or WardrobeCollectionFrame.activeFrame == WardrobeCollectionFrame.ItemsCollectionFrame) then
 		showToggleCheckbox = C_Transmog.CanHaveSecondaryAppearanceForSlotID(self.selectedSlotButton.transmogLocation.slotID);
 	end
-	self.ToggleSecondaryAppearanceCheckbox:SetShown(showToggleCheckbox);
+	WardrobeTransmogFrame.ToggleSecondaryAppearanceCheckbox:SetShown(showToggleCheckbox);
+    WardrobeTransmogFrame.ToggleSecondaryAppearanceCheckbox:ClearAllPoints()
+----    WardrobeTransmogFrame.ToggleSecondaryAppearanceCheckbox:SetParent(BetterWardrobeCollectionFrame.ItemsCollectionFrame)
+
+	WardrobeTransmogFrame.ToggleSecondaryAppearanceCheckbox:SetPoint("LEFT", BetterWardrobeCollectionFrame.ItemsCollectionFrame.ModelR3C1, "LEFT", -2, -110);
+    WardrobeTransmogFrame.ToggleSecondaryAppearanceCheckbox:SetFrameLevel(400)
+	WardrobeTransmogFrame.ToggleSecondaryAppearanceCheckbox:SetShown(showToggleCheckbox); 
 end
 
 function BW_TransmogFrameMixin:GetSelectedTransmogLocation()

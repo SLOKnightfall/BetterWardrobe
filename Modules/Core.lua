@@ -1371,7 +1371,7 @@ function addon:OnEnable()
 		addon.RefreshSubItemData()
 		addon.RefreshOutfitData()
 	end)
-		addPatrons()
+	addPatrons()
 	addon:RegisterEvent("TRANSMOG_COLLECTION_SOURCE_REMOVED", "EventHandler")
 	addon:RegisterEvent("TRANSMOG_COLLECTION_SOURCE_ADDED", "EventHandler")
 	if IsAddOnLoaded("Blizzard_Collections") then
@@ -1482,17 +1482,13 @@ function addon:EventHandler(event, ...)
 
 		C_Timer.After(0, function()
 			addon.Init:LoadModules()
-
-			WardrobeTransmogFrame.ToggleSecondaryAppearanceCheckbox.Label:ClearAllPoints()
-			WardrobeTransmogFrame.ToggleSecondaryAppearanceCheckbox:ClearAllPoints()
-			WardrobeTransmogFrame.ToggleSecondaryAppearanceCheckbox.Label:SetPoint("RIGHT", BetterWardrobeCollectionFrame.ItemsCollectionFrame.PagingFrame.PageText, "LEFT", -30, 0)
-			WardrobeTransmogFrame.ToggleSecondaryAppearanceCheckbox:SetPoint("RIGHT", WardrobeTransmogFrame.ToggleSecondaryAppearanceCheckbox.Label, "LEFT", 0, 0)
-			WardrobeTransmogFrame.ToggleSecondaryAppearanceCheckbox:SetFrameLevel(CollectionsJournal.TitleContainer:GetFrameLevel()+200);
 		 end)
 
 
 	elseif (event == "PLAYER_ENTERING_WORLD") then
 		addon:SendMessage("BW_OnPlayerEnterWorld")
+		C_Timer.After(1, function() addon.Init:UpdateCollectedAppearances() end)
+
 		C_Timer.After(1, function() addon:ResetSetsCollectionFrame() end)
 
 	elseif (event == "TRANSMOG_COLLECTION_SOURCE_ADDED") then
@@ -1505,7 +1501,7 @@ function addon:EventHandler(event, ...)
 	end
 end
 
-local f=CreateFrame("Frame", nil, UIParent)
+local f = CreateFrame("Frame", nil, UIParent)
 f:ClearAllPoints()
 f:SetPoint("TOPRIGHT", 100, 100)
 f:SetSize(1, 1)
