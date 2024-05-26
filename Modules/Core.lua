@@ -1487,9 +1487,9 @@ function addon:EventHandler(event, ...)
 
 	elseif (event == "PLAYER_ENTERING_WORLD") then
 		addon:SendMessage("BW_OnPlayerEnterWorld")
-		C_Timer.After(1, function() addon.Init:UpdateCollectedAppearances() end)
 
 		C_Timer.After(1, function() addon:ResetSetsCollectionFrame() end)
+		C_Timer.After(15, function() addon.Init:UpdateCollectedAppearances() end)
 
 	elseif (event == "TRANSMOG_COLLECTION_SOURCE_ADDED") then
 		local x = ...
