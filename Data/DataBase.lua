@@ -65,6 +65,7 @@ local pvpDescriptions = {
 
 
 
+
 local armorMask = {400, 3592, 68, 35}
 local WowSets = {{}, {}, {}, {}, {}}
 WowSets["CLOTH"] = WowSets[1]
@@ -87,14 +88,31 @@ function BuildBlizzSets()
 			data.expansionID  = data.expansionID + 1
 			data.BuildBlizzSets = true
 			data.setType = "Blizzard"
+				if data.classMask == 16383 then
+					 data.classMask = 0
+				elseif data.classMask == 4164 then
+					data.classMask = 68
+				elseif data.classMask == 2048 then
+						data.classMask = 3592
+				
+				elseif data.classMask == 256 then
+						data.classMask = 400
+
+				elseif data.classMask == 32 then
+					data.classMask = 35
+				end
 
 			if data.classMask and Globals.CLASS_MASK_TO_ID[data.classMask] then 
 				data.classID = Globals.CLASS_MASK_TO_ID[data.classMask]
 				data.className, data.classTag = GetClassInfo(data.classID);
 			end
 			
+
 			for armor, mask in ipairs(armorMask) do 
+
 				--if bit.band(data.classMask, mask) == mask  then
+					if data.classMask == 16383 then print("kk")end
+					--print (mask.."/"..data.classMask)
 				if bit.bor(mask, data.classMask) == mask then
 
 					local baseSet = C_TransmogSets.GetBaseSetID(data.setID)
