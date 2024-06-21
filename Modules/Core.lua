@@ -1374,12 +1374,6 @@ function addon:OnEnable()
 	addPatrons()
 	addon:RegisterEvent("TRANSMOG_COLLECTION_SOURCE_REMOVED", "EventHandler")
 	addon:RegisterEvent("TRANSMOG_COLLECTION_SOURCE_ADDED", "EventHandler")
-	if IsAddOnLoaded("Blizzard_Collections") then
-		C_Timer.After(0.5, function() addon.Init:LoadModules() end)
-	else
-		addon:RegisterEvent("ADDON_LOADED", "EventHandler")
-	end
-
 	addon:RegisterEvent("PLAYER_ENTERING_WORLD", "EventHandler")
 
 	--Cache any default Blizz Saved Sets
@@ -1389,7 +1383,7 @@ end
 
 --Hides default collection window when at transmog vendor
 local function UpdateTransmogVendor()
-	--WardrobeCollectionFrame:Hide()
+	WardrobeCollectionFrame:Hide()
 
 
 	BetterWardrobeCollectionFrame:Show()
@@ -1423,7 +1417,7 @@ function addon.Init:LoadModules()
 		if (WardrobeCollectionFrame:GetParent() == self or not WardrobeCollectionFrame:GetParent():IsShown()) then
 			if selected == 5 then
 				--HideUIPanel(WardrobeFrame)
-				--WardrobeCollectionFrame:Hide()
+				WardrobeCollectionFrame:Hide()
 				--BetterWardrobeCollectionFrame:Show()
 
 				BetterWardrobeCollectionFrame:SetContainer(self)
@@ -1480,14 +1474,14 @@ function addon:EventHandler(event, ...)
 		addon:SendMessage("BW_ADDON_LOADED")
 		addon:UnregisterEvent("ADDON_LOADED")
 
-		C_Timer.After(0, function()
-			addon.Init:LoadModules()
-		 end)
-
-
 	elseif (event == "PLAYER_ENTERING_WORLD") then
 		addon:SendMessage("BW_OnPlayerEnterWorld")
 
+		if not C_AddOns.IsAddOnLoaded("Blizzard_Collections") then
+      		C_AddOns.LoadAddOn("Blizzard_Collections")
+    	end
+    
+		C_Timer.After(0.5, function() addon.Init:LoadModules() end)
 		C_Timer.After(1, function() addon:ResetSetsCollectionFrame() end)
 		C_Timer.After(15, function() addon.Init:UpdateCollectedAppearances() end)
 

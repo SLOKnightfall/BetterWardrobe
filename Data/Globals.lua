@@ -13,6 +13,7 @@ Globals.ARMOR_MASK = {
   PLATE = 35,
 }
 --/dump GetSpellDescription(298886)
+-- ID, Mask, Armor
 Globals.CLASS_INFO = {
   DEATHKNIGHT = {6,32,"PLATE"},
   DEMONHUNTER = {12, 2048, "LEATHER"},
@@ -30,6 +31,7 @@ Globals.CLASS_INFO = {
 }
 
 
+bit.band(400, 16)
 Globals.CLASS_MASK_TO_ID = {}
 
 
@@ -37,7 +39,85 @@ for i, data in pairs(Globals.CLASS_INFO) do
   Globals.CLASS_MASK_TO_ID[data[2]] = data[1]
 end
 
+Globals.CLASS_MASK = {
+    [1] = {1, 2, 32, 35, 0}, -- Plate Wearer
+    [2] = {1, 2, 32, 35, 0}, -- Plate Wearer
+    [3] = {4, 64, 68, 0, 4096, 4164},    -- Mail Wearer
+    [4] = {8, 512, 1024, 2048, 3592, 0}, -- Leather Wearer
+    [5] = {16, 128, 256, 400, 0}, -- Cloth Wearer
+    [6] = {1, 2, 32, 35, 0}, -- Plate Wearer
+    [7] = {4, 64, 68, 0, 4096, 4164},    -- Mail Wearer
+    [8] = {16, 128, 256, 400, 0}, -- Cloth Wearer
+    [9] = {16, 128, 256, 400, 0}, -- Cloth Wearer
+    [10] = {8, 512, 1024, 2048, 3592, 0}, -- Leather Wearer
+    [11] = {8, 512, 1024, 2048, 3592, 0}, -- Leather Wearer
+    [12] = {8, 512, 1024, 2048, 3592, 0}, -- Leather Wearer
+    [13] = {4, 64, 68, 0, 4096, 4164},    -- Mail Wearer
 
+}
+Globals.CLASS_NAMES = {
+    [1] = {"Warrior","WARRIOR"},
+    [2] = {"Paladin","PALADIN"},
+    [4] = {"Hunter","HUNTER"},
+    [8] = {"Rogue","ROGUE"},
+    [16] = {"Priest","PRIEST"},
+    [32] = {"Death Knight","DEATHKNIGHT"},
+    [64] = {"Shaman","SHAMAN"},
+    [128] = {"Mage","MAGE"},
+    [256] = {"Warlock","WARLOCK"},
+    [512]  = {"Monk","MONK"},
+    [1024] = {"Druid","DRUID"},
+    [2048] = {"Demon Hunter","DEMONHUNTER"},
+    [4096] = {"Evoker", "EVOKER"},
+}
+
+Globals.ClassToMask = {
+    [1] = 1,
+    [2] = 2,
+    [3] = 4,
+    [4] = 8,
+    [5] = 16,
+    [6] = 32,
+    [7] = 64,
+    [8] = 128,
+    [9] = 256,
+    [10] = 512,
+    [11] = 1024,
+    [12] = 2048,
+    [13] = 4096,
+}
+
+Globals.ClassArmorType = {
+    [1]  = 4, --[1]  = 1, --[1] =    
+    [2]  = 4, --[2]  = 1, --[2] =    
+    [3]  = 3, --[3]  = 2, --[4] =    
+    [4]  = 2, --[4]  = 3, --[8] =    
+    [5]  = 1, --[5]  = 4, --[16] =   
+    [6]  = 4, --[6]  = 1, --[32] =   
+    [7]  = 3, --[7]  = 2, --[64] =   
+    [8]  = 1, --[8]  = 4, --[128] =  
+    [9]  = 1, --[9]  = 4, --[256] =  
+    [10] = 2, --[10] = 3, --[512] =  
+    [11] = 2, --[11] = 3, --[1024] = 
+    [12] = 2, --[12] = 3, --[2048] = 
+    [13] = 3,
+}
+
+Globals.ClassArmorMask = {
+    [1]  = {0, 1, 35},
+    [2]  = {0, 2, 35},
+    [3]  = {0, 4, 68, 4164},
+    [4]  = {0, 8, 3592},
+    [5]  = {0, 16, 400},
+    [6]  = {0, 32, 35},
+    [7]  = {0, 64, 68, 4164},
+    [8]  = {0, 128, 400},
+    [9]  = {0, 256, 400},
+    [10] = {0, 512, 3592},
+    [11] = {0, 1024, 3592},
+    [12] = {0, 2048, 3592},
+    [13] = {0, 4096, 68, 4164},
+}
 
 --[[
 

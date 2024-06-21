@@ -324,7 +324,7 @@
 							<Anchors>
 								<Anchor point="RIGHT" relativeKey="$parent.Icon" relativePoint="LEFT"  x="7" y="1"/>
 							</Anchors>
-						</FontString>	
+						</FontString>
 					</Layer>
 				</Layers>
 				<Scripts>
@@ -337,6 +337,40 @@
 					</OnLeave>
 
 				</Scripts>
+			</Frame>
+			<Frame parentKey="Remix" hidden="true">
+				<Size x="20" y="20"/>
+				<Anchors>
+					<Anchor point="TOPRIGHT" relativeKey="$parent" x="0" y = "-25"/>
+				</Anchors>
+				<Layers>
+					<Layer level="ARTWORK">
+						<Texture parentKey="Icon" file="Interface\ICONS\Ability_Evoker_EmeraldBlossom">
+							<Size x="20" y="20"/>
+							<Anchors>
+								<Anchor point="BOTTOMLEFT" relativeKey="$parent" relativePoint="BOTTOMLEFT" x="0" y="0"/>
+							</Anchors>
+						</Texture>	
+
+					</Layer>
+				</Layers>
+			</Frame>
+			<Frame parentKey="Store" hidden="true">
+				<Size x="20" y="20"/>
+				<Anchors>
+					<Anchor point="TOPRIGHT" relativeKey="$parent" x="0" y = "-25"/>
+				</Anchors>
+				<Layers>
+					<Layer level="ARTWORK">
+						<Texture parentKey="Icon" file="Interface\ICONS\TradingPostCurrency">
+							<Size x="20" y="20"/>
+							<Anchors>
+								<Anchor point="BOTTOMLEFT" relativeKey="$parent" relativePoint="BOTTOMLEFT" x="0" y="0"/>
+							</Anchors>
+						</Texture>	
+
+					</Layer>
+				</Layers>
 			</Frame>
 			<Frame inherits="BetterWardrobeIconsTemplate" />
 			<Button parentKey="EditButton" inherits="BetterWardrobeOutfitButtonButtonTemplate">
@@ -540,9 +574,7 @@
 					<Anchor point="TOPLEFT" x="43" y="19"/>
 				</Anchors>
 				<Scripts>
-					<OnLoad method="OnLoad"/>
-					<OnEnter method="OnEnter"/>
-					<OnLeave method="OnLeave"/>
+
 					<OnShow>
 	    				self:SetFrameLevel(CollectionsJournal.TitleContainer:GetFrameLevel()+200);
 	     			</OnShow>

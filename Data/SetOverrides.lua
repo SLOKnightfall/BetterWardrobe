@@ -673,6 +673,9 @@ local altitems = {
 	[186417] = 186421, --Mythic
 	[186905] = 186422, --Glad
 	[186906] = 186423, --Elite
+
+--Plunderlord
+	[198627] = 218283, --eyepatch with out hat
 }
 
 

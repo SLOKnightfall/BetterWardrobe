@@ -6818,7 +6818,8 @@ function BetterWardrobeSetsScrollFrameButtonMixin:Init(elementData)
 	self.CollectionListVisual.UnavailableItems:SetShown(CheckSetAvailability(displayData.setID))
 	self.CollectionListVisual.InvalidTexture:SetShown(BetterWardrobeCollectionFrame.selectedCollectionTab == 3 and not displayData.isClass)
 
-
+	self.Store:SetShown(addon.MiscSets.TRADINGPOST_SETS[self.setID] or displayData.filter == 12)
+	self.Remix:SetShown(addon.MiscSets.REMIX_SETS[self.setID])
 
 	self.CollectionListVisual.Collection.Collection_Icon:SetShown(isInList)
 	self.CollectionListVisual.Collection.Collected_Icon:SetShown(isInList and setCollected)

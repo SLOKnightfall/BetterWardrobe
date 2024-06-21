@@ -496,7 +496,16 @@ L["NOTE_117"] = "Shadowlands Zereth Mortis Set"
 L["NOTE_118"] = "Trading Post"
 L["NOTE_119"] = "Grey Item Set"
 L["NOTE_120"] = "White Item Set"
-
+L["NOTE_121"] = "Holiday"
+L["NOTE_122"] = "Sabellian's Set"
+L["NOTE_123"] = "Azerothian Archives"
+L["NOTE_124"] = "White Item Set"
+L["NOTE_125"] = "Plunderlords's Finery"
+L["NOTE_126"] = "Class Starting Set"
+L["NOTE_125"] = "Plunderlord's Finery"
+L["NOTE_125"] = "Plunderlords's Finery"
+L["NOTE_126"] = "Class Starting Set"
+L["NOTE_127"] = "Trading Post Class Set"
 
 L["Swap to Better Wardrobe View"] = true
 L["Swap to Extended Transmog Sets View"] = true

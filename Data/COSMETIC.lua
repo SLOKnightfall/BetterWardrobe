@@ -222,7 +222,7 @@ addon.ArmorSets["COSMETIC"] ={
 	]]--
 	[50214]={
 		["armorType"] =  13 ,
-		["label"] =  0 ,
+		["label"] =  121 ,
 		["setID"] =  50214,
 		["expansionID"] =  1 ,
 		["filter"] =  13 ,
@@ -233,7 +233,7 @@ addon.ArmorSets["COSMETIC"] ={
 	},
 	[50215]={
 		["armorType"] =  13 ,
-		["label"] =  0 ,
+		["label"] =  121 ,
 		["setID"] =  50215,
 		["expansionID"] =  1 ,
 		["filter"] =  13 ,
@@ -244,7 +244,7 @@ addon.ArmorSets["COSMETIC"] ={
 	},
 	[50216]={
 		["armorType"] =  13 ,
-		["label"] =  0 ,
+		["label"] =  121 ,
 		["setID"] =  50216,
 		["expansionID"] =  1 ,
 		["filter"] =  13 ,
@@ -255,7 +255,7 @@ addon.ArmorSets["COSMETIC"] ={
 	},
 	[50217]={
 		["armorType"] =  13 ,
-		["label"] =  0 ,
+		["label"] =  121 ,
 		["setID"] =  50217,
 		["expansionID"] =  1 ,
 		["filter"] =  13 ,
@@ -266,7 +266,7 @@ addon.ArmorSets["COSMETIC"] ={
 	},
 	[50218]={
 		["armorType"] =  13 ,
-		["label"] =  0 ,
+		["label"] =  121 ,
 		["setID"] =  50218,
 		["expansionID"] =  1 ,
 		["filter"] =  13 ,
@@ -277,7 +277,7 @@ addon.ArmorSets["COSMETIC"] ={
 	},
 		[50219]={
 		["armorType"] =  13,
-		["label"] =  0 ,
+		["label"] =  121 ,
 		["setID"] =  50219,
 		["expansionID"] =  1,
 		["filter"] =  13,
@@ -288,7 +288,7 @@ addon.ArmorSets["COSMETIC"] ={
 	},
 	[50220]={
 		["armorType"] =  13 ,
-		["label"] =  0 ,
+		["label"] =  121 ,
 		["setID"] =  50220,
 		["expansionID"] =  1,
 		["filter"] =  13 ,
@@ -299,7 +299,7 @@ addon.ArmorSets["COSMETIC"] ={
 	},
 	[50221]={
 		["armorType"] =  13 ,
-		["label"] =  0 ,
+		["label"] =  121 ,
 		["setID"] =  50221,
 		["expansionID"] =  1 ,
 		["filter"] =  13 ,
@@ -310,7 +310,7 @@ addon.ArmorSets["COSMETIC"] ={
 	},
 	[50222]={
 		["armorType"] =  13 ,
-		["label"] =  0 ,
+		["label"] =  121 ,
 		["setID"] =  50222,
 		["expansionID"] =  1 ,
 		["filter"] =  13 ,
@@ -321,7 +321,7 @@ addon.ArmorSets["COSMETIC"] ={
 	},
 	[50223]={
 		["armorType"] =  13 ,
-		["label"] =  0 ,
+		["label"] =  121 ,
 		["setID"] =  50223,
 		["expansionID"] =  1 ,
 		["filter"] =  13 ,
@@ -332,7 +332,7 @@ addon.ArmorSets["COSMETIC"] ={
 	},
 	[50224]={
 		["armorType"] =  13 ,
-		["label"] =  0 ,
+		["label"] =  121 ,
 		["setID"] =  50224,
 		["expansionID"] =  1 ,
 		["filter"] =  13 ,
@@ -343,7 +343,7 @@ addon.ArmorSets["COSMETIC"] ={
 	},
 	[50225]={
 		["armorType"] =  13 ,
-		["label"] =  0 ,
+		["label"] =  121 ,
 		["setID"] =  50225,
 		["expansionID"] =  1 ,
 		["filter"] =  13 ,
@@ -354,7 +354,7 @@ addon.ArmorSets["COSMETIC"] ={
 	},
 	[50226]={
 		["armorType"] =  13 ,
-		["label"] =  0 ,
+		["label"] =  121 ,
 		["setID"] =  50226,
 		["expansionID"] =  1 ,
 		["filter"] =  13 ,
@@ -365,7 +365,7 @@ addon.ArmorSets["COSMETIC"] ={
 	},
 	[50227]={
 		["armorType"] =  13 ,
-		["label"] =  0 ,
+		["label"] =  121 ,
 		["setID"] =  50227,
 		["expansionID"] =  1 ,
 		["filter"] =  13 ,
@@ -376,7 +376,7 @@ addon.ArmorSets["COSMETIC"] ={
 	},
 	[50228]={
 		["armorType"] =  13 ,
-		["label"] =  0 ,
+		["label"] =  121 ,
 		["setID"] =  50228,
 		["expansionID"] =  1 ,
 		["filter"] =  13 ,
@@ -388,7 +388,7 @@ addon.ArmorSets["COSMETIC"] ={
 
 	[50229]={
 		["armorType"] =  13 ,
-		["label"] =  0 ,
+		["label"] =  121 ,
 		["setID"] =  50229,
 		["expansionID"] =  1 ,
 		["filter"] =  1 ,
@@ -399,7 +399,7 @@ addon.ArmorSets["COSMETIC"] ={
 	},
 	[50326]={
 		["armorType"] =  13 ,
-		["label"] =  0 ,
+		["label"] =  122 ,
 		["setID"] =  50326,
 		["expansionID"] =  10 ,
 		["filter"] =  1 ,
@@ -408,10 +408,10 @@ addon.ArmorSets["COSMETIC"] ={
 		["itemData"] = {[3] = {'200955:0',183074,77239},[6] = {'200956:0',183075,77234},[7] = {'200957:0',183076,77235},[8] = {'200958:0',183077,77236},[10] = {'200959:0',183078,77237},[16] = {'200961:0',183079,77238},[5] = {'200962:0',183080,77240},},
 		["sourceType"] =  0 ,
 	},
-		[50355]={
+	[50356]={
 		["armorType"] =  13 ,
-		["label"] =  0 ,
-		["setID"] =  50355,
+		["label"] =  123 ,
+		["setID"] =  50356,
 		["expansionID"] =  10 ,
 		["filter"] =  1 ,
 		["name"] =  "Azerothian Archives - Excavator" ,
@@ -419,15 +419,37 @@ addon.ArmorSets["COSMETIC"] ={
 		["itemData"] = {[3] = {'212692:0',194960,81911},[6] = {'212638:0"',194953,83461},[7] = {'212640:0',194955,83469},[8] = {'212641:0',194956,83468},[10] = {'212642:0',194957,83466},[16] = {'212639:0',194954,83467},[5] = {'212793:0',194987,83507},},
 		["sourceType"] =  0 ,
 	},
-			[50356]={
+	[50357]={
 		["armorType"] =  13 ,
-		["label"] =  0 ,
-		["setID"] =  50356,
+		["label"] =  123 ,
+		["setID"] =  50357,
 		["expansionID"] =  10 ,
 		["filter"] =  1 ,
 		["name"] =  "Azerothian Archives - Historian" ,
 		["mod"] =  0 ,
 		["itemData"] = {[3] = {'208452:0',189754,81918},[6] = {'212633:0"',194948,83456},[7] = {'212635:0',194950,83460},[8] = {"212636:0", 194951,83459},[10] = {"212637:0",194952, 83457},[16] = {"212634:0", 194949,83458},[5] = {"212794:0",194988,	83506},},
+		["sourceType"] =  0 ,
+	},
+	[50358]={
+		["armorType"] =  13 ,
+		["label"] =  125 ,
+		["setID"] =  50358,
+		["expansionID"] =  10 ,
+		["filter"] =  1 ,
+		["name"] =  "Swabbie's Slops" ,
+		["mod"] =  0 ,
+		["itemData"] = {[3] = {"216994:0",198786,37898},[6] = {"190807:0",169021,69784},[7] = {"216989:0",198781,36476},[8] = {"216991:0",198783,36485},[10] = {"160221:0",96233,36483},[16] = {"216984:0",198776,84302,}},
+		["sourceType"] =  0 ,
+		},
+	[50359]={
+		["armorType"] =  13 ,
+		["label"] =  125 ,
+		["setID"] =  50359,
+		["expansionID"] =  10 ,
+		["filter"] =  1 ,
+		["name"] =  "Storm Captain's Finery" ,
+		["mod"] =  0 ,
+		["itemData"] = {[3] =  {"216993:0",198785,37883},[6] ={"213436:0",195323,83597},[7] = {"216990:0",198782,36516},[8] = {"216992:0",198784,36507},[10] ={"216986:0",198778,36539,},[16] = {"216985:0",198777,38510,}},
 		["sourceType"] =  0 ,
 	},
 		
