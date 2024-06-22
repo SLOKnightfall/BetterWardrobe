@@ -1474,7 +1474,14 @@ function addon:EventHandler(event, ...)
 		addon:SendMessage("BW_ADDON_LOADED")
 		addon:UnregisterEvent("ADDON_LOADED")
 
-	elseif (event == "PLAYER_ENTERING_WORLD") then
+	elseif event == "PLAYER_LOGIN" then
+		if not C_AddOns.IsAddOnLoaded("Blizzard_Collections") then
+      		C_AddOns.LoadAddOn("Blizzard_Collections")
+    	end
+    
+		C_Timer.After(0.5, function() addon.Init:LoadModules() end)
+
+	elseif event == "PLAYER_ENTERING_WORLD" then
 		addon:SendMessage("BW_OnPlayerEnterWorld")
 
 		if not C_AddOns.IsAddOnLoaded("Blizzard_Collections") then
