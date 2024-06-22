@@ -1484,11 +1484,6 @@ function addon:EventHandler(event, ...)
 	elseif event == "PLAYER_ENTERING_WORLD" then
 		addon:SendMessage("BW_OnPlayerEnterWorld")
 
-		if not C_AddOns.IsAddOnLoaded("Blizzard_Collections") then
-      		C_AddOns.LoadAddOn("Blizzard_Collections")
-    	end
-    
-		C_Timer.After(0.5, function() addon.Init:LoadModules() end)
 		C_Timer.After(1, function() addon:ResetSetsCollectionFrame() end)
 		C_Timer.After(15, function() addon.Init:UpdateCollectedAppearances() end)
 
