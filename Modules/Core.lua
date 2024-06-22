@@ -1379,6 +1379,12 @@ function addon:OnEnable()
 	--Cache any default Blizz Saved Sets
 	addon.StoreBlizzardSets()
 	initialize = true
+
+	if not C_AddOns.IsAddOnLoaded("Blizzard_Collections") then
+  		C_AddOns.LoadAddOn("Blizzard_Collections")
+	end
+
+	C_Timer.After(1, function() addon.Init:LoadModules() end)
 end
 
 --Hides default collection window when at transmog vendor
@@ -1475,17 +1481,11 @@ function addon:EventHandler(event, ...)
 		addon:UnregisterEvent("ADDON_LOADED")
 
 	elseif event == "PLAYER_LOGIN" then
-		if not C_AddOns.IsAddOnLoaded("Blizzard_Collections") then
-      		C_AddOns.LoadAddOn("Blizzard_Collections")
-    	end
-    
-		C_Timer.After(0.5, function() addon.Init:LoadModules() end)
 
 	elseif event == "PLAYER_ENTERING_WORLD" then
 		addon:SendMessage("BW_OnPlayerEnterWorld")
-
 		C_Timer.After(1, function() addon:ResetSetsCollectionFrame() end)
-		C_Timer.After(15, function() addon.Init:UpdateCollectedAppearances() end)
+		--C_Timer.After(15, function() addon.Init:UpdateCollectedAppearances() end)
 
 	elseif (event == "TRANSMOG_COLLECTION_SOURCE_ADDED") then
 		local x = ...

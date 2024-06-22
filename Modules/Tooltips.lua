@@ -24,9 +24,9 @@ local function IsAppearanceCollected(item)
 
 	if not appearanceID then return end
 
-	if sourceID and addon:IsCollected(appearanceID) then
-		return true, not C_TransmogCollection.PlayerHasTransmogItemModifiedAppearance(sourceID)
-	end
+	--if sourceID and addon:IsCollected(appearanceID) then
+		--return true, not C_TransmogCollection.PlayerHasTransmogItemModifiedAppearance(sourceID)
+	--end
 
 	local sources = C_TransmogCollection.GetAllAppearanceSources(appearanceID)
 	if sources then
