@@ -1225,10 +1225,10 @@ function BetterWardrobeCollectionFrameMixin:SetTab(tabID)
 
 	local ElvUI = IsAddOnLoaded("ElvUI")
 
-if BW_DBSavedSetDropdown then
-	
-	BW_DBSavedSetDropdown:Hide()
-end
+	if SavedOutfitDropDownMenu then
+		
+		SavedOutfitDropDownMenu:Hide()
+	end
 	self.BW_SetsHideSlotButton:Hide()
 	BetterWardrobeVisualToggle.VisualMode = false;
 	self.TransmogOptionsButton:Hide()
@@ -1343,7 +1343,7 @@ end
 		self.SetsTransmogFrame:SetShown(atTransmogrifier)
 		local sortValue
 		if tabID == TAB_SAVED_SETS then 
-			BW_DBSavedSetDropdown:Show()
+			SavedOutfitDropDownMenu:Show()
 			--BW_SortDropDown:SetPoint("TOPLEFT", BetterWardrobeVisualToggle, "TOPRIGHT", 5, 0)
 			BW_SortDropDown:ClearAllPoints()
 			BW_SortDropDown:SetPoint("TOPRIGHT", self.SearchBox, "TOPRIGHT", 21, 5)

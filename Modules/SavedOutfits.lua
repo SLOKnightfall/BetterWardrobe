@@ -978,7 +978,13 @@ function BetterWardrobeOutfitButtonMixin:OnClick()
 	PlaySound(SOUNDKIT.IG_MAINMENU_OPTION_CHECKBOX_ON)
 	BetterWardrobeOutfitFrame:Hide()
 
+	--Reset saved list to player
+	local name = UnitName("player")
+	local realm = GetRealmName()
+	addon.SelecteSavedList = false
+
 	if ( self.outfitID ) then
+
 		BetterWardrobeOutfitFrame.dropDown:SelectOutfit(self.outfitID, true)
 	else
 		--if ( WardrobeTransmogFrame and HelpTip:IsShowing(WardrobeTransmogFrame, TRANSMOG_OUTFIT_DROPDOWN_TUTORIAL) ) then
@@ -1115,15 +1121,23 @@ end
 --Dropdownmenu for the selection of other character's saved sets
 function addon.Init.SavedSetsDropDown_Initialize(self)
 	--local f = BW_UIDropDownMenu_Create("BW_DBSavedSetDropdown", BW_WardrobeCollectionFrame)
-	BW_DBSavedSetDropdown = CreateFrame("Frame", "BW_DBSavedSetDropdown", BetterWardrobeCollectionFrame, "BW_UIDropDownMenuTemplate")
+	--BW_DBSavedSetDropdown = CreateFrame("Frame", "BW_DBSavedSetDropdown", BetterWardrobeCollectionFrame, "BW_UIDropDownMenuTemplate")
 	--BW_DBSavedSetDropdown:SetPoint("TOPRIGHT", "BW_SortDropDown", "TOPRIGHT")
-	BW_DBSavedSetDropdown:SetPoint("TOPLEFT", BetterWardrobeVisualToggle, "TOPRIGHT", -15, 0)
+	--BW_DBSavedSetDropdown:SetPoint("TOPLEFT", BetterWardrobeVisualToggle, "TOPRIGHT", -15, 0)
 
-	BW_UIDropDownMenu_SetWidth(BW_DBSavedSetDropdown, 165) -- Use in place of dropDown:SetWidth
+	--BW_UIDropDownMenu_SetWidth(BW_DBSavedSetDropdown, 165) -- Use in place of dropDown:SetWidth
 
-	BW_UIDropDownMenu_Initialize(BW_DBSavedSetDropdown, SavedOutfitDB_Dropdown_Menu)
-	BW_UIDropDownMenu_SetSelectedValue(BW_DBSavedSetDropdown, addon.setdb:GetCurrentProfile())
-	BW_DBSavedSetDropdown:Hide()
+	--BW_UIDropDownMenu_Initialize(BW_DBSavedSetDropdown, SavedOutfitDB_Dropdown_Menu)
+	--BW_UIDropDownMenu_SetSelectedValue(BW_DBSavedSetDropdown, addon.setdb:GetCurrentProfile())
+	--BW_DBSavedSetDropdown:Hide()
+
+	SavedOutfitDropDownMenu:Hide()
+	SavedOutfitDropDownMenu:SetParent(BetterWardrobeCollectionFrame)
+	SavedOutfitDropDownMenu:ClearAllPoints()
+	--SavedOutfitDropDownMenu:SetPoint("TOPRIGHT", "BW_SortDropDown", "TOPRIGHT")
+
+	SavedOutfitDropDownMenu:SetPoint("TOPLEFT", BetterWardrobeVisualToggle, "TOPRIGHT", -15, 0)
+	BW_UIDropDownMenu_SetText(SavedOutfitDropDownMenu, addon.setdb:GetCurrentProfile())
 
 end
 

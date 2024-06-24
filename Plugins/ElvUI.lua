@@ -347,7 +347,7 @@ local function SkinTransmogFrames()
 
 	--Items
 	S:HandleDropDownBox(BW_SortDropDown)
-	S:HandleDropDownBox(BW_DBSavedSetDropdown)
+	S:HandleDropDownBox(SavedOutfitDropDownMenu)
 	S:HandleDropDownBox(BW_ColectionListFrame.dropdownFrame)
 	BW_ColectionListFrame.dropdownFrame:ClearAllPoints()
 	BW_ColectionListFrame.dropdownFrame:SetPoint("BOTTOM", -25, 15)
