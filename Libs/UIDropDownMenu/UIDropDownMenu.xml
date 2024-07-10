@@ -3,6 +3,9 @@
 	<Script file="UIDropDownMenu.lua"/>
 	<Include file="UIDropDownMenuTemplates.xml"/>
 	<Script file="EasyMenu.lua"/>
+	<Script file="FilterDropdown.lua"/>
+
+	
 	<Button name="BW_DropDownList1" toplevel="true" frameStrata="FULLSCREEN_DIALOG" inherits="BW_UIDropDownListTemplate" hidden="true" id="1">
 		<Size x="180" y="10"/>
 		<Scripts>

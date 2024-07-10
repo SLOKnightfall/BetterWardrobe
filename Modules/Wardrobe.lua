@@ -4083,6 +4083,33 @@ function BetterWardrobeCollectionFrameSearchBoxMixin:OnEnter()
 end
 
 -- ***** FILTER
+local setCollected,setUncollected,setPvE,setPvP;
+local function clearFilters()
+	setCollected = C_TransmogSets.GetBaseSetsFilter(LE_TRANSMOG_SET_FILTER_COLLECTED)
+	setUncollected = C_TransmogSets.GetBaseSetsFilter(LE_TRANSMOG_SET_FILTER_UNCOLLECTED)
+	setPvE = C_TransmogSets.GetBaseSetsFilter(LE_TRANSMOG_SET_FILTER_PVE)
+	setPvP =	C_TransmogSets.GetBaseSetsFilter(LE_TRANSMOG_SET_FILTER_PVP)
+
+	C_TransmogSets.SetBaseSetsFilter(LE_TRANSMOG_SET_FILTER_UNCOLLECTED, true)
+	C_TransmogSets.SetBaseSetsFilter(LE_TRANSMOG_SET_FILTER_COLLECTED, true)
+	C_TransmogSets.SetBaseSetsFilter(LE_TRANSMOG_SET_FILTER_PVE, true)
+	C_TransmogSets.SetBaseSetsFilter(LE_TRANSMOG_SET_FILTER_PVP, true)
+	RefreshLists()
+
+	--BetterWardrobeCollectionFrame:SetTab(1)
+	--BetterWardrobeCollectionFrame:SetTab(2)
+end
+
+local function resetFilters()
+	C_TransmogSets.SetBaseSetsFilter(LE_TRANSMOG_SET_FILTER_UNCOLLECTED, setUncollected)
+	C_TransmogSets.SetBaseSetsFilter(LE_TRANSMOG_SET_FILTER_COLLECTED, setCollected)
+	C_TransmogSets.SetBaseSetsFilter(LE_TRANSMOG_SET_FILTER_PVE, setPvE)
+	C_TransmogSets.SetBaseSetsFilter(LE_TRANSMOG_SET_FILTER_PVP, setPvP)
+	RefreshLists()
+end
+
+
+
 
 local FILTER_SOURCES = {L["MISC"], L["Classic Set"], L["Quest Set"], L["Dungeon Set"], L["Raid Set"], L["Recolor"], L["PvP"],L["Garrison"], L["Island Expedition"], L["Warfronts"], L["Covenants"], L["Trading Post"], L["Holiday"], L["NOTE_119"],L["NOTE_120"]}
 local EXPANSIONS = {EXPANSION_NAME0, EXPANSION_NAME1, EXPANSION_NAME2, EXPANSION_NAME3, EXPANSION_NAME4, EXPANSION_NAME5, EXPANSION_NAME6, EXPANSION_NAME7, EXPANSION_NAME8, EXPANSION_NAME9}
@@ -4107,7 +4134,7 @@ local filterCollected = addon.Filters.Extra.filterCollected;
 local missingSelection = addon.Filters.Extra.missingSelection;
 local filterSelection = addon.Filters.Extra.filterSelection;
 local xpacSelection = addon.Filters.Extra.xpacSelection;
-local sets = {"Base", "Extra"}
+local sets = {"Base", "Extra"};
 
 for i, types in ipairs(sets) do
 	for i = 1, #FILTER_SOURCES do
@@ -4120,258 +4147,108 @@ for i, types in ipairs(sets) do
 end
 
 local function RefreshLists()
-	local atTransmog =C_Transmog.IsAtTransmogNPC()
+	local atTransmog =C_Transmog.IsAtTransmogNPC();
 	if atTransmog then
-		addon.SetsDataProvider:ClearUsableSets()
-		BetterWardrobeCollectionFrame.SetsTransmogFrame:UpdateSets()
+		addon.SetsDataProvider:ClearUsableSets();
+		BetterWardrobeCollectionFrame.SetsTransmogFrame:UpdateSets();
 	else
-		addon.SetsDataProvider:ClearBaseSets()
-		addon.SetsDataProvider:ClearVariantSets()
-		addon.SetsDataProvider:ClearUsableSets()
-		BetterWardrobeCollectionFrame.SetsCollectionFrame:Refresh()
+		addon.SetsDataProvider:ClearBaseSets();
+		addon.SetsDataProvider:ClearVariantSets();
+		addon.SetsDataProvider:ClearUsableSets();
+		BetterWardrobeCollectionFrame.SetsCollectionFrame:Refresh();
 	end										
 end
 addon.RefreshLists = RefreshLists;
 
 function BetterWardrobeFilterDropDown_OnLoad(self)
-	BW_UIDropDownMenu_Initialize(self, BetterWardrobeFilterDropDown_Initialize, "MENU")
+	BW_UIDropDownMenu_Initialize(self, BetterWardrobeFilterDropDown_Initialize, "MENU");
 end
 
 function BetterWardrobeFilterDropDown_Initialize(self, level)
 	if ( not BetterWardrobeCollectionFrame.activeFrame ) then
 		return;
 	end
-
 	if ( BetterWardrobeCollectionFrame:GetSearchType() == Enum.TransmogSearchType.Items ) then
-		BetterWardrobeFilterDropDown_InitializeItems(self, level)
+		BetterWardrobeFilterDropDown_InitializeItems(self, level);
 	elseif ( BetterWardrobeCollectionFrame:GetSearchType() == Enum.TransmogSearchType.BaseSets ) then
-		BetterWardrobeFilterDropDown_InitializeBaseSets(self, level)
+		BetterWardrobeFilterDropDown_InitializeBaseSets(self, level);
 	end
 end
 
+function BetterWardrobeFilterDropDown_SetAllSourceTypeFilters(value)
+	C_TransmogCollection.SetAllSourceTypeFilters(value);
+	BW_UIDropDownMenu_Refresh(BetterWardrobeFilterDropDown, BW_UIDROPDOWNMENU_MENU_VALUE, BW_UIDROPDOWNMENU_MENU_LEVEL);
+end
+
+local transmogSourceOrderPriorities = {
+	[Enum.TransmogSource.JournalEncounter] = 5,
+	[Enum.TransmogSource.Quest] = 5,
+	[Enum.TransmogSource.Vendor] = 5,
+	[Enum.TransmogSource.WorldDrop] = 5,
+	[Enum.TransmogSource.Achievement] = 5,
+	[Enum.TransmogSource.Profession] = 5,
+	[Enum.TransmogSource.TradingPost] = 4,
+};
+
 function BetterWardrobeFilterDropDown_InitializeItems(self, level)
-	local info = BW_UIDropDownMenu_CreateInfo()
-	info.keepShownOnClick = true;
-	local atTransmogrifier = C_Transmog.IsAtTransmogNPC()
+	-- Transmog NPC only uses source filters
+	local sourceFilters = {
+		{ type = BW_FilterComponent.TextButton,
+			text = CHECK_ALL,
+			set = function() BetterWardrobeFilterDropDown_SetAllSourceTypeFilters(true) end,
+		},
+		{ type = BW_FilterComponent.TextButton,
+			text = UNCHECK_ALL,
+			set = function() BetterWardrobeFilterDropDown_SetAllSourceTypeFilters(false) end,
+		},
+		{ type = BW_FilterComponent.DynamicFilterSet,
+			buttonType = BW_FilterComponent.Checkbox,
+			set = C_TransmogCollection.SetSourceTypeFilter,
+			isSet = C_TransmogCollection.IsSourceTypeFilterChecked,
+			numFilters = C_TransmogCollection.GetNumTransmogSources,
+			globalPrepend = "TRANSMOG_SOURCE_",
+			customSortOrder = CollectionsUtil.GetSortedFilterIndexList("TRANSMOG", transmogSourceOrderPriorities);
+		},
+	};
 
-	if level == 1 and not atTransmogrifier then
-		info.text = COLLECTED;
-		info.func = function(_, _, _, value)
-						C_TransmogCollection.SetCollectedShown(value)
-					end
-		info.checked = C_TransmogCollection.GetCollectedShown()
-		info.isNotRadio = true;
-		BW_UIDropDownMenu_AddButton(info, level)
+	local appearanceCollectionFilters = {
+		{ type = BW_FilterComponent.Checkbox, text = COLLECTED, set = C_TransmogCollection.SetCollectedShown, isSet = C_TransmogCollection.GetCollectedShown },
+		{ type = BW_FilterComponent.Checkbox, text = NOT_COLLECTED, set = C_TransmogCollection.SetUncollectedShown, isSet = C_TransmogCollection.GetUncollectedShown },
+		{ type = BW_FilterComponent.Submenu, text = SOURCES, value = 1, childrenInfo = {
+				-- "Appearances" Collection tab has collection filters + source filters
+				filters = sourceFilters,
+			},
+		},
+	};
 
-		info.text = NOT_COLLECTED;
-		info.func = function(_, _, _, value)
-						C_TransmogCollection.SetUncollectedShown(value)
-					end
-		info.checked = C_TransmogCollection.GetUncollectedShown()
-		info.isNotRadio = true;
-		BW_UIDropDownMenu_AddButton(info, level)
+	local atTransmogrifier = C_Transmog.IsAtTransmogNPC();
+	local filterSystem = {
+		onUpdate = BetterWardrobeResetFiltersButton_UpdateVisibility,
+		filters = (atTransmogrifier and sourceFilters or appearanceCollectionFilters),
+	};
 
-		info.checked = 	nil;
-		info.isNotRadio = nil;
-		info.func =  nil;
-		info.hasArrow = true;
-		info.notCheckable = true;
-
-		info.text = SOURCES;
-		info.value = 1;
-		BW_UIDropDownMenu_AddButton(info, level)
-	else
-		if level == 2 or atTransmogrifier then
-			local refreshLevel = atTransmogrifier and 1 or 2;
-			info.hasArrow = false;
-			info.isNotRadio = true;
-			info.notCheckable = true;
-
-			info.text = CHECK_ALL;
-			info.func = function()
-							C_TransmogCollection.SetAllSourceTypeFilters(true)
-							BW_UIDropDownMenu_Refresh(BetterWardrobeFilterDropDown, 1, refreshLevel)
-						end
-			BW_UIDropDownMenu_AddButton(info, level)
-
-			info.text = UNCHECK_ALL;
-			info.func = function()
-							C_TransmogCollection.SetAllSourceTypeFilters(false)
-							BW_UIDropDownMenu_Refresh(BetterWardrobeFilterDropDown, 1, refreshLevel)
-						end
-			BW_UIDropDownMenu_AddButton(info, level)
-			info.notCheckable = false;
-
-			local numSources = C_TransmogCollection.GetNumTransmogSources()
-			for i = 1, numSources do
-				info.text = _G["TRANSMOG_SOURCE_"..i]
-				info.func = function(_, _, _, value)
-							C_TransmogCollection.SetSourceTypeFilter(i, value)
-						end
-				info.checked = function() return C_TransmogCollection.IsSourceTypeFilterChecked(i) end
-				BW_UIDropDownMenu_AddButton(info, level)
-			end
-		end
-	end
+	FilterDropDownSystem.Initialize(self, filterSystem, level);
 end
 
 local locationDrowpDown = addon.Globals.locationDrowpDown;
 
-function BetterWardrobeFilterDropDown_InitializeBaseSets(self, level)
-	local info = BW_UIDropDownMenu_CreateInfo()
-	info.keepShownOnClick = true;
-	info.isNotRadio = true;
-	local atTransmogrifier = C_Transmog.IsAtTransmogNPC()
+local function setMissingDropdown(value)
+	for i in pairs(locationDrowpDown) do
+		missingSelection[i] = value;
+	end
+	RefreshLists()
+	BW_UIDropDownMenu_Refresh(BetterWardrobeFilterDropDown, BW_UIDROPDOWNMENU_MENU_VALUE, BW_UIDROPDOWNMENU_MENU_LEVEL);
+end
 
-	if BetterWardrobeCollectionFrame.selectedCollectionTab == 2 then 
-		local filterCollected = addon.Filters.Base.filterCollected;
-		local missingSelection = addon.Filters.Base.missingSelection;
-		local filterSelection = addon.Filters.Base.filterSelection;
-		local xpacSelection = addon.Filters.Base.xpacSelection;
+local  missing_dropdown =  {
+	{ type = BW_FilterComponent.TextButton, text = CHECK_ALL, set = function() setMissingDropdown(true) end,},
+	{ type = BW_FilterComponent.TextButton, text = UNCHECK_ALL, set = function() setMissingDropdown(false) end,  },
+	{ type = BW_FilterComponent.Separator },
+}
 
-		if level == 1 then
-			local refreshLevel = 1;
-
-			info.text = COLLECTED;
-			info.func = function(_, _, _, value)
-							C_TransmogSets.SetBaseSetsFilter(LE_TRANSMOG_SET_FILTER_COLLECTED, value)
-							addon.TRANSMOG_SET_FILTER[LE_TRANSMOG_SET_FILTER_COLLECTED] = value;
-
-						end
-			info.checked = C_TransmogSets.GetBaseSetsFilter(LE_TRANSMOG_SET_FILTER_COLLECTED)
-			BW_UIDropDownMenu_AddButton(info, level)
-
-			info.text = NOT_COLLECTED;
-			info.func = function(_, _, _, value)
-							C_TransmogSets.SetBaseSetsFilter(LE_TRANSMOG_SET_FILTER_UNCOLLECTED, value)
-							addon.TRANSMOG_SET_FILTER[LE_TRANSMOG_SET_FILTER_UNCOLLECTED] = value;
-
-						end
-			info.checked = C_TransmogSets.GetBaseSetsFilter(LE_TRANSMOG_SET_FILTER_UNCOLLECTED)
-			BW_UIDropDownMenu_AddButton(info, level)
-
-			BW_UIDropDownMenu_AddSeparator()
-
-			info = BW_UIDropDownMenu_CreateInfo()
-			info.keepShownOnClick = true;
-			info.isNotRadio = true;
-
-			info.text = TRANSMOG_SET_PVE;
-			info.func = function(_, _, _, value)
-							C_TransmogSets.SetBaseSetsFilter(LE_TRANSMOG_SET_FILTER_PVE, value)
-						end
-			info.checked = C_TransmogSets.GetBaseSetsFilter(LE_TRANSMOG_SET_FILTER_PVE)
-			BW_UIDropDownMenu_AddButton(info, level)
-
-			info.text = TRANSMOG_SET_PVP;
-			info.func = function(_, _, _, value)
-							C_TransmogSets.SetBaseSetsFilter(LE_TRANSMOG_SET_FILTER_PVP, value)
-						end
-			info.checked = C_TransmogSets.GetBaseSetsFilter(LE_TRANSMOG_SET_FILTER_PVP)
-			BW_UIDropDownMenu_AddButton(info, level)
-
-			BW_UIDropDownMenu_AddSeparator()
-			info.checked = 	true;
-			info.isNotRadio = true;
-			info.func = function(info, arg1, _, value)
-						addon.Profile.ShowHidden = not addon.Profile.ShowHidden;
-						RefreshLists()
-				end
-			info.hasArrow = false;
-			info.notCheckable = false;
-			info.checked = addon.Profile.ShowHidden;
-			info.text = L["Show Hidden Items"]
-			info.value = 4;
-			BW_UIDropDownMenu_AddButton(info, level)
-
-			info.checked = 	nil;
-			info.isNotRadio = nil;
-			info.func =  nil;
-			info.hasArrow = true;
-			info.notCheckable = true;
-
-			info.text = L["Expansion"]
-			info.value = 2;
-			BW_UIDropDownMenu_AddButton(info, level)
-
-			info.text = "Missing:"
-			info.value = 3;
-			BW_UIDropDownMenu_AddButton(info, level)
-
-		elseif level == 2  and BW_UIDROPDOWNMENU_MENU_VALUE == 2 then
-			local refreshLevel = 2;
-			info.hasArrow = false;
-			info.isNotRadio = true;
-			info.notCheckable = true;
-			info.text = CHECK_ALL;
-			info.func = function()
-							for i = 1, #xpacSelection do
-								xpacSelection[i] = true;
-							end
-							RefreshLists()
-							BW_UIDropDownMenu_Refresh(self)
-						end
-			BW_UIDropDownMenu_AddButton(info, level)
-
-			local refreshLevel = 2;
-			info.hasArrow = false;
-			info.isNotRadio = true;
-			info.notCheckable = true;
-
-			info.text = UNCHECK_ALL;
-			info.func = function()
-							for i = 1, #xpacSelection do
-									xpacSelection[i] = false;
-							end
-							RefreshLists()
-							BW_UIDropDownMenu_Refresh(self)
-						end
-			BW_UIDropDownMenu_AddButton(info, level)
-			BW_UIDropDownMenu_AddSeparator(level)
-
-			info.notCheckable = false;
-			for i = 1, #EXPANSIONS do
-				info.text = EXPANSIONS[i]
-					info.func = function(_, _, _, value)
-						xpacSelection[i] = value;
-						RefreshLists()
-					end
-					info.checked = 	function() return xpacSelection[i] end
-				BW_UIDropDownMenu_AddButton(info, level)
-			end
-
-		elseif level == 2  and BW_UIDROPDOWNMENU_MENU_VALUE == 3 then
-			info.hasArrow = false;
-			info.isNotRadio = true;
-			info.notCheckable = true;
-			local refreshLevel = 2;
-
-			info.text = CHECK_ALL;
-			info.func = function()
-							for i in pairs(locationDrowpDown) do
-								missingSelection[i] = true;
-							end
-							RefreshLists()
-							BW_UIDropDownMenu_Refresh(self)
-						end
-			BW_UIDropDownMenu_AddButton(info, level)
-
-			info.text = UNCHECK_ALL;
-			info.func = function()
-							for i in pairs(locationDrowpDown) do
-								missingSelection[i] = false;
-							end
-							RefreshLists()
-							BW_UIDropDownMenu_Refresh(self)
-						end
-			BW_UIDropDownMenu_AddButton(info, level)
-			BW_UIDropDownMenu_AddSeparator(level)
-
-			for index, id in pairs(locationDrowpDown) do
-				if index ~= 21 then --Skip "robe" type;
-					info.text = id;
-					info.notCheckable = false;
-					info.func = function(_, _, _, value)
+for index, id in pairs(locationDrowpDown) do
+	if index ~= 21 then --Skip "robe" type;
+		local menu = { type = BW_FilterComponent.Checkbox, text = id, set = function(_, _, _, value)
 								missingSelection[index] = value;
 
 								if index == 6 then
@@ -4380,274 +4257,290 @@ function BetterWardrobeFilterDropDown_InitializeBaseSets(self, level)
 
 								BW_UIDropDownMenu_Refresh(self)
 								RefreshLists()
-							end
-					info.checked = function() return missingSelection[index] end
-					BW_UIDropDownMenu_AddButton(info, level)
-				end
-			end
-		--[[elseif level == 2  and UIDROPDOWNMENU_MENU_VALUE == 4 then
-					local counter = 1;
-					for name in pairs(addon.Globals.ARMOR_MASK) do
-						info.keepShownOnClick = false;
-			
-						info.text = name;
-						info.func = function(info, arg1, _, value)
-								addon.selectedArmorType = arg1;
-								addon.extraSetsCache = nil;
-								BW_WardrobeCollectionFrame_SetTab(3)
-								BW_WardrobeCollectionFrame_SetTab(2)
-								RefreshArmor()
-						end
-						info.arg1 = name;
-						info.checked = 	function() return addon.selectedArmorType == name end
-						UIDropDownMenu_AddButton(info, level)
-					end]]
-		end
+							end, isSet = function() return missingSelection[index] end }
+		tinsert(missing_dropdown, menu);
+	end
+end
 
-	elseif BetterWardrobeCollectionFrame.selectedCollectionTab == 3 then 
-		local filterCollected = addon.Filters.Extra.filterCollected;
-		local missingSelection = addon.Filters.Extra.missingSelection;
-		local filterSelection = addon.Filters.Extra.filterSelection;
-		local xpacSelection = addon.Filters.Extra.xpacSelection;
-		if level == 1 then
-			local refreshLevel = 1;
-			info.text = COLLECTED;
-			info.func = function(_, _, _, value)
-							filterCollected[1] = value;
-							RefreshLists()
-							--UIDropDownMenu_Refresh(BetterWardrobeFilterDropDown)
-						end
-			info.checked = 	function() return filterCollected[1] end
-			info.isNotRadio = true;
-			BW_UIDropDownMenu_AddButton(info, level)
+local function setExpansionDropdown(value)
+	for i = 1, #xpacSelection do
+		xpacSelection[i] = value;
+	end
+	RefreshLists();
+	BW_UIDropDownMenu_Refresh(BetterWardrobeFilterDropDown, BW_UIDROPDOWNMENU_MENU_VALUE, BW_UIDROPDOWNMENU_MENU_LEVEL);
+end
 
-			info.text = NOT_COLLECTED;
-			info.func = function(_, _, _, value)
-							filterCollected[2] =  value;
-							RefreshLists()
-							--UIDropDownMenu_Refresh(BetterWardrobeFilterDropDown)
-						end
-			info.checked = 	function() return filterCollected[2] end
-			info.isNotRadio = true;
+local expansion_dropdown = 	{ 
+	{ type = BW_FilterComponent.TextButton, text = CHECK_ALL, set = function() setExpansionDropdown(true) end,},
+	{ type = BW_FilterComponent.TextButton, text = UNCHECK_ALL, set = function() setExpansionDropdown(false) end,},
+	{ type = BW_FilterComponent.Separator },
+}
 
-			BW_UIDropDownMenu_AddButton(info, level)
-			BW_UIDropDownMenu_AddSeparator()
+for i = 1, #EXPANSIONS do
+	local menu = { type = BW_FilterComponent.Checkbox, text = EXPANSIONS[i], set = function(_, _, _, value)	xpacSelection[i] = value; RefreshLists(); end, isSet = function() return xpacSelection[i] end }
+	tinsert(expansion_dropdown, menu)		
+end
 
-			info.checked = 	true;
-			info.isNotRadio = true;
-			info.func = function(info, arg1, _, value)
+local armortype_dropdown = 	{ }
+for name in pairs(addon.Globals.ARMOR_MASK) do
+	local menu = { type = BW_FilterComponent.Checkbox, text = L[name], set = function(self)
+				addon.selectedArmorType = string.upper(L[name]);
+				addon.useAltSet = true;
+				RefreshLists();
+				BW_UIDropDownMenu_Refresh(BetterWardrobeFilterDropDown, BW_UIDROPDOWNMENU_MENU_VALUE, BW_UIDROPDOWNMENU_MENU_LEVEL);
+		end, isSet = function() return addon.selectedArmorType == string.upper(L[name]) end }
+	tinsert(armortype_dropdown, menu);
+end	
+
+local function setSourcesDropdown(value)
+	for i = 1, #filterSelection do
+		filterSelection[i] = value;
+		RefreshLists()
+	end
+
+	BW_UIDropDownMenu_Refresh(BetterWardrobeFilterDropDown, BW_UIDROPDOWNMENU_MENU_VALUE, BW_UIDROPDOWNMENU_MENU_LEVEL);
+end
+--todo: Fix filter reset
+
+
+function SetDefaultBaseSetsFilters()
+	C_TransmogSets.SetDefaultBaseSetsFilters();
+	setMissingDropdown(true);
+	setSourcesDropdown(true);
+	setExpansionDropdown(true)
+
+end
+function BetterWardrobeFilterDropDown_ResetFilters()
+	if ( BetterWardrobeCollectionFrame:GetSearchType() == Enum.TransmogSearchType.Items ) then
+		C_TransmogCollection.SetDefaultFilters();
+	else
+		C_TransmogSets.SetDefaultBaseSetsFilters();
+		setMissingDropdown(true);
+		setSourcesDropdown(true);
+		setExpansionDropdown(true)
+	end
+	BetterWardrobeCollectionFrame.FilterButton.ResetButton:Hide();
+end
+
+function BetterWardrobeResetFiltersButton_UpdateVisibility()
+	if ( BetterWardrobeCollectionFrame:GetSearchType() == Enum.TransmogSearchType.Items ) then
+		BetterWardrobeCollectionFrame.FilterButton.ResetButton:SetShown(not C_TransmogCollection.IsUsingDefaultFilters());
+
+	else
+		BetterWardrobeCollectionFrame.FilterButton.ResetButton:SetShown(not C_TransmogSets.IsUsingDefaultBaseSetsFilters());
+	end
+end
+
+function BetterWardrobeFilterDropDown_SetBaseSetCollectedShown(value)
+	C_TransmogSets.SetBaseSetsFilter(LE_TRANSMOG_SET_FILTER_COLLECTED, value);
+end
+
+function BetterWardrobeFilterDropDown_GetBaseSetCollectedShown()
+	return C_TransmogSets.GetBaseSetsFilter(LE_TRANSMOG_SET_FILTER_COLLECTED);
+end
+
+function BetterWardrobeFilterDropDown_SetBaseSetUncollectedShown(value)
+	C_TransmogSets.SetBaseSetsFilter(LE_TRANSMOG_SET_FILTER_UNCOLLECTED, value);
+end
+
+function BetterWardrobeFilterDropDown_GetBaseSetUncollectedShown()
+	return C_TransmogSets.GetBaseSetsFilter(LE_TRANSMOG_SET_FILTER_UNCOLLECTED);
+end
+
+function BetterWardrobeFilterDropDown_SetBaseSetPVEShown(value)
+	C_TransmogSets.SetBaseSetsFilter(LE_TRANSMOG_SET_FILTER_PVE, value);
+end
+
+function BetterWardrobeFilterDropDown_GetBaseSetPVEShown()
+	return C_TransmogSets.GetBaseSetsFilter(LE_TRANSMOG_SET_FILTER_PVE);
+end
+
+function BetterWardrobeFilterDropDown_SetBaseSetPVPShown(value)
+	C_TransmogSets.SetBaseSetsFilter(LE_TRANSMOG_SET_FILTER_PVP, value);
+end
+
+function BetterWardrobeFilterDropDown_GetBaseSetPVPShown()
+	return C_TransmogSets.GetBaseSetsFilter(LE_TRANSMOG_SET_FILTER_PVP);
+end
+
+--TODO: Check once done
+
+local locationDrowpDown = addon.Globals.locationDrowpDown;
+
+local function setMissingDropdown(value)
+	for i in pairs(locationDrowpDown) do
+		missingSelection[i] = value;
+	end
+	RefreshLists()
+	BW_UIDropDownMenu_Refresh(BetterWardrobeFilterDropDown, BW_UIDROPDOWNMENU_MENU_VALUE, BW_UIDROPDOWNMENU_MENU_LEVEL);
+end
+
+local  missing_dropdown =  {
+	{ type = BW_FilterComponent.TextButton, text = CHECK_ALL, set = function() setMissingDropdown(true) end,},
+	{ type = BW_FilterComponent.TextButton, text = UNCHECK_ALL, set = function() setMissingDropdown(false) end,  },
+	{ type = BW_FilterComponent.Separator },
+}
+
+for index, id in pairs(locationDrowpDown) do
+	if index ~= 21 then --Skip "robe" type;
+		local menu = { type = BW_FilterComponent.Checkbox, text = id, set = function(_, _, _, value)
+								missingSelection[index] = value;
+
+								if index == 6 then
+									missingSelection[21] = value;
+								end
+
+								BW_UIDropDownMenu_Refresh(self)
+								RefreshLists()
+							end, isSet = function() return missingSelection[index] end }
+		tinsert(missing_dropdown, menu);
+	end
+end
+
+local function setExpansionDropdown(value)
+	for i = 1, #xpacSelection do
+		xpacSelection[i] = value;
+	end
+	RefreshLists();
+	BW_UIDropDownMenu_Refresh(BetterWardrobeFilterDropDown, BW_UIDROPDOWNMENU_MENU_VALUE, BW_UIDROPDOWNMENU_MENU_LEVEL);
+end
+
+local expansion_dropdown = 	{ 
+	{ type = BW_FilterComponent.TextButton, text = CHECK_ALL, set = function() setExpansionDropdown(true) end,},
+	{ type = BW_FilterComponent.TextButton, text = UNCHECK_ALL, set = function() setExpansionDropdown(false) end,},
+	{ type = BW_FilterComponent.Separator },
+}
+
+for i = 1, #EXPANSIONS do
+	local menu = { type = BW_FilterComponent.Checkbox, text = EXPANSIONS[i], set = function(_, _, _, value)	xpacSelection[i] = value; RefreshLists(); end, isSet = function() return xpacSelection[i] end }
+	tinsert(expansion_dropdown, menu)		
+end
+
+local armortype_dropdown = 	{ }
+for name in pairs(addon.Globals.ARMOR_MASK) do
+	local menu = { type = BW_FilterComponent.Checkbox, text = L[name], set = function(self)
+				addon.selectedArmorType = string.upper(L[name]);
+				addon.useAltSet = true;
+				RefreshLists();
+				BW_UIDropDownMenu_Refresh(BetterWardrobeFilterDropDown, BW_UIDROPDOWNMENU_MENU_VALUE, BW_UIDROPDOWNMENU_MENU_LEVEL);
+		end, isSet = function() return addon.selectedArmorType == string.upper(L[name]) end }
+	tinsert(armortype_dropdown, menu);
+end	
+
+local function setSourcesDropdown(value)
+	for i = 1, #filterSelection do
+		filterSelection[i] = value;
+		RefreshLists()
+	end
+
+	BW_UIDropDownMenu_Refresh(BetterWardrobeFilterDropDown, BW_UIDROPDOWNMENU_MENU_VALUE, BW_UIDROPDOWNMENU_MENU_LEVEL);
+end
+
+local sources_dropdown = 	{ 
+	{ type = BW_FilterComponent.TextButton, text = CHECK_ALL, set = function() setSourcesDropdown(true) end,},
+	{ type = BW_FilterComponent.TextButton, text = UNCHECK_ALL, set = function() setSourcesDropdown(false) end,},
+	{ type = BW_FilterComponent.Separator },
+}
+
+local numSources = #FILTER_SOURCES --C_TransmogCollection.GetNumTransmogSources()
+for i = 1, numSources do
+		local menu = { type = BW_FilterComponent.Checkbox, text = FILTER_SOURCES[i], set = function(value)
+			filterSelection[i] = value;
+			RefreshLists()
+			--C_TransmogCollection.SetSourceTypeFilter(i, value)
+
+		end, isSet = function() return filterSelection[i] end }
+	tinsert(sources_dropdown, menu)
+end
+
+local filterSystemBase = {
+		onUpdate = BetterWardrobeResetFiltersButton_UpdateVisibility,
+		filters = {
+			{ type = BW_FilterComponent.Checkbox, text = COLLECTED, filter = LE_TRANSMOG_SET_FILTER_COLLECTED, set = BetterWardrobeFilterDropDown_SetBaseSetCollectedShown, isSet = BetterWardrobeFilterDropDown_GetBaseSetCollectedShown },
+			{ type = BW_FilterComponent.Checkbox, text = NOT_COLLECTED, filter = LE_TRANSMOG_SET_FILTER_UNCOLLECTED, set = BetterWardrobeFilterDropDown_SetBaseSetUncollectedShown, isSet = BetterWardrobeFilterDropDown_GetBaseSetUncollectedShown },
+			{ type = BW_FilterComponent.Separator },
+			{ type = BW_FilterComponent.Checkbox, text = TRANSMOG_SET_PVE, filter = LE_TRANSMOG_SET_FILTER_PVE, set = BetterWardrobeFilterDropDown_SetBaseSetPVEShown, isSet = BetterWardrobeFilterDropDown_GetBaseSetPVEShown },
+			{ type = BW_FilterComponent.Checkbox, text = TRANSMOG_SET_PVP, filter = LE_TRANSMOG_SET_FILTER_PVP, set = BetterWardrobeFilterDropDown_SetBaseSetPVPShown, isSet = BetterWardrobeFilterDropDown_GetBaseSetPVPShown },
+			{ type = BW_FilterComponent.Separator },
+			{ type = BW_FilterComponent.Checkbox, text = L["Show Hidden Items"], filter = 4, set = function(info, arg1, _, value)
 						addon.Profile.ShowHidden = not addon.Profile.ShowHidden;
 						RefreshLists()
-				end
-			info.hasArrow = false;
-			info.notCheckable = false;
-			info.checked = addon.Profile.ShowHidden;
-			info.text = L["Show Hidden Items"]
-			info.value = 4;
-			BW_UIDropDownMenu_AddButton(info, level)
+				end, isSet = function() return  addon.Profile.ShowHidden end
+			},
 
+			{ type = BW_FilterComponent.Submenu, text = L["Expansion"], value = 2, childrenInfo = {
+					filters = expansion_dropdown,
+				},
+			},
+			{ type = BW_FilterComponent.Submenu, text = "Missing", value = 3, childrenInfo = {
+				filters = missing_dropdown,
+				}		
+			},
 
-			info.text = L["Class Sets Only"]
-			info.func = function(_, _, _, value)
+		},
+	};
+
+local filterSystemExtra = {
+		onUpdate = BetterWardrobeResetFiltersButton_UpdateVisibility,
+		filters = {
+			{ type = BW_FilterComponent.Checkbox, text = COLLECTED, filter = LE_TRANSMOG_SET_FILTER_COLLECTED, set = BetterWardrobeFilterDropDown_SetBaseSetCollectedShown, isSet = BetterWardrobeFilterDropDown_GetBaseSetCollectedShown },
+			{ type = BW_FilterComponent.Checkbox, text = NOT_COLLECTED, filter = LE_TRANSMOG_SET_FILTER_UNCOLLECTED, set = BetterWardrobeFilterDropDown_SetBaseSetUncollectedShown, isSet = BetterWardrobeFilterDropDown_GetBaseSetUncollectedShown },
+			{ type = BW_FilterComponent.Separator },
+			{ type = BW_FilterComponent.Checkbox, text = L["Show Hidden Items"], filter = 4, set = function(info, arg1, _, value)
+						addon.Profile.ShowHidden = not addon.Profile.ShowHidden;
+						RefreshLists()
+				end, isSet = function() return  addon.Profile.ShowHidden end
+			},
+			{ type = BW_FilterComponent.Checkbox, text = L["Class Sets Only"], filter = 4, set = function(_, _, _, value)
 							addon.Profile.IgnoreClassRestrictions = not addon.Profile.IgnoreClassRestrictions;
 							addon.Init:BuildDB()
 							BetterWardrobeCollectionFrame.SetsTransmogFrame:UpdateProgressBar()
 							RefreshLists()
-						end
-			info.checked = 	function() return not addon.Profile.IgnoreClassRestrictions end
-			info.isNotRadio = true;
-			BW_UIDropDownMenu_AddButton(info, level)
-
-			info.text = L["Hide Unavailable Sets"]
-			info.func = function(_, _, _, value)
+						end, isSet = function() return not addon.Profile.IgnoreClassRestrictions end 
+			},
+			{ type = BW_FilterComponent.Checkbox, text = L["Hide Unavailable Sets"], filter = 4, set = function(_, _, _, value)
 							addon.Profile.HideUnavalableSets = not addon.Profile.HideUnavalableSets;
 							addon.Init:BuildDB()
 							BetterWardrobeCollectionFrame.SetsTransmogFrame:UpdateProgressBar()
 							RefreshLists()
-						end
-			info.checked = 	function() return not addon.Profile.HideUnavalableSets end
-			info.isNotRadio = true;
-			BW_UIDropDownMenu_AddButton(info, level)
+						end, isSet = function() return not addon.Profile.IgnoreClassRestrictions end 
+			},
+			
+			{ type = BW_FilterComponent.Separator },
+			{ type = BW_FilterComponent.Submenu, text = SOURCES, value = 1, childrenInfo = {
+					filters = sources_dropdown,
+				},
+			},
+			{ type = BW_FilterComponent.Submenu, text = L["Expansion"], value = 2, childrenInfo = {
+					filters = expansion_dropdown,
+				},
+			},
+			{ type = BW_FilterComponent.Submenu, text = "Missing", value = 3, childrenInfo = {
+				filters = missing_dropdown,
+				}		
+			},
+			{ type = BW_FilterComponent.Submenu, text = L["Armor Type"], value = 4, childrenInfo = {
+				filters = armortype_dropdown,
+				}		
+			},
 
-			info.checked = 	nil;
-			info.isNotRadio = nil;
-			info.func =  nil;
-			info.hasArrow = true;
-			info.notCheckable = true;
+		},
+	};
 
-			info.text = SOURCES;
-			info.value = 1;
-			info.isNotRadio = true;
-			--info.arg1 = self:GetName().."Check"
-			--info.func = function(dropdownbutton, arg1)
-				--_G[arg1]:Hide()
-			--end,
-			BW_UIDropDownMenu_AddButton(info, level)
 
-			info.text = L["Expansion"]
-			info.value = 2;
-			BW_UIDropDownMenu_AddButton(info, level)
-
-			info.text = L["Missing:"]
-			info.value = 3;
-			BW_UIDropDownMenu_AddButton(info, level)
-
-			info.text = L["Armor Type"]
-			info.value = 4;
-			BW_UIDropDownMenu_AddButton(info, level)
-
-		elseif level == 2  and BW_UIDROPDOWNMENU_MENU_VALUE == 1 then
-			local refreshLevel = 2;
-			info.hasArrow = false;
-			info.isNotRadio = true;
-			info.notCheckable = true;
-			--tinsert(filterSelection,true)
-			info.text = CHECK_ALL;
-			info.func = function()
-							for i = 1, #filterSelection do
-									filterSelection[i] = true;
-							end
-							RefreshLists()
-							BW_UIDropDownMenu_Refresh(self)
-						end
-			BW_UIDropDownMenu_AddButton(info, level)
-
-			local refreshLevel = 2;
-			info.hasArrow = false;
-			info.isNotRadio = true;
-			info.notCheckable = true;
-			--tinsert(filterSelection,true)
-
-			info.text = UNCHECK_ALL;
-			info.func = function()
-							for i = 1, #filterSelection do
-									filterSelection[i] = false;
-							end
-							RefreshLists()
-							BW_UIDropDownMenu_Refresh(self)
-						end
-			BW_UIDropDownMenu_AddButton(info, level)
-			BW_UIDropDownMenu_AddSeparator(level)
-
-			info.notCheckable = false;
-
-			local numSources = #FILTER_SOURCES --C_TransmogCollection.GetNumTransmogSources()
-			for i = 1, numSources do
-				--tinsert(filterSelection,true)
-				info.text = FILTER_SOURCES[i]
-					info.func = function(_, _, _, value)
-						filterSelection[i] = value;
-						RefreshLists()
-					end
-					info.checked = 	function() return filterSelection[i] end
-				BW_UIDropDownMenu_AddButton(info, level)
-			end
-
-		elseif level == 2  and BW_UIDROPDOWNMENU_MENU_VALUE == 2 then
-			local refreshLevel = 2;
-			info.hasArrow = false;
-			info.isNotRadio = true;
-			info.notCheckable = true;
-			info.text = CHECK_ALL;
-			info.func = function()
-							for i = 1, #xpacSelection do
-								xpacSelection[i] = true;
-							end
-							RefreshLists()
-							BW_UIDropDownMenu_Refresh(self)
-						end
-			BW_UIDropDownMenu_AddButton(info, level)
-
-			local refreshLevel = 2;
-			info.hasArrow = false;
-			info.isNotRadio = true;
-			info.notCheckable = true;
-
-			info.text = UNCHECK_ALL;
-			info.func = function()
-							for i = 1, #xpacSelection do
-									xpacSelection[i] = false;
-							end
-							RefreshLists()
-							BW_UIDropDownMenu_Refresh(self)
-						end
-			BW_UIDropDownMenu_AddButton(info, level)
-			BW_UIDropDownMenu_AddSeparator(level)
-
-			info.notCheckable = false;
-			for i = 1, #EXPANSIONS do
-				info.text = EXPANSIONS[i]
-					info.func = function(_, _, _, value)
-						xpacSelection[i] = value;
-						RefreshLists()
-					end
-					info.checked = 	function() return xpacSelection[i] end
-				BW_UIDropDownMenu_AddButton(info, level)
-			end
-
-		elseif level == 2  and BW_UIDROPDOWNMENU_MENU_VALUE == 3 then
-			info.hasArrow = false;
-			info.isNotRadio = true;
-			info.notCheckable = true;
-			local refreshLevel = 2;
-
-			info.text = CHECK_ALL;
-			info.func = function()
-							for i in pairs(locationDrowpDown) do
-								missingSelection[i] = true;
-							end
-							RefreshLists()
-							BW_UIDropDownMenu_Refresh(self)
-						end
-			BW_UIDropDownMenu_AddButton(info, level)
-
-			info.text = UNCHECK_ALL;
-			info.func = function()
-							for i in pairs(locationDrowpDown) do
-								missingSelection[i] = false;
-							end
-							RefreshLists()
-							BW_UIDropDownMenu_Refresh(self)
-						end
-			BW_UIDropDownMenu_AddButton(info, level)
-			BW_UIDropDownMenu_AddSeparator(level)
-
-			for index, id in pairs(locationDrowpDown) do
-				if index ~= 21 then --Skip "robe" type;
-					info.text = id;
-					info.notCheckable = false;
-					info.func = function(_, _, _, value)
-								missingSelection[index] = value;
-
-								if index == 6 then
-									missingSelection[21] = value;
-								end
-
-								BW_UIDropDownMenu_Refresh(self)
-								RefreshLists()
-							end
-					info.checked = function() return missingSelection[index] end
-					BW_UIDropDownMenu_AddButton(info, level)
-				end
-			end
-		elseif level == 2  and BW_UIDROPDOWNMENU_MENU_VALUE == 4 then
-			local counter = 1;
-			for name in pairs(addon.Globals.ARMOR_MASK) do
-				info.keepShownOnClick = false;
-				info.text = L[name]
-				info.func = function(info, arg1, _, value)
-						addon.selectedArmorType = arg1;
-						addon.useAltSet = true;
-						RefreshLists()
-				end
-				info.arg1 = name;
-				info.checked = 	function() return addon.selectedArmorType == name end
-				BW_UIDropDownMenu_AddButton(info, level)
-			end
-
-		end
+function BetterWardrobeFilterDropDown_InitializeBaseSets(self, level)
+	local filter = {}
+	if BetterWardrobeCollectionFrame:CheckTab(2) then 
+		filter = filterSystemBase;
+	elseif BetterWardrobeCollectionFrame:CheckTab(3) then
+		filter = filterSystemExtra;
 	end
+
+	local filterSystem = filter;
+
+	BW_FilterDropDownSystem.Initialize(self, filterSystem, level);
 end
+
 
 -- ***** SPEC DROPDOWN
 
