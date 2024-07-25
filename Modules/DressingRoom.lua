@@ -53,7 +53,7 @@ function BetterWardrobe:ToggleDressingRoom()
 end
 
 function addon.Init:DressingRoom()
-	DressUpFrameOutfitDropDown:Hide()
+	-----DressUpFrameOutfitDropDown:Hide()
 
 	Buttons = BW_DressingRoomFrame.PreviewButtonFrame.Slots
 	Profile = addon.Profile
@@ -80,7 +80,7 @@ function addon:DressingRoom_Enable()
 
 	if DressUpFrame.MaximizeMinimizeFrame then
 		DressUpFrame.MaximizeMinimizeFrame:SetOnMaximizedCallback(function(self)
-			DressUpFrameOutfitDropDown:Hide()
+			-----DressUpFrameOutfitDropDown:Hide()
 
 			if Profile.DR_ResizeWindow then
 				DressUpFrame.MaximizeMinimizeFrame:GetParent():SetSize(Profile.DR_Width, Profile.DR_Height) 
@@ -92,7 +92,7 @@ function addon:DressingRoom_Enable()
 			
 
 
-		addon:Hook(DressUpFrame.MaximizeMinimizeFrame, "minimizedCallback", function() DressUpFrameOutfitDropDown:Hide() end, true)
+	-----	addon:Hook(DressUpFrame.MaximizeMinimizeFrame, "minimizedCallback", function() DressUpFrameOutfitDropDown:Hide() end, true)
 
 
 	end

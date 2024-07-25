@@ -297,7 +297,7 @@ do
 							---local visualID, sourceID = addon.GetItemSource(baseItem)
 							--setData.itemAppearance = addon.ItemAppearance[visualID]
 						setData.uiOrder = UIID_Counter[setData.expansionID]
-						UIID_Counter[setData.expansionID] = UIID_Counter[setData.expansionID] + 1
+						----UIID_Counter[setData.expansionID] = UIID_Counter[setData.expansionID] + 1
 						SET_INDEX[setData.setID] = setData
 						ArmorDB[armorType][setData.setID] = setData
 					end

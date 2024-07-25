@@ -6,11 +6,11 @@
 	<Script file="FilterDropdown.lua"/>
 
 	
-	<Button name="BW_DropDownList1" toplevel="true" frameStrata="FULLSCREEN_DIALOG" inherits="BW_UIDropDownListTemplate" hidden="true" id="1">
+	<Button name="BW_DropDownList1" toplevel="true" frameStrata="FULLSCREEN_DIALOG" inherits="BW_UIDropDownListTemplate" clampedToScreen="true" hidden="true" id="1">
 		<Size x="180" y="10"/>
 		<Scripts>
 			<OnLoad>
-			local fontName, fontHeight, fontFlags = _G["BW_DropDownList1Button1NormalText"]:GetFont();
+				local fontName, fontHeight, fontFlags = _G["BW_DropDownList1Button1NormalText"]:GetFont();
 				BW_UIDROPDOWNMENU_DEFAULT_TEXT_HEIGHT = fontHeight;
 			</OnLoad>
 		</Scripts>

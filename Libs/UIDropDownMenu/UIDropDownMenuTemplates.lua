@@ -4,24 +4,26 @@
 -- to that button and assumes responsibility for all relevant dropdown menu operations.
 -- The hidden button will request a size that it should become from the custom frame.
 
-BW_UIDropDownMenuButtonMixin = {}
+local envTable = GetCurrentEnvironment();
 
-function BW_UIDropDownMenuButtonMixin:OnEnter(...)
+BW_DropDownMenuButtonMixin = {}
+
+function BW_DropDownMenuButtonMixin:OnEnter(...)
 	ExecuteFrameScript(self:GetParent(), "OnEnter", ...);
 end
 
-function BW_UIDropDownMenuButtonMixin:OnLeave(...)
+function BW_DropDownMenuButtonMixin:OnLeave(...)
 	ExecuteFrameScript(self:GetParent(), "OnLeave", ...);
 end
 
-function BW_UIDropDownMenuButtonMixin:OnMouseDown(button)
+function BW_DropDownMenuButtonMixin:OnMouseDown(button)
 	if self:IsEnabled() then
 		BW_ToggleDropDownMenu(nil, nil, self:GetParent());
 		PlaySound(SOUNDKIT.IG_MAINMENU_OPTION_CHECKBOX_ON);
 	end
 end
 
-LargeBW_UIDropDownMenuButtonMixin = CreateFromMixins(BW_UIDropDownMenuButtonMixin);
+LargeBW_UIDropDownMenuButtonMixin = CreateFromMixins(BW_DropDownMenuButtonMixin);
 
 function LargeBW_UIDropDownMenuButtonMixin:OnMouseDown(button)
 	if self:IsEnabled() then
@@ -39,16 +41,17 @@ function BW_DropDownExpandArrowMixin:OnEnter()
 	BW_CloseDropDownMenus(level);
 
 	if self:IsEnabled() then
-		local listFrame = _G["BW_DropDownList"..level];
-		if ( not listFrame or not listFrame:IsShown() or select(2, listFrame:GetPoint()) ~= self ) then
-			BW_ToggleDropDownMenu(level, self:GetParent().value, nil, nil, nil, nil, self:GetParent().menuList, self);
+		local listFrame = envTable["BW_DropDownList"..level];
+		if ( not listFrame or not listFrame:IsShown() or select(2, listFrame:GetPoint(1)) ~= self ) then
+			BW_ToggleDropDownMenu(level, self:GetParent().value, nil, nil, nil, nil, self:GetParent().menuList, self, nil, self:GetParent().menuListDisplayMode);
+
 		end
 	end
 end
 
 function BW_DropDownExpandArrowMixin:OnMouseDown(button)
 	if self:IsEnabled() then
-		BW_ToggleDropDownMenu(self:GetParent():GetParent():GetID() + 1, self:GetParent().value, nil, nil, nil, nil, self:GetParent().menuList, self);
+		BW_ToggleDropDownMenu(self:GetParent():GetParent():GetID() + 1, self:GetParent().value, nil, nil, nil, nil, self:GetParent().menuList, self, nil, self:GetParent().menuListDisplayMode);
 	end
 end
 
@@ -82,11 +85,4 @@ end
 
 function BW_UIDropDownCustomMenuEntryMixin:GetContextData()
 	return self.contextData;
-end
-
-
-BW_ColorSwatchMixin = {}
-
-function BW_ColorSwatchMixin:SetColor(color)
-	self.Color:SetVertexColor(color:GetRGB());
 end

@@ -95,6 +95,7 @@
 			<OnLoad method="OnLoad"/>
 			<OnModelLoaded method="OnModelLoaded"/>
 			<OnMouseDown method="OnMouseDown"/>
+			<OnMouseUp method="OnMouseUp"/>
 			<OnEnter method="OnEnter"/>
 			<OnLeave method="OnLeave"/>
 			<OnShow method="OnShow"/>
@@ -175,6 +176,7 @@
 			<OnShow method="OnShow"/>
 			<OnHide method="OnHide"/>
 			<OnMouseDown method="OnMouseDown"/>
+			<OnMouseUp method="OnMouseUp"/>
 			<OnModelLoaded method="OnModelLoaded"/>
 		</Scripts>
 	</DressUpModel>
@@ -245,17 +247,41 @@
 
 	<Button name="BetterWardrobeSetsScrollFrameButtonTemplate" mixin="BetterWardrobeSetsScrollFrameButtonMixin" registerForClicks="LeftButtonUp,RightButtonUp" virtual="true">
 		<Size x="208" y="46"/>
+		<Frames>
+			<Frame parentKey="IconFrame" mixin="BetterWardrobeSetsScrollFrameButtonIconFrameMixin">
+				<Size x="38" y="38"/>
+				<Anchors>
+					<Anchor point="LEFT" x="-42" y="0"/>
+				</Anchors>
+				<Layers>
+					<Layer level="ARTWORK">
+						<Texture parentKey="Icon" setAllPoints="true"/>
+					</Layer>
+					<Layer level="OVERLAY" textureSubLevel="-1">
+						<Texture parentKey="Cover" setAllPoints="true">
+							<Color r="0" g="0" b="0" a="0.7"/>
+						</Texture>
+					</Layer>
+					<Layer level="OVERLAY" textureSubLevel="1">
+						<Texture parentKey="Favorite" atlas="PetJournal-FavoritesIcon" useAtlasSize="true" >
+							<Anchors>
+								<Anchor point="TOPLEFT" x="-8" y="8"/>
+							</Anchors>
+						</Texture>
+					</Layer>
+				</Layers>
+				<Scripts>
+					<OnEnter method="OnEnter"/>
+					<OnLeave method="OnLeave"/>
+				</Scripts>
+			</Frame>
+		</Frames>
+
 		<Layers>
 			<Layer level="BACKGROUND">
 				<Texture atlas="PetList-ButtonBackground" parentKey="Background"/>
 			</Layer>
 			<Layer level="ARTWORK">
-				<Texture parentKey="Icon">
-					<Size x="38" y="38"/>
-					<Anchors>
-						<Anchor point="LEFT" x="-42" y="0"/>
-					</Anchors>
-				</Texture>
 				<FontString parentKey="Name" inherits="GameFontNormal" justifyH="LEFT" maxLines="2">
 					<Size x="190" y="0"/>
 					<Anchors>
@@ -277,26 +303,12 @@
 					<Color r="0.0118" g="0.247" b="0.00392" a="1"/>
 				</Texture>
 			</Layer>
-			<Layer level="OVERLAY" textureSubLevel="-1">
-				<Texture parentKey="IconCover">
-					<Size x="38" y="38"/>
-					<Anchors>
-						<Anchor point="LEFT" x="-42" y="0"/>
-					</Anchors>
-					<Color r="0" g="0" b="0" a="0.7"/>
-				</Texture>
-			</Layer>
 			<Layer level="OVERLAY">
 				<Texture parentKey="SelectedTexture" atlas="PetList-ButtonSelect" hidden="true"/>
-				<Texture parentKey="Favorite" atlas="PetJournal-FavoritesIcon" useAtlasSize="true">
-					<Anchors>
-						<Anchor point="TOPLEFT" relativeKey="$parent.Icon" x="-8" y="8"/>
-					</Anchors>
-				</Texture>
 				<Texture parentKey="New" atlas="GarrMission-AbilityHighlight" alphaMode="ADD" hidden="true">
 					<Size x="56" y="56"/>
 					<Anchors>
-						<Anchor point="CENTER" relativeKey="$parent.Icon"/>
+						<Anchor point="CENTER" relativeKey="$parent.IconFrame"/>
 					</Anchors>
 				</Texture>
 			</Layer>
@@ -304,6 +316,9 @@
 				<Texture parentKey="HighlightTexture" atlas="PetList-ButtonHighlight" setAllPoints="true"/>
 			</Layer>
 		</Layers>
+		<Scripts>
+			<OnClick method="OnClick"/>
+		</Scripts>
 		<Frames>
 
 			<Frame parentKey="Variants" mixin = "BetterWardrobeSetsDetailsAltItemMixin" hidden="false">
@@ -322,7 +337,7 @@
 						<FontString parentKey="Count" inherits="GameFontDisableSmallLeft" justifyH="CENTER" maxLines="1" text="0">
 							<Size x="20" y="20"/>
 							<Anchors>
-								<Anchor point="RIGHT" relativeKey="$parent.Icon" relativePoint="LEFT"  x="7" y="1"/>
+								<Anchor point="RIGHT" relativeKey="$parent.IconFrame" relativePoint="LEFT"  x="7" y="1"/>
 							</Anchors>
 						</FontString>
 					</Layer>
@@ -345,7 +360,7 @@
 				</Anchors>
 				<Layers>
 					<Layer level="ARTWORK">
-						<Texture parentKey="Icon" file="Interface\ICONS\Ability_Evoker_EmeraldBlossom">
+						<Texture parentKey="Icon" file="Interface\Timer\Panda-Logo">
 							<Size x="20" y="20"/>
 							<Anchors>
 								<Anchor point="BOTTOMLEFT" relativeKey="$parent" relativePoint="BOTTOMLEFT" x="0" y="0"/>
@@ -362,7 +377,7 @@
 				</Anchors>
 				<Layers>
 					<Layer level="ARTWORK">
-						<Texture parentKey="Icon" file="Interface\ICONS\TradingPostCurrency">
+						<Texture parentKey="Icon" atlas="trading-post-minimap-icon">
 							<Size x="20" y="20"/>
 							<Anchors>
 								<Anchor point="BOTTOMLEFT" relativeKey="$parent" relativePoint="BOTTOMLEFT" x="0" y="0"/>
@@ -479,7 +494,7 @@
 				</Scripts>
 			</Frame>
 
-			<Frame parentKey="AltItem" mixin = "BetterWardrobeSetsDetailsAltItemMixin" hidden="true">
+			<Frame parentKey="AltItem" mixin = "BetterWardrobeSetsDetailsAltItemMixin" hidden="false">
 				<Size x="25" y="10"/>
 
 				<Anchors>
@@ -491,14 +506,14 @@
 						<Texture parentKey="AltIconRight" file="Interface\BUTTONS\UI-SpellbookIcon-NextPage-Up" >
 							<Size x="15" y="15"/>
 							<Anchors>
-								<Anchor point="BOTTOMRIGHT" relativeKey="$parent.Icon" relativePoint="BOTTOMRIGHT" X='0' Y='-5'/>
+								<Anchor point="BOTTOMRIGHT" relativeKey="$parent.IconFrame" relativePoint="BOTTOMRIGHT" X='0' Y='-5'/>
 							</Anchors>
 
 						</Texture>
 							<Texture parentKey="AltIconLeft" file="Interface\BUTTONS\UI-SpellbookIcon-PrevPage-Up" >
 							<Size x="15" y="15"/>
 							<Anchors>
-								<Anchor point="BOTTOMLEFT" relativeKey="$parent.Icon" relativePoint="BOTTOMLEFT" X='0' Y='-5'/>
+								<Anchor point="BOTTOMLEFT" relativeKey="$parent.IconFrame" relativePoint="BOTTOMLEFT" X='0' Y='-5'/>
 							</Anchors>
 
 						</Texture>
@@ -533,24 +548,27 @@
 			</Frame>
 		</Frames>
 		<Scripts>
+			<OnShow method="OnShow"/>
+			<OnHide method="OnHide"/>
+			<OnEvent method="OnEvent"/>
 			<OnEnter method="OnEnter"/>
 			<OnLeave method="OnLeave"/>
 			<OnMouseDown method="OnMouseDown"/>
+			<OnMouseUp method="OnMouseUp"/>
 		</Scripts>
 	</Frame>
-		<Frame name="BW_AlertTrackingFeatureTemplate" inherits="NewFeatureLabelTemplate" mixin="BW_AlertTrackingFeatureMixin" virtual="true">
-		<Size x="1" y="1"/>
-	</Frame>
-
 	<Frame name="BW_TrackingInterfaceShortcutsFrame" hidden="true">
 		<Size x="226" y="40"/>
 		<Layers>
 			<Layer level="OVERLAY">
 				<FontString parentKey="HeaderText" inherits="GameFontHighlightLeft" text="WARDROBE_SHORTCUTS_TUTORIAL_2" justifyH="LEFT" justifyV="TOP">
-					<Size x="0" y="0"/>
+					<Size x="196" y="0"/>
+					<Anchors>
+						<Anchor point="TOPLEFT"/>
+					</Anchors>				
 				</FontString>
 				<FontString parentKey="Text" inherits="GameFontHighlightLeft" text="WARDROBE_SHORTCUTS_TUTORIAL_3" justifyH="LEFT" justifyV="TOP">
-					<Size x="0" y="0"/>
+					<Size x="196" y="0"/>
 					<Anchors>
 						<Anchor point="TOP" relativeKey="$parent.HeaderText" relativePoint="BOTTOM" y="-1"/>
 						<Anchor point="LEFT" relativeKey="$parent.HeaderText" relativePoint="LEFT"/>
@@ -558,31 +576,13 @@
 				</FontString>
 			</Layer>
 		</Layers>
-		<Frames>
-			<Frame parentKey="NewAlert" inherits="BW_AlertTrackingFeatureTemplate">
-				<Anchors>
-					<Anchor point="LEFT" relativeKey="$parent.HeaderText" relativePoint="RIGHT" x="17"/>
-				</Anchors>
-			</Frame>
-		</Frames>
 	</Frame>
 
 	<Frame name="BetterWardrobeCollectionFrameTemplate" parent="CollectionsJournal" mixin="BetterWardrobeCollectionFrameMixin" setAllPoints="true" hidden="true" virtual="true" frameLevel="50">
 		<Frames>
-			<Button parentKey="InfoButton" inherits="MainHelpPlateButton" mixin="BetterWardrobeCollectionTutorialMixin" hidden="true" frameLevel="75">
-				<Anchors>
-					<Anchor point="TOPLEFT" x="43" y="19"/>
-				</Anchors>
-				<Scripts>
-
-					<OnShow>
-	    				self:SetFrameLevel(CollectionsJournal.TitleContainer:GetFrameLevel()+200);
-	     			</OnShow>
-				</Scripts>
-			</Button>
 			<Button name="$parentTab1" parentKey="ItemsTab" inherits="BW_PanelTopTabButtonTemplate" text="WARDROBE_ITEMS" id="1" >
 				<KeyValues>
-					<KeyValue key="minWidth" value="2" type="number"/>
+					<KeyValue key="minWidth" value="57" type="number"/>
 				</KeyValues>
 				<Anchors>
 					<Anchor point="TOPLEFT" x="58" y="-28"/>
@@ -595,7 +595,7 @@
 			</Button>
 			<Button name="$parentTab2" parentKey="SetsTab" inherits="BW_PanelTopTabButtonTemplate" text="WARDROBE_SETS" id="2" frameLevel="75" >
 				<KeyValues>
-					<KeyValue key="minWidth" value="2" type="number"/>
+					<KeyValue key="minWidth" value="57" type="number"/>
 				</KeyValues>
 				<Anchors>
 					<Anchor point="LEFT" relativeTo="$parentTab1"  relativePoint="RIGHT" x="0" y="0"/>
@@ -630,7 +630,7 @@
 			</Button>
 			<Button name="$parentTab3" parentKey="ExtraSetsTab" inherits="BW_PanelTopTabButtonTemplate" text="Extra" id="3" frameLevel="75" >
 				<KeyValues>
-					<KeyValue key="minWidth" value="2" type="number"/>
+					<KeyValue key="minWidth" value="57" type="number"/>
 				</KeyValues>
 				<Anchors>
 					<Anchor point="LEFT" relativeKey="$parent.SetsTab" relativePoint="RIGHT" x="0" y="0"/>
@@ -665,7 +665,7 @@
 			</Button>
 			<Button name="$parentTab4" parentKey="SavedSetsTab" inherits="BW_PanelTopTabButtonTemplate" text="Saved" id="4" frameLevel="75" >
 				<KeyValues>
-					<KeyValue key="minWidth" value="2" type="number"/>
+					<KeyValue key="minWidth" value="57" type="number"/>
 				</KeyValues>
 				<Anchors>
 					<Anchor point="LEFT" relativeKey="$parent.ExtraSetsTab"  relativePoint="RIGHT" x="0" y="0"/>
@@ -683,7 +683,7 @@
 						</Layers>
 						<Scripts>
 							<OnUpdate>
-								if self:IsMouseOver() then
+								if ( self:IsMouseOver() ) then
 									self:SetAlpha(0);
 								else
 									self:SetAlpha(abs(mod(GetTime(), 2) - 1));
@@ -784,10 +784,10 @@
 									</Layer>
 								</Layers>
 								<Frames>
-									<Frame parentKey="Spinner" inherits="LoadingSpinnerTemplate" hidden="false">
-										<Size x="38" y="38"/>
+									<Frame parentKey="Spinner" inherits="SpinnerTemplate" hidden="false">
+										<Size x="20" y="20"/>
 										<Anchors>
-											<Anchor point="RIGHT" relativeKey="$parent.Text" relativePoint="LEFT" x="4"/>
+											<Anchor point="RIGHT" relativeKey="$parent.Text" relativePoint="LEFT" x="-5"/>
 										</Anchors>
 									</Frame>
 								</Frames>
@@ -897,47 +897,36 @@
 				</Anchors>
 
 			</Button>
-			<DropDownToggleButton parentKey="FilterButton" inherits="UIResettableDropdownButtonTemplate" text="FILTER">
-				<Size x="93" y="22"/>
+
+
+			<DropdownButton parentKey="FilterButton" inherits="WowStyle1FilterDropdownTemplate">
 				<KeyValues>
-					<KeyValue key="resetFunction" value="BetterWardrobeFilterDropDown_ResetFilters" type="global"/>
+					<KeyValue key="resizeToText" type="boolean" value="false"/>
 				</KeyValues>
 				<Anchors>
-					<Anchor point="LEFT" relativeKey="$parent.SearchBox" relativePoint="RIGHT" x="2" y="-1"/>
+					<Anchor point="LEFT" relativeKey="$parent.SearchBox" relativePoint="RIGHT" x="7" y="0"/>
 				</Anchors>
-				<Layers>
-					<Layer level="ARTWORK">
-						<Texture parentKey="Icon" file="Interface\ChatFrame\ChatFrameExpandArrow">
-							<Size x="10" y="12"/>
-							<Anchors>
-								<Anchor point="RIGHT" relativeKey="$parent.Right" relativePoint="RIGHT" x="-5"/>
-							</Anchors>
-						</Texture>
-					</Layer>
-				</Layers>
-				<Scripts>
-					<OnMouseDown inherit="prepend">
-						--UIMenuButtonStretchMixin.OnMouseDown(self, button);
-						if self:IsEnabled() then
-							--PlaySound(SOUNDKIT.IG_MAINMENU_OPTION_CHECKBOX_ON);
-							BW_ToggleDropDownMenu(1, nil, BetterWardrobeFilterDropDown, self, 74, 15);
-						end
-					</OnMouseDown>
-					<OnEnable>
-						self.Icon:SetDesaturated(false);
-					</OnEnable>
-					<OnDisable>
-						self.Icon:SetDesaturated(true);
-						self.ResetButton:Hide();
-					</OnDisable>
-				</Scripts>
-			</DropDownToggleButton>
+			</DropdownButton>
+
+
+
 			<Frame name="BetterWardrobeFilterDropDown" parentKey="FilterDropDown" inherits="BW_UIDropDownMenuTemplate">
 				<Scripts>
 					<OnLoad function="BetterWardrobeFilterDropDown_OnLoad"/>
 				</Scripts>
 			</Frame>
-			<DropDownToggleButton parentKey="TransmogOptionsButton" name="BW_TransmogOptionsButton" inherits="UIMenuButtonStretchTemplate" text="Options" hidden="false">
+			<DropdownButton parentKey="ClassDropdown" inherits="WowStyle1DropdownTemplate" mixin="BetterWardrobeCollectionClassDropdownMixin">
+				<Anchors>
+					<Anchor point="TOPLEFT" y="-20"/>
+				</Anchors>
+				<Scripts>
+					<OnLoad method="OnLoad"/>
+					<OnShow method="OnShow"/>
+					<OnHide method="OnHide"/>
+				</Scripts>
+			</DropdownButton>
+
+			<DropdownButton parentKey="TransmogOptionsButton" name="BW_TransmogOptionsButton" inherits="UIMenuButtonStretchTemplate" text="Options" hidden="false">
 				<Size x="93" y="22"/>
 				<Anchors>
 					<Anchor point="BOTTOMRIGHT" x="-55" y="80"/>
@@ -968,7 +957,7 @@
 					</OnDisable>
 
 				</Scripts>
-			</DropDownToggleButton>
+			</DropdownButton>
 			<Button parentKey="BW_SetsHideSlotButton" inherits="SquareIconButtonTemplate" >
 				<Size x="32" y="32"/>
 				<Anchors>
@@ -1043,28 +1032,27 @@
 					</CheckButton>
 					<Frame parentKey="PagingFrame" inherits="BW_CollectionsPagingFrameTemplate">
 						<Anchors>
-							<Anchor point="BOTTOM" x="22" y="38"/>
+							<Anchor point="BOTTOM" x="22" y="29"/>
 						</Anchors>
 					</Frame>
 					<Frame name="BetterWardrobeModelRightClickDropDown" parentKey="RightClickDropDown" inherits="BW_UIDropDownMenuTemplate" hidden="true"/>
-					<Frame parentKey="WeaponDropDown" name="$parentWeaponDropDown" inherits="BW_UIDropDownMenuTemplate" enableMouse="true" hidden="true">
-						<Size x="87" y="22"/>
+					<DropdownButton parentKey="WeaponDropdown" inherits="WowStyle1DropdownTemplate" hidden="true">
 						<Anchors>
-							<Anchor point="TOPRIGHT" x="-6" y="-22"/>
+							<Anchor point="TOPRIGHT" x="-25" y="-58"/>
+
+
+
 						</Anchors>
-						<Scripts>
-							<OnLoad function="BetterWardrobeCollectionFrameWeaponDropDown_OnLoad"/>
-						</Scripts>
-					</Frame>
+					</DropdownButton>
 					<Frame parentKey="SlotsFrame">
 						<Size x="10" y="10"/>
 						<Anchors>
-							<Anchor point="TOPLEFT" x="18" y="-20"/>
+							<Anchor point="TOPLEFT" x="180" y="-20"/>
 						</Anchors>
 					</Frame>
 					<DressUpModel parentArray="Models" parentKey="ModelR1C1" inherits="BetterWardrobeItemsModelTemplate">
 						<Anchors>
-							<Anchor point="TOP" x="-238" y="-85"/>
+							<Anchor point="TOP" x="-238" y="-92"/>
 						</Anchors>
 					</DressUpModel>
 					<DressUpModel parentArray="Models" parentKey="ModelR1C2" inherits="BetterWardrobeItemsModelTemplate">
@@ -1373,7 +1361,7 @@
 						<Frames>
 
 							<Frame parentKey="ScrollBox" setAllPoints="true" inherits="WowScrollBoxList"/>
-							<EventFrame parentKey="ScrollBar" inherits="MinimalScrollBar" name="BetterWardrobeCollectionFrameScrollFrameScrollBar">
+							<EventFrame parentKey="ScrollBar" inherits="MinimalScrollBar">
 								<Anchors>
 									<Anchor point="TOPLEFT" relativeKey="$parent.ScrollBox" relativePoint="TOPRIGHT" x="8" y="31"/>
 									<Anchor point="BOTTOMLEFT" relativeKey="$parent.ScrollBox" relativePoint="BOTTOMRIGHT" x="8" y="-1"/>
@@ -1547,39 +1535,12 @@
 									</OnClick>
 								</Scripts>
 							</Button>
-							<DropDownToggleButton name="BetterWardrobeSetsCollectionVariantSetsButton" parentKey="VariantSetsButton" inherits="UIMenuButtonStretchTemplate" frameLevel="80" >
-								<Size x="108" y="22"/>
+
+							<DropdownButton parentKey="VariantSetsDropdown" inherits="WowStyle1DropdownTemplate" frameLevel="80">
 								<Anchors>
-									<Anchor point="TOPRIGHT" x="-55" y="-6"/>
+									<Anchor point="TOPRIGHT" x="-6" y="-6"/>
 								</Anchors>
-								<Layers>
-									<Layer level="ARTWORK">
-										<Texture parentKey="Icon" atlas="friendslist-categorybutton-arrow-down" useAtlasSize="true">
-											<Anchors>
-												<Anchor point="RIGHT" relativeKey="$parent.Right" relativePoint="RIGHT" x="-5" y="-2"/>
-											</Anchors>
-										</Texture>
-									</Layer>
-								</Layers>
-								<Scripts>
-									<OnLoad inherit="prepend">
-										self.Text:ClearAllPoints();
-										self.Text:SetPoint("LEFT", 11, -1);
-										self.Text:SetSize(75, 10);
-										self.Text:SetJustifyH("LEFT");
-									</OnLoad>
-									<OnMouseDown>
-										UIMenuButtonStretchMixin.OnMouseDown(self, button);
-										PlaySound(SOUNDKIT.IG_MAINMENU_OPTION_CHECKBOX_ON);
-										BW_ToggleDropDownMenu(1, nil, self:GetParent().VariantSetsDropDown, self:GetName(), 0, 1);
-									</OnMouseDown>
-								</Scripts>
-							</DropDownToggleButton>
-							<Frame name="BetterWardrobeSetsCollectionVariantSetsDropDown" parentKey="VariantSetsDropDown" inherits="BW_UIDropDownMenuTemplate">
-								<Scripts>
-									<OnLoad function="BetterWardrobeSetsCollectionVariantSetsDropDown_OnLoad"/>
-								</Scripts>
-							</Frame>
+							</DropdownButton>
 						</Frames>
 					</Frame>
 				</Frames>
@@ -2273,17 +2234,20 @@
 							</Layer>
 						</Layers>
 					</Frame>
-					<Frame parentKey="OutfitDropDown" name="BetterWardrobeOutfitDropDown2" inherits="BetterWardrobeOutfitDropDownTemplate" mixin="BetterWardrobeOutfitMixin">
+
+					<!--WardrobeOutfitDropdownOverrideMixin provides implementation overrides of functions in WardrobeOutfitDropdownMixin-->
+					<DropdownButton parentKey="OutfitDropdown" inherits="WardrobeOutfitDropdownTemplate" mixin="WardrobeOutfitDropdownOverrideMixin">
 						<KeyValues>
-							<KeyValue key="width" value="188" type="number"/>
+							<KeyValue key="width" value="207" type="number"/>
 							<KeyValue key="minMenuStringWidth" value="152" type="number"/>
 							<KeyValue key="maxMenuStringWidth" value="216" type="number"/>
 							<KeyValue key="replaceInvalidSources" value="false" type="boolean"/>
 						</KeyValues>
 						<Anchors>
-							<Anchor point="TOPLEFT" x="-14" y="28"/>
+							<Anchor point="TOPLEFT" x="0" y="28"/>
 						</Anchors>
-					</Frame>
+
+					</DropdownButton>
 					<ModelScene parentKey="ModelScene" inherits="PanningModelSceneMixinTemplate">
 						<Size x="294" y="488"/>
 						<Anchors>
@@ -2309,11 +2273,13 @@
 								</Anchors>
 								<Layers>
 									<Layer level="ARTWORK">
-										<Texture parentKey="Icon" atlas="transmog-icon-revert-small" useAtlasSize="true">
+										<Texture parentKey="Icon" atlas="common-icon-undo" >
+											<Size x="18" y="18"/>
 											<Anchors>
-												<Anchor point="LEFT" x="1"/>
+												<Anchor point="CENTER" />
 											</Anchors>
 										</Texture>
+
 									</Layer>
 								</Layers>
 								<HighlightTexture file="Interface\Buttons\UI-Common-MouseHilight" alphaMode="ADD"/>
@@ -2480,12 +2446,8 @@
 							</OnClick>
 						</Scripts>
 					</Button>
-					<Frame name="$parentSpecDropDown" parentKey="SpecDropDown" inherits="BW_UIDropDownMenuTemplate">
-						<Scripts>
-							<OnLoad function="BetterWardrobeTransmogFrameSpecDropDown_OnLoad"/>
-						</Scripts>
-					</Frame>
-					<DropDownToggleButton parentKey="SpecButton" inherits="UIMenuButtonStretchTemplate">
+
+					<DropdownButton parentKey="SpecButton" inherits="UIMenuButtonStretchTemplate">
 						<Size x="22" y="22"/>
 						<Anchors>
 							<Anchor point="RIGHT" relativeKey="$parent.ApplyButton" relativePoint="LEFT" x="1" y="0"/>
@@ -2515,7 +2477,7 @@
 								self.Icon:SetPoint("CENTER", 0, 0);
 							</OnMouseUp>
 						</Scripts>
-					</DropDownToggleButton>
+					</DropdownButton>
 				</Frames>
 				<Scripts>
 					<OnLoad method="OnLoad"/>

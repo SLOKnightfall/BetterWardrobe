@@ -54,16 +54,16 @@ end
 
 
 function UI:CreateDropDown()
-	WardrobeOutfitDropDown:Hide()
+	-----OutfitDropDown:Hide()
 --	BetterWardrobeOutfitDropDown:SetParent(WardrobeTransmogFrame)
 	--BetterWardrobeOutfitDropDown:ClearAllPoints()
 	--BetterWardrobeOutfitDropDown:SetPoint("TOPLEFT", -14, -28)
 
 	addon:SecureHook(WardrobeTransmogFrame, "OnTransmogApplied", function()
 	C_Timer.After(.5, function()
-			if BetterWardrobeOutfitDropDown.selectedOutfitID and BetterWardrobeOutfitDropDown:IsOutfitDressed() then
-				BetterWardrobeOutfitDropDown:OnOutfitApplied(BetterWardrobeOutfitDropDown.selectedOutfitID)
-			end
+			--if BetterWardrobeOutfitDropDown.selectedOutfitID and BetterWardrobeOutfitDropDown:IsOutfitDressed() then
+				--BetterWardrobeOutfitDropDown:OnOutfitApplied(BetterWardrobeOutfitDropDown.selectedOutfitID)
+			--end
 		end)
 		end, true)
 
@@ -434,8 +434,8 @@ function UI.ExtendTransmogView(reset)
 
 	--if not addon.Profile.LargeTransmogArea or not addon.Profile.ExtraLargeTransmogArea then return end
 	local scale = 1
-	BW_LoadQueueButton:ClearAllPoints()
-	BW_LoadQueueButton:SetPoint("TOPLEFT", BetterWardrobeOutfitDropDown.SaveButton, "TOPRIGHT", 5, 0)
+	--BW_LoadQueueButton:ClearAllPoints()
+	--BW_LoadQueueButton:SetPoint("TOPLEFT", BetterWardrobeOutfitDropDown.SaveButton, "TOPRIGHT", 5, 0)
 
 	if addon.Profile.ExtraLargeTransmogArea then
 		scale = 1.25
@@ -486,10 +486,10 @@ function UI.ExtendTransmogView(reset)
 		WardrobeTransmogFrame.ModelScene.ClearAllPendingButton:SetPoint("TOPRIGHT", WardrobeTransmogFrame, -20, -20)
 		WardrobeTransmogFrame.ModelScene.ControlFrame:SetPoint("TOP", WardrobeTransmogFrame, "TOP", 0, -4)
 
-		BetterWardrobeOutfitDropDown:ClearAllPoints()
-		BetterWardrobeOutfitDropDown:SetPoint("TOPLEFT", WardrobeTransmogFrame, 35, 28)
-		BW_LoadQueueButton:ClearAllPoints()
-		BW_LoadQueueButton:SetPoint("TOPLEFT", BetterWardrobeOutfitDropDown, "TOPRIGHT", 85, -5)
+		--BetterWardrobeOutfitDropDown:ClearAllPoints()
+	--BetterWardrobeOutfitDropDown:SetPoint("TOPLEFT", WardrobeTransmogFrame, 35, 28)
+		--BW_LoadQueueButton:ClearAllPoints()
+		--BW_LoadQueueButton:SetPoint("TOPLEFT", BetterWardrobeOutfitDropDown, "TOPRIGHT", 85, -5)
 
 		if UIPanelWindows["WardrobeFrame"] then 
 		UIPanelWindows["WardrobeFrame"].width = 1280
@@ -531,8 +531,8 @@ function UI.ExtendTransmogView(reset)
 		WardrobeTransmogFrame.SecondaryHandEnchantButton:ClearAllPoints()
 		WardrobeTransmogFrame.SecondaryHandEnchantButton:SetPoint("BOTTOM", WardrobeTransmogFrame.SecondaryHandButton, "BOTTOM", 0, -20)
 		        
-		BetterWardrobeOutfitDropDown:ClearAllPoints()
-		BetterWardrobeOutfitDropDown:SetPoint("TOPLEFT", WardrobeTransmogFrame, 35, 28)
+		--BetterWardrobeOutfitDropDown:ClearAllPoints()
+		--BetterWardrobeOutfitDropDown:SetPoint("TOPLEFT", WardrobeTransmogFrame, 35, 28)
 		if UIPanelWindows["WardrobeFrame"] then 
 			UIPanelWindows["WardrobeFrame"].width = 1170
 		else 
@@ -575,11 +575,11 @@ function UI.ExtendTransmogView(reset)
 		WardrobeTransmogFrame.SecondaryHandEnchantButton:ClearAllPoints()
 		WardrobeTransmogFrame.SecondaryHandEnchantButton:SetPoint("BOTTOM", WardrobeTransmogFrame.SecondaryHandButton, "BOTTOM", 0, -20)	
 
-		BetterWardrobeOutfitDropDown:ClearAllPoints()
-		BetterWardrobeOutfitDropDown:SetPoint("TOPLEFT", WardrobeTransmogFrame, -14, 28)
+		--BetterWardrobeOutfitDropDown:ClearAllPoints()
+		--BetterWardrobeOutfitDropDown:SetPoint("TOPLEFT", WardrobeTransmogFrame, -14, 28)
 
 		BW_LoadQueueButton:ClearAllPoints()
-		BW_LoadQueueButton:SetPoint("BOTTOMLEFT", BetterWardrobeOutfitDropDown.SaveButton, "TOPLEFT", 0, 5)
+		--BW_LoadQueueButton:SetPoint("BOTTOMLEFT", BetterWardrobeOutfitDropDown.SaveButton, "TOPLEFT", 0, 5)
 
 		if UIPanelWindows["WardrobeFrame"] then 
 			UIPanelWindows["WardrobeFrame"].width = 965
