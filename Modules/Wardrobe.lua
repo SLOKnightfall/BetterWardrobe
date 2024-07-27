@@ -448,10 +448,17 @@ end
 
 function BW_TransmogFrameMixin:EvaluateSecondaryAppearanceCheckbox()
 	local showToggleCheckbox = false;
-	if self.selectedSlotButton and BetterWardrobeCollectionFrame.activeFrame == BetterWardrobeCollectionFrame.ItemsCollectionFrame then
+	if self.selectedSlotButton and (BetterWardrobeCollectionFrame.activeFrame == BetterWardrobeCollectionFrame.ItemsCollectionFrame or WardrobeCollectionFrame.activeFrame == WardrobeCollectionFrame.ItemsCollectionFrame) then
+
 		showToggleCheckbox = C_Transmog.CanHaveSecondaryAppearanceForSlotID(self.selectedSlotButton.transmogLocation.slotID);
 	end
-	self.ToggleSecondaryAppearanceCheckbox:SetShown(showToggleCheckbox);
+	WardrobeTransmogFrame.ToggleSecondaryAppearanceCheckbox:SetShown(showToggleCheckbox);
+    WardrobeTransmogFrame.ToggleSecondaryAppearanceCheckbox:ClearAllPoints();
+----    WardrobeTransmogFrame.ToggleSecondaryAppearanceCheckbox:SetParent(BetterWardrobeCollectionFrame.ItemsCollectionFrame)
+
+	WardrobeTransmogFrame.ToggleSecondaryAppearanceCheckbox:SetPoint("LEFT", BetterWardrobeCollectionFrame.ItemsCollectionFrame.ModelR3C1, "LEFT", -2, -110);
+    WardrobeTransmogFrame.ToggleSecondaryAppearanceCheckbox:SetFrameLevel(400);
+	WardrobeTransmogFrame.ToggleSecondaryAppearanceCheckbox:SetShown(showToggleCheckbox); 
 end
 
 function BW_TransmogFrameMixin:GetSelectedTransmogLocation()
@@ -1111,6 +1118,21 @@ local SET_MODEL_PAN_AND_ZOOM_LIMITS = {
 
 BetterWardrobeCollectionFrameMixin = { };
 
+function BetterWardrobeCollectionFrameMixin:ReloadTab()
+		self.ItemsCollectionFrame:Hide()
+		self.SetsCollectionFrame:Hide()
+		self.SetsTransmogFrame:Hide()
+end
+
+function BetterWardrobeCollectionFrameMixin:CheckTab(tab)
+	local atTransmogrifier = C_Transmog.IsAtTransmogNPC()
+	if (atTransmogrifier and BetterWardrobeCollectionFrame.selectedTransmogTab == tab) or BetterWardrobeCollectionFrame.selectedCollectionTab == tab then
+		return true;
+	end
+end
+BW_CheckTab = BetterWardrobeCollectionFrameMixin.CheckTab
+
+
 function BetterWardrobeCollectionFrameMixin:SetContainer(parent)
 	self:SetParent(parent);
 	self:ClearAllPoints();
@@ -1118,11 +1140,11 @@ function BetterWardrobeCollectionFrameMixin:SetContainer(parent)
 		self:SetPoint("TOPLEFT", CollectionsJournal);
 		self:SetPoint("BOTTOMRIGHT", CollectionsJournal);
 		self.ItemsCollectionFrame.ModelR1C1:SetPoint("TOP", -238, -94);
-		self.ItemsCollectionFrame.PagingFrame:SetPoint("BOTTOM", 22, 29);
+		self.ItemsCollectionFrame.PagingFrame:SetPoint("BOTTOM", 22, 40);
 		self.ItemsCollectionFrame.SlotsFrame:Show();
 		self.ItemsCollectionFrame.BGCornerTopLeft:Hide();
 		self.ItemsCollectionFrame.BGCornerTopRight:Hide();
-		self.ItemsCollectionFrame.WeaponDropdown:SetPoint("TOPRIGHT", -25, -58);
+		self.ItemsCollectionFrame.WeaponDropdown:SetPoint("TOPRIGHT", -70, -58);
 		self.ClassDropdown:Show();
 		self.ItemsCollectionFrame.NoValidItemsLabel:Hide();
 		self.ItemsTab:SetPoint("TOPLEFT", 58, -28);
@@ -1154,12 +1176,37 @@ function BetterWardrobeCollectionFrameMixin:SetTab(tabID)
 	local atTransmogrifier = C_Transmog.IsAtTransmogNPC();
 	if atTransmogrifier then
 		self.selectedTransmogTab = tabID;
+		self.selectedCollectionTab = 1;
 	else
 		self.selectedCollectionTab = tabID;
+		self.selectedTransmogTab = 1;
 	end
+
+
+	local ElvUI = IsAddOnLoaded("ElvUI")
+
+	if SavedOutfitDropDownMenu then
+		SavedOutfitDropDownMenu:Hide()
+	end
+
+	self.BW_SetsHideSlotButton:Hide()
+	BetterWardrobeVisualToggle.VisualMode = false;
+	self.TransmogOptionsButton:Hide()
+	----self.ItemsCollectionFrame:Hide()
+	self.SetsCollectionFrame:Hide()
+	self.SetsTransmogFrame:Hide()
+
+-----addon.ColorFilterFrame:Hide()
+
+
 	if tabID == TAB_ITEMS then
+		BetterWardrobeVisualToggle:Hide()
+		-----addon.ColorFilterFrame:Show()
+			if BW_ColectionListFrame then 
+		BW_ColectionListFrame:SetShown(BetterWardrobeCollectionFrame:IsShown() and not atTransmogrifier)
+	end
+
 		self.activeFrame = self.ItemsCollectionFrame;
-		zz = self.activeFrame
 		self.ItemsCollectionFrame:Show();
 		self.SetsCollectionFrame:Hide();
 		self.SetsTransmogFrame:Hide();
@@ -1171,14 +1218,76 @@ function BetterWardrobeCollectionFrameMixin:SetTab(tabID)
 		self.FilterButton:Show();
 		self.FilterButton:SetEnabled(enableSearchAndFilter);
 		self.ClassDropdown:ClearAllPoints();
+		--self.ClassDropdown:SetPoint("BOTTOMLEFT", BetterWardrobeCollectionFrameTab1, "TOPRIGHT", -12, -2);
+
 		self.ClassDropdown:SetPoint("TOPRIGHT", self.ItemsCollectionFrame.SlotsFrame, "TOPLEFT", -12, -2);
 		self:InitItemsFilterButton();
-	elseif tabID == TAB_SETS then
+
+
+		BW_SortDropDown:Show()
+		BW_SortDropDown:ClearAllPoints()
+
+		local _, isWeapon = C_TransmogCollection.GetCategoryInfo((BetterWardrobeCollectionFrame and BetterWardrobeCollectionFrame.ItemsCollectionFrame:GetActiveCategory()) or 1)
+		local yOffset = (atTransmogrifier and (isWeapon and 55 or 32)) or LegionWardrobeY;
+		if atTransmogrifier  then
+			self.TransmogOptionsButton:Show();
+			BetterWardrobeCollectionFrame.ItemsCollectionFrame.ApplyOnClickCheckbox:Hide();
+
+			if ElvUI then 
+				--BetterWardrobeCollectionFrame.ItemsCollectionFrame.WeaponDropdown:SetPoint("TOPRIGHT", -42, -10)
+				BW_SortDropDown:SetPoint("TOPLEFT", BetterWardrobeCollectionFrame.ItemsCollectionFrame.WeaponDropdown, "BOTTOMLEFT", 0, 0)
+				BetterWardrobeCollectionFrame.AlteredFormSwapButton:ClearAllPoints();
+				BetterWardrobeCollectionFrame.AlteredFormSwapButton:SetPoint("TOPRIGHT",self:GetParent(), "TOPRIGHT", -17,-45)
+			else 
+				BetterWardrobeCollectionFrame.ItemsCollectionFrame.WeaponDropdown:SetPoint("TOPRIGHT", -48, -38)
+				BW_SortDropDown:SetWidth(157);
+
+				BW_SortDropDown:SetPoint("BOTTOMLEFT", BetterWardrobeCollectionFrame.ItemsCollectionFrame.WeaponDropdown, "TOPLEFT", 0, 3)
+				BetterWardrobeCollectionFrame.AlteredFormSwapButton:ClearAllPoints();
+				BetterWardrobeCollectionFrame.AlteredFormSwapButton:SetPoint("TOPRIGHT",self:GetParent(), "TOPRIGHT", -12,-50)
+			end
+
+		else
+			BetterWardrobeCollectionFrame.ItemsCollectionFrame.ApplyOnClickCheckbox:Show();
+
+			----BetterWardrobeCollectionFrame.ItemsCollectionFrame.WeaponDropdown:SetPoint("TOPRIGHT", -32, -25)
+			if ElvUI then 
+				BW_SortDropDown:SetPoint("TOPLEFT", BetterWardrobeCollectionFrame.ItemsCollectionFrame.WeaponDropdown, "BOTTOMLEFT", -55, yOffset)
+				BetterWardrobeCollectionFrame.AlteredFormSwapButton:ClearAllPoints()
+				BetterWardrobeCollectionFrame.AlteredFormSwapButton:SetPoint("TOPRIGHT",self:GetParent(), "TOPRIGHT", -13,-55)
+			else 
+				BW_SortDropDown:SetWidth(150);
+
+				BW_SortDropDown:SetPoint("TOPRIGHT", self.ItemsCollectionFrame.SlotsFrame, "TOPLEFT", -12, -35);
+
+
+				--BW_SortDropDown:SetPoint("TOPLEFT", BetterWardrobeCollectionFrame, "TOPLEFT", 0, -110)
+				BetterWardrobeCollectionFrame.AlteredFormSwapButton:ClearAllPoints()
+				BetterWardrobeCollectionFrame.AlteredFormSwapButton:SetPoint("TOPRIGHT",BetterWardrobeCollectionFrame.ItemsCollectionFrame.WeaponDropdown, "TOPRIGHT", 35, 13)
+
+								-----BW_SortDropDown:SetPoint("TOPLEFT", BetterWardrobeCollectionFrame.ItemsCollectionFrame.WeaponDropDown, "BOTTOMLEFT", 0, yOffset)
+				------BetterWardrobeCollectionFrame.AlteredFormSwapButton:ClearAllPoints()
+				-----BetterWardrobeCollectionFrame.AlteredFormSwapButton:SetPoint("TOPRIGHT",self:GetParent(), "TOPRIGHT", -19,-65)
+			end
+
+
+
+
+
+
+		end
+
+
+	elseif tabID == TAB_SETS or tabID == TAB_EXTRASETS or tabID == TAB_SAVED_SETS  then
+		BetterWardrobeVisualToggle:Show()
+		if BW_ColectionListFrame then 
+			BW_ColectionListFrame:Hide()
+		end
 		self.ItemsCollectionFrame:Hide();
 		self.SearchBox:ClearAllPoints();
 		if ( atTransmogrifier )  then
 			self.activeFrame = self.SetsTransmogFrame;
-			self.SearchBox:SetPoint("TOPRIGHT", -107, -35);
+			self.SearchBox:SetPoint("TOPRIGHT", -95, -35);
 			self.SearchBox:SetWidth(115);
 			self.FilterButton:Hide();
 		else
@@ -1188,6 +1297,8 @@ function BetterWardrobeCollectionFrameMixin:SetTab(tabID)
 			self.FilterButton:Show();
 			self.FilterButton:SetEnabled(true);
 			self:InitBaseSetsFilterButton();
+			self.BW_SetsHideSlotButton:Show()
+
 		end
 
 		self.SearchBox:SetEnabled(true);
@@ -1195,6 +1306,45 @@ function BetterWardrobeCollectionFrameMixin:SetTab(tabID)
 		self.ClassDropdown:SetPoint("BOTTOMRIGHT", self.SetsCollectionFrame, "TOPRIGHT", -9, 4);
 		self.SetsCollectionFrame:SetShown(not atTransmogrifier);
 		self.SetsTransmogFrame:SetShown(atTransmogrifier);
+		BW_SortDropDown:Show()
+		BW_SortDropDown:ClearAllPoints()
+
+		local _, isWeapon = C_TransmogCollection.GetCategoryInfo((BetterWardrobeCollectionFrame and BetterWardrobeCollectionFrame.ItemsCollectionFrame:GetActiveCategory()) or 1)
+		local yOffset = (atTransmogrifier and (isWeapon and 55 or 32)) or LegionWardrobeY;
+		if atTransmogrifier  then
+			self.TransmogOptionsButton:Show()
+			self.activeFrame = self.SetsTransmogFrame;
+
+
+			if tabID == TAB_SAVED_SETS then 
+				--self.SearchBox:SetPoint("TOPRIGHT", -457, -83)
+			else
+				--self.SearchBox:SetPoint("TOPRIGHT", -97, -35)
+			end
+
+			if ElvUI then 
+				BW_SortDropDown:SetPoint("TOPLEFT", BetterWardrobeCollectionFrame.ItemsCollectionFrame.WeaponDropdown, "BOTTOMLEFT", 0, 0)
+				BetterWardrobeCollectionFrame.AlteredFormSwapButton:ClearAllPoints()
+				BetterWardrobeCollectionFrame.AlteredFormSwapButton:SetPoint("TOPRIGHT",self:GetParent(), "TOPRIGHT", -17,-45)
+			else 
+				BW_SortDropDown:SetPoint("BOTTOMLEFT", BetterWardrobeCollectionFrame.ItemsCollectionFrame.WeaponDropdown, "TOPLEFT", 0, 3)
+				BetterWardrobeCollectionFrame.AlteredFormSwapButton:ClearAllPoints()
+				BetterWardrobeCollectionFrame.AlteredFormSwapButton:SetPoint("TOPRIGHT",self:GetParent(), "TOPRIGHT", -12,-50)
+			end
+
+		else
+			--BetterWardrobeCollectionFrame.ItemsCollectionFrame.WeaponDropdown:SetPoint("TOPRIGHT", -32, -25)
+			if ElvUI then 
+				--BW_SortDropDown:SetPoint("TOPLEFT", BetterWardrobeCollectionFrame.ItemsCollectionFrame.WeaponDropdown, "BOTTOMLEFT", -55, yOffset)
+				BetterWardrobeCollectionFrame.AlteredFormSwapButton:ClearAllPoints()
+				BetterWardrobeCollectionFrame.AlteredFormSwapButton:SetPoint("TOPRIGHT",self:GetParent(), "TOPRIGHT", -13,-55)
+			else 
+				BW_SortDropDown:SetPoint("TOPLEFT", BetterWardrobeCollectionFrame.ItemsCollectionFrame.WeaponDropdown, "BOTTOMLEFT", 0, yOffset)
+				BetterWardrobeCollectionFrame.AlteredFormSwapButton:ClearAllPoints()
+				BetterWardrobeCollectionFrame.AlteredFormSwapButton:SetPoint("TOPRIGHT",self:GetParent(), "TOPRIGHT", -19,-75)
+			end
+		end
+
 	end
 
 	WardrobeFrame:TriggerEvent(BetterWardrobeFrameMixin.Event.OnCollectionTabChanged);
@@ -2243,6 +2393,18 @@ function BetterWardrobeItemsCollectionMixin:FilterVisuals()
 end
 
 function BetterWardrobeItemsCollectionMixin:SortVisuals()
+	if BetterWardrobeCollectionFrame.selectedCollectionTab == 1 then 
+
+		if self:GetActiveCategory() and self:GetActiveCategory() ~= Enum.TransmogCollectionType.Paired then
+			addon.SortItems(addon.sortDB.sortDropdown,self)
+		elseif self:GetActiveCategory() and self:GetActiveCategory() == Enum.TransmogCollectionType.Paired then
+			addon.SortItems(1, self)
+
+		else
+			addon.SortItems(1, self)
+		end
+	end
+	--[[
 	local comparison = function(source1, source2)
 		if ( source1.isCollected ~= source2.isCollected ) then
 			return source1.isCollected;
@@ -2269,6 +2431,7 @@ function BetterWardrobeItemsCollectionMixin:SortVisuals()
 	end
 
 	table.sort(self.filteredVisualsList, comparison);
+	]]
 end
 
 function BetterWardrobeItemsCollectionMixin:GetActiveSlotInfo()
@@ -2580,7 +2743,9 @@ function BetterWardrobeItemsCollectionMixin:RefreshVisualsList()
 
 	end
 	self:FilterVisuals();
-	self:SortVisuals();
+	addon:CacheCategory(self)
+	C_Timer.After(.1, function()self:SortVisuals(); self:UpdateItems(); end)
+
 	self.PagingFrame:SetMaxPages(ceil(#self.filteredVisualsList / self.PAGE_SIZE));
 end
 
@@ -4025,6 +4190,10 @@ function BetterWardrobeSetsCollectionMixin:DisplaySet(setID)
 		showVariantSetsDropdown = numVisibleSets > 1;
 	end
 
+	if (BetterWardrobeCollectionFrame.selectedCollectionTab == TAB_SAVED_SETS) then
+		showVariantSetsDropdown = false
+	end
+
 	if showVariantSetsDropdown then
 		self.DetailsFrame.VariantSetsDropdown:Show();
 		self.DetailsFrame.VariantSetsDropdown:SetText(setInfo.description);
@@ -5057,11 +5226,14 @@ function BetterWardrobeSetsDetailsItemUseabiltiyMixin:OnEnter()
 	local status = self:GetParent().itemCollectionStatus;
 	local text;
 	if status == "CollectedCharCantUse" then
-		text = L["Class cant use appearance. Useable appearance available."]
+		text = L["Class cant use appearance. Useable appearance available."];
 	elseif status == "CollectedCharCantGet" or status == "NotCollectedCharCantGet" then 
-		text = L["Class can't collect or use appearance."]
-	elseif status == "NotCollectedUnavailable" then 
-		text = L["Item No Longer Obtainable."]
+		text = L["Class can't collect or use appearance."];
+	elseif status == "NotCollectedUnavailable" then
+
+		text = L["Item No Longer Obtainable."];
+	else
+		text = "";
 	end
 
 	GameTooltip:SetOwner(self, "ANCHOR_RIGHT", 0, 0)
@@ -5101,3 +5273,190 @@ function BetterWardrobeSetsDetailsAltItemMixin:OnMouseDown()
 	--print(sourceInfo.name)
 	BetterWardrobeCollectionFrame.SetsCollectionFrame:DisplaySet(self.setID)
 end
+
+
+local SortOrder;
+local DEFAULT = addon.Globals.DEFAULT;
+local APPEARANCE = addon.Globals.APPEARANCE;
+local ALPHABETIC = addon.Globals.ALPHABETIC;
+local ITEM_SOURCE = addon.Globals.ITEM_SOURCE;
+local EXPANSION = addon.Globals.EXPANSION;
+local COLOR = addon.Globals.COLOR;
+local ILEVEL = 8
+local ITEMID = 9
+local ARTIFACT = 7;
+local TAB_ITEMS = addon.Globals.TAB_ITEMS;
+local TAB_SETS = addon.Globals.TAB_SETS;
+local TAB_EXTRASETS = addon.Globals.TAB_EXTRASETS;
+local TAB_SAVED_SETS = addon.Globals.TAB_SAVED_SETS;
+--local TABS_MAX_WIDTH = addon.Globals.TABS_MAX_WIDTH;
+--local dropdownOrder = {DEFAULT, ALPHABETIC, APPEARANCE, COLOR, EXPANSION, ITEM_SOURCE};
+local dropdownOrder = {DEFAULT, ALPHABETIC, APPEARANCE, COLOR, EXPANSION, ITEM_SOURCE}
+
+local locationDrowpDown = addon.Globals.locationDrowpDown;
+--= {INVTYPE_HEAD, INVTYPE_SHOULDER, INVTYPE_CLOAK, INVTYPE_CHEST, INVTYPE_WAIST, INVTYPE_LEGS, INVTYPE_FEET, INVTYPE_WRIST, INVTYPE_HAND}
+local defaults = {
+	sortDropdown = DEFAULT,
+	reverse = false,
+}
+
+function addon.Init.SortDropDown_Initialize()
+	if not addon.sortDB then
+		addon.sortDB = CopyTable(defaults)
+	end
+	local Wardrobe = BetterWardrobeCollectionFrame.ItemsCollectionFrame;
+	db = addon.sortDB;
+
+	BW_SortDropDown = CreateFrame("DropdownButton", "BW_SortDropDown", BetterWardrobeCollectionFrame, "WowStyle1DropdownTemplate")
+	BW_SortDropDown:SetWidth(150)
+
+	--BW_SortDropDown = BW_UIDropDownMenu_Create("BW_SortDropDown", BW_WardrobeCollectionFrame)
+	-----BW_UIDropDownMenu_SetWidth(BW_SortDropDown, 130)
+	--[[
+	BW_UIDropDownMenu_Initialize(BW_SortDropDown, function(self)
+		local info = BW_UIDropDownMenu_CreateInfo()
+		local selectedValue = BW_UIDropDownMenu_GetSelectedValue(self)
+
+		info.func = function(self)
+				local tabID = addon.GetTab()
+				--print(tabID)
+				local sortValue
+				if tabID ==4 then
+					addon.setdb.profile.sorting = self.value
+					sortValue = addon.setdb.profile.sorting
+
+				else
+					db.sortDropdown = self.value;
+					sortValue = db.sortDropdown
+				end
+				
+				--print (self.value)
+				--print(sortValue)
+				BW_UIDropDownMenu_SetSelectedValue(BW_SortDropDown, sortValue)
+				BW_UIDropDownMenu_SetText(BW_SortDropDown, COMPACT_UNIT_FRAME_PROFILE_SORTBY.." "..L[sortValue])
+				--db.reverse = IsModifierKeyDown()
+
+				if tabID == 1 then
+					--Wardrobe:OnShow()
+					Wardrobe:RefreshVisualsList()
+					Wardrobe:UpdateItems()
+					Wardrobe:UpdateWeaponDropDown()
+				elseif tabID == 2 then
+					RefreshLists()
+				elseif tabID == 3 then
+					RefreshLists()
+				elseif tabID == 4 then
+					--RefreshLists()
+										
+
+					BetterWardrobeCollectionFrame:SetTab(3)
+					BetterWardrobeCollectionFrame:SetTab(4)
+
+				end
+			end
+
+			local tabID = addon.GetTab()
+			for index, id in pairs(dropdownOrder) do
+				if id == ITEM_SOURCE and (tabID == 2 or tabID == 3) then
+				elseif (tabID == 4 and index <= 2) or tabID ~= 4 then 
+					info.value, info.text = id, L[id]
+					info.checked = (id == selectedValue)
+					BW_UIDropDownMenu_AddButton(info)
+				end
+			end
+
+
+			if tabID == 1 then
+				info.value = ILEVEL;
+				info.text = L[ILEVEL]
+				info.checked = (8 == selectedValue)
+				BW_UIDropDownMenu_AddButton(info)
+
+				info.value = ITEMID;
+				info.text = L[ITEMID]
+				info.checked = (9 == selectedValue)
+				BW_UIDropDownMenu_AddButton(info)
+			end
+
+			if tabID == 1 and( Wardrobe.activeCategory and Wardrobe.activeCategory >= 13) then
+				info.value = ARTIFACT;
+				info.text = L[ARTIFACT]
+				info.checked = (7 == selectedValue)
+				BW_UIDropDownMenu_AddButton(info)
+			end
+
+		end)
+		]]
+	local tabID = addon.GetTab()
+	local sortValue
+	----print(tabID)
+	if tabID ==4 then
+		sortValue = addon.setdb.profile.sorting
+	else
+		sortValue = db.sortDropdown
+	end
+	
+	-----BW_UIDropDownMenu_SetSelectedValue(BW_SortDropDown, sortValue)
+end
+
+
+BetterWardrobeCollectionSortDropdownMixin = {};
+local sortid =  1
+
+function BetterWardrobeCollectionSortDropdownMixin:OnLoad()
+	if not addon.sortDB then
+		addon.sortDB = CopyTable(defaults)
+	end
+
+	self:SetWidth(150);
+	self:SetSelectionTranslator(function(selection)
+		return COMPACT_UNIT_FRAME_PROFILE_SORTBY.." "..selection.text;
+	end);
+end
+
+function BetterWardrobeCollectionSortDropdownMixin:OnShow()
+	self:Refresh();
+	WardrobeFrame:RegisterCallback(BetterWardrobeFrameMixin.Event.OnCollectionTabChanged, self.Refresh, self);
+end
+
+function BetterWardrobeCollectionSortDropdownMixin:OnHide()
+	WardrobeFrame:UnregisterCallback(BetterWardrobeFrameMixin.Event.OnCollectionTabChanged, self);
+end
+
+function BetterWardrobeCollectionSortDropdownMixin:GetSortFilter()
+	return addon.sortDB.sortDropdown
+end
+
+function BetterWardrobeCollectionSortDropdownMixin:SetSortFilter(id)
+	addon.sortDB.sortDropdown = id;
+	BetterWardrobeCollectionFrame.ItemsCollectionFrame:RefreshVisualsList();
+
+	self:Refresh();
+end
+
+
+function BetterWardrobeCollectionSortDropdownMixin:Refresh()
+	self:SetupMenu(function(dropdown, rootDescription)
+		rootDescription:SetTag("BW_SORT_MENU");
+
+		local function IsSortFilterSet(id)
+			return self:GetSortFilter()  == id
+		end;
+
+		local function SetSortFilter(id)
+			self:SetSortFilter(id);
+		end;
+
+		for index, id in pairs(dropdownOrder) do
+			--if id == ITEM_SOURCE and (tabID == 2 or tabID == 3) then
+			--elseif (tabID == 4 and index <= 2) or tabID ~= 4 then 
+				--info.value, info.text = id, L[id]
+				--info.checked = (id == selectedValue)
+				--BW_UIDropDownMenu_AddButton(info)
+				rootDescription:CreateRadio(L[id], IsSortFilterSet, SetSortFilter, id);
+			--end
+		end
+	end);
+end
+
+

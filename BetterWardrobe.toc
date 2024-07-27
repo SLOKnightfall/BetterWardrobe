@@ -70,7 +70,7 @@ Modules\SavedOutfits.xml
 Modules\DressingRoom.xml
 Modules\Wardrobe.xml
 Modules\ColorFilter.lua
-Modules\dropdown.xml
+#Modules\dropdown.xml
 #Modules\PreviewWindows.lua
 
 Modules\CollectionList.xml

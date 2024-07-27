@@ -257,6 +257,7 @@ function BetterWardrobeOutfitDropDownMixin:OnOutfitModified(outfitID)
 end
 
 function BetterWardrobeOutfitDropDownMixin:SelectOutfit(outfitID, loadOutfit)
+	if true then return false end
 	local name
 	if ( outfitID ) then
 		name = GetOutfitName(outfitID)
@@ -1131,13 +1132,13 @@ function addon.Init.SavedSetsDropDown_Initialize(self)
 	--BW_UIDropDownMenu_SetSelectedValue(BW_DBSavedSetDropdown, addon.setdb:GetCurrentProfile())
 	--BW_DBSavedSetDropdown:Hide()
 
-	SavedOutfitDropDownMenu:Hide()
-	SavedOutfitDropDownMenu:SetParent(BetterWardrobeCollectionFrame)
-	SavedOutfitDropDownMenu:ClearAllPoints()
+	----SavedOutfitDropDownMenu:Hide()
+	----SavedOutfitDropDownMenu:SetParent(BetterWardrobeCollectionFrame)
+	----SavedOutfitDropDownMenu:ClearAllPoints()
 	--SavedOutfitDropDownMenu:SetPoint("TOPRIGHT", "BW_SortDropDown", "TOPRIGHT")
 
-	SavedOutfitDropDownMenu:SetPoint("TOPLEFT", BetterWardrobeVisualToggle, "TOPRIGHT", -15, 0)
-	BW_UIDropDownMenu_SetText(SavedOutfitDropDownMenu, addon.setdb:GetCurrentProfile())
+	----SavedOutfitDropDownMenu:SetPoint("TOPLEFT", BetterWardrobeVisualToggle, "TOPRIGHT", -15, 0)
+	----BW_UIDropDownMenu_SetText(SavedOutfitDropDownMenu, addon.setdb:GetCurrentProfile())
 
 end
 

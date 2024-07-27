@@ -926,10 +926,21 @@
 				</Scripts>
 			</DropdownButton>
 
+			<DropdownButton parentKey="SortDropdown" name = "BW_SortDropDown" inherits="WowStyle1DropdownTemplate" mixin="BetterWardrobeCollectionSortDropdownMixin">
+				<Anchors>
+					<Anchor point="TOPLEFT" y="-20"/>
+				</Anchors>
+				<Scripts>
+					<OnLoad method="OnLoad"/>
+					<OnShow method="OnShow"/>
+					<OnHide method="OnHide"/>
+				</Scripts>
+			</DropdownButton>
+
 			<DropdownButton parentKey="TransmogOptionsButton" name="BW_TransmogOptionsButton" inherits="UIMenuButtonStretchTemplate" text="Options" hidden="false">
 				<Size x="93" y="22"/>
 				<Anchors>
-					<Anchor point="BOTTOMRIGHT" x="-55" y="80"/>
+					<Anchor point="BOTTOMRIGHT" x="-53" y="80"/>
 				</Anchors>
 				<Layers>
 					<Layer level="ARTWORK">
@@ -961,7 +972,7 @@
 			<Button parentKey="BW_SetsHideSlotButton" inherits="SquareIconButtonTemplate" >
 				<Size x="32" y="32"/>
 				<Anchors>
-					<Anchor point="BOTTOM" relativeKey="$parent" relativePoint="BOTTOM" x="-35" y="15"/>
+					<Anchor point="TOPLEFT" relativeKey="$parent.TransmogOptionsButton" relativePoint="BOTTOMRIGHT" x="-30" y="-5"/>
 				</Anchors>					
 				<Layers>
 					<Layer level="ARTWORK" textureSubLevel="5">
@@ -1039,9 +1050,6 @@
 					<DropdownButton parentKey="WeaponDropdown" inherits="WowStyle1DropdownTemplate" hidden="true">
 						<Anchors>
 							<Anchor point="TOPRIGHT" x="-25" y="-58"/>
-
-
-
 						</Anchors>
 					</DropdownButton>
 					<Frame parentKey="SlotsFrame">
@@ -1485,7 +1493,7 @@
 								<Layers>
 									<Layer level="ARTWORK" textureSubLevel="5">
 										<Texture parentKey="Icon" atlas="poi-transmogrifier" useAtlasSize="false">
-											<Size x="16" y="20"/>
+											<Size x="24" y="24"/>
 											<Anchors>
 												<Anchor point="CENTER" />
 											</Anchors>
@@ -1538,7 +1546,7 @@
 
 							<DropdownButton parentKey="VariantSetsDropdown" inherits="WowStyle1DropdownTemplate" frameLevel="80">
 								<Anchors>
-									<Anchor point="TOPRIGHT" x="-6" y="-6"/>
+									<Anchor point="TOPRIGHT" x="-60" y="-3"/>
 								</Anchors>
 							</DropdownButton>
 						</Frames>
@@ -1792,28 +1800,7 @@
 					<OnMouseWheel method="OnMouseWheel"/>
 				</Scripts>
 			</Frame>
-			<Frame parentKey="BW_OutfitDropDown" name="BetterWardrobeOutfitDropDown" parent = "WardrobeTransmogFrame" inherits="BetterWardrobeOutfitDropDownTemplate" mixin="BetterWardrobeOutfitMixin"  hidden = "false">
-				<KeyValues>
-					<KeyValue key="width" value="188" type="number"/>
-					<KeyValue key="minMenuStringWidth" value="152" type="number"/>
-					<KeyValue key="maxMenuStringWidth" value="216" type="number"/>
-					<KeyValue key="replaceInvalidSources" value="false" type="boolean"/>
-				</KeyValues>
-				<Anchors>
-					<Anchor point="TOPLEFT" x="-14" y="28"/>
-				</Anchors>
-			</Frame>
 		</Frames>
-		<Layers>
-			<Layer level="BACKGROUND" textureSubLevel="-6">
-				<Texture name="$parentBg" file="Interface\FrameGeneral\UI-Background-Rock" horizTile="true" vertTile="true" parentKey="Bg">
-					<Anchors>
-						<Anchor point="TOPLEFT" x="2" y="-21"/>
-						<Anchor point="BOTTOMRIGHT" x="-2" y="2"/>
-					</Anchors>
-				</Texture>
-			</Layer>
-		</Layers>
 		<Scripts>
 			<OnLoad method="OnLoad"/>
 			<OnEvent method="OnEvent"/>
@@ -2236,7 +2223,7 @@
 					</Frame>
 
 					<!--WardrobeOutfitDropdownOverrideMixin provides implementation overrides of functions in WardrobeOutfitDropdownMixin-->
-					<DropdownButton parentKey="OutfitDropdown" inherits="WardrobeOutfitDropdownTemplate" mixin="WardrobeOutfitDropdownOverrideMixin">
+					<DropdownButton parentKey="BW_OutfitDropdown" inherits="WardrobeOutfitDropdownTemplate" mixin="WardrobeOutfitDropdownOverrideMixin">
 						<KeyValues>
 							<KeyValue key="width" value="207" type="number"/>
 							<KeyValue key="minMenuStringWidth" value="152" type="number"/>

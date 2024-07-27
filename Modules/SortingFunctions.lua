@@ -173,7 +173,7 @@ local function SortItemDefault(self)
 end
 
 
-local function CacheCategory(self)
+ function addon:CacheCategory(self)
 	local Wardrobe = BetterWardrobeCollectionFrame.ItemsCollectionFrame
 	for _, data in pairs(self.filteredVisualsList) do
 		local id = data.visualID
@@ -193,12 +193,14 @@ end
 
 
 local function SortItemAlphabetic(self)
-	if not categoryCached[self:GetActiveCategory()] then
-		CacheCategory(self)
-	end
 
+	if not categoryCached[self:GetActiveCategory()] then
+		addon:CacheCategory(self)
+		C_Timer.After(.5, function()SortItemAlphabetic(self) end)
+			return false
+	end
 	if BetterWardrobeCollectionFrame.ItemsCollectionFrame:IsVisible() then
-		C_Timer.After(.0, function()
+		C_Timer.After(.1, function()
 				local comparison = function(source1, source2)
 					local item1 = itemCache[source1.visualID].name
 					local item2 = itemCache[source2.visualID].name
