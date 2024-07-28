@@ -481,7 +481,7 @@ function BW_TransmogFrameMixin:RefreshPlayerModel()
 		local hideWeapons = false;
 		local useNativeForm = true;
 		local _, raceFilename = UnitRace("Player");
-		if(raceFilename == "Dracthyr" or raceFilename == "Worgen") then
+		if (raceFilename == "Dracthyr" or raceFilename == "Worgen") then
 			useNativeForm = not self.inAlternateForm;
 		end
 		actor:SetModelByUnit("player", sheatheWeapons, autoDress, hideWeapons, useNativeForm);
@@ -2577,8 +2577,21 @@ function BetterWardrobeItemsCollectionMixin:UpdateItems()
 			
 			-- camera
 			if ( self.transmogLocation:IsAppearance() ) then
-				cameraID = C_TransmogCollection.GetAppearanceCameraID(visualInfo.visualID, cameraVariation);
+				if visualInfo.artifact then
+						cameraID = visualInfo.camera;
+				else
+						local inNativeForm = C_UnitAuras.WantsAlteredForm("player");
+
+						if  (inNativeForm and addon.useNativeForm) or (not inNativeForm and not addon.useNativeForm)  or isWeapon then 
+							cameraID = C_TransmogCollection.GetAppearanceCameraID(visualInfo.visualID, cameraVariation)
+						else
+							cameraID = addon.Camera:GetCameraIDBySlot(self.activeCategory)
+						end
+				end
+				
 			end
+
+			--print(cameraID)
 			if ( model.cameraID ~= cameraID ) then
 				addon.Model_ApplyUICamera(model, cameraID);
 				model.cameraID = cameraID;

@@ -384,54 +384,88 @@ function DressingRoom:GetSource(mainHandEnchant, offHandEnchant)
 	end
 end
 
+local DefaultActorID = 1620;
+local ActorIDList = {
+	[4207724] = 1653, --Dracthyr
+	[4395382] = 1654, --Dracthyr Male Visage
+	[4220488] = 1654, --Dracthyr Female Visage
+	[307454] = 1626, --Worgen Male
+	[307453] = 1645, --Worgen Female
+};
+
 local isPlayer = false
 function DressingRoom:UpdateModel(unit)
-	local unit = unit or "player"
+	local unit = unit or "player";
 	if not UnitExists(unit) or not UnitIsPlayer(unit) or not CanInspect(unit, false) then
 		return
 	end
 
-	SetDressUpBackground(unit)
-	local actor = DressUpFrame.ModelScene:GetPlayerActor()
+	SetDressUpBackground(unit);
+	local actor = DressUpFrame.ModelScene:GetPlayerActor();
 
-	if not actor then return end
+	if not actor then return end;
 	
-	BW_DressingRoomFrame:RegisterEvent("INSPECT_READY")
-	NotifyInspect(unit)
+	local itemList;
+	if actor then
+		itemList = CopyTable(actor:GetItemitemList());
+	end
+	
+	if unit ~= "player" then
+		BW_DressingRoomFrame:RegisterEvent("INSPECT_READY")
+		NotifyInspect(unit);
+	end
 
-	UnitInfo.raceID = select(3, UnitRace(unit))
-	UnitInfo.classID = select(3, UnitClass(unit))
-	UnitInfo.genderID = UnitSex(unit)
+	UnitInfo.raceID = select(3, UnitRace(unit));
+	UnitInfo.classID = select(3, UnitClass(unit));
+	UnitInfo.genderID = UnitSex(unit);
 
-	local model, refresh
-	local sheatheWeapons = actor:GetSheathed() or false
+	local model, refresh;
+	local sheatheWeapons = actor:GetSheathed() or false;
 
 	if useTarget then
-		model = unit
-		isPlayer = false
-		actor:SetModelByUnit(model, sheatheWeapons, true, false, addon.useNativeForm )
-		refresh = true
+		model = unit;
+		isPlayer = false;
+		actor:SetModelByUnit(model, sheatheWeapons, true, false, addon.useNativeForm );
+		refresh = true;
 
 	else
-		model = "player"
+		model = "player";
 		if not isPlayer then
-			isPlayer = true
-			actor:SetModelByUnit(model, sheatheWeapons, true, false, addon.useNativeForm)
-			refresh = true
+			isPlayer = true;
+			actor:SetModelByUnit(model, sheatheWeapons, true, false, addon.useNativeForm);
+			refresh = true;
 		end
 	end
 
 	if refresh then
-		local modelInfo = C_ModelInfo.GetModelSceneActorInfoByID(483)
-		C_Timer.After(0.1, function() DressUpFrame.ModelScene:InitializeActor(actor, modelInfo) end)
+		C_Timer.After(0.1, function() 			
+			local fileID = actor:GetModelFileID();
+			local infoID;
+			if fileID and ActorIDList[fileID] then
+				infoID = ActorIDList[fileID];
+			else
+				infoID = DefaultActorID;
+			end
+			local modelInfo = C_ModelInfo.GetModelSceneActorInfoByID(infoID);
+
+			if modelInfo then
+				actor:ApplyFromModelSceneActorInfo(modelInfo);
+			end
+
+			if itemList then
+				for slotID, transmogInfo in ipairs(itemList) do
+					actor:SetItemTransmogInfo(transmogInfo, slotID);
+				end
+			end
+		 end)
 	end
 end
 
 BW_DressingRoomFrameMixin = {}
 function BW_DressingRoomFrameMixin:OnLoad()
-	self:RegisterEvent("ADDON_LOADED")
-	hooksecurefunc("DressUpVisual", DressingRoom.Update)
-	hooksecurefunc("DressUpCollectionAppearance", DressingRoom.Update)
+	self:RegisterEvent("ADDON_LOADED");
+	hooksecurefunc("DressUpVisual", DressingRoom.Update);
+	hooksecurefunc("DressUpCollectionAppearance", DressingRoom.Update);
 --[[
 	DressUpFrame.LinkButton:ClearAllPoints()
 	DressUpFrame.LinkButton:SetPoint("LEFT",BW_DressingRoomFrame.BW_DressingRoomUndressButton, "RIGHT",-6,0)
@@ -457,36 +491,36 @@ function BW_DressingRoomFrameMixin:OnLoad()
 	highlight:SetPoint("BOTTOMRIGHT",DressUpFrame.LinkButton, "BOTTOMRIGHT",-8,5 )
 --]]
 	if IsAddOnLoaded("Narcissus") then
-		BW_DressingRoomFrame.BW_DressingRoomSwapFormButton:Hide()
+		BW_DressingRoomFrame.BW_DressingRoomSwapFormButton:Hide();
 	end
 end
 
 
 function BW_DressingRoomFrameMixin:OnShow()
-	itemhistory = {}
-	BW_DressingRoomFrame.BW_DressingRoomUndoButton:Hide()
-	addon:StoreItems()
+	itemhistory = {};
+	BW_DressingRoomFrame.BW_DressingRoomUndoButton:Hide();
+	addon:StoreItems();
 	if not Profile.DR_OptionsEnable then return end
 
-	BW_DressingRoomFrame.PreviewButtonFrame:SetShown(addon.Profile.DR_ShowItemButtons)
-	DressingRoom:UpdateBackground()	
-	HideArmorOnShow = addon.Profile.DR_StartUndressed
-	HideWeaponOnShow = addon.Profile.DR_HideWeapons
-	HideTabardOnShow = addon.Profile.DR_HideTabard
-	HideShirtOnShow = addon.Profile.DR_HideShirt
-	forceView = true
+	BW_DressingRoomFrame.PreviewButtonFrame:SetShown(addon.Profile.DR_ShowItemButtons);
+	DressingRoom:UpdateBackground();
+	HideArmorOnShow = addon.Profile.DR_StartUndressed;
+	HideWeaponOnShow = addon.Profile.DR_HideWeapons;
+	HideTabardOnShow = addon.Profile.DR_HideTabard;
+	HideShirtOnShow = addon.Profile.DR_HideShirt;
+	forceView = true;
 
 	if not GetCVarBool("transmogShouldersSeparately") then 
-		BW_DressingRoomFrame.PreviewButtonFrame.PreviewButtonRightShoulder:Hide()
-		BW_DressingRoomFrame.PreviewButtonFrame.PreviewButtonBack:ClearAllPoints()
+		BW_DressingRoomFrame.PreviewButtonFrame.PreviewButtonRightShoulder:Hide();
+		BW_DressingRoomFrame.PreviewButtonFrame.PreviewButtonBack:ClearAllPoints();
 		BW_DressingRoomFrame.PreviewButtonFrame.PreviewButtonBack:SetPoint("TOPLEFT", BW_DressingRoomFrame.PreviewButtonFrame.PreviewButtonLeftShoulder,"BOTTOMLEFT")
 	else
-		BW_DressingRoomFrame.PreviewButtonFrame.PreviewButtonRightShoulder:Show()
-		BW_DressingRoomFrame.PreviewButtonFrame.PreviewButtonBack:ClearAllPoints()
+		BW_DressingRoomFrame.PreviewButtonFrame.PreviewButtonRightShoulder:Show();
+		BW_DressingRoomFrame.PreviewButtonFrame.PreviewButtonBack:ClearAllPoints();
 		BW_DressingRoomFrame.PreviewButtonFrame.PreviewButtonBack:SetPoint("TOPLEFT", BW_DressingRoomFrame.PreviewButtonFrame.PreviewButtonRightShoulder,"BOTTOMLEFT")
 	end
 
-	C_Timer.After(0, function() DressingRoom:GetSource() end)
+	C_Timer.After(0, function() DressingRoom:GetSource() end);
 end
 
 
