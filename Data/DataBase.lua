@@ -300,9 +300,9 @@ function BuildBlizzSets()
 							data.baseSetID = initTradingPostSet;
 							AddVariant(data, initTradingPostSet);
 							if data.favorite then
-								local baseSet = BetterWardrobeSetsDataProviderMixin:GetSetByID(initTradingPostSet);
+								----local baseSet = BetterWardrobeSetsDataProviderMixin:GetSetByID(initTradingPostSet);
 								if not baseSet.favoriteSetID then
-									baseSet.favoriteSetID = data.setID;
+								----	baseSet.favoriteSetID = data.setID;
 								end
 							end
 						end
@@ -1501,6 +1501,50 @@ end
 
 function addon:IsCollected(visualID)
 	return collectedAppearances[visualID]
+end
+
+function addon.GetSetsources(setID)
+	--return C_TransmogSets.GetSetPrimaryAppearances(setID)
+	return addon.C_TransmogSets.GetSetSources(setID)
+end
+
+
+function addon:GetSetByID(SetID)
+  if (BaseSets[SetID]) then
+    return BaseSets[SetID];
+  end
+  
+  if (VariantSetsIDs[SetID]) then
+    local baseSet = VariantSetsIDs[SetID];
+    
+    for i=1, #VariantSets[baseSet] do
+      if VariantSets[baseSet][i].setID == SetID then
+        return VariantSets[baseSet][i];
+      end
+    end
+  end
+  
+  if (NotUsedSets[SetID]) then
+    return NotUsedSets[SetID];
+  end
+  
+  if (TransmogSetsIndex and TransmogSetsIndex[SetID]) then
+    return TransmogSets[TransmogSetsIndex[SetID]];
+  end
+  
+	return nil;
+end
+
+
+function addon:GetBaseSetID(SetID)
+  if (NotUsedSets[SetID]) then
+    return SetID;
+  end
+  
+  if (BaseSets[SetID]) then
+    return SetID;
+  end
+  return VariantSetsIDs[SetID];
 end
 
 

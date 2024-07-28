@@ -644,6 +644,7 @@ end]]
 --end
 
 function addon.Model_ApplyUICamera(self, uiCameraID)
+	--print(uiCameraID)
 	local posX, posY, posZ, yaw, pitch, roll, animId, animVariation, animFrame, centerModel = GetUICameraInfo(uiCameraID)
 	if posX and posY and posZ and yaw and pitch and roll then
 		self:MakeCurrentCameraCustom()

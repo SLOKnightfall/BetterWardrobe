@@ -2186,7 +2186,7 @@
 					</Layer>
 				</Layers>
 				<Frames>
-					<CheckButton parentKey="ToggleSecondaryAppearanceCheckbox" mixin="BW_TransmogToggleSecondaryAppearanceCheckboxMixin" hidden="true">
+					<CheckButton parentKey="ToggleSecondaryAppearanceCheckbox" mixin="BetterTransmogToggleSecondaryAppearanceCheckboxMixin" hidden="true">
 						<Size x="30" y="30"/>
 						<Anchors>
 							<Anchor point="BOTTOMLEFT" x="348" y="15"/>
