@@ -478,7 +478,12 @@ end
 
 addon.RefreshFilter = true
 function addon:FilterSets(setList, setType)
-	if 	C_Transmog.IsAtTransmogNPC() then return setList end
+	if 	C_Transmog.IsAtTransmogNPC() then return setList 
+	else
+return setList
+	end
+
+
 
 	local FilterSets = {}
 	local searchString = string.lower(WardrobeCollectionFrameSearchBox:GetText())
