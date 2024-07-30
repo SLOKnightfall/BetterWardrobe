@@ -244,10 +244,10 @@ function BetterWardrobeTransmogVendorOptionsDropDown_OnLoad(self)
 end
 
 local dropdownOrder = {DEFAULT, ALPHABETIC, APPEARANCE, COLOR, EXPANSION, ITEM_SOURCE}
-local locationDrowpDown = addon.Globals.locationDrowpDown
+local locationDropDown = addon.Globals.locationDropDown
 
 addon.includeLocation = {}
-for i, location in pairs(locationDrowpDown) do
+for i, location in pairs(locationDropDown) do
 	addon.includeLocation[i] = true
 end
 
@@ -352,7 +352,7 @@ function UI:OptionsDropDown_Initialize(level)
 
 		info.text = CHECK_ALL
 		info.func = function()
-						for i in pairs(locationDrowpDown) do
+						for i in pairs(locationDropDown) do
 							addon.includeLocation[i] = true
 						end
 						BetterWardrobeCollectionFrame.SetsTransmogFrame:OnSearchUpdate()
@@ -367,7 +367,7 @@ function UI:OptionsDropDown_Initialize(level)
 
 		info.text = UNCHECK_ALL
 		info.func = function()
-						for i in pairs(locationDrowpDown) do
+						for i in pairs(locationDropDown) do
 							addon.includeLocation[i] = false
 						end
 						BetterWardrobeCollectionFrame.SetsTransmogFrame:OnSearchUpdate()
@@ -381,7 +381,7 @@ function UI:OptionsDropDown_Initialize(level)
 					end
 		BW_UIDropDownMenu_AddButton(info, level)
 		
-		for index, id in pairs(locationDrowpDown) do
+		for index, id in pairs(locationDropDown) do
 			if index ~= 21 then --Skip "robe" type
 				info.notCheckable = false
 				info.text = id

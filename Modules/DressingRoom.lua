@@ -667,13 +667,13 @@ local function BW_DressingRoomImportButton_OnClick(self)
 		},
 		{
 			text = L["Import Item"],
-			func = function() BetterWardrobeOutfitFrameMixin:ShowPopup("BETTER_WARDROBE_IMPORT_ITEM_POPUP")	end,
+			func = function() BetterWardrobeOutfitManager:ShowPopup("BETTER_WARDROBE_IMPORT_ITEM_POPUP")	end,
 			isNotRadio = true,
 			notCheckable = true,
 		},
 		{
 			text = L["Import Set"],
-			func = function()BetterWardrobeOutfitFrameMixin:ShowPopup("BETTER_WARDROBE_IMPORT_SET_POPUP") end,
+			func = function()BetterWardrobeOutfitManager:ShowPopup("BETTER_WARDROBE_IMPORT_SET_POPUP") end,
 			isNotRadio = true,
 			notCheckable = true,
 		},
@@ -851,8 +851,7 @@ function BetterDressUpOutfitMixin:LoadOutfit(outfitID)
 	DressingRoom:Update()
 	import = true
 	local setType = addon.GetSetType(outfitID)
-	
-	if setType == "SavedBlizzard" then
+	if setType == "SavedBlizzard"  or (outfitID >= 5000 and outfitID <= 6000) then
 		local outfitID = addon:GetBlizzID(outfitID)
 		DressUpItemTransmogInfoList(C_TransmogCollection.GetOutfitItemTransmogInfoList(outfitID))
 	else

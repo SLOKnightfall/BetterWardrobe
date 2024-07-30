@@ -362,7 +362,7 @@ function CollectionList:OptionButton_OnClick(button)
 			text =  L["Add List"],
 			func = function()
 				action = "add"
-				BetterWardrobeOutfitFrameMixin:ShowPopup("BW_NAME_COLLECTION")
+				BetterWardrobeOutfitManager:ShowPopup("BW_NAME_COLLECTION")
 			end,
 			isNotRadio = true,
 			notCheckable = true,
@@ -371,7 +371,7 @@ function CollectionList:OptionButton_OnClick(button)
 			text = L["Rename"],
 			func = function()
 				action = "rename"
-				BetterWardrobeOutfitFrameMixin:ShowPopup("BW_NAME_COLLECTION")
+				BetterWardrobeOutfitManager:ShowPopup("BW_NAME_COLLECTION")
 			end,
 			isNotRadio = true,
 			notCheckable = true,
@@ -389,7 +389,7 @@ function CollectionList:OptionButton_OnClick(button)
 		{
 			text = L["Add by Item ID"],
 			func = function()
-				BetterWardrobeOutfitFrameMixin:ShowPopup("BETTER_WARDROBE_COLLECTIONLIST_ITEM_POPUP")
+				BetterWardrobeOutfitManager:ShowPopup("BETTER_WARDROBE_COLLECTIONLIST_ITEM_POPUP")
 			end,
 			isNotRadio = true,
 			notCheckable = true,

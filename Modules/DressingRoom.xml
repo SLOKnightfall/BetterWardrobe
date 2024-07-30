@@ -283,18 +283,18 @@
 				<Scripts>
 				</Scripts>				
 			</Button>
-			<Frame parentKey="BW_OutfitDropDown"  name="BetterWardrobeDressUpFrameDropDown" inherits="BetterWardrobeOutfitDropDownTemplate" mixin="BetterDressUpOutfitMixin" >
+			<DropdownButton parentKey="OutfitDropDown"  name="$parentOutfitDropdown" inherits="BetterWardrobeOutfitDropDownTemplate" mixin="BetterDressUpOutfitMixin" >
 				<KeyValues>
 					<KeyValue key="width" value="163" type="number"/>
 					<KeyValue key="minMenuStringWidth" value="127" type="number"/>
 					<KeyValue key="maxMenuStringWidth" value="190" type="number"/>
 				</KeyValues>
 				<Anchors>
-					<Anchor point="TOP" relativeTo="DressUpFrame" relativePoint="TOP" x="-23" y="-28"/>
+					<Anchor point="TOP" relativeTo="DressUpFrame" relativePoint="TOP" x="-23" y="-58"/>
 				</Anchors>
 				<Scripts>
 				</Scripts>
-			</Frame>
+			</DropdownButton>
 		</Frames>
 		<Scripts>
 			<OnLoad method="OnLoad" />

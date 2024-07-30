@@ -48,7 +48,7 @@
 			<Frame parentKey="SlotsFrame" hidden = "true">
 				<Size x="10" y="10"/>
 				<Anchors>
-					<Anchor point="TOPLEFT" x="18" y="-100"/>
+					<Anchor point="TOPLEFT" x="180" y="-100"/>
 				</Anchors>
 			</Frame>
 			<Button name = "BW_CollectionListButton" parentKey="CollectionListButton" inherits="UIMenuButtonStretchTemplate" hidden="false">

@@ -697,6 +697,7 @@ function addon.StoreBlizzardSets()
 	end
 
 	addon.setdb.global.sets[addon.setdb:GetCurrentProfile()] = BlizzardSavedSets
+	zzz = addon.setdb.global.sets
 	return BlizzardSavedSets
 end
 

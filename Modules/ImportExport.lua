@@ -180,7 +180,7 @@ function BW_TransmogVendorExportButton_OnClick(self)
 			text = L["Import Item"],
 			func = function()
 				importFrom = "Transmog"
-				BetterWardrobeOutfitFrameMixin:ShowPopup("BETTER_WARDROBE_IMPORT_ITEM_POPUP")
+				BetterWardrobeOutfitManager:ShowPopup("BETTER_WARDROBE_IMPORT_ITEM_POPUP")
 			end,
 			isNotRadio = true,
 			notCheckable = true,
@@ -189,7 +189,7 @@ function BW_TransmogVendorExportButton_OnClick(self)
 			text = L["Import Set"],
 			func = function()
 				importFrom = "Transmog"
-				BetterWardrobeOutfitFrameMixin:ShowPopup("BETTER_WARDROBE_IMPORT_SET_POPUP")
+				BetterWardrobeOutfitManager:ShowPopup("BETTER_WARDROBE_IMPORT_SET_POPUP")
 			end,
 			isNotRadio = true,
 			notCheckable = true,
