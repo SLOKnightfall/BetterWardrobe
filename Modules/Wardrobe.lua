@@ -1184,20 +1184,19 @@ function BetterWardrobeCollectionFrameMixin:SetTab(tabID)
 	end
 
 
-	local ElvUI = IsAddOnLoaded("ElvUI")
+	local ElvUI = IsAddOnLoaded("ElvUI");
 
 	--if SavedOutfitDropDownMenu then
-		--SavedOutfitDropDownMenu:Hide()
+		--SavedOutfitDropDownMenu:Hide();
 	--end
 
-	self.BW_SetsHideSlotButton:Hide()
+	self.BW_SetsHideSlotButton:Hide();
 	BetterWardrobeVisualToggle.VisualMode = false;
-	self.TransmogOptionsButton:Hide()
-	----self.ItemsCollectionFrame:Hide()
-	self.SetsCollectionFrame:Hide()
-	self.SetsTransmogFrame:Hide()
-	self.ClassDropdown:Show()
-	self.SavedOutfitDropDown:Hide()
+	self.TransmogOptionsButton:Hide();
+	----self.ItemsCollectionFrame:Hide();
+	self.SetsCollectionFrame:Hide();
+	self.SetsTransmogFrame:Hide();
+	self.SavedOutfitDropDown:Hide();
 
 -----addon.ColorFilterFrame:Hide()
 
@@ -1205,9 +1204,9 @@ function BetterWardrobeCollectionFrameMixin:SetTab(tabID)
 	if tabID == TAB_ITEMS then
 		BetterWardrobeVisualToggle:Hide()
 		-----addon.ColorFilterFrame:Show()
-			if BW_ColectionListFrame then 
-		BW_ColectionListFrame:SetShown(BetterWardrobeCollectionFrame:IsShown() and not atTransmogrifier)
-	end
+		if BW_ColectionListFrame then 
+			BW_ColectionListFrame:SetShown(BetterWardrobeCollectionFrame:IsShown() and not atTransmogrifier)
+		end
 
 		self.activeFrame = self.ItemsCollectionFrame;
 		self.ItemsCollectionFrame:Show();
@@ -1221,8 +1220,6 @@ function BetterWardrobeCollectionFrameMixin:SetTab(tabID)
 		self.FilterButton:Show();
 		self.FilterButton:SetEnabled(enableSearchAndFilter);
 		self.ClassDropdown:ClearAllPoints();
-		--self.ClassDropdown:SetPoint("BOTTOMLEFT", BetterWardrobeCollectionFrameTab1, "TOPRIGHT", -12, -2);
-
 		self.ClassDropdown:SetPoint("TOPRIGHT", self.ItemsCollectionFrame.SlotsFrame, "TOPLEFT", -12, -2);
 		self:InitItemsFilterButton();
 
@@ -1387,6 +1384,7 @@ function BetterWardrobeCollectionFrameMixin:InitItemsFilterButton()
 			local filterIndex = filterIndexList[i] and filterIndexList[i].index or index;
 			description:CreateCheckbox(_G["TRANSMOG_SOURCE_"..filterIndex], IsChecked, SetChecked, filterIndex);
 		end
+
 	end
 
 	self.FilterButton:SetIsDefaultCallback(function()
@@ -1396,6 +1394,19 @@ function BetterWardrobeCollectionFrameMixin:InitItemsFilterButton()
 	self.FilterButton:SetDefaultCallback(function()
 		return C_TransmogCollection.SetDefaultFilters();
 	end);
+
+
+		local function shouldShowHidden()
+			return addon.Profile.ShowHidden;
+		end
+
+		local function setShowHidden()
+			addon.Profile.ShowHidden = not addon.Profile.ShowHidden;
+			BetterWardrobeCollectionFrame.ItemsCollectionFrame:RefreshVisualsList();
+			BetterWardrobeCollectionFrame.ItemsCollectionFrame:UpdateItems();
+		end
+
+					
 	
 	if C_Transmog.IsAtTransmogNPC() then
 		self.FilterButton:SetText(SOURCES);
@@ -1408,6 +1419,7 @@ function BetterWardrobeCollectionFrameMixin:InitItemsFilterButton()
 		self.FilterButton:SetupMenu(function(dropdown, rootDescription)
 			rootDescription:SetTag("MENU_WARDROBE_FILTER");
 
+			rootDescription:CreateCheckbox(L["Show Hidden Items"], shouldShowHidden, setShowHidden);
 			rootDescription:CreateCheckbox(COLLECTED, C_TransmogCollection.GetCollectedShown, function()
 				C_TransmogCollection.SetCollectedShown(not C_TransmogCollection.GetCollectedShown());
 			end);
@@ -2602,8 +2614,11 @@ function BetterWardrobeItemsCollectionMixin:FilterVisuals()
 			table.insert(filteredVisualsList, visualInfo);
 		end
 	end
-		self.filteredVisualsList = filteredVisualsList;
-	end
+		filteredVisualsList = addon.Sets:ClearHidden(filteredVisualsList, "item")--self.visualsList;
+
+
+	self.filteredVisualsList = filteredVisualsList;
+end
 
 function BetterWardrobeItemsCollectionMixin:SortVisuals()
 	if BetterWardrobeCollectionFrame.selectedCollectionTab == 1 then 
@@ -2861,7 +2876,6 @@ function BetterWardrobeItemsCollectionMixin:UpdateItems()
 				model:UpdateContentTracking();
 				model:UpdateTrackingDisabledOverlay();
 			end
-
 
 			-- state at the transmogrifier
 			local transmogStateAtlas;
@@ -3415,10 +3429,71 @@ function BetterWardrobeItemsModelMixin:OnMouseDown(button)
 		end
 end
 
+local function ToggleHidden(model, isHidden)
+	local tabID = addon.GetTab()
+	if tabID == 1 then
+		local visualID = model.visualInfo.visualID;
+		local _, _, _, _, _, itemLink = C_TransmogCollection.GetAppearanceSourceInfo(visualID);
+		local name, link;
+		if itemLink then 
+			local source = CollectionWardrobeUtil.GetSortedAppearanceSources(visualID, addon.GetItemCategory(visualID), addon.GetTransmogLocation(itemLink))[1];
+			name, link = GetItemInfo(source.itemID);
+		end
+
+		if not link then
+			link = visualID
+		end
+		addon.HiddenAppearanceDB.profile.item[visualID] = not isHidden and link;
+		--self:UpdateWardrobe()
+		print(string.format("%s "..link.." %s", isHidden and L["unhiding_item"] or L["hiding_item"], isHidden and L["inhiding_item_end"] or L["hiding_item_end"] ));
+		BetterWardrobeCollectionFrame.ItemsCollectionFrame:RefreshVisualsList();
+		BetterWardrobeCollectionFrame.ItemsCollectionFrame:UpdateItems();
+
+	elseif tabID == 2 then
+		local setInfo = C_TransmogSets.GetSetInfo(tonumber(model.setID));
+		local name = setInfo["name"];
+
+		local baseSetID = C_TransmogSets.GetBaseSetID(model.setID);
+		addon.HiddenAppearanceDB.profile.set[baseSetID] = not isHidden and name or nil;
+
+		local sourceinfo = C_TransmogSets.GetSetSources(baseSetID);
+		for i,data in pairs(sourceinfo) do
+			local info = C_TransmogCollection.GetSourceInfo(i);
+				addon.HiddenAppearanceDB.profile.item[info.visualID] = not isHidden and info.name or nil;
+		end
+
+		local variantSets = C_TransmogSets.GetVariantSets(baseSetID);
+			for i, data in ipairs(variantSets) do
+				addon.HiddenAppearanceDB.profile.set[data.setID] = not isHidden and data.name or nil;
+
+				local sourceinfo = C_TransmogSets.GetSetSources(data.setID);
+				for i,data in pairs(sourceinfo) do
+					local info = C_TransmogCollection.GetSourceInfo(i);
+						addon.HiddenAppearanceDB.profile.item[info.visualID] = not isHidden and info.name or nil;
+				end
+		end	
+
+		BetterWardrobeCollectionFrame.SetsCollectionFrame:OnSearchUpdate();
+		BetterWardrobeCollectionFrame.SetsTransmogFrame:OnSearchUpdate();
+		print(format("%s "..name.." %s", isHidden and L["unhiding_set"] or L["hiding_set"], isHidden and L["unhiding_set_end"] or L["hiding_set_end"]))
+	else
+		local setInfo = addon.GetSetInfo(model.setID);
+		local name = setInfo["name"];
+		addon.HiddenAppearanceDB.profile.extraset[model.setID] = not isHidden and name or nil;
+		print(format("%s "..name.." %s", isHidden and L["unhiding_set"] or L["hiding_set"], isHidden and L["unhiding_set_end"] or L["hiding_set_end"]));
+		BetterWardrobeCollectionFrame.SetsCollectionFrame:OnSearchUpdate();
+		BetterWardrobeCollectionFrame.SetsTransmogFrame:OnSearchUpdate();
+
+	end
+			--self:UpdateWardrobe()
+end
+
 function BetterWardrobeItemsModelMixin:OnMouseUp(button)
 	if button == "RightButton" then
 		local itemsCollectionFrame = self:GetParent();
-		if ( not self.visualInfo.isCollected or self.visualInfo.isHideVisual or itemsCollectionFrame.transmogLocation:IsIllusion() ) then
+
+		if itemsCollectionFrame:GetActiveCategory() == Enum.TransmogCollectionType.Paired then return end
+		if ( itemsCollectionFrame.transmogLocation:IsIllusion() ) then
 			return;
 		end
 
@@ -3430,6 +3505,54 @@ function BetterWardrobeItemsModelMixin:OnMouseUp(button)
 			local text = favorite and TRANSMOG_ITEM_UNSET_FAVORITE or TRANSMOG_ITEM_SET_FAVORITE;
 			rootDescription:CreateButton(text, function()
 				WardrobeCollectionFrameModelDropdown_SetFavorite(appearanceID, not favorite);
+			end);
+
+			local isHidden = addon.HiddenAppearanceDB.profile.item[self.visualInfo.visualID];
+			text = isHidden and SHOW or HIDE;
+			rootDescription:CreateButton(text, function()
+				ToggleHidden(self, isHidden);
+			end);
+			
+			local collected = self.visualInfo.isCollected;
+			local collectionList = addon.CollectionList:CurrentList();
+			local isInList = match or addon.CollectionList:IsInList(self.visualInfo.visualID, "item");
+			local targetSet = match or variantTarget or self.visualInfo.visualID;
+			local targetText = match and " - "..matchType or variantTarget and " - "..variantType or "";
+			local isInList = collectionList["item"][targetSet];
+
+			text = isInList and L["Remove from Collection List"]..targetText or L["Add to Collection List"]..targetText;
+
+			rootDescription:CreateButton(text,function()
+				addon.CollectionList:UpdateList("item", targetSet, not isInList);
+			end);
+
+			text = L["View Sources"]
+			rootDescription:CreateButton(text, function()
+				addon.CollectionList:GenerateSourceListView(self.visualInfo.visualIDP);
+			end);
+
+			text = L["View Recolors"]
+			rootDescription:CreateButton(text, function()
+			if not IsAddOnLoaded("BetterWardrobe_SourceData") then
+				EnableAddOn("BetterWardrobe_SourceData");
+				LoadAddOn("BetterWardrobe_SourceData");
+			end
+			local Recolors = _G.BetterWardrobeData.ItemRecolors or {};
+				for i = 1, #Recolors do
+					local visualList = Recolors[i];
+					for j = 1, #visualList do
+						if visualList[j] == visualID then
+							BetterWardrobeCollectionFrame.ItemsCollectionFrame.recolors = visualList;
+							BetterWardrobeCollectionFrame.ItemsCollectionFrame:RefreshVisualsList();
+							BetterWardrobeCollectionFrame.ItemsCollectionFrame:FilterVisuals();
+							BetterWardrobeCollectionFrame.ItemsCollectionFrame:SortVisuals();
+							BetterWardrobeCollectionFrame.ItemsCollectionFrame:UpdateItems();
+							addon.ColorFilterButton.revert:Show();
+							return;
+						end
+					end
+				end
+				print(L["No Recolors Found"]);
 			end);
 
 			rootDescription:QueueSpacer();
@@ -3773,191 +3896,9 @@ function BetterWardrobeItemsCollectionMixin:ValidateChosenVisualSources()
 	end
 end
 
-local function ToggleHidden(model, isHidden)
-	local tabID = addon.GetTab()
-	if tabID == 1 then
-		local visualID = model.visualInfo.visualID;
-		local _, _, _, _, _, itemLink = C_TransmogCollection.GetAppearanceSourceInfo(visualID)	
-		local source = CollectionWardrobeUtil.GetSortedAppearanceSources(visualID, addon.GetItemCategory(visualID), addon.GetTransmogLocation(itemLink))[1]
-		local name, link = GetItemInfo(source.itemID)
-		addon.HiddenAppearanceDB.profile.item[visualID] = not isHidden and name;
-		--self:UpdateWardrobe()
-		print(string.format("%s "..link.." %s", isHidden and L["unhiding_item"] or L["hiding_item"], isHidden and L["inhiding_item_end"] or L["hiding_item_end"] ))
-		BetterWardrobeCollectionFrame.ItemsCollectionFrame:RefreshVisualsList()
-		BetterWardrobeCollectionFrame.ItemsCollectionFrame:UpdateItems()
-
-	elseif tabID == 2 then
-		local setInfo = C_TransmogSets.GetSetInfo(tonumber(model.setID))
-		local name = setInfo["name"]
-
-		local baseSetID = C_TransmogSets.GetBaseSetID(model.setID)
-		addon.HiddenAppearanceDB.profile.set[baseSetID] = not isHidden and name or nil;
-
-		local sourceinfo = C_TransmogSets.GetSetSources(baseSetID)
-		for i,data in pairs(sourceinfo) do
-			local info = C_TransmogCollection.GetSourceInfo(i)
-				addon.HiddenAppearanceDB.profile.item[info.visualID] = not isHidden and info.name or nil;
-		end
-
-		local variantSets = C_TransmogSets.GetVariantSets(baseSetID)
-			for i, data in ipairs(variantSets) do
-				addon.HiddenAppearanceDB.profile.set[data.setID] = not isHidden and data.name or nil;
-
-				local sourceinfo = C_TransmogSets.GetSetSources(data.setID)
-				for i,data in pairs(sourceinfo) do
-					local info = C_TransmogCollection.GetSourceInfo(i)
-						addon.HiddenAppearanceDB.profile.item[info.visualID] = not isHidden and info.name or nil;
-				end
-		end	
-
-		BetterWardrobeCollectionFrame.SetsCollectionFrame:OnSearchUpdate()
-		BetterWardrobeCollectionFrame.SetsTransmogFrame:OnSearchUpdate()
-		print(format("%s "..name.." %s", isHidden and L["unhiding_set"] or L["hiding_set"], isHidden and L["unhiding_set_end"] or L["hiding_set_end"]))
-	else
-		local setInfo = addon.GetSetInfo(model.setID)
-		local name = setInfo["name"]
-		addon.HiddenAppearanceDB.profile.extraset[model.setID] = not isHidden and name or nil;
-		print(format("%s "..name.." %s", isHidden and L["unhiding_set"] or L["hiding_set"], isHidden and L["unhiding_set_end"] or L["hiding_set_end"]))
-		BetterWardrobeCollectionFrame.SetsCollectionFrame:OnSearchUpdate()
-		BetterWardrobeCollectionFrame.SetsTransmogFrame:OnSearchUpdate()
-
-	end
-			--self:UpdateWardrobe()
-end
-
-function BetterWardrobeCollectionFrameRightClickDropDown_Init(self)
-	local appearanceID = self.activeFrame.visualInfo.visualID;
-	local info = BW_UIDropDownMenu_CreateInfo()
-	-- Set Favorite
-	if ( C_TransmogCollection.GetIsAppearanceFavorite(appearanceID) or addon:IsFavoriteItem(appearanceID) ) then
-		info.text = BATTLE_PET_UNFAVORITE;
-		info.arg1 = appearanceID;
-		info.arg2 = 0;
-	else
-		info.text = BATTLE_PET_FAVORITE;
-		info.arg1 = appearanceID;
-		info.arg2 = 1;
-	end
-	info.notCheckable = true;
-	info.func = function(_, visualID, value) BetterWardrobeCollectionFrameModelDropDown_SetFavorite(visualID, value); end
-	BW_UIDropDownMenu_AddButton(info)
-
-	BW_UIDropDownMenu_AddSeparator()
-	local isHidden = addon.HiddenAppearanceDB.profile.item[self.activeFrame.visualInfo.visualID]
-	BW_UIDropDownMenu_AddButton({
-		notCheckable = true,
-		text = isHidden and SHOW or HIDE,
-		func = function() ToggleHidden(self.activeFrame, isHidden) end,
-	})
-
-	local collected = self.activeFrame.visualInfo.isCollected;
-	--Collection List Right Click options;
-	local collectionList = addon.CollectionList:CurrentList()
-	local isInList = match or addon.CollectionList:IsInList(self.activeFrame.visualInfo.visualID, "item")
-
-	--if  type  == "set" or ((isInList and collected) or not collected)then --(type == "item" and not (model.visualInfo and model.visualInfo.isCollected)) or type == "set" or type == "extraset" then
-		local targetSet = match or variantTarget or self.activeFrame.visualInfo.visualID;
-		local targetText = match and " - "..matchType or variantTarget and " - "..variantType or ""
-		BW_UIDropDownMenu_AddSeparator()
-		local isInList = collectionList["item"][targetSet]
-		BW_UIDropDownMenu_AddButton({
-			notCheckable = true,
-			text = isInList and L["Remove from Collection List"]..targetText or L["Add to Collection List"]..targetText,
-			func = function()
-						addon.CollectionList:UpdateList("item", targetSet, not isInList)
-				end,
-		})
-
-	info.text = L["View Sources"]
-			info.arg1 = appearanceID;
-			info.arg2 = 1;
-			
-			info.notCheckable = true;
-			info.func = function(_, visualID, value)  
-												addon.CollectionList:GenerateSourceListView(visualID)
-						end
-			BW_UIDropDownMenu_AddButton(info)
-		
-		
-			info.text = L["View Recolors"]
-			info.arg1 = appearanceID;
-			info.arg2 = 1;
-			
-			info.notCheckable = true;
-			info.func = function(_, visualID, value)  
-			if not IsAddOnLoaded("BetterWardrobe_SourceData") then
-				EnableAddOn("BetterWardrobe_SourceData")
-				LoadAddOn("BetterWardrobe_SourceData")
-			end
-			local Recolors = _G.BetterWardrobeData.ItemRecolors or {}
-				for i = 1, #Recolors do
-					local visualList = Recolors[i]
-					for j = 1, #visualList do
-						if visualList[j] == visualID then
-							BetterWardrobeCollectionFrame.ItemsCollectionFrame.recolors = visualList;
-							BetterWardrobeCollectionFrame.ItemsCollectionFrame:RefreshVisualsList()
-							BetterWardrobeCollectionFrame.ItemsCollectionFrame:FilterVisuals()
-							BetterWardrobeCollectionFrame.ItemsCollectionFrame:SortVisuals()
-							BetterWardrobeCollectionFrame.ItemsCollectionFrame:UpdateItems()
-							addon.ColorFilterButton.revert:Show()
-							return;
-						end
-					end
-				end
-				print(L["No Recolors Found"])
-		
-			end
-			BW_UIDropDownMenu_AddButton(info)
-
-	-- Cancel
-
-	info = BW_UIDropDownMenu_CreateInfo()
-	info.notCheckable = true;
-	info.text = CANCEL;
-	BW_UIDropDownMenu_AddSeparator()
-	BW_UIDropDownMenu_AddButton(info)
-
-	local headerInserted = false;
-	local sources = CollectionWardrobeUtil.GetSortedAppearanceSources(appearanceID, BetterWardrobeCollectionFrame.ItemsCollectionFrame:GetActiveCategory(), BetterWardrobeCollectionFrame.ItemsCollectionFrame.transmogLocation)
-	local chosenSourceID = BetterWardrobeCollectionFrame.ItemsCollectionFrame:GetChosenVisualSource(appearanceID)
-	info.func = WardrobeCollectionFrameModelDropDown_SetSource;
-	for i = 1, #sources do
-		if ( sources[i].isCollected and BetterWardrobeCollectionFrame.ItemsCollectionFrame:IsAppearanceUsableForActiveCategory(sources[i]) ) then
-			if ( not headerInserted ) then
-				headerInserted = true;
-				-- space
-				info.text = " "
-				info.disabled = true;
-				BW_UIDropDownMenu_AddButton(info)
-				info.disabled = nil;
-				-- header
-				info.text = WARDROBE_TRANSMOGRIFY_AS;
-				info.isTitle = true;
-				info.colorCode = NORMAL_FONT_COLOR_CODE;
-				BW_UIDropDownMenu_AddButton(info)
-				info.isTitle = nil;
-				-- turn off notCheckable
-				info.notCheckable = nil;
-			end
-			local name, nameColor = BetterWardrobeCollectionFrame:GetAppearanceNameTextAndColor(sources[i])
-			info.text = name;
-			info.colorCode = nameColor:GenerateHexColorMarkup()
-			info.disabled = nil;
-			info.arg1 = appearanceID;
-			info.arg2 = sources[i].sourceID;
-			-- choose the 1st valid source if one isn't explicitly chosen
-			if ( chosenSourceID == Constants.Transmog.NoTransmogID ) then
-				chosenSourceID = sources[i].sourceID;
-			end
-			info.checked = (chosenSourceID == sources[i].sourceID)
-			BW_UIDropDownMenu_AddButton(info)
-		end
-	end
-end
-
 function BetterWardrobeCollectionFrameModelDropDown_SetSource(self, visualID, sourceID)
-	BetterWardrobeCollectionFrame.ItemsCollectionFrame:SetChosenVisualSource(visualID, sourceID)
-	BetterWardrobeCollectionFrame.ItemsCollectionFrame:SelectVisual(visualID)
+	BetterWardrobeCollectionFrame.ItemsCollectionFrame:SetChosenVisualSource(visualID, sourceID);
+	BetterWardrobeCollectionFrame.ItemsCollectionFrame:SelectVisual(visualID);
 end
 
 
@@ -3968,13 +3909,13 @@ function addon:SetFavoriteItem(visualID, set)
 		addon.favoritesDB.profile.item[visualID] = true;
 	end
 
-	BetterWardrobeCollectionFrame.ItemsCollectionFrame:RefreshVisualsList()
-	BetterWardrobeCollectionFrame.ItemsCollectionFrame:UpdateItems()
+	BetterWardrobeCollectionFrame.ItemsCollectionFrame:RefreshVisualsList();
+	BetterWardrobeCollectionFrame.ItemsCollectionFrame:UpdateItems();
 end
 
 
 function addon:IsFavoriteItem(visualID)
-	return addon.favoritesDB.profile.item[visualID]
+	return addon.favoritesDB.profile.item[visualID];
 end
 
 function BetterWardrobeCollectionFrameModelDropdown_SetFavorite(visualID, setFavorite, confirmed)

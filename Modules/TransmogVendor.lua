@@ -253,6 +253,7 @@ end
 
 
 function UI:OptionsDropDown_Initialize(level)
+if true then return end
 	local refreshLevel = 1
 
 	local info = BW_UIDropDownMenu_CreateInfo()
