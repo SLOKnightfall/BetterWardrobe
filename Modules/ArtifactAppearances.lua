@@ -157,6 +157,7 @@ local function BuildDruidAppearances(artifactID, table)
 				sourceInfo.artifact = true
 				sourceInfo.mod = i
 				sourceInfo.artifactID = itemID
+				sourceInfo.canDisplayOnPlayer = true
 
 				if 	addon.Globals.UNLOCK_DATA[data.unlock] then 
 					sourceInfo.unlock = addon.Globals.UNLOCK_DATA[data.unlock].unlock
@@ -246,6 +247,9 @@ function addon.BuildClassArtifactAppearanceList()
 				sourceInfo.artifact = true
 				sourceInfo.mod = index
 				sourceInfo.artifactID = itemID
+				   sourceInfo.isUsable=true
+    sourceInfo.canDisplayOnPlayer=true
+    sourceInfo.alwaysShowItem = true
 				if 	addon.Globals.UNLOCK_DATA[data.unlock] then 
 					sourceInfo.unlock = addon.Globals.UNLOCK_DATA[data.unlock].unlock
 					sourceInfo.unlockAch = addon.Globals.UNLOCK_DATA[data.unlock].ach

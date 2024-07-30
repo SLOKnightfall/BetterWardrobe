@@ -2389,6 +2389,10 @@ function BetterWardrobeItemsCollectionMixin:UpdateWeaponDropdown()
 		name, isWeapon = C_TransmogCollection.GetCategoryInfo(self:GetActiveCategory());
 	end
 
+	if self:GetActiveCategory() == 29 then
+		isWeapon = true;
+	end
+
 	self.WeaponDropdown:SetShown(isWeapon);
 
 	if not isWeapon then
@@ -2417,24 +2421,34 @@ function BetterWardrobeItemsCollectionMixin:UpdateWeaponDropdown()
 			if not canTransmogrify and not hasUndo then
 				checkCategory = false;
 			end
+
 		end
 
 		local isForMainHand = transmogLocation:IsMainHand();
 		local isForOffHand = transmogLocation:IsOffHand();
 		for categoryID = FIRST_TRANSMOG_COLLECTION_WEAPON_TYPE, LAST_TRANSMOG_COLLECTION_WEAPON_TYPE do
 			local name, isWeapon, canEnchant, canMainHand, canOffHand = C_TransmogCollection.GetCategoryInfo(categoryID);
+
 			if name and isWeapon then
 				if (isForMainHand and canMainHand) or (isForOffHand and canOffHand) then
-					if not checkCategory or C_TransmogCollection.IsCategoryValidForItem(categoryID, equippedItemID) then
+					if not checkCategory or C_TransmogCollection.IsCategoryValidForItem(categoryID, equippedItemID) or categoryID == Enum.TransmogCollectionType.Paired then 
 						rootDescription:CreateRadio(name, IsSelected, SetSelected, categoryID);
 					end
 				end
+			end
+
+			if categoryID == LAST_TRANSMOG_COLLECTION_WEAPON_TYPE and not name then
+				local name = "Legion Artifacts";
+				rootDescription:CreateRadio(name, IsSelected, SetSelected, categoryID);
 			end
 		end
 
 		self.WeaponDropdown:SetEnabled(rootDescription:HasElements());
 	end);
 end
+
+
+
 
 function BetterWardrobeItemsCollectionMixin:SetActiveCategory(category)
 	local previousCategory = self.activeCategory;
@@ -2558,25 +2572,38 @@ function BetterWardrobeItemsCollectionMixin:FilterVisuals()
 	end
 
 	local slotID = self.transmogLocation.slotID;
+
+--	if isAtTransmogrifier and 
+
+--	end
+
+	local slotID = self.transmogLocation.slotID;
 	for i, visualInfo in ipairs(visualsList) do
 		local skip = false;
 		if visualInfo.restrictedSlotID then
-			skip = (slotID ~= visualInfo.restrictedSlotID);
+			skip = (slotID ~= visualInfo.restrictedSlotID)
 		end
 		if not skip then
 			if isAtTransmogrifier then
 				if (visualInfo.isUsable and visualInfo.isCollected) or visualInfo.alwaysShowItem then
-					table.insert(filteredVisualsList, visualInfo);
+					table.insert(filteredVisualsList, visualInfo)
 				end
 			else
 				if not visualInfo.isHideVisual then
-					table.insert(filteredVisualsList, visualInfo);
+					table.insert(filteredVisualsList, visualInfo)
 				end
 			end
 		end
 	end
-	self.filteredVisualsList = filteredVisualsList;
-end
+
+	if (self:GetActiveCategory() and self:GetActiveCategory() == Enum.TransmogCollectionType.Paired) then
+		filteredVisualsList = {}
+		for i, visualInfo in ipairs(visualsList) do
+			table.insert(filteredVisualsList, visualInfo);
+		end
+	end
+		self.filteredVisualsList = filteredVisualsList;
+	end
 
 function BetterWardrobeItemsCollectionMixin:SortVisuals()
 	if BetterWardrobeCollectionFrame.selectedCollectionTab == 1 then 
@@ -2830,8 +2857,11 @@ function BetterWardrobeItemsCollectionMixin:UpdateItems()
 				end
 			end
 			model.visualInfo = visualInfo;
-			model:UpdateContentTracking();
-			model:UpdateTrackingDisabledOverlay();
+			if self:GetActiveCategory() and self:GetActiveCategory() ~= Enum.TransmogCollectionType.Paired then
+				model:UpdateContentTracking();
+				model:UpdateTrackingDisabledOverlay();
+			end
+
 
 			-- state at the transmogrifier
 			local transmogStateAtlas;
@@ -2978,6 +3008,8 @@ function BetterWardrobeItemsCollectionMixin:UpdateProgressBar()
 	self:GetParent():UpdateProgressBar(collected, total);
 end
 
+local offspecartifact = {}
+
 function BetterWardrobeItemsCollectionMixin:RefreshVisualsList()
 	if not self.transmogLocation then return end
 	if self.transmogLocation:IsIllusion() then
@@ -3022,6 +3054,7 @@ function BetterWardrobeItemsCollectionMixin:RefreshVisualsList()
 	self:FilterVisuals()
 	self:SortVisuals()
 	self.PagingFrame:SetMaxPages(ceil(#self.filteredVisualsList / self.PAGE_SIZE))
+	zz = self.filteredVisualsList
 end
 
 function BetterWardrobeItemsCollectionMixin:GetFilteredVisualsList()
