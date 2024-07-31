@@ -125,7 +125,7 @@ function CollectionList:UpdateList(type, typeID, add, sourceID)
 	end
 
 	local collectionList = addon.CollectionList:CurrentList()
-
+print(addon.CollectionList:CurrentList())
 	if type == "item" then --TypeID is visualID
 		collectionList[type][typeID] = add or nil
 		if BetterWardrobeCollectionFrame.ItemsCollectionFrame:IsShown() then
@@ -328,23 +328,53 @@ function CollectionList:Dropdown_Initialize(frame, level, menuList)
 end
 
 
+local function GeneratorFunction(owner, rootDescription)
+	rootDescription:CreateTitle("Collection Lists");
+			rootDescription:SetTag("MENU_COLLECTION_LIST");
+
+		local list = addon.collectionListDB.profile.lists
+		for index, data in pairs(list) do
+			rootDescription:CreateRadio(data.name, function() return index == CollectionList:SelectedCollectionList()  end, function()
+				CollectionList:SelectedCollectionList(index)
+				--BW_UIDropDownMenu_SetSelectedID(BW_CollectionList_Dropdown, arg1)
+				BetterWardrobeCollectionFrame.ItemsCollectionFrame:RefreshVisualsList()
+				BetterWardrobeCollectionFrame.ItemsCollectionFrame:UpdateItems()
+			end,index);
+
+		end
+
+		if MogItLoaded then
+			rootDescription:CreateButton( "MogIt Wishlist", function()
+				CollectionList:SelectedCollectionList(#list + 1)
+				--BW_UIDropDownMenu_SetSelectedID(BW_CollectionList_Dropdown, arg1)
+				BetterWardrobeCollectionFrame.ItemsCollectionFrame:RefreshVisualsList()
+				BetterWardrobeCollectionFrame.ItemsCollectionFrame:UpdateItems()
+			end);
+
+		end
+end
+
 --Dropdownmenu for the Collection List
 function CollectionList:CreateDropdown()
-	BW_CollectionList_Dropdown = CreateFrame("Frame", "BW_CollectionList_Dropdown", BW_ColectionListFrame, "BW_UIDropDownMenuTemplate")
+	BW_CollectionList_Dropdown = CreateFrame("DropdownButton", "BW_CollectionList_Dropdown", BW_ColectionListFrame, "WowStyle1DropdownTemplate")
 	BW_CollectionList_Dropdown:SetPoint("BOTTOM", -80, 15)
+	--BW_CollectionList_Dropdown:SetScript("OnMouseUp", function(button) 
+BW_CollectionList_Dropdown:SetupMenu(GeneratorFunction);
 
+
+--end)
 	local level = BW_ColectionListFrame:GetFrameLevel()
 	BW_CollectionList_Dropdown:SetFrameLevel(level+1)
-	BW_UIDropDownMenu_Initialize(BW_CollectionList_Dropdown, CollectionList.Dropdown_Initialize)
-	BW_UIDropDownMenu_SetText(BW_CollectionList_Dropdown, "")
+	--BW_UIDropDownMenu_Initialize(BW_CollectionList_Dropdown, CollectionList.Dropdown_Initialize)
+	--BW_UIDropDownMenu_SetText(BW_CollectionList_Dropdown, "")
 
-	BW_UIDropDownMenu_SetSelectedID(BW_CollectionList_Dropdown, CollectionList:SelectedCollectionList())
+	--BW_UIDropDownMenu_SetSelectedID(BW_CollectionList_Dropdown, CollectionList:SelectedCollectionList())
 
 	BW_ColectionListFrame.dropdownFrame = BW_CollectionList_Dropdown
 
 	local button = CreateFrame("Button", "BW_CollectionListOptionsButton", BW_CollectionList_Dropdown, "SquareIconButtonTemplate")
 	button:SetSize(30,30)
-	button:SetPoint("LEFT", "BW_CollectionList_DropdownButton", "RIGHT", 1, -2)
+	button:SetPoint("LEFT", "BW_CollectionList_Dropdown", "RIGHT", 1, -2)
 	button.Icon:SetTexture("Interface\\Buttons\\UI-OptionsButton")
 	button.Icon:SetSize(15,15)
 	button:SetScript("OnClick", function(button) CollectionList:OptionButton_OnClick(button) end)
@@ -403,7 +433,7 @@ end
 
 
 function CollectionList:AddMogItData()
-	MogItLoaded = true --IsAddOnLoaded("MogIt")
+	MogItLoaded = IsAddOnLoaded("MogIt")
 	 if not MogItLoaded and CollectionList:SelectedCollectionList() == "MOGIT" then
 	 	CollectionList:SelectedCollectionList(1)
 	 end
@@ -419,6 +449,7 @@ function CollectionList:AddList(name)
 	local list = CollectionList:SelectedCollectionList(#profile.lists)
 	BetterWardrobeCollectionFrame.ItemsCollectionFrame:RefreshVisualsList()
 	BetterWardrobeCollectionFrame.ItemsCollectionFrame:UpdateItems()
+	BW_CollectionList_Dropdown:SetupMenu(GeneratorFunction);
 
 	return true
 end
@@ -430,7 +461,9 @@ function CollectionList:RenameList(name)
 	local profile = addon.collectionListDB.profile
 	local list = CollectionList:CurrentList()
 	list.name = name
-	BW_CollectionList_DropdownText:SetText(list.name)
+	--BW_CollectionList_DropdownText:SetText(list.name)
+	BW_CollectionList_Dropdown:SetupMenu(GeneratorFunction);
+
 	return true
 end
 
@@ -446,6 +479,8 @@ function CollectionList:DeleteList()
 	CollectionList:SelectedCollectionList(1)
 	BetterWardrobeCollectionFrame.ItemsCollectionFrame:RefreshVisualsList()
 	BetterWardrobeCollectionFrame.ItemsCollectionFrame:UpdateItems()
+	BW_CollectionList_Dropdown:SetupMenu(GeneratorFunction);
+
 	return true
 end
 
@@ -503,11 +538,8 @@ end
 function CollectionList:SelectedCollectionList(value)
 	if value then
 		addon.collectionListDB.profile.selectedCollectionList = value
-		BW_UIDropDownMenu_SetSelectedID(BW_CollectionList_Dropdown, value)
 		local list = CollectionList:CurrentList()
 		if not list then return end
-		BW_CollectionList_DropdownText:SetText(list.name)
-
 	end
 
 	return addon.collectionListDB.profile.selectedCollectionList
