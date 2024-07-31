@@ -1395,19 +1395,16 @@ function BetterWardrobeCollectionFrameMixin:InitItemsFilterButton()
 		return C_TransmogCollection.SetDefaultFilters();
 	end);
 
+	local function shouldShowHidden()
+		return addon.Profile.ShowHidden;
+	end
 
-		local function shouldShowHidden()
-			return addon.Profile.ShowHidden;
-		end
+	local function setShowHidden()
+		addon.Profile.ShowHidden = not addon.Profile.ShowHidden;
+		BetterWardrobeCollectionFrame.ItemsCollectionFrame:RefreshVisualsList();
+		BetterWardrobeCollectionFrame.ItemsCollectionFrame:UpdateItems();
+	end
 
-		local function setShowHidden()
-			addon.Profile.ShowHidden = not addon.Profile.ShowHidden;
-			BetterWardrobeCollectionFrame.ItemsCollectionFrame:RefreshVisualsList();
-			BetterWardrobeCollectionFrame.ItemsCollectionFrame:UpdateItems();
-		end
-
-					
-	
 	if C_Transmog.IsAtTransmogNPC() then
 		self.FilterButton:SetText(SOURCES);
 		self.FilterButton:SetupMenu(function(dropdown, rootDescription)
@@ -1442,8 +1439,6 @@ function BetterWardrobeCollectionFrameMixin:InitItemsFilterButton()
 	end
 end
 
-
-
 local FILTER_SOURCES = {L["MISC"], L["Classic Set"], L["Quest Set"], L["Dungeon Set"], L["Raid Set"], L["Recolor"], L["PvP"],L["Garrison"], L["Island Expedition"], L["Warfronts"], L["Covenants"], L["Trading Post"], L["Holiday"], L["NOTE_119"],L["NOTE_120"]}
 local EXPANSIONS = {EXPANSION_NAME0, EXPANSION_NAME1, EXPANSION_NAME2, EXPANSION_NAME3, EXPANSION_NAME4, EXPANSION_NAME5, EXPANSION_NAME6, EXPANSION_NAME7, EXPANSION_NAME8, EXPANSION_NAME9,EXPANSION_NAME10}
 
@@ -1462,10 +1457,10 @@ addon.Filters = {
 	},
 
 }
-local filterCollected = addon.Filters.Extra.filterCollected;
-local missingSelection = addon.Filters.Extra.missingSelection;
-local filterSelection = addon.Filters.Extra.filterSelection;
-local xpacSelection = addon.Filters.Extra.xpacSelection;
+		local filterCollected = addon.Filters.Base.filterCollected;
+		local missingSelection = addon.Filters.Base.missingSelection;
+		local filterSelection = addon.Filters.Base.filterSelection;
+		local xpacSelection = addon.Filters.Base.xpacSelection;
 local sets = {"Base", "Extra"}
 
 for i, types in ipairs(sets) do
@@ -1476,7 +1471,27 @@ for i, types in ipairs(sets) do
 	for i = 1, #EXPANSIONS do
 		addon.Filters[types].xpacSelection[i] = true;
 	end
+
+		for i in pairs(addon.Globals.locationDropDown) do
+
+		addon.Filters[types].missingSelection[i] = true;
+	end
 end
+
+local function RefreshLists()
+	local atTransmog =C_Transmog.IsAtTransmogNPC()
+	if atTransmog then
+		addon.SetsDataProvider:ClearUsableSets()
+		BetterWardrobeCollectionFrame.SetsTransmogFrame:UpdateSets()
+	else
+		addon.SetsDataProvider:ClearBaseSets()
+		addon.SetsDataProvider:ClearVariantSets()
+		addon.SetsDataProvider:ClearUsableSets()
+		BetterWardrobeCollectionFrame.SetsCollectionFrame:Refresh()
+	end										
+end
+addon.RefreshLists = RefreshLists;
+local locationDropDown = addon.Globals.locationDropDown;
 
 function BetterWardrobeCollectionFrameMixin:InitBaseSetsFilterButton()
 	self.FilterButton:SetIsDefaultCallback(function()
@@ -1494,48 +1509,142 @@ function BetterWardrobeCollectionFrameMixin:InitBaseSetsFilterButton()
 			C_TransmogSets.SetBaseSetsFilter(filter, not C_TransmogSets.GetBaseSetsFilter(filter));
 		end
 
+		local function shouldShowHidden()
+			return addon.Profile.ShowHidden;
+		end
+
+		local function setShowHidden()
+			addon.Profile.ShowHidden = not addon.Profile.ShowHidden;
+			RefreshLists();
+		end
+
+		rootDescription:CreateCheckbox(L["Show Hidden Items"], shouldShowHidden, setShowHidden, 5);
+		rootDescription:CreateCheckbox(L["Class Sets Only"], 
+			function() 
+				return addon.Profile.IgnoreClassRestrictions 
+			end, 
+			function() 
+				addon.Profile.IgnoreClassRestrictions = not addon.Profile.IgnoreClassRestrictions;
+				addon.Init:BuildDB()
+				BetterWardrobeCollectionFrame.SetsTransmogFrame:UpdateProgressBar()
+			end, 6);
+
+		rootDescription:CreateCheckbox(L["Hide Unavailable Sets"], 
+			function() 
+				return not addon.Profile.HideUnavalableSets;
+			end, 
+			function() 							
+				addon.Profile.HideUnavalableSets = not addon.Profile.HideUnavalableSets;
+				addon.Init:BuildDB()
+				BetterWardrobeCollectionFrame.SetsTransmogFrame:UpdateProgressBar()
+				RefreshLists()
+			end, 7);
+
+		rootDescription:CreateDivider();
+
 		rootDescription:CreateCheckbox(COLLECTED, C_TransmogSets.GetBaseSetsFilter, GetBaseSetsFilter, LE_TRANSMOG_SET_FILTER_COLLECTED);
 		rootDescription:CreateCheckbox(NOT_COLLECTED, C_TransmogSets.GetBaseSetsFilter, GetBaseSetsFilter, LE_TRANSMOG_SET_FILTER_UNCOLLECTED);
 		rootDescription:CreateDivider();
 		rootDescription:CreateCheckbox(TRANSMOG_SET_PVE, C_TransmogSets.GetBaseSetsFilter, GetBaseSetsFilter, LE_TRANSMOG_SET_FILTER_PVE);
 		rootDescription:CreateCheckbox(TRANSMOG_SET_PVP, C_TransmogSets.GetBaseSetsFilter, GetBaseSetsFilter, LE_TRANSMOG_SET_FILTER_PVP);
 		rootDescription:CreateDivider();
-		rootDescription:CreateCheckbox(L["Show Hidden Items"], C_TransmogSets.GetBaseSetsFilter, GetBaseSetsFilter, LE_TRANSMOG_SET_FILTER_PVP);
+
+	if BetterWardrobeCollectionFrame.selectedCollectionTab == 3 then 
+
+		local submenu = rootDescription:CreateButton(SOURCES);
+		submenu:CreateButton(CHECK_ALL, function()
+			for index = 1,  #FILTER_SOURCES do
+				filterSelection[index] = true;
+				RefreshLists();
+
+			end
+		end);
+
+		submenu:CreateButton(UNCHECK_ALL, function()
+			for index = 1,  #FILTER_SOURCES do
+				filterSelection[index] = false;
+				RefreshLists();
+
+			end
+		end);
+
+		submenu:CreateDivider();
+
+		for index = 1,  #FILTER_SOURCES do
+			local filterIndex = index;
+			submenu:CreateCheckbox(FILTER_SOURCES[index], 
+				function() return filterSelection[index] end,
+				function() 	
+					filterSelection[index] = not filterSelection[index];
+					RefreshLists()
+				end,
+				index);
+		end
+en
+
+		local submenu = rootDescription:CreateButton(L["Expansion"]);
+		submenu:CreateButton(CHECK_ALL, function()
+			for i = 1, #xpacSelection do
+				xpacSelection[i] = true;
+			end
+			RefreshLists()
+		end);
+
+		submenu:CreateButton(UNCHECK_ALL, function()
+			for i = 1, #xpacSelection do
+				xpacSelection[i] = false;
+			end
+			RefreshLists()
+		end);
+
+		submenu:CreateDivider();
 		
+		local filterIndexList = CollectionsUtil.GetSortedFilterIndexList("TRANSMOG", transmogSourceOrderPriorities);
+		local numSources = #EXPANSIONS --C_TransmogCollection.GetNumTransmogSources()
+		for index = 1, numSources do
+			local filterIndex = index;
+			submenu:CreateCheckbox(EXPANSIONS[index],	
+				function()
+					return xpacSelection[index]
+				end,
+				function()
+					xpacSelection[index] = not xpacSelection[index];
+					RefreshLists()
+				end,
+	 		index);
+		end
 
-			local submenu = rootDescription:CreateButton(SOURCES);
-			submenu:CreateButton(CHECK_ALL, SetEnabledFunction, true);
-			submenu:CreateButton(UNCHECK_ALL, SetEnabledFunction, true);
-			submenu:CreateDivider();
-			local numSources = #FILTER_SOURCES --C_TransmogCollection.GetNumTransmogSources()
-			for i = 1, numSources do
-				submenu:CreateButton(FILTER_SOURCES[i], SetEnabledFunction, true);
+		local locationDropDown = addon.Globals.locationDropDown;
 
+		local submenu = rootDescription:CreateButton("Missing");
+		submenu:CreateButton(CHECK_ALL, function()
+			for i in pairs(locationDropDown) do
+				missingSelection[i] = true;
 			end
+			RefreshLists()
+		end);
 
-			local submenu = rootDescription:CreateButton(L["Expansion"]);
-			submenu:CreateButton(CHECK_ALL, SetEnabledFunction, true);
-			submenu:CreateButton(UNCHECK_ALL, SetEnabledFunction, true);
-			submenu:CreateDivider();
-			for i = 1, #EXPANSIONS do
-				submenu:CreateButton(EXPANSIONS[i], SetEnabledFunction, true);
+		submenu:CreateButton(UNCHECK_ALL, function()
+			for i in pairs(locationDropDown) do
+				missingSelection[i] = false;
 			end
+			RefreshLists()
+		end);
 
-			local locationDropDown = addon.Globals.locationDropDown;
-			local submenu = rootDescription:CreateButton("Missing");
-			submenu:CreateButton(CHECK_ALL, SetEnabledFunction, true);
-			submenu:CreateButton(UNCHECK_ALL, SetEnabledFunction, true);
-			submenu:CreateDivider();
-			for index, id in pairs(locationDropDown) do
-				if index ~= 21 then --Skip "robe" type;
-					submenu:CreateButton(id, SetEnabledFunction, true);
-
-				end
+		submenu:CreateDivider();
+		for index, id in pairs(locationDropDown) do
+			if index ~= 21 then --Skip "robe" type;
+				submenu:CreateCheckbox(id, 
+					function()
+						return missingSelection[index]
+					end,
+					function()
+						missingSelection[index] = not missingSelection[index];
+						RefreshLists()
+					end,
+					index);
 			end
-		rootDescription:CreateCheckbox(L["Class Sets Only"], C_TransmogSets.GetBaseSetsFilter, GetBaseSetsFilter, LE_TRANSMOG_SET_FILTER_PVP);
-		rootDescription:CreateCheckbox(L["Hide Unavailable Sets"], C_TransmogSets.GetBaseSetsFilter, GetBaseSetsFilter, LE_TRANSMOG_SET_FILTER_PVP);
-
-
+		end
 	end);
 end
 
@@ -7548,7 +7657,6 @@ local TAB_SAVED_SETS = addon.Globals.TAB_SAVED_SETS;
 --local dropdownOrder = {DEFAULT, ALPHABETIC, APPEARANCE, COLOR, EXPANSION, ITEM_SOURCE};
 local dropdownOrder = {DEFAULT, ALPHABETIC, APPEARANCE, COLOR, EXPANSION, ITEM_SOURCE};
 
-local locationDropDown = addon.Globals.locationDropDown;
 --= {INVTYPE_HEAD, INVTYPE_SHOULDER, INVTYPE_CLOAK, INVTYPE_CHEST, INVTYPE_WAIST, INVTYPE_LEGS, INVTYPE_FEET, INVTYPE_WRIST, INVTYPE_HAND}
 local defaults = {
 	sortDropdown = DEFAULT,
