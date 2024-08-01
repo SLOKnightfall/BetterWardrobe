@@ -908,13 +908,6 @@
 				</Anchors>
 			</DropdownButton>
 
-
-
-			<Frame name="BetterWardrobeFilterDropDown" parentKey="FilterDropDown" inherits="BW_UIDropDownMenuTemplate">
-				<Scripts>
-					<OnLoad function="BetterWardrobeFilterDropDown_OnLoad"/>
-				</Scripts>
-			</Frame>
 			<DropdownButton parentKey="ClassDropdown" inherits="WowStyle1DropdownTemplate" mixin="BetterWardrobeCollectionClassDropdownMixin">
 				<Anchors>
 					<Anchor point="TOPLEFT" y="-20"/>
@@ -937,7 +930,7 @@
 				</Scripts>
 			</DropdownButton>
 
-			<DropdownButton parentKey="SavedOutfitDropDown" name = "SavedOutfitDropDown" inherits="WowStyle1DropdownTemplate" mixin="BetterWardrobeCollectionSavedOutfitDropdownMixin">
+			<DropdownButton parentKey="SavedOutfitDropDown" name = "BW_SavedOutfitDropDown" inherits="WowStyle1DropdownTemplate" mixin="BetterWardrobeCollectionSavedOutfitDropdownMixin">
 				<Anchors>
 					<Anchor point="Right" relativeKey="$parent.ClassDropdown" relativePoint="RIGHT" x="0" y="0"/>
 				</Anchors>
@@ -948,36 +941,18 @@
 				</Scripts>
 			</DropdownButton>
 
-			<DropdownButton parentKey="TransmogOptionsButton" name="BW_TransmogOptionsButton" inherits="UIMenuButtonStretchTemplate" text="Options" hidden="false">
+			<DropdownButton parentKey="TransmogOptionsButton" name="BW_TransmogOptionsButton" inherits="WowStyle1FilterDropdownTemplate" text="Options" hidden="false" mixin="BetterWardrobeTransmogOptionsDropdownMixin">
 				<Size x="93" y="22"/>
 				<Anchors>
 					<Anchor point="BOTTOMRIGHT" x="-53" y="80"/>
 				</Anchors>
-				<Layers>
-					<Layer level="ARTWORK">
-						<Texture parentKey="Icon" file="Interface\ChatFrame\ChatFrameExpandArrow">
-							<Size x="10" y="12"/>
-							<Anchors>
-								<Anchor point="RIGHT" relativeKey="$parent.Right" relativePoint="RIGHT" x="-5"/>
-							</Anchors>
-						</Texture>
-					</Layer>
-				</Layers>
 				<Scripts>
-					<OnMouseDown>
-						UIMenuButtonStretchMixin.OnMouseDown(self, button);
-						if self:IsEnabled() then
-							PlaySound(SOUNDKIT.IG_MAINMENU_OPTION_CHECKBOX_ON);
-							BW_ToggleDropDownMenu(1, nil, BW_TransmogOptionsDropDown, self, 74, 15);
-						end
-					</OnMouseDown>
 					<OnEnable>
 						self.Icon:SetDesaturated(false);
 					</OnEnable>
 					<OnDisable>
 						self.Icon:SetDesaturated(true);
 					</OnDisable>
-
 				</Scripts>
 			</DropdownButton>
 			<Button parentKey="BW_SetsHideSlotButton" inherits="SquareIconButtonTemplate" >

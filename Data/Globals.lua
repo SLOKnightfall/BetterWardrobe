@@ -152,6 +152,7 @@ for class, data in pairs(Globals.CLASS_INFO) do
 end
 
 Globals.locationDropDown = {
+  
   [2] = INVTYPE_HEAD,
   --[2] = 134112, neck
   [4] = INVTYPE_SHOULDER,

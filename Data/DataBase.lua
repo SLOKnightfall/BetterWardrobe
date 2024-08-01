@@ -219,6 +219,8 @@ do
 
 					setData.itemData = setData.itemData or {}
 
+					setData.validForCharacter = true;
+
 
 					for slotID, itemData in pairs(setData.itemData) do
 						local appearanceID = itemData[3]
