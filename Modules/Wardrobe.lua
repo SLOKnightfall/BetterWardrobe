@@ -38,9 +38,7 @@ addon.useAltSet = false;
 
 --local Sets = {};
 --addon.Sets = Sets;
-local inventoryTypes = {
-
-};
+local inventoryTypes = {};
 
 local EXCLUSION_CATEGORY_OFFHAND = 1;
 local EXCLUSION_CATEGORY_MAINHAND = 2;
@@ -5562,7 +5560,6 @@ function BetterWardrobeSetsCollectionMixin:DisplaySet(setID)
 			showVariantSetsDropdown = numVisibleSets > 1;
 		end
 	end
-	
 	if (BetterWardrobeCollectionFrame.selectedCollectionTab == TAB_SAVED_SETS or BetterWardrobeCollectionFrame.selectedCollectionTab == TAB_EXTRASETS) then
 		showVariantSetsDropdown = false
 	end
@@ -5982,16 +5979,6 @@ function BetterWardrobeSetsCollectionMixin:RefreshAppearanceTooltip()
 		return;
 	end
 
-	local sources = C_TransmogSets.GetSourcesForSlot(self:GetSelectedSetID(), self.tooltipTransmogSlot);
-	if ( #sources == 0 ) then
-		-- can happen if a slot only has HiddenUntilCollected sources
-		local sourceInfo = C_TransmogCollection.GetSourceInfo(self.tooltipPrimarySourceID);
-		tinsert(sources, sourceInfo);
-	end
-	CollectionWardrobeUtil.SortSources(sources, sources[1].visualID, self.tooltipPrimarySourceID); 
-	local warningString = CollectionWardrobeUtil.GetBestVisibilityWarning(self.Model, self.transmogLocation, sources[1].visualID);	
-	self:GetParent():SetAppearanceTooltip(self, sources, self.tooltipPrimarySourceID, warningString, self.tooltipSlot);
-
 	if BetterWardrobeCollectionFrame.selectedCollectionTab == 2 then
 		local sources = C_TransmogSets.GetSourcesForSlot(self:GetSelectedSetID(), self.tooltipTransmogSlot);
 		if ( #sources == 0 ) then
@@ -6020,10 +6007,11 @@ function BetterWardrobeSetsCollectionMixin:RefreshAppearanceTooltip()
 		local transmogLocation = TransmogUtil.CreateTransmogLocation(self.tooltipTransmogSlot, Enum.TransmogType.Appearance, Enum.TransmogModification.Main);
 
 
-		local sources = CollectionWardrobeUtil.GetSortedAppearanceSourcesForClass(self.tooltipVisualID, C_TransmogCollection.GetClassFilter(), self.activeCategory, self.transmogLocation);
-		local chosenSourceID = self:GetChosenVisualSource(self.tooltipVisualID);	
+print(visualID)
+		local sources = CollectionWardrobeUtil.GetSortedAppearanceSourcesForClass(visualID, C_TransmogCollection.GetClassFilter(), self.activeCategory, self.transmogLocation);
+		local chosenSourceID = BetterWardrobeCollectionFrame.ItemsCollectionFrame:GetChosenVisualSource(visualID);	
 	
-		local warningString = CollectionWardrobeUtil.GetBestVisibilityWarning(self.tooltipModel, self.transmogLocation, self.tooltipVisualID);	
+		local warningString = CollectionWardrobeUtil.GetBestVisibilityWarning(self.tooltipModel, self.transmogLocation, visualID);	
 		self:GetParent():SetAppearanceTooltip(self, sources, chosenSourceID, warningString);
 
 		--local warningString = GetVisibilityWarning(self.Model, transmogLocation);	
@@ -6673,11 +6661,18 @@ function BetterWardrobeSetsDetailsItemMixin:OnEnter()
 		self.New:Hide();
 
 		local setID = BetterWardrobeCollectionFrame.SetsCollectionFrame:GetSelectedSetID();
-		C_TransmogSets.ClearSetNewSourcesForSlot(setID, self.transmogSlot);
-		local baseSetID = C_TransmogSets.GetBaseSetID(setID);
-		SetsDataProvider:ResetBaseSetNewStatus(baseSetID);
+		if BetterWardrobeCollectionFrame:CheckTab(2) then
+			C_TransmogSets.ClearSetNewSourcesForSlot(setID, self.transmogSlot)
+		else
+			addon.ClearSetNewSourcesForSlot(setID, self.transmogSlot)
+		end
+		local baseSetID = C_TransmogSets.GetBaseSetID(setID)
+		if baseSetID then 
+			SetsDataProvider:ResetBaseSetNewStatus(baseSetID)
+			--BetterWardrobeCollectionFrame.SetsCollectionFrame:Refresh()
+			BetterWardrobeCollectionFrame.SetsCollectionFrame.ListContainer:ReinitializeButtonWithBaseSetID(baseSetID)
+		end
 
-		BetterWardrobeCollectionFrame.SetsCollectionFrame.ListContainer:ReinitializeButtonWithBaseSetID(baseSetID);
 	end
 end
 
