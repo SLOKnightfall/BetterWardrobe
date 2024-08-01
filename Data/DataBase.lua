@@ -176,9 +176,7 @@ do
 		local playerFaction, _ = UnitFactionGroup('player')
 		local buildID = (select(4, GetBuildInfo()))
 		BuildBlizzSets()
-		--[==[@debug@ 
-		addon:AddTestSets()
-		--@end-debug@]==]
+		--addon:AddTestSets()
 		for armorType, data in pairs(addon.ArmorSets) do
 			ArmorDB[armorType] = {}
 
