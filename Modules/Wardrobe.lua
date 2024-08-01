@@ -6004,19 +6004,9 @@ function BetterWardrobeSetsCollectionMixin:RefreshAppearanceTooltip()
 		end
 
 		CollectionWardrobeUtil.SortSources(sources, sources[1].visualID, self.tooltipPrimarySourceID)
-		local transmogLocation = TransmogUtil.CreateTransmogLocation(self.tooltipTransmogSlot, Enum.TransmogType.Appearance, Enum.TransmogModification.Main);
-
-
-print(visualID)
-		local sources = CollectionWardrobeUtil.GetSortedAppearanceSourcesForClass(visualID, C_TransmogCollection.GetClassFilter(), self.activeCategory, self.transmogLocation);
-		local chosenSourceID = BetterWardrobeCollectionFrame.ItemsCollectionFrame:GetChosenVisualSource(visualID);	
-	
+		local transmogLocation = TransmogUtil.CreateTransmogLocation(self.tooltipTransmogSlot, Enum.TransmogType.Appearance, Enum.TransmogModification.Main);	
 		local warningString = CollectionWardrobeUtil.GetBestVisibilityWarning(self.tooltipModel, self.transmogLocation, visualID);	
-		self:GetParent():SetAppearanceTooltip(self, sources, chosenSourceID, warningString);
-
-		--local warningString = GetVisibilityWarning(self.Model, transmogLocation);	
-		--self:GetParent():SetAppearanceTooltip(self, sources, self.tooltipPrimarySourceID, warningString)
-		--self:GetParent():SetAppearanceTooltip(self, sources, self.tooltipPrimarySourceID)
+		self:GetParent():SetAppearanceTooltip(self, sources, self.tooltipPrimarySourceID, warningString)
 
 		C_Timer.After(.05, function() if needsRefresh then self:RefreshAppearanceTooltip(); needsRefresh = false; end end) --Fix for items that returned retreaving info;
 	end
