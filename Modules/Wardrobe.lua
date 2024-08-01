@@ -5546,10 +5546,10 @@ function BetterWardrobeSetsCollectionMixin:DisplaySet(setID)
 		end
 	end
 
+	local showVariantSetsDropdown = false;
 	if (BetterWardrobeCollectionFrame.selectedCollectionTab == TAB_SETS) then
 
 		-- variant sets
-		local showVariantSetsDropdown = false;
 		local baseSetID = C_TransmogSets.GetBaseSetID(setID);
 		local variantSets = SetsDataProvider:GetVariantSets(baseSetID);
 		if variantSets then
@@ -5562,6 +5562,7 @@ function BetterWardrobeSetsCollectionMixin:DisplaySet(setID)
 			showVariantSetsDropdown = numVisibleSets > 1;
 		end
 	end
+	
 	if (BetterWardrobeCollectionFrame.selectedCollectionTab == TAB_SAVED_SETS or BetterWardrobeCollectionFrame.selectedCollectionTab == TAB_EXTRASETS) then
 		showVariantSetsDropdown = false
 	end
