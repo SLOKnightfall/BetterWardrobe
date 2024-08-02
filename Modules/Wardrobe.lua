@@ -7671,6 +7671,39 @@ addon:SecureHook("SetItemRef", function(link, ...)
 	end
 end)
 
+function BW_JournalHideSlotMenu_OnClick(parent)
+
+	local function resetModel()
+			local tab = BetterWardrobeCollectionFrame.selectedCollectionTab;
+			if tab ==2 then
+				local set = BetterWardrobeCollectionFrame.SetsCollectionFrame:GetSelectedSetID()
+				BetterWardrobeCollectionFrame.SetsCollectionFrame:DisplaySet(set)
+			else
+				local set = BetterWardrobeCollectionFrame.SetsCollectionFrame:GetSelectedSetID()
+				BetterWardrobeCollectionFrame.SetsCollectionFrame:DisplaySet(set)
+			end
+		end
+
+	local Profile = addon.Profile
+	local armor = addon.Globals.EmptyArmor
+	local name  = addon.QueueList[3]
+	local profile = addon.setdb.profile.autoHideSlot
+
+	local function GeneratorFunction(owner, rootDescription)
+		rootDescription:CreateCheckbox(L["Toggle Hidden View"], function() return addon.setdb.profile.autoHideSlot.toggle end, function () addon.setdb.profile.autoHideSlot.toggle = not addon.setdb.profile.autoHideSlot.toggle; resetModel() end);
+		rootDescription:CreateDivider();
+		rootDescription:CreateTitle(L["Select Slot to Hide"]);
+		for i = 1, 19 do 
+			if armor[i] then
+				rootDescription:CreateCheckbox(_G[addon.Globals.INVENTORY_SLOT_NAMES[i]], function() return profile[i] end, function(data) profile[i] = not profile[i]; resetModel() end);
+			end
+		end
+	end
+	
+	MenuUtil.CreateContextMenu(parent, GeneratorFunction);
+
+end
+
 BetterWardrobeSetsDetailsItemUseabiltiyMixin = { }
 
 function BetterWardrobeSetsDetailsItemUseabiltiyMixin:OnEnter()

@@ -111,11 +111,10 @@ function UI:CreateButtons()
 	--Load Queue Button
 	local BW_LoadQueueButton = CreateFrame("Button", "BW_LoadQueueButton", WardrobeTransmogFrame, "BetterWardrobeButtonTemplate")
 	BW_LoadQueueButton.Icon:SetTexture("Interface\\Buttons\\UI-OptionsButton")
-	BW_LoadQueueButton:SetPoint("TOPLEFT", WardrobeOutfitDropDown, "TOPRIGHT", 80 ,-5)
+	BW_LoadQueueButton:SetPoint("TOPLEFT", WardrobeTransmogFrame.OutfitDropdown.SaveButton, "TOPRIGHT", 50,-2)
 	BW_LoadQueueButton.buttonID = "Import"
 	BW_LoadQueueButton:SetScript("OnClick", function(self) BW_TransmogVendorExportButton_OnClick(self) end)
 	--BW_LoadQueueButton:SetScript("OnEnter",  function(self) BW_DressingRoomButtonMixin:OnEnter(self) end)
-
 
 	--Randomize Button, Mixin defined in Randomizer.lua
 	local BW_RandomizeButton = CreateFrame("Button", "BW_RandomizeButton", WardrobeTransmogFrame, "BetterWardrobeButtonTemplate")
@@ -163,27 +162,17 @@ function UI:HideSlotMenu_OnClick(parent)
 	local name  = addon.QueueList[3]
 	local contextMenuData = {{ text = L["Select Slot to Hide"], isTitle = true, notCheckable = true},}
 	local profile = addon.setdb.profile.autoHideSlot
-	for i = 1, 19 do 
-		if armor[i] then 
-			local menu = {
-				text = _G[addon.Globals.INVENTORY_SLOT_NAMES[i]],
-				func = function (self, arg1, arg2, value)
-					profile[i] = not profile[i]
-				end,
-				isNotRadio = true,
-				notCheckable = false,
-				checked = function() return profile[i] end,
-				keepShownOnClick = true, 
-			}
-			tinsert (contextMenuData, menu)
 
+	local function GeneratorFunction(owner, rootDescription)
+		rootDescription:CreateTitle(L["Select Slot to Hide"]);
+		for i = 1, 19 do 
+			if armor[i] then
+				rootDescription:CreateCheckbox(_G[addon.Globals.INVENTORY_SLOT_NAMES[i]], function() return profile[i] end, function(data) profile[i] = not profile[i] end);
+			end
 		end
 	end
-
-	--table.sort(contextMenuData, function(a,b) return a.index<b.index end)
-
-	addon.ContextMenu:SetPoint("TOPLEFT", parent, "TOPLEFT", 0, 0)
-	BW_EasyMenu(contextMenuData, addon.ContextMenu, "cursor", 0, 0, "MENU")
+	
+	MenuUtil.CreateContextMenu(parent, GeneratorFunction);
 end
 
 

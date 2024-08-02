@@ -127,7 +127,7 @@ local function RandomizeOutfit()
 	local outfits = addon.GetOutfits()
 	local randomOutfitID = outfits[random(#outfits)].outfitID
 
-	BetterWardrobeOutfitDropDown:SelectOutfit(randomOutfitID, true)
+	BetterWardrobeTMOutfitDropDown:SelectOutfit(randomOutfitID, true)
 end
 
 
