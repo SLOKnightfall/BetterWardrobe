@@ -168,6 +168,7 @@ function BetterWardrobeOutfitDropdownMixin:OnLoad()
 	self.SaveButton:SetScript("OnClick", function()	
 		BetterWardrobeOutfitManager:StartOutfitSave(self, self:GetSelectedOutfitID());
 	end);
+		addon:SecureHook(DressUpFrame, "OnDressModel", function() 	self:UpdateSaveButton(); end)
 
 end
 
@@ -182,6 +183,7 @@ end
 function BetterWardrobeOutfitDropdownMixin:OnShow()
 	self:RegisterEvent("TRANSMOG_OUTFITS_CHANGED");
 	self:RegisterEvent("TRANSMOGRIFY_UPDATE");
+
 	self:SelectOutfit(self:GetLastOutfitID());
 	self:InitOutfitDropdown();
 end
@@ -246,6 +248,30 @@ function BetterWardrobeOutfitDropdownMixin:InitOutfitDropdown()
 	self:SetupMenu(function(dropdown, rootDescription)
 		rootDescription:SetTag("MENU_WARDROBE_OUTFITS");
 
+		local extent = 20;
+		local maxCharacters = 8;
+		local maxScrollExtent = extent * maxCharacters;
+		rootDescription:SetScrollMode(maxScrollExtent);
+
+		local text = GREEN_FONT_COLOR:WrapTextInColorCode(TRANSMOG_OUTFIT_NEW);
+		local button = rootDescription:CreateButton(text, function()
+			if WardrobeTransmogFrame and HelpTip:IsShowing(WardrobeTransmogFrame, TRANSMOG_OUTFIT_DROPDOWN_TUTORIAL) then
+				HelpTip:Hide(WardrobeTransmogFrame, TRANSMOG_OUTFIT_DROPDOWN_TUTORIAL);
+				SetCVarBitfield("closedInfoFrames", LE_FRAME_TUTORIAL_TRANSMOG_OUTFIT_DROPDOWN, true);
+			end
+			WardrobeOutfitManager:StartOutfitSave(self);
+		end);
+
+		button:AddInitializer(function(button, description, menu)
+			local texture = button:AttachTexture();
+			texture:SetSize(19,19);
+			texture:SetPoint("LEFT");
+			texture:SetTexture([[Interface\PaperDollInfoFrame\Character-Plus]]);
+
+			local fontString = button.fontString;
+			fontString:SetPoint("LEFT", texture, "RIGHT", 3, 0);
+		end);
+
 		local outfits = addon.GetOutfits(true)
 		for i = 1, #outfits do
 			local outfit = outfits[i]
@@ -282,37 +308,17 @@ function BetterWardrobeOutfitDropdownMixin:InitOutfitDropdown()
 				end);
 
 				gearButton:SetScript("OnClick", function()
-					WardrobeOutfitEditFrame:ShowForOutfit(outfit.outfitID)
+					BetterWardrobeOutfitEditFrame:ShowForOutfit(outfit.outfitID)
 					menu:Close();
 				end);
 			end);
 		end
 
-		if #outfits < C_TransmogCollection.GetNumMaxOutfits() then
-			local text = GREEN_FONT_COLOR:WrapTextInColorCode(TRANSMOG_OUTFIT_NEW);
-			local button = rootDescription:CreateButton(text, function()
-				if WardrobeTransmogFrame and HelpTip:IsShowing(WardrobeTransmogFrame, TRANSMOG_OUTFIT_DROPDOWN_TUTORIAL) then
-					HelpTip:Hide(WardrobeTransmogFrame, TRANSMOG_OUTFIT_DROPDOWN_TUTORIAL);
-					SetCVarBitfield("closedInfoFrames", LE_FRAME_TUTORIAL_TRANSMOG_OUTFIT_DROPDOWN, true);
-				end
-				WardrobeOutfitManager:StartOutfitSave(self);
-			end);
 
-			button:AddInitializer(function(button, description, menu)
-				local texture = button:AttachTexture();
-				texture:SetSize(19,19);
-				texture:SetPoint("LEFT");
-				texture:SetTexture([[Interface\PaperDollInfoFrame\Character-Plus]]);
-
-				local fontString = button.fontString;
-				fontString:SetPoint("LEFT", texture, "RIGHT", 3, 0);
-			end);
-		end
 	end);
 end
 
-
-function WardrobeOutfitDropdownMixin:NewOutfit(outfitID)
+function BetterWardrobeOutfitDropdownMixin:NewOutfit(outfitID)
 	self:SetSelectedOutfitID(outfitID);
 	self:InitOutfitDropdown();
 	self:UpdateSaveButton();
@@ -354,8 +360,9 @@ function BetterWardrobeOutfitDropdownMixin:IsOutfitDressed()
 	if not self.selectedOutfitID then
 		return true
 	end
-
-	if addon.GetSetType(self.selectedOutfitID) == "SavedBlizzard" then 
+	
+	--if addon.GetSetType(self.selectedOutfitID) == "SavedBlizzard" then 
+	if self.selectedOutfitID >= 5000 and self.selectedOutfitID <= 5020 then 
 		local selectedOutfitID = addon:GetBlizzID(self.selectedOutfitID);
 		local outfitItemTransmogInfoList = C_TransmogCollection.GetOutfitItemTransmogInfoList(selectedOutfitID);
 		if not outfitItemTransmogInfoList then
@@ -754,17 +761,17 @@ end
 BetterWardrobeOutfitEditFrameMixin = { }
 
 function BetterWardrobeOutfitEditFrameMixin:ShowForOutfit(outfitID)
-	BetterWardrobeOutfitManager:Hide()
-	BetterWardrobeOutfitManager:ShowPopup(self)
+	BetterWardrobeOutfitFrame:Hide()
+	BetterWardrobeOutfitFrame:ShowPopup(self)
 	self.outfitID = outfitID
 	local name = GetOutfitName(outfitID)
 	self.EditBox:SetText(name)
 end
 
 function BetterWardrobeOutfitEditFrameMixin:OnDelete()
-	BetterWardrobeOutfitManager:Hide()
+	BetterWardrobeOutfitFrame:Hide()
 	local name = C_TransmogCollection.GetOutfitInfo(addon:GetBlizzID(self.outfitID)) or self.name or ""
-	BetterWardrobeOutfitManager:ShowPopup("BW_CONFIRM_DELETE_TRANSMOG_OUTFIT", name, nil,  self.outfitID)
+	BetterWardrobeOutfitFrame:ShowPopup("BW_CONFIRM_DELETE_TRANSMOG_OUTFIT", name, nil,  self.outfitID)
 end
 
 function BetterWardrobeOutfitEditFrameMixin:OnAccept()
@@ -772,7 +779,7 @@ function BetterWardrobeOutfitEditFrameMixin:OnAccept()
 		return
 	end
 	StaticPopupSpecial_Hide(self)
-	BetterWardrobeOutfitManager:NameOutfit(self.EditBox:GetText(), self.outfitID)
+	BetterWardrobeOutfitFrame:NameOutfit(self.EditBox:GetText(), self.outfitID)
 	addon:SendMessage("BW_TRANSMOG_COLLECTION_UPDATED")
 end
 

@@ -312,7 +312,6 @@ function BW_TransmogFrameMixin:GetRandomAppearanceID()
 		for i = minIndex, maxIndex do
 			local currentIndex = startPoint + i;
 			if currentIndex > maxIndex then
-				-- overflow cycles from the beginning
 				currentIndex = currentIndex - range;
 			end
 			local visualInfo = visualsList[currentIndex];
@@ -4556,8 +4555,6 @@ function BetterWardrobeSetsDataProviderMixin:GetUsableSets(incVariants)
 
 							if ((not atTransmogrifier and BetterWardrobeVisualToggle.VisualMode) or topSourcesCollected >= cutoffLimit and topSourcesTotal > 0 ) then --and not C_TransmogSets.IsSetUsable(set.setID) then
 							--if (BetterWardrobeVisualToggle.viewAll and BetterWardrobeVisualToggle.VisualMode) or (not atTransmogrifier and BetterWardrobeVisualToggle.VisualMode) or topSourcesCollected >= cutoffLimit  and topSourcesTotal > 0 then --and not C_TransmogSets.IsSetUsable(set.setID) then
-
-								
 								tinsert(self.usableSets, set)
 							end
 						--end
@@ -4583,7 +4580,6 @@ function BetterWardrobeSetsDataProviderMixin:GetUsableSets(incVariants)
 
 				self.usableSets = addon:SearchSets(self.usableSets)
 				self:SortSets(self.usableSets)
-
 			end
 			
 			return self.usableSets;
@@ -7317,14 +7313,14 @@ function BetterWardrobeSetsTransmogMixin:LoadSet(setID)
 			end
 
 			--[[if setData then
-										local TransmogLocation = TransmogUtil.CreateTransmogLocation(16, Enum.TransmogType.Illusion, Enum.TransmogModification.Main)
-										local pendingInfo = TransmogUtil.CreateTransmogPendingInfo(Enum.TransmogPendingType.Apply, setData.mainHandEnchant or 0)
-										C_Transmog.SetPending(TransmogLocation, pendingInfo)
-						
-										local TransmogLocation = TransmogUtil.CreateTransmogLocation(17, Enum.TransmogType.Illusion, Enum.TransmogModification.Main)
-										local pendingInfo = TransmogUtil.CreateTransmogPendingInfo(Enum.TransmogPendingType.Apply, setData.offHandEnchant or 0)
-										C_Transmog.SetPending(TransmogLocation, pendingInfo)
-									end]]
+				local TransmogLocation = TransmogUtil.CreateTransmogLocation(16, Enum.TransmogType.Illusion, Enum.TransmogModification.Main)
+				local pendingInfo = TransmogUtil.CreateTransmogPendingInfo(Enum.TransmogPendingType.Apply, setData.mainHandEnchant or 0)
+				C_Transmog.SetPending(TransmogLocation, pendingInfo)
+
+				local TransmogLocation = TransmogUtil.CreateTransmogLocation(17, Enum.TransmogType.Illusion, Enum.TransmogModification.Main)
+				local pendingInfo = TransmogUtil.CreateTransmogPendingInfo(Enum.TransmogPendingType.Apply, setData.offHandEnchant or 0)
+				C_Transmog.SetPending(TransmogLocation, pendingInfo)
+			end]]
 		end
 	end
 	local emptySlotData = Sets:GetEmptySlots();
@@ -7449,10 +7445,10 @@ function BetterWardrobeSetsTransmogMixin:SelectSet(setID)
 		--BW_UIDropDownMenu_SetText(BetterWardrobeOutfitDropDown, GRAY_FONT_COLOR_CODE..TRANSMOG_OUTFIT_NONE..FONT_COLOR_CODE_CLOSE)
 	end
 
-	BetterWardrobeOutfitDropDown.selectedOutfitID = setID;
+	----BetterWardrobeOutfitDropDown.selectedOutfitID = setID;
 
-	BetterWardrobeOutfitDropDown:UpdateSaveButton()
-	BetterWardrobeOutfitDropDown:OnSelectOutfit(setID)
+	----BetterWardrobeOutfitDropDown:UpdateSaveButton()
+	----BetterWardrobeOutfitDropDown:OnSelectOutfit(setID)
 	end
 	--self:ResetPage()
 end
@@ -7500,21 +7496,16 @@ function BetterWardrobeSetsTransmogMixin:ResetPage()
 	self:UpdateSets();
 end
 
-
-
 --Visual View TOggle;
 	BetterWardrobeVisualToggleMixin = {}
 
 	function BetterWardrobeVisualToggleMixin:OnClick()
-	
 	end
 	
-
 	function BetterWardrobeVisualToggleMixin:OnHide()
 		--BetterWardrobeCollectionFrame.BW_SetsTransmogFrame:Hide()
 		self.VisualMode = false;
 	end
-
 
 	function BetterWardrobeVisualToggleMixin:OnEnter()
 		GameTooltip:SetOwner(self, "ANCHOR_RIGHT")
@@ -7529,8 +7520,6 @@ end
 
 local EmptyArmor = addon.Globals.EmptyArmor
 
-
-
 function Sets:GetEmptySlots()
 	local setInfo = {}
 
@@ -7541,7 +7530,6 @@ function Sets:GetEmptySlots()
 	return setInfo;
 end
 
-
 function Sets:EmptySlots(transmogSources)
 	local EmptySet = self:GetEmptySlots()
 
@@ -7551,9 +7539,6 @@ function Sets:EmptySlots(transmogSources)
 
 	return EmptySet;
 end
-
-
-
 
 function Sets.isMogKnown(sourceID)
 	local sourceInfo = C_TransmogCollection.GetSourceInfo(sourceID)
@@ -7821,7 +7806,7 @@ end
 
 function BetterWardrobeCollectionSavedOutfitDropdownMixin:Refresh()
 	self:SetupMenu(function(dropdown, rootDescription)
-		rootDescription:SetTag("BW_SORT_MENU");
+		rootDescription:SetTag("BW_SAVED_SETS");
 
 		local function IsProfileSet(name)
 			if not addon.SelecteSavedList then

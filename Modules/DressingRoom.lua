@@ -53,7 +53,7 @@ function BetterWardrobe:ToggleDressingRoom()
 end
 
 function addon.Init:DressingRoom()
-	-----DressUpFrameOutfitDropDown:Hide()
+	DressUpFrameOutfitDropdown:Hide()
 
 	Buttons = BW_DressingRoomFrame.PreviewButtonFrame.Slots
 	Profile = addon.Profile
@@ -80,7 +80,7 @@ function addon:DressingRoom_Enable()
 
 	if DressUpFrame.MaximizeMinimizeFrame then
 		DressUpFrame.MaximizeMinimizeFrame:SetOnMaximizedCallback(function(self)
-			-----DressUpFrameOutfitDropDown:Hide()
+			DressUpFrameOutfitDropdown:Hide()
 
 			if Profile.DR_ResizeWindow then
 				DressUpFrame.MaximizeMinimizeFrame:GetParent():SetSize(Profile.DR_Width, Profile.DR_Height) 
@@ -92,7 +92,7 @@ function addon:DressingRoom_Enable()
 			
 
 
-	-----	addon:Hook(DressUpFrame.MaximizeMinimizeFrame, "minimizedCallback", function() DressUpFrameOutfitDropDown:Hide() end, true)
+	-----	addon:Hook(DressUpFrame.MaximizeMinimizeFrame, "minimizedCallback", function() DressUpFrameOutfitDropdown:Hide() end, true)
 
 
 	end
@@ -466,6 +466,7 @@ function BW_DressingRoomFrameMixin:OnLoad()
 	self:RegisterEvent("ADDON_LOADED");
 	hooksecurefunc("DressUpVisual", DressingRoom.Update);
 	hooksecurefunc("DressUpCollectionAppearance", DressingRoom.Update);
+
 --[[
 	DressUpFrame.LinkButton:ClearAllPoints()
 	DressUpFrame.LinkButton:SetPoint("LEFT",BW_DressingRoomFrame.BW_DressingRoomUndressButton, "RIGHT",-6,0)
@@ -851,7 +852,7 @@ function BetterDressUpOutfitMixin:LoadOutfit(outfitID)
 	DressingRoom:Update()
 	import = true
 	local setType = addon.GetSetType(outfitID)
-	if setType == "SavedBlizzard"  or (outfitID >= 5000 and outfitID <= 6000) then
+	if setType == "SavedBlizzard"  or (outfitID >= 5000 and outfitID <= 5020) then
 		local outfitID = addon:GetBlizzID(outfitID)
 		DressUpItemTransmogInfoList(C_TransmogCollection.GetOutfitItemTransmogInfoList(outfitID))
 	else

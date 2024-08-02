@@ -290,7 +290,7 @@
 					<KeyValue key="maxMenuStringWidth" value="190" type="number"/>
 				</KeyValues>
 				<Anchors>
-					<Anchor point="TOP" relativeTo="DressUpFrame" relativePoint="TOP" x="-23" y="-58"/>
+					<Anchor point="TOP" relativeTo="DressUpFrame" relativePoint="TOP" x="-23" y="-28"/>
 				</Anchors>
 				<Scripts>
 				</Scripts>

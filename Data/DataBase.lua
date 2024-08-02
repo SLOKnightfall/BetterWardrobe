@@ -176,7 +176,10 @@ do
 		local playerFaction, _ = UnitFactionGroup('player')
 		local buildID = (select(4, GetBuildInfo()))
 		BuildBlizzSets()
-		--addon:AddTestSets()
+
+		--@debug@
+			addon:AddTestSets()
+		--@end-debug@
 		for armorType, data in pairs(addon.ArmorSets) do
 			ArmorDB[armorType] = {}
 
@@ -400,6 +403,7 @@ end
 		------SET_INDEX[0] = hiddenSet
 		-----tinsert(SET_DATA, hiddenSet)
 		addon.BuildClassArtifactAppearanceList()
+		addon.GetSavedList()
 	end
 
 	function addon.Init:BuildAltDB()
@@ -697,7 +701,6 @@ function addon.StoreBlizzardSets()
 	end
 
 	addon.setdb.global.sets[addon.setdb:GetCurrentProfile()] = BlizzardSavedSets
-	zzz = addon.setdb.global.sets
 	return BlizzardSavedSets
 end
 

@@ -2209,7 +2209,7 @@
 					</Frame>
 
 					<!--WardrobeOutfitDropdownOverrideMixin provides implementation overrides of functions in WardrobeOutfitDropdownMixin-->
-					<DropdownButton parentKey="BW_OutfitDropdown" inherits="WardrobeOutfitDropdownTemplate" mixin="WardrobeOutfitDropdownOverrideMixin">
+					<DropdownButton parentKey="OutfitDropdown" name="DDM" inherits="WardrobeOutfitDropdownTemplate" mixin="BetterWardrobeOutfitDropdownOverrideMixin">
 						<KeyValues>
 							<KeyValue key="width" value="207" type="number"/>
 							<KeyValue key="minMenuStringWidth" value="152" type="number"/>
