@@ -54,9 +54,12 @@ end
 
 
 function UI:CreateDropDown()
-	-----OutfitDropDown:Hide()
---	BetterWardrobeOutfitDropDown:SetParent(WardrobeTransmogFrame)
-	--BetterWardrobeOutfitDropDown:ClearAllPoints()
+	WardrobeTransmogFrame.OutfitDropdown:Hide()
+
+	local f = CreateFrame("DropdownButton", "BetterWardrobeTMOutfitDropDown", WardrobeTransmogFrame, "BetterWardrobeSavedSetDropdownTemplate")
+
+--	f:SetParent(WardrobeTransmogFrame)
+	--f:ClearAllPoints()
 	--BetterWardrobeOutfitDropDown:SetPoint("TOPLEFT", -14, -28)
 
 	addon:SecureHook(WardrobeTransmogFrame, "OnTransmogApplied", function()
@@ -492,6 +495,8 @@ function UI.ExtendTransmogView(reset)
 	--BetterWardrobeOutfitDropDown:SetPoint("TOPLEFT", WardrobeTransmogFrame, 35, 28)
 		--BW_LoadQueueButton:ClearAllPoints()
 		--BW_LoadQueueButton:SetPoint("TOPLEFT", BetterWardrobeOutfitDropDown, "TOPRIGHT", 85, -5)
+		BetterWardrobeTMOutfitDropDown:ClearAllPoints()
+		BetterWardrobeTMOutfitDropDown:SetPoint("TOPLEFT", 50, 28)
 
 		if UIPanelWindows["WardrobeFrame"] then 
 		UIPanelWindows["WardrobeFrame"].width = 1280
@@ -532,7 +537,10 @@ function UI.ExtendTransmogView(reset)
 		WardrobeTransmogFrame.MainHandEnchantButton:SetPoint("BOTTOM", WardrobeTransmogFrame.MainHandButton, "BOTTOM", 0, -20)
 		WardrobeTransmogFrame.SecondaryHandEnchantButton:ClearAllPoints()
 		WardrobeTransmogFrame.SecondaryHandEnchantButton:SetPoint("BOTTOM", WardrobeTransmogFrame.SecondaryHandButton, "BOTTOM", 0, -20)
-		        
+		
+		BetterWardrobeTMOutfitDropDown:ClearAllPoints()
+		BetterWardrobeTMOutfitDropDown:SetPoint("TOPLEFT", 50, 28)
+
 		--BetterWardrobeOutfitDropDown:ClearAllPoints()
 		--BetterWardrobeOutfitDropDown:SetPoint("TOPLEFT", WardrobeTransmogFrame, 35, 28)
 		if UIPanelWindows["WardrobeFrame"] then 
@@ -576,7 +584,8 @@ function UI.ExtendTransmogView(reset)
 		WardrobeTransmogFrame.MainHandEnchantButton:SetPoint("BOTTOM", WardrobeTransmogFrame.MainHandButton, "BOTTOM", 0, -20)
 		WardrobeTransmogFrame.SecondaryHandEnchantButton:ClearAllPoints()
 		WardrobeTransmogFrame.SecondaryHandEnchantButton:SetPoint("BOTTOM", WardrobeTransmogFrame.SecondaryHandButton, "BOTTOM", 0, -20)	
-
+		BetterWardrobeTMOutfitDropDown:ClearAllPoints()
+		BetterWardrobeTMOutfitDropDown:SetPoint("TOPLEFT", 3, 28)
 		--BetterWardrobeOutfitDropDown:ClearAllPoints()
 		--BetterWardrobeOutfitDropDown:SetPoint("TOPLEFT", WardrobeTransmogFrame, -14, 28)
 

@@ -632,14 +632,38 @@ function BetterWardrobeOutfitDropdownOverrideMixin:GetItemTransmogInfoList()
 	return nil;
 end
 
+function BetterWardrobeOutfitDropdownOverrideMixin:OnSelectOutfit(outfitID)
+	addon.OutfitDB.char.lastTransmogOutfitIDSpec = addon.OutfitDB.char.lastTransmogOutfitIDSpec or {}
+
+	if addon.IsDefaultSet(outfitID) then
+
+		-- outfitID can be 0, so use empty string for none
+		local value = addon:GetBlizzID(outfitID) or ""
+		for specIndex = 1, GetNumSpecializations() do
+			if GetCVar("lastTransmogOutfitIDSpec"..specIndex) == "" then
+				SetCVar("lastTransmogOutfitIDSpec"..specIndex, value)
+				addon.OutfitDB.char.lastTransmogOutfitIDSpec[specIndex] = outfitID;
+			end
+		end
+	else
+		local value = outfitID or ""
+		for specIndex = 1, GetNumSpecializations() do
+			if addon.OutfitDB.char.lastTransmogOutfitIDSpec[specIndex] == "" then
+				addon.OutfitDB.char.lastTransmogOutfitIDSpec[specIndex] = value;
+			end
+		end
+	end
+end
+
 function BetterWardrobeOutfitDropdownOverrideMixin:GetLastOutfitID()
 	local specIndex = GetSpecialization();
-	return addon.OutfitDB.char.lastTransmogOutfitIDSpec[specIndex];
-	--return tonumber(GetCVar("lastTransmogOutfitIDSpec"..specIndex));
+	--return addon.OutfitDB.char.lastTransmogOutfitIDSpec[specIndex];
+	return tonumber(GetCVar(addon.OutfitDB.char.lastTransmogOutfitIDSpec[specIndex]));
 end
-BetterWardrobeOutfitDropdownOverrideMixin = { };
 
-function BetterWardrobeOutfitDropdownOverrideMixin:OnLoad()
+BetterTransmogSlotButtonMixin = { };
+
+function BetterTransmogSlotButtonMixin:OnLoad()
 	local slotID, textureName = GetInventorySlotInfo(self.slot);
 	self.slotID = slotID;
 	self.transmogLocation = TransmogUtil.GetTransmogLocation(slotID, self.transmogType, self.modification);
@@ -652,7 +676,7 @@ function BetterWardrobeOutfitDropdownOverrideMixin:OnLoad()
 	self:RegisterForClicks("LeftButtonUp", "RightButtonUp");
 end
 
-function BetterWardrobeOutfitDropdownOverrideMixin:OnClick(mouseButton)
+function BetterTransmogSlotButtonMixin:OnClick(mouseButton)
 	local isTransmogrified, hasPending, isPendingCollected, canTransmogrify, cannotTransmogrifyReason, hasUndo = C_Transmog.GetSlotInfo(self.transmogLocation);
 	-- save for sound to play on TRANSMOGRIFY_UPDATE event
 	self.hadUndo = hasUndo;
@@ -698,12 +722,12 @@ function BetterWardrobeOutfitDropdownOverrideMixin:OnClick(mouseButton)
 	self:OnEnter();
 end
 
-function BetterWardrobeOutfitDropdownOverrideMixin:OnUserSelect()
+function BetterTransmogSlotButtonMixin:OnUserSelect()
 	local fromOnClick = true;
 	self:GetParent():SelectSlotButton(self, fromOnClick);
 end
 
-function BetterWardrobeOutfitDropdownOverrideMixin:OnEnter()
+function BetterTransmogSlotButtonMixin:OnEnter()
 	local isTransmogrified, hasPending, isPendingCollected, canTransmogrify, cannotTransmogrifyReason, hasUndo = C_Transmog.GetSlotInfo(self.transmogLocation);
 
 	if ( self.transmogLocation:IsIllusion() ) then
@@ -763,7 +787,7 @@ function BetterWardrobeOutfitDropdownOverrideMixin:OnEnter()
 	self.UpdateTooltip = GenerateClosure(self.OnEnter, self);
 end
 
-function BetterWardrobeOutfitDropdownOverrideMixin:OnLeave()
+function BetterTransmogSlotButtonMixin:OnLeave()
 	if ( self.UndoButton and not self.UndoButton:IsMouseOver() ) then
 		self.UndoButton:Hide();
 	end
@@ -772,25 +796,25 @@ function BetterWardrobeOutfitDropdownOverrideMixin:OnLeave()
 	self.UpdateTooltip = nil;
 end
 
-function BetterWardrobeOutfitDropdownOverrideMixin:OnShow()
+function BetterTransmogSlotButtonMixin:OnShow()
 	self:Update();
 end
 
-function BetterWardrobeOutfitDropdownOverrideMixin:OnHide()
+function BetterTransmogSlotButtonMixin:OnHide()
 	self.priorTransmogID = nil;
 end
 
-function BetterWardrobeOutfitDropdownOverrideMixin:SetSelected(selected)
+function BetterTransmogSlotButtonMixin:SetSelected(selected)
 	self.SelectedTexture:SetShown(selected);
 end
 
-function BetterWardrobeOutfitDropdownOverrideMixin:OnTransmogrifySuccess()
+function BetterTransmogSlotButtonMixin:OnTransmogrifySuccess()
 	self:Animate();
 	self:GetParent():MarkDirty();
 	self.priorTransmogID = nil;
 end
 
-function BetterWardrobeOutfitDropdownOverrideMixin:Animate()
+function BetterTransmogSlotButtonMixin:Animate()
 	-- don't do anything if already animating;
 	if self.AnimFrame:IsShown() then
 		return;
@@ -805,12 +829,12 @@ function BetterWardrobeOutfitDropdownOverrideMixin:Animate()
 	self.AnimFrame.Anim:Play();
 end
 
-function BetterWardrobeOutfitDropdownOverrideMixin:OnAnimFinished()
+function BetterTransmogSlotButtonMixin:OnAnimFinished()
 	self.AnimFrame:Hide();
 	self:Update();
 end
 
-function BetterWardrobeOutfitDropdownOverrideMixin:Update()
+function BetterTransmogSlotButtonMixin:Update()
 	if not self:IsShown() then
 		return;
 	end
@@ -917,7 +941,7 @@ function BetterWardrobeOutfitDropdownOverrideMixin:Update()
 	end
 end
 
-function BetterWardrobeOutfitDropdownOverrideMixin:GetEffectiveTransmogID()
+function BetterTransmogSlotButtonMixin:GetEffectiveTransmogID()
 	if not C_Item.DoesItemExist(self.itemLocation) then
 		return Constants.Transmog.NoTransmogID;
 	end
@@ -946,7 +970,7 @@ function BetterWardrobeOutfitDropdownOverrideMixin:GetEffectiveTransmogID()
 	end
 end
 
-function BetterWardrobeOutfitDropdownOverrideMixin:RefreshItemModel()
+function BetterTransmogSlotButtonMixin:RefreshItemModel()
 	local actor = WardrobeTransmogFrame.ModelScene:GetPlayerActor();
 	if not actor then
 		return;

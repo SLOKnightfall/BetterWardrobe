@@ -2209,7 +2209,7 @@
 					</Frame>
 
 					<!--WardrobeOutfitDropdownOverrideMixin provides implementation overrides of functions in WardrobeOutfitDropdownMixin-->
-					<DropdownButton parentKey="OutfitDropdown" name="DDM" inherits="WardrobeOutfitDropdownTemplate" mixin="BetterWardrobeOutfitDropdownOverrideMixin">
+					<DropdownButton parentKey="OutfitDropdown" inherits="WardrobeOutfitDropdownTemplate" mixin="BetterWardrobeOutfitDropdownOverrideMixin">
 						<KeyValues>
 							<KeyValue key="width" value="207" type="number"/>
 							<KeyValue key="minMenuStringWidth" value="152" type="number"/>
@@ -2465,4 +2465,18 @@
 			<OnLoad method="OnLoad"/>
 		</Scripts>
 	</Frame>
+
+			<!--WardrobeOutfitDropdownOverrideMixin provides implementation overrides of functions in WardrobeOutfitDropdownMixin-->
+	<DropdownButton name="BetterWardrobeSavedSetDropdownTemplate" parentKey="OutfitDropdown" inherits="BetterWardrobeOutfitDropDownTemplate" mixin="BetterWardrobeOutfitDropdownOverrideMixin" virtual="true">
+		<KeyValues>
+			<KeyValue key="width" value="207" type="number"/>
+			<KeyValue key="minMenuStringWidth" value="152" type="number"/>
+			<KeyValue key="maxMenuStringWidth" value="216" type="number"/>
+			<KeyValue key="replaceInvalidSources" value="false" type="boolean"/>
+		</KeyValues>
+		<Anchors>
+			<Anchor point="TOPLEFT" x="3" y="28"/>
+		</Anchors>
+
+	</DropdownButton>
 </Ui>

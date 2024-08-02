@@ -168,8 +168,6 @@ function BetterWardrobeOutfitDropdownMixin:OnLoad()
 	self.SaveButton:SetScript("OnClick", function()	
 		BetterWardrobeOutfitManager:StartOutfitSave(self, self:GetSelectedOutfitID());
 	end);
-		addon:SecureHook(DressUpFrame, "OnDressModel", function() 	self:UpdateSaveButton(); end)
-
 end
 
 function BetterWardrobeOutfitDropdownMixin:SetSelectedOutfitID(outfitID)
@@ -360,7 +358,7 @@ function BetterWardrobeOutfitDropdownMixin:IsOutfitDressed()
 	if not self.selectedOutfitID then
 		return true
 	end
-	
+
 	--if addon.GetSetType(self.selectedOutfitID) == "SavedBlizzard" then 
 	if self.selectedOutfitID >= 5000 and self.selectedOutfitID <= 5020 then 
 		local selectedOutfitID = addon:GetBlizzID(self.selectedOutfitID);

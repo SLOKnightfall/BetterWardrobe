@@ -101,6 +101,8 @@ function addon:DressingRoom_Enable()
 	DressUpFrame:RegisterForDrag("LeftButton")
 	DressUpFrame:SetScript("OnDragStart", DressUpFrame.StartMoving)
 	DressUpFrame:SetScript("OnDragStop", DressUpFrame.StopMovingOrSizing)
+	hooksecurefunc("DressUpVisual", DressingRoom.Update);
+	hooksecurefunc("DressUpCollectionAppearance", DressingRoom.Update);
 end
 
 function addon:DressingRoom_Disable()
@@ -464,8 +466,6 @@ end
 BW_DressingRoomFrameMixin = {}
 function BW_DressingRoomFrameMixin:OnLoad()
 	self:RegisterEvent("ADDON_LOADED");
-	hooksecurefunc("DressUpVisual", DressingRoom.Update);
-	hooksecurefunc("DressUpCollectionAppearance", DressingRoom.Update);
 
 --[[
 	DressUpFrame.LinkButton:ClearAllPoints()

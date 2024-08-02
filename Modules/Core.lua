@@ -1453,7 +1453,8 @@ function addon.Init:LoadModules()
 	addon:SecureHook(WardrobeTransmogFrame, "SetPendingTransmog", function(self,...) BW_TransmogFrameMixin.Update(self,...) end)
 	addon:SecureHook(WardrobeTransmogFrame, "GetSlotButton", function(self,...) BW_TransmogFrameMixin.GetSlotButton(self,...) end)
 	--addon:SecureHook(WardrobeTransmogFrame, "OnTransmogApplied", function(self,...) BW_TransmogFrameMixin.OnTransmogApplied(self,...) end)
-		
+	addon:SecureHook(DressUpFrame, "OnDressModel", function() 	BW_DressingRoomFrameOutfitDropdown:UpdateSaveButton(); end)
+
 
 	C_Timer.After(0, function()
 		addon:UpdatePetTracker()
