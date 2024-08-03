@@ -1264,15 +1264,15 @@ function BetterWardrobeCollectionFrameMixin:SetTab(tabID)
 			self.ClassDropdown:Hide();
 
 			if ElvUI then 
-				--BetterWardrobeCollectionFrame.ItemsCollectionFrame.WeaponDropdown:SetPoint("TOPRIGHT", -42, -10)
+				BetterWardrobeCollectionFrame.ItemsCollectionFrame.WeaponDropdown:SetPoint("TOPRIGHT", -42, -10)
 				BW_SortDropDown:SetPoint("TOPLEFT", BetterWardrobeCollectionFrame.ItemsCollectionFrame.WeaponDropdown, "BOTTOMLEFT", 0, 0)
+
 				BetterWardrobeCollectionFrame.AlteredFormSwapButton:ClearAllPoints();
 				BetterWardrobeCollectionFrame.AlteredFormSwapButton:SetPoint("TOPRIGHT",self:GetParent(), "TOPRIGHT", -17,-45)
 			else 
-				BetterWardrobeCollectionFrame.ItemsCollectionFrame.WeaponDropdown:SetPoint("TOPRIGHT", -48, -38)
-				BW_SortDropDown:SetWidth(157);
-
+				--BetterWardrobeCollectionFrame.ItemsCollectionFrame.WeaponDropdown:SetPoint("TOPRIGHT", -48, -38)
 				BW_SortDropDown:SetPoint("BOTTOMLEFT", BetterWardrobeCollectionFrame.ItemsCollectionFrame.WeaponDropdown, "TOPLEFT", 0, 3)
+
 				BetterWardrobeCollectionFrame.AlteredFormSwapButton:ClearAllPoints();
 				BetterWardrobeCollectionFrame.AlteredFormSwapButton:SetPoint("TOPRIGHT",self:GetParent(), "TOPRIGHT", -12,-50)
 			end
@@ -1281,23 +1281,16 @@ function BetterWardrobeCollectionFrameMixin:SetTab(tabID)
 			self.ClassDropdown:Show();
 
 			BetterWardrobeCollectionFrame.ItemsCollectionFrame.ApplyOnClickCheckbox:Show();
+			BW_SortDropDown:SetPoint("TOPRIGHT", self.ItemsCollectionFrame.SlotsFrame, "TOPLEFT", -12, -35);
 
 			----BetterWardrobeCollectionFrame.ItemsCollectionFrame.WeaponDropdown:SetPoint("TOPRIGHT", -32, -25)
 			if ElvUI then 
-				BW_SortDropDown:SetPoint("TOPLEFT", BetterWardrobeCollectionFrame.ItemsCollectionFrame.WeaponDropdown, "BOTTOMLEFT", -55, yOffset)
 				BetterWardrobeCollectionFrame.AlteredFormSwapButton:ClearAllPoints()
 				BetterWardrobeCollectionFrame.AlteredFormSwapButton:SetPoint("TOPRIGHT",self:GetParent(), "TOPRIGHT", -13,-55)
 			else 
-				BW_SortDropDown:SetWidth(150);
-
-				BW_SortDropDown:SetPoint("TOPRIGHT", self.ItemsCollectionFrame.SlotsFrame, "TOPLEFT", -12, -35);
-
-
 				--BW_SortDropDown:SetPoint("TOPLEFT", BetterWardrobeCollectionFrame, "TOPLEFT", 0, -110)
 				BetterWardrobeCollectionFrame.AlteredFormSwapButton:ClearAllPoints()
 				BetterWardrobeCollectionFrame.AlteredFormSwapButton:SetPoint("TOPRIGHT",BetterWardrobeCollectionFrame.ItemsCollectionFrame.WeaponDropdown, "TOPRIGHT", 35, 13)
-
-								-----BW_SortDropDown:SetPoint("TOPLEFT", BetterWardrobeCollectionFrame.ItemsCollectionFrame.WeaponDropDown, "BOTTOMLEFT", 0, yOffset)
 				------BetterWardrobeCollectionFrame.AlteredFormSwapButton:ClearAllPoints()
 				-----BetterWardrobeCollectionFrame.AlteredFormSwapButton:SetPoint("TOPRIGHT",self:GetParent(), "TOPRIGHT", -19,-65)
 			end
@@ -1314,7 +1307,7 @@ function BetterWardrobeCollectionFrameMixin:SetTab(tabID)
 		self.SearchBox:Show()
 
 		if ( atTransmogrifier )  then
-						self.TransmogOptionsButton:Show();
+			self.TransmogOptionsButton:Show();
 
 			self.activeFrame = self.SetsTransmogFrame;
 			self.SearchBox:SetPoint("TOPRIGHT", -95, -35);

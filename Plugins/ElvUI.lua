@@ -25,84 +25,7 @@ local EP = LibStub("LibElvUIPlugin-1.0") --We can use this to automatically inse
 
 local function LoadSkin_ElvUI()
 --DropDownMenu
-	hooksecurefunc('BW_UIDropDownMenu_CreateFrames', function(level, index)
-		local listFrame = _G['BW_DropDownList'..level];
-
-		local listFrameName = listFrame:GetName();
-		local expandArrow = _G[listFrameName..'Button'..index..'ExpandArrow'];
-		if expandArrow then
-			local normTex = expandArrow:GetNormalTexture()
-			expandArrow:SetNormalTexture(E.Media.Textures.ArrowUp)
-			normTex:SetVertexColor(unpack(E.media.rgbvaluecolor))
-			normTex:SetRotation(S.ArrowRotation.right)
-			expandArrow:Size(12, 12)
-		end
-
-		local Backdrop = _G[listFrameName..'Backdrop']
-		if not Backdrop.template then Backdrop:StripTextures() end
-		Backdrop:CreateBackdrop('Transparent')
-
-		local menuBackdrop = _G[listFrameName..'MenuBackdrop']
-		if not menuBackdrop.template then menuBackdrop:StripTextures() end
-		menuBackdrop:CreateBackdrop('Transparent')
-	end)
-
-	hooksecurefunc('BW_UIDropDownMenu_SetIconImage', function(icon, texture)
-		if texture:find('Divider') then
-			local r, g, b = unpack(E.media.rgbvaluecolor)
-			icon:SetColorTexture(r, g, b, 0.45)
-			icon:Height(1)
-		end
-	end)
-
-	hooksecurefunc('BW_ToggleDropDownMenu', function(level)
-		if not level then
-			level = 1;
-		end
-
-		local r, g, b = unpack(E.media.rgbvaluecolor)
-
-		for i = 1, _G.BW_UIDROPDOWNMENU_MAXBUTTONS do
-			local button = _G['BW_DropDownList'..level..'Button'..i]
-			local check = _G['BW_DropDownList'..level..'Button'..i..'Check']
-			local uncheck = _G['BW_DropDownList'..level..'Button'..i..'UnCheck']
-			local highlight = _G['BW_DropDownList'..level..'Button'..i..'Highlight']
-
-			highlight:SetTexture(E.Media.Textures.Highlight)
-			highlight:SetBlendMode('BLEND')
-			highlight:SetDrawLayer('BACKGROUND')
-			highlight:SetVertexColor(r, g, b)
-
-			if not button.backdrop then
-				button:CreateBackdrop()
-			end
-
-			button.backdrop:Hide()
-
-			if not button.notCheckable then
-				uncheck:SetTexture()
-				local _, co = check:GetTexCoord()
-				if co == 0 then
-					check:SetTexture([[Interface\Buttons\UI-CheckBox-Check]])
-					check:SetVertexColor(r, g, b, 1)
-					check:Size(20, 20)
-					check:SetDesaturated(true)
-					button.backdrop:SetInside(check, 4, 4)
-				else
-					check:SetTexture(E.media.normTex)
-					check:SetVertexColor(r, g, b, 1)
-					check:Size(10, 10)
-					check:SetDesaturated(false)
-					button.backdrop:SetOutside(check)
-				end
-
-				button.backdrop:Show()
-				check:SetTexCoord(0, 1, 0, 1)
-			else
-				check:Size(16, 16)
-			end
-		end
-	end)
+	
 
 end
 
@@ -117,39 +40,50 @@ end
 
 local function SkinTransmogFrames()
 
-	-- Appearances Tab
-	local WardrobeCollectionFrame = _G.BetterWardrobeCollectionFrame
-	S:HandleTab(WardrobeCollectionFrame.ItemsTab)
-	S:HandleTab(WardrobeCollectionFrame.SetsTab)
-	S:HandleTab(WardrobeCollectionFrame.ExtraSetsTab)
-	S:HandleTab(WardrobeCollectionFrame.SavedSetsTab)
+	local BetterWardrobeCollectionFrame = _G.BetterWardrobeCollectionFrame
+	S:HandleTab(BetterWardrobeCollectionFrame.ItemsTab)
+	S:HandleTab(BetterWardrobeCollectionFrame.SetsTab)
+	S:HandleTab(BetterWardrobeCollectionFrame.ExtraSetsTab)
+	S:HandleTab(BetterWardrobeCollectionFrame.SavedSetsTab)
 
-	WardrobeCollectionFrame.progressBar:StripTextures()
-	WardrobeCollectionFrame.progressBar:CreateBackdrop()
-	WardrobeCollectionFrame.progressBar:SetStatusBarTexture(E.media.normTex)
-	E:RegisterStatusBar(WardrobeCollectionFrame.progressBar)
+	BetterWardrobeCollectionFrame.progressBar:StripTextures()
+	BetterWardrobeCollectionFrame.progressBar:CreateBackdrop()
+	BetterWardrobeCollectionFrame.progressBar:SetStatusBarTexture(E.media.normTex)
+	E:RegisterStatusBar(BetterWardrobeCollectionFrame.progressBar)
 
 	S:HandleEditBox(_G.BetterWardrobeCollectionFrameSearchBox)
-	_G.BetterWardrobeCollectionFrameSearchBox:SetFrameLevel(500)
+	_G.BetterWardrobeCollectionFrameSearchBox:SetFrameLevel(5)
+	S:HandleDropDownBox(_G.BetterWardrobeCollectionFrame.ClassDropdown, 145)
+	S:HandleDropDownBox(_G.BW_SortDropDown, 145)
+	S:HandleDropDownBox(_G.BW_CollectionList_Dropdown, 145)
+	S:HandleDropDownBox(_G.BW_SavedOutfitDropDown, 145)
+	S:HandleDropDownBox(_G.BW_TransmogOptionsButton, 145)
+	S:HandleDropDownBox(_G.BetterWardrobeTMOutfitDropDown, 145)
+	S:HandleButton(_G.BetterWardrobeTMOutfitDropDown.SaveButton, nil, nil, nil, nil, nil, nil, nil, nil, nil, nil, true, 'right')
 
-	S:HandleButton(WardrobeCollectionFrame.FilterButton)
-	WardrobeCollectionFrame.FilterButton:Point('LEFT', WardrobeCollectionFrame.searchBox, 'RIGHT', 2, 0)
-	S:HandleCloseButton(WardrobeCollectionFrame.FilterButton.ResetButton)
-	S:HandleDropDownBox(_G.BetterWardrobeCollectionFrameWeaponDropDown)
-	WardrobeCollectionFrame.ItemsCollectionFrame:StripTextures()
+	S:HandleButton(_G.BW_CollectionListButton, nil, nil, nil, nil, nil, nil, nil, nil, nil, nil, true, 'right')
+
+	S:HandleButton(_G.BW_CollectionListOptionsButton, nil, nil, nil, nil, nil, nil, nil, nil, nil, nil, true, 'right')
+
+	S:HandleButton(BetterWardrobeCollectionFrame.FilterButton, nil, nil, nil, nil, nil, nil, nil, nil, nil, nil, true, 'right')
+	BetterWardrobeCollectionFrame.FilterButton:Point('LEFT', BetterWardrobeCollectionFrame.searchBox, 'RIGHT', 2, 0)
+	S:HandleCloseButton(BetterWardrobeCollectionFrame.FilterButton.ResetButton)
+	BetterWardrobeCollectionFrame.FilterButton.ResetButton:ClearAllPoints()
+	BetterWardrobeCollectionFrame.FilterButton.ResetButton:Point('CENTER', BetterWardrobeCollectionFrame.FilterButton, 'TOPRIGHT', 0, 0)
+	S:HandleDropDownBox(_G.BetterWardrobeCollectionFrame.ItemsCollectionFrame.WeaponDropdown)
+	BetterWardrobeCollectionFrame.ItemsCollectionFrame:StripTextures()
 
 	for _, Frame in ipairs(BetterWardrobeCollectionFrame.ContentFrames) do
 		if Frame.Models then
 			for _, Model in pairs(Frame.Models) do
-				Model:SetFrameLevel(Model:GetFrameLevel() + 1)
 				Model.Border:SetAlpha(0)
 				Model.TransmogStateTexture:SetAlpha(0)
 
 				local border = CreateFrame('Frame', nil, Model)
 				border:SetTemplate()
 				border:ClearAllPoints()
-				border:SetPoint('TOPLEFT', Model, 'TOPLEFT', 0, 1) -- dont use set inside, left side needs to be 0
-				border:SetPoint('BOTTOMRIGHT', Model, 'BOTTOMRIGHT', 1, -1)
+				border:Point('TOPLEFT', Model, 'TOPLEFT', 0, 1) -- dont use set inside, left side needs to be 0
+				border:Point('BOTTOMRIGHT', Model, 'BOTTOMRIGHT', 1, -1)
 				border:SetBackdropColor(0, 0, 0, 0)
 				border.callbackBackdropColor = clearBackdrop
 
@@ -158,8 +92,8 @@ local function SkinTransmogFrames()
 
 				for _, region in next, { Model:GetRegions() } do
 					if region:IsObjectType('Texture') then -- check for hover glow
-						local texture = region:GetTexture()
-						if texture == 1116940 or texture == 1569530 then -- transmogrify.blp (items:1116940 or sets:1569530)
+						local texture, regionName = region:GetTexture(), region:GetDebugName() -- find transmogrify.blp (sets:1569530 or items:1116940)
+						if texture == 1569530 or (texture == 1116940 and not strfind(regionName, 'SlotInvalidTexture') and not strfind(regionName, 'DisabledOverlay')) then
 							region:SetColorTexture(1, 1, 1, 0.3)
 							region:SetBlendMode('ADD')
 							region:SetAllPoints(Model)
@@ -188,8 +122,8 @@ local function SkinTransmogFrames()
 			Glowframe:CreateBackdrop(nil, nil, nil, nil, nil, nil, nil, nil, pending:GetFrameLevel())
 
 			if Glowframe.backdrop then
-				Glowframe.backdrop:SetPoint('TOPLEFT', pending, 'TOPLEFT', 0, 1) -- dont use set inside, left side needs to be 0
-				Glowframe.backdrop:SetPoint('BOTTOMRIGHT', pending, 'BOTTOMRIGHT', 1, -1)
+				Glowframe.backdrop:Point('TOPLEFT', pending, 'TOPLEFT', 0, 1) -- dont use set inside, left side needs to be 0
+				Glowframe.backdrop:Point('BOTTOMRIGHT', pending, 'BOTTOMRIGHT', 1, -1)
 				Glowframe.backdrop:SetBackdropBorderColor(1, 0.7, 1)
 				Glowframe.backdrop:SetBackdropColor(0, 0, 0, 0)
 			end
@@ -203,9 +137,10 @@ local function SkinTransmogFrames()
 			end
 		end
 
-		if Frame.PagingFrame then
-			S:HandleNextPrevButton(Frame.PagingFrame.PrevPageButton, nil, nil, true)
-			S:HandleNextPrevButton(Frame.PagingFrame.NextPageButton, nil, nil, true)
+		local paging = Frame.PagingFrame
+		if paging then
+			S:HandleNextPrevButton(paging.PrevPageButton, nil, nil, true)
+			S:HandleNextPrevButton(paging.NextPageButton, nil, nil, true)
 		end
 	end
 
@@ -215,128 +150,37 @@ local function SkinTransmogFrames()
 	SetsCollectionFrame.LeftInset:StripTextures()
 	S:HandleTrimScrollBar(SetsCollectionFrame.ListContainer.ScrollBar)
 
-	hooksecurefunc(SetsCollectionFrame.ListContainer.ScrollBox, 'Update', function(button)
-		for _, child in next, { button.ScrollTarget:GetChildren() } do
-			if not child.IsSkinned then
-				child.Background:Hide()
-				child.HighlightTexture:SetTexture('')
-				child.Icon:SetSize(42, 42)
-				S:HandleIcon(child.Icon)
-				child.IconCover:SetOutside(child.Icon)
-
-				child.SelectedTexture:SetDrawLayer('BACKGROUND')
-				child.SelectedTexture:SetColorTexture(1, 1, 1, .25)
-				child.SelectedTexture:ClearAllPoints()
-				child.SelectedTexture:SetPoint('TOPLEFT', 4, -2)
-				child.SelectedTexture:SetPoint('BOTTOMRIGHT', -1, 2)
-				child.SelectedTexture:CreateBackdrop('Transparent')
-
-				child.IsSkinned = true
-			end
-		end
-	end)
-
+	----hooksecurefunc(SetsCollectionFrame.ListContainer.ScrollBox, 'Update', SetsFrame_ScrollBoxUpdate)
 
 	local DetailsFrame = SetsCollectionFrame.DetailsFrame
 	DetailsFrame.ModelFadeTexture:Hide()
 	DetailsFrame.IconRowBackground:Hide()
 	DetailsFrame.Name:FontTemplate(nil, 16)
 	DetailsFrame.LongName:FontTemplate(nil, 16)
-	S:HandleButton(DetailsFrame.VariantSetsButton)
+	S:HandleDropDownBox(DetailsFrame.VariantSetsDropdown)
+	----hooksecurefunc(SetsCollectionFrame, 'SetItemFrameQuality', SetsFrame_SetItemFrameQuality)
+
+	--local WardrobeFrame = _G.BetterWardrobeFrame
+	--S:HandlePortraitFrame(WardrobeFrame)
+
 
 	S:HandleButton(DetailsFrame.BW_LinkSetButton)
 	S:HandleButton(DetailsFrame.BW_OpenDressingRoomButton)
 	DetailsFrame.BW_LinkSetButton:SetSize(20,20)
-
 	DetailsFrame.BW_OpenDressingRoomButton:SetSize(20,20)
 
-	--S:HandleButton(SetsCollectionFrame.BW_SetsHideSlotButton)
+	S:HandleButton(BetterWardrobeCollectionFrame.BW_SetsHideSlotButton)
+	BetterWardrobeCollectionFrame.BW_SetsHideSlotButton:SetSize(20,20)
 
-	hooksecurefunc(SetsCollectionFrame, 'SetItemFrameQuality', function(_, itemFrame)
-		local icon = itemFrame.Icon
-		if not icon.backdrop then
-			icon:CreateBackdrop()
-			icon:SetTexCoord(unpack(E.TexCoords))
-			itemFrame.IconBorder:Hide()
-		end
+	BetterWardrobeCollectionFrame.ItemsCollectionFrame:StripTextures()
+	BetterWardrobeCollectionFrame.ItemsCollectionFrame:SetTemplate('Transparent')
 
-		if itemFrame.collected then
-			local quality = C_TransmogCollection_GetSourceInfo(itemFrame.sourceID).quality or 1
+	BetterWardrobeCollectionFrame.SetsTransmogFrame:StripTextures()
+	BetterWardrobeCollectionFrame.SetsTransmogFrame:SetTemplate('Transparent')
+	S:HandleNextPrevButton(BetterWardrobeCollectionFrame.SetsTransmogFrame.PagingFrame.NextPageButton)
+	S:HandleNextPrevButton(BetterWardrobeCollectionFrame.SetsTransmogFrame.PagingFrame.PrevPageButton)
 
-			local color = BAG_ITEM_QUALITY_COLORS[quality]
-			if color then 
-				icon.backdrop:SetBackdropBorderColor(color.r, color.g, color.b)
-			end
-
-		else
-			icon.backdrop:SetBackdropBorderColor(unpack(E.media.bordercolor))
-		end
-	end)
-
-	_G.BetterWardrobeSetsCollectionVariantSetsButton.Icon:SetTexture(E.Media.Textures.ArrowUp)
-	_G.BetterWardrobeSetsCollectionVariantSetsButton.Icon:SetRotation(S.ArrowRotation.down)
-
-
-	--local WardrobeFrame = _G.WardrobeFrame
-	--S:HandlePortraitFrame(WardrobeFrame)
-
-
-	local WardrobeOutfitFrame = _G.BetterWardrobeOutfitFrame
-	WardrobeOutfitFrame:StripTextures()
-	WardrobeOutfitFrame:SetTemplate('Transparent')
-	S:HandleButton(_G.BetterWardrobeOutfitDropDown.SaveButton)
-	S:HandleDropDownBox(_G.BetterWardrobeOutfitDropDown, 221)
-	_G.BetterWardrobeOutfitDropDown:Height(34)
-	_G.BetterWardrobeOutfitDropDown.SaveButton:ClearAllPoints()
-	_G.BetterWardrobeOutfitDropDown.SaveButton:Point('TOPLEFT', _G.BetterWardrobeOutfitDropDown, 'TOPRIGHT', -2, -2)
-
-	local WardrobeTransmogFrame = _G.WardrobeTransmogFrame
-	WardrobeTransmogFrame:StripTextures()
-
-	for i = 1, #WardrobeTransmogFrame.SlotButtons do
-		local slotButton = WardrobeTransmogFrame.SlotButtons[i]
-		slotButton:SetFrameLevel(slotButton:GetFrameLevel() + 2)
-		slotButton:StripTextures()
-		slotButton:CreateBackdrop(nil, nil, nil, nil, nil, nil, nil, true)
-		slotButton.Border:Kill()
-		slotButton.Icon:SetTexCoord(unpack(E.TexCoords))
-		slotButton.Icon:SetInside(slotButton.backdrop)
-
-		local undo = slotButton.UndoButton
-		if undo then undo:SetHighlightTexture(E.ClearTexture) end
-
-		local pending = slotButton.PendingFrame
-		if pending then
-			if slotButton.transmogType == 1 then
-				pending.Glow:Size(48)
-				pending.Ants:Size(30)
-			else
-				pending.Glow:Size(74)
-				pending.Ants:Size(48)
-			end
-		end
-	end
-
-	WardrobeTransmogFrame.SpecButton:ClearAllPoints()
-	WardrobeTransmogFrame.SpecButton:Point('RIGHT', WardrobeTransmogFrame.ApplyButton, 'LEFT', -2, 0)
-	S:HandleButton(WardrobeTransmogFrame.SpecButton)
-	S:HandleButton(WardrobeTransmogFrame.ApplyButton)
-	S:HandleButton(WardrobeTransmogFrame.ModelScene.ClearAllPendingButton)
-	S:HandleCheckBox(WardrobeTransmogFrame.ToggleSecondaryAppearanceCheckbox)
-
-	WardrobeCollectionFrame.ItemsCollectionFrame:StripTextures()
-	WardrobeCollectionFrame.ItemsCollectionFrame:SetTemplate('Transparent')
-
-	S:HandleButton(BetterWardrobeCollectionFrame.AlteredFormSwapButton)
-	BetterWardrobeCollectionFrame.AlteredFormSwapButton:SetSize(20,20)
-	BetterWardrobeCollectionFrame.AlteredFormSwapButton.Portrait:SetSize(20,20)
-
-	WardrobeCollectionFrame.SetsTransmogFrame:StripTextures()
-	WardrobeCollectionFrame.SetsTransmogFrame:SetTemplate('Transparent')
-	S:HandleNextPrevButton(WardrobeCollectionFrame.SetsTransmogFrame.PagingFrame.NextPageButton)
-	S:HandleNextPrevButton(WardrobeCollectionFrame.SetsTransmogFrame.PagingFrame.PrevPageButton)
-
-	local WardrobeOutfitEditFrame = _G.WardrobeOutfitEditFrame
+	local WardrobeOutfitEditFrame = _G.BetterWardrobeOutfitEditFrame
 	WardrobeOutfitEditFrame:StripTextures()
 	WardrobeOutfitEditFrame:SetTemplate('Transparent')
 	WardrobeOutfitEditFrame.EditBox:StripTextures()
@@ -346,49 +190,41 @@ local function SkinTransmogFrames()
 	S:HandleButton(WardrobeOutfitEditFrame.DeleteButton)
 
 	--Items
-	S:HandleDropDownBox(BW_SortDropDown)
-	S:HandleDropDownBox(SavedOutfitDropDownMenu)
-	S:HandleDropDownBox(BW_ColectionListFrame.dropdownFrame)
-	BW_ColectionListFrame.dropdownFrame:ClearAllPoints()
-	BW_ColectionListFrame.dropdownFrame:SetPoint("BOTTOM", -25, 15)
 
-	S:HandleButton(BW_CollectionListOptionsButton)
+
+	S:HandleButton(_G.BW_CollectionListOptionsButton)
 	BW_CollectionListOptionsButton:SetSize(25,25)
 
-	S:HandleButton(BW_LoadQueueButton)
+	S:HandleButton(_G.BW_LoadQueueButton)
 	BW_LoadQueueButton:ClearAllPoints()
-	BW_LoadQueueButton:Point("TOPLEFT",BetterWardrobeOutfitDropDown, "TOPRIGHT", 90, -2)
+	BW_LoadQueueButton:Point("TOPLEFT",BetterWardrobeTMOutfitDropDown, "TOPRIGHT", 95, -2)
 
-	S:HandleButton(BW_RandomizeButton)
+	S:HandleButton(_G.BW_RandomizeButton)
 	BW_RandomizeButton:ClearAllPoints()
 	BW_RandomizeButton:Point("TOPLEFT",BW_LoadQueueButton, "TOPRIGHT", 5, 0)
 
-	S:HandleButton(BW_SlotHideButton)
+	S:HandleButton(_G.BW_SlotHideButton)
 	BW_SlotHideButton:ClearAllPoints()
 	BW_SlotHideButton:Point("TOPLEFT",BW_RandomizeButton, "TOPRIGHT", 5, 0)
-
-	S:HandleButton(BW_TransmogOptionsButton)
-	S:HandleCheckBox(WardrobeCollectionFrame.ItemsCollectionFrame.ApplyOnClickCheckbox)
-
 end
 
 local function UpdateDressingRoom()
 	--Dropdown Menu
-	BetterWardrobeOutfitFrame:StripTextures()
-	BetterWardrobeOutfitFrame:CreateBackdrop('Transparent')
+	--BetterWardrobeOutfitFrame:StripTextures()
+	--BetterWardrobeOutfitFrame:CreateBackdrop('Transparent')
 
 	--DressingRoom
-	BW_DressingRoomFrame:StripTextures()
-	BW_DressingRoomFrame:CreateBackdrop('Transparent')
-	S:HandleScrollBar(BetterWardrobeOutfitFrameScrollFrameScrollBar)
+	--BW_DressingRoomFrame:StripTextures()
+	--BW_DressingRoomFrame:CreateBackdrop('Transparent')
+--	--S:HandleScrollBar(BetterWardrobeOutfitFrameScrollFrameScrollBar)
 
 
-	BetterWardrobeDressUpFrameDropDown:StripTextures()
-	BetterWardrobeDressUpFrameDropDown:CreateBackdrop()
+--	BetterWardrobeDressUpFrameDropDown:StripTextures()
+	--BetterWardrobeDressUpFrameDropDown:CreateBackdrop()
 	--BetterWardrobeOutfitDropDown:Set
-	S:HandleNextPrevButton(BetterWardrobeDressUpFrameDropDownButton)
-	BetterWardrobeDressUpFrameDropDownButton:ClearAllPoints()
-	BetterWardrobeDressUpFrameDropDownButton:SetPoint("RIGHT")
+--	S:HandleNextPrevButton(BetterWardrobeDressUpFrameDropDownButton)
+	--BetterWardrobeDressUpFrameDropDownButton:ClearAllPoints()
+	--BetterWardrobeDressUpFrameDropDownButton:SetPoint("RIGHT")
 	--BetterWardrobeOutfitDropDown.SaveButton:ClearAllPoints()
 	--BetterWardrobeOutfitDropDown.SaveButton:SetPoint("LEFT",BetterWardrobeOutfitDropDown, "RIGHT", 3, 0)
 
@@ -396,9 +232,9 @@ local function UpdateDressingRoom()
 	--S:HandleDropDownBox(BetterWardrobeDressUpFrameDropDown, 221)
 	--BetterWardrobeDressUpFrameDropDown:SetHeight(34)
 
-	S:HandleButton(BetterWardrobeDressUpFrameDropDown.SaveButton)
-	BetterWardrobeDressUpFrameDropDown.SaveButton:ClearAllPoints()
-	BetterWardrobeDressUpFrameDropDown.SaveButton:SetPoint("LEFT", BetterWardrobeDressUpFrameDropDown, "RIGHT", 3, 0)
+	--S:HandleButton(BetterWardrobeDressUpFrameDropDown.SaveButton)
+	--BetterWardrobeDressUpFrameDropDown.SaveButton:ClearAllPoints()
+	--BetterWardrobeDressUpFrameDropDown.SaveButton:SetPoint("LEFT", BetterWardrobeDressUpFrameDropDown, "RIGHT", 3, 0)
 
 	S:HandleButton(BW_DressingRoomFrame.BW_DressingRoomSettingsButton)
 	BW_DressingRoomFrame.BW_DressingRoomSettingsButton:SetSize(25,25)
@@ -433,16 +269,19 @@ local function UpdateDressingRoom()
 	--DressUpFrame.LinkButton:SetSize(25,25)
 	--DressUpFrame.LinkButton:SetPoint("LEFT", BW_DressingRoomFrame.BW_DressingRoomUndressButton, "RIGHT" , 00)
 
-	DressUpFrameOutfitDropDown:ClearAllPoints()
-	DressUpFrameOutfitDropDown:SetSize(1,1)
-	DressUpFrameOutfitDropDown:SetPoint("LEFT", UIParent, "LEFT", -1000,-1000)
-	DressUpFrameOutfitDropDown:Hide()
-	DressUpFrameOutfitDropDownButton:Hide()
-	DressUpFrameOutfitDropDown.SaveButton:Hide()
-	for index, button in pairs(BW_DressingRoomFrame.PreviewButtonFrame.Slots) do
-		S:HandleItemButton(button)
+	--DressUpFrameOutfitDropDown:ClearAllPoints()
+	--DressUpFrameOutfitDropDown:SetSize(1,1)
+	--DressUpFrameOutfitDropDown:SetPoint("LEFT", UIParent, "LEFT", -1000,-1000)
+	--DressUpFrameOutfitDropDown:Hide()
+	--DressUpFrameOutfitDropDownButton:Hide()
+	--DressUpFrameOutfitDropDown.SaveButton:Hide()
+	--for index, button in pairs(BW_DressingRoomFrame.PreviewButtonFrame.Slots) do
+		--S:HandleItemButton(button)
 		--button.IconBorder:SetColorTexture(1, 1, 1, 0.1)
-	end
+	--end
+
+	S:HandleDropDownBox(_G.BW_DressingRoomFrameOutfitDropdown, 145)
+	S:HandleButton(_G.BW_DressingRoomFrameOutfitDropdown.SaveButton, nil, nil, nil, nil, nil, nil, nil, nil, nil, nil, true, 'right')
 
 	S:HandleButton(BW_DressingRoomFrame.BW_DressingRoomSwapFormButton)
 	BW_DressingRoomFrame.BW_DressingRoomSwapFormButton:SetSize(20,20)
@@ -473,14 +312,14 @@ local function UpdateDressingRoom()
 			end)]]--
 
 	-- Outfit Edit Frame
-	local WardrobeOutfitEditFrame = _G.BetterWardrobeOutfitEditFrame
-	WardrobeOutfitEditFrame:StripTextures()
-	WardrobeOutfitEditFrame:CreateBackdrop('Transparent')
-	WardrobeOutfitEditFrame.EditBox:StripTextures()
-	S:HandleEditBox(WardrobeOutfitEditFrame.EditBox)
-	S:HandleButton(WardrobeOutfitEditFrame.AcceptButton)
-	S:HandleButton(WardrobeOutfitEditFrame.CancelButton)
-	S:HandleButton(WardrobeOutfitEditFrame.DeleteButton)
+	local BetterWardrobeOutfitEditFrame = _G.BetterWardrobeOutfitEditFrame
+	BetterWardrobeOutfitEditFrame:StripTextures()
+	BetterWardrobeOutfitEditFrame:CreateBackdrop('Transparent')
+	BetterWardrobeOutfitEditFrame.EditBox:StripTextures()
+	S:HandleEditBox(BetterWardrobeOutfitEditFrame.EditBox)
+	S:HandleButton(BetterWardrobeOutfitEditFrame.AcceptButton)
+	S:HandleButton(BetterWardrobeOutfitEditFrame.CancelButton)
+	S:HandleButton(BetterWardrobeOutfitEditFrame.DeleteButton)
 end
 
 addon.ElvUI_init = false
