@@ -257,7 +257,7 @@ function BetterWardrobeOutfitDropdownMixin:InitOutfitDropdown()
 				HelpTip:Hide(WardrobeTransmogFrame, TRANSMOG_OUTFIT_DROPDOWN_TUTORIAL);
 				SetCVarBitfield("closedInfoFrames", LE_FRAME_TUTORIAL_TRANSMOG_OUTFIT_DROPDOWN, true);
 			end
-			WardrobeOutfitManager:StartOutfitSave(self);
+			BetterWardrobeOutfitManager:StartOutfitSave(self);
 		end);
 
 		button:AddInitializer(function(button, description, menu)
@@ -495,8 +495,7 @@ function BetterWardrobeOutfitManager:NewOutfit(name)
 
 	--addon.setdb.global.sets[addon.setdb:GetCurrentProfile()] = addon.GetSavedList()
 	addon.setdb.global.sets[addon.setdb:GetCurrentProfile()] = addon.StoreBlizzardSets();
-
-
+	addon.GetSavedList()
 end
 
 function BetterWardrobeOutfitManager:DeleteOutfit(outfitID)
@@ -719,7 +718,6 @@ function BetterWardrobeOutfitManager:ContinueWithSave()
 			addon.OutfitDB.char.outfits[LookupIndexFromID(self.outfitID)]  = addon.OutfitDB.char.outfits[LookupIndexFromID(self.outfitID)] or {}
 			outfit = addon.OutfitDB.char.outfits[LookupIndexFromID(self.outfitID)]
 			--outfit.itemTransmogInfoList =  self.itemTransmogInfoList or {}
-
 			local itemData = {}
 			for i, data in pairs(self.itemTransmogInfoList) do
 				local sourceInfo = C_TransmogCollection.GetSourceInfo(data.appearanceID)
@@ -734,9 +732,11 @@ function BetterWardrobeOutfitManager:ContinueWithSave()
 
 			outfit.itemData = itemData
 			BetterWardrobeOutfitManager:ClosePopups()
+			addon.GetSavedList()
+
 	else
 		-- this is a new outfit
-		WardrobeOutfitFrame:ShowPopup("BW_NAME_TRANSMOG_OUTFIT")
+		BetterWardrobeOutfitFrame:ShowPopup("BW_NAME_TRANSMOG_OUTFIT")
 	end
 end
 
