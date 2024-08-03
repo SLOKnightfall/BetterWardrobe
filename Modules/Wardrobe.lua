@@ -3057,9 +3057,14 @@ function BetterWardrobeItemsCollectionMixin:UpdateItems()
 			-- hide visual option
 			model.HideVisual.Icon:SetShown(isAtTransmogrifier and visualInfo.isHideVisual);
 			-- slots not allowed
-			local showAsInvalid = not canDisplayVisuals or not self.slotAllowed;
+			--local showAsInvalid = not canDisplayVisuals or not self.slotAllowed;
+			local showAsInvalid = not self.slotAllowed;
+			if not BW_CollectionListTitle:IsShown() then
 			model.SlotInvalidTexture:SetShown(showAsInvalid);		
 			model:SetDesaturated(showAsInvalid);
+			end
+			--model.SlotInvalidTexture:SetShown(showAsInvalid);		
+			--model:SetDesaturated(showAsInvalid);
 
 			--model.SlotInvalidTexture:SetShown(not self.slotAllowed);			
 
@@ -6315,6 +6320,9 @@ function BetterWardrobeSetsScrollFrameButtonMixin:SetSelected(selected)
 end
 
 function BetterWardrobeSetsScrollFrameButtonMixin:OnClick(buttonName, down)
+	if BetterWardrobeCollectionFrame.selectedCollectionTab == 4 then
+		return
+	end
 	if ( buttonName == "LeftButton" ) then
 		PlaySound(SOUNDKIT.IG_MAINMENU_OPTION_CHECKBOX_ON);
 		g_selectionBehavior:Select(self);
@@ -6339,7 +6347,6 @@ function BetterWardrobeSetsScrollFrameButtonMixin:OnClick(buttonName, down)
 
 			local text;
 			local targetSetID;
-
 
 			local favorite = (type == "set" and baseSet.favoriteSetID ~= nil) or addon.favoritesDB.profile.extraset[baseSetID]
 			--local favorite = baseSet.favoriteSetID ~= nil;

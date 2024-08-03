@@ -125,7 +125,6 @@ function CollectionList:UpdateList(type, typeID, add, sourceID)
 	end
 
 	local collectionList = addon.CollectionList:CurrentList()
-print(addon.CollectionList:CurrentList())
 	if type == "item" then --TypeID is visualID
 		collectionList[type][typeID] = add or nil
 		if BetterWardrobeCollectionFrame.ItemsCollectionFrame:IsShown() then
