@@ -657,8 +657,8 @@ end
 
 function BetterWardrobeOutfitDropdownOverrideMixin:GetLastOutfitID()
 	local specIndex = GetSpecialization();
-	--return addon.OutfitDB.char.lastTransmogOutfitIDSpec[specIndex];
-	return tonumber(GetCVar(addon.OutfitDB.char.lastTransmogOutfitIDSpec[specIndex]));
+	return addon.OutfitDB.char.lastTransmogOutfitIDSpec[specIndex];
+	--return tonumber(GetCVar(addon.OutfitDB.char.lastTransmogOutfitIDSpec[specIndex]));
 end
 
 BetterTransmogSlotButtonMixin = { };
