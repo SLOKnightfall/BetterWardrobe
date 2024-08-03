@@ -406,7 +406,7 @@
 						local name = self:GetParent().Name:GetText()
 						--print(self:GetParent().setID)
 						PlaySound(SOUNDKIT.IG_MAINMENU_OPTION_CHECKBOX_ON);
-						BetterWardrobeOutfitEditFrame:ShowForOutfit_CollectionJournal(self:GetParent().setID, name, self);
+						BetterWardrobeOutfitEditFrame:ShowForOutfit(self:GetParent().setID, name, self);
 					</OnClick>
 
 					<OnEnter>

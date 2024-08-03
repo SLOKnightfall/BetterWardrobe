@@ -6287,8 +6287,9 @@ function BetterWardrobeSetsScrollFrameButtonMixin:Init(elementData)
 	self.IconFrame:SetIconColor(HIGHLIGHT_FONT_COLOR);
 	end
 
+	self.IconFrame:SetFavoriteIconShown(isFavorite or elementData.favoriteSetID)
 
-	-----self.Favorite:SetShown(isFavorite or elementData.favoriteSetID);
+	--self.Favorite:SetShown(isFavorite or elementData.favoriteSetID);
 	self.CollectionListVisual.Hidden.Icon:SetShown(isHidden);
 	self.CollectionListVisual.Unavailable:SetShown(CheckSetAvailability(displayData.setID));
 	self.CollectionListVisual.UnavailableItems:SetShown(CheckSetAvailability(displayData.setID));
@@ -6338,11 +6339,14 @@ function BetterWardrobeSetsScrollFrameButtonMixin:OnClick(buttonName, down)
 
 			local text;
 			local targetSetID;
-			local favorite = baseSet.favoriteSetID ~= nil;
+
+
+			local favorite = (type == "set" and baseSet.favoriteSetID ~= nil) or addon.favoritesDB.profile.extraset[baseSetID]
+			--local favorite = baseSet.favoriteSetID ~= nil;
 			if favorite then
 				targetSetID = baseSet.favoriteSetID;
 				if useDescription then
-					local setInfo = C_TransmogSets.GetSetInfo(baseSet.favoriteSetID);
+					local setInfo = C_TransmogSets.GetSetInfo(baseSet.favoriteSetID or baseSetIDP);
 					text = format(TRANSMOG_SETS_UNFAVORITE_WITH_DESCRIPTION, setInfo.description);
 				else
 					text = TRANSMOG_ITEM_UNSET_FAVORITE;
@@ -6358,7 +6362,16 @@ function BetterWardrobeSetsScrollFrameButtonMixin:OnClick(buttonName, down)
 			end
 
 			rootDescription:CreateButton(text, function()
-				C_TransmogSets.SetIsFavorite(targetSetID, not favorite);
+			if type == "set"  then
+					C_TransmogSets.SetIsFavorite(targetSetID, not favorite)
+
+			elseif type == "extraset"  then
+					addon.favoritesDB.profile.extraset[baseSetID] = not favorite;
+					BetterWardrobeCollectionFrame.SetsCollectionFrame:Refresh()
+					BetterWardrobeCollectionFrame.SetsCollectionFrame:OnSearchUpdate()
+			end
+
+				--C_TransmogSets.SetIsFavorite(targetSetID, not favorite);
 			end);
 
 			local collected = self.setCollected;
@@ -7648,18 +7661,16 @@ addon:SecureHook("SetItemRef", function(link, ...)
 			--LoadAddOn("Blizzard_Collections")
 		end
 
-
 		if ( not CollectionsJournal or not CollectionsJournal:IsVisible() ) then
 			local _, sourceID = strsplit(":", addedLink);
 			--ToggleCollectionsJournal(5)
 			--print(addedLink)
 			TransmogUtil.OpenCollectionToItem(sourceID);
 			--WardrobeCollectionFrame:OpenTransmogLink(sourceID)
-
 		end
 
 			C_Timer.After(0.1, function() BetterWardrobeCollectionFrame:OpenTransmogLink(link) end)
-				
+			
 		return;
 	end
 end)
