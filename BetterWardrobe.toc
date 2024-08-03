@@ -26,7 +26,6 @@ Libs\LibArmorToken-1.0\lib.xml
 Libs\LibAppropriateitems-1.0\lib.xml
 #Libs\LibDataBroker-1.1\LibDataBroker-1.1.lua
 #Libs\LibTextDump-1.0\LibTextDump-1.0.lua
-Libs\UIDropDownMenu\UIDropDownMenu.xml
 Libs\AceSerializer-3.0\AceSerializer-3.0.xml
 Libs\TaintLess\TaintLess.xml
 
@@ -79,7 +78,6 @@ Modules\TransmogVendor.xml
 
 Modules\ImportExport.lua
 Modules\Tooltips.lua
-#Modules\UI.lua
 Modules\SortingFunctions.lua
 
 #3rd party addon compatability

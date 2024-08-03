@@ -7990,7 +7990,6 @@ function BetterWardrobeTransmogOptionsDropdownMixin:OnLoad()
 									addon.includeLocation[21] = value;
 								end
 
-								BW_UIDropDownMenu_Refresh(BW_TransmogOptionsDropDown, 1, 1)
 								BetterWardrobeCollectionFrame.SetsTransmogFrame:OnSearchUpdate();
 							end, 
 						index);

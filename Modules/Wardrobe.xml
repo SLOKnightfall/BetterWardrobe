@@ -1560,11 +1560,6 @@
 					</Layer>
 				</Layers>
 				<Frames>
-					<Frame name="BetterWardrobeSetsTransmogModelRightClickDropDown" parentKey="RightClickDropDown" inherits="BW_UIDropDownMenuTemplate" hidden="true">
-						<Scripts>
-							<OnLoad function="BetterWardrobeSetsTransmogModelRightClickDropDown_OnLoad"/>
-						</Scripts>
-					</Frame>
 					<Frame parentKey="PagingFrame" inherits="BW_CollectionsPagingFrameTemplate">
 						<Anchors>
 							<Anchor point="BOTTOM" x="22" y="38"/>

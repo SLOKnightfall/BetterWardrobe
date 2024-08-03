@@ -131,6 +131,7 @@ function addon:CreateChatLink()
 			end
 		--end
 	end
+	print(string)
 	Export(string,false)
 end
 
@@ -156,70 +157,9 @@ end
 
 
 function BW_TransmogVendorExportButton_OnClick(self)
-	local Profile = addon.Profile
-	local name  = addon.QueueList[3]
-	local contextMenuData = {
-		{
-			text = L["Import/Export Options"], isTitle = true, notCheckable = true,
-		},
-		{
-			text = L["Load Set: %s"]:format( name or L["None Selected"]),
-			func = function()
-				local setType = addon.QueueList[1]
-				local setID = addon.QueueList[2]
-				if setType == "set" then
-					BetterWardrobeCollectionFrame.SetsTransmogFrame:LoadSet(setID)
-				elseif setType == "extraset" then
-					BetterWardrobeCollectionFrame.SetsTransmogFrame:LoadSet(setID)
-				end
-			end,
-			isNotRadio = true,
-			notCheckable = true,
-		},
-	--[[	{
-			text = L["Import Item"],
-			func = function()
-				importFrom = "Transmog"
-				BetterWardrobeOutfitManager:ShowPopup("BETTER_WARDROBE_IMPORT_ITEM_POPUP")
-			end,
-			isNotRadio = true,
-			notCheckable = true,
-		},
-		{
-			text = L["Import Set"],
-			func = function()
-				importFrom = "Transmog"
-				BetterWardrobeOutfitManager:ShowPopup("BETTER_WARDROBE_IMPORT_SET_POPUP")
-			end,
-			isNotRadio = true,
-			notCheckable = true,
-		},
-		{
-			text = L["Export Set"],
-			func = function()
-				ExportTransmogVendorSet()
-			end,
-			notCheckable = true,
-			isNotRadio = true,
-		},
-		]]--
-				{
-			text = L["Create Dressing Room Command Link"],
-			func = function()
-				addon:CreateChatLinkTransmogVendor()
-			end,
-			notCheckable = true,
-			isNotRadio = true,
-		},
-	}
-	
-	BW_UIDropDownMenu_SetAnchor(addon.ContextMenu, 0, 0, "TOPLEFT", self, "TOPLEFT")
-	BW_EasyMenu(contextMenuData, addon.ContextMenu, addon.ContextMenu, 0, 0, "MENU")
-	
-	--DropDownList1:ClearAllPoints()
-	--DropDownList1:SetPoint("BOTTOMLEFT", self, "BOTTOMLEFT", 0, 0)
-	--DropDownList1:SetClampedToScreen(true)
-end
 
+
+
+end
 
 --/run local function f(i,b)DressUpItemLink("item:"..i.."::::::::::::9:"..b);end;f(27457,0);f(27489,0);f(27539,0);f(27548,0);f(27748,0);f(27790,0);f(27897,0);f(28221,0);

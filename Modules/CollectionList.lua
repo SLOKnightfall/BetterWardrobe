@@ -10,8 +10,6 @@ local MogItLoaded = false
 
 function  addon.Init:initCollectionList()
 	local f = CreateFrame("Frame", "BW_ColectionListFrame", BetterWardrobeCollectionFrame, "BW_ColectionListFrameTemplate")
-	local ContextMenu = CreateFrame("Frame", addonName .. "ContextMenuFrame", UIParent, "BW_UIDropDownMenuTemplate")
-	addon.ContextMenu = ContextMenu
 end
 
 function CollectionList:BuildCollectionList(complete)
@@ -382,54 +380,18 @@ end
 
 local action
 function CollectionList:OptionButton_OnClick(button)
-	local  ContextMenu = addon.ContextMenu
-	local Profile = addon.Profile
-	local name  = addon.QueueList[3]
-	local disable = CollectionList:SelectedCollectionList() == "MOGIT"
-	local contextMenuData = {
-		{
-			text =  L["Add List"],
-			func = function()
-				action = "add"
-				BetterWardrobeOutfitManager:ShowPopup("BW_NAME_COLLECTION")
-			end,
-			isNotRadio = true,
-			notCheckable = true,
-		},
-		{
-			text = L["Rename"],
-			func = function()
-				action = "rename"
-				BetterWardrobeOutfitManager:ShowPopup("BW_NAME_COLLECTION")
-			end,
-			isNotRadio = true,
-			notCheckable = true,
-			disabled = disable,
-		},
-		{
-			text = L["Delete"],
-			func = function()
-				CollectionList:DeleteList()
-			end,
-			isNotRadio = true,
-			notCheckable = true,
-			disabled = disable,
-		},
-		{
-			text = L["Add by Item ID"],
-			func = function()
-				BetterWardrobeOutfitManager:ShowPopup("BETTER_WARDROBE_COLLECTIONLIST_ITEM_POPUP")
-			end,
-			isNotRadio = true,
-			notCheckable = true,
-			disabled = disable,
-		},
-	}
 
-	BW_UIDropDownMenu_SetAnchor(ContextMenu, 0, 0, "BOTTOMLEFT", button, "BOTTOMLEFT")
-	BW_EasyMenu(contextMenuData, ContextMenu, ContextMenu, 0, 0, "MENU")	
+	local function GeneratorFunction(owner, rootDescription)
+		rootDescription:CreateButton(L["Add List"], function() action = "add"; BetterWardrobeOutfitManager:ShowPopup("BW_NAME_COLLECTION") end);
+				rootDescription:CreateButton(L["Rename"], function() action = "rename"; BetterWardrobeOutfitManager:ShowPopup("BW_NAME_COLLECTION") end);
+		rootDescription:CreateButton(L["Delete"], function() CollectionList:DeleteList()end);
+		rootDescription:CreateButton(L["Add by Item ID"],  function() BetterWardrobeOutfitManager:ShowPopup("BETTER_WARDROBE_COLLECTIONLIST_ITEM_POPUP") end);
+
+	end
+	
+	MenuUtil.CreateContextMenu(parent, GeneratorFunction);
+
 end
-
 
 function CollectionList:AddMogItData()
 	MogItLoaded = IsAddOnLoaded("MogIt")

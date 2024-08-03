@@ -548,94 +548,45 @@ function BW_DressingRoomFrameMixin:OnEvent(event, ...)
 	end
 end
 
-local ContextMenu = CreateFrame("Frame", addonName .. "ContextMenuFrame", UIParent, "BW_UIDropDownMenuTemplate")
-addon.ContextMenu = ContextMenu
 
 local function DressupSettingsButton_OnClick(self)
-	local Profile = addon.Profile
-	local contextMenuData = {
-		{
-			text = L["Display Options"], isTitle = true, notCheckable = true,
-		},
-		{
-			text = L["Show Item Buttons"],
-			func = function()
+	local function GeneratorFunction(owner, rootDescription)
+		local Profile = addon.Profile
+
+		rootDescription:CreateTitle(L["Display Options"]);
+		rootDescription:CreateCheckbox(L["Show Item Buttons"], function() return Profile.DR_ShowItemButtons end, function()
 				Profile.DR_ShowItemButtons = not Profile.DR_ShowItemButtons
 				BW_DressingRoomFrame.PreviewButtonFrame:SetShown(addon.Profile.DR_ShowItemButtons)
-			end,
-			isNotRadio = true,
-			checked = function() return Profile.DR_ShowItemButtons end,
-		},
-		{
-			text = L["Show DressingRoom Controls"],
-			func = function()
+			end);
+		rootDescription:CreateCheckbox(L["Show DressingRoom Controls"], function() return Profile.DR_ShowControls end, function()
 				Profile.DR_ShowControls = not Profile.DR_ShowControls
-				DressingRoom:ToggleControlPanel(Profile.DR_ShowControls)
-			end,
-			isNotRadio = true,
-			checked = function() return Profile.DR_ShowControls end,
-		},
-		{
-			text = L["Dim Backround Image"],
-			func = function()
+				--DressingRoom:ToggleControlPanel(Profile.DR_ShowControls)
+			end);
+		rootDescription:CreateCheckbox(L["Dim Backround Image"], function() return Profile.DR_DimBackground end, function()
 				Profile.DR_DimBackground = not Profile.DR_DimBackground
 				DressingRoom:UpdateBackground()
-			end,
-			checked = function() return Profile.DR_DimBackground end,
-			isNotRadio = true,
-		},
-		{
-			text = L["Hide Backround Image"],
-			func = function()
+			end);
+		rootDescription:CreateCheckbox(L["Hide Backround Image"], function() return Profile.DR_HideBackground end, function()
 				Profile.DR_HideBackground = not Profile.DR_HideBackground
 				DressingRoom:UpdateBackground()
-			end,
-			checked = function() return Profile.DR_HideBackground end,
-			isNotRadio = true,
-		},
-		{
-			text = L["Character Options"], isTitle = true, notCheckable = true,
-		},
-		{
-			text = L["Start Undressed"],
-			func = function() Profile.DR_StartUndressed = not Profile.DR_StartUndressed end,
-			checked = function() return Profile.DR_StartUndressed end,
-			isNotRadio = true,
-		},
-		{
-			text = L["Hide Tabard"],
-			func = function() Profile.DR_HideTabard = not Profile.DR_HideTabard end,
-			checked = function() return Profile.DR_HideTabard end,
-			isNotRadio = true,
-		},
-		{
-			text = L["Hide Weapons"],
-			func = function() Profile.DR_HideWeapons = not Profile.DR_HideWeapons end,
-			checked = function() return Profile.DR_HideWeapons end,
-			isNotRadio = true,
-		},
-		{
-			text = L["Hide Shirt"],
-			func = function() Profile.DR_HideShirt = not Profile.DR_HideShirt end,
-			checked = function() return Profile.DR_HideShirt end,
-			isNotRadio = true,
-		},
-	}
+			end);
+		rootDescription:CreateTitle(L["Character Options"]);
+		rootDescription:CreateCheckbox(L["Start Undressed"], function() return Profile.DR_StartUndressed end, function() Profile.DR_StartUndressed = not Profile.DR_StartUndressed end);
+		rootDescription:CreateCheckbox(L["Hide Tabard"], function() return Profile.DR_HideTabard end, function() Profile.DR_HideTabard = not Profile.DR_HideTabard end);
+		rootDescription:CreateCheckbox(L["Hide Weapons"], function() return Profile.DR_HideWeapons end, function() Profile.DR_HideWeapons = not Profile.DR_HideWeapons end);
+		rootDescription:CreateCheckbox(L["Hide Shirt"], function() return Profile.DR_HideShirt end, function() Profile.DR_HideShirt = not Profile.DR_HideShirt end);
+	end
 	
-	BW_UIDropDownMenu_SetAnchor(ContextMenu, 0, 0, "BOTTOMLEFT", self, "BOTTOMLEFT")
-	BW_EasyMenu(contextMenuData, ContextMenu, ContextMenu, 0, 0, "MENU",5)
+	MenuUtil.CreateContextMenu(parent, GeneratorFunction);
 end
 
 local function BW_DressingRoomImportButton_OnClick(self)
-	local Profile = addon.Profile
-	local name = addon.QueueList[3]
-	local contextMenuData = {
-		{
-			text = L["Import/Export Options"], isTitle = true, notCheckable = true,
-		},
-		{
-			text = L["Load Set: %s"]:format( name or L["None Selected"]),
-			func = function()
+
+	local function GeneratorFunction(owner, rootDescription)
+		local Profile = addon.Profile
+
+		rootDescription:CreateTitle(L["Import/Export Options"]);
+		rootDescription:CreateButton(L["Load Set: %s"]:format( name or L["None Selected"]), function()
 				local sources
 				local setType = addon.QueueList[1]
 				local setID = addon.QueueList[2]
@@ -662,38 +613,22 @@ local function BW_DressingRoomImportButton_OnClick(self)
 				--DressUpSources(sources)
 				import = false
 				DressingRoom:Update()
-			end,
-			isNotRadio = true,
-			notCheckable = true,
-		},
-		{
-			text = L["Import Item"],
-			func = function() BetterWardrobeOutfitManager:ShowPopup("BETTER_WARDROBE_IMPORT_ITEM_POPUP")	end,
-			isNotRadio = true,
-			notCheckable = true,
-		},
-		{
-			text = L["Import Set"],
-			func = function()BetterWardrobeOutfitManager:ShowPopup("BETTER_WARDROBE_IMPORT_SET_POPUP") end,
-			isNotRadio = true,
-			notCheckable = true,
-		},
-		{
-			text = L["Export Set"],
-			func = function() addon:ExportSet()	end,
-			notCheckable = true,
-			isNotRadio = true,
-		},
-		{
-			text = L["Create Dressing Room Command Link"],
-			func = function() addon:CreateChatLink() end,
-			notCheckable = true,
-			isNotRadio = true,
-		},
-	}
-	BW_UIDropDownMenu_SetAnchor(ContextMenu, 0, 0, "BOTTOMLEFT", self, "BOTTOMLEFT")
-	BW_EasyMenu(contextMenuData, ContextMenu, self, 0, 0, "MENU")
+			end);
+
+	
+		if  C_Transmog.IsAtTransmogNPC() then
+		
+		else
+					rootDescription:CreateButton(L["Import Item"], function() BetterWardrobeOutfitManager:ShowPopup("BETTER_WARDROBE_IMPORT_ITEM_POPUP") end);
+		--rootDescription:CreateButton(L["Import Set"], function()BetterWardrobeOutfitManager:ShowPopup("BETTER_WARDROBE_IMPORT_SET_POPUP") end);
+		--rootDescription:CreateButton(L["Create Dressing Room Command Link"], function() addon:CreateChatLink() end);
+		end
+
+		end
+	
+	MenuUtil.CreateContextMenu(parent, GeneratorFunction);
 end
+
 
 BW_DressingRoomButtonMixin = {}
 function BW_DressingRoomButtonMixin:OnMouseDown()
@@ -705,7 +640,6 @@ function BW_DressingRoomButtonMixin:OnMouseDown()
 
 	elseif button == "Import" then
 		BW_DressingRoomImportButton_OnClick(self)
-
 	elseif button == "Player" then
 		useTarget = false
 		DressingRoom:UpdateModel("player")

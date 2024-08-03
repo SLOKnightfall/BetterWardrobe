@@ -138,8 +138,8 @@ function UI:CreateButtons()
 	--BW_SlotHideButton:SetScript("OnMouseDown", BW_SlotHideButton.OnMouseDown)
 	--BW_SlotHideButton:SetScript("OnEnter", BW_SlotHideButton.OnEnter)
 
-	local BW_TransmogOptionsDropDown= CreateFrame("Frame", "BW_TransmogOptionsDropDown", BetterWardrobeCollectionFrame, "BW_UIDropDownMenuTemplate")
-	BW_TransmogOptionsDropDown = BW_TransmogOptionsDropDown
+	----local BW_TransmogOptionsDropDown= CreateFrame("Frame", "BW_TransmogOptionsDropDown", BetterWardrobeCollectionFrame, "BW_UIDropDownMenuTemplate")
+	----BW_TransmogOptionsDropDown = BW_TransmogOptionsDropDown
 
 	local f = CreateFrame("Frame", "BW_AltIcon1", WardrobeTransmogFrame.HeadButton, "AltItemtemplate")
 	local f = CreateFrame("Frame", "BW_AltIcon3", WardrobeTransmogFrame.ShoulderButton, "AltItemtemplate")
@@ -171,58 +171,9 @@ function UI:HideSlotMenu_OnClick(parent)
 			end
 		end
 	end
-	
+
 	MenuUtil.CreateContextMenu(parent, GeneratorFunction);
 end
-
-
-
---[[function UI.OptionsDropDown_Initialize(self)
-	local  f = addon.Frame:Create("SimpleGroup")
-	--UI.SavedSetDropDownFrame = f
-	f.frame:SetParent("BetterWardrobeCollectionFrame")
-	f:SetWidth(87)--, 22)
-	f:SetHeight(22)
-
-	f:ClearAllPoints()
-	f:SetPoint("TOPLEFT", "BW_SortDropDown", "TOPLEFT")
-	local list = {}
-
-	for name in pairs(addon.setdb.global.sets)do
-		tinsert(list, name)
-	end
-
-	local dropdown = addon.Frame:Create("Dropdown")
-	dropdown:SetWidth(175)--, 22)
-	--dropdown:SetHeight(22)
-	f:AddChild(dropdown)
-	dropdown:SetList(list)
-
-	for i, name in ipairs(list) do
-		if name == addon.setdb:GetCurrentProfile() then
-			dropdown:SetValue(i)
-			break
-		end
-	end
-	
-	dropdown:SetCallback("OnValueChanged", function(widget) 
-		local value = widget.list[widget.value]
-		local name = UnitName("player")
-		local realm = GetRealmName()
-
-		if value ~= addon.setdb:GetCurrentProfile() then 
-			addon.SelecteSavedList = widget.list[widget.value]
-		else
-			addon.SelecteSavedList = false
-		end
-
-		BW_WardrobeCollectionFrame_SetTab(2)
-		BW_WardrobeCollectionFrame_SetTab(4)
-		addon.savedSetCache = nil
-	end)
-end]]
-
-
 
 function BW_TransmogOptionsButton_OnEnter(self)
 	if not addon.Profile.ShowIncomplete then 
@@ -233,7 +184,7 @@ function BW_TransmogOptionsButton_OnEnter(self)
 end
 
 function BetterWardrobeTransmogVendorOptionsDropDown_OnLoad(self)
-	BW_UIDropDownMenu_Initialize(self, UI.OptionsDropDown_Initialize, "MENU")
+	----BW_UIDropDownMenu_Initialize(self, UI.OptionsDropDown_Initialize, "MENU")
 end
 
 local dropdownOrder = {DEFAULT, ALPHABETIC, APPEARANCE, COLOR, EXPANSION, ITEM_SOURCE}
