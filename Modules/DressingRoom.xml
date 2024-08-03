@@ -459,9 +459,6 @@
 					<OnHide method="OnHide"/>
 					<OnClick method="OnClick"/>
 				</Scripts>
-				<Frames>
-					<Frame parentKey="DropDown" inherits="BW_UIDropDownMenuTemplate"/>
-				</Frames>
 			</DropDownToggleButton>	
 		</Frames>
 		<Layers>

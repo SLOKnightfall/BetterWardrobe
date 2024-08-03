@@ -8,7 +8,6 @@ local UI = {}
 function addon.Init:BuildTransmogVendorUI()
 	UI:CreateButtons()
 	UI:CreateDropDown()
-	--UI.OptionsDropDown_Initialize()
 	UI.ExtendTransmogView()
 	---UpdateSlotButtons()
 
@@ -55,13 +54,7 @@ end
 
 function UI:CreateDropDown()
 	WardrobeTransmogFrame.OutfitDropdown:Hide()
-
 	local f = CreateFrame("DropdownButton", "BetterWardrobeTMOutfitDropDown", WardrobeTransmogFrame, "BetterWardrobeSavedSetDropdownTemplate")
-
---	f:SetParent(WardrobeTransmogFrame)
-	--f:ClearAllPoints()
-	--BetterWardrobeOutfitDropDown:SetPoint("TOPLEFT", -14, -28)
-
 	addon:SecureHook(WardrobeTransmogFrame, "OnTransmogApplied", function()
 	C_Timer.After(.5, function()
 			--if BetterWardrobeOutfitDropDown.selectedOutfitID and BetterWardrobeOutfitDropDown:IsOutfitDressed() then
@@ -69,40 +62,6 @@ function UI:CreateDropDown()
 			--end
 		end)
 		end, true)
-
-	--Frame Mixin functionaly in SavedOutfits.lua file
-	--BetterWardrobeOutfitDropDown = CreateFrame("Frame", "BetterWardrobeOutfitDropDown", WardrobeTransmogFrame, "BetterWardrobeOutfitDropDownTemplate")
-	----local f = CreateFrame("Frame", "BetterWardrobeOutfitDropDown", WardrobeTransmogFrame, "BW_UIDropDownMenuTemplate")
-
-	--local f = BW_UIDropDownMenu_Create("BetterWardrobeOutfitDropDown", WardrobeTransmogFrame)
---f:SetPoint("CENTER")
---f:SetSize(100,22)
---[[	f.width = 163
-	f.minMenuStringWidth = 127
-	f.maxMenuStringWidth = 190
-
-	f:SetPoint("TOPLEFT", -14, -28)
-	--Mixin(f, WardrobeOutfitDropDownMixin)
-	--Mixin(f, BW_WardrobeOutfitMixin)
-	f.SaveButton = CreateFrame("Button", nil, f, "UIPanelButtonTemplate")
-	f.SaveButton:SetSize(88, 22)
-	local button = _G[f:GetName().."Button"]
-	f.SaveButton:SetPoint("LEFT", button, "RIGHT", 3, 0)
-	f.SaveButton:SetScript("OnClick", function(self)
-					PlaySound(SOUNDKIT.IG_MAINMENU_OPTION_CHECKBOX_ON);
-					local dropDown = self:GetParent();
-					dropDown:CheckOutfitForSave(BW_UIDropDownMenu_GetText(dropDown));
-				end)
-	f.SaveButton:SetText(SAVE)
-	f:SetScript("OnLoad", f.OnLoad)
---	f:OnLoad()
-	f:SetScript("OnEvent", f.OnEvent)
-	f:SetScript("OnShow", f.OnShow)
-	f:SetScript("OnHide", f.OnHide)]]
-----	BetterWardrobeOutfitDropDown = f
-
-	----local f = CreateFrame("Frame", "BW_WardrobeOutfitFrame", WardrobeTransmogFrame, "BW_WardrobeOutfitFrameTemplate")
-
 end
 
 
@@ -184,7 +143,6 @@ function BW_TransmogOptionsButton_OnEnter(self)
 end
 
 function BetterWardrobeTransmogVendorOptionsDropDown_OnLoad(self)
-	----BW_UIDropDownMenu_Initialize(self, UI.OptionsDropDown_Initialize, "MENU")
 end
 
 local dropdownOrder = {DEFAULT, ALPHABETIC, APPEARANCE, COLOR, EXPANSION, ITEM_SOURCE}
@@ -195,182 +153,6 @@ for i, location in pairs(locationDropDown) do
 	addon.includeLocation[i] = true
 end
 
-
-function UI:OptionsDropDown_Initialize(level)
-if true then return end
-	local refreshLevel = 1
-
-	local info = BW_UIDropDownMenu_CreateInfo()
-	info.keepShownOnClick = true
-	
-	if level == 1 then
-		info.hasArrow = false
-		info.isNotRadio = true
-		info.keepShownOnClick = false
-		
-		info.checked = 	true
-		info.isNotRadio = true
-		info.func = function(info, arg1, _, value)
-					addon.Profile.ShowHidden = not addon.Profile.ShowHidden
-					BetterWardrobeCollectionFrame.SetsTransmogFrame:OnSearchUpdate()
-			end
-		info.hasArrow = false
-		info.notCheckable = false
-		info.checked = addon.Profile.ShowHidden
-		info.text = L["Show Hidden Items"]
-		info.value = 6
-		BW_UIDropDownMenu_AddButton(info, level)
-
-
-
-		if  BetterWardrobeCollectionFrame:CheckTab(2) or BetterWardrobeCollectionFrame:CheckTab(3) or BetterWardrobeCollectionFrame:CheckTab(4)  then
-			info.checked = 	true
-			info.isNotRadio = true
-			info.func = function(info, arg1, _, value)
-						addon.Profile.HiddenMog = not addon.Profile.HiddenMog
-						BetterWardrobeCollectionFrame.SetsTransmogFrame:OnSearchUpdate()
-				end
-			info.hasArrow = false
-			info.notCheckable = false
-			info.checked = addon.Profile.HiddenMog
-			info.text = L["Use Hidden Item for Unavilable Items"]
-			info.value = 7
-			BW_UIDropDownMenu_AddButton(info, level)
-		end
-
-		if  BetterWardrobeCollectionFrame:CheckTab(2) or BetterWardrobeCollectionFrame:CheckTab(3) then 
-			info.text = L["Show Incomplete Sets"]
-			info.value = 1
-			info.func = function(_, _, _, value)
-				addon.Profile.ShowIncomplete = not addon.Profile.ShowIncomplete
-				BetterWardrobeCollectionFrame.SetsTransmogFrame:OnSearchUpdate()
-			end
-			info.checked = function() return addon.Profile.ShowIncomplete end
-			BW_UIDropDownMenu_AddButton(info, level)
-
-			info.keepShownOnClick = true
-			info.hasArrow = true
-			info.isNotRadio = true
-			info.notCheckable = true
-			if addon.Profile.ShowIncomplete then 
-			BW_UIDropDownMenu_AddSeparator()
-
-			info.keepShownOnClick = true
-			info.hasArrow = false
-			info.isNotRadio = true
-			info.notCheckable = false
-
-			info.text = L["Hide Missing Set Pieces at Transmog Vendor"]
-			info.value = 4
-			info.func = function(_, _, _, value)
-				addon.Profile.HideMissing = not addon.Profile.HideMissing
-				BetterWardrobeCollectionFrame.SetsTransmogFrame:OnSearchUpdate()
-				BetterWardrobeCollectionFrame.SetsTransmogFrame:UpdateSets()
-			end
-			info.checked = function() return addon.Profile.HideMissing end
-			BW_UIDropDownMenu_AddButton(info, level)
-
-			info.keepShownOnClick = true
-			info.hasArrow = true
-			info.isNotRadio = true
-			info.notCheckable = true
-
-				info.text = "Include:"
-				info.value = 2
-				BW_UIDropDownMenu_AddButton(info, level)
-
-				info.hasArrow = true
-				info.isNotRadio = true
-				info.notCheckable = true
-				info.checked = false
-
-				info.text = "Cuttoff:"
-				info.value = 3
-				BW_UIDropDownMenu_AddButton(info, level)
-			end
-		end
-	elseif level == 2  and BW_UIDROPDOWNMENU_MENU_VALUE == 2 and addon.Profile.ShowIncomplete then
-		info.hasArrow = false
-		info.isNotRadio = true
-		info.notCheckable = true
-		local refreshLevel = 2
-
-		info.text = CHECK_ALL
-		info.func = function()
-						for i in pairs(locationDropDown) do
-							addon.includeLocation[i] = true
-						end
-						BetterWardrobeCollectionFrame.SetsTransmogFrame:OnSearchUpdate()
-						--BW_SetsTransmogFrame:OnSearchUpdate()
-						if BetterWardrobeCollectionFrame.selectedTransmogTab == 3 then 
-							----BW_WardrobeCollectionFrame_SetTab(2)
-							----BW_WardrobeCollectionFrame_SetTab(3)
-						end
-						BW_UIDropDownMenu_Refresh(BW_TransmogOptionsDropDown, 1, refreshLevel)
-					end
-		BW_UIDropDownMenu_AddButton(info, level)
-
-		info.text = UNCHECK_ALL
-		info.func = function()
-						for i in pairs(locationDropDown) do
-							addon.includeLocation[i] = false
-						end
-						BetterWardrobeCollectionFrame.SetsTransmogFrame:OnSearchUpdate()
-						--BW_SetsTransmogFrame:OnSearchUpdate()
-												--BW_SetsTransmogFrame:OnSearchUpdate()
-						if BetterWardrobeCollectionFrame.selectedTransmogTab == 3 then 
-						--	--BW_WardrobeCollectionFrame_SetTab(2)
-							----BW_WardrobeCollectionFrame_SetTab(3)
-						end
-						BW_UIDropDownMenu_Refresh(BW_TransmogOptionsDropDown, 1, refreshLevel)
-					end
-		BW_UIDropDownMenu_AddButton(info, level)
-		
-		for index, id in pairs(locationDropDown) do
-			if index ~= 21 then --Skip "robe" type
-				info.notCheckable = false
-				info.text = id
-				info.func = function(_, _, _, value)
-							addon.includeLocation[index] = value
-
-							if index == 6 then
-								addon.includeLocation[21] = value
-							end
-
-							BW_UIDropDownMenu_Refresh(BW_TransmogOptionsDropDown, 1, 1)
-							BetterWardrobeCollectionFrame.SetsTransmogFrame:OnSearchUpdate()
-							--BW_SetsTransmogFrame:OnSearchUpdate()
-													--BW_SetsTransmogFrame:OnSearchUpdate()
-							if BetterWardrobeCollectionFrame.selectedTransmogTab == 3 then 
-								----BW_WardrobeCollectionFrame_SetTab(2)
-								----BW_WardrobeCollectionFrame_SetTab(3)
-							end
-						end
-				info.checked = function() return addon.includeLocation[index] end
-				BW_UIDropDownMenu_AddButton(info, level)
-			end
-		end
-
-	elseif level == 2 and BW_UIDROPDOWNMENU_MENU_VALUE == 3 and addon.Profile.ShowIncomplete then
-		local refreshLevel = 2
-		info.notCheckable = false
-		info.keepShownOnClick = false
-		for i = 1, 7 do
-			local info =BW_UIDropDownMenu_CreateInfo()
-			--tinsert(xpacSelection,true)
-			info.text = i
-			info.value = i
-				info.func = function(a, b, c, value)
-					addon.Profile.PartialLimit = info.value
-					BW_UIDropDownMenu_Refresh(BW_TransmogOptionsDropDown, 1, 1)
-					BetterWardrobeCollectionFrame.SetsTransmogFrame:OnSearchUpdate()
-					----BW_SetsTransmogFrame:OnSearchUpdate()
-				end
-			info.checked = 	function() return info.value == addon.Profile.PartialLimit end
-			BW_UIDropDownMenu_AddButton(info, level)
-		end
-	end
-end
 
 
 -- Base Transmog Sets Window Upates

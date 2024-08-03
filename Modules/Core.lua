@@ -934,7 +934,7 @@ function addon.RefreshSubItemData()
 end
 
 function addon.RefreshCollectionListData()
-	BW_UIDropDownMenu_SetSelectedID(BW_CollectionList_Dropdown, addon.CollectionList:SelectedCollectionList())
+	--BW_UIDropDownMenu_SetSelectedID(BW_CollectionList_Dropdown, addon.CollectionList:SelectedCollectionList())
 end
 
 

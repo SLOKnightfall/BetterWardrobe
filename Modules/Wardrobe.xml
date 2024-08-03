@@ -1032,7 +1032,6 @@
 							<Anchor point="BOTTOM" x="22" y="29"/>
 						</Anchors>
 					</Frame>
-					<Frame name="BetterWardrobeModelRightClickDropDown" parentKey="RightClickDropDown" inherits="BW_UIDropDownMenuTemplate" hidden="true"/>
 					<DropdownButton parentKey="WeaponDropdown" inherits="WowStyle1DropdownTemplate" hidden="true">
 						<Anchors>
 							<Anchor point="TOPRIGHT" x="-25" y="-58"/>
@@ -1361,8 +1360,6 @@
 									<Anchor point="BOTTOMLEFT" relativeKey="$parent.ScrollBox" relativePoint="BOTTOMRIGHT" x="8" y="-1"/>
 								</Anchors>
 							</EventFrame>
-
-							<Frame parentKey="FavoriteDropDown" inherits="BW_UIDropDownMenuTemplate" enableMouse="true"/>
 						</Frames>
 						<Scripts>
 							<OnLoad method="OnLoad"/>
