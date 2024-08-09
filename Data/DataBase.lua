@@ -234,7 +234,7 @@ do
 
 			
 					setData.uiOrder = UIID_Counter[setData.expansionID] -- id * 100
-					UIID_Counter[setData.expansionID] = UIID_Counter[setData.expansionID] +1
+					--UIID_Counter[setData.expansionID] = UIID_Counter[setData.expansionID] +1
 					SET_INDEX[newID] = setData
 					ArmorDB[armorType][newID] = setData
 				end
