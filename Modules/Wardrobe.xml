@@ -1532,6 +1532,36 @@
 									<Anchor point="TOPRIGHT" x="-60" y="-3"/>
 								</Anchors>
 							</DropdownButton>
+							<Frame parentKey="Faction" hidden="false">
+								<Anchors>
+									<Anchor point="TOPLEFT" relativeKey="$parent" x="0" y = "-120"/>
+									<Anchor point="BOTTOMRIGHT" relativeKey="$parent" x="0" y = "10"/>
+								</Anchors>
+								<Layers>
+									<Layer level="ARTWORK">
+										<Texture parentKey="Horde" file="Interface\PvPRankBadges\PvPRankHorde" hidden="false">
+											<Anchors>
+												<Anchor point="TOPLEFT" relativeKey="$parent" x="0" y = "0"/>
+												<Anchor point="BOTTOMRIGHT" relativeKey="$parent" x="0" y = "0"/>
+											</Anchors>
+										</Texture>	
+									</Layer>									
+									<Layer level="ARTWORK">
+										<Texture parentKey="Alliance" file="Interface\PvPRankBadges\PvPRankAlliance" hidden="true">
+											<Anchors>
+												<Anchor point="TOPLEFT" relativeKey="$parent" x="0" y = "0"/>
+												<Anchor point="BOTTOMRIGHT" relativeKey="$parent" x="0" y = "0"/>
+											</Anchors>
+										</Texture>	
+									</Layer>
+								</Layers>
+								<Scripts>
+									<OnShow> 
+										local level = self:GetParent():GetParent().Model:GetFrameLevel()-1
+										self:SetFrameLevel(level);
+									</OnShow>
+								</Scripts>
+							</Frame>
 						</Frames>
 					</Frame>
 				</Frames>

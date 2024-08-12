@@ -1558,7 +1558,7 @@ function BetterWardrobeCollectionFrameMixin:InitBaseSetsFilterButton()
 			end, 
 			function() 
 				addon.Profile.IgnoreClassRestrictions = not addon.Profile.IgnoreClassRestrictions;
-				addon.Init:BuildDB()
+				--addon.Init:BuildDB()
 				BetterWardrobeCollectionFrame.SetsTransmogFrame:UpdateProgressBar()
 			end, 6);
 
@@ -1568,7 +1568,7 @@ function BetterWardrobeCollectionFrameMixin:InitBaseSetsFilterButton()
 			end, 
 			function() 							
 				addon.Profile.HideUnavalableSets = not addon.Profile.HideUnavalableSets;
-				addon.Init:BuildDB()
+				--addon.Init:BuildDB()
 				BetterWardrobeCollectionFrame.SetsTransmogFrame:UpdateProgressBar()
 				RefreshLists()
 			end, 7);
@@ -1643,7 +1643,7 @@ function BetterWardrobeCollectionFrameMixin:InitBaseSetsFilterButton()
 					xpacSelection[index] = not xpacSelection[index];
 					RefreshLists()
 				end,
-	 		index);
+			index);
 		end
 
 		local locationDropDown = addon.Globals.locationDropDown;
@@ -3138,7 +3138,7 @@ function BetterWardrobeItemsCollectionMixin:UpdateItems()
 			bitfieldFlag = LE_FRAME_TUTORIAL_TRANSMOG_MODEL_CLICK,
 			targetPoint = HelpTip.Point.RightEdgeCenter,
 			onAcknowledgeCallback = function() BetterWardrobeCollectionFrame.fromSuggestedContent = nil;
-											   BetterWardrobeCollectionFrame.ItemsCollectionFrame:CheckHelpTip(); end,
+												 BetterWardrobeCollectionFrame.ItemsCollectionFrame:CheckHelpTip(); end,
 			acknowledgeOnHide = true,
 		};
 		HelpTip:Show(self, helpTipInfo, tutorialAnchorFrame);
@@ -3146,9 +3146,9 @@ function BetterWardrobeItemsCollectionMixin:UpdateItems()
 		HelpTip:Hide(self, WARDROBE_TRACKING_TUTORIAL);
 	end
 	]]
-	if 	#addon.GetBaseList() == 0 then 
-		addon.Init:BuildDB();
-	end
+	--if 	#addon.GetBaseList() == 0 then 
+		--addon.Init:BuildDB();
+	--end
 end
 
 function BetterWardrobeItemsCollectionMixin:UpdateProgressBar()
@@ -3599,7 +3599,7 @@ local function ToggleHidden(model, isHidden)
 		local setInfo = C_TransmogSets.GetSetInfo(tonumber(model.setID));
 		local name = setInfo["name"];
 
-		local baseSetID = C_TransmogSets.GetBaseSetID(model.setID);
+		local baseSetID = SetsDataProvider:GetBaseSetID(model.setID);
 
 		local atTransmogrifier = C_Transmog.IsAtTransmogNPC()
 
@@ -3614,7 +3614,7 @@ local function ToggleHidden(model, isHidden)
 			--	addon.HiddenAppearanceDB.profile.item[info.visualID] = not isHidden and info.name or nil;
 		--end
 
-		local variantSets = C_TransmogSets.GetVariantSets(baseSetID);
+		local variantSets = SetsDataProvider:GetVariantSets(baseSetID) --C_TransmogSets.GetVariantSets(baseSetID);
 			for i, data in ipairs(variantSets) do
 				addon.HiddenAppearanceDB.profile.set[data.setID] = not isHidden and data.name or nil;
 
@@ -3909,10 +3909,10 @@ function BetterWardrobeSetsTransmogModelMixin:OnMouseUp(button)
 					rootDescription:CreateButton(TRANSMOG_ITEM_SET_FAVORITE, function()
 						if tab == 2 then
 							if isGroupFavorite then
-								local baseSetID = C_TransmogSets.GetBaseSetID(self.setID);
+								local baseSetID = SetsDataProvider:GetBaseSetID(self.setID);
 								C_TransmogSets.SetIsFavorite(baseSetID, false);
 
-								for index, variantSet in ipairs(C_TransmogSets.GetVariantSets(baseSetID)) do
+								for index, variantSet in ipairs(SetsDataProvider:GetVariantSets(baseSetID)) do
 									C_TransmogSets.SetIsFavorite(variantSet.setID, false);
 								end
 							end
@@ -4011,7 +4011,7 @@ function BetterWardrobeSetsTransmogModelMixin:RefreshTooltip()
 			end
 		end
 	elseif BetterWardrobeCollectionFrame:CheckTab(3) then
-		local sources = addon.GetSetsources(self.setID);
+		local sources = addon.SetsDataProvider:GetSetSources(self.setID);
 		for sourceID in pairs(sources) do
 			numTotalSlots = numTotalSlots + 1;
 			if (sourceQualityTable[sourceID]) then
@@ -4215,6 +4215,9 @@ function BetterWardrobeCollectionClassDropdownMixin:SetClassFilter(classID)
 		C_TransmogCollection.SetClassFilter(classID);
 	elseif searchType == Enum.TransmogSearchType.BaseSets then
 		C_TransmogSets.SetTransmogSetsClassFilter(classID);
+		addon:ClearSets()
+		addon.Init:InitDB()
+		addon.RefreshLists()
 	end
 
 	self:Refresh();
@@ -4359,6 +4362,274 @@ local IN_PROGRESS_FONT_COLOR_CODE = "|cff40c040";
 
 BetterWardrobeSetsDataProviderMixin = {};
 
+local factionNames = { playerFaction = "", opposingFaction = "" };
+
+local ClassName;
+local ClassIndex = nil;
+local ClassMaskMap = {
+		[1] = {1, 2, 32, 35}, -- Plate Wearer
+		[2] = {1, 2, 32, 35}, -- Plate Wearer
+		[3] = {4, 64, 4096, 4164},    -- Mail Wearer
+		[4] = {8, 512, 1024, 2048, 3592, 11784}, -- Leather Wearer
+		[5] = {16, 128, 256, 400}, -- Cloth Wearer
+		[6] = {1, 2, 32, 35}, -- Plate Wearer
+		[7] = {4, 64, 4096, 4164},    -- Mail Wearer
+		[8] = {16, 128, 256, 400}, -- Cloth Wearer
+		[9] = {16, 128, 256, 400}, -- Cloth Wearer
+		[10] = {8, 512, 1024, 2048, 3592, 11784}, -- Leather Wearer
+		[11] = {8, 512, 1024, 2048, 3592, 11784}, -- Leather Wearer
+		[12] = {8, 512, 1024, 2048, 3592, 11784}, -- Leather Wearer
+		[13] = {4, 64, 4096, 4164},    -- Mail Wearer
+}
+local ClassNameMask = {
+		[1] = "Warrior",
+		[2] = "Paladin",
+		[4] = "Hunter",
+		[8] = "Rogue",
+		[16] = "Priest",
+		[32] = "Death Knight",
+		[64] = "Shaman",
+		[128] = "Mage",
+		[256] = "Warlock",
+		[512]  = "Monk",
+		[1024] = "Druid",
+		[2048] = "Demon Hunter",
+		[4096] = "Evoker",
+}
+local ClassNameLookupMask = {
+		[1] = "WARRIOR",
+		[2] = "PALADIN",
+		[4] = "HUNTER",
+		[8] = "ROGUE",
+		[16] = "PRIEST",
+		[32] = "DEATHKNIGHT",
+		[64] = "SHAMAN",
+		[128] = "MAGE",
+		[256] = "WARLOCK",
+		[512] = "MONK",
+		[1024] = "DRUID",
+		[2048] = "DEMONHUNTER",
+		[4096] = "EVOKER",
+}
+local ClassToMask = {
+		[1] = 1,
+		[2] = 2,
+		[3] = 4,
+		[4] = 8,
+		[5] = 16,
+		[6] = 32,
+		[7] = 64,
+		[8] = 128,
+		[9] = 256,
+		[10] = 512,
+		[11] = 1024,
+		[12] = 2048,
+		[13] = 4096,
+}
+local ClassArmorType = {
+		[1]  = 4, --[1]  = 1, --[1] =    
+		[2]  = 4, --[2]  = 1, --[2] =    
+		[3]  = 3, --[3]  = 2, --[4] =    
+		[4]  = 2, --[4]  = 3, --[8] =    
+		[5]  = 1, --[5]  = 4, --[16] =   
+		[6]  = 4, --[6]  = 1, --[32] =   
+		[7]  = 3, --[7]  = 2, --[64] =   
+		[8]  = 1, --[8]  = 4, --[128] =  
+		[9]  = 1, --[9]  = 4, --[256] =  
+		[10] = 2, --[10] = 3, --[512] =  
+		[11] = 2, --[11] = 3, --[1024] = 
+		[12] = 2, --[12] = 3, --[2048] = 
+		[13] = 3,
+}
+local ClassArmorMask = {
+		[1]  = {1, 35},
+		[2]  = {2, 35},
+		[3]  = {4, 4164},
+		[4]  = {8, 3592, 11784},
+		[5]  = {16, 400},
+		[6]  = {32, 35},
+		[7]  = {64, 4164},
+		[8]  = {128, 400},
+		[9]  = {256, 400},
+		[10] = {512, 3592, 11784},
+		[11] = {1024, 3592, 11784},
+		[12] = {2048, 3592, 11784},
+		[13] = {4096, 4164},
+}
+local ArmorTypeRadio = {};
+local pvpDescriptions = {
+		["Honor"] = true,
+		["Gladiator"] = true,
+		["Elite"] = true,
+		["Warfront"] = true,
+		["Aspirant"] = true,
+		["Combatant"] = true,
+		["Combatant I"] = true,
+}
+--local raceIDs = {
+--    1,2,3,4,5,6,7,8,9,
+--    10,11,22,24,27,28,29,30,
+--    31,32,34,36
+--}
+--local raceList = {};
+local heritageSets = {
+		[1522] = 28, --Highmountain
+		[1523] = 27, --Nightborne
+		[1524] = 29, --Void Elves
+		[1525] = 30, --Lightforged Draenei
+		[1679] = 34, --Dark Iron Dwarves
+		[1680] = 36, --Warsong (Mag'har)
+		[1681] = 36, --BlackRock (Mag'har)
+		[1682] = 36, --Frostwolves (Mag'har)
+		[1741] = 32, --Kul Tirans
+		[1742] = 31, --Zandalari
+		[1803] = 3, --Dwarves
+		[1804] = 10, --Blood Elves
+		[1828] = 7, --Gnome
+		[1829] = 6, --Tauren
+		[1980] = 37, --Mechagnome
+		[1981] = 35, --Vulpera
+		[1976] = 22, --Worgen
+		[1977] = 9, --Goblin
+		[3121] = 4, -- Night Elf
+		[3130] = 4, -- Night Elf
+		[3086] = 5, -- Forsaken
+		[2831] = 1, -- Human
+		[2832] = 1, -- Human
+		[2830] = 1, -- Human
+		[2833] = 2, -- Orc
+		[2834] = 2, -- Orc
+		[2835] = 2, -- Orc
+		[3515] = 8, -- Troll
+		[3350] = 8, -- Troll
+		[3346] = 11, -- Draenei
+		[3347] = 11, -- Draenei
+		[3700] = 84, -- Earthen1
+		[3701] = 84, -- Earthen1
+		[3702] = 84, -- Earthen1
+		[3700] = 85, -- Earthen2
+		[3701] = 85, -- Earthen2
+		[3702] = 85, -- Earthen2
+}
+local hiddenVisuals = {
+		[1] = {77344,134110},
+		[2] = {0},--0,
+		[3] = {77343,134112},
+		[4] = {83202,142503},
+		[5] = {104602,168659},
+		[6] = {84223,143539},
+		[7] = {0},--0,
+		[8] = {104603,168664},
+		[9] = {104604,168665},
+		[10] = {94331,158329},
+		[11] = {0},--0,
+		[12] = {0},--0,
+		[13] = {0},--0,
+		[14] = {0},--0,
+		[15] = {77345,134111},
+		[16] = {0},--0,
+		[17] = {0},--0,
+		[18] = {0},--0,
+		[19] = {83203,142504},
+}
+
+local function GetColoredClassNameString(classMask)
+	if type(classMask) == "string" then
+		for a,b in pairs(ClassNameMask) do
+			if b == classMask then
+				classMask = a;
+				break;
+			end
+		end
+		if type(classMask) == "string" then return "" end
+	end
+	
+	if ClassNameLookupMask[classMask] == nil then return "" end
+	local classColorRet = C_ClassColor.GetClassColor(ClassNameLookupMask[classMask]);
+	return classColorRet:WrapTextInColorCode(ClassNameMask[classMask]);
+end
+
+--Returns a string colored based on the required faction.
+local function GetFactionColoredString(faction, text)
+	if (faction == "Horde") then
+		return "|cFFB02626"..text.."|r";
+	else
+		return "|cFF0E50D0"..text.."|r";
+	end
+end
+
+--Returns a string that is a colorized version of the given string.
+--If it fails to color, it will return the given string.
+local function ColorStringByClass(toColor,classMask)
+	if type(classMask) == "string" then
+		for a,b in pairs(ClassNameMask) do
+			if b == classMask then
+				classMask = a;
+				break;
+			end
+		end
+		if type(classMask) == "string" then return toColor; end
+	end
+	
+	if ClassNameLookupMask[classMask] == nil then return toColor; end
+	local classColorRet = C_ClassColor.GetClassColor(ClassNameLookupMask[classMask]);
+	return classColorRet:WrapTextInColorCode(toColor);
+end
+
+--Returns a string that is a colorized version of the given string.
+--Inputs: String, Red value, Green value, Blue value
+local function ColorString(toColor,r,g,b)
+	local color = string.format("%02X%02X%02X",r*256,g*256,b*256);
+	return "|cFF"..color..toColor.."|r";
+end
+
+local function GetPlayerClassArmorType()
+	return ClassArmorType[select(3,UnitClass('player'))];
+end
+
+
+
+function BetterWardrobeSetsDataProviderMixin:GetSetByID(SetID)
+local BaseSets = addon.BaseSets
+local VariantSetsIDs = addon.VariantSetsIDs
+local VariantSets = addon.VariantSets
+
+	if (BaseSets[SetID] ~= nil) then
+		return BaseSets[SetID];
+	end
+	
+	if (VariantSetsIDs[SetID] ~= nil) then
+		local baseSet = VariantSetsIDs[SetID];
+		
+		for i=1,#VariantSets[baseSet] do
+			if VariantSets[baseSet][i].setID == SetID then
+				return VariantSets[baseSet][i];
+			end
+		end
+	end
+	
+
+	
+	----if (SetsForTransmogrifyIndex and SetsForTransmogrifyIndex[SetID] ~= nil) then
+	 ---- return SetsForTransmogrify[SetsForTransmogrifyIndex[SetID]];
+	----end
+	
+	return nil;
+end
+
+function BetterWardrobeSetsDataProviderMixin:GetBaseSetID(SetID)
+	local BaseSets = addon.BaseSets
+	local VariantSetsIDs = addon.VariantSetsIDs
+	
+	if (BaseSets[SetID]) then
+		return SetID;
+	end
+	
+	return VariantSetsIDs[SetID];
+end
+
+
+
 function BetterWardrobeSetsDataProviderMixin:SortSets(sets, reverseUIOrder, ignorePatchID)
 		addon.SortSet(sets, reverseUIOrder, ignorePatchID)
 		--[[
@@ -4453,7 +4724,7 @@ else
 			end
 		end
 	else
-		local setSources = addon.GetSetsources(setInfo.setID)
+		local setSources = SetsDataProvider:GetSetSources(setInfo.setID)
 		for sourceID, isCollected in pairs(setSources) do
 			local sourceInfo = C_TransmogCollection.GetSourceInfo(sourceID)
 			if missingSelection[sourceInfo.invType] and not isCollected then
@@ -4475,43 +4746,7 @@ end
 
 function BetterWardrobeSetsDataProviderMixin:GetBaseSets(filter)
 	local filteredSets = {}
-	local useBaseSet = not  C_Transmog.IsAtTransmogNPC()
-	local atTransmogrifier = C_Transmog.IsAtTransmogNPC()
-	local searchString = string.lower(WardrobeCollectionFrameSearchBox:GetText())
-	local basesets = {}
-
-	if 	BetterWardrobeCollectionFrame:CheckTab(2) then
-		basesets = self.baseSets;
-		if ( not self.baseSets ) then
-			self.baseSets = C_TransmogSets.GetBaseSets()
-			--if not atTransmogrifier then 
-				self.baseSets = addon:FilterSets(self.baseSets)
-			--else
-
-			--end
-			self:DetermineFavorites()
-			self:SortSets(self.baseSets)
-		end
-		return self.baseSets;
-
-	elseif 	BetterWardrobeCollectionFrame:CheckTab(3) then
-		basesets = self.baseExtraSets;
-		--if not self.baseExtraSets then 
-			if addon.useAltSet then
-				addon.refreshData = true;
-				self.baseExtraSets = addon.GetBaseList()
-			else
-				self.baseExtraSets = addon.GetBaseList()
-			end
-
-			--if not atTransmogrifier then
-				self.baseExtraSets = addon:FilterSets(self.baseExtraSets)
-			--end
-			self:SortSets(self.baseExtraSets)
-		--ZSend
-		return self.baseExtraSets;
-
-	elseif 	BetterWardrobeCollectionFrame:CheckTab(4) then
+	if 	BetterWardrobeCollectionFrame:CheckTab(4) then
 		basesets = self.baseSavedSets;
 		if not self.baseSavedSets then 
 			self.baseSavedSets = addon.GetSavedList()
@@ -4521,8 +4756,18 @@ function BetterWardrobeSetsDataProviderMixin:GetBaseSets(filter)
 		return self.baseSavedSets;
 	end
 
-	return {}
+
+	if ( not self.baseSets ) then
+		--self.baseSets = addon.BaseList --C_TransmogSets.GetBaseSets();
+		self.baseSets = addon:FilterSets(addon.BaseList)
+		self:DetermineFavorites();
+		self:SortSets(self.baseSets);
+	end
+	return self.baseSets;
 end
+
+
+
 
 function BetterWardrobeSetsDataProviderMixin:GetBaseSetByID(baseSetID)
 	local baseSets = self:GetBaseSets();
@@ -4582,7 +4827,7 @@ function BetterWardrobeSetsDataProviderMixin:GetUsableSets(incVariants)
 						--end
 
 						if incVariants then 
-							local variantSets = C_TransmogSets.GetVariantSets(set.setID)
+							local variantSets = self:GetVariantSets(set.setID)
 							if variantSets then 
 								for i, set in ipairs(variantSets) do
 									--if not setIDS[set.setID or set.baseSetID] then 
@@ -4644,79 +4889,82 @@ function BetterWardrobeSetsDataProviderMixin:GetVariantSets(baseSetID)
 		self.variantSets = { };
 	end
 
-if BetterWardrobeCollectionFrame:CheckTab(4)  then return {} end
+	if BetterWardrobeCollectionFrame:CheckTab(4)  then return {} end
+
 	local variantSets = self.variantSets[baseSetID];
 	if ( not variantSets ) then
-		variantSets = C_TransmogSets.GetVariantSets(baseSetID) or { };
-		self.variantSets[baseSetID] = variantSets;
-		if ( #variantSets > 0 ) then
-			-- add base to variants and sort
-			local baseSet = self:GetBaseSetByID(baseSetID);
-			if ( baseSet ) then
-				tinsert(variantSets, baseSet);
-			end
-			local reverseUIOrder = true;
-			local ignorePatchID = true;
-			self:SortSets(variantSets, reverseUIOrder, ignorePatchID);
+
+		local variantSetsAll = addon.VariantSets[addon.VariantSetsIDs[baseSetID]];
+		if not variantSetsAll then
+			variantSetsAll = {};
 		end
+		
+		local variantSets = {};
+		for i=1, #variantSetsAll do
+			tinsert(variantSets, variantSetsAll[i]);
+		end
+
+		local reverseUIOrder = true;
+		local ignorePatchID = true;
+
+		addon.SortVariantSet(variantSets, reverseUIOrder, ignorePatchID);
+		self.variantSets[baseSetID] = variantSets;
+
 	end
-	return variantSets;
+
+	return variantSets or {};
 end
 
 function BetterWardrobeSetsDataProviderMixin:GetSetSourceData(setID)
 	if ( not self.sourceData ) then
-		self.sourceData = { }
+		self.sourceData = { };
 	end
-
-	if ( not self.sourceExtraData ) then
-		self.sourceExtraData = { }
-	end
-
-	local setType = addon.GetSetType(setID)
-	if (setType == nil or setType == "BlizzardSet") then
-		--	sourceData = addon:CheckForExtraItems(setID, sourceData)
-		local sourceData = self.sourceData[setID]
-		if ( not sourceData ) then
-			local primaryAppearances = C_TransmogSets.GetSetPrimaryAppearances(setID)
-			primaryAppearances = addon:CheckForExtraItems(setID, primaryAppearances)
-			local numCollected = 0;
-			local numTotal = 0;
-			local sources = {}
-			for i, primaryAppearance in ipairs(primaryAppearances) do
-				sources[primaryAppearance.appearanceID] = true;
-				if primaryAppearance.collected then
-					numCollected = numCollected + 1;
-				end
-				numTotal = numTotal + 1;
-			end
-			sourceData = { numCollected = numCollected, numTotal = numTotal, sources = sources, primaryAppearances = primaryAppearances }
-			self.sourceData[setID] = sourceData;
-		end
-
-		return sourceData
-
-	else
-		local sourceExtraData = self.sourceExtraData[setID]
-		if ( not sourceExtraData ) then
-			local sources, unavailable = addon.GetSetsources(setID)
-			local numCollected = 0;
-			local numTotal = 0;
-			if sources  then
-				for sourceID, collected in pairs(sources) do
-					if (collected) then
-						numCollected = numCollected + 1;
-					end
-					numTotal = numTotal + 1;
-				end
-				sourceExtraData = { numCollected = numCollected, numTotal = numTotal, sources = sources, unavailable = unavailable }
-				self.sourceExtraData[setID] = sourceExtraData
-			end
-		end
-		return sourceExtraData;
 	
+	local sourceData = self.sourceData[setID];
+	if (  not sourceData ) then
+		local sources = self:GetSetSources(setID);
+			
+		local numCollected = 0;
+		local numTotal = 0;
+		local numUsable = 0;
+		for sourceID, collected in pairs(sources) do
+			local sourceInfo = C_TransmogCollection.GetSourceInfo(sourceID);
+			if sourceInfo then
+				local appearanceID = sourceInfo.visualID;
+				
+				local thisCollected = false;
+				if appearanceID then
+					local allSources = C_TransmogCollection.GetAllAppearanceSources(appearanceID);
+					
+					local isCollectedChecked, isTransmogrifyChecked = false, false;
+					for _, ID in pairs(allSources) do
+						
+						local info = C_TransmogCollection.GetSourceInfo(ID);
+						if info then
+							if not isCollectedChecked and info.isCollected then
+								numCollected = numCollected + 1;
+								thisCollected = true;
+								----isCollectedChecked = true;
+							end
+							----if not isTransmogrifyChecked and TransmogrifySourceTest(info) then
+							----	numUsable = numUsable + 1;
+								----isTransmogrifyChecked = true;
+							-----end
+							---if isCollectedChecked and isTransmogrifyChecked then
+								----break;
+							----end
+						end
+					end
+				end
+			end
+			numTotal = numTotal + 1;
+		end
+		sourceData = { numCollected = numCollected, numUsable = numUsable, numTotal = numTotal, sources = sources, collected = numCollected == numTotal };
+		self.sourceData[setID] = sourceData;
 	end
-end
 
+	return self.sourceData[setID];
+end
 
 function BetterWardrobeSetsDataProviderMixin:GetSetSourceCounts(setID)
 	local sourceData = self:GetSetSourceData(setID);
@@ -4728,49 +4976,50 @@ function BetterWardrobeSetsDataProviderMixin:GetSetSourceCounts(setID)
 end
 
 function BetterWardrobeSetsDataProviderMixin:GetBaseSetData(setID)
-	if not setID then return {} end
-	if ( not self.baseSetsData ) then
-		self.baseSetsData = { }
-	end
-
-	if ( not self.baseExtraSetsData ) then
-		self.baseExtraSetsData = { }
+	--if not setID then return {} end
+	local baseSetID = self:GetBaseSetID(setID);
+	local variantSets = self:GetVariantSets(baseSetID);
+	
+	local hasNew = self:SetHasNewSources(baseSetID);
+	if not hasNew then
+		for i = 1, #variantSets do
+			if self:SetHasNewSources(variantSets[i].setID) then
+				hasNew = true;
+				break;
+			end
+		end
 	end
 	
-	local setType = addon.GetSetType(setID)
-	if (setType == nil or setType == "BlizzardSet") then
-		if ( not self.baseSetsData[setID] ) then
-			local baseSetID = C_TransmogSets.GetBaseSetID(setID)
-			if ( baseSetID ~= setID ) then
-				return;
+	if ( not addon.BaseSetsData[setID] ) then
+		--local baseSetID = GetBaseSetID(setID);
+		
+		local topCollected, topTotal, topUsable = self:GetSetSourceCounts(baseSetID, nil, forceUpdate);
+		local numSets = 0;
+		local numFinishedSets = 0;
+		local numUsableSets = 0;
+			
+		--local variantSets = GetVariantSets(baseSetID);
+		for i = 1, #variantSets do
+			local numCollected, numTotal, numUsable = self:GetSetSourceCounts(variantSets[i].setID, nil, forceUpdate);
+			
+			numSets = numSets + 1;
+			if (numCollected == numTotal) then
+				numFinishedSets = numFinishedSets + 1;
 			end
-			local topCollected, topTotal = self:GetSetSourceCounts(setID)
-			local variantSets = self:GetVariantSets(setID)
-			for i = 1, #variantSets do
-				local numCollected, numTotal = self:GetSetSourceCounts(variantSets[i].setID)
-				if ( numCollected > topCollected ) then
-					topCollected = numCollected;
-					topTotal = numTotal;
-				end
+			if (numUsable == numTotal) then
+				numUsableSets = numUsableSets + 1;
 			end
-			local setInfo = { topCollected = topCollected, topTotal = topTotal, completed = (topCollected == topTotal) }
-			self.baseSetsData[setID] = setInfo;
+			
+			if ( numCollected > topCollected ) then
+				topCollected = numCollected;
+				topTotal = numTotal;
+			end
 		end
-		return self.baseSetsData[setID]
-
-	else	
-		if ( not self.baseExtraSetsData[setID] ) then
-			local baseSetID = setID;
-			if (baseSetID ~= setID) then
-				return;
-			end
-			local topCollected, topTotal = self:GetSetSourceCounts(setID)
-			local setInfo = {topCollected = topCollected, topTotal = topTotal, completed = (topCollected == topTotal) }
-			self.baseExtraSetsData[setID] = setInfo;
-		end
-		return self.baseExtraSetsData[setID]
+		
+		local setInfo = { topCollected = topCollected, topTotal = topTotal, completed = (topCollected == topTotal), numSets = numSets, numFinishedSets = numFinishedSets, numUsableSets = numUsableSets, allCompleted = (numSets == numFinishedSets), isPvP = addon.BaseSetsPvPFlag[baseSetID] };
+		addon.BaseSetsData[setID] = setInfo;
 	end
-	return {}
+	return addon.BaseSetsData[setID];
 end
 
 function BetterWardrobeSetsDataProviderMixin:GetSetSourceTopCounts(setID)
@@ -4782,31 +5031,57 @@ function BetterWardrobeSetsDataProviderMixin:GetSetSourceTopCounts(setID)
 	end
 end
 
-function BetterWardrobeSetsDataProviderMixin:IsBaseSetNew(baseSetID)
-	local baseSetData = {}
-	--if not baseSetData then print(1) return false end
 
-	if BetterWardrobeCollectionFrame:CheckTab(2) then
-		baseSetData = self:GetBaseSetData(baseSetID)
+function BetterWardrobeSetsDataProviderMixin:GetSetSources(setID)
+	--print(setID)
+	local set  = self:GetSetByID(setID) or {};
+		
+	if set.sources == nil then
+		set.sources = {};
+		local setAppearances = C_TransmogSets.GetSetPrimaryAppearances(setID);
+		for i, appearanceInfo in ipairs(setAppearances) do
+			set.sources[appearanceInfo.appearanceID] = appearanceInfo.collected;
+		end
+	end
+	
+	return set.sources;
+end
 
-		if ( not baseSetData.newStatus ) then
-			local newStatus = C_TransmogSets.SetHasNewSources(baseSetID)
-			if ( not newStatus ) then
-				-- check variants
-				local variantSets = self:GetVariantSets(baseSetID)
-				for i, variantSet in ipairs(variantSets) do
-					if ( C_TransmogSets.SetHasNewSources(variantSet.setID) ) then
-						newStatus = true;
-						break;
-					end
+local NewVisualIDs = {}
+function BetterWardrobeSetsDataProviderMixin:SetHasNewSources(setID)
+	if setID and setID >= 5000 then
+		local sources = self:GetSetSources(setID);
+		for sourceID,_ in pairs(sources) do
+			local visID = C_TransmogCollection.GetSourceInfo(sourceID).visualID;
+			for i=1,#NewVisualIDs do
+				if visID == NewVisualIDs[i] then
+					return true;
 				end
 			end
-			baseSetData.newStatus = newStatus;
 		end
-	else
-		----elseif BetterWardrobeCollectionFrame:CheckTab(3) then
-			local newStatus = addon.C_TransmogSets.SetHasNewSources(baseSetID)
-			baseSetData.newStatus = newStatus;
+		return false;
+	elseif setID then
+		return C_TransmogSets.SetHasNewSources(setID);
+	end
+end
+
+function BetterWardrobeSetsDataProviderMixin:IsBaseSetNew(baseSetID)
+	local baseSetData = self:GetBaseSetData(baseSetID);
+
+	if ( not baseSetData.newStatus ) then
+		local newStatus = self:SetHasNewSources(baseSetID);
+		if ( not newStatus ) then
+			-- check variants
+			local variantSets = self:GetVariantSets(baseSetID);
+			for i, variantSet in ipairs(variantSets) do
+				if ( variantSet.setID and self:SetHasNewSources(baseSetID) ) then
+
+					newStatus = true;
+					break;
+				end
+			end
+		end
+		baseSetData.newStatus = newStatus;
 	end
 
 	return baseSetData.newStatus;
@@ -4845,11 +5120,52 @@ local function CheckClass(itemLink)
 end
 
 
+--TODO: REVISIT
+local function IsSetComplete(setID)
+	local sources = SetsDataProvider:GetSetSources(setID);
+	for sourceID,collected in pairs(sources) do
+		local sourceInfo = C_TransmogCollection.GetSourceInfo(sourceID);
+		if sourceInfo then
+			local appearanceID = sourceInfo.visualID;
+			
+			local thisCollected = false;
+			if sourceInfo.isCollected then
+				thisCollected = true;
+			elseif appearanceID then
+				local appSources = C_TransmogCollection.GetAllAppearanceSources(appearanceID);
+				
+				for _,sourceID2 in pairs(appSources) do
+					
+					local sourceInfos = C_TransmogCollection.GetSourceInfo(sourceID2);
+					if sourceInfos ~= nil then
+						if sourceInfos.isCollected then
+							thisCollected = true;
+							break;
+						end
+					end
+				end
+			end
+			if not thisCollected then 
+				return false;
+			end
+		end
+	end
+	return true;
+end
+
+
+local SetIDForSource = {};
+
+--TODO: REVISIT
+local function GetSetIDsBySourceID(sourceID)
+	local visID = C_TransmogCollection.GetSourceInfo(sourceID).visualID;
+	return SetIDForSource[visID];
+end
 
 function BetterWardrobeSetsDataProviderMixin:ResetBaseSetNewStatus(baseSetID)
 	local baseSetData = self:GetBaseSetData(baseSetID)
 	if ( baseSetData ) then
-		baseSetData.newStatus = nil;
+		baseSetData.newStatus = false;
 	end
 end
 
@@ -4860,20 +5176,20 @@ local function GetCombinedAppearanceSources(appearanceID)
 	local sources2 = (appearanceID and itemLink and C_TransmogCollection.GetAppearanceSources(appearanceID, addon.GetItemCategory(appearanceID), addon.GetTransmogLocation(itemLink)) )or {}
 
 	if (sources2 and sources) then
-	  for i = 1, #sources2 do
+		for i = 1, #sources2 do
 		local addTosources = true;
 		for j = 1, #sources do
-		  if sources2[i].sourceID == sources[j] then
+			if sources2[i].sourceID == sources[j] then
 			addTosources = false;
 			break;
-		  end
+			end
 		end
 		if addTosources then
-		  table.insert(sources, sources2[i].sourceID)
+			table.insert(sources, sources2[i].sourceID)
 		end
-	  end
+		end
 	elseif sources2 and not sources then
-	  sources = sources2;
+		sources = sources2;
 	end
 
 	return sources;
@@ -4915,22 +5231,7 @@ function BetterWardrobeSetsDataProviderMixin:GetSortedSetSources(setID)
 
 
 
-	if (setType == nil or setType == "BlizzardSet")  then
-	--if BetterWardrobeCollectionFrame:CheckTab(2) then
-		for i, primaryAppearance in ipairs(sourceData.primaryAppearances) do
-			local sourceID = primaryAppearance.appearanceID;
-			local sourceInfo = C_TransmogCollection.GetSourceInfo(sourceID)
-			local sources = (sourceInfo and GetCombinedAppearanceSources(sourceInfo.visualID)) or {}
-			local characterCollectable, characterUseable = CheckCollectionStatus(sources)
 
-			if ( sourceInfo ) then
-				local sortOrder = EJ_GetInvTypeSortOrder(sourceInfo.invType)
-				tinsert(returnTable, { sourceID = sourceID, collected = primaryAppearance.collected, sortOrder = sortOrder, itemID = sourceInfo.itemID, invType = sourceInfo.invType, characterUseable = characterUseable, characterCollectable = characterCollectable })
-			end
-		end
-
-
-	else
 	----elseif BetterWardrobeCollectionFrame:CheckTab(3) then
 		for sourceID, collected in pairs(sourceData.sources) do
 			local sourceInfo = C_TransmogCollection.GetSourceInfo(sourceID)
@@ -4942,7 +5243,7 @@ function BetterWardrobeSetsDataProviderMixin:GetSortedSetSources(setID)
 				tinsert(returnTable, {sourceID = sourceID, collected = collected, sortOrder = sortOrder, itemID = sourceInfo.itemID, invType = sourceInfo.invType, visualID = sourceInfo.visualID, characterUseable = characterUseable, characterCollectable = characterCollectable  })
 			end
 		end
-	end
+
 
 	local comparison = function(entry1, entry2)
 		if ( entry1.sortOrder == entry2.sortOrder ) then
@@ -4971,6 +5272,7 @@ function BetterWardrobeSetsDataProviderMixin:ClearSets()
 	self.sourceData = nil;
 	self.sourceExtraData = nil;
 end
+addon.ClearSets = BetterWardrobeSetsDataProviderMixin.ClearSets
 
 function BetterWardrobeSetsDataProviderMixin:ClearBaseSets()
 	self.baseSets = nil;
@@ -5013,10 +5315,12 @@ function BetterWardrobeSetsDataProviderMixin:DetermineFavorites()
 			baseSet.favoriteSetID = baseSet.setID;
 		else
 			local variantSets = self:GetVariantSets(baseSet.setID);
-			for j = 1, #variantSets do
-				if ( variantSets[j].favorite ) then
-					baseSet.favoriteSetID = variantSets[j].setID;
-					break;
+			if #variantSets < 0 then 
+				for j = 1, #variantSets do
+					if ( variantSets[j].favorite ) then
+						baseSet.favoriteSetID = variantSets[j].setID;
+						break;
+					end
 				end
 			end
 		end
@@ -5050,11 +5354,12 @@ function BetterWardrobeSetsCollectionMixin:OnLoad()
 
 	self.DetailsFrame.VariantSetsDropdown:SetSelectionTranslator(function(selection)
 		local variantSet = selection.data;
-		return variantSet.description;
+		return variantSet.description or variantSet.name;
 	end);
 
 	self.selectedVariantSets = { };
 end
+
 
 function BetterWardrobeSetsCollectionMixin:OnShow()
 	self:RegisterEvent("GET_ITEM_INFO_RECEIVED");
@@ -5096,7 +5401,7 @@ function BetterWardrobeSetsCollectionMixin:OnShow()
 		self:Refresh();
 	end
 
-	if BetterWardrobeCollectionFrame:CheckTab(2) then
+	--if BetterWardrobeCollectionFrame:CheckTab(2) then
 
 	local latestSource = C_TransmogSets.GetLatestSource();
 	if ( latestSource ~= Constants.Transmog.NoTransmogID ) then
@@ -5104,7 +5409,7 @@ function BetterWardrobeSetsCollectionMixin:OnShow()
 		local setID = sets and sets[1];
 		if ( setID ) then
 			self:SelectSet(setID);
-			local baseSetID = C_TransmogSets.GetBaseSetID(setID);
+			local baseSetID = SetsDataProvider:GetBaseSetID(setID);
 			self:ScrollToSet(baseSetID, ScrollBoxConstants.AlignCenter);
 		end
 		self:ClearLatestSource();
@@ -5113,9 +5418,8 @@ function BetterWardrobeSetsCollectionMixin:OnShow()
 	self.DetailsFrame.VariantSetsDropdown:SetupMenu(function(dropdown, rootDescription)
 		rootDescription:SetTag("MENU_WARDROBE_VARIANT_SETS");
 
-		local selectedSetID = self.selectedSetID --self:GetSelectedSetID();
-
-		local baseSetID = C_TransmogSets.GetBaseSetID(selectedSetID);
+		local selectedSetID = self:GetSelectedSetID();
+		local baseSetID = SetsDataProvider:GetBaseSetID(selectedSetID);
 
 		local function IsSelected(variantSet)
 			return variantSet.setID == self:GetSelectedSetID();
@@ -5123,10 +5427,13 @@ function BetterWardrobeSetsCollectionMixin:OnShow()
 		
 		local function SetSelected(variantSet)
 			self:SelectSet(variantSet.setID);
-		end
+			local desc =variantSet.description or variantSet.name
 
+			self.DetailsFrame.VariantSetsDropdown:SetText(desc);
+
+		end
 		for index, variantSet in ipairs(SetsDataProvider:GetVariantSets(baseSetID)) do
-			if not variantSet.hiddenUntilCollected or variantSet.collected then
+			--if not variantSet.hiddenUntilCollected or variantSet.collected then
 				local numSourcesCollected, numSourcesTotal = SetsDataProvider:GetSetSourceCounts(variantSet.setID);
 				local colorCode = IN_PROGRESS_FONT_COLOR_CODE;
 				if numSourcesCollected == numSourcesTotal then
@@ -5135,20 +5442,25 @@ function BetterWardrobeSetsCollectionMixin:OnShow()
 					colorCode = GRAY_FONT_COLOR_CODE;
 				end
 
-				local text = format(ITEM_SET_NAME, (variantSet.description)..colorCode, numSourcesCollected, numSourcesTotal);
+				local desc =variantSet.description or variantSet.name
+				local text = format(ITEM_SET_NAME, (desc)..colorCode, numSourcesCollected, numSourcesTotal);
+				if variantSet.requiredFaction then
+					text = GetFactionColoredString(variantSet.requiredFaction, text )
+				end
 				rootDescription:CreateRadio(text, IsSelected, SetSelected, variantSet);
-			end
+			--end
 		end
 	end);
-	else
-		local latestSource = newTransmogInfo["latestSource"]
 
-		if (latestSource ~= NO_TRANSMOG_SOURCE_ID) then
-			self:SelectSet(latestSource)
-			self:ScrollToSet(latestSource)
-			self:ClearLatestSource()
-		end
-	end
+	--else
+		--local latestSource = newTransmogInfo["latestSource"]
+
+		--if (latestSource ~= NO_TRANSMOG_SOURCE_ID) then
+			--self:SelectSet(latestSource)
+			--self:ScrollToSet(latestSource)
+			--self:ClearLatestSource()
+		--end
+	--end
 	BetterWardrobeCollectionFrame.progressBar:Show();
 	self:UpdateProgressBar();
 	self:RefreshCameras();
@@ -5283,9 +5595,8 @@ end
 
 function BetterWardrobeSetsCollectionMixin:DisplaySet(setID)
 	if not setID then return end
-
 	--=local setInfo = (setID and C_TransmogSets.GetSetInfo(setID)) or nil;
-	local setInfo = addon.C_TransmogSets.GetSetInfo(setID) 
+	local setInfo = SetsDataProvider:GetSetByID(setID) 
 
 	local buildID = (select(4, GetBuildInfo())) or nil;
 
@@ -5351,7 +5662,8 @@ function BetterWardrobeSetsCollectionMixin:DisplaySet(setID)
 		self.DetailsFrame.LongName:Hide();
 	end
 
-	self.DetailsFrame.Label:SetText((setInfo.label or "")..((not setInfo.isClass and setInfo.className) and " -"..setInfo.className.."-" or ""))--..setID );
+	self.DetailsFrame.Label:SetText((setInfo.label or "")..((not setInfo.isClass and setInfo.className) and " -"..setInfo.className.."-" or "")..setID );
+	--print(setInfo.label)
 	--self.DetailsFrame.LimitedSet:SetShown(setInfo.limitedTimeSet);
 
 	if ((setInfo.description == ELITE) and setInfo.patchID < buildID) or (setID <= 1446 and setID >=1436) then
@@ -5372,7 +5684,31 @@ function BetterWardrobeSetsCollectionMixin:DisplaySet(setID)
 		self.DetailsFrame.LimitedSet:Hide();
 	end
 
+	if setInfo.requiredFaction then
+		if setInfo.requiredFaction == "Alliance" then
+			self.DetailsFrame.Faction:Show()
+			self.DetailsFrame.Faction.Alliance:Show()
+			self.DetailsFrame.Faction.Horde:Hide()
 
+
+		elseif setInfo.requiredFaction == "Horde" then
+			self.DetailsFrame.Faction:Show()
+			self.DetailsFrame.Faction.Horde:Show()
+			self.DetailsFrame.Faction.Alliance:Hide()
+
+		end
+		self.DetailsFrame.Faction.Horde:SetDesaturated(true)
+		self.DetailsFrame.Faction.Horde:SetAlpha(.9)
+		self.DetailsFrame.Faction.Alliance:SetDesaturated(true)
+		self.DetailsFrame.Faction.Alliance:SetAlpha(.4)
+
+	else
+		self.DetailsFrame.Faction:Hide()
+		self.DetailsFrame.Faction.Horde:Hide()
+		self.DetailsFrame.Faction.Alliance:Hide()
+
+	end
+	
 	local newSourceIDs = C_TransmogSets.GetSetNewSources(setID) or addon.GetSetNewSources(setID);
 
 	self.DetailsFrame.itemFramesPool:ReleaseAll();
@@ -5481,7 +5817,7 @@ function BetterWardrobeSetsCollectionMixin:DisplaySet(setID)
 		if ( sortedSources[i].collected ) then
 			if not sortedSources[i].characterUseable then
 				if sortedSources[i].characterCollectable then
-				  itemFrame.itemCollectionStatus = "CollectedCharCantUse";
+					itemFrame.itemCollectionStatus = "CollectedCharCantUse";
 				--else
 				 -- itemFrame.itemCollectionStatus = "CollectedCharCantGet";
 				end
@@ -5498,7 +5834,7 @@ function BetterWardrobeSetsCollectionMixin:DisplaySet(setID)
 			itemFrame.itemCollectionStatus = nil;
 		else
 			--We don't care if item is collected
-		  if not sortedSources[i].collected then 
+			if not sortedSources[i].collected then 
 			itemFrame.itemCollectionStatus = "NotCollectedUnavailable";
 		end
 		--itemFrame.unavailable:Show();
@@ -5563,28 +5899,28 @@ function BetterWardrobeSetsCollectionMixin:DisplaySet(setID)
 	end
 
 	local showVariantSetsDropdown = false;
-	if (BetterWardrobeCollectionFrame.selectedCollectionTab == TAB_SETS) then
+	if (BetterWardrobeCollectionFrame.selectedCollectionTab ~= TAB_SAVED_SETS ) then
 
 		-- variant sets
-		local baseSetID = C_TransmogSets.GetBaseSetID(setID);
+		local baseSetID = SetsDataProvider:GetBaseSetID(setID);
 		local variantSets = SetsDataProvider:GetVariantSets(baseSetID);
 		if variantSets then
 			local numVisibleSets = 0;
 			for i, set in ipairs(variantSets) do
-				if not set.hiddenUntilCollected or set.collected then
+				--if not set.hiddenUntilCollected or set.collected then
 					numVisibleSets = numVisibleSets + 1;
-				end
+				--end
 			end
 			showVariantSetsDropdown = numVisibleSets > 1;
 		end
 	end
-	if (BetterWardrobeCollectionFrame.selectedCollectionTab == TAB_SAVED_SETS or BetterWardrobeCollectionFrame.selectedCollectionTab == TAB_EXTRASETS) then
+	if (BetterWardrobeCollectionFrame.selectedCollectionTab == TAB_SAVED_SETS ) then
 		showVariantSetsDropdown = false
 	end
 
 	if showVariantSetsDropdown then
 		self.DetailsFrame.VariantSetsDropdown:Show();
-		self.DetailsFrame.VariantSetsDropdown:SetText(setInfo.description);
+		self.DetailsFrame.VariantSetsDropdown:SetText(setInfo.description or setInfo.name);
 	else
 		self.DetailsFrame.VariantSetsDropdown:Hide();
 	end
@@ -5804,7 +6140,7 @@ function BetterWardrobeSetsCollectionMixin:SetItemUseability(itemFrame)
 		--itemFrame.Icon:SetAlpha(0.6);
 		--itemFrame.CanUse.Icon:SetAlpha(0.5);
 		--itemFrame.New:Hide();
-  
+	
 	--elseif itemCollectionStatus == "NotCollectedCharCantGet" then
 		--itemFrame.CanUse:Show();
 		---itemFrame.Icon:SetDesaturated(true)
@@ -5905,67 +6241,65 @@ function BetterWardrobeSetsCollectionMixin:SelectBaseSetID(baseSetID)
 end
 
 function BetterWardrobeSetsCollectionMixin:GetDefaultSetIDForBaseSet(baseSetID)
+	local baseSetID = SetsDataProvider:GetBaseSetID(baseSetID);
+	
 	if ( SetsDataProvider:IsBaseSetNew(baseSetID) ) then
-		if ( C_TransmogSets.SetHasNewSources(baseSetID) ) then
+		if ( SetsDataProvider:SetHasNewSources(baseSetID) ) then
 			return baseSetID;
 		else
 			local variantSets = SetsDataProvider:GetVariantSets(baseSetID);
 			for i, variantSet in ipairs(variantSets) do
-				if ( C_TransmogSets.SetHasNewSources(variantSet.setID) ) then
+				if ( SetsDataProvider:SetHasNewSources(variantSet.setID) ) then
 					return variantSet.setID;
 				end
 			end
 		end
 	end
 
-	if ( self.selectedVariantSets[baseSetID] ) then
-		return self.selectedVariantSets[baseSetID];
-	end
-
-	local baseSet = SetsDataProvider:GetBaseSetByID(baseSetID);
-	if ( baseSet.favoriteSetID ) then
+	local baseSet = addon.BaseSets[baseSetID];
+	if ( baseSet and baseSet.favoriteSetID ) then
 		return baseSet.favoriteSetID;
 	end
+
 	-- pick the one with most collected, higher difficulty wins ties
 	local highestCount = 0;
 	local highestCountSetID;
-	local variantSets = SetsDataProvider:GetVariantSets(baseSetID);
+	local variantSets = SetsDataProvider:GetVariantSets(baseSetID, true);
 	for i = 1, #variantSets do
-		local variantSetID = variantSets[i].setID;
+		local variantSetID = variantSets[i].setID
 		local numCollected = SetsDataProvider:GetSetSourceCounts(variantSetID);
-		if ( numCollected > 0 and numCollected >= highestCount ) then
+		if (numCollected > highestCount)  then
 			highestCount = numCollected;
 			highestCountSetID = variantSetID;
 		end
 	end
+
 	return highestCountSetID or baseSetID;
 end
 
 function BetterWardrobeSetsCollectionMixin:SelectSetFromButton(setID)
 	CloseDropDownMenus()
-	if BetterWardrobeCollectionFrame.selectedCollectionTab == 2 then 
-		self:SelectSet(self:GetDefaultSetIDForBaseSet(setID))
-	----elseif BetterWardrobeCollectionFrame.selectedCollectionTab == 3 then 
-	else
-		self:SelectSet(setID)
-	end
+	self:SelectSet(self:GetDefaultSetIDForBaseSet(setID))
+
 end
 
 function BetterWardrobeSetsCollectionMixin:SelectSet(setID)
-	if BetterWardrobeCollectionFrame.selectedCollectionTab == 2 then
+	if BetterWardrobeCollectionFrame.selectedCollectionTab ~=4 then
 
+		if BetterWardrobeCollectionFrame.selectedCollectionTab == 2 then
+			self.selectedSetID = setID;
+		elseif BetterWardrobeCollectionFrame.selectedCollectionTab == 3 then
+			self.selectedExtraSetID = setID;
+
+		end	
 		self.selectedSetID = setID;
-		local baseSetID = C_TransmogSets.GetBaseSetID(setID);
+
+		local baseSetID = SetsDataProvider:GetBaseSetID(setID);
 		local variantSets = SetsDataProvider:GetVariantSets(baseSetID);
 		if ( #variantSets > 0 ) then
 			self.selectedVariantSets[baseSetID] = setID;
 		end
 
-		----self.ListContainer:SelectElementDataMatchingSetID(baseSetID);
-
-		----self:DisplaySet(self:GetSelectedSetID());
-	elseif BetterWardrobeCollectionFrame.selectedCollectionTab == 3 then
-		self.selectedExtraSetID = setID;
 	elseif BetterWardrobeCollectionFrame.selectedCollectionTab == 4 then
 		self.selectedSavedSetID = setID;
 	end
@@ -6056,12 +6390,11 @@ function BetterWardrobeSetsCollectionMixin:HandleKey(key)
 		end
 	end
 	local selectedSetID;
+
 	if BetterWardrobeCollectionFrame.selectedCollectionTab == 4 then
 		selectedSetID = self:GetSelectedSavedSetID();
-	elseif BetterWardrobeCollectionFrame.selectedCollectionTab == 3 then
-		selectedSetID = self:GetSelectedSetID();
-	elseif BetterWardrobeCollectionFrame.selectedCollectionTab == 2 then
-		selectedSetID = C_TransmogSets.GetBaseSetID(self:GetSelectedSetID());
+	else 
+		selectedSetID = SetsDataProvider:GetBaseSetID(self:GetSelectedSetID());
 	end
 	local _, index = SetsDataProvider:GetBaseSetByID(selectedSetID);
 	if ( not index ) then
@@ -6082,7 +6415,7 @@ end
 function BetterWardrobeSetsCollectionMixin:ScrollToSet(setID, alignment)
 	local scrollBox = self.ListContainer.ScrollBox;
 
-	local baseSetID = C_TransmogSets.GetBaseSetID(setID) or setID;
+	local baseSetID = SetsDataProvider:GetBaseSetID(setID) or setID;
 	local function FindSet(elementData)
 		return elementData.setID == baseSetID;
 	end
@@ -6162,7 +6495,7 @@ function BetterWardrobeSetsCollectionMixin:OpenInDressingRoom(setID)
 		end
 
 	elseif setType == "extraset" then
-		sources = addon.GetSetsources(setID)
+		sources = SetsDataProvider:GetSetSources(setID)
 	end
 
 	if not sources then return end
@@ -6214,13 +6547,14 @@ end
 local function variantsTooltip(elementData, variantSets)
 	if not elementData.description then return "" end
 
-	local ratioText = elementData.description..": " 
-	local have, total = addon.SetsDataProvider:GetSetSourceCounts(elementData.setID)
-	ratioText = ratioText..have .. "/" .. total.."\n"
-
-	for i, setdata in ipairs(variantSets)do
+	--local ratioText = elementData.description..": " 
+	--local have, total = addon.SetsDataProvider:GetSetSourceCounts(elementData.setID)
+	--ratioText = ratioText..have .. "/" .. total.."\n"
+	local  ratioText = ""
+	for i, setdata in ipairs(variantSets) do
 		local have, total = addon.SetsDataProvider:GetSetSourceCounts(setdata.setID)
-		 ratioText =  ratioText..setdata.description..": ".. have .. "/" .. total.."\n"
+		text = setdata.description or setdata.name
+		 ratioText =  ratioText..text..": ".. have .. "/" .. total.."\n"
 	end
 
 	return ratioText
@@ -6231,26 +6565,29 @@ BetterWardrobeSetsScrollFrameButtonMixin = {};
 function BetterWardrobeSetsScrollFrameButtonMixin:Init(elementData)
 	local displayData = elementData;
 	if not displayData then return end
-		local variantSets = C_TransmogSets.GetVariantSets(elementData.setID) or {};
+		local variantSets = SetsDataProvider:GetVariantSets(elementData.setID) or {} --C_TransmogSets.GetVariantSets(elementData.setID) or {};
 
 	-- if the base set is hiddenUntilCollected and not collected, it's showing up because one of its variant sets is collected
 	-- in that case use any variant set to populate the info in the list
-	if elementData.hiddenUntilCollected and not elementData.collected and BetterWardrobeCollectionFrame.selectedCollectionTab == 2 then
-		if variantSets then
+	--if elementData.hiddenUntilCollected and not elementData.collected and BetterWardrobeCollectionFrame.selectedCollectionTab == 2 then
+		if #variantSets >0 then
 			-- variant sets are already filtered for visibility (won't get a hiddenUntilCollected one unless it's collected)
 			-- any set will do so just picking first one
 			displayData = variantSets[1];
 		end
-	end
+	--end
 
-	if #variantSets == 0  or IsAddOnLoaded("CanIMogIt") then
+	if #variantSets <= 1  or IsAddOnLoaded("CanIMogIt") then
 		self.Variants:Hide()
 		self.Variants.Count:SetText(0)
 	else
 		self.Variants:Show()
-		self.Variants.Count:SetText(#variantSets + 1)
+		self.Variants.Count:SetText(#variantSets)
 	end
-	self.Name:SetText(displayData.name..((displayData.className) and " ("..displayData.className..")" or "") );
+
+	local subName = gsub(displayData.name, " %(Recolor%)", "")
+	----self.Name:SetText(subName..((displayData.className) and " ("..displayData.className..")" or "") );
+	self.Name:SetText(subName );
 	local topSourcesCollected, topSourcesTotal = SetsDataProvider:GetSetSourceTopCounts(displayData.setID);
 	-- progress visuals use the top collected progress, so collected visuals should reflect the top completion status as well
 	local setCollected = displayData.collected or topSourcesCollected == topSourcesTotal;
@@ -6534,7 +6871,7 @@ end
 function BetterWardrobeSetsCollectionContainerMixin:UpdateListSelection()
 	local selectedSetID = self:GetParent():GetSelectedSetID();
 	if selectedSetID then
-		self:SelectElementDataMatchingSetID(C_TransmogSets.GetBaseSetID(selectedSetID));
+		self:SelectElementDataMatchingSetID(SetsDataProvider:GetBaseSetID(selectedSetID));
 	end
 end
 
@@ -6689,7 +7026,7 @@ function BetterWardrobeSetsDetailsItemMixin:OnEnter()
 		else
 			addon.ClearSetNewSourcesForSlot(setID, self.transmogSlot)
 		end
-		local baseSetID = C_TransmogSets.GetBaseSetID(setID)
+		local baseSetID = SetsDataProvider:GetBaseSetID(setID)
 		if baseSetID then 
 			SetsDataProvider:ResetBaseSetNewStatus(baseSetID)
 			--BetterWardrobeCollectionFrame.SetsCollectionFrame:Refresh()
@@ -7223,7 +7560,7 @@ function BetterWardrobeSetsTransmogMixin:LoadSet(setID)
 	local setData;
 	--Default Saved sets;
 	if setType == "SavedBlizzard" then
-		local setSources = addon.C_TransmogSets.GetSetSources(setID);
+		local setSources = SetsDataProvider:GetSetSources(setID);
 		for sourceID in pairs(setSources) do
 			local sourceInfo = C_TransmogCollection.GetSourceInfo(sourceID);
 			if sourceInfo then 
@@ -7467,7 +7804,7 @@ function BetterWardrobeSetsTransmogMixin:OnSearchUpdate()
 end
 
 function BetterWardrobeSetsTransmogMixin:SelectSet(setID)
-  --TODO REVISIT FOR OTHE SET TYopes;
+	--TODO REVISIT FOR OTHE SET TYopes;
 	self.selectedSetID = setID;
 	selected = true;
 	self:LoadSet(setID)
@@ -7600,7 +7937,7 @@ function Sets.isMogKnown(sourceID)
 end
 
 function addon.Sets:SelectedVariant(setID)
-	local baseSetID = C_TransmogSets.GetBaseSetID(setID) --or setID;
+	local baseSetID = SetsDataProvider:GetBaseSetID(setID) --or setID;
 	if not baseSetID then return end
 
 	local variantSets = SetsDataProvider:GetVariantSets(baseSetID)
@@ -7630,7 +7967,7 @@ function addon.Sets:GetLocationBasedCount(setInfo)
 	local totalCount = 0;
 	local items = {}
 	local setID = setInfo.setID;
-	local sources = addon.C_TransmogSets.GetSetSources(setID)
+	local sources = SetsDataProvider:GetSetSources(setID)
 
 	for sourceID in pairs(sources) do
 		local sourceInfo = C_TransmogCollection.GetSourceInfo(sourceID)

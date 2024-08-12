@@ -25,6 +25,101 @@ local TAB_SETS = 2
 local TAB_EXTRASETS = 3
 local TAB_SAVED_SETS = 4
 
+local factionNames = { playerFaction = "", opposingFaction = "" };
+
+local ClassName;
+local ClassIndex = nil;
+local ClassMaskMap = {
+    [1] = {1, 2, 32, 35}, -- Plate Wearer
+    [2] = {1, 2, 32, 35}, -- Plate Wearer
+    [3] = {4, 64, 4096, 4164},    -- Mail Wearer
+    [4] = {8, 512, 1024, 2048, 3592, 11784}, -- Leather Wearer
+    [5] = {16, 128, 256, 400}, -- Cloth Wearer
+    [6] = {1, 2, 32, 35}, -- Plate Wearer
+    [7] = {4, 64, 4096, 4164},    -- Mail Wearer
+    [8] = {16, 128, 256, 400}, -- Cloth Wearer
+    [9] = {16, 128, 256, 400}, -- Cloth Wearer
+    [10] = {8, 512, 1024, 2048, 3592, 11784}, -- Leather Wearer
+    [11] = {8, 512, 1024, 2048, 3592, 11784}, -- Leather Wearer
+    [12] = {8, 512, 1024, 2048, 3592, 11784}, -- Leather Wearer
+    [13] = {4, 64, 4096, 4164},    -- Mail Wearer
+}
+local ClassNameMask = {
+    [1] = "Warrior",
+    [2] = "Paladin",
+    [4] = "Hunter",
+    [8] = "Rogue",
+    [16] = "Priest",
+    [32] = "Death Knight",
+    [64] = "Shaman",
+    [128] = "Mage",
+    [256] = "Warlock",
+    [512]  = "Monk",
+    [1024] = "Druid",
+    [2048] = "Demon Hunter",
+    [4096] = "Evoker",
+}
+local ClassNameLookupMask = {
+    [1] = "WARRIOR",
+    [2] = "PALADIN",
+    [4] = "HUNTER",
+    [8] = "ROGUE",
+    [16] = "PRIEST",
+    [32] = "DEATHKNIGHT",
+    [64] = "SHAMAN",
+    [128] = "MAGE",
+    [256] = "WARLOCK",
+    [512] = "MONK",
+    [1024] = "DRUID",
+    [2048] = "DEMONHUNTER",
+    [4096] = "EVOKER",
+}
+local ClassToMask = {
+    [1] = 1,
+    [2] = 2,
+    [3] = 4,
+    [4] = 8,
+    [5] = 16,
+    [6] = 32,
+    [7] = 64,
+    [8] = 128,
+    [9] = 256,
+    [10] = 512,
+    [11] = 1024,
+    [12] = 2048,
+    [13] = 4096,
+}
+local ClassArmorType = {
+    [1]  = 4, --[1]  = 1, --[1] =    
+    [2]  = 4, --[2]  = 1, --[2] =    
+    [3]  = 3, --[3]  = 2, --[4] =    
+    [4]  = 2, --[4]  = 3, --[8] =    
+    [5]  = 1, --[5]  = 4, --[16] =   
+    [6]  = 4, --[6]  = 1, --[32] =   
+    [7]  = 3, --[7]  = 2, --[64] =   
+    [8]  = 1, --[8]  = 4, --[128] =  
+    [9]  = 1, --[9]  = 4, --[256] =  
+    [10] = 2, --[10] = 3, --[512] =  
+    [11] = 2, --[11] = 3, --[1024] = 
+    [12] = 2, --[12] = 3, --[2048] = 
+    [13] = 3,
+}
+local ClassArmorMask = {
+    [1]  = {1, 35},
+    [2]  = {2, 35},
+    [3]  = {4, 4164},
+    [4]  = {8, 3592, 11784},
+    [5]  = {16, 400},
+    [6]  = {32, 35},
+    [7]  = {64, 4164},
+    [8]  = {128, 400},
+    [9]  = {256, 400},
+    [10] = {512, 3592, 11784},
+    [11] = {1024, 3592, 11784},
+    [12] = {2048, 3592, 11784},
+    [13] = {4096, 4164},
+}
+
 
 local function GetTab(tab)
 		local atTransmogrifier = C_Transmog.IsAtTransmogNPC();
@@ -611,6 +706,27 @@ function addon.SortVariantSet(sets, reverseUIOrder, ignorePatchID)
 		if ( set1.favorite ~= set2.favorite ) then
 			return set1.favorite;
 		end
+
+			----if ( set1.requiredFaction and set1.requiredFaction ~= set2.requiredFaction) then
+			----	if (set1.requiredFaction == factionNames.playerFaction) then
+				----	return true;
+				----elseif (set2.requiredFaction == factionNames.playerFaction) then
+				-----	return false;
+				----elseif (set1.requiredFaction == nil) then
+				----	return true;
+				----else
+				----	return false;
+				----end
+			----end
+			if ( set1.classMask and set1.classMask ~= set2.classMask ) then
+				if ClassNameMask[set1.classMask] == nil and ClassNameMask[set2.classMask] ~= nil then return true;  end
+				if ClassNameMask[set2.classMask] == nil and ClassNameMask[set1.classMask] ~= nil then return false; end
+				if set1.classMask == ClassToMask[ClassIndex] then return true; end
+				if set2.classMask == ClassToMask[ClassIndex] then return false; end
+				return set1.classMask < set2.classMask;
+			end
+
+
 		if ( set1.expansionID ~= set2.expansionID ) then
 			return set1.expansionID > set2.expansionID;
 		end
@@ -619,7 +735,7 @@ function addon.SortVariantSet(sets, reverseUIOrder, ignorePatchID)
 				return set1.patchID > set2.patchID;
 			end
 		end
-		if ( set1.uiOrder ~= set2.uiOrder ) then
+		if ( set1.uiOrder and set2.uiOrder and set1.uiOrder ~= set2.uiOrder ) then
 			if ( reverseUIOrder ) then
 				return set1.uiOrder < set2.uiOrder;
 			else

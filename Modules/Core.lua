@@ -61,7 +61,6 @@ function optionHandler:Setter(info, value)
 			addon:DressingRoom_Enable()
 		end
 	elseif info.arg == IgnoreClassRestrictions or info.arg == IgnoreClassLookalikeRestrictions then
-		--addon.extraSetsCache = nil
 		addon.Init:BuildDB()
 
 	elseif info.arg == "ShowAdditionalSourceTooltips" then

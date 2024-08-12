@@ -505,9 +505,9 @@ function addon:FilterSets(setList, setType)
 		local expansion = data.expansionID
 		local sourcefilter = (BetterWardrobeCollectionFrame:CheckTab(3) and filterSelection[data.filter])
 		local unavailableFilter = (not unavailable or (addon.Profile.HideUnavalableSets and unavailable))
-
+		local tab = (BetterWardrobeCollectionFrame:CheckTab(2) and data.tab == 2) or (BetterWardrobeCollectionFrame:CheckTab(3) and data.tab == 3)
 		if BetterWardrobeCollectionFrame:CheckTab(2) then
-			expansion = expansion + 1
+			--expansion = expansion + 1
 			sourcefilter = true
 			unavailableFilter = true
 		end
@@ -517,7 +517,8 @@ function addon:FilterSets(setList, setType)
 			--CheckMissingLocation(data) and
 			xpacSelection[expansion] and
 			--not duplicate and
-			sourcefilter then
+			sourcefilter and
+				tab then
 			--(not unavailable or (addon.Profile.HideUnavalableSets and unavailable)) then ----and
 			tinsert(FilterSets, data)
 		end
