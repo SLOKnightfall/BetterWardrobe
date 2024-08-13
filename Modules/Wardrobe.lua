@@ -449,7 +449,7 @@ end
 
 function BW_TransmogFrameMixin:EvaluateSecondaryAppearanceCheckbox()
 	local showToggleCheckbox = false;
-	if self.selectedSlotButton and (BetterWardrobeCollectionFrame.activeFrame == BetterWardrobeCollectionFrame.ItemsCollectionFrame or WardrobeCollectionFrame.activeFrame == WardrobeCollectionFrame.ItemsCollectionFrame) then
+	if self.selectedSlotButton and (BetterWardrobeCollectionFrame.activeFrame == BetterWardrobeCollectionFrame.ItemsCollectionFrame) then
 
 		showToggleCheckbox = C_Transmog.CanHaveSecondaryAppearanceForSlotID(self.selectedSlotButton.transmogLocation.slotID);
 	end
@@ -1208,7 +1208,7 @@ function BetterWardrobeCollectionFrameMixin:SetTab(tabID)
 	end
 
 
-	local ElvUI = IsAddOnLoaded("ElvUI");
+	local ElvUI = C_AddOns.IsAddOnLoaded("ElvUI");
 
 	--if SavedOutfitDropDownMenu then
 		--SavedOutfitDropDownMenu:Hide();
@@ -3685,9 +3685,9 @@ function BetterWardrobeItemsModelMixin:OnMouseUp(button)
 
 			text = L["View Recolors"]
 			rootDescription:CreateButton(text, function()
-			if not IsAddOnLoaded("BetterWardrobe_SourceData") then
-				EnableAddOn("BetterWardrobe_SourceData");
-				LoadAddOn("BetterWardrobe_SourceData");
+			if not C_AddOns.IsAddOnLoaded("BetterWardrobe_SourceData") then
+				C_AddOns.EnableAddOn("BetterWardrobe_SourceData");
+				C_AddOns.LoadAddOn("BetterWardrobe_SourceData");
 			end
 			local Recolors = _G.BetterWardrobeData.ItemRecolors or {};
 				for i = 1, #Recolors do
@@ -4888,7 +4888,7 @@ local function CheckCollectionStatus(sources)
 		local sourceInfo = C_TransmogCollection.GetSourceInfo(sourceID)
 		
 		local link = select(6, C_TransmogCollection.GetAppearanceSourceInfo(sourceInfo.sourceID))
-		local classSet = CheckClass(link)
+		--local classSet = CheckClass(link)
 		
 		if not characterCollectable and classSet then
 			characterCollectable = true;
@@ -6243,7 +6243,7 @@ function BetterWardrobeSetsScrollFrameButtonMixin:Init(elementData)
 		end
 	end
 
-	if #variantSets == 0  or IsAddOnLoaded("CanIMogIt") then
+	if #variantSets == 0  or C_AddOns.IsAddOnLoaded("CanIMogIt") then
 		self.Variants:Hide()
 		self.Variants.Count:SetText(0)
 	else
@@ -6303,7 +6303,7 @@ function BetterWardrobeSetsScrollFrameButtonMixin:Init(elementData)
 	self.CollectionListVisual.Collection.Collection_Icon:SetShown(isInList);
 	self.CollectionListVisual.Collection.Collected_Icon:SetShown(isInList and setCollected);
 
-	self.EditButton:SetShown((BetterWardrobeCollectionFrame:CheckTab(4) and (self.setID < 50000 or self.setID >=70000 or IsAddOnLoaded("MogIt"))))
+	self.EditButton:SetShown((BetterWardrobeCollectionFrame:CheckTab(4) and (self.setID < 50000 or self.setID >=70000 or C_AddOns.IsAddOnLoaded("MogIt"))))
 
 	if ( topSourcesCollected == 0 or setCollected ) then
 		self.ProgressBar:Hide();
@@ -6966,7 +6966,13 @@ function BetterWardrobeSetsTransmogMixin:UpdateSets()
 					--model.SetInfo.setName:SetText((addon.Profile.ShowNames and setInfo["name"].."\n"..(setInfo["description"] or "")) or "")
 
 					local name = setInfo["name"]
-					local description = "\n"..(setInfo["description"] or "")
+					local description
+					if  setInfo["description"] then
+						description = "\n"..("("..setInfo["description"]..")")
+					else
+						description = "\n"..("")
+					end
+					--local description = "\n"..("("..setInfo["description"]..")" or "")
 					
 					--local description = (setInfo["description"] and "\n-"..setInfo["description"].."-") or ""
 					--local classname = (setInfo.className and "\n ("..setInfo.className..")") or ""
@@ -7664,8 +7670,8 @@ addon:SecureHook("SetItemRef", function(link, ...)
 	local linkType, id = strsplit(":", link)
 
 	if (linkType == "transmogappearance" or linkType == "transmogset" or linkType == "BW_transmogset" or linkType == "BW_transmogset-extra") then
-		if not IsAddOnLoaded("Blizzard_Collections") then
-			--LoadAddOn("Blizzard_Collections")
+		if not C_AddOns.IsAddOnLoaded("Blizzard_Collections") then
+			--C_AddOns.LoadAddOn("Blizzard_Collections")
 		end
 
 		if ( not CollectionsJournal or not CollectionsJournal:IsVisible() ) then

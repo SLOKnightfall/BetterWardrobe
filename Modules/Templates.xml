@@ -6,28 +6,29 @@
 	<Frame name="BetterWardrobeSetInfoTemplate" parentKey="SetInfo" virtual="true" setAllPoints="true" hidden="false">
 		<Anchors>
 			<Anchor point="TOPLEFT" x="2" y="-2" relativePoint="TOPLEFT"/>
-			<Anchor point="BOTTOMRIGHT" x="2" y="-2" relativePoint="BOTTOMRIGHT"/>
+			<Anchor point="BOTTOMRIGHT" x="2" y="-30" relativePoint="BOTTOMRIGHT"/>
 		</Anchors>
 		<Layers>
 			<Layer level="OVERLAY">
-				<FontString parentKey="progress" inherits="GameFontHighlightMedium" text="">
+				<FontString parentKey="progress" inherits="GameFontHighlightMedium" text="" >
 					<Anchors>
 						<Anchor point="TOP" y="-2"/>
 					</Anchors>
 					<Color r="0.804" g="0.725" b="0.616"/>
 				</FontString>
 			</Layer>
-		<Layer level="OVERLAY">
-				<FontString parentKey="setName" inherits="GameFontHighlightMedium" text="">
+			<Layer level="OVERLAY">
+				<FontString parentKey="setName" inherits="GameFontHighlight" text="" justifyV="TOP">
+					<Size x="70" y="95"/>
 					<Anchors>
-				<Anchor point="BOTTOMLEFT"  y="15" relativePoint="BOTTOMLEFT"/>
-			<Anchor point="BOTTOMRIGHT"  relativePoint="BOTTOMRIGHT"/>
+						<Anchor point="TOPLEFT"  y="25" relativePoint="BOTTOMLEFT"/>
+						<Anchor point="TOPRIGHT" y="25" relativePoint="BOTTOMRIGHT"/>
 					</Anchors>
 					
 					<Shadow>
-					<Offset x="5" y="-5" />
-				<Color r="0.804" g="0.725" b="0.616"/>
-									</Shadow>
+						<Offset x="5" y="-5" />
+						<Color r="0.804" g="0.725" b="0.616"/>
+					</Shadow>
 				</FontString>
 			</Layer>
 		</Layers>

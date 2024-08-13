@@ -90,9 +90,9 @@ end
 
 local function SortColor(sets)
 	local comparison = function(source1, source2)
-		if not IsAddOnLoaded("BetterWardrobe_SourceData") then
-			EnableAddOn("BetterWardrobe_SourceData")
-			LoadAddOn("BetterWardrobe_SourceData")
+		if not C_AddOns.IsAddOnLoaded("BetterWardrobe_SourceData") then
+			C_AddOns.EnableAddOn("BetterWardrobe_SourceData")
+			C_AddOns.LoadAddOn("BetterWardrobe_SourceData")
 		end
 
 		if not source1 or not source2 then
@@ -296,9 +296,9 @@ end
 
 local function SortItemByAppearance(self)
 	local comparison = function(source1, source2)
-		if not IsAddOnLoaded("BetterWardrobe_SourceData") then
-			LoadAddOn("BetterWardrobe_SourceData")
-			EnableAddOn("BetterWardrobe_SourceData")
+		if not C_AddOns.IsAddOnLoaded("BetterWardrobe_SourceData") then
+			C_AddOns.LoadAddOn("BetterWardrobe_SourceData")
+			C_AddOns.EnableAddOn("BetterWardrobe_SourceData")
 		end
 		local ItemAppearance = (_G.BetterWardrobeData and _G.BetterWardrobeData.ItemAppearance) or {}
 
@@ -338,9 +338,9 @@ local function SortByItemSource(self)
 					end
 				end
 			else
-				if not IsAddOnLoaded("BetterWardrobe_SourceData") then
-					EnableAddOn("BetterWardrobe_SourceData")
-					LoadAddOn("BetterWardrobe_SourceData")
+				if not C_AddOns.IsAddOnLoaded("BetterWardrobe_SourceData") then
+					C_AddOns.EnableAddOn("BetterWardrobe_SourceData")
+					C_AddOns.LoadAddOn("BetterWardrobe_SourceData")
 				end
 				local ItemAppearance = (_G.BetterWardrobeData and _G.BetterWardrobeData.ItemAppearance) or {}
 				--local ItemAppearance = addon.ItemAppearance or {}
@@ -488,9 +488,9 @@ end
 
 local function SortSetByAppearance(sets) 
 	local comparison = function(source1, source2)
-		if not IsAddOnLoaded("BetterWardrobe_SourceData") then
-			EnableAddOn("BetterWardrobe_SourceData")
-			LoadAddOn("BetterWardrobe_SourceData")
+		if not C_AddOns.IsAddOnLoaded("BetterWardrobe_SourceData") then
+			C_AddOns.EnableAddOn("BetterWardrobe_SourceData")
+			C_AddOns.LoadAddOn("BetterWardrobe_SourceData")
 		end
 		local ItemAppearance = (_G.BetterWardrobeData and _G.BetterWardrobeData.ItemAppearance) or {}
 		--local ItemAppearance = addon.ItemAppearance or {}

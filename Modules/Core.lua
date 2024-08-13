@@ -82,13 +82,13 @@ function optionHandler:Getter(info)
 end
 
 function optionHandler:TSMDisable(info)
-	return not IsAddOnLoaded("TradeSkillMaster")
+	return not C_AddOns.IsAddOnLoaded("TradeSkillMaster")
 end
 
 function optionHandler:TSMSources(info)
 	local sources = {}
 	local table = {}
-	if (IsAddOnLoaded("TradeSkillMaster")) then
+	if (C_AddOns.IsAddOnLoaded("TradeSkillMaster")) then
 		TSM_API.GetPriceSourceKeys(sources)
 	end
 
@@ -1467,7 +1467,7 @@ function addon.Init:LoadModules()
 		local selected = CollectionsJournal_GetTab(CollectionsJournal)
 		BetterWardrobeCollectionFrame:SetShown(selected == 5) 
 
-		if IsAddOnLoaded("ElvUI") then 
+		if C_AddOns.IsAddOnLoaded("ElvUI") then 
 			addon.ApplyElvUISkin()
 		end
 
