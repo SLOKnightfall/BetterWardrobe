@@ -8,7 +8,7 @@ addon.TransmogOutfits = TransmogOutfits
 
 function TransmogOutfits.GetOutfits() return {} end
 
-if not IsAddOnLoaded("TransmogOutfits") then return end
+if not C_AddOns.IsAddOnLoaded("TransmogOutfits") then return end
 if true then return end -- TODO remove when updated
 
 function TransmogOutfits.GetOutfits() 

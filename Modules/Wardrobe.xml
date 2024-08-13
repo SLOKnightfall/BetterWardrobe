@@ -322,7 +322,7 @@
 		<Frames>
 
 			<Frame parentKey="Variants" mixin = "BetterWardrobeSetsDetailsAltItemMixin" hidden="false">
-				<Size x="20" y="35"/>
+				<Size x="35" y="15"/>
 				<Anchors>
 					<Anchor point="TOPRIGHT" relativeKey="$parent" x="5" y = "5"/>
 				</Anchors>
@@ -331,13 +331,13 @@
 						<Texture parentKey="Icon" file="Interface\CHATFRAME\UI-InChatFriendsArrow">
 							<Size x="15" y="15"/>
 							<Anchors>
-								<Anchor point="RIGHT" relativeKey="$parent" relativePoint="RIGHT" x="0" y="3"/>
+								<Anchor point="RIGHT" relativeKey="$parent" relativePoint="RIGHT" x="2" y="-7"/>
 							</Anchors>
 						</Texture>
 						<FontString parentKey="Count" inherits="GameFontDisableSmallLeft" justifyH="CENTER" maxLines="1" text="0">
 							<Size x="20" y="20"/>
 							<Anchors>
-								<Anchor point="RIGHT" relativeKey="$parent.IconFrame" relativePoint="LEFT"  x="7" y="1"/>
+								<Anchor point="TOPRIGHT" relativeKey="$parent.IconFrame" relativePoint="TOPRIGHT"  x="-7" y="-3"/>
 							</Anchors>
 						</FontString>
 					</Layer>
@@ -944,7 +944,7 @@
 			<DropdownButton parentKey="TransmogOptionsButton" name="BW_TransmogOptionsButton" inherits="WowStyle1FilterDropdownTemplate" text="Options" hidden="false" mixin="BetterWardrobeTransmogOptionsDropdownMixin">
 				<Size x="93" y="22"/>
 				<Anchors>
-					<Anchor point="BOTTOMRIGHT" x="-53" y="80"/>
+					<Anchor point="BOTTOMRIGHT" x="-53" y="20"/>
 				</Anchors>
 				<Scripts>
 					<OnEnable>
@@ -1559,12 +1559,12 @@
 				<Frames>
 					<Frame parentKey="PagingFrame" inherits="BW_CollectionsPagingFrameTemplate">
 						<Anchors>
-							<Anchor point="BOTTOM" x="22" y="38"/>
+							<Anchor point="BOTTOM" x="22" y="10"/>
 						</Anchors>
 					</Frame>
 					<DressUpModel parentArray="Models" parentKey="ModelR1C1" inherits="BetterWardrobeSetsTransmogModelTemplate">
 						<Anchors>
-							<Anchor point="TOPLEFT" x="50" y="-50"/>
+							<Anchor point="TOPLEFT" x="50" y="-20"/>
 						</Anchors>
 					</DressUpModel>
 					<DressUpModel parentArray="Models" parentKey="ModelR1C2" inherits="BetterWardrobeSetsTransmogModelTemplate">
@@ -1584,7 +1584,7 @@
 					</DressUpModel>
 					<DressUpModel parentArray="Models" parentKey="ModelR2C1" inherits="BetterWardrobeSetsTransmogModelTemplate">
 						<Anchors>
-							<Anchor point="TOPLEFT" relativeKey="$parent.ModelR1C1" relativePoint="BOTTOMLEFT" x="0" y="-14"/>
+							<Anchor point="TOPLEFT" relativeKey="$parent.ModelR1C1" relativePoint="BOTTOMLEFT" x="0" y="-55"/>
 						</Anchors>
 					</DressUpModel>
 					<DressUpModel parentArray="Models" parentKey="ModelR2C2" inherits="BetterWardrobeSetsTransmogModelTemplate">

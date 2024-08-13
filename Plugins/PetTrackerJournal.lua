@@ -5,7 +5,7 @@ addon = LibStub("AceAddon-3.0"):GetAddon(addonName)
 function addon:UpdatePetTracker()
 end
 
-if not IsAddOnLoaded("PetTracker") then return end
+if not C_AddOns.IsAddOnLoaded("PetTracker") then return end
 
 --Fixes frame issues when PetTracker is being used
 function addon:UpdatePetTracker()

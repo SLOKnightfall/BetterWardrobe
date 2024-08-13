@@ -362,7 +362,7 @@ function CollectionList:OptionButton_OnClick(button)
 end
 
 function CollectionList:AddMogItData()
-	MogItLoaded = IsAddOnLoaded("MogIt")
+	MogItLoaded = C_AddOns.IsAddOnLoaded("MogIt")
 	 if not MogItLoaded and CollectionList:SelectedCollectionList() == "MOGIT" then
 	 	CollectionList:SelectedCollectionList(1)
 	 end
@@ -484,7 +484,7 @@ end
 
 local TSMSources
 local function TSMPricelookup(itemID)
-	if (not IsAddOnLoaded("TradeSkillMaster")) then return "" end
+	if (not C_AddOns.IsAddOnLoaded("TradeSkillMaster")) then return "" end
 
 	if not TSMSources  then
 		TSMSources = {}

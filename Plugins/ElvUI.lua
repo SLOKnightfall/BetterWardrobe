@@ -2,7 +2,7 @@
 	Elvui Plugin to reskin new/changed UI
 ]]
 
-if not IsAddOnLoaded("ElvUI") then return end
+if not C_AddOns.IsAddOnLoaded("ElvUI") then return end
 local addonName, addon = ...
 
 local E, L, V, P, G = unpack(ElvUI); --Import: Engine, Locales, PrivateDB, ProfileDB, GlobalDB

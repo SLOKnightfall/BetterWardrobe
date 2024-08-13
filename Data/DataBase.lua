@@ -21,7 +21,7 @@ local function isPVP(index)
 end
 
 local CLASS_NAMES_LOCALIZED = {}
-FillLocalizedClassList(CLASS_NAMES_LOCALIZED) --Fills a table with localized class names, callable with localization-independent class IDs
+--FillLocalizedClassList(CLASS_NAMES_LOCALIZED) --Fills a table with localized class names, callable with localization-independent class IDs
 
 local ARMOR_MASK = Globals.ARMOR_MASK
 local EmptyArmor = Globals.EmptyArmor
@@ -234,7 +234,6 @@ do
 
 			
 					setData.uiOrder = UIID_Counter[setData.expansionID] -- id * 100
-					UIID_Counter[setData.expansionID] = UIID_Counter[setData.expansionID] +1
 					SET_INDEX[newID] = setData
 					ArmorDB[armorType][newID] = setData
 				end

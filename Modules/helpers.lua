@@ -52,8 +52,8 @@ function xxxx()
 
 
 
-	if not IsAddOnLoaded("BetterWardrobe_SourceData") then
-		LoadAddOn("BetterWardrobe_SourceData")
+	if not C_AddOns.IsAddOnLoaded("BetterWardrobe_SourceData") then
+		C_AddOns.LoadAddOn("BetterWardrobe_SourceData")
 	end
 	local ColorTable = (_G.BetterWardrobeData and _G.BetterWardrobeData.ColorTable) or {}
 BTT = {}
