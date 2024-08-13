@@ -506,6 +506,8 @@ L["NOTE_125"] = "Plunderlord's Finery"
 L["NOTE_125"] = "Plunderlords's Finery"
 L["NOTE_126"] = "Class Starting Set"
 L["NOTE_127"] = "Trading Post Class Set"
+L["NOTE_128"] = "War Within Launch Event Set"
+
 
 L["Swap to Better Wardrobe View"] = true
 L["Swap to Extended Transmog Sets View"] = true
