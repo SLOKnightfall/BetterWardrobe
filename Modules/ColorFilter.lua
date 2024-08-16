@@ -120,9 +120,9 @@ function addon:CompareLAB(R1, G1, B1, R2, G2, B2)
 end
 
 local function SelectColor()
-	if not IsAddOnLoaded("BetterWardrobe_SourceData") then
-		EnableAddOn("BetterWardrobe_SourceData")
-		LoadAddOn("BetterWardrobe_SourceData")
+	if not C_AddOns.IsAddOnLoaded("BetterWardrobe_SourceData") then
+		C_AddOns.EnableAddOn("BetterWardrobe_SourceData")
+		C_AddOns.LoadAddOn("BetterWardrobe_SourceData")
 	end
 	local ColorTable = (_G.BetterWardrobeData and _G.BetterWardrobeData.ColorTable) or {}
 	ColorPickerFrame.hasOpacity = false
@@ -192,18 +192,10 @@ end
 function addon.Init:InitFilterButtons()
 	local frame = CreateFrame("Button", nil, BetterWardrobeCollectionFrame)
 	local atTransmogrifier = C_Transmog.IsAtTransmogNPC();
-
+	frame:ClearAllPoints()
+	frame:SetPoint("TOPRIGHT", BW_SortDropDown, 30, 0)
 	frame:SetSize(25, 25)
-	frame:SetScript("OnShow",function()
-			frame:ClearAllPoints()
-			local atTransmogrifier = C_Transmog.IsAtTransmogNPC();
 
-			if atTransmogrifier then
-				addon.ColorFilterFrame:SetPoint("TOPRIGHT", BW_SortDropDown, 20, 0)
-			else
-				addon.ColorFilterFrame:SetPoint("TOPRIGHT", BW_SortDropDown, 15, 0)
-			end
-		end)
 
 	frame:SetScript("OnHide",function()
 		ColorPickerFrame:Hide()

@@ -491,7 +491,7 @@ function BW_DressingRoomFrameMixin:OnLoad()
 	highlight:SetPoint("TOPLEFT",DressUpFrame.LinkButton, "TOPLEFT",-3,-1 )
 	highlight:SetPoint("BOTTOMRIGHT",DressUpFrame.LinkButton, "BOTTOMRIGHT",-8,5 )
 --]]
-	if IsAddOnLoaded("Narcissus") then
+	if C_AddOns.IsAddOnLoaded("Narcissus") then
 		BW_DressingRoomFrame.BW_DressingRoomSwapFormButton:Hide();
 	end
 end
@@ -599,7 +599,7 @@ local function BW_DressingRoomImportButton_OnClick(self)
 				if setType == "set" then
 					sources = C_TransmogSets.GetSetSources(setID)
 				elseif setType == "extraset" then
-					sources = addon.GetSetsources(setID)
+					sources = addon.SetsDataProvider:GetSetSources(setID) --addon.GetSetsources(setID)
 				end
 
 				if not sources then return end

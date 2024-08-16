@@ -27,7 +27,7 @@ Libs\LibAppropriateitems-1.0\lib.xml
 #Libs\LibDataBroker-1.1\LibDataBroker-1.1.lua
 #Libs\LibTextDump-1.0\LibTextDump-1.0.lua
 Libs\AceSerializer-3.0\AceSerializer-3.0.xml
-Libs\TaintLess\TaintLess.xml
+#Libs\TaintLess\TaintLess.xml
 
 #Locale
 Locale\enUS.lua

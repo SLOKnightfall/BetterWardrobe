@@ -15,7 +15,7 @@ end
 function MogIt:RenameSet(setName)
 end
 
-if not IsAddOnLoaded("MogIt") then return end
+if not C_AddOns.IsAddOnLoaded("MogIt") then return end
 
 local  mog = _G["MogIt"]
 local L = LibStub("AceLocale-3.0"):GetLocale(addonName)

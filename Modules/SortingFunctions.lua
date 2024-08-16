@@ -27,23 +27,8 @@ local TAB_SAVED_SETS = 4
 
 local factionNames = { playerFaction = "", opposingFaction = "" };
 
-local ClassName;
 local ClassIndex = nil;
-local ClassMaskMap = {
-    [1] = {1, 2, 32, 35}, -- Plate Wearer
-    [2] = {1, 2, 32, 35}, -- Plate Wearer
-    [3] = {4, 64, 4096, 4164},    -- Mail Wearer
-    [4] = {8, 512, 1024, 2048, 3592, 11784}, -- Leather Wearer
-    [5] = {16, 128, 256, 400}, -- Cloth Wearer
-    [6] = {1, 2, 32, 35}, -- Plate Wearer
-    [7] = {4, 64, 4096, 4164},    -- Mail Wearer
-    [8] = {16, 128, 256, 400}, -- Cloth Wearer
-    [9] = {16, 128, 256, 400}, -- Cloth Wearer
-    [10] = {8, 512, 1024, 2048, 3592, 11784}, -- Leather Wearer
-    [11] = {8, 512, 1024, 2048, 3592, 11784}, -- Leather Wearer
-    [12] = {8, 512, 1024, 2048, 3592, 11784}, -- Leather Wearer
-    [13] = {4, 64, 4096, 4164},    -- Mail Wearer
-}
+
 local ClassNameMask = {
     [1] = "Warrior",
     [2] = "Paladin",
@@ -185,9 +170,9 @@ end
 
 local function SortColor(sets)
 	local comparison = function(source1, source2)
-		if not IsAddOnLoaded("BetterWardrobe_SourceData") then
-			EnableAddOn("BetterWardrobe_SourceData")
-			LoadAddOn("BetterWardrobe_SourceData")
+		if not C_AddOns.IsAddOnLoaded("BetterWardrobe_SourceData") then
+			C_AddOns.EnableAddOn("BetterWardrobe_SourceData")
+			C_AddOns.LoadAddOn("BetterWardrobe_SourceData")
 		end
 
 		if not source1 or not source2 then
@@ -391,9 +376,9 @@ end
 
 local function SortItemByAppearance(self)
 	local comparison = function(source1, source2)
-		if not IsAddOnLoaded("BetterWardrobe_SourceData") then
-			LoadAddOn("BetterWardrobe_SourceData")
-			EnableAddOn("BetterWardrobe_SourceData")
+		if not C_AddOns.IsAddOnLoaded("BetterWardrobe_SourceData") then
+			C_AddOns.LoadAddOn("BetterWardrobe_SourceData")
+			C_AddOns.EnableAddOn("BetterWardrobe_SourceData")
 		end
 		local ItemAppearance = (_G.BetterWardrobeData and _G.BetterWardrobeData.ItemAppearance) or {}
 
@@ -433,9 +418,9 @@ local function SortByItemSource(self)
 					end
 				end
 			else
-				if not IsAddOnLoaded("BetterWardrobe_SourceData") then
-					EnableAddOn("BetterWardrobe_SourceData")
-					LoadAddOn("BetterWardrobe_SourceData")
+				if not C_AddOns.IsAddOnLoaded("BetterWardrobe_SourceData") then
+					C_AddOns.EnableAddOn("BetterWardrobe_SourceData")
+					C_AddOns.LoadAddOn("BetterWardrobe_SourceData")
 				end
 				local ItemAppearance = (_G.BetterWardrobeData and _G.BetterWardrobeData.ItemAppearance) or {}
 				--local ItemAppearance = addon.ItemAppearance or {}
@@ -583,9 +568,9 @@ end
 
 local function SortSetByAppearance(sets) 
 	local comparison = function(source1, source2)
-		if not IsAddOnLoaded("BetterWardrobe_SourceData") then
-			EnableAddOn("BetterWardrobe_SourceData")
-			LoadAddOn("BetterWardrobe_SourceData")
+		if not C_AddOns.IsAddOnLoaded("BetterWardrobe_SourceData") then
+			C_AddOns.EnableAddOn("BetterWardrobe_SourceData")
+			C_AddOns.LoadAddOn("BetterWardrobe_SourceData")
 		end
 		local ItemAppearance = (_G.BetterWardrobeData and _G.BetterWardrobeData.ItemAppearance) or {}
 		--local ItemAppearance = addon.ItemAppearance or {}
@@ -718,6 +703,8 @@ function addon.SortVariantSet(sets, reverseUIOrder, ignorePatchID)
 				----	return false;
 				----end
 			----end
+
+			--[[
 			if ( set1.classMask and set1.classMask ~= set2.classMask ) then
 				if ClassNameMask[set1.classMask] == nil and ClassNameMask[set2.classMask] ~= nil then return true;  end
 				if ClassNameMask[set2.classMask] == nil and ClassNameMask[set1.classMask] ~= nil then return false; end
@@ -725,7 +712,7 @@ function addon.SortVariantSet(sets, reverseUIOrder, ignorePatchID)
 				if set2.classMask == ClassToMask[ClassIndex] then return false; end
 				return set1.classMask < set2.classMask;
 			end
-
+]]--
 
 		if ( set1.expansionID ~= set2.expansionID ) then
 			return set1.expansionID > set2.expansionID;

@@ -676,6 +676,9 @@ local altitems = {
 
 --Plunderlord
 	[198627] = 218283, --eyepatch with out hat
+	[222868] = 218283, --eyepatch with out hat
+	[198786] = {184346,184347,184348,222847}, --beanies
+	[198785] = {96286,96285,184350,184349}, --tricorns
 }
 
 

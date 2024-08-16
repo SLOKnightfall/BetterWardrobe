@@ -12,7 +12,7 @@ end
 --local oldDisplaySet =  WardrobeCollectionFrame.SetsCollectionFrame.DisplaySet
 --SetsDataProvider = CreateFromMixins(WardrobeSetsDataProviderMixin);
 
-if not IsAddOnLoaded("ExtendedSets") then return end
+if not C_AddOns.IsAddOnLoaded("ExtendedSets") then return end
 
 function addon:InitExtendedSetsSwap() 
 	local button = CreateFrame("Button", nil, CollectionsJournal)

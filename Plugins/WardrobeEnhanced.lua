@@ -8,7 +8,7 @@ addon = LibStub("AceAddon-3.0"):GetAddon(addonName)
 function addon.Init:UpdateWardrobeEnhanced()
 end
 
-if not IsAddOnLoaded("LegionWardrobe") then return end
+if not C_AddOns.IsAddOnLoaded("LegionWardrobe") then return end
 if true then return end -- TODO Remove once updated
 local setsButton_tooltip = "Sets"
 local resetFilterButton_tooltip = "Reset filter"
@@ -303,7 +303,7 @@ function addon.Init:UpdateWardrobeEnhanced()
 		return
 	end
 
-	--LoadAddOn("LegionWardrobeData")
+	--C_AddOns.LoadAddOn("LegionWardrobeData")
 
 end
 

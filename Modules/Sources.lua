@@ -178,9 +178,9 @@ local function GetSourceInfo(itemID)
 end
 
 local function BuildSourceList(visualID)
-	if not IsAddOnLoaded("BetterWardrobe_SourceData") then
-		EnableAddOn("BetterWardrobe_SourceData")
-		LoadAddOn("BetterWardrobe_SourceData")
+	if not C_AddOns.IsAddOnLoaded("BetterWardrobe_SourceData") then
+		C_AddOns.EnableAddOn("BetterWardrobe_SourceData")
+		C_AddOns.LoadAddOn("BetterWardrobe_SourceData")
 		vendorDB = (_G.BetterWardrobeData and _G.BetterWardrobeData.vendorDB) or {}
 		locationDB = (_G.BetterWardrobeData and _G.BetterWardrobeData.locationDB) or {}
 	end

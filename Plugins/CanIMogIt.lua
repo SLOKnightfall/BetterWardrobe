@@ -6,7 +6,7 @@ addon = LibStub("AceAddon-3.0"):GetAddon(addonName)
 function addon:UpdateCanIMogIt() 
 end
 
-if not IsAddOnLoaded("CanIMogIt") then return end
+if not C_AddOns.IsAddOnLoaded("CanIMogIt") then return end
 local addonName, addon = ...
 --addon = LibStub("AceAddon-3.0"):NewAddon(addon, addonName, "AceEvent-3.0", "AceConsole-3.0", "AceHook-3.0")
 addon = LibStub("AceAddon-3.0"):GetAddon(addonName)

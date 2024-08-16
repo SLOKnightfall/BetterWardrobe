@@ -476,14 +476,56 @@ local function CheckMissingLocation(setInfo)
 	return not filtered
 end
 
+
+local function OpposingFaction(faction)
+	local faction = UnitFactionGroup("player")
+	if faction == "Horde" then
+		return "Alliance", "Stormwind", 1 -- "Kul Tiras",
+	elseif faction == "Alliance" then
+		return "Horde", "Orgrimmar", 2 -- "Zandalar",
+	end
+end
+
 addon.RefreshFilter = true
 function addon:FilterSets(setList, setType)
-	if 	C_Transmog.IsAtTransmogNPC() then return setList 
-	else
---return setList
-	end
-
 	local FilterSets = {}
+	local searchValue = BetterWardrobeCollectionFrameSearchBox:GetText()
+	local filterList = setList
+	if searchValue ~= ""  then
+		filterList = addon.searchSet
+	end
+	local faction = UnitFactionGroup("player")
+	local opFaction = OpposingFaction(faction)
+	local requiredFaction = true
+	if C_Transmog.IsAtTransmogNPC() then 
+		for i, data in pairs(setList) do
+				 setData = BetterWardrobeSetsDataProviderMixin:GetSetSourceData(data.setID)
+			local holidayName 
+			--for sourceID,_ in pairs(setData.sources) do
+				--holidayName = C_TransmogCollection.GetSourceRequiredHoliday(sourceID);
+				--if holidayName then break end
+			--end
+--print(faction)
+--print(opFaction)
+			if data.requiredFaction == 1  then
+				data.requiredFaction = "Alliance"
+			elseif data.requiredFaction == 2 then
+				data.requiredFaction = "Horde"
+			end
+			
+			if data.requiredFaction and data.requiredFaction ~= faction then
+				requiredFaction = false
+			elseif not data.requiredFaction or data.requiredFaction and data.requiredFaction == faction then
+				requiredFaction = true
+			end
+		
+			local tab = (BetterWardrobeCollectionFrame.selectedTransmogTab == 2 and data.tab == 2) or (BetterWardrobeCollectionFrame.selectedTransmogTab == 3 and data.tab == 3)
+			if tab and not holidayName and requiredFaction then
+				tinsert(FilterSets, data)
+			end
+		end
+		return FilterSets
+	end
 	local searchString = string.lower(WardrobeCollectionFrameSearchBox:GetText())
 	local filterCollected = addon.Filters.Base.filterCollected
 	local missingSelection = addon.Filters.Base.missingSelection
@@ -497,9 +539,8 @@ function addon:FilterSets(setList, setType)
 		--xpacSelection = addon.Filters.Extra.xpacSelection
 	--end
 
-	setList = addon:SearchSets(setList)
 
-	for i, data in ipairs(setList) do
+	for i, data in ipairs(filterList) do
 		local setData = BetterWardrobeSetsDataProviderMixin:GetSetSourceData(data.setID)
 		local count , total = setData.numCollected, setData.numTotal
 		local expansion = data.expansionID
@@ -516,31 +557,61 @@ function addon:FilterSets(setList, setType)
 		if ((filterCollected[1] and collected) or (filterCollected[2] and not collected)) and
 			--CheckMissingLocation(data) and
 			xpacSelection[expansion] and
-			--not duplicate and
 			sourcefilter and
-				tab then
+			tab then
 			--(not unavailable or (addon.Profile.HideUnavalableSets and unavailable)) then ----and
 			tinsert(FilterSets, data)
 		end
 	end
 
-	
 	return FilterSets
+end
+
+
+local function SearchValueFound(set, searchValue)
+	local start, _ = string.find(string.lower(set.name), searchValue);
+	if start ~= nil then return true; end
+	
+	if set.label then
+		start, _ = string.find(string.lower(set.label), searchValue);
+		if start ~= nil then return true; end
+	end
+	
+	local varSets = addon.SetsDataProvider:GetVariantSets(set.baseSet);
+	
+	for id,varSet in pairs(varSets) do
+		start, _ = string.find(string.lower(varSet.name), searchValue);
+		if start ~= nil then return true; end
+	end
+	
+	return false;
 end
 
 
 function addon:SearchSets(setList)
 	local searchedSets = {}
 	local searchString = string.lower(BetterWardrobeCollectionFrameSearchBox:GetText())
+ 	local atTransmogrifier = C_Transmog.IsAtTransmogNPC()
 
-	setList = Sets:ClearHidden(setList)
 	if searchString == "" then return setList end
-	for i, data in ipairs(setList) do
-		if (searchString and string.find(string.lower(data.name), searchString)) or (data.label and string.find(string.lower(data.label), searchString)) or (data.description and string.find(string.lower(data.description), searchString)) or (data.className and string.find(string.lower(data.className), searchString)) then
-			tinsert(searchedSets, data)
+
+	if atTransmogrifier then
+		setList = Sets:ClearHidden(setList)
+		for i, data in ipairs(setList) do
+			if (searchString and string.find(string.lower(data.name), searchString)) or (data.label and string.find(string.lower(data.label), searchString)) or (data.description and string.find(string.lower(data.description), searchString)) or (data.className and string.find(string.lower(data.className), searchString)) then
+				tinsert(searchedSets, data)
+			end
 		end
+		return searchedSets
+
+	else
+		for _, baseSet in ipairs(setList) do
+			if SearchValueFound(baseSet, searchValue) then
+				table.insert(addon.searchSet, baseSet);
+			end
+		end
+		return searchedSets
 	end
-	return searchedSets
 end
 
 

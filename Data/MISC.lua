@@ -68,9 +68,6 @@ addon.MiscSets.SPECIAL_SETS = {
 	[1903] = "Wendigo Woolies",
 	[1913] = "Eternal Traveler",
 	[1914] = "Sprite Darters",
-	[1902] = "Renowned Explorer's Attire",
-	[1998] = "Renowned Explorer's Attire",
-	[1999] = "Renowned Explorer's Attire",
 	[2200] = "Celestial Observers",
 	[2482] = "Fireplume Regalia",
 	[2857] = "Waveborne Diplomats",
@@ -143,9 +140,29 @@ addon.MiscSets.HERITAGE_SETS = {
 
 addon.MiscSets.customGroups = {
 	[3443] = "Plunderlord",
-	[3486] = "Plunderlord",
-	[60357] = "Plunderlord",
-	[60358] = "Plunderlord",
-
-	
+	[3875] = "Plunderlord",
+	[50358] = "Plunderlord",
+	[50359] = "Plunderlord",
+	[3448] = "Spring Reveler",
+	[3444] = "Spring Reveler",
+	[3361] = "Spring Reveler",
+	[3446] = "Spring Reveler",
+	[1902] = "Azerothian Archives", --"Renowned Explorer's Attire",
+	[1998] = "Azerothian Archives", --"Renowned Explorer's Attire",
+	[1999] = "Azerothian Archives", --"Renowned Explorer's Attire",
+	[3306] = "Trading Post",
 }
+
+
+addon.MiscSets.CustomDesc = {
+	[3875] = "Plunderlord's Radiant Finery",
+	[3447] = "World Drop - Turquoise",
+	[3446] = "World Drop - Turquoise",
+	[3358] = "In-Game Shop - Twilight Witch",
+	[3355] = "In-Game Shop - Shadowbane",
+	[3354] = "In-Game Shop - Venombane",
+	[3190] = "Trading Post - Formal",
+	[3189] = "In-Game Shop - Masquerade",
+}
+
+		
