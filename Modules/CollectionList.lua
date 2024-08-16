@@ -327,7 +327,7 @@ end
 --Dropdownmenu for the Collection List
 function CollectionList:CreateDropdown()
 	BW_CollectionList_Dropdown = CreateFrame("DropdownButton", "BW_CollectionList_Dropdown", BW_ColectionListFrame, "WowStyle1DropdownTemplate")
-	BW_CollectionList_Dropdown:SetPoint("BOTTOM", -80, 15)
+	BW_CollectionList_Dropdown:SetPoint("BOTTOM", BW_ColectionListFrame, "BOTTOM", 0, 15)
 	--BW_CollectionList_Dropdown:SetScript("OnMouseUp", function(button) 
 BW_CollectionList_Dropdown:SetupMenu(GeneratorFunction);
 
@@ -339,7 +339,7 @@ BW_CollectionList_Dropdown:SetupMenu(GeneratorFunction);
 
 	local button = CreateFrame("Button", "BW_CollectionListOptionsButton", BW_CollectionList_Dropdown, "SquareIconButtonTemplate")
 	button:SetSize(30,30)
-	button:SetPoint("LEFT", "BW_CollectionList_Dropdown", "RIGHT", 1, -2)
+	button:SetPoint("LEFT", "BW_CollectionList_Dropdown", "RIGHT", 1, 0)
 	button.Icon:SetTexture("Interface\\Buttons\\UI-OptionsButton")
 	button.Icon:SetSize(15,15)
 	button:SetScript("OnClick", function(button) CollectionList:OptionButton_OnClick(button) end)

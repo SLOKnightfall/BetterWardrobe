@@ -187,6 +187,7 @@ function BetterWardrobeOutfitDropdownMixin:OnShow()
 end
 
 function BetterWardrobeOutfitDropdownMixin:SelectOutfit(outfitID)
+	if not outfitID then return end;
 	self:SetSelectedOutfitID(outfitID);
 	self:LoadOutfit(outfitID);
 	self:UpdateSaveButton();
@@ -355,7 +356,7 @@ local function isHiddenAppearance(appearanceID, set_appearanceID, slotID)
 end
 
 function BetterWardrobeOutfitDropdownMixin:IsOutfitDressed()
-	if not self.selectedOutfitID then
+	if not self.selectedOutfitID or self.selectedOutfitID == "" then
 		return true
 	end
 

@@ -657,7 +657,10 @@ end
 
 function BetterWardrobeOutfitDropdownOverrideMixin:GetLastOutfitID()
 	local specIndex = GetSpecialization();
-	return addon.OutfitDB.char.lastTransmogOutfitIDSpec[specIndex];
+	local lastOutfit = addon.OutfitDB.char.lastTransmogOutfitIDSpec[specIndex]
+
+	if lastOutfit == "" then lastOutfit = nil end
+	return lastOutfit;
 	--return tonumber(GetCVar(addon.OutfitDB.char.lastTransmogOutfitIDSpec[specIndex]));
 end
 
@@ -1182,7 +1185,7 @@ function BetterWardrobeCollectionFrameMixin:SetContainer(parent)
 		self.ItemsCollectionFrame.SlotsFrame:Hide();
 		self.ItemsCollectionFrame.BGCornerTopLeft:Show();
 		self.ItemsCollectionFrame.BGCornerTopRight:Show();
-		self.ItemsCollectionFrame.WeaponDropdown:SetPoint("TOPRIGHT", -48, -26);
+		self.ItemsCollectionFrame.WeaponDropdown:SetPoint("TOPRIGHT", -48, -38);
 		self.ClassDropdown:Hide();
 		self.ItemsTab:SetPoint("TOPLEFT", 8, -28);
 		self:SetTab(self.selectedTransmogTab);
@@ -1214,7 +1217,7 @@ function BetterWardrobeCollectionFrameMixin:SetTab(tabID)
 		--SavedOutfitDropDownMenu:Hide();
 	--end
 
-	self.BW_SetsHideSlotButton:Hide();
+	--self.BW_SetsHideSlotButton:Hide();
 	BetterWardrobeVisualToggle.VisualMode = false;
 	self.TransmogOptionsButton:Hide();
 	----self.ItemsCollectionFrame:Hide();
@@ -1337,7 +1340,7 @@ function BetterWardrobeCollectionFrameMixin:SetTab(tabID)
 			self.FilterButton:Show();
 			self.FilterButton:SetEnabled(true);
 			self:InitBaseSetsFilterButton();
-			self.BW_SetsHideSlotButton:Show();
+			--self.BW_SetsHideSlotButton:Show();
 			self.ClassDropdown:Show();
 
 
@@ -5664,6 +5667,20 @@ function BetterWardrobeSetsCollectionMixin:DisplaySavedSet(setID)
 		for i, sourceID in pairs(setInfo.sources) do	
 			tinsert(sortedSources, sourceID);
 		end
+	elseif  setType == "SavedExtra" then
+		for i, sourceID in ipairs(setInfo.sources) do
+			if sourceID ~= 0 then 
+				tinsert(sortedSources, sourceID);
+			end
+		end
+
+		if setInfo.offShoulder and setInfo.offShoulder ~= 0 then
+			local baseSourceID = C_Transmog.GetSlotVisualInfo(TransmogUtil.GetTransmogLocation("SHOULDERSLOT", Enum.TransmogType.Appearance, Enum.TransmogModification.Secondary));
+			if setInfo.offShoulder ~= baseSourceID then
+				offShoulder = setInfo.offShoulder;
+				tinsert(sortedSources, offShoulderindex , offShoulder);
+			end	
+		end	
 	elseif setType == "SavedTransmogOutfit"  or setType == "SavedExtra" then
 		for i, itemID in pairs(setInfo.items) do
 			if itemID ~= 0 then 
@@ -6329,7 +6346,7 @@ function BetterWardrobeSetsScrollFrameButtonMixin:Init(elementData)
 
 	self.Store:SetShown(addon.MiscSets.TRADINGPOST_SETS[self.setID] or displayData.filter == 12);
 	self.Remix:SetShown(addon.MiscSets.REMIX_SETS[self.setID] );
-		self.EditButton:Hide();
+	self.EditButton:Hide();
 
 	self.variantInfo = variantsTooltip(elementData, variantSets);
 
@@ -6994,18 +7011,20 @@ function BetterWardrobeSetsTransmogMixin:UpdateSets()
 						model.AltItemtems:Hide()
 
 					end
-			else
-			if ( model.setID ~= set.setID ) then
-				model:Undress();
-				--local sourceData = GetSetSourceData(set.setID, set.sources);
-				local sources = SetsDataProvider:GetSetSources(set.setID, set);
 
-				for sourceID in pairs(sources) do
-					--if (not Profile.HideMissing and not BW_WardrobeToggle.VisualMode) or (Profile.HideMissing and BW_WardrobeToggle.VisualMode) or (Profile.HideMissing and isMogKnown(sourceID)) then 
-					if (not addon.Profile.HideMissing and (not BetterWardrobeVisualToggle.VisualMode or (Sets.isMogKnown(sourceID) and BetterWardrobeVisualToggle.VisualMode))) or 
-						(addon.Profile.HideMissing and (BetterWardrobeVisualToggle.VisualMode or Sets.isMogKnown(sourceID))) then 
+			elseif setType == "SavedExtra" then 
+				model:Undress()
+				local primaryAppearances = {}
+				local sourceData = SetsDataProvider:GetSetSources(set.setID)
+				local tab = BetterWardrobeCollectionFrame.selectedTransmogTab;
+				for _, sourceID in ipairs(sourceData) do
+					if (tab == 4 and not BetterWardrobeVisualToggle.VisualMode) or
+								(CollectionsJournal:IsShown()) or
+								(not addon.Profile.HideMissing and (not BetterWardrobeVisualToggle.VisualMode or (Sets.isMogKnown(sourceID) and BetterWardrobeVisualToggle.VisualMode))) or
+								(addon.Profile.HideMissing and (BetterWardrobeVisualToggle.VisualMode or Sets.isMogKnown(sourceID))) then
 						model:TryOn(sourceID)
 					end
+
 					if not hasAlternateForm and addon:CheckAltItem(sourceID) then
 						hasAlternateForm = true
 					end
@@ -7015,8 +7034,29 @@ function BetterWardrobeSetsTransmogMixin:UpdateSets()
 						model.AltItemtems:Hide()
 					end
 				end
+			else
+				if ( model.setID ~= set.setID ) then
+					model:Undress();
+					--local sourceData = GetSetSourceData(set.setID, set.sources);
+					local sources = SetsDataProvider:GetSetSources(set.setID);
+
+					for sourceID in pairs(sources) do
+						--if (not Profile.HideMissing and not BW_WardrobeToggle.VisualMode) or (Profile.HideMissing and BW_WardrobeToggle.VisualMode) or (Profile.HideMissing and isMogKnown(sourceID)) then 
+						if (not addon.Profile.HideMissing and (not BetterWardrobeVisualToggle.VisualMode or (Sets.isMogKnown(sourceID) and BetterWardrobeVisualToggle.VisualMode))) or 
+							(addon.Profile.HideMissing and (BetterWardrobeVisualToggle.VisualMode or Sets.isMogKnown(sourceID))) then 
+							model:TryOn(sourceID)
+						end
+						if not hasAlternateForm and addon:CheckAltItem(sourceID) then
+							hasAlternateForm = true
+						end
+						if hasAlternateForm then
+							model.AltItemtems:Show()--local f = CreateFrame("Frame", "112cd2", model, "AltItemtemplate")
+						else
+							model.AltItemtems:Hide()
+						end
+					end
+				end
 			end
-		end
 			local transmogStateAtlas;
 			if ( set.setID == self.appliedSetID and set.setID == self.selectedSetID ) then
 				transmogStateAtlas = "transmog-set-border-current-transmogged";

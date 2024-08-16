@@ -62,54 +62,54 @@ WowSets["MAIL"] = WowSets[3]
 WowSets["PLATE"] = WowSets[4]
 WowSets["COSMETIC"] = WowSets[5]
 
-local BaseList = {}
-addon.BaseList = BaseList
-local BaseListLabels = {}
-addon.BaseListLabels = BaseListLabels
-local BaseIDs = {}
-addon.BaseIDs = BaseIDs
-local VariantSets = {};
-addon.VariantSets = VariantSets
-local VariantIDs = {};
-addon.VariantIDs = VariantIDs
+local baseList = {}
+addon.BaseList = baseList
+local baseListLabels = {}
+addon.BaseListLabels = baseListLabels
+local baseIDs = {}
+addon.BaseIDs = baseIDs
+local variantSets = {};
+addon.VariantSets = variantSets
+local variantIDs = {};
+addon.VariantIDs = variantIDs
 
 local function AddVariant(set, baseSetID)
-	if not VariantSets[baseSetID] then
-		VariantSets[baseSetID] = {};
+	if not variantSets[baseSetID] then
+		variantSets[baseSetID] = {};
 	end
 	
 	set.baseSetID = baseSetID;
-	tinsert(VariantSets[baseSetID], set)
-	VariantIDs[set.setID] = baseSetID;
+	tinsert(variantSets[baseSetID], set)
+	variantIDs[set.setID] = baseSetID;
 end
 
 local function AddVariantToBaseSet(set, newBaseID)
-	if not VariantSets[newBaseID] then
-		VariantSets[newBaseID] = {};
+	if not variantSets[newBaseID] then
+		variantSets[newBaseID] = {};
 	end
 	
 	local baseID = set.baseSetID;
 	--if not baseID then baseID = set.setID; end
 	
-	if VariantSets[baseID] then
-		for i=1,#VariantSets[baseID] do
-			tinsert(VariantSets[newBaseID], VariantSets[baseID][i]);
-			VariantIDs[VariantSets[baseID][i].setID] = newBaseID;
-			VariantSets[baseID][i].baseSetID = newBaseID;
+	if variantSets[baseID] then
+		for i=1,#variantSets[baseID] do
+			tinsert(variantSets[newBaseID], variantSets[baseID][i]);
+			variantIDs[variantSets[baseID][i].setID] = newBaseID;
+			variantSets[baseID][i].baseSetID = newBaseID;
 		end
 	end
 
-	if VariantSets[set.setID] then
-		for i=1,#VariantSets[set.setID] do
-			tinsert(VariantSets[newBaseID], VariantSets[set.setID][i]);
-			VariantIDs[VariantSets[set.setID][i].setID] = newBaseID;
-			VariantSets[set.setID][i].baseSetID = newBaseID;
+	if variantSets[set.setID] then
+		for i=1,#variantSets[set.setID] do
+			tinsert(variantSets[newBaseID], variantSets[set.setID][i]);
+			variantIDs[variantSets[set.setID][i].setID] = newBaseID;
+			variantSets[set.setID][i].baseSetID = newBaseID;
 		end
 	end
 	
 	set.baseSetID = newBaseID;
-	VariantSets[baseID] = nil;
-	VariantSets[set.setID] = nil;
+	variantSets[baseID] = nil;
+	variantSets[set.setID] = nil;
 end
 
 
@@ -253,9 +253,9 @@ function BuildBlizzSets()
 
 				if not initSpecialSet then
 					initSpecialSet = data.setID;
-					BaseIDs[data.setID] = data;
-					BaseListLabels[data.label] = data.setID; 
-					table.insert(BaseList, data);
+					baseIDs[data.setID] = data;
+					baseListLabels[data.label] = data.setID; 
+					table.insert(baseList, data);
 					AddVariant(data, data.setID);
 
 				else
@@ -271,10 +271,10 @@ function BuildBlizzSets()
 			elseif addon.Profile.CombineTradingPost and data.label == tradingPostGlobalString  then --or addon.MiscSets.TRADINGPOST_SETS[data.setID]  then -- or addon.MiscSets.TRADINGPOST_SETS[data.setID] then
 					if not initTradingPostSet then
 						initTradingPostSet = data.setID;
-						BaseIDs[data.setID] = data;
+						baseIDs[data.setID] = data;
 
-						BaseListLabels[data.label] = data.setID;
-						table.insert(BaseList,data);
+						baseListLabels[data.label] = data.setID;
+						table.insert(baseList,data);
 
 						AddVariant(data, data.setID);
 					else
@@ -319,35 +319,35 @@ function BuildBlizzSets()
 				SET_INDEX[data.setID] = data
 
 
-				if data.customGroups and BaseListLabels[data.customGroups] then
+				if data.customGroups and baseListLabels[data.customGroups] then
 					subSet = true;
-					subSetBaseID = BaseListLabels[data.customGroups]
+					subSetBaseID = baseListLabels[data.customGroups]
 				
-				elseif not data.customGroups and data.label and BaseListLabels[data.label] then
+				elseif not data.customGroups and data.label and baseListLabels[data.label] then
 					subSet = true;
-					subSetBaseID = BaseListLabels[data.label]
+					subSetBaseID = baseListLabels[data.label]
 				end
 			
 				if subSet then
 					if data.favorite then
-						----if not BaseIDs[subSetBaseID].favoriteSetID then
-						----	BaseIDs[subSetBaseID].favoriteSetID = data.setID;
+						----if not baseIDs[subSetBaseID].favoriteSetID then
+						----	baseIDs[subSetBaseID].favoriteSetID = data.setID;
 						----end
 					end
 
 					AddVariant(data, subSetBaseID);
 					data.baseSetID = subSetBaseID;
 				else
-					BaseIDs[data.setID] = data;
+					baseIDs[data.setID] = data;
 
 					if data.customGroups then
-						BaseListLabels[data.customGroups] = data.setID;
+						baseListLabels[data.customGroups] = data.setID;
 
 					elseif data.label then
-						BaseListLabels[data.label] = data.setID;
+						baseListLabels[data.label] = data.setID;
 					end
 
-					table.insert(BaseList, data);
+					table.insert(baseList, data);
 					AddVariant(data, data.setID);
 				end
 			end
@@ -466,19 +466,19 @@ do
 					 	data.customGroups = data.custom --or data.label.."-"..subName--data.armorType
 					end
 
-					if data.customGroups and BaseListLabels[data.customGroups]  then
+					if data.customGroups and baseListLabels[data.customGroups]  then
 						subSet = true;
-						subSetBaseID = BaseListLabels[data.customGroups]
+						subSetBaseID = baseListLabels[data.customGroups]
 					--elseif data.name ~= subName then
 						--subSet = true;
 
 						--data.tab = 2
-						--subSetBaseID = BaseListLabels[subName]
-					elseif not data.customGroups and data.label and BaseListLabels[data.label] then
+						--subSetBaseID = baseListLabels[subName]
+					elseif not data.customGroups and data.label and baseListLabels[data.label] then
 
-					--elseif data.label and BaseListLabels[data.label] then
+					--elseif data.label and baseListLabels[data.label] then
 						subSet = true;
-						subSetBaseID = BaseListLabels[data.label]
+						subSetBaseID = baseListLabels[data.label]
 					end
 
 				--print(data.name)
@@ -488,21 +488,21 @@ do
 						data.baseSetID = subSetBaseID;
 
 					else
-						BaseIDs[data.setID] = data;
+						baseIDs[data.setID] = data;
 
 						data.baseSetID = data.setID;
 
 
 						if data.customGroups then
-							BaseListLabels[data.customGroups] = data.setID;
+							baseListLabels[data.customGroups] = data.setID;
 
 						elseif data.name then
-							BaseListLabels[data.label] = data.setID;
+							baseListLabels[data.label] = data.setID;
 						end
 
-						--BaseListLabels[data.label] = data.setID;
+						--baseListLabels[data.label] = data.setID;
 
-						table.insert(BaseList, data);
+						table.insert(baseList, data);
 						AddVariant(data, data.setID);
 					end
 
@@ -672,11 +672,11 @@ end
 		--wipe(addon.SavedSetCache)
 		addon.SavedSetCache =  nil
 
-		wipe(BaseListLabels)
-		wipe(BaseList)
-		wipe(BaseIDs)
-		wipe(VariantSets)
-		wipe(VariantIDs)
+		wipe(baseListLabels)
+		wipe(baseList)
+		wipe(baseIDs)
+		wipe(variantSets)
+		wipe(variantIDs)
 		--wipe(subitemlist)
 	end
 
@@ -685,7 +685,7 @@ end
 			addon.Init:BuildDB()
 			addon.refreshData = false
 		end
-		return BaseIDs
+		return baseIDs
 	end
 
 	local MAX_DEFAULT_OUTFITS = C_TransmogCollection.GetNumMaxOutfits()
@@ -812,6 +812,7 @@ end
 							data.itemTransmogInfoList = nil
 							data.items = nil
 							data.validForCharacter = true
+				data.icon = icon
 
 						elseif data.sources and  #data.sources ~= 0 then
 							for item_data, source_data in pairs(data.sources) do 
@@ -982,22 +983,23 @@ end
 					local ItemTransmogInfoList = {}
 					info.sources = {}
 					for slotID = 1, 19 do
-								info.sources[i] = data[slotID]
+						local sourceID = data[slotID]
+						info.sources[slotID] = 0
+						if sourceID  and sourceID ~= NO_TRANSMOG_SOURCE_ID and sourceID ~= 0 then 
+							 sourceInfo = C_TransmogCollection.GetSourceInfo(sourceID)
+									
+							if sourceInfo and sourceInfo.invType then 
+								local slot = C_Transmog.GetSlotForInventoryType(sourceInfo.invType);
+								local appearanceID = sourceInfo.visualID
+								local itemID = sourceInfo.itemID
+								local itemMod = sourceInfo.itemModID
+								info.itemData = info.itemData or {}
+								info.itemData[slot] = {"'"..itemID..":"..itemMod.."'", sourceID, appearanceID}
+														info.sources[slotID] = sourceInfo.sourceID
 
-						--local sourceID = data[slotID]
-					--	info.sources[slotID] = data[slotID] or 0
-					--	if sourceID  and sourceID ~= NO_TRANSMOG_SOURCE_ID and sourceID ~= 0 then 
-							--local sourceInfo = C_TransmogCollection.GetSourceInfo(sourceID)
-						 			
-							--if sourceInfo and sourceInfo.invType then 
-							--	local slot = C_Transmog.GetSlotForInventoryType(sourceInfo.invType);
-							--	local appearanceID = sourceInfo.visualID
-							--	local itemID = sourceInfo.itemID
-							--	local itemMod = sourceInfo.itemModID
-								--info.itemData = info.itemData or {}
-								--info.itemData[slot] = {"'"..itemID..":"..itemMod.."'", sourceID, appearanceID}
-						--end
+							end
 						end
+						--end
 
 							--[[local illusionID
 																					if slotID == 16 then 
@@ -1008,7 +1010,7 @@ end
 																						illusionID = 0
 																					end
 																					ItemTransmogInfoList[slotID] = ItemUtil.CreateItemTransmogInfo(data[slotID] or 0, 0, illusionID);]]
-					--end
+					end
 
 
 
@@ -1064,8 +1066,8 @@ end
 					--info.itemTransmogInfoList = data.itemTransmogInfoList
 				end
 
-				BaseIDs[info.setID] =  info;
-				table.insert(BaseList, info);
+				baseIDs[info.setID] =  info;
+				table.insert(baseList, info);
 
 				SET_INDEX[info.setID] = info
 				tinsert(list, info)
