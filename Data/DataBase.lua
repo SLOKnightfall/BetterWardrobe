@@ -650,26 +650,10 @@ end
 		--addon.BuildClassArtifactAppearanceList()
 	end
 
-	--function x()
-	--	for id, setData in pairs(SET_INDEX) do
-		--	if setData["items"] then
-			--	print(setData.name)
-				--for index, item in pairs( setData["items"]) do
-				--	print(item)
-				--end
-			--end
-		--end
-	--end
-
-
 	function addon:ClearCache()
-		--addon.ArmorSets = nil
 		wipe(addon.ArmorSetModCache)
-		--addon.extraSetsCache = nil
 		wipe(SET_INDEX)
 		addon.ClearArtifactData()
-		--wipe(subitemlist)
-		--wipe(addon.SavedSetCache)
 		addon.SavedSetCache =  nil
 
 		wipe(baseListLabels)
@@ -677,7 +661,6 @@ end
 		wipe(baseIDs)
 		wipe(variantSets)
 		wipe(variantIDs)
-		--wipe(subitemlist)
 	end
 
 	function addon.GetBaseList()
@@ -695,14 +678,13 @@ end
 	end
 
 	local profileCache = {}
-	local savedSetID = 50000
+	local savedSetID = 6000
 
 	local function loadAltsSavedSets(profile)
 		if not addon.setdb.global.sets[profile] then return {} end
 
 		if not profileCache[profile] then 
 			local FullList = CopyTable(addon.setdb.global.sets[profile])
-
 			--FullList = addon.setdb.global.sets[addon.SelecteSavedList]
 			for i, data in ipairs(FullList) do
 				data.setType = "SavedExtra"
@@ -712,26 +694,35 @@ end
 
 				if data.sources  then
 					for index, sourceID in pairs(data.sources) do 
-						local sourceInfo = C_TransmogCollection.GetSourceInfo(sourceID)
-
-						if sourceInfo and sourceInfo.invType then  
-							local appearanceID = sourceInfo.visualID
-							local itemID = sourceInfo.itemID
-							local itemMod = sourceInfo.itemModID
-							local sourceID = sourceInfo.sourceID
-							data.itemData = data.itemData or {} 
-							data.itemData[index] = {"'"..itemID..":"..itemMod.."'", sourceID, appearanceID}
-						end
+						--local sourceInfo = C_TransmogCollection.GetSourceInfo(sourceID)
+						data[index] =  sourceID
+					--	if sourceInfo and sourceInfo.invType then  
+						--	local appearanceID = sourceInfo.visualID
+							--local itemID = sourceInfo.itemID
+							--local itemMod = sourceInfo.itemModID
+						--	local sourceID = sourceInfo.sourceID
+							--data.itemData = data.itemData or {} 
+							--data.itemData[index] = {"'"..itemID..":"..itemMod.."'", sourceID, appearanceID}
+						--end
 					end
+					data.sources = nil
+				else
+					--data.sources = {}
+						for i=1, 19 do
+							--data.sources[i] = data[i] or 0
+						end
 				end
 			end
-
 
 			if addon.OutfitDB.sv.char[profile] and addon.OutfitDB.sv.char[profile].outfits  then 
 				local extendeSets = CopyTable(addon.OutfitDB.sv.char[profile].outfits)
 
 				if extendeSets then 
 					for i, data in ipairs(extendeSets) do
+				----data.setType = "SavedExtra"
+				--savedSetID = savedSetID + 1
+				--data.outfitID = savedSetID
+				----data.label = L["Saved Set"]
 						tinsert(FullList, data)
 					end
 				end
@@ -741,7 +732,6 @@ end
 		end
 
 		return profileCache[profile]
-
 	end
 
 	function addon.GetOutfits(character)
@@ -769,7 +759,7 @@ end
 				data.validForCharacter = true
 			end
 
-		--Extended Sets
+			--Extended Sets
 			if addon.OutfitDB.char.outfits then 
 				for i, data in ipairs(addon.OutfitDB.char.outfits) do
 					data.outfitID = MAX_DEFAULT_OUTFITS + i + 5000
@@ -974,14 +964,14 @@ end
 
 				if data.setType == "SavedBlizzard" then 
 					local outfitItemTransmogInfoList = C_TransmogCollection.GetOutfitItemTransmogInfoList(data.outfitID - 5000);
-					info.sources = {}
-					for i, data in pairs(outfitItemTransmogInfoList) do
-						info.sources[i] = data.appearanceID
-					end
+					--info.sources = {}
+					--for i, data in pairs(outfitItemTransmogInfoList) do
+						--.sources[i] = data.appearanceID
+					--end
 
 				elseif data.setType == "SavedExtra" then
 					local ItemTransmogInfoList = {}
-					info.sources = {}
+					info.sources = info.sources or {}
 					for slotID = 1, 19 do
 						local sourceID = data[slotID]
 						info.sources[slotID] = 0
@@ -995,8 +985,7 @@ end
 								local itemMod = sourceInfo.itemModID
 								info.itemData = info.itemData or {}
 								info.itemData[slot] = {"'"..itemID..":"..itemMod.."'", sourceID, appearanceID}
-														info.sources[slotID] = sourceInfo.sourceID
-
+								info.sources[slotID] = sourceInfo.sourceID
 							end
 						end
 						--end
@@ -1222,6 +1211,7 @@ end
 	end
 
 	function addon.GetItemSource(itemID, itemMod)
+
 		if addon.ArmorSetModCache[itemID] and addon.ArmorSetModCache[itemID][itemMod] then return addon.ArmorSetModCache[itemID][itemMod][1], addon.ArmorSetModCache[itemID][itemMod][2] end
 			local itemSource
 			local visualID, sourceID
@@ -1239,7 +1229,7 @@ end
 				f.model:TryOn(itemlink)
 				local  TransmogInfoList = DressUpOutfitMixin:GetItemTransmogInfoList()
 				for i = 1, 19 do
-					local source = 0---- f.model:GetSlotTransmogSources(i)
+					local source = 10000---- f.model:GetSlotTransmogSources(i)
 					if source ~= 0 then
 						--addon.itemSourceID[itemID] = source
 						sourceID = source

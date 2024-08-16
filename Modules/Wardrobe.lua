@@ -1228,6 +1228,7 @@ function BetterWardrobeCollectionFrameMixin:SetTab(tabID)
 
 -----addon.ColorFilterFrame:Hide()
 
+		BetterWardrobeVisualToggle:Hide() --until toggle gets fixed
 
 	if tabID == TAB_ITEMS then
 
@@ -1300,7 +1301,7 @@ function BetterWardrobeCollectionFrameMixin:SetTab(tabID)
 		end
 
 	elseif tabID == TAB_SETS or tabID == TAB_EXTRASETS or tabID == TAB_SAVED_SETS  then
-		BetterWardrobeVisualToggle:Show()
+		--BetterWardrobeVisualToggle:Show()
 		BW_SortDropDown:Hide()
 		if BW_ColectionListFrame then 
 			BW_ColectionListFrame:Hide()
@@ -1355,11 +1356,12 @@ function BetterWardrobeCollectionFrameMixin:SetTab(tabID)
 		self.SetsTransmogFrame:SetShown(atTransmogrifier);
 		local sortValue
 		if tabID == TAB_SAVED_SETS then 
+			BW_SortDropDown:Hide()
 			--SavedOutfitDropDownMenu:Show()
 			--BW_SortDropDown:SetPoint("TOPLEFT", BetterWardrobeVisualToggle, "TOPRIGHT", 5, 0)
 			BW_SortDropDown:ClearAllPoints()
 			BW_SortDropDown:SetPoint("TOPRIGHT", self.SearchBox, "TOPRIGHT", 21, 5)
-			BW_SortDropDown:Show()
+			--BW_SortDropDown:Show()
 			self.FilterButton:Hide()
 			self.SearchBox:Hide()
 			self.ClassDropdown:Hide()
@@ -6337,7 +6339,7 @@ function BetterWardrobeSetsScrollFrameButtonMixin:Init(elementData)
 	end
 	self.Name:SetTextColor(color.r, color.g, color.b);
 	self.Label:SetText(displayData.label);
-	self.IconFrame:SetIconTexture(SetsDataProvider:GetIconForSet(displayData.setID));
+	self.IconFrame:SetIconTexture(displayData.icon or SetsDataProvider:GetIconForSet(displayData.setID));
 	self.IconFrame:SetIconDesaturation((topSourcesCollected == 0) and 1 or 0);
 	self.IconFrame:SetIconCoverShown(not setCollected);
 	self.IconFrame:SetIconColor(displayData.validForCharacter and HIGHLIGHT_FONT_COLOR or RED_FONT_COLOR);

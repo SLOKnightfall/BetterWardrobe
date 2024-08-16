@@ -1493,8 +1493,8 @@
 								<Scripts>
 									<OnShow> 
 										self.buttonID = "HideSlot" 
-										local level = self:GetParent().SetsCollectionFrame.Model:GetFrameLevel() + 5
-										self:SetFrameLevel(level);
+										--local level = self:GetParent().SetsCollectionFrame.Model:GetFrameLevel() + 5
+										--self:SetFrameLevel(level);
 									</OnShow>
 									<OnEnter>
 										BW_DressingRoomButtonMixin.OnEnter(self)  
