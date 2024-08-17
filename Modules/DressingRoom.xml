@@ -45,7 +45,7 @@
 		<Frames>
 			<Frame parentKey="PreviewButtonFrame" hidden="false" >
 				<Anchors>
-					<Anchor point="TOPLEFT" relativeKey="$parent" relativePoint="LEFT" x="12" y="134"/>/>
+					<Anchor point="TOPLEFT" relativeKey="$parent" relativePoint="LEFT" x="12" y="134"/>
 					<Anchor point="BOTTOMRIGHT"/>
 				</Anchors>
 				<Frames>
