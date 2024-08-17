@@ -479,7 +479,7 @@
 				</Anchors>
 					<Layers>
 						<Layer level="OVERLAY">
-					<Texture  file="Interface\artifacts\ArtifactPower-QuestBorder"  alphaMode="SUBTRACT" >
+					<Texture  file="Interface\artifacts\ArtifactPower-QuestBorder"  alphaMode="BLEND" >
 					<Size x="60" y="60"/>
 					<Anchors>
 					</Anchors>
