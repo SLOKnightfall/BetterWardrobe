@@ -149,14 +149,14 @@
 			<Frame parentKey="AltItemtems" hidden="true" >
 				<Size x="25" y="25"/>
 				<Anchors>
-					<Anchor point="BOTTOMRIGHT" relativeKey="$parent" relativePoint="TOPRIGHT" x='8' Y='-15'/>
+					<Anchor point="BOTTOMRIGHT" relativeKey="$parent" relativePoint="TOPRIGHT" x='8' y='-15'/>
 				</Anchors>
 					<Layers>
 						<Layer level="OVERLAY">		
 						<Texture parentKey="AltIconRight" file="Interface\FriendsFrame\UI-Toast-ChatInviteIcon" >
 							<Size x="25" y="25"/>
 							<Anchors>
-								<Anchor point="CENTER" x='0' Y='0'/>
+								<Anchor point="CENTER" x='0' y='0'/>
 							</Anchors>
 
 						</Texture>
@@ -516,14 +516,14 @@
 						<Texture parentKey="AltIconRight" file="Interface\BUTTONS\UI-SpellbookIcon-NextPage-Up" >
 							<Size x="15" y="15"/>
 							<Anchors>
-								<Anchor point="BOTTOMRIGHT" relativeKey="$parent.IconFrame" relativePoint="BOTTOMRIGHT" x='0' Y='-5'/>
+								<Anchor point="BOTTOMRIGHT" relativeKey="$parent.IconFrame" relativePoint="BOTTOMRIGHT" x='0' y='-5'/>
 							</Anchors>
 
 						</Texture>
 							<Texture parentKey="AltIconLeft" file="Interface\BUTTONS\UI-SpellbookIcon-PrevPage-Up" >
 							<Size x="15" y="15"/>
 							<Anchors>
-								<Anchor point="BOTTOMLEFT" relativeKey="$parent.IconFrame" relativePoint="BOTTOMLEFT" x='0' Y='-5'/>
+								<Anchor point="BOTTOMLEFT" relativeKey="$parent.IconFrame" relativePoint="BOTTOMLEFT" x='0' y='-5'/>
 							</Anchors>
 
 						</Texture>
