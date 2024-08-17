@@ -942,7 +942,7 @@
 
 			<DropdownButton parentKey="SavedOutfitDropDown" name = "BW_SavedOutfitDropDown" inherits="WowStyle1DropdownTemplate" mixin="BetterWardrobeCollectionSavedOutfitDropdownMixin">
 				<Anchors>
-					<Anchor point="Right" relativeKey="$parent.ClassDropdown" relativePoint="RIGHT" x="0" y="0"/>
+					<Anchor point="RIGHT" relativeKey="$parent.ClassDropdown" relativePoint="RIGHT" x="0" y="0"/>
 				</Anchors>
 				<Scripts>
 					<OnLoad method="OnLoad"/>
