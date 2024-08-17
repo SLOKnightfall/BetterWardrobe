@@ -355,6 +355,7 @@ local function SortItemByExpansion(sets)
 		item2.itemID = item2.itemID or 0
 		C_Item.RequestLoadItemDataByID(item1.itemID)
 		C_Item.RequestLoadItemDataByID(item2.itemID)
+		local GetItemInfo = C_Item and C_Item.GetItemInfo
 		item1.expansionID = select(15,  GetItemInfo(item1.itemID)) 
 		item2.expansionID = select(15,  GetItemInfo(item2.itemID))
 

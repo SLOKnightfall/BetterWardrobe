@@ -205,7 +205,7 @@ function addon.BuildClassArtifactAppearanceList()
 						break
 					end
 				end
-
+				local GetItemInfoInstant = C_Item and C_Item.GetItemInfoInstant
 				local _, _, _, _, _, itemClassID, itemSubClassID = GetItemInfoInstant(itemID)
 				if (itemClassID == 2 or itemClassID == 4) and addon.Globals.CAMERAS[itemClassID][itemSubClassID] then 
 					appearanceCameraID = addon.Globals.CAMERAS[itemClassID][itemSubClassID]

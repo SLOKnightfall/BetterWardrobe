@@ -30,6 +30,7 @@ local playerNme
 local realmName
 local playerClass, classID,_
 local L = LibStub("AceLocale-3.0"):GetLocale(addonName)
+local GetItemInfoInstant = C_Item and C_Item.GetItemInfoInstant
 
 --ACE3 Option Handlers
 local optionHandler = {}

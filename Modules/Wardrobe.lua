@@ -1962,6 +1962,7 @@ function BetterWardrobeCollectionFrameMixin:SetAppearanceTooltip(contentFrame, s
 	end
 
 	if addon.Profile.ShowILevelTooltips and itemID then 
+		local GetItemInfo = C_Item and C_Item.GetItemInfo
 		local ilevel = select(4, GetItemInfo(itemID))
 		if ilevel then 
 			GameTooltip_AddNormalLine(GameTooltip, "ILevel: " .. ilevel);
@@ -3596,6 +3597,7 @@ function BetterWardrobeItemsModelMixin:OnMouseDown(button)
 end
 
 local function ToggleHidden(model, isHidden)
+	local GetItemInfo = C_Item and C_Item.GetItemInfo
 	local tabID = addon.GetTab()
 	if tabID == 1 then
 		local visualID = model.visualInfo.visualID;

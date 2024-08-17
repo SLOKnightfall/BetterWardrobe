@@ -13,6 +13,7 @@ end
 -- TODO: class-restricted items, offhand-restricted items?
 function lib:IsAppropriate(item, class)
     class = class or playerclass
+    local GetItemInfoInstant = C_Item and C_Item.GetItemInfoInstant
     local slot, _, itemclass, itemsubclass = select(4, GetItemInfoInstant(item))
     if slot == 'INVTYPE_CLOAK' then
         -- Cloaks are cloth, technically. But everyone can wear them.

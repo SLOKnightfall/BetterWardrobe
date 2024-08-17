@@ -332,8 +332,8 @@ local function AddAdditional(parent, index, data, itemID)
 		spellID = data[1]
 		profession = data[2]
 		link = GetSpellLink(spellID)
-
-		local name, rank, icon, castTime, minRange, maxRange, spellId = GetSpellInfo(spellID)
+		local spellinfo = C_Spell and C_Spell.GetSpellInfo(spellID)
+		local name, rank, icon, castTime, minRange, maxRange, spellId = spellinfo.name, spellinfo.iconID, spellinfo.originalIconID, spellinfo.castTime, spellinfo.minRange, spellinfo.maxRange, spellinfo.spellID
 		--local id, name, points = GetAchievementInfo(sourceName)
 		sourceName = name
 		sourceName = ACHIEVEMENT_COLOR_CODE..sourceName..L.ENDCOLOR
@@ -356,7 +356,7 @@ local function AddAdditional(parent, index, data, itemID)
 		price_text = ""
 		local goldCost = tonumber(prices)
 		if goldCost > 0 then
-			price_text = price_text .. GetCoinTextureString(goldCost).."   "
+			price_text = price_text .. C_CurrencyInfo.GetCoinTextureString(goldCost).."   "
 			SourceInfo:SetText(("-%s: %s - %s: %s - Price: %s"):format( transmogSource, L[vendorName] or L["No Data Available"], L["Zone"], zones or "?", price_text))
 		end
 
@@ -467,7 +467,7 @@ function CollectionList:GenerateSourceListView(visualID)
 			else
 				collectedStatus = RED_FONT_COLOR_CODE.."["..L["Not Collected"].."]"..L.ENDCOLOR
 			end
-
+			local GetItemInfo = C_Item and C_Item.GetItemInfo
 			local itemName, _, itemQuality = GetItemInfo(itemLink)
 			--local itemID =GetItemInfoFromHyperlink(itemLink)
 			local nameColor = ITEM_QUALITY_COLORS[itemQuality] or ""
