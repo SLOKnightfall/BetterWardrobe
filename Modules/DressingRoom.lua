@@ -176,6 +176,7 @@ local function GetDressUpModelSlotSource(slotID, enchantID)
 	local hasAppearance = C_TransmogCollection.PlayerHasTransmog(itemID, itemModID) or IsAppearanceKnown(itemLink)
 
 	if itemName and (slotID == 16 or slotID == 17) then 
+		local GetItemInfo = C_Item and C_Item.GetItemInfo
 		local _, _, _, _, _, _, _, _, _, _, _, classID, subclassID = GetItemInfo(itemName)
 		if classID == LE_ITEM_CLASS_WEAPON then
 			if subclassID == LE_ITEM_WEAPON_BOWS or subclassID == LE_ITEM_WEAPON_GUNS or subclassID == LE_ITEM_WEAPON_CROSSBOW then 

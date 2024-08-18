@@ -13,6 +13,7 @@ local genders = {
 local gender = genders[UnitSex("player")]
 
 function Camera:GetCameraID(item, force)
+	local GetItemInfoInstant = C_Item and C_Item.GetItemInfoInstant
 	local cameraType, isWeapon, cameraID
 	local itemid, _, _, slot, _, class, subclass = GetItemInfoInstant(item)
 	slot = addon.Globals.INVENTORY_SLOT_NAMES[slot]

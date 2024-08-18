@@ -50,6 +50,7 @@ local itemSlots = {
 
 
 local function GetItemSlot(itemLinkOrID)
+	local GetItemInfoInstant = C_Item and C_Item.GetItemInfoInstant
 	local _, _, _, slot = GetItemInfoInstant(itemLinkOrID)
 	if not slot then return end
 	return itemSlots[slot]

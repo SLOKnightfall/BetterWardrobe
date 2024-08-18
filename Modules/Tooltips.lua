@@ -13,6 +13,7 @@ local preview = CreateFrame("Frame", "BW_ProfileTooltip", UIParent, "TooltipBord
 addon.preview = preview
 
 local function IsAppearanceCollected(item)
+	local GetItemInfoInstant = C_Item and C_Item.GetItemInfoInstant
 	local itemID = GetItemInfoInstant(item)
 
 	if not itemID then return end
@@ -384,6 +385,7 @@ function preview:ShowPreview(itemLink, parent)
 
 	if addon.Profile.ShowOwnedItemTooltips and not found_systemTooltip then
 		local apperanceKnownText, canTransmog
+		local GetItemInfoInstant = C_Item and C_Item.GetItemInfoInstant
 		local itemID = GetItemInfoInstant(itemLink)
 		if itemID then
 			canTransmog = select(3, C_Transmog.CanTransmogItem(itemID))
@@ -522,7 +524,7 @@ function preview:ShowPreview(itemLink, parent)
 
 		--GameTooltip:Show()
 	end
-
+	local GetItemInfo = C_Item and C_Item.GetItemInfo
 	local slot = select(9, GetItemInfo(id))
 	if addon.Profile.TooltipPreview_Show and (not addon.Globals.mods[addon.Profile.TooltipPreview_Modifier] or addon.Globals.mods[addon.Profile.TooltipPreview_Modifier]()) and self.item ~= id then
 		self.item = id

@@ -1134,7 +1134,7 @@ end
 			BetterWardrobeOutfitManager:ShowPopup("BETTER_WARDROBE_SUBITEM_INVALID_POPUP")
 			return false 
 		end
-
+		local GetItemInfoInstant = C_Item and C_Item.GetItemInfoInstant
 		local _, _, _, itemEquipLoc1 = GetItemInfoInstant(itemID) 
 		local _, _, _, itemEquipLoc2 = GetItemInfoInstant(subID) 
 
@@ -1142,7 +1142,7 @@ end
 			BetterWardrobeOutfitManager:ShowPopup("BETTER_WARDROBE_SUBITEM_WRONG_LOCATION_POPUP")
 			return false 
 		else
-
+			local GetItemInfo = C_Item and C_Item.GetItemInfo
 			local itemName1, link1 = GetItemInfo(tonumber(itemID))
 			local itemName2, link2 = GetItemInfo(tonumber(subID))
 
