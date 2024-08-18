@@ -3703,7 +3703,7 @@ function BetterWardrobeItemsModelMixin:OnMouseUp(button)
 
 			text = L["View Sources"]
 			rootDescription:CreateButton(text, function()
-				addon.CollectionList:GenerateSourceListView(self.visualInfo.visualIDP);
+				addon.CollectionList:GenerateSourceListView(self.visualInfo.visualID);
 			end);
 
 			text = L["View Recolors"]
