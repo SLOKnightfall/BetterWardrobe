@@ -166,3 +166,40 @@ addon.MiscSets.CustomDesc = {
 }
 
 		
+addon.MiscSets.HeritageSets = {
+	[1522] = 28, --Highmountain
+	[1523] = 27, --Nightborne
+	[1524] = 29, --Void Elves
+	[1525] = 30, --Lightforged
+	[1679] = 34, --Dark Iron
+	[1680] = 36, --Mag'har (Warsong)
+	[1681] = 36, --Mag'har (BlackRock)
+	[1682] = 36, --Mag'har (Frostwolves)
+	[1741] = 32, --Kul Tiran
+	[1742] = 31, --Zandalari
+	[1803] = 3, --Dwarf
+	[1804] = 10, --Blood Elves
+	[1828] = 7, --Gnome
+	[1829] = 6, --Tauren
+	[1980] = 37, --Mechagnome
+	[1981] = 35, --Vulpera
+	[1976] = 22, --Worgen
+	[1977] = 9, --Goblin
+	[3121] = 4, -- Night Elf
+	[3130] = 4, -- Night Elf
+	[3086] = 5, -- Forsaken
+	[2831] = 1, -- Human
+	[2832] = 1, -- Human
+	[2830] = 1, -- Human
+	[2833] = 2, -- Orc (Warsong)
+	[2834] = 2, -- Orc (BlackRock)
+	[2835] = 2, -- Orc (Frostwolves)
+	[3515] = 8, -- Troll (Red)
+	[3350] = 8, -- Troll (Brown)
+	[3346] = 11, -- Draenei (Pruple)
+	[3347] = 11, -- Draenei (Orange)
+	[3700] = 85, -- Earthen (Dornogal)
+	[3701] = 85, -- Earthen (Freywold)
+	[3702] = 85, -- Earthen (Gundargaz)
+}
+--/dump C_TransmogSets.GetSetInfo(2832)

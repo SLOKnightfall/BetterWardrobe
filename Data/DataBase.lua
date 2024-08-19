@@ -117,22 +117,22 @@ end
 local function SetClassIDs(armorType)
 	local localizedClass, _, classInd = UnitClass('player');
 	local ClassArmorType = addon.Globals.ClassArmorType
-  if armorType then
-    if armorType == ClassArmorType[classInd] then
-      ClassName = localizedClass;
-      ClassIndex = classInd;
-      return;
-    end
-  
-    for i,j in pairs(ClassArmorType) do
-      if j == armorType then ClassName, _, ClassIndex = GetClassInfo(i); break; end;
-    end
-    
-  else
-    ClassName = localizedClass;
-    ClassIndex = classInd;
-    _,_,currentRaceID = UnitRace('player');
-  end
+	if armorType then
+		if armorType == ClassArmorType[classInd] then
+			ClassName = localizedClass;
+			ClassIndex = classInd;
+			return;
+		end
+	
+		for i,j in pairs(ClassArmorType) do
+			if j == armorType then ClassName, _, ClassIndex = GetClassInfo(i); break; end;
+		end
+		
+	else
+		ClassName = localizedClass;
+		ClassIndex = classInd;
+		_,_,currentRaceID = UnitRace('player');
+	end
 end
 
 --TODO Still Needed?
@@ -159,10 +159,16 @@ local function UseSet(data)
 	local selectedArmorType = dropdownClass or playerClass;
 	local ClassArmor = addon.Globals.ClassArmorMask[selectedArmorType];
 	local correctClass = false
+	local _,_,playerRace = UnitRace('player');
 	local playerFaction, _ = UnitFactionGroup('player')
 	local correctFaction = false
 	local ClassArmorTypeMask = addon.Globals.ClassArmorMask[tonumber(selectedArmorType)]
+	local correctHeratiage = false
+	local heritageSets = addon.MiscSets.HeritageSets
 
+	if heritageSets[data.setID] and heritageSets[data.setID] == playerRace or not heritageSets[data.setID]  then
+			correctHeratiage = true;
+	end
 
 	if data.classMask and (data.classMask == 0 or data.classMask == 16383) then
 		correctClass = true;
@@ -205,7 +211,9 @@ local function UseSet(data)
 	end
 
 	if correctFaction
-	and correctClass then
+	and correctClass 
+	and correctHeratiage
+	then
 		return true
 	else
 		return false;
@@ -432,7 +440,7 @@ do
 			for id, data in pairs(data) do
 				--print(UseSet(data))
 				if (data.requiredFaction and data.requiredFaction == GetFactionID(playerFaction) or data.requiredFaction == nil) and 
-				 	(not data.BuildBlizzSets and (data.filter ~= 5 and data.filter ~= 7 and data.filter ~= 11)) and  UseSet(data) then 
+					(not data.BuildBlizzSets and (data.filter ~= 5 and data.filter ~= 7 and data.filter ~= 11)) and  UseSet(data) then 
 					--data.isHeritageArmor = string.find(data.name, "Heritage")
 
 					local classInfo = CLASS_INFO[playerClass]
@@ -494,7 +502,7 @@ do
 					elseif addon.MiscSets.customGroups[tonumber(data.setID)] then
 						data.customGroups = addon.MiscSets.customGroups[tonumber(data.setID)]
 					elseif data.custom then
-					 	data.customGroups = data.custom --or data.label.."-"..subName--data.armorType
+						data.customGroups = data.custom --or data.label.."-"..subName--data.armorType
 					end
 
 					if data.customGroups and baseListLabels[data.customGroups]  then
@@ -929,7 +937,7 @@ end
 	end
 
 	function addon.GetSetType(outfitID)
-		  setData = addon.GetSetInfo(outfitID)
+			setData = addon.GetSetInfo(outfitID)
 		return setData and setData.setType or "Unknown"
 	end
 
@@ -1247,7 +1255,7 @@ end
 			local itemSource
 			local visualID, sourceID
 			local f =  addon.frame
-	 		if itemMod then
+			if itemMod then
 				visualID, sourceID = C_TransmogCollection.GetItemInfo(itemID, itemMod)
 			else
 				visualID, sourceID = C_TransmogCollection.GetItemInfo(itemID)
