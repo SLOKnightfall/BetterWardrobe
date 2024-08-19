@@ -410,7 +410,7 @@ function DressingRoom:UpdateModel(unit)
 	
 	local itemList;
 	if actor then
-		itemList = CopyTable(actor:GetItemitemList());
+		itemList = CopyTable(actor:GetItemTransmogInfoList());
 	end
 	
 	if unit ~= "player" then
