@@ -508,6 +508,7 @@ function addon:FilterSets(setList, setType)
 	local faction = UnitFactionGroup("player")
 	local opFaction = OpposingFaction(faction)
 	local requiredFaction = true
+
 	if C_Transmog.IsAtTransmogNPC() then 
 		for i, data in pairs(setList) do
 				 setData = BetterWardrobeSetsDataProviderMixin:GetSetSourceData(data.setID)
@@ -516,8 +517,7 @@ function addon:FilterSets(setList, setType)
 				--holidayName = C_TransmogCollection.GetSourceRequiredHoliday(sourceID);
 				--if holidayName then break end
 			--end
---print(faction)
---print(opFaction)
+
 			if data.requiredFaction == 1  then
 				data.requiredFaction = "Alliance"
 			elseif data.requiredFaction == 2 then
@@ -560,11 +560,10 @@ function addon:FilterSets(setList, setType)
 
 	for i, data in ipairs(filterList) do
 		local setData = BetterWardrobeSetsDataProviderMixin:GetSetSourceData(data.setID)
-		local isPvP = false
+		local isPvP = data.description and PvPSets[data.description];
 		local count , total = setData.numCollected, setData.numTotal
 		local expansion = data.expansionID
 		local sourcefilter = (BetterWardrobeCollectionFrame:CheckTab(3) and filterSelection[data.filter])
-		--print(data.filter)
 		local unavailableFilter = (not unavailable or (addon.Profile.HideUnavalableSets and unavailable))
 		local tab = (BetterWardrobeCollectionFrame:CheckTab(2) and data.tab == 2) or (BetterWardrobeCollectionFrame:CheckTab(3) and data.tab == 3)
 		if BetterWardrobeCollectionFrame:CheckTab(2) then
@@ -573,8 +572,6 @@ function addon:FilterSets(setList, setType)
 			unavailableFilter = true
 		end
 
-		isPvP = data.description and PvPSets[data.description];   
-	
 		local collected = count == total
 		if ((filterCollected and collected) or (filterUncollected and not collected)) and
 			((filterPVE and not isPvP) or (filterPVP and isPvP)) and

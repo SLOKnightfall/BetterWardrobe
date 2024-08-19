@@ -5039,7 +5039,6 @@ function BetterWardrobeSetsCollectionMixin:OnLoad()
 	self.selectedVariantSets = { };
 end
 
-
 function BetterWardrobeSetsCollectionMixin:OnShow()
 	self:RegisterEvent("GET_ITEM_INFO_RECEIVED");
 	self:RegisterEvent("TRANSMOG_COLLECTION_ITEM_UPDATE");
@@ -5080,8 +5079,6 @@ function BetterWardrobeSetsCollectionMixin:OnShow()
 		self:Refresh();
 	end
 
-	--if BetterWardrobeCollectionFrame:CheckTab(2) then
-
 	local latestSource = C_TransmogSets.GetLatestSource();
 	if ( latestSource ~= Constants.Transmog.NoTransmogID ) then
 		local sets = C_TransmogSets.GetSetsContainingSourceID(latestSource);
@@ -5111,6 +5108,7 @@ function BetterWardrobeSetsCollectionMixin:OnShow()
 			self.DetailsFrame.VariantSetsDropdown:SetText(desc);
 
 		end
+
 		for index, variantSet in ipairs(SetsDataProvider:GetVariantSets(baseSetID)) do
 			--if not variantSet.hiddenUntilCollected or variantSet.collected then
 				local numSourcesCollected, numSourcesTotal = SetsDataProvider:GetSetSourceCounts(variantSet.setID);
@@ -5123,7 +5121,7 @@ function BetterWardrobeSetsCollectionMixin:OnShow()
 
 				local desc = variantSet.description or variantSet.name
 				local text = format(ITEM_SET_NAME, (desc)..colorCode, numSourcesCollected, numSourcesTotal);
-				if variantSet.requiredFaction then
+				if not addon.Profile.CurrentFactionSets and variantSet.requiredFaction then
 					if (variantSet.requiredFaction == "Horde") then
 						text = "|cFFB02626"..text.."|r";
 					else
@@ -5182,7 +5180,6 @@ function BetterWardrobeSetsCollectionMixin:OnEvent(event, ...)
 		self:ClearLatestSource();
 	end
 end
-
 
 function addon.SetHasNewSourcesForSlot(setID, transmogSlot)
 	if not  newTransmogInfo[setID] then return false end

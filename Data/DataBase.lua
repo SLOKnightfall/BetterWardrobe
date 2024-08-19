@@ -560,20 +560,17 @@ do
 					data.newStatus = false
 
 					for i, itemData in pairs(data.itemData) do
-					--zz = itemData
-					--pri(s)
-						--tinsert(data.sources, itemData[3])
-
-					if subitemlist[item] then 
-						local replacementID = subitemlist[item]
-						local appearanceID, sourceID = C_TransmogCollection.GetItemInfo(replacementID)
-						local sources = C_TransmogCollection.GetAppearanceSources(appearanceID)
-						WardrobeCollectionFrame_SortSources(sources)
-						setData["items"][index] = replacementID
-						setData.sources[item] = nil
-						setData.sources[replacementID] = appearanceID
-					else
-						data.sources[itemData[2]] = true
+						if subitemlist[item] then 
+							local replacementID = subitemlist[item]
+							local appearanceID, sourceID = C_TransmogCollection.GetItemInfo(replacementID)
+							local sources = C_TransmogCollection.GetAppearanceSources(appearanceID)
+							WardrobeCollectionFrame_SortSources(sources)
+							setData["items"][index] = replacementID
+							setData.sources[item] = nil
+							setData.sources[replacementID] = appearanceID
+						else
+							local info = C_TransmogCollection.GetSourceInfo(itemData[2])
+							data.sources[itemData[2]] = info.isCollected
 						end
 					end
 					data.uiOrder = UIID_Counter[data.expansionID] -- id * 100
@@ -583,8 +580,6 @@ do
 			end
 		end
 		--addon.ArmorSets = nil
-
-
 	end
 
 
