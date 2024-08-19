@@ -46,6 +46,10 @@ local collectedAppearances = {}
 
 
 local function GetFactionID(faction)
+	if type(faction) == "number" then
+		return faction		
+	end
+
 	if faction == "Horde" then
 		return  2-- 64
 	elseif faction == "Alliance" then
@@ -166,6 +170,7 @@ local function UseSet(data)
 	local correctHeratiage = false
 	local heritageSets = addon.MiscSets.HeritageSets
 
+
 	if heritageSets[data.setID] and heritageSets[data.setID] == playerRace  then
 				correctHeratiage = true;
 					correctFaction = true;
@@ -210,8 +215,11 @@ local function UseSet(data)
 		]]--
 	end
 
-	if addon.Profile.CurrentFactionSets and  (data.requiredFaction and data.requiredFaction == GetFactionID(playerFaction) or data.requiredFaction == nil) or not addon.Profile.CurrentFactionSets then
+	if addon.Profile.CurrentFactionSets and (data.requiredFaction and GetFactionID(data.requiredFaction) == GetFactionID(playerFaction) or data.requiredFaction == nil) or not addon.Profile.CurrentFactionSets then
+			--print(data.name)
+
 			correctFaction =  true
+			--return true
 	end
 
 --if true then return true end
