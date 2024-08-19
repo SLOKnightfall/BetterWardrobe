@@ -5106,7 +5106,7 @@ function BetterWardrobeSetsCollectionMixin:OnShow()
 		
 		local function SetSelected(variantSet)
 			self:SelectSet(variantSet.setID);
-			local desc =variantSet.description or variantSet.name
+			local desc = variantSet.description or variantSet.name
 
 			self.DetailsFrame.VariantSetsDropdown:SetText(desc);
 
@@ -5121,7 +5121,7 @@ function BetterWardrobeSetsCollectionMixin:OnShow()
 					colorCode = GRAY_FONT_COLOR_CODE;
 				end
 
-				local desc =variantSet.description or variantSet.name
+				local desc = variantSet.description or variantSet.name
 				local text = format(ITEM_SET_NAME, (desc)..colorCode, numSourcesCollected, numSourcesTotal);
 				if variantSet.requiredFaction then
 					if (variantSet.requiredFaction == "Horde") then
@@ -6336,10 +6336,10 @@ function BetterWardrobeSetsScrollFrameButtonMixin:Init(elementData)
 	-- if the base set is hiddenUntilCollected and not collected, it's showing up because one of its variant sets is collected
 	-- in that case use any variant set to populate the info in the list
 	--if elementData.hiddenUntilCollected and not elementData.collected and BetterWardrobeCollectionFrame.selectedCollectionTab == 2 then
-		if #variantSets >0 then
+		if #variantSets > 0 then
 			-- variant sets are already filtered for visibility (won't get a hiddenUntilCollected one unless it's collected)
 			-- any set will do so just picking first one
-			displayData = variantSets[1];
+			--displayData = variantSets[1];
 		end
 	--end
 
@@ -6348,7 +6348,6 @@ function BetterWardrobeSetsScrollFrameButtonMixin:Init(elementData)
 		self.Variants.Count:SetText(0)
 	else
 		self.Variants:Show()
-		--self.Variants.Count:SetText(#variantSets + 1)
 		self.Variants.Count:SetText(#variantSets)
 	end
 
@@ -6364,9 +6363,11 @@ function BetterWardrobeSetsScrollFrameButtonMixin:Init(elementData)
 	elseif ( topSourcesCollected == 0 ) then
 		color = GRAY_FONT_COLOR;
 	end
+
+	displayData.icon = displayData.icon or SetsDataProvider:GetIconForSet(displayData.setID)
 	self.Name:SetTextColor(color.r, color.g, color.b);
 	self.Label:SetText(displayData.label);
-	self.IconFrame:SetIconTexture(displayData.icon or SetsDataProvider:GetIconForSet(displayData.setID));
+	self.IconFrame:SetIconTexture(displayData.icon );
 	self.IconFrame:SetIconDesaturation((topSourcesCollected == 0) and 1 or 0);
 	self.IconFrame:SetIconCoverShown(not setCollected);
 	self.IconFrame:SetIconColor(displayData.validForCharacter and HIGHLIGHT_FONT_COLOR or RED_FONT_COLOR);
