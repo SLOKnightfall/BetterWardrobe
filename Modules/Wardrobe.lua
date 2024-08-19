@@ -1606,6 +1606,8 @@ function BetterWardrobeCollectionFrameMixin:InitBaseSetsFilterButton()
 
 			end, 6);
 
+		----TODO: FIX
+--[[
 		rootDescription:CreateCheckbox(L["Hide Unavailable Sets"], 
 			function() 
 				return not addon.Profile.HideUnavalableSets;
@@ -1616,7 +1618,7 @@ function BetterWardrobeCollectionFrameMixin:InitBaseSetsFilterButton()
 				BetterWardrobeCollectionFrame.SetsTransmogFrame:UpdateProgressBar()
 				RefreshLists()
 			end, 7);
-
+]]--
 		rootDescription:CreateDivider();
 
 		rootDescription:CreateCheckbox(COLLECTED, C_TransmogSets.GetBaseSetsFilter, GetBaseSetsFilter, LE_TRANSMOG_SET_FILTER_COLLECTED);
@@ -7341,7 +7343,6 @@ function BetterWardrobeSetsTransmogMixin:LoadSet(setID)
 		end
 	end
 	local emptySlotData = Sets:GetEmptySlots();
-
 	if addon.Profile.HiddenMog and setData.setType then	
 		local clearSlots = Sets:EmptySlots(transmogSources);
 		for i, x in pairs(clearSlots) do

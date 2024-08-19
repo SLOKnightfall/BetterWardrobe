@@ -1036,6 +1036,7 @@ local defaults = {
 		TooltipPreview_CustomGender = 0,
 		TooltipPreview_DressingDummy = false,
 		IgnoreClassRestrictions = false,
+		CurrentFactionSets = true,
 		ExtraLargeTransmogArea = false,
 		ExtraLargeTransmogAreaMax = screenWidth,
 		AutoApply = false,

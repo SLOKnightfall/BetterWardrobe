@@ -182,9 +182,9 @@ local function UseSet(data)
 					end
 				end
 			else
-				if data.classMask == tonumber(selectedArmorType) then 
-					correctClass = true;
-				end
+					local classInfo = CLASS_INFO[playerClass]
+					local className = (classMask and GetClassInfo(classMask)) or nil
+					correctClass = data.classMask == classInfo[1] or not data.classMask
 			end
 			--[[
 		else
@@ -209,6 +209,8 @@ local function UseSet(data)
 	if addon.Profile.CurrentFactionSets and  (data.requiredFaction and data.requiredFaction == GetFactionID(playerFaction) or data.requiredFaction == nil) or not addon.Profile.CurrentFactionSets then
 			correctFaction =  true
 	end
+
+--if true then return true end
 
 	if correctFaction
 	and correctClass 
@@ -263,7 +265,7 @@ function BuildBlizzSets()
 			--Covenant Sets
 			elseif data.setID <= 2221 and data.setID >= 2015 then 
 				data.filter = 11
-				data.tab = 3
+				data.tab = 2
 
 			--Shop & Trading Post
 			elseif addon.MiscSets.TRADINGPOST_SETS[data.setID]  or (data.label and string.find(data.label, inGameShopGlobalString))  or (data.label and string.find(data.label, tradingPostGlobalString))  
@@ -429,13 +431,10 @@ do
 		local at = Globals.ClassArmorType[dropdownclass]
 		local ty = Globals.ARMOR_TYPE[at]
 			armorType = ty or addon.Globals.CLASS_INFO[playerClass][3]
-					--print(armorType)
-
 			ArmorDB[armorType] = {}
 			local armorSetdata = {addon.ArmorSets[armorType], addon.ArmorSets["COSMETIC"]}
 		for armorType, data in ipairs(armorSetdata) do
 			ArmorDB[armorType] = {}
-
 
 			for id, data in pairs(data) do
 				--print(UseSet(data))
@@ -544,15 +543,9 @@ do
 						table.insert(baseList, data);
 						AddVariant(data, data.setID);
 					end
-
-
-
-
-
-
 					data.sources = {}
 
-			data.newStatus = false
+					data.newStatus = false
 
 					for i, itemData in pairs(data.itemData) do
 					--zz = itemData

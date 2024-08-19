@@ -202,4 +202,4 @@ addon.MiscSets.HeritageSets = {
 	[3701] = 85, -- Earthen (Freywold)
 	[3702] = 85, -- Earthen (Gundargaz)
 }
---/dump C_TransmogSets.GetSetInfo(2832)
+--/dump C_TransmogSets.GetSetInfo(3195)

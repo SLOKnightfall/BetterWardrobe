@@ -487,6 +487,16 @@ local function OpposingFaction(faction)
 	end
 end
 
+local PvPSets = {
+	["Honor"] = true,
+	["Combatant"] = true,
+	["Combatant I"] = true,
+	["Warfront"] = true,
+	["Aspirant"] = true,
+	["Gladiator"] = true,
+	["Elite"] = true,
+}
+
 addon.RefreshFilter = true
 function addon:FilterSets(setList, setType)
 	local FilterSets = {}
@@ -527,8 +537,14 @@ function addon:FilterSets(setList, setType)
 		end
 		return FilterSets
 	end
+
+
 	local searchString = string.lower(WardrobeCollectionFrameSearchBox:GetText())
-	local filterCollected = addon.Filters.Base.filterCollected
+	local filterCollected = C_TransmogSets.GetBaseSetsFilter(LE_TRANSMOG_SET_FILTER_COLLECTED)
+	local filterUncollected = C_TransmogSets.GetBaseSetsFilter(LE_TRANSMOG_SET_FILTER_UNCOLLECTED)
+	local filterPVE = C_TransmogSets.GetBaseSetsFilter(LE_TRANSMOG_SET_FILTER_PVE)
+	local filterPVP = C_TransmogSets.GetBaseSetsFilter(LE_TRANSMOG_SET_FILTER_PVP)
+
 	local missingSelection = addon.Filters.Base.missingSelection
 	local filterSelection = addon.Filters.Base.filterSelection
 	local xpacSelection = addon.Filters.Base.xpacSelection
@@ -539,13 +555,16 @@ function addon:FilterSets(setList, setType)
 		--filterSelection = addon.Filters.Extra.filterSelection
 		--xpacSelection = addon.Filters.Extra.xpacSelection
 	--end
+		--local PvPSets = false
 
 
 	for i, data in ipairs(filterList) do
 		local setData = BetterWardrobeSetsDataProviderMixin:GetSetSourceData(data.setID)
+		local isPvP = false
 		local count , total = setData.numCollected, setData.numTotal
 		local expansion = data.expansionID
 		local sourcefilter = (BetterWardrobeCollectionFrame:CheckTab(3) and filterSelection[data.filter])
+		--print(data.filter)
 		local unavailableFilter = (not unavailable or (addon.Profile.HideUnavalableSets and unavailable))
 		local tab = (BetterWardrobeCollectionFrame:CheckTab(2) and data.tab == 2) or (BetterWardrobeCollectionFrame:CheckTab(3) and data.tab == 3)
 		if BetterWardrobeCollectionFrame:CheckTab(2) then
@@ -553,9 +572,12 @@ function addon:FilterSets(setList, setType)
 			sourcefilter = true
 			unavailableFilter = true
 		end
-		
+
+		isPvP = data.description and PvPSets[data.description];   
+	
 		local collected = count == total
-		if ((filterCollected[1] and collected) or (filterCollected[2] and not collected)) and
+		if ((filterCollected and collected) or (filterUncollected and not collected)) and
+			((filterPVE and not isPvP) or (filterPVP and isPvP)) and
 			--CheckMissingLocation(data) and
 			xpacSelection[expansion] and
 			sourcefilter and
