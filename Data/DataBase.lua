@@ -158,27 +158,58 @@ local function UseSet(data)
 	local dropdownClass = C_TransmogSets.GetTransmogSetsClassFilter();
 	local selectedArmorType = dropdownClass or playerClass;
 	local ClassArmor = addon.Globals.ClassArmorMask[selectedArmorType];
-	if data.classMask  then
-		if data.classMask == 0 or data.classMask == 16383 then
-			return true;
-		end
+	local correctClass = false
+	local playerFaction, _ = UnitFactionGroup('player')
+	local correctFaction = false
+	local ClassArmorTypeMask = addon.Globals.ClassArmorMask[tonumber(selectedArmorType)]
 
-		if data.setType == "Blizzard" then 
-			for i = 1, #ClassArmor do
-				if data.classMask == ClassArmor[i] then
-					return true;
+
+	if data.classMask and (data.classMask == 0 or data.classMask == 16383) then
+		correctClass = true;
+	else
+		--if not addon.Profile.IgnoreClassRestrictions then
+			if data.setType == "Blizzard" then 
+				for i = 1, #ClassArmor do
+					if data.classMask == ClassArmor[i] then
+						correctClass = true;
+						break;
+					end
+				end
+			else
+				if data.classMask == tonumber(selectedArmorType) then 
+					correctClass = true;
 				end
 			end
+			--[[
 		else
-			if data.classMask == tonumber(selectedArmorType) then 
-				return true;
+			if data.setType == "Blizzard" then 
+				--zz = data
+				--print(data.armorType)
+
+				--print(data.classMask)
+				--if data.classMask == 400 then print(data.name) end
+				for i = 1, #ClassArmorTypeMask do
+					if data.classMask == ClassArmorTypeMask[i] then
+
+						correctClass = true;
+						break;
+					end
+				end
 			end
 		end
-
-		return false;
+		]]--
 	end
 
-	return true;
+	if addon.Profile.CurrentFactionSets and  (data.requiredFaction and data.requiredFaction == GetFactionID(playerFaction) or data.requiredFaction == nil) or not addon.Profile.CurrentFactionSets then
+			correctFaction =  true
+	end
+
+	if correctFaction
+	and correctClass then
+		return true
+	else
+		return false;
+	end
 end
 
 -- Gets all the Blizzard sets, filters out any sets shown in the base set tab and adds them to the apropriate ArmorDB
