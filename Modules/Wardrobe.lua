@@ -1848,7 +1848,6 @@ end
 
 function BetterWardrobeCollectionFrameMixin:OnKeyDown(key)
 	if self.tooltipCycle and key == WARDROBE_CYCLE_KEY then
-		self:SetPropagateKeyboardInput(false);
 		if IsShiftKeyDown() then
 			self.tooltipSourceIndex = self.tooltipSourceIndex - 1;
 		else
@@ -1857,13 +1856,8 @@ function BetterWardrobeCollectionFrameMixin:OnKeyDown(key)
 		self.tooltipContentFrame:RefreshAppearanceTooltip();
 	elseif key == WARDROBE_PREV_VISUAL_KEY or key == WARDROBE_NEXT_VISUAL_KEY or key == WARDROBE_UP_VISUAL_KEY or key == WARDROBE_DOWN_VISUAL_KEY then
 		if self.activeFrame:CanHandleKey(key) then
-			self:SetPropagateKeyboardInput(false);
 			self.activeFrame:HandleKey(key);
-		else
-			self:SetPropagateKeyboardInput(true);
 		end
-	else
-		self:SetPropagateKeyboardInput(true);
 	end
 end
 
