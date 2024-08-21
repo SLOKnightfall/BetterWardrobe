@@ -11,22 +11,65 @@ local itemBonusPattern = "item:(%d+):%d*:%d*:%d*:%d*:%d*:%d*:%d*:%d*:%d*:%d*:(%d
 
 local IE ={}
 
-local function Export(itemString, button)
+local function Export(itemString)
+	if LISTWINDOW then LISTWINDOW:Hide() end
+
+	local f = AceGUI:Create("Window")
+	f:SetCallback("OnClose",function(widget) AceGUI:Release(widget) end)
+	f:SetTitle("Wardrobe Export")
+	f:SetLayout("Fill")
+	f:EnableResize(false)
+	_G["BetterWardrobeExportWindow"] = f.frame
+	LISTWINDOW = f
+	tinsert(UISpecialFrames, "BetterWardrobeExportWindow")
+
+	local MultiLineEditBox = AceGUI:Create("MultiLineEditBox")
+	MultiLineEditBox:SetFullHeight(true)
+	MultiLineEditBox:SetFullWidth(true)
+	MultiLineEditBox:SetLabel("")
+	f:AddChild(MultiLineEditBox)
+
+	MultiLineEditBox:SetText(itemString or "")
 end
+
+
 
 --local testString = "compare?items=16955:32570:137109:29337:42376:35221:37363:16952:13075:50632:27512:34675"
 --local t2 = "compare?items=163307.0.0.0.0.0.0.0.0.0.5126:163453.0.0.0.0.0.0.0.0.0.5126:163455.0.0.0.0.0.0.0.0.0.5126:163456.0.0.0.0.0.0.0.0.0.5126:163458.0.0.0.0.0.0.0.0.0.5126:163459.0.0.0.0.0.0.0.0.0.5126:163460.0.0.0.0.0.0.0.0.0.5126:163461.0.0.0.0.0.0.0.0.0.5126"
 
 --compare?items=16955:32570:137109:29337:42376:35221:37363:16952:13075:50632:27512:34675
 
+--local string2 = "/outfit v1 194960,0,0,194987,194953,0,0,0,194954,194955,194956,194957,93239,-1,0,0,0"
 
 local function ImportSet(importString)
+	local itemData = {}
+	importString = string.gsub(importString,"/outfit v1", "")
+	for item in importString:gmatch("[(%-?%d+)]+") do
+		table.insert(itemData, item)
+	end
+
+	local itemTransmogInfoList ={} 
+
+	for i = 1, 19 do
+		local secondary = 0
+		local sourceID = itemData[i]
+
+		if sourceID then 
+			itemTransmogInfo = ItemUtil.CreateItemTransmogInfo(sourceID or 0, secondary, 0)
+		else
+			itemTransmogInfo = ItemUtil.CreateItemTransmogInfo( 0, 0, 0)
+		end
+		itemTransmogInfoList[i] = itemTransmogInfo	
+	end
+
+	DressUpItemTransmogInfoList(itemTransmogInfoList)
 end
 
 
 local importFrom = nil
+addon.importFrom = importFrom
 StaticPopupDialogs["BETTER_WARDROBE_IMPORT_SET_POPUP"] = {
-	text = L["Copy and paste a Wowhead Compare URL into the text box below to import"],
+	text = L["Copy and paste a WoW Outfit Link into the text box below to import"],
 	preferredIndex = 3,
 	button1 = L["Import"],
 	button2 = CANCEL,
@@ -43,7 +86,7 @@ StaticPopupDialogs["BETTER_WARDROBE_IMPORT_SET_POPUP"] = {
 		end
 	end,
 	OnAccept = function(self)
-		if importFrom == "Transmog" then 
+		if importFrom == "tmog"  then 
 			IE.ImportTransmogVendorSet(self.editBox:GetText())
 		else
 			ImportSet(self.editBox:GetText());
@@ -56,8 +99,10 @@ StaticPopupDialogs["BETTER_WARDROBE_IMPORT_SET_POPUP"] = {
 };
 
 
+
+--/outfit v1 194960,0,0,194987,194953,0,0,0,194954,194955,194956,194957,93239,-1,0,0,0
 --https://www.wowhead.com/item=163307/honorbound-centurions-vambraces?bonus=5126:1562#see-also
-local WowheadURL = "www.wowhead.com/item=(%d+).-bonus=(%d+):%d*"
+--local WowheadURL = "www.wowhead.com/item=(%d+).-bonus=(%d+):%d*"
 
 local function ConvertItemLink(item)
 end
@@ -69,7 +114,6 @@ end
 
 local function ImportItemTransMogVendor(importString)
 end
-
 
 StaticPopupDialogs["BETTER_WARDROBE_IMPORT_ITEM_POPUP"] = {
 	text = L["Type the item ID or url in the text box below"],
@@ -98,22 +142,51 @@ StaticPopupDialogs["BETTER_WARDROBE_IMPORT_ITEM_POPUP"] = {
 	whileDead = true,
 };
 
-
-
 function addon:ExportSet()
+	local playerActor = DressUpFrame.ModelScene:GetPlayerActor();
+	local itemTransmogInfoList = playerActor and playerActor:GetItemTransmogInfoList();
+	if not itemTransmogInfoList then
+		return;
+	end
+
+	local slashCommand = TransmogUtil.CreateOutfitSlashCommand(itemTransmogInfoList);
+	Export(slashCommand)
 end
 
-
-local function ExportTransmogVendorSet()
+function addon:ExportTransmogVendorSet()
+	local str = "/outfit v1 ";
+	for key, transmogSlot in pairs(TRANSMOG_SLOTS) do
+		if ( transmogSlot.location:IsAppearance() ) then
+			
+			----local sourceID = WardrobeOutfitDropDown:GetSlotSourceID(transmogSlot.location)
+			local _, _, sourceID = TransmogUtil.GetInfoForEquippedSlot(transmogSlot.location);
+			if ( sourceID ) then
+				str = str..sourceID..","
+			else
+				str = str.."0,"
+			end
+		end
+	end
+	Export(str,false)
 end
-
-
---compare?items=57290.0.0.0.0.0.0.0.0.0.0:163458.0.0.0.0.0.0.0.0.0.1:37513.0.0.0.0.0.0.0.0.0.0:173460.0.0.0.0.0.0.0.0.0.0:98093.0.0.0.0.0.0.0.0.0.0:38115.0.0.0.0.0.0.0.0.0.0:152399.0.0.0.0.0.0.0.0.0.0:80698.0.0.0.0.0.0.0.0.0.0:167829.0.0.0.0.0.0.0.0.0.0:98149.0.0.0.0.0.0.0.0.0.0:35870.0.0.0.0.0.0.0.0.0.0:62968.0.0.0.0.0.0.0.0.0.0:155409.0.0.0.0.0.0.0.0.0.0
 
 function IE.ImportTransmogVendorSet(importString)
+	local transmogSources = {}
+	importString = string.gsub(importString,"/outfit v1", "")
+	for item in importString:gmatch("[(%-?%d+)]+") do
+		table.insert(transmogSources, item)
+	end
 
+	for _,sourceID in ipairs(transmogSources) do
+		local sourceInfo = C_TransmogCollection.GetSourceInfo(sourceID)
+		if sourceInfo then
+			local slot = C_Transmog.GetSlotForInventoryType(sourceInfo.invType);
+			local pendingInfo = TransmogUtil.CreateTransmogPendingInfo(Enum.TransmogPendingType.Apply, sourceID);
+			local transmogLocation = TransmogUtil.CreateTransmogLocation(slot, Enum.TransmogType.Appearance, Enum.TransmogModification.Main);
+			C_Transmog.SetPending(transmogLocation, pendingInfo);
+		end
+	end
 end
-
 
 local linkText = "f(%d,%d);"
 function addon:CreateChatLink()
@@ -157,9 +230,6 @@ end
 
 
 function BW_TransmogVendorExportButton_OnClick(self)
-
-
-
 end
 
 --/run local function f(i,b)DressUpItemLink("item:"..i.."::::::::::::9:"..b);end;f(27457,0);f(27489,0);f(27539,0);f(27548,0);f(27748,0);f(27790,0);f(27897,0);f(28221,0);

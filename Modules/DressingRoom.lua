@@ -618,10 +618,15 @@ local function BW_DressingRoomImportButton_OnClick(self)
 
 	
 		if  C_Transmog.IsAtTransmogNPC() then
-		
+			rootDescription:CreateButton(L["Import Set"], function() addon.importFrom = "tmog"; BetterWardrobeOutfitManager:ShowPopup("BETTER_WARDROBE_IMPORT_SET_POPUP") end);
+			rootDescription:CreateButton(L["Export Set"], function() addon:ExportTransmogVendorSet() end);
+
+
 		else
-					rootDescription:CreateButton(L["Import Item"], function() BetterWardrobeOutfitManager:ShowPopup("BETTER_WARDROBE_IMPORT_ITEM_POPUP") end);
-		--rootDescription:CreateButton(L["Import Set"], function()BetterWardrobeOutfitManager:ShowPopup("BETTER_WARDROBE_IMPORT_SET_POPUP") end);
+			rootDescription:CreateButton(L["Import Item"], function() BetterWardrobeOutfitManager:ShowPopup("BETTER_WARDROBE_IMPORT_ITEM_POPUP") end);
+			rootDescription:CreateButton(L["Import Set"], function() BetterWardrobeOutfitManager:ShowPopup("BETTER_WARDROBE_IMPORT_SET_POPUP") end);
+			rootDescription:CreateButton(L["Export Set"], function() addon:ExportSet() end);
+
 		--rootDescription:CreateButton(L["Create Dressing Room Command Link"], function() addon:CreateChatLink() end);
 		end
 

@@ -170,11 +170,10 @@ local function UseSet(data)
 	local correctHeratiage = false
 	local heritageSets = addon.MiscSets.HeritageSets
 
-
 	if heritageSets[data.setID] and heritageSets[data.setID] == playerRace  then
-				correctHeratiage = true;
-					correctFaction = true;
-					correctClass = true;
+		correctHeratiage = true;
+		correctFaction = true;
+		correctClass = true;
 	elseif not heritageSets[data.setID] then
 		correctHeratiage = true;
 	end
