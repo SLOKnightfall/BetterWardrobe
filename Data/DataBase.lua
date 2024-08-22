@@ -214,11 +214,9 @@ local function UseSet(data)
 		]]--
 	end
 
-	if addon.Profile.CurrentFactionSets and (data.requiredFaction and GetFactionID(data.requiredFaction) == GetFactionID(playerFaction) or data.requiredFaction == nil) or not addon.Profile.CurrentFactionSets then
-			--print(data.name)
-
+	if addon.Profile.CurrentFactionSets and (data.requiredFaction and GetFactionID(data.requiredFaction) == GetFactionID(playerFaction) or data.requiredFaction == nil) 
+		or not addon.Profile.CurrentFactionSets then
 			correctFaction =  true
-			--return true
 	end
 
 --if true then return true end
@@ -936,7 +934,9 @@ end
 	end
 
 	function addon.GetSetType(outfitID)
-			setData = addon.GetSetInfo(outfitID)
+			if outfitID >= 5000 and outfitID < (5000 + MAX_DEFAULT_OUTFITS) then return "SavedBlizzard" end
+
+			local setData = addon.GetSetInfo(outfitID)
 		return setData and setData.setType or "Unknown"
 	end
 

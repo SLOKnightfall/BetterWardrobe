@@ -6346,7 +6346,7 @@ function BetterWardrobeSetsScrollFrameButtonMixin:Init(elementData)
 		end
 	--end
 
-	if #variantSets <= 1  or C_AddOns.IsAddOnLoaded("CanIMogIt") then
+	if #variantSets <= 1  or (C_AddOns.IsAddOnLoaded("CanIMogIt") and CanIMogItOptions["showSetInfo"]) then
 		self.Variants:Hide()
 		self.Variants.Count:SetText(0)
 	else
@@ -7207,14 +7207,13 @@ function BetterWardrobeSetsTransmogMixin:OnPageChanged(userAction)
 end
 
 function BetterWardrobeSetsTransmogMixin:LoadSet(setID)
+print(setID)
 	local waitingOnData = false;
 	local transmogSources = { };
 	local setType = addon.GetSetType(setID);
-	local offShoulder;
-	local mainHandEnchant;
-	local offHandEnchant;
-	  setData = ""
-	--Default Saved sets;
+
+
+	--Default Blizzard Saved sets;
 	if setType == "SavedBlizzard" then
 		local setSources = SetsDataProvider:GetSetSources(setID);
 		for sourceID in pairs(setSources) do
@@ -7242,32 +7241,32 @@ function BetterWardrobeSetsTransmogMixin:LoadSet(setID)
 		end
 		C_Transmog.LoadOutfit(addon:GetBlizzID(setID))
 	else
+		local setData = addon.GetSetInfo(setID);
+		if not setData or setType == "Unknown" then return end
 
+		local offShoulder = setData.offShoulder or 0;
+		local mainHandEnchant = setData.mainHandEnchant or 0;
+		local offHandEnchant = setData.offHandEnchant or 0;
 
-			setData = addon.GetSetInfo(setID);
-			offShoulder = setData.offShoulder or 0;
-			mainHandEnchant = setData.mainHandEnchant or 0;
-			offHandEnchant = setData.offHandEnchant or 0;
-
+		--Load Default Blizzard set
+		if setData.setType == "Blizzard" then
 			local sources = setData.sources--GetSetSources(setID);
-	if setData.setType == "Blizzard" then
-		for sourceID,_ in pairs(sources) do
-			local sourceInfo = C_TransmogCollection.GetSourceInfo(sourceID);
-			local slot = C_Transmog.GetSlotForInventoryType(sourceInfo.invType);
-			local tmogLocation = TransmogUtil.CreateTransmogLocation(slot, Enum.TransmogType.Appearance, Enum.TransmogModification.Main);
-			local slotSources = C_TransmogCollection.GetAppearanceSources(sourceInfo.visualID, sourceInfo.categoryID, tmogLocation);
-			CollectionWardrobeUtil.SortSources(slotSources, sourceInfo.visualID);
-			local index = CollectionWardrobeUtil.GetDefaultSourceIndex(slotSources, sourceID);
-			transmogSources[slot] = slotSources[index].sourceID;
-			for i, slotSourceInfo in ipairs(slotSources) do
-				if ( not slotSourceInfo.name ) then
-					waitingOnData = true;
+			for sourceID,_ in pairs(sources) do
+				local sourceInfo = C_TransmogCollection.GetSourceInfo(sourceID);
+				local slot = C_Transmog.GetSlotForInventoryType(sourceInfo.invType);
+				local tmogLocation = TransmogUtil.CreateTransmogLocation(slot, Enum.TransmogType.Appearance, Enum.TransmogModification.Main);
+				local slotSources = C_TransmogCollection.GetAppearanceSources(sourceInfo.visualID, sourceInfo.categoryID, tmogLocation);
+				CollectionWardrobeUtil.SortSources(slotSources, sourceInfo.visualID);
+				local index = CollectionWardrobeUtil.GetDefaultSourceIndex(slotSources, sourceID);
+				transmogSources[slot] = slotSources[index].sourceID;
+				for i, slotSourceInfo in ipairs(slotSources) do
+					if ( not slotSourceInfo.name ) then
+						waitingOnData = true;
+					end
 				end
 			end
-			
-		end
-	else
-
+		--Load extra and extended sets
+		else
 			if setData.itemData then 
 				for slotID, slotData in pairs(setData.itemData) do
 					local sourceID = slotData[2];
@@ -7299,7 +7298,7 @@ function BetterWardrobeSetsTransmogMixin:LoadSet(setID)
 					--transmogSources[slotID] = data[2]
 				--end
 			end
-	end	
+		end	
 
 		if ( waitingOnData ) then
 			self.loadingSetID = setID;
@@ -7346,6 +7345,7 @@ function BetterWardrobeSetsTransmogMixin:LoadSet(setID)
 			end]]
 		end
 	end
+
 	local emptySlotData = Sets:GetEmptySlots();
 	if addon.Profile.HiddenMog and setData.setType then	
 		local clearSlots = Sets:EmptySlots(transmogSources);
@@ -7647,6 +7647,9 @@ function addon.Sets:GetLocationBasedCount(setInfo)
 end
 --addon:SecureHook(WardrobeCollectionFrame, "OpenTransmogLink", function() print("test") end)
 
+
+--TODO: FIX
+--[[
 addon:SecureHook("SetItemRef", function(link, ...) 
 	if InCombatLockdown() then return end
 
@@ -7672,6 +7675,7 @@ addon:SecureHook("SetItemRef", function(link, ...)
 		return;
 	end
 end)
+]]--
 
 function BW_JournalHideSlotMenu_OnClick(parent)
 
