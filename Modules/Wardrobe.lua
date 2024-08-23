@@ -7207,7 +7207,6 @@ function BetterWardrobeSetsTransmogMixin:OnPageChanged(userAction)
 end
 
 function BetterWardrobeSetsTransmogMixin:LoadSet(setID)
-print(setID)
 	local waitingOnData = false;
 	local transmogSources = { };
 	local setType = addon.GetSetType(setID);
@@ -7347,7 +7346,7 @@ print(setID)
 	end
 
 	local emptySlotData = Sets:GetEmptySlots();
-	if addon.Profile.HiddenMog and setData.setType then	
+	if addon.Profile.HiddenMog and setType then	
 		local clearSlots = Sets:EmptySlots(transmogSources);
 		for i, x in pairs(clearSlots) do
 			local _, source = addon.GetItemSource(x) --C_TransmogCollection.GetItemInfo(x);
