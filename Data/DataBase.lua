@@ -1002,10 +1002,10 @@ end
 
 				if data.setType == "SavedBlizzard" then 
 					local outfitItemTransmogInfoList = C_TransmogCollection.GetOutfitItemTransmogInfoList(data.outfitID - 5000);
-					--info.sources = {}
-					--for i, data in pairs(outfitItemTransmogInfoList) do
-						--.sources[i] = data.appearanceID
-					--end
+					info.sources = {}
+					for i, infoList in pairs(outfitItemTransmogInfoList) do
+						info.sources[i] = infoList.appearanceID
+					end
 
 				elseif data.setType == "SavedExtra" then
 					local ItemTransmogInfoList = {}

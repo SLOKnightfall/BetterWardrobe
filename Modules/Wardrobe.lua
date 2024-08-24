@@ -4704,17 +4704,21 @@ function BetterWardrobeSetsDataProviderMixin:GetSetSourceTopCounts(setID)
 	end
 end
 
-
 function BetterWardrobeSetsDataProviderMixin:GetSetSources(setID)
-	local set  = self:GetSetByID(setID) or {};
-		if not setID then return {} end
-	if set.sources == nil then
+	local set = self:GetSetByID(setID) or {};
+	if not setID then return {} end
+
+	if not set.sources and set.setType == "Blizzard" then
 		set.sources = {};
 		local setAppearances = C_TransmogSets.GetSetPrimaryAppearances(setID);
 		for i, appearanceInfo in ipairs(setAppearances) do
 			set.sources[appearanceInfo.appearanceID] = appearanceInfo.collected;
 		end
 	end
+
+	set.sources =  set.sources or {};
+
+	--check for set item substitutions
 	for id, data in pairs(set.sources) do
 		local newSourceID = addon.GetSubItem(id, setID)
 		if newSourceID then
@@ -7211,7 +7215,6 @@ function BetterWardrobeSetsTransmogMixin:LoadSet(setID)
 	local transmogSources = { };
 	local setType = addon.GetSetType(setID);
 
-
 	--Default Blizzard Saved sets;
 	if setType == "SavedBlizzard" then
 		local setSources = SetsDataProvider:GetSetSources(setID);
@@ -7255,6 +7258,7 @@ function BetterWardrobeSetsTransmogMixin:LoadSet(setID)
 				local slot = C_Transmog.GetSlotForInventoryType(sourceInfo.invType);
 				local tmogLocation = TransmogUtil.CreateTransmogLocation(slot, Enum.TransmogType.Appearance, Enum.TransmogModification.Main);
 				local slotSources = C_TransmogCollection.GetAppearanceSources(sourceInfo.visualID, sourceInfo.categoryID, tmogLocation);
+				if not slotSources then return end
 				CollectionWardrobeUtil.SortSources(slotSources, sourceInfo.visualID);
 				local index = CollectionWardrobeUtil.GetDefaultSourceIndex(slotSources, sourceID);
 				transmogSources[slot] = slotSources[index].sourceID;
@@ -7346,7 +7350,9 @@ function BetterWardrobeSetsTransmogMixin:LoadSet(setID)
 	end
 
 	local emptySlotData = Sets:GetEmptySlots();
-	if addon.Profile.HiddenMog and setType then	
+				local tab = BetterWardrobeCollectionFrame.selectedTransmogTab;
+
+	if addon.Profile.HiddenMog and setType and tab ~= 4 then	
 		local clearSlots = Sets:EmptySlots(transmogSources);
 		for i, x in pairs(clearSlots) do
 			local _, source = addon.GetItemSource(x) --C_TransmogCollection.GetItemInfo(x);
