@@ -7350,9 +7350,9 @@ function BetterWardrobeSetsTransmogMixin:LoadSet(setID)
 	end
 
 	local emptySlotData = Sets:GetEmptySlots();
-				local tab = BetterWardrobeCollectionFrame.selectedTransmogTab;
+	local tab = BetterWardrobeCollectionFrame.selectedTransmogTab;
 
-	if addon.Profile.HiddenMog and setType and tab ~= 4 then	
+	if addon.Profile.HiddenMog and (setType and setType ~= "SavedExtra" and setType ~= "SavedBlizzard")  then	
 		local clearSlots = Sets:EmptySlots(transmogSources);
 		for i, x in pairs(clearSlots) do
 			local _, source = addon.GetItemSource(x) --C_TransmogCollection.GetItemInfo(x);

@@ -937,7 +937,7 @@ end
 			if outfitID >= 5000 and outfitID < (5000 + MAX_DEFAULT_OUTFITS) then return "SavedBlizzard" end
 
 			local setData = addon.GetSetInfo(outfitID)
-		return setData and setData.setType or "Unknown"
+		return setData and setData.setType or nil
 	end
 
 
