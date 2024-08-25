@@ -76,6 +76,7 @@ local variantSets = {};
 addon.VariantSets = variantSets
 local variantIDs = {};
 addon.VariantIDs = variantIDs
+local fullList = {}
 
 local function AddVariant(set, baseSetID)
 	if not variantSets[baseSetID] then
@@ -84,6 +85,7 @@ local function AddVariant(set, baseSetID)
 	
 	set.baseSetID = baseSetID;
 	tinsert(variantSets[baseSetID], set)
+	fullList[set.setID] = set
 	variantIDs[set.setID] = baseSetID;
 end
 
@@ -367,6 +369,8 @@ function BuildBlizzSets()
 				local subSet = false;
 				local subSetBaseID;
 				SET_INDEX[data.setID] = data
+				fullList[data.setID] = set
+
 
 
 				if data.customGroups and baseListLabels[data.customGroups] then
@@ -1158,12 +1162,28 @@ end
 
 
 	function addon.GetSetInfo(setID)
-		return SET_INDEX[setID]
+			local atTransmogrifier = C_Transmog.IsAtTransmogNPC()
+		if atTransmogrifier then 
+			return fullList[setID]
+		else
+			return SET_INDEX[setID]
+		end
+
 	end
 
 	function addon.GetSets()
-		return SET_INDEX
+		local atTransmogrifier = C_Transmog.IsAtTransmogNPC()
+		if atTransmogrifier then 
+			return fullList
+		else
+			return SET_INDEX
+		end
 	end 
+
+	function addon.GetFullSets()
+
+	return 	fullList
+end
 	function addon.SetItemSubstitute(itemID, subID)
 		itemID = tonumber(itemID)
 		subID = tonumber(subID)

@@ -4575,7 +4575,12 @@ function BetterWardrobeSetsDataProviderMixin:GetUsableSets(incVariants)
 
 	if not self.usableSets then
 		self.usableSets = {}
+
 		local sets = addon.GetSets();
+		if atTransmogrifier then 
+		sets = addon.GetFullSets()
+	end
+
 		local countData;
 		sets = addon:FilterSets(sets)
 		sets = addon:SearchSets(sets)
@@ -7458,7 +7463,6 @@ function BetterWardrobeSetsTransmogMixin:OnSearchUpdate()
 end
 
 function BetterWardrobeSetsTransmogMixin:SelectSet(setID)
-
 	--TODO REVISIT FOR OTHE SET TYopes;
 	self.selectedSetID = setID;
 	selected = true;
@@ -7470,7 +7474,7 @@ function BetterWardrobeSetsTransmogMixin:SelectSet(setID)
 	if ( name ) then
 		--BW_UIDropDownMenu_SetText(BetterWardrobeOutfitDropDown, name)
 	else
-		outfitID = nil;
+		--outfitID = nil;
 		--BW_UIDropDownMenu_SetText(BetterWardrobeOutfitDropDown, GRAY_FONT_COLOR_CODE..TRANSMOG_OUTFIT_NONE..FONT_COLOR_CODE_CLOSE)
 	end
 
