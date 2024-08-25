@@ -693,6 +693,7 @@ end
 	function addon:ClearCache()
 		wipe(addon.ArmorSetModCache)
 		wipe(SET_INDEX)
+		wipe(fullList)
 		addon.ClearArtifactData()
 		addon.SavedSetCache =  nil
 
@@ -974,6 +975,7 @@ end
 			local savedOutfits = addon.GetOutfits()
 			local list = {}
 			SET_INDEX = SET_INDEX or {}
+			fullList = fullList or {}
 			for index, data in ipairs(savedOutfits) do
 				local info = {}
 				info.items = data.items or {}
@@ -1101,6 +1103,7 @@ end
 				table.insert(baseList, info);
 
 				SET_INDEX[info.setID] = info
+				fullList[info.setID] = info
 				tinsert(list, info)
 			end
 			
