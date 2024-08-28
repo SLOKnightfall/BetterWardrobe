@@ -4759,7 +4759,7 @@ end
 function BetterWardrobeSetsDataProviderMixin:IsBaseSetNew(baseSetID)
 	local baseSetData = self:GetBaseSetData(baseSetID);
 
-	if ( not baseSetData.newStatus ) then
+	if (baseSetData and  not baseSetData.newStatus ) then
 		local newStatus = self:SetHasNewSources(baseSetID);
 		if ( not newStatus ) then
 			-- check variants
@@ -4773,9 +4773,10 @@ function BetterWardrobeSetsDataProviderMixin:IsBaseSetNew(baseSetID)
 			end
 		end
 		baseSetData.newStatus = newStatus;
+		return baseSetData.newStatus;
+	else
+		return false
 	end
-
-	return baseSetData.newStatus;
 end
 
 local classGlobal = strsplit(" ", ITEM_CLASSES_ALLOWED)
@@ -5902,19 +5903,21 @@ local function ContainsValue(data, searchValue)
 
 	searchValue = string.lower(searchValue);
 
-	found = string.find(string.lower(data.name), searchValue);
-	
+	local nameFound = string.find(string.lower(data.name), searchValue);
+	local labelFound = false
+	local variantFound = false
 	if data.label then
-		found = string.find(string.lower(data.label), searchValue);
+		labelFound = string.find(string.lower(data.label), searchValue);
 	end
 
 	local baseSetID = SetsDataProvider:GetBaseSetID(data.setID)
 	local variantSets = SetsDataProvider:GetVariantSets(baseSetID);
 	for _, variant in pairs(variantSets) do
-		found = string.find(string.lower(variant.name), searchValue);
+		variantFound = string.find(string.lower(variant.name), searchValue);
+		if variantFound then break end
 	end
 
-	return found;
+	return nameFound or labelFound or variantFound;
 end
 
 local init = true
@@ -5932,11 +5935,11 @@ function BetterWardrobeSetsCollectionMixin:OnSearchUpdate()
 		wipe(addon.searchSet);
 		if searchValue ~= "" then
 			for _, baseSet in pairs(addon.BaseIDs) do
-			if ContainsValue(baseSet, searchValue) then
-				table.insert(addon.searchSet, baseSet);
+				if ContainsValue(baseSet, searchValue) then
+					table.insert(addon.searchSet, baseSet);
+				end
 			end
 		end
-	end
 
 	--addon:FilterSets(addon.searchSet)
 	RefreshLists();
@@ -6248,12 +6251,10 @@ function BetterWardrobeSetsCollectionMixin:OpenInDressingRoom(setID)
 		end)
 		end
 		
-	local setType = tabType[addon.GetTab()]
-	 setInfo = addon.GetSetInfo(setID) or C_TransmogSets.GetSetInfo(setID)
+	--local setType = tabType[addon.GetTab()]
+	local setInfo = addon.GetSetInfo(setID) or C_TransmogSets.GetSetInfo(setID)
+	local setType = setInfo.setType
 
-
-
-	
 	--local setType = addon.QueueList[1]
 	--local setID = addon.QueueList[2]
 	local playerActor = DressUpFrame.ModelScene:GetPlayerActor()
@@ -6262,15 +6263,14 @@ function BetterWardrobeSetsCollectionMixin:OpenInDressingRoom(setID)
 		return false
 	end
 
-	if setType == "set" then
+	if setType == "Blizzard" then
 		sources = {}
 		local sourceInfo = C_TransmogSets.GetSetPrimaryAppearances(setID)
 		for i, data in ipairs(sourceInfo) do
 			sources[data.appearanceID] = false
-
 		end
 
-	elseif setType == "extraset" then
+	elseif setType == "ExtraSet" then
 		sources = SetsDataProvider:GetSetSources(setID)
 	end
 

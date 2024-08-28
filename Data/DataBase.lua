@@ -77,6 +77,7 @@ addon.VariantSets = variantSets
 local variantIDs = {};
 addon.VariantIDs = variantIDs
 local fullList = {}
+addon.fullList = fullList
 
 local function AddVariant(set, baseSetID)
 	if not variantSets[baseSetID] then
