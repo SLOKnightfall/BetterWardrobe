@@ -641,15 +641,15 @@ function BetterWardrobeOutfitDropdownOverrideMixin:OnSelectOutfit(outfitID)
 		local value = addon:GetBlizzID(outfitID) or ""
 		for specIndex = 1, GetNumSpecializations() do
 			if GetCVar("lastTransmogOutfitIDSpec"..specIndex) == "" then
-				SetCVar("lastTransmogOutfitIDSpec"..specIndex, value)
-				addon.OutfitDB.char.lastTransmogOutfitIDSpec[specIndex] = outfitID;
+				--SetCVar("lastTransmogOutfitIDSpec"..specIndex, value)
+				--addon.OutfitDB.char.lastTransmogOutfitIDSpec[specIndex] = outfitID;
 			end
 		end
 	else
 		local value = outfitID or ""
 		for specIndex = 1, GetNumSpecializations() do
 			if addon.OutfitDB.char.lastTransmogOutfitIDSpec[specIndex] == "" then
-				addon.OutfitDB.char.lastTransmogOutfitIDSpec[specIndex] = value;
+				--addon.OutfitDB.char.lastTransmogOutfitIDSpec[specIndex] = value;
 			end
 		end
 	end

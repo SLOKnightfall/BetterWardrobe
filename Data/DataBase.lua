@@ -655,6 +655,8 @@ function addon.Init:UpdateCollectedAppearances()
 		end
 	end
 end
+
+
 	function addon.Init:InitDB()
 		addon:ClearCache()
 		buildSetSubstitutions()
