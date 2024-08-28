@@ -6108,7 +6108,7 @@ function BetterWardrobeSetsCollectionMixin:RefreshAppearanceTooltip()
 	end
 
 	if BetterWardrobeCollectionFrame.selectedCollectionTab == 2 then
-		local sources = C_TransmogSets.GetSourcesForSlot(self:GetSelectedSetID(), self.tooltipTransmogSlot);
+		local sources = C_TransmogSets.GetSourcesForSlot(self:GetSelectedSetID(), self.tooltipTransmogSlot) or {};
 		if ( #sources == 0 ) then
 			-- can happen if a slot only has HiddenUntilCollected sources
 			local sourceInfo = C_TransmogCollection.GetSourceInfo(self.tooltipPrimarySourceID);

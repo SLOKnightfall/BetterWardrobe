@@ -114,6 +114,10 @@ addon.MiscSets.customGroups = {
 	[1998] = "Azerothian Archives", --"Renowned Explorer's Attire",
 	[1999] = "Azerothian Archives", --"Renowned Explorer's Attire",
 	[3306] = "Trading Post",
+	[3518] = "Arathi Atire",
+	[3876] = "Arathi Atire",
+	[3877] = "Arathi Atire",
+
 }
 
 

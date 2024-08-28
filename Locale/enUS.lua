@@ -503,6 +503,8 @@ L["NOTE_125"] = "Plunderlord's Finery"
 L["NOTE_126"] = "Class Starting Set"
 L["NOTE_127"] = "Class Ensemble"
 L["NOTE_128"] = "War Within Launch Event Set"
+L["NOTE_129"] = "Underground Gear"
+L["NOTE_130"] = "Hallowfall Gear"
 
 
 L["Swap to Better Wardrobe View"] = true
