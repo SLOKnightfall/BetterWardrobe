@@ -687,10 +687,10 @@ function addon.SortVariantSet(sets, reverseUIOrder, ignorePatchID)
 		local groupFavorite1 = set1.favoriteSetID and true;
 		local groupFavorite2 = set2.favoriteSetID and true;
 		if ( groupFavorite1 ~= groupFavorite2 ) then
-			return groupFavorite1;
+--return groupFavorite1;
 		end
 		if ( set1.favorite ~= set2.favorite ) then
-			return set1.favorite;
+			--return set1.favorite;
 		end
 
 			----if ( set1.requiredFaction and set1.requiredFaction ~= set2.requiredFaction) then

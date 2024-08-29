@@ -118,6 +118,42 @@ addon.MiscSets.customGroups = {
 	[3876] = "Arathi Atire",
 	[3877] = "Arathi Atire",
 
+	[3411] = "Dawnwatcher",
+	[3412] = "Dawnwatcher",
+	[3410] = "Dawnwatcher",
+	[3416] = "Jade Guardian",
+	[3417] = "Jade Guardian",
+	[3418] = "Jade Guardian",
+	[3419] = "Jade Guardian",
+	[3407] = "Trailseeker",
+	[3408] = "Trailseeker",
+	[3406] = "Trailseeker",
+	[3409] = "Trailseeker",
+
+	[3431] = "Gatecrasher",
+	[3433] = "Gatecrasher",
+	[3432] = "Gatecrasher",
+	[3416] = "Gatecrasher",
+	[3429] = "Warplate",
+	[3427] = "Warplate",
+	[3426] = "Warplate",
+	[3428] = "Warplate",
+
+
+	[3391] = "mistveil",
+	[3392] = "mistveil",
+	[3393] = "mistveil",
+	[3390] = "mistveil",
+	[3399] = "snowdrift",
+	[3398] = "snowdrift",
+	[3397] = "snowdrift",
+
+	[3375] = "Mistwalker",
+	[3374] = "Mistwalker",
+	[3376] = "Mistwalker",
+	[3372] = "spiritwalker",
+	[3373] = "spiritwalker",
+	[3371] = "spiritwalker",
 }
 
 

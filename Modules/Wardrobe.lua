@@ -5112,6 +5112,8 @@ function BetterWardrobeSetsCollectionMixin:OnShow()
 
 		local selectedSetID = self:GetSelectedSetID();
 		local baseSetID = SetsDataProvider:GetBaseSetID(selectedSetID);
+		local variantSetList = SetsDataProvider:GetVariantSets(baseSetID)
+		addon.SortVariantSet(variantSetList, true, true);
 
 		local function IsSelected(variantSet)
 			return variantSet.setID == self:GetSelectedSetID();
@@ -5125,7 +5127,7 @@ function BetterWardrobeSetsCollectionMixin:OnShow()
 
 		end
 
-		for index, variantSet in ipairs(SetsDataProvider:GetVariantSets(baseSetID)) do
+		for index, variantSet in ipairs(variantSetList) do
 			--if not variantSet.hiddenUntilCollected or variantSet.collected then
 				local numSourcesCollected, numSourcesTotal = SetsDataProvider:GetSetSourceCounts(variantSet.setID);
 				local colorCode = IN_PROGRESS_FONT_COLOR_CODE;
