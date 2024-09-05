@@ -191,6 +191,7 @@ local function BuildSourceList(visualID)
 	local sourceID = sources and sources.sourceID
 	local data = {}
 	local data_index = 1
+
 	if sources then
 		for i=1,#sources do
 			local sourceInfo = C_TransmogCollection.GetSourceInfo(sources[i])
@@ -201,16 +202,16 @@ local function BuildSourceList(visualID)
 				local sourceData = itemID and itemSourceDB[itemID] or sourceInfo
 				local sourceType = sourceInfo.sourceType
 				--Don't want to list items with hidden sources
-				if sourceType then 
+				--if sourceType then 
 					data[data_index] = {
 						["itemID"] = itemID ,
-						["itemLink"] = itemLink,
-						["sourceType"] = sourceType,
-						["sourceData"] = sourceData,
-						["sourceID"] = sources[i],
+						["itemLink"] = itemLink or nil,
+						["sourceType"] = sourceType or nil,
+						["sourceData"] = sourceData or nil,
+						["sourceID"] = sources[i] or nil,
 					}
 					data_index = data_index + 1
-				end
+				--end
 			end
 		end
 	end
@@ -455,7 +456,6 @@ function CollectionList:GenerateSourceListView(visualID)
 	scroll:SetFullWidth(true)
 	scroll:SetFullHeight(true)
 	scrollcontainer:AddChild(scroll)	
-
 	local list = BuildSourceList(visualID)
 	for i, data in ipairs(list) do
 		if data then
