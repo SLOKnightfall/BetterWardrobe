@@ -3954,6 +3954,8 @@ function BetterWardrobeSetsTransmogModelMixin:OnMouseUp(button)
 					rootDescription:CreateButton(TRANSMOG_ITEM_UNSET_FAVORITE, function()
 						if tab == 2 then 
 							C_TransmogSets.SetIsFavorite(self.setID, false);
+														RefreshLists()	
+
 						else
 							addon.favoritesDB.profile.extraset[self.setID] = nil;
 							RefreshLists()	
@@ -3972,6 +3974,8 @@ function BetterWardrobeSetsTransmogModelMixin:OnMouseUp(button)
 							end
 
 							C_TransmogSets.SetIsFavorite(self.setID, true);
+														RefreshLists()	
+
 						elseif tab == 3 then
 							addon.favoritesDB.profile.extraset[self.setID] = true;
 							RefreshLists()
@@ -4575,11 +4579,11 @@ function BetterWardrobeSetsDataProviderMixin:GetUsableSets(incVariants)
 
 	if not self.usableSets then
 		self.usableSets = {}
-
 		local sets = addon.GetSets();
 		if atTransmogrifier then 
-		sets = addon.GetFullSets()
-	end
+			sets = addon.GetFullSets()
+		end
+		self:SortSets(sets)
 
 		local countData;
 		sets = addon:FilterSets(sets)
@@ -4593,10 +4597,10 @@ function BetterWardrobeSetsDataProviderMixin:GetUsableSets(incVariants)
 				tinsert(self.usableSets, data)
 			end
 
-			self:SortSets(self.usableSets)
 		end
 	end
-		
+	self:SortSets(self.usableSets)
+
 	return self.usableSets
 end
 
@@ -6478,13 +6482,12 @@ function BetterWardrobeSetsScrollFrameButtonMixin:OnClick(buttonName, down)
 
 			local text;
 			local targetSetID;
-
-			local favorite = (type == "set" and baseSet.favoriteSetID ~= nil) or addon.favoritesDB.profile.extraset[baseSetID]
+			local favorite = (type == "set" and baseSet.favorite) or addon.favoritesDB.profile.extraset[baseSetID]
 			--local favorite = baseSet.favoriteSetID ~= nil;
 			if favorite then
-				targetSetID = baseSet.favoriteSetID;
+				targetSetID = BetterWardrobeCollectionFrame.SetsCollectionFrame:GetDefaultSetIDForBaseSet(baseSetID);
 				if useDescription then
-					local setInfo = C_TransmogSets.GetSetInfo(baseSet.favoriteSetID or baseSetIDP);
+					local setInfo = C_TransmogSets.GetSetInfo(targetSetID);
 					text = format(TRANSMOG_SETS_UNFAVORITE_WITH_DESCRIPTION, setInfo.description);
 				else
 					text = TRANSMOG_ITEM_UNSET_FAVORITE;
@@ -6493,6 +6496,7 @@ function BetterWardrobeSetsScrollFrameButtonMixin:OnClick(buttonName, down)
 				targetSetID = BetterWardrobeCollectionFrame.SetsCollectionFrame:GetDefaultSetIDForBaseSet(baseSetID);
 				if useDescription then
 					local setInfo = C_TransmogSets.GetSetInfo(targetSetID);
+					local description = (setInfo and setInfo.description) or ""
 					text = format(TRANSMOG_SETS_FAVORITE_WITH_DESCRIPTION, setInfo.description);
 				else
 					text = TRANSMOG_ITEM_SET_FAVORITE;
@@ -7027,6 +7031,8 @@ end
 
 function BetterWardrobeSetsTransmogMixin:UpdateSets()
 	local usableSets = SetsDataProvider:GetUsableSets(force);
+		--self:SortSets(self.usableSets)
+
 	self.PagingFrame:SetMaxPages(ceil(#usableSets / self.PAGE_SIZE));
 	local pendingTransmogModelFrame = nil;
 	local indexOffset = (self.PagingFrame:GetCurrentPage() - 1) * self.PAGE_SIZE;

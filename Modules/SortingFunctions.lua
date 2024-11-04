@@ -520,8 +520,8 @@ end
 
 local function SortDefault(sets)
 	local comparison = function(set1, set2)	
-		local groupFavorite1 = (addon.favoritesDB.profile.extraset[set1.setID] or set1.favoriteSetID) and true
-		local groupFavorite2 = (addon.favoritesDB.profile.extraset[set2.setID] or set2.favoriteSetID) and true
+		local groupFavorite1 = (addon.favoritesDB.profile.extraset[set1.setID] or set1.favoriteSetID or set1.favorite ) and true
+		local groupFavorite2 = (addon.favoritesDB.profile.extraset[set2.setID] or set2.favoriteSetID or set2.favorite) and true
 		if ( groupFavorite1 ~= groupFavorite2 ) then
 			return groupFavorite1
 		end
