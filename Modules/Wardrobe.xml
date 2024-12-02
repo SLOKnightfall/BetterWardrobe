@@ -1,7 +1,30 @@
 <Ui xmlns="http://www.blizzard.com/wow/ui/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.blizzard.com/wow/ui/
 ..\FrameXML\UI.xsd">
 	<Script file="Wardrobe.lua"/>
-
+	<Button name="BetterWardrobeOutfitButtonButtonTemplate" virtual="true">
+		<Scripts>
+			<OnEnter>
+				self:GetParent():GetParent():StopHideCountDown();
+				self.texture:SetAlpha(1.0);
+				GameTooltip:SetOwner(self, "ANCHOR_RIGHT");
+				GameTooltip:SetText(self.tooltipText);
+			</OnEnter>
+			<OnLeave>
+				self:GetParent():GetParent():StartHideCountDown();
+				self.texture:SetAlpha(0.5);
+				GameTooltip_Hide();
+			</OnLeave>
+			<OnMouseDown>
+				self.texture:SetPoint("TOPLEFT", 1, -1);
+			</OnMouseDown>
+			<OnMouseUp>
+				self.texture:SetPoint("TOPLEFT", 0, 0);
+			</OnMouseUp>
+			<OnShow>
+				self.texture:SetPoint("TOPLEFT", 0, 0);
+			</OnShow>
+		</Scripts>
+	</Button>
 	<Button name="BW_PanelTopTabButtonTemplate" inherits="PanelTabButtonTemplate" mixin="PanelTopTabButtonMixin" virtual="true"/>
 
 	<DressUpModel name="BetterWardrobeItemsModelTemplate" mixin="BetterWardrobeItemsModelMixin" inherits="ContentTrackingElementTemplate" virtual="true">

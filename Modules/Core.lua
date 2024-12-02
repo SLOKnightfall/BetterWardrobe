@@ -1361,24 +1361,24 @@ function addon:OnEnable()
 	addon.Profile = self.db.profile
 	Profile = addon.Profile
 
-	addon.Init:InitDB()
+	----addon.Init:InitDB()
 	--addon.Init:BuildTooltips()
-	addon.Init:DressingRoom()
+	----addon.Init:DressingRoom()
 	--addon.Init.LoadCollectionListModule()
 	--BW_ColectionListFrameTemplate
 	--addon.Init:BuildTooltips()
-	addon:InitTooltips()
+	----addon:InitTooltips()
 	C_Timer.After(0.5, function()
-		addon.RefreshSubItemData()
-		addon.RefreshOutfitData()
+		----addon.RefreshSubItemData()
+		----addon.RefreshOutfitData()
 	end)
-	addPatrons()
+	----addPatrons()
 	addon:RegisterEvent("TRANSMOG_COLLECTION_SOURCE_REMOVED", "EventHandler")
 	addon:RegisterEvent("TRANSMOG_COLLECTION_SOURCE_ADDED", "EventHandler")
 	addon:RegisterEvent("PLAYER_ENTERING_WORLD", "EventHandler")
 
 	--Cache any default Blizz Saved Sets
-	addon.StoreBlizzardSets()
+	---addon.StoreBlizzardSets()
 	initialize = true
 
 	if not C_AddOns.IsAddOnLoaded("Blizzard_Collections") then
@@ -1412,10 +1412,10 @@ function addon.Init:LoadModules()
 		return false
 	end
 
-	C_Timer.After(0, function() addon.Init:UpdateWardrobeEnhanced() end)
+	-----C_Timer.After(0, function() addon.Init:UpdateWardrobeEnhanced() end)
 
 	local f = CreateFrame("Frame", "BetterWardrobeCollectionFrame", UIParent, "BetterWardrobeCollectionFrameTemplate" )
-
+	setFrames()
 	--Hooks into the colection tabs and sets Better Wardobe when viewing the wardrobe collection
 	addon:SecureHook(nil, "CollectionsJournal_UpdateSelectedTab", function(self)
 		local selected = CollectionsJournal_GetTab(self)
@@ -1458,12 +1458,12 @@ function addon.Init:LoadModules()
 
 
 	C_Timer.After(0, function()
-		addon:UpdatePetTracker()
-		addon.Init:initCollectionList()
-	 	addon.Init:BuildCollectionList()
-		addon.Init:BuildTransmogVendorUI()
-		addon:UpdateCanIMogIt()
-		addon:InitExtendedSetsSwap()
+		----addon:UpdatePetTracker()
+		----addon.Init:initCollectionList()
+	 	----addon.Init:BuildCollectionList()
+		----addon.Init:BuildTransmogVendorUI()
+		----addon:UpdateCanIMogIt()
+		----addon:InitExtendedSetsSwap()
 
 		local selected = CollectionsJournal_GetTab(CollectionsJournal)
 		BetterWardrobeCollectionFrame:SetShown(selected == 5) 
@@ -1484,7 +1484,7 @@ function addon:EventHandler(event, ...)
 
 	elseif event == "PLAYER_ENTERING_WORLD" then
 		addon:SendMessage("BW_OnPlayerEnterWorld")
-		C_Timer.After(1, function() addon:ResetSetsCollectionFrame() end)
+		----C_Timer.After(1, function() addon:ResetSetsCollectionFrame() end)
 		--C_Timer.After(15, function() addon.Init:UpdateCollectedAppearances() end)
 
 	elseif (event == "TRANSMOG_COLLECTION_SOURCE_ADDED") then
