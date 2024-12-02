@@ -37,6 +37,18 @@ Locale\zhTW.lua
 
 #Core files
 Data\Globals.lua
+Data\DataBase.lua
+Data\CLOTH.lua
+Data\LEATHER.lua
+Data\MAIL.lua
+Data\PLATE.lua
+Data\COSMETIC.lua
+Data\MISC.lua
+Data\SetOverrides.lua
+#@debug@
+Data\test.lua
+#@end-debug@
+
 Modules\CollectionTemplates.xml
 Modules\Templates.xml
 Modules\Core.lua

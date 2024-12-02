@@ -18,7 +18,7 @@ addon.QueueList = {}
 addon.validSetCache = {}
 addon.usableSourceCache = {}
 addon.UI = {}
-addon.Init = {}
+addon.Init = addon.Init or {}
 addon.Plugins = {}
 local newTransmogInfo  = {["latestSource"] = NO_TRANSMOG_SOURCE_ID} --{[99999999] = {[58138] = 10}, }
 addon.TRANSMOG_SET_FILTER = {}
@@ -1361,7 +1361,7 @@ function addon:OnEnable()
 	addon.Profile = self.db.profile
 	Profile = addon.Profile
 
-	----addon.Init:InitDB()
+	addon.Init:InitDB()
 	--addon.Init:BuildTooltips()
 	----addon.Init:DressingRoom()
 	--addon.Init.LoadCollectionListModule()
@@ -1378,7 +1378,7 @@ function addon:OnEnable()
 	addon:RegisterEvent("PLAYER_ENTERING_WORLD", "EventHandler")
 
 	--Cache any default Blizz Saved Sets
-	---addon.StoreBlizzardSets()
+	addon.StoreBlizzardSets()
 	initialize = true
 
 	if not C_AddOns.IsAddOnLoaded("Blizzard_Collections") then
