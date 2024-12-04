@@ -1,4 +1,4 @@
-## Interface: 110005
+## Interface: 100207, 110000, 110002
 ## Title: BetterWardrobe (@project-version@)
 ## Version: @project-version@
 ## Author: SLOKnightfall
@@ -37,6 +37,18 @@ Locale\zhTW.lua
 
 #Core files
 Data\Globals.lua
+Modules\CollectionTemplates.xml
+Modules\Templates.xml
+Modules\Core.lua
+#Modules\Celebrate.xml
+#Data files
+#Data\ColorData.lua
+Data\CameraData.lua
+Data\AppearanceData.lua
+Data\ArtifactData.lua
+#Data\SourceData.lua
+Patrons.lua
+
 Data\DataBase.lua
 Data\CLOTH.lua
 Data\LEATHER.lua
@@ -49,8 +61,35 @@ Data\SetOverrides.lua
 Data\test.lua
 #@end-debug@
 
-Modules\CollectionTemplates.xml
-Modules\Templates.xml
-Modules\Core.lua
 
+#Modules
+Modules\BlizzardAPI.lua
+Modules\ArtifactAppearances.lua
+Modules\SavedOutfits.xml
+Modules\DressingRoom.xml
 Modules\Wardrobe.xml
+Modules\ColorFilter.lua
+#Modules\PreviewWindows.lua
+
+Modules\CollectionList.xml
+Modules\Sources.lua
+
+Modules\TransmogVendor.xml
+
+Modules\ImportExport.lua
+Modules\Tooltips.lua
+Modules\SortingFunctions.lua
+
+#3rd party addon compatability
+Plugins\ElvUI.lua
+Plugins\CanIMogIt.lua
+Plugins\MogIt.lua
+Plugins\WardrobeEnhanced.lua
+Plugins\TransmogOutfits.lua
+Plugins\ExtendedTransmog.lua
+Plugins\PetTrackerJournal.lua
+
+#@do-not-package@
+#Testing
+#UnitTests\DataBase.lua
+#@end-do-not-package@

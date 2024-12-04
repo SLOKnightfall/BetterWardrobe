@@ -544,7 +544,7 @@ end
 
 		BuildArmorDB()
 		--addon.Init:BuildDB()
-		----addon.BuildClassArtifactAppearanceList()
+		addon.BuildClassArtifactAppearanceList()
 		----addon.GetSavedList()
 	end
 

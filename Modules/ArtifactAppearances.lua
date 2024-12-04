@@ -177,9 +177,12 @@ local sourcelist = {}
 function addon.BuildClassArtifactAppearanceList() 
 	wipe(visualIDIndex)
 	wipe(sourcelist)
+	local classFilter = C_TransmogCollection.GetClassFilter()
+	local classMask = addon.Globals.ClassToMask[classFilter]
+	local className = addon.Globals.CLASS_NAMES[classMask]
 
 	local _, playerClass, classID = UnitClass("player")
-	local artifactList = CLASS_ARTIFACT_DATA[playerClass]
+	local artifactList = CLASS_ARTIFACT_DATA[className[2]]
 	local uiOrderBase = 0
 
 	for itemID in pairs(artifactList) do 
@@ -212,7 +215,7 @@ function addon.BuildClassArtifactAppearanceList()
 				end
 			end
 
-			local sourceInfo = C_TransmogCollection.GetSourceInfo(sourceID)
+			 sourceInfo = C_TransmogCollection.GetSourceInfo(sourceID)
 			if sourceInfo then
 				if not appearanceCameraID or appearanceCameraID == 0 then 
 					sourceInfo.camera = camera
@@ -247,12 +250,15 @@ function addon.BuildClassArtifactAppearanceList()
 				sourceInfo.artifact = true
 				sourceInfo.mod = index
 				sourceInfo.artifactID = itemID
-				   sourceInfo.isUsable=true
-    sourceInfo.canDisplayOnPlayer=true
-    sourceInfo.alwaysShowItem = true
-				if 	addon.Globals.UNLOCK_DATA[data.unlock] then 
-					sourceInfo.unlock = addon.Globals.UNLOCK_DATA[data.unlock].unlock
-					sourceInfo.unlockAch = addon.Globals.UNLOCK_DATA[data.unlock].ach
+				sourceInfo.isUsable = true
+				sourceInfo.canDisplayOnPlayer = true
+				sourceInfo.alwaysShowItem = true
+				sourceInfo.useError = nil
+				sourceInfo.useErrorType = nil
+				if 	addon.Globals.UNLOCK_DATA[data.unlock] then
+					local unlock = addon.Globals.UNLOCK_DATA[data.unlock]
+					sourceInfo.unlock = unlock.unlock
+					sourceInfo.unlockAch = unlock.ach
 				end
 
 				visualIDIndex[sourceInfo.visualID] = sourceInfo
@@ -319,6 +325,7 @@ function addon.SetArtifactAppearanceTooltip(contentFrame, sourceInfo, sourceID)
 	else
 		--print (self.tooltipVisualID)
 	end
+	addon:AddTooltipDebugContent({sourceInfo})
 end
 
 
