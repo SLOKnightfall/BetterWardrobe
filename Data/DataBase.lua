@@ -41,15 +41,15 @@ WowSets["COSMETIC"] = WowSets[5]
 
 local SET_INDEX = {}
 local baseList = {}
-addon.BaseList = baseList
+addon.baseList = baseList
 local baseListLabels = {}
-addon.BaseListLabels = baseListLabels
+addon.baseListLabels = baseListLabels
 local baseIDs = {}
-addon.BaseIDs = baseIDs
+addon.baseIDs = baseIDs
 local variantSets = {};
-addon.VariantSets = variantSets
+addon.variantSets = variantSets
 local variantIDs = {};
-addon.VariantIDs = variantIDs
+addon.variantIDs = variantIDs
 local fullList = {}
 addon.fullList = fullList
 addon.ArmorSetModCache = {}
@@ -195,8 +195,8 @@ local function UseSet(data)
 --if true then return true end
 
 	if correctFaction
-	and correctClass 
-	and correctHeratiage
+		and correctClass 
+		and correctHeratiage
 	then
 		return true
 	else
@@ -984,4 +984,17 @@ function addon.StoreBlizzardSets()
 
 	addon.setdb.global.sets[addon.setdb:GetCurrentProfile()] = BlizzardSavedSets
 	return BlizzardSavedSets
+end
+
+function addon.GetSetType(outfitID)
+	local setData = addon:GetSetInfo(outfitID)
+	return setData and setData.setType or nil
+
+
+	--local MAX_DEFAULT_OUTFITS = C_TransmogCollection.GetNumMaxOutfits()
+	----return outfitID < MAX_DEFAULT_OUTFITS  -- #C_TransmogCollection.GetOutfits()--MAX_DEFAULT_OUTFITS 
+end
+
+function dd(id)
+	return fullList[id]
 end

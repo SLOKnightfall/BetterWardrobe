@@ -107,7 +107,7 @@ local ClassArmorMask = {
 
 
 local function GetTab(tab)
-		local atTransmogrifier = C_Transmog.IsAtTransmogNPC();
+	local atTransmogrifier = C_Transmog.IsAtTransmogNPC();
 	local tabID
 
 	if ( atTransmogrifier ) then
@@ -218,32 +218,29 @@ local function SortItemDefault(self)
 	if not self then return end
 
 	local comparison = function(source1, source2)
-		if (source1.isCollected ~= source2.isCollected) then
-			return source1.isCollected
+		if ( source1.isCollected ~= source2.isCollected ) then
+			return source1.isCollected;
 		end
-
-		if (source1.isUsable ~= source2.isUsable) then
-			return source1.isUsable
+		if ( source1.isUsable ~= source2.isUsable ) then
+			return source1.isUsable;
 		end
-
-		if (source1.isFavorite ~= source2.isFavorite) then
-			return source1.isFavorite
+		if ( source1.isFavorite ~= source2.isFavorite ) then
+			return source1.isFavorite;
 		end
-
-		if (addon:IsFavoriteItem(source1.visualID) ~= addon:IsFavoriteItem(source2.visualID)) then
-			return addon:IsFavoriteItem(source1.visualID)
+		--if (addon:IsFavoriteItem(source1.visualID) ~= addon:IsFavoriteItem(source2.visualID)) then
+			--return addon:IsFavoriteItem(source1.visualID)
+		--end
+		if ( source1.canDisplayOnPlayer ~= source2.canDisplayOnPlayer ) then
+			return source1.canDisplayOnPlayer;
 		end
-
-		if (source1.isHideVisual ~= source2.isHideVisual) then
-			return source1.isHideVisual
+		if ( source1.isHideVisual ~= source2.isHideVisual ) then
+			return source1.isHideVisual;
 		end
-
-		if (source1.hasActiveRequiredHoliday ~= source2.hasActiveRequiredHoliday) then
-			return source1.hasActiveRequiredHoliday
+		if ( source1.hasActiveRequiredHoliday ~= source2.hasActiveRequiredHoliday ) then
+			return source1.hasActiveRequiredHoliday;
 		end
-
-		if (source1.uiOrder and source2.uiOrder) then
-			return SortOrder(source1.uiOrder, source2.uiOrder)
+		if ( source1.uiOrder and source2.uiOrder ) then
+			return source1.uiOrder > source2.uiOrder;
 		end
 
 		return SortOrder(source1.sourceID, source2.sourceID)
@@ -273,10 +270,9 @@ end
 
 
 local function SortItemAlphabetic(self)
-
 	if not categoryCached[self:GetActiveCategory()] then
 		addon:CacheCategory(self)
-		C_Timer.After(.5, function()SortItemAlphabetic(self) end)
+		C_Timer.After(.5, function() SortItemAlphabetic(self) end)
 			return false
 	end
 	if BetterWardrobeCollectionFrame.ItemsCollectionFrame:IsVisible() then

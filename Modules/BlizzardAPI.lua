@@ -68,13 +68,14 @@ addon.GetTransmogLocation = GetTransmogLocation
 --Determines type of set based on setID
 local function DetermineSetType(setID)
 
-	local setType = addon.GetSetType(setID)
+	 local setData = dd(setID) --addon.GetSetType(setID)
+	 local setType = setData.setType
 	--Default Blizzard Set
-	if not setType or setType == "BlizzardSet"then
+	if not setType or setType == "Blizzard"then
 		return "set"
 
 	--Extra Set
-	elseif setType == "ExtraSet" then
+	elseif setType == "Extra" then
 		return "extraSet"
 
 	else
@@ -82,6 +83,7 @@ local function DetermineSetType(setID)
 	--Saved Set
 		return "savedset"
 	end
+
 end
 
 addon.DetermineSetType = DetermineSetType
@@ -128,7 +130,9 @@ function addon.C_TransmogSets.GetSetPrimaryAppearances(setID)
 
 	else
 	--elseif setType == "extraset" then
-		local setSources = addon.GetSetsources(setID)
+		 local setInfo = addon.C_TransmogSets.GetSetInfo(setID)
+		 local setSources = setInfo.sources
+
 		local primaryAppearances = {}
 		for appearanceID, collected in pairs(setSources) do
 			local data = {["appearanceID"] = appearanceID, ["collected"] = collected}
@@ -149,14 +153,23 @@ function addon.C_TransmogSets.GetSetInfo(setID)
 
 else
 	--elseif setType == "extraset" then
-		return addon.GetSetInfo(setID)
+		ddd = dd(setID)
+		return dd(setID) --addon.GetSetInfo(setID)
 	end
 end
 
 
 function addon.C_TransmogSets.SetIsFavorite(setID, value)
+	local setType = DetermineSetType(setID)
+	zz = addon.C_TransmogSets.GetSetInfo(4227)
+	if setType == "set" then
+		return C_TransmogSets.SetIsFavorite(setID, value)
+	end
 end
 
+function addon.C_TransmogSets.GetBaseSets()
+	return addon.baseList
+end
 
 function addon.C_TransmogSets.GetBaseSetsCounts()
 	if BetterWardrobeCollectionFrame:CheckTab(2) then
@@ -201,7 +214,9 @@ function addon.C_TransmogSets.SetHasNewSources(setID)
 	end
 end
 
-
+function addon.C_TransmogSets.GetVariantSets(baseSetID)
+	return addon.variantSets[baseSetID]
+end
 
 function addon.C_TransmogSets.SetHasNewSourcesForSlot(setID, transmogSlot)
 	if (addon.newTransmogInfo[setID]) then 
@@ -297,7 +312,7 @@ function addon.C_TransmogSets.GetSetSources(setID)
 		if not setInfo.itemData then
 		else
 			--print("Lookup "..counter)
-			counter = counter+1
+			counter = counter + 1
 			for slotID, sourceData in pairs(setInfo.itemData) do
 				local sourceID = sourceData[2]
 				local appearanceID = sourceData[3]
@@ -739,7 +754,6 @@ end]]
 --end
 
 function addon.Model_ApplyUICamera(self, uiCameraID)
-	--print(uiCameraID)
 	local posX, posY, posZ, yaw, pitch, roll, animId, animVariation, animFrame, centerModel = GetUICameraInfo(uiCameraID)
 	if posX and posY and posZ and yaw and pitch and roll then
 		self:MakeCurrentCameraCustom()

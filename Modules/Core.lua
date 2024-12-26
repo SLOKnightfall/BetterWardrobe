@@ -232,8 +232,58 @@ local options = {
 							width = .7,
 							disabled = function() return not addon.Profile.ShowCollectionUpdates end,
 						},
-						TSM_Market = {
+						ShowRemixIcon = {
 							order = 6,
+							name = L["Show Remix Icon"],
+							type = "toggle",
+							width = 1.3,
+							--disabled = function() return not addon.Profile.ShowCollectionUpdates end,
+						},
+						RemixIconPosition = {
+							order = 6.5,
+							name = L["Remix Icon Position"],
+							type = "select",
+								values = function()
+											local tbl = {
+												Left = L["Left"],
+												Right = L["Right"],
+
+											}
+											--for k,v in pairs(addon.Globals.mods) do
+												--tbl[k] = k
+											--end
+											return tbl
+										end,
+								width = 1.2,
+							--disabled = function() return not addon.Profile.ShowCollectionUpdates end,
+						},
+						ShowShopIcon = {
+							order = 7,
+							name = L["Show Shop Icon"],
+							type = "toggle",
+							width = 1.3,
+							--disabled = function() return not addon.Profile.ShowCollectionUpdates end,
+						},
+						ShopIconPosition = {
+							order = 7.5,
+							name = L["Shop Icon Position"],
+							type = "select",
+								values = function()
+											local tbl = {
+												Left = L["Left"],
+												Right = L["Right"],
+
+											}
+											--for k,v in pairs(addon.Globals.mods) do
+												--tbl[k] = k
+											--end
+											return tbl
+										end,
+								width = 1.2,
+							--disabled = function() return not addon.Profile.ShowCollectionUpdates end,
+						},
+						TSM_Market = {
+							order = 8,
 							name = L["TSM Source to Use"],
 							--desc = "TSM Source to get price data.",
 							type = "select",
@@ -243,6 +293,7 @@ local options = {
 							values = "TSMSources",
 							disabled = "TSMDisable",
 						},
+
 					},
 				},
 				transmog_settings={
@@ -1040,6 +1091,9 @@ local defaults = {
 		ExtraLargeTransmogArea = false,
 		ExtraLargeTransmogAreaMax = screenWidth,
 		AutoApply = false,
+		ShopIconPosition = "Right",
+		RemixIconPosition = "Right",
+
 	}
 }
 local DB_Defaults = {
@@ -1087,6 +1141,10 @@ local DB_Defaults = {
 		}
 	},
 	collection_cache_defaults = {
+		global = {sets={}, },
+
+	},
+	tabOverwrite_defaults = {
 		global = {sets={}, },
 
 	},
@@ -1305,7 +1363,9 @@ function addon:OnInitialize()
 	self.char_savedOutfits = LibStub("AceDB-3.0"):New("BetterWardrobe_SavedOutfitData", charSavedOutfits_defaults, true)
 
 	self.collectionCache = LibStub("AceDB-3.0"):New("BetterWardrobe_CollectionCache", collection_cache_defaults, true)
+	self.tabOverwrite = LibStub("AceDB-3.0"):New("BetterWardrobe_TabOverwrite", tabOverwrite_defaults, true)
 
+	xx =  self.tabOverwrite
 
 	local profile = self.setdb:GetCurrentProfile()
 	--self.setdb.global[profile] = self.setdb.char
@@ -1464,6 +1524,8 @@ function addon.Init:LoadModules()
 		----addon.Init:BuildTransmogVendorUI()
 		----addon:UpdateCanIMogIt()
 		----addon:InitExtendedSetsSwap()
+		addon.Init:InitColorFilterButtons()
+
 
 		local selected = CollectionsJournal_GetTab(CollectionsJournal)
 		BetterWardrobeCollectionFrame:SetShown(selected == 5) 

@@ -106,6 +106,8 @@ addon.MiscSets.customGroups = {
 	[3875] = "Plunderlord",
 	[50358] = "Plunderlord",
 	[50359] = "Plunderlord",
+	[4175] = "Plunderlord",
+
 	[3448] = "Spring Reveler",
 	[3444] = "Spring Reveler",
 	[3361] = "Spring Reveler",
@@ -159,6 +161,7 @@ addon.MiscSets.customGroups = {
 
 addon.MiscSets.CustomDesc = {
 	[3875] = "Plunderlord's Radiant Finery",
+		[4175] = "Plunderlord s",
 	[3447] = "World Drop - Turquoise",
 	[3446] = "World Drop - Turquoise",
 	[3358] = "In-Game Shop - Twilight Witch",

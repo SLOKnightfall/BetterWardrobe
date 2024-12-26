@@ -20,9 +20,30 @@ local SetAdditions = {
 	[716] = {189870},--firehawk-robes-of-conflagration-Heroic-recolor
 }
 
-
-
 local altitems = { 
+
+--Cosmetics
+	[218968] = 218968, --Purple Snugglefin head
+	[218961] = 218960, --Green Snugglefin head
+	[230296] = 230295, -- Dark Ranger Chest
+	[183080] = 183073 , --Sabellian Set
+--Fireplume cosmetic
+	[169680] = {169689,169778,169779}, --Fireplume legs
+	[169679] = {169688, 169782}, --Fireplume Chest
+	[169777] = 169681, --Fireplume Gloves
+--Plunderlord
+	[198627] = 218283, --eyepatch with out hat
+	[222868] = 218283, --eyepatch with out hat
+	[198786] = {184346,184347,184348,222847}, --beanies
+	[198785] = {96286,96285,184350,184349}, --tricorns
+--Heritage Armor
+	[102667] = 102661, --Blood Elf, Chest/Robe
+	[107808] = 108030, --Goblin, Goggles
+	[107820] = 107821, --Worgen, Chest/Robe
+--Draeni Heratage 
+	[194095] = 194107, --Helm - Purple
+	[194102] = 194106, --Helm - Orange
+
 --Wrath
 	[25034] = 24955, --25man Normal ICC Mage
 
@@ -98,8 +119,6 @@ local altitems = {
 	[71824] = 71775, --Shaman, Chest/Robe (Season 3 Gladiatoriator)
 
 --legion
-
-
 	--Seat of the Triumvirate
 	[89366] = 89232, --Mail, Chest/Robe
 
@@ -190,17 +209,7 @@ local altitems = {
 
 	-- [180804] = 180831,--Cloth Titan Keeper's Vestments, Dungeon (red)
 	[179945] = 182935,--Cloth Titan Keeper's Vestments, WQ (blue)
-	[183080] = 183073 , --Sabellian Set
 
-	--Heritage Armor
-	[102667] = 102661, --Blood Elf, Chest/Robe
-	[107808] = 108030, --Goblin, Goggles
-	[107820] = 107821, --Worgen, Chest/Robe
-
-	--Fireplume cosmetic
-	[169680] = {169689,169778,169779}, --Fireplume legs
-	[169679] = {169688, 169782}, --Fireplume Chest
-	[169777] = 169681, --Fireplume Gloves
 
 --DF Hero
 
@@ -851,15 +860,6 @@ local altitems = {
 	[189816] = 189876, --Infinite - Helm
 	[189818] = 189912, --Infinite - Shoulders
 
---Draeni Heratage 
-	[194095] = 194107, --Helm - Purple
-	[194102] = 194106, --Helm - Orange
-
---Plunderlord
-	[198627] = 218283, --eyepatch with out hat
-	[222868] = 218283, --eyepatch with out hat
-	[198786] = {184346,184347,184348,222847}, --beanies
-	[198785] = {96286,96285,184350,184349}, --tricorns
 
 --WW
 	--Educator's Knowledge
@@ -1168,6 +1168,9 @@ local altitems = {
 
 	[217851] = 217853, --Elite helm
 	[217867] = 217869, --Elite Shoulders
+
+
+
 }
 
 
