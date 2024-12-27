@@ -1226,14 +1226,14 @@ function BetterWardrobeCollectionFrameMixin:SetTab(tabID)
 	self.SavedOutfitDropDown:Hide();
 
 
------addon.ColorFilterFrame:Hide()
+	addon.ColorFilterFrame:Hide()
 
 		BetterWardrobeVisualToggle:Hide() --until toggle gets fixed
 
 	if tabID == TAB_ITEMS then
 
 		BetterWardrobeVisualToggle:Hide()
-		-----addon.ColorFilterFrame:Show()
+		addon.ColorFilterFrame:Show()
 		if BW_ColectionListFrame then 
 			BW_ColectionListFrame:SetShown(BetterWardrobeCollectionFrame:IsShown() and not atTransmogrifier)
 		end
@@ -4598,8 +4598,8 @@ function BetterWardrobeSetsDataProviderMixin:GetUsableSets(incVariants)
 			end
 
 		end
+		self:SortSets(self.usableSets)
 	end
-	self:SortSets(self.usableSets)
 
 	return self.usableSets
 end

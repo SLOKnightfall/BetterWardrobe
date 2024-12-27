@@ -1464,6 +1464,8 @@ function addon.Init:LoadModules()
 		addon.Init:BuildTransmogVendorUI()
 		addon:UpdateCanIMogIt()
 		addon:InitExtendedSetsSwap()
+		addon.Init:InitFilterButtons()
+
 
 		local selected = CollectionsJournal_GetTab(CollectionsJournal)
 		BetterWardrobeCollectionFrame:SetShown(selected == 5) 
