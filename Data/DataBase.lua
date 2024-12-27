@@ -1169,21 +1169,21 @@ end
 
 	function addon.GetSetInfo(setID)
 			local atTransmogrifier = C_Transmog.IsAtTransmogNPC()
-		if atTransmogrifier then 
+		--if atTransmogrifier then 
 			return fullList[setID]
-		else
-			return SET_INDEX[setID]
-		end
+		--else
+			--return SET_INDEX[setID]
+		--end
 
 	end
 
 	function addon.GetSets()
 		local atTransmogrifier = C_Transmog.IsAtTransmogNPC()
-		if atTransmogrifier then 
+		--if atTransmogrifier then 
 			return fullList
-		else
-			return SET_INDEX
-		end
+		--else
+			--return SET_INDEX
+		--end
 	end 
 
 	function addon.GetFullSets()
