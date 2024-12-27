@@ -4034,7 +4034,7 @@ function BetterWardrobeSetsTransmogModelMixin:RefreshTooltip()
 	
 	if not self.setID then return end
 
-	local holidayName 
+	local holidayName, useError
 	for sourceID,_ in pairs(sources) do
 		if not holidayName then 
 			holidayName = C_TransmogCollection.GetSourceRequiredHoliday(sourceID);
@@ -4043,13 +4043,19 @@ function BetterWardrobeSetsTransmogModelMixin:RefreshTooltip()
 		if ( sourceQualityTable[sourceID] ) then
 			totalQuality = totalQuality + sourceQualityTable[sourceID];
 		else
-			local sourceInfo = C_TransmogCollection.GetSourceInfo(sourceID);
+			 sourceInfo = C_TransmogCollection.GetSourceInfo(sourceID);
 			if ( sourceInfo and sourceInfo.quality ) then
 				sourceQualityTable[sourceID] = sourceInfo.quality;
 				totalQuality = totalQuality + sourceInfo.quality;
 			else
 				waitingOnQuality = true;
 			end
+		end
+
+		local sourceInfo = C_TransmogCollection.GetSourceInfo(sourceID);
+		if sourceInfo and sourceInfo.useError and not useError then 
+			useError = sourceInfo.useError
+
 		end
 	end
 
@@ -4062,6 +4068,10 @@ function BetterWardrobeSetsTransmogModelMixin:RefreshTooltip()
 		GameTooltip:SetText(setInfo.name, color.r, color.g, color.b);
 		if ( setInfo.label ) then
 			GameTooltip:AddLine(setInfo.label);
+			GameTooltip:Show();
+		end
+		if ( useError ) then
+			GameTooltip:AddLine(useError, LIGHTBLUE_FONT_COLOR.r, LIGHTBLUE_FONT_COLOR.g, LIGHTBLUE_FONT_COLOR.b);
 			GameTooltip:Show();
 		end
 		if ( holidayName ) then
@@ -4511,7 +4521,7 @@ else
 			end
 		end
 	else
-		local setSources = SetsDataProvider:GetSetSources(setInfo.setID)
+		local setSources = SetsDataProvider(setInfo.setID)
 		for sourceID, isCollected in pairs(setSources) do
 			local sourceInfo = C_TransmogCollection.GetSourceInfo(sourceID)
 			if missingSelection[sourceInfo.invType] and not isCollected then
@@ -4545,6 +4555,7 @@ function BetterWardrobeSetsDataProviderMixin:GetBaseSets(filter)
 
 
 	if ( not self.baseSets ) then
+		print("building")
 		--self.baseSets = addon.BaseList --C_TransmogSets.GetBaseSets();
 		self.baseSets = addon:FilterSets(addon.BaseList)
 		self:DetermineFavorites();
@@ -7138,8 +7149,8 @@ function BetterWardrobeSetsTransmogMixin:UpdateSets()
 				local setInfo = addon.GetSetInfo(set.setID);
 				if setInfo then 
 
-				local isFavorite = C_TransmogSets.GetIsFavorite(set.setID) or addon.favoritesDB.profile.extraset[set.setID];
-				local isHidden = addon.HiddenAppearanceDB.profile.extraset[set.setID];
+					local isFavorite = C_TransmogSets.GetIsFavorite(set.setID) or addon.favoritesDB.profile.extraset[set.setID];
+					local isHidden = addon.HiddenAppearanceDB.profile.extraset[set.setID];
 
 					model.Favorite.Icon:SetShown(isFavorite)
 					model.setID = set.setID;
@@ -7153,6 +7164,13 @@ function BetterWardrobeSetsTransmogMixin:UpdateSets()
 					model.CollectionListVisual.Collection.Collected_Icon:SetShown(isInList and C_TransmogSets.IsBaseSetCollected(set.setID))
 
 					--model.SetInfo.setName:SetText((addon.Profile.ShowNames and setInfo["name"].."\n"..(setInfo["description"] or "")) or "")
+
+					color = RED_FONT_COLOR;
+					color.r = 1
+					color.g = 1
+					color.b = 1
+
+
 
 					local name = setInfo["name"]
 					local description
@@ -7168,6 +7186,10 @@ function BetterWardrobeSetsTransmogMixin:UpdateSets()
 					if addon.Profile.ShowNames then 
 						model.SetInfo.setName:Show()
 						model.SetInfo.setName:SetText(("%s%s"):format(name, description))
+						--print(model.SetInfo.setName:GetTextColor())
+						--model.SetInfo.setName:SetTextColor(color.r, color.g, color.b);
+
+
 					else
 						model.SetInfo.setName:Hide()
 					end
