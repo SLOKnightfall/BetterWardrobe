@@ -518,7 +518,7 @@ function addon:FilterSets(setList, setType)
 	local searchValue = BetterWardrobeCollectionFrameSearchBox:GetText()
 	local filterList = setList
 	if searchValue ~= ""  then
-		filterList = addon.searchSet
+		filterList = addon:SearchSets(setList)
 	end
 	local faction = UnitFactionGroup("player")
 	local opFaction = OpposingFaction(faction)
@@ -553,7 +553,6 @@ function addon:FilterSets(setList, setType)
 		return FilterSets
 	end
 
-
 	local searchString = string.lower(WardrobeCollectionFrameSearchBox:GetText())
 	local filterCollected = C_TransmogSets.GetBaseSetsFilter(LE_TRANSMOG_SET_FILTER_COLLECTED)
 	local filterUncollected = C_TransmogSets.GetBaseSetsFilter(LE_TRANSMOG_SET_FILTER_UNCOLLECTED)
@@ -571,7 +570,6 @@ function addon:FilterSets(setList, setType)
 		--xpacSelection = addon.Filters.Extra.xpacSelection
 	--end
 		--local PvPSets = false
-
 
 	for i, data in ipairs(filterList) do
 		local setData = BetterWardrobeSetsDataProviderMixin:GetSetSourceData(data.setID)
@@ -602,8 +600,8 @@ function addon:FilterSets(setList, setType)
 	return FilterSets
 end
 
-
 local function SearchValueFound(set, searchValue)
+	if not searchValue then return end
 	local start, _ = string.find(string.lower(set.name), searchValue);
 	if start ~= nil then return true; end
 	
@@ -621,7 +619,6 @@ local function SearchValueFound(set, searchValue)
 	
 	return false;
 end
-
 
 function addon:SearchSets(setList)
 	local searchedSets = {}
@@ -641,8 +638,8 @@ function addon:SearchSets(setList)
 
 	else
 		for _, baseSet in ipairs(setList) do
-			if SearchValueFound(baseSet, searchValue) then
-				table.insert(addon.searchSet, baseSet);
+			if SearchValueFound(baseSet, searchString) then
+				table.insert(searchedSets, baseSet);
 			end
 		end
 		return searchedSets

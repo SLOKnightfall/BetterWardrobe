@@ -412,8 +412,9 @@ local function BuildArmorDB()
 	local dropdownclass = C_TransmogSets.GetTransmogSetsClassFilter();
 	local at = Globals.ClassArmorType[dropdownclass]
 	local ty = Globals.ARMOR_TYPE[at]
-		armorType = ty or addon.Globals.CLASS_INFO[playerClass][3]
-		local armorSetdata = {addon.ArmorSets[armorType], addon.ArmorSets["COSMETIC"]}
+	armorType = ty or addon.Globals.CLASS_INFO[playerClass][3]
+	local armorSetdata = {addon.ArmorSets[armorType], addon.ArmorSets["COSMETIC"]}
+
 	for armorType, data in ipairs(armorSetdata) do
 
 		for id, data in pairs(data) do
@@ -454,7 +455,7 @@ local function BuildArmorDB()
 				data.setID = newID
 				data.newStatus = false
 				data.itemData = data.itemData or {}
-				data.validForCharacter = true;
+				data.validForCharacter = (classID == dropdownclass);
 
 				--for slotID, itemData in pairs(data.itemData) do
 				--	local appearanceID = itemData[3]
@@ -1000,4 +1001,48 @@ end
 
 function dd(id)
 	return fullList[id]
+end
+
+function addon.GetItemSource(itemID, itemMod)
+	if addon.ArmorSetModCache[itemID] and addon.ArmorSetModCache[itemID][itemMod] then return addon.ArmorSetModCache[itemID][itemMod][1], addon.ArmorSetModCache[itemID][itemMod][2] end
+		local itemSource
+		local visualID, sourceID
+		local f =  addon.frame
+		if itemMod then
+			visualID, sourceID = C_TransmogCollection.GetItemInfo(itemID, itemMod)
+		else
+			visualID, sourceID = C_TransmogCollection.GetItemInfo(itemID)
+		end
+
+		if not sourceID then
+			local itemlink = "item:"..itemID..":0"
+			f.model:Show()
+			f.model:Undress()
+			f.model:TryOn(itemlink)
+			local  TransmogInfoList = DressUpOutfitMixin:GetItemTransmogInfoList()
+			for i = 1, 19 do
+				local source = 0---- f.model:GetSlotTransmogSources(i)
+				if source ~= 0 then
+					--addon.itemSourceID[itemID] = source
+					sourceID = source
+					break
+				end
+			end
+		end
+
+		if not sourceID then 
+			visualID, sourceID = C_TransmogCollection.GetItemInfo(itemID, 0)
+		end
+
+	--[[		if sourceID and itemMod then
+						addon.modArmor[itemID] = addon.modArmor[itemID] or {}
+						addon.modArmor[itemID][itemMod] = sourceID
+					end]]
+		if sourceID and itemMod then 
+			addon.ArmorSetModCache[itemID] = addon.ArmorSetModCache[itemID]  or {}
+			addon.ArmorSetModCache[itemID][itemMod] = {visualID, sourceID}
+		end
+
+		f.model:Hide()
+	return visualID ,sourceID
 end

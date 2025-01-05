@@ -431,8 +431,8 @@ L["NOTE_102"] = "Shadowlands Dungeon Set"
 --Raid
 
 
-L["NOTE_3"] = "Molten Core Set"
-L["NOTE_4"] = "Blackwing's Lair Set"
+L["NOTE_3"] = "Molten Core"
+L["NOTE_4"] = "Blackwing Lair"
 L["NOTE_5"] = "Naxxramas (Original) Raid Set"
 L["NOTE_9"] = "Ruins of Ahn'Qiraj Set"
 L["NOTE_10"] = "Temple of Ahn'Qiraj Raid Set"

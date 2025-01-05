@@ -32,6 +32,9 @@ local IN_PROGRESS_FONT_COLOR_CODE = addon.Globals.IN_PROGRESS_FONT_COLOR_CODE;
 local COLLECTION_LIST_WIDTH = addon.Globals.COLLECTION_LIST_WIDTH;
 
 
+
+local Sets = addon.Sets;
+
 local tabType = {"item", "set", "set"}
 
 addon.useAltSet = false;
@@ -1440,7 +1443,6 @@ function WardrobeCollectionFrameMixin:InitItemsFilterButton()
 		self.FilterButton:SetupMenu(function(dropdown, rootDescription)
 			rootDescription:SetTag("MENU_WARDROBE_FILTER");
 
-			rootDescription:CreateCheckbox(L["Show Hidden Items"], shouldShowHidden, setShowHidden);
 
 			rootDescription:CreateCheckbox(COLLECTED, C_TransmogCollection.GetCollectedShown, function()
 				C_TransmogCollection.SetCollectedShown(not C_TransmogCollection.GetCollectedShown());
@@ -1460,6 +1462,10 @@ function WardrobeCollectionFrameMixin:InitItemsFilterButton()
 
 			local submenu = rootDescription:CreateButton(SOURCES);
 			CreateSourceFilters(submenu);
+
+		rootDescription:CreateDivider();
+	 	submenu = rootDescription:CreateButton("Options");
+		submenu:CreateCheckbox(L["Show Hidden Items"], shouldShowHidden, setShowHidden);
 		end);
 	end
 end
@@ -1511,98 +1517,100 @@ local function RefreshLists()
 	else
 		addon.SetsDataProvider:ClearSets()
 		BetterWardrobeCollectionFrame.SetsCollectionFrame:Refresh()
-	end										
+	end	
+	BetterWardrobeCollectionFrame.SetsTransmogFrame:UpdateProgressBar()								
 end
 
 addon.RefreshLists = RefreshLists;
 local locationDropDown = addon.Globals.locationDropDown;
 
 function WardrobeCollectionFrameMixin:InitBaseSetsFilterButton()
+
 	self.FilterButton:SetIsDefaultCallback(function()
-		return C_TransmogSets.IsUsingDefaultBaseSetsFilters();
+		local numSources = #EXPANSIONS --C_TransmogCollection.GetNumTransmogSources()
+		for index = 1, numSources do
+			if not xpacSelection[index] then return false end
+		end
+
+		for index = 1,  #FILTER_SOURCES do
+			if not filterSelection[index] then return false end
+		end
+
+		for index in pairs(locationDropDown) do
+			if not missingSelection[index] then return false end
+		end
+
+		return C_TransmogSets.IsUsingDefaultBaseSetsFilters()
 	end);
 
-	self.FilterButton:SetDefaultCallback(function()
-		return C_TransmogSets.SetDefaultBaseSetsFilters();
-	end);
+
 
 	self.FilterButton:SetupMenu(function(dropdown, rootDescription)
 		rootDescription:SetTag("MENU_WARDROBE_BASE_SETS_FILTER");
 
-		local function GetBaseSetsFilter(filter)
-			C_TransmogSets.SetBaseSetsFilter(filter, not C_TransmogSets.GetBaseSetsFilter(filter));
-		end
+	local function GetBaseSetsFilter(filter)
+		C_TransmogSets.SetBaseSetsFilter(filter, not C_TransmogSets.GetBaseSetsFilter(filter));
+	end
 
-		local function shouldShowHidden()
-			return addon.Profile.ShowHidden;
-		end
+	local function shouldShowHidden()
+		return addon.Profile.ShowHidden;
+	end
 
-		local function setShowHidden()
-			addon.Profile.ShowHidden = not addon.Profile.ShowHidden;
-			RefreshLists();
-		end
+	local function setShowHidden()
+		addon.Profile.ShowHidden = not addon.Profile.ShowHidden;
+		RefreshLists();
+	end
 
-		local function ShowIgnoreClassRestrictions()
-			return addon.Profile.IgnoreClassRestrictions;
-		end
+	local function ShowIgnoreClassRestrictions()
+		return addon.Profile.IgnoreClassRestrictions;
+	end
 
-		local function setIgnoreClassRestrictions()
-			addon.Profile.IgnoreClassRestrictions = not addon.Profile.IgnoreClassRestrictions;
-			addon.Init:InitDB();
-			RefreshLists();
-		end
-		local function ShowFactionOnly()
-			return addon.Profile.CurrentFactionSets;
-		end
+	local function setIgnoreClassRestrictions()
+		addon.Profile.IgnoreClassRestrictions = not addon.Profile.IgnoreClassRestrictions;
+		addon.Init:InitDB();
+		RefreshLists();
+	end
+	local function ShowFactionOnly()
+		return addon.Profile.CurrentFactionSets;
+	end
 
-		local function setShowFactionOnly()
-			addon.Profile.CurrentFactionSets = not addon.Profile.CurrentFactionSets;
-			addon.Init:InitDB();
-			RefreshLists();
+	local function setShowFactionOnly()
+		addon.Profile.CurrentFactionSets = not addon.Profile.CurrentFactionSets;
+		addon.Init:InitDB();
+		RefreshLists();
+	end
+
+	local function xpackCheckAll(value)
+		for index = 1, #xpacSelection do
+			xpacSelection[index] = value;
 		end
+	end
+
+	local function sourceCheckAll(value)
+		for index = 1,  #FILTER_SOURCES do
+			filterSelection[index] = value;
+		end
+	end
+
+	local function missingCheckAll(value)
+		for index in pairs(locationDropDown) do
+			missingSelection[index] = value;
+		end
+	end
+
+	self.FilterButton:SetDefaultCallback(function()
+		xpackCheckAll(true)
+		sourceCheckAll(true)
+		missingCheckAll(true)
+		return C_TransmogSets.SetDefaultBaseSetsFilters();
+	end);
 
 		--rootDescription:CreateCheckbox(L["Ignore Class Restriction Filter"], ShowIgnoreClassRestrictions, setIgnoreClassRestrictions, 5);
 
 		--rootDescription:CreateCheckbox(L["Show Only Player's Faction"], ShowFactionOnly, setShowFactionOnly, 5);
 		--rootDescription:CreateCheckbox(L["Show Only Player's Faction"], ShowFactionOnly, setShowFactionOnly, 5);
 
-		rootDescription:CreateCheckbox(L["Show Hidden Sets"], 
-			function() 
-				return addon.Profile.ShowHidden 
-			end, 
-			function() 
-				addon.Profile.ShowHidden = not addon.Profile.ShowHidden;
-				--BetterWardrobeCollectionFrame.SetsTransmogFrame:UpdateProgressBar()
-				addon.Init:InitDB()
-				RefreshLists()
-
-			end, 6);
-
-		rootDescription:CreateDivider();
-		rootDescription:CreateCheckbox(L["Combine Special Sets"], 
-			function() 
-				return addon.Profile.CombineSpecial 
-			end, 
-			function() 
-				addon.Profile.CombineSpecial = not addon.Profile.CombineSpecial;
-				--BetterWardrobeCollectionFrame.SetsTransmogFrame:UpdateProgressBar()
-				addon.Init:InitDB()
-				RefreshLists()
-
-			end, 6);
-
-		rootDescription:CreateCheckbox(L["Combine Trading Post Sets"], 
-			function() 
-				return addon.Profile.CombineTradingPost 
-			end, 
-			function() 
-				addon.Profile.CombineTradingPost = not addon.Profile.CombineTradingPost;
-				--addon.Init:BuildDB()
-				--BetterWardrobeCollectionFrame.SetsTransmogFrame:UpdateProgressBar()
-				addon.Init:InitDB()
-				RefreshLists()
-
-			end, 6);
+		
 
 		----TODO: FIX
 --[[
@@ -1617,8 +1625,6 @@ function WardrobeCollectionFrameMixin:InitBaseSetsFilterButton()
 				RefreshLists()
 			end, 7);
 ]]--
-		rootDescription:CreateDivider();
-
 		rootDescription:CreateCheckbox(COLLECTED, C_TransmogSets.GetBaseSetsFilter, GetBaseSetsFilter, LE_TRANSMOG_SET_FILTER_COLLECTED);
 		rootDescription:CreateCheckbox(NOT_COLLECTED, C_TransmogSets.GetBaseSetsFilter, GetBaseSetsFilter, LE_TRANSMOG_SET_FILTER_UNCOLLECTED);
 		rootDescription:CreateDivider();
@@ -1630,16 +1636,12 @@ function WardrobeCollectionFrameMixin:InitBaseSetsFilterButton()
 
 		local submenu = rootDescription:CreateButton(SOURCES);
 		submenu:CreateButton(CHECK_ALL, function()
-			for index = 1,  #FILTER_SOURCES do
-				filterSelection[index] = true;
-			end
+			sourceCheckAll(true)
 			RefreshLists();
 		end);
 
 		submenu:CreateButton(UNCHECK_ALL, function()
-			for index = 1,  #FILTER_SOURCES do
-				filterSelection[index] = false;
-			end
+			sourceCheckAll(false)
 			RefreshLists();
 
 		end);
@@ -1650,7 +1652,7 @@ function WardrobeCollectionFrameMixin:InitBaseSetsFilterButton()
 			local filterIndex = index;
 			submenu:CreateCheckbox(FILTER_SOURCES[index], 
 				function() return filterSelection[index] end,
-				function() 	
+				function() 
 					filterSelection[index] = not filterSelection[index];
 					RefreshLists()
 				end,
@@ -1660,16 +1662,12 @@ function WardrobeCollectionFrameMixin:InitBaseSetsFilterButton()
 
 		local submenu = rootDescription:CreateButton(L["Expansion"]);
 		submenu:CreateButton(CHECK_ALL, function()
-			for i = 1, #xpacSelection do
-				xpacSelection[i] = true;
-			end
+			xpackCheckAll(true)
 			RefreshLists()
 		end);
 
 		submenu:CreateButton(UNCHECK_ALL, function()
-			for i = 1, #xpacSelection do
-				xpacSelection[i] = false;
-			end
+			xpackCheckAll(false)
 			RefreshLists()
 		end);
 
@@ -1686,6 +1684,7 @@ function WardrobeCollectionFrameMixin:InitBaseSetsFilterButton()
 				function()
 					xpacSelection[index] = not xpacSelection[index];
 					RefreshLists()
+
 				end,
 			index);
 		end
@@ -1694,16 +1693,12 @@ function WardrobeCollectionFrameMixin:InitBaseSetsFilterButton()
 
 		local submenu = rootDescription:CreateButton("Missing");
 		submenu:CreateButton(CHECK_ALL, function()
-			for i in pairs(locationDropDown) do
-				missingSelection[i] = true;
-			end
+			missingCheckAll(true)
 			RefreshLists()
 		end);
 
 		submenu:CreateButton(UNCHECK_ALL, function()
-			for i in pairs(locationDropDown) do
-				missingSelection[i] = false;
-			end
+			missingCheckAll(false)
 			RefreshLists()
 		end);
 
@@ -1721,6 +1716,44 @@ function WardrobeCollectionFrameMixin:InitBaseSetsFilterButton()
 					index);
 			end
 		end
+
+		rootDescription:CreateDivider();
+	 	submenu = rootDescription:CreateButton("Options");
+
+		submenu:CreateCheckbox(L["Show Hidden Sets"], 
+			function() 
+				return addon.Profile.ShowHidden 
+			end, 
+			function() 
+				addon.Profile.ShowHidden = not addon.Profile.ShowHidden;
+				addon.Init:InitDB()
+				RefreshLists()
+
+			end, 6);
+
+		submenu:CreateDivider();
+		submenu:CreateCheckbox(L["Combine Special Sets"], 
+			function() 
+				return addon.Profile.CombineSpecial 
+			end, 
+			function() 
+				addon.Profile.CombineSpecial = not addon.Profile.CombineSpecial;
+				addon.Init:InitDB()
+				RefreshLists()
+
+			end, 6);
+
+		submenu:CreateCheckbox(L["Combine Trading Post Sets"], 
+			function() 
+				return addon.Profile.CombineTradingPost 
+			end, 
+			function() 
+				addon.Profile.CombineTradingPost = not addon.Profile.CombineTradingPost;
+				--addon.Init:BuildDB()
+				addon.Init:InitDB()
+				RefreshLists()
+
+			end, 6);
 	end);
 end
 
@@ -3063,14 +3096,27 @@ function WardrobeItemsCollectionMixin:UpdateItems()
 				model.NewString:Hide();
 				model.NewGlow:Hide();
 			end
+
 			-- favorite
 			model.Favorite.Icon:SetShown(visualInfo.isFavorite);
 			-- hide visual option
 			model.HideVisual.Icon:SetShown(isAtTransmogrifier and visualInfo.isHideVisual);
+
 			-- slots not allowed
-			local showAsInvalid = not canDisplayVisuals or not self.slotAllowed;
-			model.SlotInvalidTexture:SetShown(showAsInvalid);		
-			model:SetDesaturated(showAsInvalid);
+			local showAsInvalid = not self.slotAllowed;
+
+			if not BW_CollectionListTitle:IsShown() then
+				model.SlotInvalidTexture:SetShown(showAsInvalid);		
+				model:SetDesaturated(showAsInvalid);
+			end
+
+			local setID = (model.visualInfo and model.visualInfo.visualID) or model.setID;
+			local isHidden = addon.HiddenAppearanceDB.profile.item[setID];
+			model.CollectionListVisual.Hidden.Icon:SetShown(isHidden);
+			local isInList = addon.CollectionList:IsInList(setID, "item")
+			model.CollectionListVisual.Collection.Collection_Icon:SetShown(isInList);
+			model.CollectionListVisual.Collection.Collected_Icon:SetShown(isInList and model.visualInfo and model.visualInfo.isCollected);
+
 
 			if ( GameTooltip:GetOwner() == model ) then
 				model:OnEnter();
@@ -3580,7 +3626,7 @@ local function ToggleHidden(model, isHidden)
 		BetterWardrobeCollectionFrame.ItemsCollectionFrame:RefreshVisualsList();
 		BetterWardrobeCollectionFrame.ItemsCollectionFrame:UpdateItems();
 	end
-
+qq = model
 		local setInfo = addon.C_TransmogSets.GetSetInfo(tonumber(model.setID)); --C_TransmogSets.GetSetInfo(tonumber(model.setID));
 		local name = setInfo["name"];
 
@@ -3617,9 +3663,7 @@ end
 function WardrobeItemsModelMixin:OnMouseUp(button)
 	if button == "RightButton" then
 		local itemsCollectionFrame = self:GetParent();
-		if itemsCollectionFrame:GetActiveCategory() == Enum.TransmogCollectionType.Paired then return end
-
-		if ( not self.visualInfo.isCollected or self.visualInfo.isHideVisual or itemsCollectionFrame.transmogLocation:IsIllusion() ) then
+		if (itemsCollectionFrame:GetActiveCategory() == Enum.TransmogCollectionType.Paired or itemsCollectionFrame.transmogLocation:IsIllusion() ) then
 			return;
 		end
 
@@ -4083,7 +4127,9 @@ function WardrobeCollectionClassDropdownMixin:SetClassFilter(classID)
 		C_TransmogCollection.SetClassFilter(classID);
 	elseif searchType == Enum.TransmogSearchType.BaseSets then
 		C_TransmogSets.SetTransmogSetsClassFilter(classID);
+		addon.Init:InitDB()
 	end
+
 
 	self:Refresh();
 end
@@ -4255,6 +4301,7 @@ local fullList = addon.fullList
 end
 	
 function BetterWardrobeSetsDataProviderMixin:GetBaseSetID(SetID)
+	if not SetID then return end
 	--local BaseSets = addon.baseIDs
 	--local VariantIDs = addon.variantIDs
 	local fullList = addon.fullList
@@ -4269,6 +4316,8 @@ function BetterWardrobeSetsDataProviderMixin:GetBaseSetID(SetID)
 end	
 
 function WardrobeSetsDataProviderMixin:SortSets(sets, reverseUIOrder, ignorePatchID)
+	addon.SortSet(sets, reverseUIOrder, ignorePatchID)
+	--[[
 	local comparison = function(set1, set2)
 		local groupFavorite1 = set1.favoriteSetID and true;
 		local groupFavorite2 = set2.favoriteSetID and true;
@@ -4301,6 +4350,7 @@ function WardrobeSetsDataProviderMixin:SortSets(sets, reverseUIOrder, ignorePatc
 	end
 
 	table.sort(sets, comparison);
+	]]--
 end
 
 local lasttab
@@ -4590,6 +4640,7 @@ addon.SetsDataProvider = SetsDataProvider
 
 local WardrobeSetsCollectionMixin = {};
 BetterWardrobeSetsCollectionMixin = WardrobeSetsCollectionMixin
+
 function WardrobeSetsCollectionMixin:OnLoad()
 	self.RightInset.BGCornerTopLeft:Hide();
 	self.RightInset.BGCornerTopRight:Hide();
@@ -5232,6 +5283,28 @@ function WardrobeSetsCollectionMixin:ScrollToSet(setID, alignment)
 	scrollBox:ScrollToElementDataByPredicate(FindSet, alignment);
 end
 
+function BetterWardrobeSetsCollectionMixin:LinkSet(setID)
+	local emptySlotData = Sets:GetEmptySlots()
+	local itemList = TransmogUtil.GetEmptyItemTransmogInfoList()
+
+	for i = 1, 19 do
+		local _, source = addon.GetItemSource(emptySlotData[i] or 0)
+		itemList[i].appearanceID = source or 0;
+		itemList[i].illusionID = 0;
+		itemList[i].secondaryAppearanceID = 0;
+	end
+
+	local sortedSources = SetsDataProvider:GetSortedSetSources(setID)
+	for i = 1, #sortedSources do
+		local slot = C_Transmog.GetSlotForInventoryType(sortedSources[i].invType)
+		itemList[slot].appearanceID = sortedSources[i].sourceID;
+	end
+
+	local hyperlink = C_TransmogCollection.GetOutfitHyperlinkFromItemTransmogInfoList(itemList)
+	if not ChatEdit_InsertLink(hyperlink) then
+		ChatFrame_OpenChat(hyperlink)
+	end
+end
 local function variantsTooltip(elementData, variantSets)
 	local  ratioText = ""
 	table.sort(variantSets, function(a,b) return (a.name) < (b.name) end);
@@ -5243,6 +5316,54 @@ local function variantsTooltip(elementData, variantSets)
 	end
 
 	return ratioText
+end
+
+function WardrobeSetsCollectionMixin:OpenInDressingRoom(setID)
+
+	if DressUpFrame:IsShown() then 
+	else
+		DressUpFrame_Show(DressUpFrame)
+		C_Timer.After(0, function() self:OpenInDressingRoom(setID) 
+		return 
+	end)
+	end
+		
+	--local setType = tabType[addon.GetTab()]
+	setInfo = dd(setID) --addon:GetSetInfo(setID)
+	local setType = setInfo.setType;
+
+	--local setType = addon.QueueList[1]
+	--local setID = addon.QueueList[2]
+	local playerActor = DressUpFrame.ModelScene:GetPlayerActor()
+
+	if not playerActor or not setID then
+		return false;
+	end
+
+	local sources = nil;
+
+	if setType == "Blizzard" then
+		sources = {}
+		local sourceInfo = C_TransmogSets.GetSetPrimaryAppearances(setID)
+		for i, data in ipairs(sourceInfo) do
+			sources[data.appearanceID] = false
+		end
+
+	elseif setType == "ExtraSet" then
+		sources = setInfo.sources
+	end
+
+	if not sources then return end
+
+	playerActor:Undress()
+	for i, d in pairs(sources)do
+		playerActor:TryOn(i)
+	end
+
+	import = true
+	--DressUpSources(sources)
+	import = false
+	addon:UpdateDressingRoom()
 end
 
 local WardrobeSetsScrollFrameButtonMixin = {};
@@ -6250,4 +6371,109 @@ end
 
 function BetterWardrobeSetsDetailsItemUseabiltiyMixin:OnLeave()
 	GameTooltip:Hide()
+end
+
+
+local EmptyArmor = addon.Globals.EmptyArmor
+
+function Sets:GetEmptySlots()
+	local setInfo = {}
+
+	for i,x in pairs(EmptyArmor) do
+		setInfo[i]=x;
+	end
+
+	return setInfo;
+end
+
+function Sets:EmptySlots(transmogSources)
+	local EmptySet = self:GetEmptySlots()
+
+	for i, x in pairs(transmogSources) do
+			EmptySet[i] = nil;
+	end
+
+	return EmptySet;
+end
+
+function Sets.isMogKnown(sourceID)
+	local sourceInfo = C_TransmogCollection.GetSourceInfo(sourceID)
+	
+	if not sourceInfo then return false end
+	local allSources = C_TransmogCollection.GetAllAppearanceSources(sourceInfo.visualID)
+
+	local list = {}
+		for _, source_ID in ipairs(allSources) do
+		
+			local info = C_TransmogCollection.GetSourceInfo(source_ID)
+			local isCollected = select(5,C_TransmogCollection.GetAppearanceSourceInfo(source_ID))
+			info.isCollected = isCollected;
+			tinsert(list, info)
+		end
+
+		if #list > 1 then
+			CollectionWardrobeUtil.SortSources(list, sourceInfo.visualID, sourceID)
+		end
+	
+		return  (list[1] and list[1].isCollected and list[1].sourceID) or false;
+end
+
+function addon.Sets:SelectedVariant(setID)
+	--local baseSetID = C_TransmogSets.GetBaseSetID(setID) --or setID;
+	local baseSetID = SetsDataProvider:GetBaseSetID(setID) --or setID;
+	if not baseSetID then return end
+
+	local variantSets = SetsDataProvider:GetVariantSets(baseSetID)
+	if not variantSets then return end
+	
+	local useDescription = (#variantSets > 0)
+	local targetSetID = BetterWardrobeCollectionFrame.SetsCollectionFrame:GetDefaultSetIDForBaseSet(baseSetID)
+	local match = false;
+
+	for i, data in ipairs(variantSets) do
+		if addon.CollectionList:IsInList (data.setID, "set") then
+			match = data.setID;
+		end
+	end
+
+	if useDescription then
+		local setInfo = C_TransmogSets.GetSetInfo(targetSetID)
+		local matchInfo = match and C_TransmogSets.GetSetInfo(match).description or nil;
+
+		return targetSetID, setInfo.description, match, matchInfo;
+	end
+end
+
+
+function addon.Sets:GetLocationBasedCount(setInfo)
+	local collectedCount = 0;
+	local totalCount = 0;
+	local items = {}
+	local setID = setInfo.setID;
+	--local sources = addon.C_TransmogSets.GetSetSources(setID)
+	local sources = SetsDataProvider:GetSetSources(setID)
+
+	for sourceID in pairs(sources) do
+		local sourceInfo = C_TransmogCollection.GetSourceInfo(sourceID)
+		if sourceInfo then
+		--local appearanceSources = sourceInfo and C_TransmogCollection.GetAppearanceSources(sourceInfo.visualID)
+			local _, visualID, _, _, _, itemLink = C_TransmogCollection.GetAppearanceSourceInfo(sourceID)	
+			local appearanceSources = (sourceInfo and itemLink and C_TransmogCollection.GetAppearanceSources(sourceInfo.visualID, addon.GetItemCategory(sourceInfo.visualID), addon.GetTransmogLocation(itemLink)) )
+			if appearanceSources then
+				if #appearanceSources > 1 then
+					CollectionWardrobeUtil.SortSources(appearanceSources, sourceInfo.visualID, sourceID)
+				end
+
+				if  addon.includeLocation[sourceInfo.invType] then
+					totalCount = totalCount + 1;
+
+					if appearanceSources[1].isCollected  then
+						collectedCount = collectedCount + 1;
+					end
+				end
+			end
+		end
+	end
+
+	return collectedCount, totalCount;
 end

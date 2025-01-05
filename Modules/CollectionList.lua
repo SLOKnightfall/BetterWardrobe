@@ -237,7 +237,6 @@ local function slotOnClick(self, transmogLocation)
 	end
 
 	CloseDropDownMenus()
-	BW_CloseDropDownMenus()
 	PlaySound(SOUNDKIT.UI_TRANSMOG_GEAR_SLOT_CLICK)
 	BetterWardrobeCollectionFrame.ItemsCollectionFrame:RefreshVisualsList()
 	BetterWardrobeCollectionFrame.ItemsCollectionFrame:UpdateItems()
