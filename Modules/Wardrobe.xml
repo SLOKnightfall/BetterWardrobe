@@ -269,7 +269,15 @@
 								<Anchor point="TOPLEFT" x="-8" y="8"/>
 							</Anchors>
 						</Texture>
+					</Layer>		
+					<Layer level="OVERLAY" textureSubLevel="1">
+							<Texture parentKey="HideVisualIcon" atlas="transmog-icon-hidden" useAtlasSize="true" hidden="true">
+							<Anchors>
+								<Anchor point="CENTER" x="0" y="0"/>
+							</Anchors>
+						</Texture>
 					</Layer>
+
 				</Layers>
 				<Scripts>
 					<OnEnter method="OnEnter"/>
@@ -1419,6 +1427,12 @@
 										<Anchor point="TOP" x="0" y="-63"/>
 									</Anchors>
 								</FontString>
+								<FontString parentKey="HolidayLabel" inherits="GameFontHighlight" maxLines="1">
+									<Size x="380" y="0"/>
+									<Anchors>
+										<Anchor point="BOTTOM" x="0" y="50"/>
+									</Anchors>
+								</FontString>
 							</Layer>
 						</Layers>
 						<Frames>
@@ -2507,8 +2521,8 @@
 								UIMenuButtonStretchMixin.OnMouseDown(self, button);
 								PlaySound(SOUNDKIT.IG_MAINMENU_OPTION_CHECKBOX_ON);
 								BW_ToggleDropDownMenu(1, nil, self:GetParent().SpecDropDown, self, 0, 0);
-								HelpTip:Hide(self:GetParent(), TRANSMOG_SPECS_BUTTON_TUTORIAL);
-								SetCVarBitfield("closedInfoFrames", LE_FRAME_TUTORIAL_TRANSMOG_SPECS_BUTTON, true);
+								--HelpTip:Hide(self:GetParent(), TRANSMOG_SPECS_BUTTON_TUTORIAL);
+								--SetCVarBitfield("closedInfoFrames", LE_FRAME_TUTORIAL_TRANSMOG_SPECS_BUTTON, true);
 								self.Icon:SetPoint("CENTER", -1, -1);
 							</OnMouseDown>
 							<OnMouseUp>

@@ -160,13 +160,13 @@ addon.MiscSets.customGroups = {
 
 
 addon.MiscSets.CustomDesc = {
-	[3875] = "Plunderlord's Radiant Finery",
-		[4175] = "Plunderlord s",
+	[3875] = "Yellow",
+	[4175] = "Black",
 	[3447] = "World Drop - Turquoise",
 	[3446] = "World Drop - Turquoise",
 	[3358] = "In-Game Shop - Twilight Witch",
-	[3355] = "In-Game Shop - Shadowbane",
-	[3354] = "In-Game Shop - Venombane",
+	[3354] = "Purple (In-Game Shop - Shadowbane)",
+	[3355] = "Green (In-Game Shop - Venombane)",
 	[3190] = "Trading Post - Formal",
 	[2833] = "Blackrock (Black)",
 	[2834] = "Frostwolf (Blue)",

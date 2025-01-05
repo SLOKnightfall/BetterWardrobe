@@ -143,6 +143,9 @@ local function UseSet(data)
 	local correctHeratiage = false
 	local heritageSets = addon.MiscSets.HeritageSets
 
+	local isHidden = addon.HiddenAppearanceDB.profile.set[data.setID]
+	if isHidden and not addon.Profile.ShowHidden then return false end
+
 	if heritageSets[data.setID] and heritageSets[data.setID] == playerRace  then
 		correctHeratiage = true;
 		correctFaction = true;
@@ -163,9 +166,9 @@ local function UseSet(data)
 					end
 				end
 			else
-					local classInfo = CLASS_INFO[playerClass]
-					local className = (classMask and GetClassInfo(classMask)) or nil
-					correctClass = data.classMask == classInfo[1] or not data.classMask
+				local classInfo = CLASS_INFO[playerClass]
+				local className = (classMask and GetClassInfo(classMask)) or nil
+				correctClass = data.classMask == classInfo[1] or not data.classMask
 			end
 			--[[
 		else
@@ -197,8 +200,8 @@ local function UseSet(data)
 	if correctFaction
 		and correctClass 
 		and correctHeratiage
-	then
-		return true
+		then
+			return true
 	else
 		return false;
 	end

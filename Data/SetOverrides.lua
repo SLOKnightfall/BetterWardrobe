@@ -23,9 +23,13 @@ local SetAdditions = {
 local altitems = { 
 
 --Cosmetics
-	[218968] = 218968, --Purple Snugglefin head
+	[218967] = 218968, --Purple Snugglefin head
 	[218961] = 218960, --Green Snugglefin head
-	[230296] = 230295, -- Dark Ranger Chest
+	[230295] = {230296,195204, 195209,}, -- Dark Ranger Chest
+	[230296] = {195204,195209, 230295}, -- Dark Ranger Chest
+	[195204] = {230296,195209, 230295}, -- Dark Ranger Chest
+	[195209] = {230296,195204, 230295}, -- Dark Ranger Chest
+
 	[183080] = 183073 , --Sabellian Set
 --Fireplume cosmetic
 	[169680] = {169689,169778,169779}, --Fireplume legs
@@ -33,7 +37,8 @@ local altitems = {
 	[169777] = 169681, --Fireplume Gloves
 --Plunderlord
 	[198627] = 218283, --eyepatch with out hat
-	[222868] = 218283, --eyepatch with out hat
+	[222868] = 218283, --eyepatch with out hat	
+	[230261] = 218283, --eyepatch with out hat
 	[198786] = {184346,184347,184348,222847}, --beanies
 	[198785] = {96286,96285,184350,184349}, --tricorns
 --Heritage Armor
