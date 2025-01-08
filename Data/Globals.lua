@@ -44,6 +44,8 @@ local PlateMasks =  {1, 2, 32, 35, 0}
 local MailMasks =  {4, 64, 68, 0, 4096, 4164}
 local LeatherMasks = {8, 512, 1024, 2048, 3592, 0}
 local ClothMaks = {16, 128, 256, 400, 0}
+
+Globals.ARMOR_TYPES = {ClothMaks,LeatherMasks, MailMasks, PlateMasks}
 Globals.CLASS_MASK = {
 		[1] = PlateMasks, -- Warrior - Plate Wearer
 		[2] = PlateMasks, -- Paladin - Plate Wearer

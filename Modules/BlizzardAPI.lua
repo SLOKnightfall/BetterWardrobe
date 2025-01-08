@@ -68,8 +68,8 @@ addon.GetTransmogLocation = GetTransmogLocation
 --Determines type of set based on setID
 local function DetermineSetType(setID)
 
-	  setData = dd(setID) --addon.GetSetType(setID)
-	 local setType = setData.setType
+	local setData = dd(setID) --addon.GetSetType(setID)
+	 local setType = setData and setData.setType
 	--Default Blizzard Set
 	if not setType or setType == "Blizzard"then
 		return "set"

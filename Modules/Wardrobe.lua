@@ -31,6 +31,7 @@ local IN_PROGRESS_FONT_COLOR =addon.Globals.IN_PROGRESS_FONT_COLOR;
 local IN_PROGRESS_FONT_COLOR_CODE = addon.Globals.IN_PROGRESS_FONT_COLOR_CODE;
 local COLLECTION_LIST_WIDTH = addon.Globals.COLLECTION_LIST_WIDTH;
 
+local armorTypes = {"Cloth","Leather","Mail","Plate"}
 
 
 local Sets = addon.Sets;
@@ -1207,6 +1208,9 @@ function WardrobeCollectionFrameMixin:SetTab(tabID)
 		self.selectedTransmogTab = 1;
 	end
 
+	if (addon.Profile.IgnoreClassRestrictions and addon.GetTab() ~= 1)  then 
+		WardrobeCollectionFrame.ClassDropdown:SetText(armorTypes[addon.armorTypeFilter])
+	end;
 
 	local ElvUI = C_AddOns.IsAddOnLoaded("ElvUI");
 
@@ -1569,6 +1573,18 @@ function WardrobeCollectionFrameMixin:InitBaseSetsFilterButton()
 		addon.Profile.IgnoreClassRestrictions = not addon.Profile.IgnoreClassRestrictions;
 		addon.Init:InitDB();
 		RefreshLists();
+		 	
+		if (addon.Profile.IgnoreClassRestrictions and addon.GetTab() ~= 1)  then 
+			WardrobeCollectionFrame.ClassDropdown:SetDefaultText(armorTypes[addon.armorTypeFilter])
+		else
+			local classfilter = C_TransmogSets.GetTransmogSetsClassFilter();
+			 classMask = addon.Globals.ClassToMask[classfilter]
+			 className = addon.Globals.CLASS_NAMES[classMask][1]
+
+			WardrobeCollectionFrame.ClassDropdown:SetDefaultText(className)
+
+		end;
+		WardrobeCollectionFrame.ClassDropdown:Update()
 	end
 	local function ShowFactionOnly()
 		return addon.Profile.CurrentFactionSets;
@@ -1605,7 +1621,6 @@ function WardrobeCollectionFrameMixin:InitBaseSetsFilterButton()
 		return C_TransmogSets.SetDefaultBaseSetsFilters();
 	end);
 
-		--rootDescription:CreateCheckbox(L["Ignore Class Restriction Filter"], ShowIgnoreClassRestrictions, setIgnoreClassRestrictions, 5);
 
 		--rootDescription:CreateCheckbox(L["Show Only Player's Faction"], ShowFactionOnly, setShowFactionOnly, 5);
 		--rootDescription:CreateCheckbox(L["Show Only Player's Faction"], ShowFactionOnly, setShowFactionOnly, 5);
@@ -1754,6 +1769,9 @@ function WardrobeCollectionFrameMixin:InitBaseSetsFilterButton()
 				RefreshLists()
 
 			end, 6);
+
+			submenu:CreateCheckbox(L["Ignore Class Restriction Filter"], ShowIgnoreClassRestrictions, setIgnoreClassRestrictions, 5);
+
 	end);
 end
 
@@ -4085,19 +4103,24 @@ end
 local WardrobeCollectionClassDropdownMixin = {};
 BetterWardrobeCollectionClassDropdownMixin = WardrobeCollectionClassDropdownMixin
 
+
 function WardrobeCollectionClassDropdownMixin:OnLoad()
 	self:SetWidth(150);
 
 	self:SetSelectionTranslator(function(selection)
-		local classInfo = selection.data;
-		local classColor = GetClassColorObj(classInfo.classFile) or HIGHLIGHT_FONT_COLOR;
-		return classColor:WrapTextInColorCode(classInfo.className);
+		if ((not addon.Profile.IgnoreClassRestrictions and addon.GetTab() ~= 1) or addon.GetTab() == 1)  then 
+
+			local classInfo = selection.data;
+			local classColor = GetClassColorObj(classInfo.classFile) or HIGHLIGHT_FONT_COLOR;
+			return classColor:WrapTextInColorCode(classInfo.className);
+		else
+			return armorTypes[addon.armorTypeFilter]
+		end
 	end);
 end
 
 function WardrobeCollectionClassDropdownMixin:OnShow()
 	self:Refresh();
-
 	WardrobeFrame:RegisterCallback(WardrobeFrameMixin.Event.OnCollectionTabChanged, self.Refresh, self);
 end
 
@@ -4110,7 +4133,12 @@ function WardrobeCollectionClassDropdownMixin:GetClassFilter()
 	if searchType == Enum.TransmogSearchType.Items then
 		return C_TransmogCollection.GetClassFilter();
 	elseif searchType == Enum.TransmogSearchType.BaseSets then
-		return C_TransmogSets.GetTransmogSetsClassFilter();
+
+		if (addon.Profile.IgnoreClassRestrictions and addon.GetTab() ~= 1)  then 
+			return false; 
+		elseif not addon.Profile.IgnoreClassRestrictions and addon.GetTab() ~= 1 then 
+			return C_TransmogSets.GetTransmogSetsClassFilter();
+		end	
 	end
 end
 
@@ -4130,18 +4158,38 @@ function WardrobeCollectionClassDropdownMixin:SetClassFilter(classID)
 		addon.Init:InitDB()
 	end
 
-
 	self:Refresh();
 end
 
+local _,_,playerClass = UnitClass("player")
+addon.armorTypeFilter = addon.Globals.ClassArmorType[playerClass]
+function WardrobeCollectionClassDropdownMixin:SetArmorTypeFilter(armorType)
+	local searchType = WardrobeCollectionFrame:GetSearchType();
+	if searchType == Enum.TransmogSearchType.BaseSets then
+		addon.armorTypeFilter = armorType;
+		addon.Init:InitDB();
+		RefreshLists();
+	end
+	
+	self:Refresh();
+end
+
+function WardrobeCollectionClassDropdownMixin:GetArmorTypeFilter()
+	local searchType = WardrobeCollectionFrame:GetSearchType();
+	if searchType == Enum.TransmogSearchType.BaseSets then
+		return addon.armorTypeFilter;
+	end
+end
+
 function WardrobeCollectionClassDropdownMixin:Refresh()
+
 	local classFilter = self:GetClassFilter();
-	if not classFilter then
+	if  not classFilter then
 		return;
 	end
 
 	local classInfo = C_CreatureInfo.GetClassInfo(classFilter);
-	if not classInfo then
+	if  not classInfo then
 		return;
 	end
 
@@ -4149,18 +4197,51 @@ function WardrobeCollectionClassDropdownMixin:Refresh()
 		rootDescription:SetTag("MENU_WARDROBE_CLASS");
 
 		local function IsClassFilterSet(classInfo)
-			return self:GetClassFilter() == classInfo.classID; 
+		
+			if addon.Profile.IgnoreClassRestrictions and addon.GetTab() ~= 1 then
+				return false
+			elseif ((not addon.Profile.IgnoreClassRestrictions and addon.GetTab() ~= 1) or addon.GetTab() == 1 )  then 
+				return self:GetClassFilter() == classInfo.classID; 
+			end
+
+			--return self:GetClassFilter() == classInfo.classID; 
 		end;
 
 		local function SetClassFilter(classInfo)
 			self:SetClassFilter(classInfo.classID); 
 		end;
 
-		for classID = 1, GetNumClasses() do
-			local classInfo = C_CreatureInfo.GetClassInfo(classID);
-			rootDescription:CreateRadio(classInfo.className, IsClassFilterSet, SetClassFilter, classInfo);
+		local function IsArmorTypeFilterSet(armorType)
+		if (addon.Profile.IgnoreClassRestrictions and addon.GetTab() ~= 1)  then
+				return self:GetArmorTypeFilter() == armorType; 
+			elseif not addon.Profile.IgnoreClassRestrictions and addon.GetTab() ~= 1 then 
+				return false
+			end
+		end;
+
+		local function SetArmorTypeFilter(armorType)
+			self:SetArmorTypeFilter(armorType); 
+		end;
+
+		if addon.Profile.IgnoreClassRestrictions and addon.GetTab() ~= 1 then 
+			rootDescription:CreateRadio("Cloth", IsArmorTypeFilterSet, SetArmorTypeFilter, 1);
+			rootDescription:CreateRadio("Leather", IsArmorTypeFilterSet, SetArmorTypeFilter, 2);
+			rootDescription:CreateRadio("Mail", IsArmorTypeFilterSet, SetArmorTypeFilter, 3);
+			rootDescription:CreateRadio("Plate", IsArmorTypeFilterSet, SetArmorTypeFilter, 4);
+		else
+			for classID = 1, GetNumClasses() do
+				local classInfo = C_CreatureInfo.GetClassInfo(classID);
+				rootDescription:CreateRadio(classInfo.className, IsClassFilterSet, SetClassFilter, classInfo);
+			end
+			--dropdown:SetText(classInfo)
 		end
+
+
+
+
 	end);
+
+
 end
 
 local WardrobeCollectionFrameSearchBoxProgressMixin = { };
@@ -5306,6 +5387,10 @@ function BetterWardrobeSetsCollectionMixin:LinkSet(setID)
 	end
 end
 local function variantsTooltip(elementData, variantSets)
+	if BetterWardrobeCollectionFrame.selectedCollectionTab == 4 then
+		return ""
+	end
+	
 	local  ratioText = ""
 	table.sort(variantSets, function(a,b) return (a.name) < (b.name) end);
 
@@ -5374,13 +5459,15 @@ function WardrobeSetsScrollFrameButtonMixin:Init(elementData)
 	-- if the base set is hiddenUntilCollected and not collected, it's showing up because one of its variant sets is collected
 	-- in that case use any variant set to populate the info in the list
 	--if elementData.hiddenUntilCollected and not elementData.collected then
+		if BetterWardrobeCollectionFrame.selectedCollectionTab ~= 4 then
+	
 		local variantSets = addon.C_TransmogSets.GetVariantSets(elementData.setID);
 		if #variantSets > 0 then
 			-- variant sets are already filtered for visibility (won't get a hiddenUntilCollected one unless it's collected)
 			-- any set will do so just picking first one
 			displayData = variantSets[1];
 		end
-	--end
+	
 
 	if #variantSets <= 1  or (C_AddOns.IsAddOnLoaded("CanIMogIt") and CanIMogItOptions["showSetInfo"]) then
 		self.Variants:Hide()
@@ -5389,7 +5476,7 @@ function WardrobeSetsScrollFrameButtonMixin:Init(elementData)
 		self.Variants:Show()
 		self.Variants.Count:SetText(#variantSets)
 	end
-
+end
 	local subName = gsub(displayData.name, " %(Recolor%)", "")
 	----self.Name:SetText(subName..((displayData.className) and " ("..displayData.className..")" or "") );
 	self.Name:SetText(subName );
@@ -5457,59 +5544,61 @@ function WardrobeSetsScrollFrameButtonMixin:OnClick(buttonName, down)
 			PlaySound(SOUNDKIT.IG_MAINMENU_OPTION_CHECKBOX_ON);
 			g_selectionBehavior:Select(self);
 		end
-	end
-	if ( buttonName == "LeftButton" ) then
-		PlaySound(SOUNDKIT.IG_MAINMENU_OPTION_CHECKBOX_ON);
-		g_selectionBehavior:Select(self);
-		addon:DebugData(self.setID)
-	elseif ( buttonName == "RightButton" ) then
-		MenuUtil.CreateContextMenu(self, function(owner, rootDescription)
-			rootDescription:SetTag("MENU_WARDROBE_SETS_SET");
+	
+	else
+		if ( buttonName == "LeftButton" ) then
+			PlaySound(SOUNDKIT.IG_MAINMENU_OPTION_CHECKBOX_ON);
+			g_selectionBehavior:Select(self);
+			addon:DebugData(self.setID)
+		elseif ( buttonName == "RightButton" ) then
+			MenuUtil.CreateContextMenu(self, function(owner, rootDescription)
+				rootDescription:SetTag("MENU_WARDROBE_SETS_SET");
 
-			local baseSetID = self.setID;
-			local baseSet = SetsDataProvider:GetBaseSetByID(baseSetID);
-			local useDescription = (#SetsDataProvider:GetVariantSets(baseSetID) > 0);
-			local type = tabType[addon.GetTab()];
+				local baseSetID = self.setID;
+				local baseSet = SetsDataProvider:GetBaseSetByID(baseSetID);
+				local useDescription = (#SetsDataProvider:GetVariantSets(baseSetID) > 0);
+				local type = tabType[addon.GetTab()];
 
-			local isHidden = addon.HiddenAppearanceDB.profile[type][baseSetID]
-			rootDescription:CreateButton(TRANSMOG_OUTFIT_POST_IN_CHAT, function()
-				BetterWardrobeSetsCollectionMixin:LinkSet(self.baseSetID or self.setID);
-			end);
+				local isHidden = addon.HiddenAppearanceDB.profile[type][baseSetID]
+				rootDescription:CreateButton(TRANSMOG_OUTFIT_POST_IN_CHAT, function()
+					BetterWardrobeSetsCollectionMixin:LinkSet(self.baseSetID or self.setID);
+				end);
 
-			rootDescription:CreateButton(isHidden and SHOW or HIDE, function()
-				--self.setID = self.baseSetID; 
-				ToggleHidden(self, isHidden);
-				addon.Init:InitDB()
-				RefreshLists()
-			end);
+				rootDescription:CreateButton(isHidden and SHOW or HIDE, function()
+					--self.setID = self.baseSetID; 
+					ToggleHidden(self, isHidden);
+					addon.Init:InitDB()
+					RefreshLists()
+				end);
 
-			local text;
-			local targetSetID;
-			local favorite = baseSet.favoriteSetID ~= nil;
-			if favorite then
-				targetSetID = baseSet.favoriteSetID;
-				if useDescription then
-					local setInfo = addon.C_TransmogSets.GetSetInfo(baseSet.favoriteSetID);
-					text = format(TRANSMOG_SETS_UNFAVORITE_WITH_DESCRIPTION, setInfo.description or setInfo.name );
+				local text;
+				local targetSetID;
+				local favorite = baseSet.favoriteSetID ~= nil;
+				if favorite then
+					targetSetID = baseSet.favoriteSetID;
+					if useDescription then
+						local setInfo = addon.C_TransmogSets.GetSetInfo(baseSet.favoriteSetID);
+						text = format(TRANSMOG_SETS_UNFAVORITE_WITH_DESCRIPTION, setInfo.description or setInfo.name );
+					else
+						text = TRANSMOG_ITEM_UNSET_FAVORITE;
+					end
 				else
-					text = TRANSMOG_ITEM_UNSET_FAVORITE;
+					targetSetID = WardrobeCollectionFrame.SetsCollectionFrame:GetDefaultSetIDForBaseSet(baseSetID);
+					if useDescription then
+						local setInfo = addon.C_TransmogSets.GetSetInfo(targetSetID);
+						text = format(TRANSMOG_SETS_FAVORITE_WITH_DESCRIPTION, setInfo.description or setInfo.name);
+					else
+						text = TRANSMOG_ITEM_SET_FAVORITE;
+					end
 				end
-			else
-				targetSetID = WardrobeCollectionFrame.SetsCollectionFrame:GetDefaultSetIDForBaseSet(baseSetID);
-				if useDescription then
-					local setInfo = addon.C_TransmogSets.GetSetInfo(targetSetID);
-					text = format(TRANSMOG_SETS_FAVORITE_WITH_DESCRIPTION, setInfo.description or setInfo.name);
-				else
-					text = TRANSMOG_ITEM_SET_FAVORITE;
-				end
-			end
 
-			rootDescription:CreateButton(text, function()
-				addon.C_TransmogSets.SetIsFavorite(targetSetID, not favorite);
-				addon.Init:InitDB()
-				RefreshLists()
+				rootDescription:CreateButton(text, function()
+					addon.C_TransmogSets.SetIsFavorite(targetSetID, not favorite);
+					addon.Init:InitDB()
+					RefreshLists()
+				end);
 			end);
-		end);
+		end
 	end
 end
 

@@ -527,8 +527,8 @@ local function SortDefault(sets)
 			if set2.label == "Special" then return false; end
 			if set1.label == "Trading Post" then return true; end
 			if set2.label == "Trading Post" then return false; end
-			if set1.label == "Holiday" then return true; end
-			if set2.label == "Holiday" then return false; end
+			--if set1.label == "Holiday" then return true; end
+			--if set2.label == "Holiday" then return false; end
 		end
 		if ( set1.expansionID ~= set2.expansionID ) then
 			return SortOrder(set1.expansionID, set2.expansionID)

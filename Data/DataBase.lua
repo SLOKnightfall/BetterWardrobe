@@ -139,9 +139,12 @@ local function UseSet(data)
 	local _,_,playerRace = UnitRace('player');
 	local playerFaction, _ = UnitFactionGroup('player')
 	local correctFaction = false
-	local ClassArmorTypeMask = addon.Globals.ClassArmorMask[tonumber(selectedArmorType)]
 	local correctHeratiage = false
 	local heritageSets = addon.MiscSets.HeritageSets
+
+	if addon.Profile.IgnoreClassRestrictions then
+		ClassArmor = Globals.ARMOR_TYPES[addon.armorTypeFilter]
+	end
 
 	local isHidden = addon.HiddenAppearanceDB.profile.set[data.setID]
 	if isHidden and not addon.Profile.ShowHidden then return false end
@@ -157,45 +160,25 @@ local function UseSet(data)
 	if data.classMask and (data.classMask == 0 or data.classMask == 16383) then
 		correctClass = true;
 	else
-		--if not addon.Profile.IgnoreClassRestrictions then
-			if data.setType == "Blizzard" then 
-				for i = 1, #ClassArmor do
-					if data.classMask == ClassArmor[i] then
-						correctClass = true;
-						break;
-					end
+		if data.setType == "Blizzard" then 
+			for i = 1, #ClassArmor do
+				if data.classMask == ClassArmor[i] then
+					correctClass = true;
+					break;
 				end
-			else
-				local classInfo = CLASS_INFO[playerClass]
-				local className = (classMask and GetClassInfo(classMask)) or nil
-				correctClass = data.classMask == classInfo[1] or not data.classMask
 			end
-			--[[
 		else
-			if data.setType == "Blizzard" then 
-				--zz = data
-				--print(data.armorType)
-
-				--print(data.classMask)
-				--if data.classMask == 400 then print(data.name) end
-				for i = 1, #ClassArmorTypeMask do
-					if data.classMask == ClassArmorTypeMask[i] then
-
-						correctClass = true;
-						break;
-					end
-				end
-			end
+			local classInfo = CLASS_INFO[playerClass]
+			local className = (classMask and GetClassInfo(classMask)) or nil
+			correctClass = data.classMask == classInfo[1] or not data.classMask
 		end
-		]]--
+	
 	end
 
 	if addon.Profile.CurrentFactionSets and (data.requiredFaction and GetFactionID(data.requiredFaction) == GetFactionID(playerFaction) or data.requiredFaction == nil) 
 		or not addon.Profile.CurrentFactionSets then
 			correctFaction =  true
 	end
-
---if true then return true end
 
 	if correctFaction
 		and correctClass 
@@ -230,9 +213,9 @@ function BuildBlizzSets()
 			elseif data.classMask == 4164 then
 				data.classMask = 68
 			elseif data.classMask == 2048 then
-					data.classMask = 3592
+				data.classMask = 3592
 			elseif data.classMask == 256 then
-					data.classMask = 400
+				data.classMask = 400
 			elseif data.classMask == 32 then
 				data.classMask = 35
 			end
@@ -255,7 +238,7 @@ function BuildBlizzSets()
 			--Shop & Trading Post
 			elseif addon.MiscSets.TRADINGPOST_SETS[data.setID]  or (data.label and string.find(data.label, inGameShopGlobalString))  or (data.label and string.find(data.label, tradingPostGlobalString))  
 				or (data.description and string.find(data.description, inGameShopGlobalString))  or (data.description and string.find(data.description, tradingPostGlobalString)) then
-				data.tab = 3
+				--data.tab = 3
 				data.filter = 12
 
 			--Raid Sets
@@ -264,7 +247,7 @@ function BuildBlizzSets()
 
 			else
 				data.filter = 1
-				data.tab = 3
+				--data.tab = 3
 			end
 
 			--Fix set description
@@ -399,6 +382,7 @@ local function OpposingFaction(faction)
 end
 
 
+local armorTypes = {"CLOTH","LEATHER","MAIL","PLATE"}
 local function BuildArmorDB()
 	addon.SetsDataProvider:ClearSets();
 	local playerFaction, _ = UnitFactionGroup('player')
@@ -413,12 +397,16 @@ local function BuildArmorDB()
 	local at = Globals.ClassArmorType[dropdownclass]
 	local ty = Globals.ARMOR_TYPE[at]
 	armorType = ty or addon.Globals.CLASS_INFO[playerClass][3]
+
+	if addon.Profile.IgnoreClassRestrictions then
+		armorType = armorTypes[addon.armorTypeFilter]
+	end
+
 	local armorSetdata = {addon.ArmorSets[armorType], addon.ArmorSets["COSMETIC"]}
 
 	for armorType, data in ipairs(armorSetdata) do
 
 		for id, data in pairs(data) do
-			--print(UseSet(data))
 			if (data.requiredFaction and data.requiredFaction == GetFactionID(playerFaction) or data.requiredFaction == nil) and 
 				(not data.BuildBlizzSets and (data.filter ~= 5 and data.filter ~= 7 and data.filter ~= 11)) and  UseSet(data) then 
 				--data.isHeritageArmor = string.find(data.name, "Heritage")
@@ -436,10 +424,14 @@ local function BuildArmorDB()
 				data.oldnote = data.label
 
 				if not data.note then
-					local note = "NOTE_"..(data.label or 0)
-					data.note = note
+					if type(data.label) == "number" then
+						local note = "NOTE_"..(data.label or 0)
+						data.note = note
 
-					data.label = L[note] or ""
+						data.label = L[note] or ""
+					else
+					end
+					--data.label
 				end
 
 				--local baseItem = data.items[1]

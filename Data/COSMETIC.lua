@@ -222,7 +222,7 @@ addon.ArmorSets["COSMETIC"] ={
 	]]--
 	[50214]={
 		["armorType"] =  13 ,
-		["label"] =  121 ,
+		["label"] =  "Brewfest" ,
 		["setID"] =  50214,
 		["expansionID"] =  1 ,
 		["filter"] =  13 ,
@@ -230,10 +230,11 @@ addon.ArmorSets["COSMETIC"] ={
 		["mod"] =  0 ,
 		["itemData"] = {[20] = {'33862:0',15662,8788},[1] = {'33864:0',15664,8790},[8] = {'33868:0',15665,8791},},
 		["sourceType"] =  0 ,
+		["customGroups"] = "Brewfest"
 	},
 	[50215]={
 		["armorType"] =  13 ,
-		["label"] =  121 ,
+		["label"] =  "Brewfest" ,
 		["setID"] =  50215,
 		["expansionID"] =  1 ,
 		["filter"] =  13 ,
@@ -241,10 +242,11 @@ addon.ArmorSets["COSMETIC"] ={
 		["mod"] =  0 ,
 		["itemData"] = {[20] = {'33862:0',15662,8788},[8] = {'33868:0',15665,8791},[1] = {'33967:0',15712,8812},},
 		["sourceType"] =  0 ,
+		["customGroups"] = "Brewfest"
 	},
 	[50216]={
 		["armorType"] =  13 ,
-		["label"] =  121 ,
+		["label"] =  "Brewfest" ,
 		["setID"] =  50216,
 		["expansionID"] =  1 ,
 		["filter"] =  13 ,
@@ -252,10 +254,11 @@ addon.ArmorSets["COSMETIC"] ={
 		["mod"] =  0 ,
 		["itemData"] = {[20] = {'33862:0',15662,8788},[8] = {'33868:0',15665,8791},[1] = {'33968:0',15713,8813},},
 		["sourceType"] =  0 ,
+		["customGroups"] = "Brewfest"
 	},
 	[50217]={
 		["armorType"] =  13 ,
-		["label"] =  121 ,
+		["label"] =  "Brewfest" ,
 		["setID"] =  50217,
 		["expansionID"] =  1 ,
 		["filter"] =  13 ,
@@ -263,10 +266,11 @@ addon.ArmorSets["COSMETIC"] ={
 		["mod"] =  0 ,
 		["itemData"] = {[20] = {'33862:0',15662,8788},[8] = {'33868:0',15665,8791},[1] = {'33969:0',15714,8814},},
 		["sourceType"] =  0 ,
+		["customGroups"] = "Brewfest"
 	},
 	[50218]={
 		["armorType"] =  13 ,
-		["label"] =  121 ,
+		["label"] =  "Brewfest" ,
 		["setID"] =  50218,
 		["expansionID"] =  1 ,
 		["filter"] =  13 ,
@@ -274,6 +278,7 @@ addon.ArmorSets["COSMETIC"] ={
 		["mod"] =  0 ,
 		["itemData"] = {[5] = {'33863:0',15663,8789},[9] = {'33966:0',15711,8811},},
 		["sourceType"] =  0 ,
+		["customGroups"] = "Brewfest"
 	},
 		[50219]={
 		["armorType"] =  13,
@@ -285,6 +290,7 @@ addon.ArmorSets["COSMETIC"] ={
 		["mod"] =  0 ,
 		["itemData"] = {[8] = {'44788:0',21595,11254},[1] = {'46723:0',22458,2838},[20] = {'46800:0',22464,11702},},
 		["sourceType"] =  0 ,
+		["customGroups"] = "Pilgrim"
 	},
 	[50220]={
 		["armorType"] =  13 ,
@@ -296,6 +302,7 @@ addon.ArmorSets["COSMETIC"] ={
 		["mod"] =  0 ,
 		["itemData"] = {[20] = {'44785:0',21594,11253},[8] = {'44788:0',21595,11254},},
 		["sourceType"] =  0 ,
+		["customGroups"] = "Pilgrim"
 	},
 	[50221]={
 		["armorType"] =  13 ,
@@ -307,6 +314,7 @@ addon.ArmorSets["COSMETIC"] ={
 		["mod"] =  0 ,
 		["itemData"] = {[3] = {'23324:0',9207,6162},[8] = {'34683:0',16110,9041},[20] = {'34685:0',16111,9042},[1] = {'74278:0',38054,16561},},
 		["sourceType"] =  0 ,
+		["customGroups"] = "Vestments of Summer",
 	},
 	[50222]={
 		["armorType"] =  13 ,
@@ -318,10 +326,11 @@ addon.ArmorSets["COSMETIC"] ={
 		["mod"] =  0 ,
 		["itemData"] = {[4] = {'6833:0',2633,2271},[5] = {'6834:0',2634,2272},[7] = {'6835:0',2635,2273},[8] = {'6836:0',2636,2274},},
 		["sourceType"] =  0 ,
+		["customGroups"] = "Tuxedo",
 	},
 	[50223]={
 		["armorType"] =  13 ,
-		["label"] =  121 ,
+		["label"] =  "Winter Veil" ,
 		["setID"] =  50223,
 		["expansionID"] =  1 ,
 		["filter"] =  13 ,
@@ -329,10 +338,11 @@ addon.ArmorSets["COSMETIC"] ={
 		["mod"] =  0 ,
 		["itemData"] = {[5] = {'139293:0',80587,30881},[7] = {'139297:0',80591,30883},[1] = {'139299:0',80593,30882},[8] = {'139301:0',80595,30880},[6] = {'139304:0',80597,30879},},
 		["sourceType"] =  0 ,
+		["custom"] = "Winter Veil",
 	},
 	[50224]={
 		["armorType"] =  13 ,
-		["label"] =  121 ,
+		["label"] =  "Winter Veil" ,
 		["setID"] =  50224,
 		["expansionID"] =  1 ,
 		["filter"] =  13 ,
@@ -340,10 +350,11 @@ addon.ArmorSets["COSMETIC"] ={
 		["mod"] =  0 ,
 		["itemData"] = {[5] = {'139294:0',80588,30902},[7] = {'139298:0',80592,30904},[1] = {'139300:0',80594,30903},[8] = {'139303:0',80596,30901},[6] = {'139305:0',80598,30900},},
 		["sourceType"] =  0 ,
+		["custom"] = "Winter Veil",
 	},
 	[50225]={
 		["armorType"] =  13 ,
-		["label"] =  121 ,
+		["label"] =  "Winter Veil" ,
 		["setID"] =  50225,
 		["expansionID"] =  1 ,
 		["filter"] =  13 ,
@@ -351,21 +362,23 @@ addon.ArmorSets["COSMETIC"] ={
 		["mod"] =  0 ,
 		["itemData"] = {[5] = {'139293:0',80587,30881},[7] = {'139295:0',80589,30899},[1] = {'139299:0',80593,30882},[8] = {'139301:0',80595,30880},[6] = {'139304:0',80597,30879},},
 		["sourceType"] =  0 ,
+		["custom"] = "Winter Veil",
 	},
 	[50226]={
 		["armorType"] =  13 ,
-		["label"] =  121 ,
+		["label"] =  "Winter Veil" ,
 		["setID"] =  50226,
 		["expansionID"] =  1 ,
 		["filter"] =  13 ,
 		["name"] =  "Finely-Tailored Winter Veil (Green - Pants)" ,
 		["mod"] =  0 ,
 		["itemData"] = {[5] = {'139294:0',80588,30902},[7] = {'139296:0',80590,30905},[1] = {'139300:0',80594,30903},[8] = {'139303:0',80596,30901},[6] = {'139305:0',80598,30900},},
-		["sourceType"] =  0 ,
+		["sourceType"] =  0,
+		["custom"] = "Winter Veil",
 	},
 	[50227]={
 		["armorType"] =  13 ,
-		["label"] =  121 ,
+		["label"] =  "Winter Veil" ,
 		["setID"] =  50227,
 		["expansionID"] =  1 ,
 		["filter"] =  13 ,
@@ -373,10 +386,11 @@ addon.ArmorSets["COSMETIC"] ={
 		["mod"] =  0 ,
 		["itemData"] = {[1] = {'21525:0',8510,5771},[20] = {'34087:0',15751,8831},},
 		["sourceType"] =  0 ,
+		["custom"] = "Winter Veil",
 	},
 	[50228]={
 		["armorType"] =  13 ,
-		["label"] =  121 ,
+		["label"] =  "Winter Veil" ,
 		["setID"] =  50228,
 		["expansionID"] =  1 ,
 		["filter"] =  13 ,
@@ -384,6 +398,7 @@ addon.ArmorSets["COSMETIC"] ={
 		["mod"] =  0 ,
 		["itemData"] = {[1] = {'21524:0',8509,5770},[20] = {'34085:0',15749,8829},},
 		["sourceType"] =  0 ,
+		["custom"] = "Winter Veil",
 	},
 
 	[50229]={
