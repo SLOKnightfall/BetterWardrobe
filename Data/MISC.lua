@@ -116,10 +116,13 @@ addon.MiscSets.customGroups = {
 	[1998] = "Azerothian Archives", --"Renowned Explorer's Attire",
 	[1999] = "Azerothian Archives", --"Renowned Explorer's Attire",
 	[3306] = "Trading Post",
-	[3518] = "Arathi Atire",
-	[3876] = "Arathi Atire",
-	[3877] = "Arathi Atire",
+	--[3518] = "Arathi Atire",
+---	[3876] = "Arathi Atire",
+--	[3877] = "Arathi Atire",
+--[4227] = "Arathi Atire",
+--[4228] = "Arathi Atire",
 
+	[3697] = "The War Within Season 1",
 	[3411] = "Dawnwatcher",
 	[3412] = "Dawnwatcher",
 	[3410] = "Dawnwatcher",
@@ -156,6 +159,30 @@ addon.MiscSets.customGroups = {
 	[3372] = "spiritwalker",
 	[3373] = "spiritwalker",
 	[3371] = "spiritwalker",
+
+	--[4150] = "Hallofall - Mail",
+	[4227] = "Hallowfall - Mail",
+	[4228] = "Hallowfall - Mail",
+
+	[3518] = "Hallowfall - Mail",
+	[3877] = "Hallowfall - Mail",
+	[3876] = "Hallowfall - Mail",
+
+	[3697] = "Hallowfall Gear",
+	[3696] = "Hallowfall Gear",
+	[3699] = "Hallowfall Gear",
+	[3698] = "Hallowfall Gear",
+
+	[3642] = "Underground Gear",
+	[4149] = "Underground Gear",
+	[4150] = "Underground Gear",
+	[4152] = "Underground Gear",
+
+
+
+
+
+
 }
 
 

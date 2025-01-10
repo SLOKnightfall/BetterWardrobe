@@ -53,7 +53,9 @@ addon.variantIDs = variantIDs
 local fullList = {}
 addon.fullList = fullList
 addon.ArmorSetModCache = {}
+addon.transmogList = {}
 
+local profileCache = {}
 local MAX_DEFAULT_OUTFITS = C_TransmogCollection.GetNumMaxOutfits()
 
 function addon:ClearCache()
@@ -99,6 +101,7 @@ local function AddVariant(set, baseSetID)
 	set.baseSetID = baseSetID;
 	tinsert(variantSets[baseSetID], set)
 	fullList[set.setID] = set
+	tinsert(addon.transmogList, set)
 	variantIDs[set.setID] = baseSetID;
 end
 
@@ -252,7 +255,7 @@ function BuildBlizzSets()
 
 			--Fix set description
 			if addon.MiscSets.CustomDesc[data.setID] then
-				data.description = addon.MiscSets.CustomDesc[data.setID];
+				--data.description = addon.MiscSets.CustomDesc[data.setID];
 			end
 
 			--Combine special cases
@@ -300,9 +303,9 @@ function BuildBlizzSets()
 				
 				if (not data.description) then
 					if addon.Globals.CLASS_NAMES[data.classMask] then
-						data.description = addon.Globals.CLASS_NAMES[data.classMask][1];
+						--data.description = addon.Globals.CLASS_NAMES[data.classMask][1];
 					else
-						data.description = data.name;
+						--data.description = data.name;
 					end
 				end
 				
@@ -327,6 +330,8 @@ function BuildBlizzSets()
 				local subSetBaseID;
 				SET_INDEX[data.setID] = data
 				fullList[data.setID] = set
+				tinsert(addon.transmogList, set)
+
 
 				if data.customGroups and baseListLabels[data.customGroups] then
 					subSet = true;
@@ -543,7 +548,7 @@ end
 		addon.BuildClassArtifactAppearanceList()
 		----addon.GetSavedList()
 	end
-
+local savedSetID = 0
 --Loads an alt character's saved sets from the DB
 local function loadAltsSavedSets(profile)
 	if not addon.setdb.global.sets[profile] then return {} end
@@ -921,7 +926,8 @@ function addon.SetItemSubstitute(itemID, subID)
 		addon:ClearCache()
 		addon.SetsDataProvider:ClearSets()
 
-		addon.Init:BuildDB()
+		--addon.Init:BuildDB()
+		BuildArmorDB()
 
 		if BetterWardrobeCollectionFrame.SetsCollectionFrame:IsShown() then  --0--TODO FIX
 			BetterWardrobeCollectionFrame.SetsCollectionFrame:Refresh()

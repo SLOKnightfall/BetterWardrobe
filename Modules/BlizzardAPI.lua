@@ -839,3 +839,9 @@ function addon.ChatFrame_OpenChat(text, chatFrame, desiredCursorPosition)
 	ChatEdit_UpdateHeader(editBox);
 	return editBox;
 end
+
+
+
+function addon.C_TransmogSets.GetUsableSets()
+	return addon.fullList
+end
