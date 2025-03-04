@@ -3414,7 +3414,7 @@ function BetterWardrobeItemsCollectionMixin:RefreshAppearanceTooltip()
 	end
 	local sources = CollectionWardrobeUtil.GetSortedAppearanceSourcesForClass(self.tooltipVisualID, C_TransmogCollection.GetClassFilter(), self.activeCategory, self.transmogLocation);
 	local chosenSourceID = self:GetChosenVisualSource(self.tooltipVisualID);	
-	local warningString = CollectionWardrobeUtil.GetBestVisibilityWarning(self.tooltipModel, self.transmogLocation, self.tooltipVisualID);	
+	local warningString = CollectionWardrobeUtil.GetBestVisibilityWarning(self.tooltipModel, self.transmogLocation, sources);	
 	self:GetParent():SetAppearanceTooltip(self, sources, chosenSourceID, warningString);
 end
 
@@ -6127,7 +6127,7 @@ function BetterWardrobeSetsCollectionMixin:RefreshAppearanceTooltip()
 			tinsert(sources, sourceInfo);
 		end
 		CollectionWardrobeUtil.SortSources(sources, sources[1].visualID, self.tooltipPrimarySourceID); 
-		local warningString = CollectionWardrobeUtil.GetBestVisibilityWarning(self.Model, self.transmogLocation, sources[1].visualID);	
+		local warningString = CollectionWardrobeUtil.GetBestVisibilityWarning(self.Model, self.transmogLocation, sources);	
 		self:GetParent():SetAppearanceTooltip(self, sources, self.tooltipPrimarySourceID, warningString, self.tooltipSlot);
 
 	else
@@ -6145,7 +6145,7 @@ function BetterWardrobeSetsCollectionMixin:RefreshAppearanceTooltip()
 
 		CollectionWardrobeUtil.SortSources(sources, sources[1].visualID, self.tooltipPrimarySourceID)
 		local transmogLocation = TransmogUtil.CreateTransmogLocation(self.tooltipTransmogSlot, Enum.TransmogType.Appearance, Enum.TransmogModification.Main);	
-		local warningString = CollectionWardrobeUtil.GetBestVisibilityWarning(self.tooltipModel, self.transmogLocation, visualID);	
+		local warningString = CollectionWardrobeUtil.GetBestVisibilityWarning(self.tooltipModel, self.transmogLocation, sources);	
 		self:GetParent():SetAppearanceTooltip(self, sources, self.tooltipPrimarySourceID, warningString)
 
 		C_Timer.After(.05, function() if needsRefresh then self:RefreshAppearanceTooltip(); needsRefresh = false; end end) --Fix for items that returned retreaving info;
