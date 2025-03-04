@@ -148,14 +148,14 @@ function addon.C_TransmogSets.GetSetInfo(setID)
 	if not setID then return {} end
 	local setType = DetermineSetType(setID)
 
-	if setType == "set" then
-		return C_TransmogSets.GetSetInfo(setID)
+	--if setType == "set" then
+		--return C_TransmogSets.GetSetInfo(setID)
 
-else
+--else
 	--elseif setType == "extraset" then
 		ddd = dd(setID)
 		return dd(setID) --addon.GetSetInfo(setID)
-	end
+	--end
 end
 
 

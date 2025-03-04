@@ -147,7 +147,7 @@
 			</Frame>
 			<Frame inherits="BetterWardrobeSetInfoTemplate"/>
 			<Frame inherits="BetterWardrobeIconsTemplate"/>
-			<Frame parentKey="AltItemtems" hidden="true" >
+			<Frame parentKey="AltItems" hidden="true" >
 				<Size x="25" y="25"/>
 				<Anchors>
 					<Anchor point="BOTTOMRIGHT" relativeKey="$parent" relativePoint="TOPRIGHT" x='8' y='-15'/>

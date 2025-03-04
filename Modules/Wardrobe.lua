@@ -3988,7 +3988,7 @@ function WardrobeSetsTransmogModelMixin:RefreshTooltip()
 	else
 		local setQuality = (numTotalSlots > 0 and totalQuality > 0) and Round(totalQuality / numTotalSlots) or Enum.ItemQuality.Common;
 		local color = ITEM_QUALITY_COLORS[setQuality];
-		local setInfo = addon:GetSetInfo(self.setID);
+		local setInfo = addon.C_TransmogSets.GetSetInfo(self.setID);
 		GameTooltip:SetText(setInfo.name, color.r, color.g, color.b);
 		if ( setInfo.label ) then
 			GameTooltip:AddLine(setInfo.label);
@@ -4489,9 +4489,12 @@ function WardrobeSetsDataProviderMixin:GetUsableSets()
 
 	if ( not self.usableSets ) then
 		self.usableSets = addon.transmogList --addon.C_TransmogSets.GetUsableSets()
-		self:SortSets(self.usableSets);
+		local usableSets = addon:FilterSets(self.usableSets)
+
+		self:SortSets(usableSets);
+		self.usableSets = usableSets
 		-- group sets by baseSetID, except for favorited sets since those are to remain bucketed to the front
-		for i, set in pairs(self.usableSets) do
+		for i, set in ipairs(self.usableSets) do
 			if ( not set.favorite ) then
 				local baseSetID = set.baseSetID or set.setID;
 				local numRelatedSets = 0;
@@ -5154,7 +5157,7 @@ function WardrobeSetsCollectionMixin:DisplaySet(setID)
 
 		itemFrame.Replacement:SetAlpha(0.3);
 
-		local hasSubItem = false ----addon.HasSubItem(setID)
+		local hasSubItem = addon.HasSubItem(setID)
 		--Show marker if the item has been swapped
 		if hasSubItem and hasSubItem[itemFrame.sourceID] then
 			itemFrame.Replacement:Show()
@@ -6173,7 +6176,7 @@ function WardrobeSetsTransmogMixin:UpdateSets()
 						end
 						model:SetItemTransmogInfo(itemTransmogInfo, slotID, canRecurse)
 
-						model.AltItemtems:Hide()
+						model.AltItems:Hide()
 
 					end
 
@@ -6194,9 +6197,9 @@ function WardrobeSetsTransmogMixin:UpdateSets()
 						hasAlternateForm = true
 					end
 					if hasAlternateForm then
-						model.AltItemtems:Show()--local f = CreateFrame("Frame", "112cd2", model, "AltItemtemplate")
+						model.AltItems:Show()--local f = CreateFrame("Frame", "112cd2", model, "AltItemtemplate")
 					else
-						model.AltItemtems:Hide()
+						model.AltItems:Hide()
 					end
 				end
 			else
@@ -6217,9 +6220,9 @@ function WardrobeSetsTransmogMixin:UpdateSets()
 							hasAlternateForm = true
 						end
 						if hasAlternateForm then
-							model.AltItemtems:Show()--local f = CreateFrame("Frame", "112cd2", model, "AltItemtemplate")
+							model.AltItems:Show()--local f = CreateFrame("Frame", "112cd2", model, "AltItemtemplate")
 						else
-							model.AltItemtems:Hide()
+							model.AltItems:Hide()
 						end
 					end
 				end
@@ -6240,17 +6243,17 @@ function WardrobeSetsTransmogMixin:UpdateSets()
 			model.Favorite.Icon:SetShown(set.favorite);
 			model.setID = set.setID;
 
-						if hasAlternateForm then
-				model.AltItemtems:Show();
+			if hasAlternateForm then
+				model.AltItems:Show();
 			else
-				model.AltItemtems:Hide();
+				model.AltItems:Hide();
 			end
 		
 
 			local topSourcesCollected, topSourcesTotal;
 				topSourcesCollected, topSourcesTotal = SetsDataProvider:GetSetSourceCounts(set.setID) 
 	 
-				local setInfo = addon.GetSetInfo(set.setID);
+				 setInfo = dd(set.setID);
 				if setInfo then 
 
 					local isFavorite = C_TransmogSets.GetIsFavorite(set.setID) or addon.favoritesDB.profile.extraset[set.setID];
@@ -6351,52 +6354,213 @@ end
 function WardrobeSetsTransmogMixin:LoadSet(setID)
 	local waitingOnData = false;
 	local transmogSources = { };
-	local primaryAppearances = addon.C_TransmogSets.GetSetPrimaryAppearances(setID);
-	for _, primaryAppearance in ipairs(primaryAppearances) do
-		local sourceID = primaryAppearance.appearanceID;
-		local sourceInfo = C_TransmogCollection.GetSourceInfo(sourceID);
-		local slot = C_Transmog.GetSlotForInventoryType(sourceInfo.invType);
-		local slotSources = C_TransmogSets.GetSourcesForSlot(setID, slot);
-		CollectionWardrobeUtil.SortSources(slotSources, sourceInfo.visualID);
-		local index = CollectionWardrobeUtil.GetDefaultSourceIndex(slotSources, sourceID);
-		transmogSources[slot] = slotSources[index].sourceID;
 
-		for _, slotSourceInfo in ipairs(slotSources) do
-			if ( not slotSourceInfo.name ) then
-				waitingOnData = true;
-			end
-		end
-	end
-	if ( waitingOnData ) then
-		self.loadingSetID = setID;
-	else
-		self.loadingSetID = nil;
-		local transmogLocation, pendingInfo;
-		for slotID, appearanceID in pairs(transmogSources) do
-			if transmogLocation then
-				transmogLocation.slotID = slotID;
-			else
-				transmogLocation = TransmogUtil.CreateTransmogLocation(slotID, Enum.TransmogType.Appearance, Enum.TransmogModification.Main);
-			end
-			if pendingInfo then
-				pendingInfo.transmogID = appearanceID;
-			else
-				pendingInfo = TransmogUtil.CreateTransmogPendingInfo(Enum.TransmogPendingType.Apply, appearanceID);
-			end
-			C_Transmog.SetPending(transmogLocation, pendingInfo);
-			-- for slots that are be split, undo it
-			if C_Transmog.CanHaveSecondaryAppearanceForSlotID(slotID) then
-				local secondaryTransmogLocation = TransmogUtil.CreateTransmogLocation(slotID, Enum.TransmogType.Appearance, Enum.TransmogModification.Secondary);
-				local itemLocation = ItemLocation:CreateFromEquipmentSlot(slotID);
-				if TransmogUtil.IsSecondaryTransmoggedForItemLocation(itemLocation) then
-					local secondaryPendingInfo = TransmogUtil.CreateTransmogPendingInfo(Enum.TransmogPendingType.ToggleOff);
-					C_Transmog.SetPending(secondaryTransmogLocation, secondaryPendingInfo);
-				else
-					C_Transmog.ClearPending(secondaryTransmogLocation);
+	local setType = addon.GetSetType(setID);
+
+	--Default Blizzard Saved sets;
+	if setType == "SavedBlizzard" then
+		local setSources = SetsDataProvider:GetSetSources(setID);
+		for sourceID in pairs(setSources) do
+			local sourceInfo = C_TransmogCollection.GetSourceInfo(sourceID);
+			if sourceInfo then 
+				local appearanceID = sourceInfo.visualID;
+				local slot = C_Transmog.GetSlotForInventoryType(sourceInfo.invType);
+
+				if slot then 
+					local _, visualID, _, _, _, itemLink = C_TransmogCollection.GetAppearanceSourceInfo(sourceID);
+					local sources = (sourceInfo and itemLink and C_TransmogCollection.GetAppearanceSources(appearanceID, addon.GetItemCategory(appearanceID), addon.GetTransmogLocation(itemLink)) );
+					--local sources = sourceInfo and C_TransmogCollection.GetAppearanceSources(appearanceID)
+					if sources and #sources > 0  then 
+						CollectionWardrobeUtil.SortSources(sources, appearanceID);
+						local index = CollectionWardrobeUtil.GetDefaultSourceIndex(sources, sourceID);
+						transmogSources[slot] = sources[index].sourceID;
+
+						for i, slotSourceInfo in ipairs(sources) do
+							if ( not slotSourceInfo.name ) then
+								waitingOnData = true;
+							end
+						end
+					end
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 				end
 			end
 		end
+		C_Transmog.LoadOutfit(addon:GetBlizzID(setID))
+	else
+		 setData = addon.C_TransmogSets.GetSetInfo(setID);
+		if not setData or setType == "Unknown" then return end
+
+		local offShoulder = setData.offShoulder or 0;
+		local mainHandEnchant = setData.mainHandEnchant or 0;
+		local offHandEnchant = setData.offHandEnchant or 0;
+
+		--Load Default Blizzard set
+
+		if setData.setType == "Blizzard" then
+		local sources = setData.sources--GetSetSources(setID);
+			for sourceID,_ in pairs(sources) do
+				local sourceInfo = C_TransmogCollection.GetSourceInfo(sourceID);
+				local slot = C_Transmog.GetSlotForInventoryType(sourceInfo.invType);
+				local tmogLocation = TransmogUtil.CreateTransmogLocation(slot, Enum.TransmogType.Appearance, Enum.TransmogModification.Main);
+				local slotSources = C_TransmogCollection.GetAppearanceSources(sourceInfo.visualID, sourceInfo.categoryID, tmogLocation);
+				if not slotSources then return end
+				CollectionWardrobeUtil.SortSources(slotSources, sourceInfo.visualID);
+				local index = CollectionWardrobeUtil.GetDefaultSourceIndex(slotSources, sourceID);
+				transmogSources[slot] = slotSources[index].sourceID;
+				for i, slotSourceInfo in ipairs(slotSources) do
+					if ( not slotSourceInfo.name ) then
+						waitingOnData = true;
+					end
+				end
+			end
+		--Load extra and extended sets
+		else
+			if setData.itemData then 
+				for slotID, slotData in pairs(setData.itemData) do
+					local sourceID = slotData[2];
+					local sourceInfo = C_TransmogCollection.GetSourceInfo(sourceID);
+					if sourceInfo then 
+
+						local appearanceID = slotData[3];
+						local slot = C_Transmog.GetSlotForInventoryType(sourceInfo.invType);
+						if slot then 
+							local _, visualID, _, _, _, itemLink = C_TransmogCollection.GetAppearanceSourceInfo(sourceID);
+							local sources = (sourceInfo and itemLink and C_TransmogCollection.GetAppearanceSources(sourceInfo.visualID, addon.GetItemCategory(sourceInfo.visualID), addon.GetTransmogLocation(itemLink)) );
+							--local sources = sourceInfo and C_TransmogCollection.GetAppearanceSources(sourceInfo.visualID);
+
+							if sources and #sources > 0  then 
+								CollectionWardrobeUtil.SortSources(sources, sourceInfo.visualID);
+								local index = CollectionWardrobeUtil.GetDefaultSourceIndex(sources, sourceID);
+								transmogSources[slot] = sources[index].sourceID;
+
+								for i, slotSourceInfo in ipairs(sources) do
+									if ( not slotSourceInfo.name ) then
+										waitingOnData = true;
+									end
+								end
+							end
+						end
+					end
+				end
+				--for slotID, data in pairs(setData.itemData) do
+					--transmogSources[slotID] = data[2]
+				--end
+			end
+		end	
+
+		if ( waitingOnData ) then
+			self.loadingSetID = setID;
+		else
+			self.loadingSetID = nil;
+			local transmogLocation, pendingInfo;
+			for slotID, appearanceID in pairs(transmogSources) do
+				transmogLocation = TransmogUtil.CreateTransmogLocation(slotID, Enum.TransmogType.Appearance, Enum.TransmogModification.Main);
+				pendingInfo = TransmogUtil.CreateTransmogPendingInfo(Enum.TransmogPendingType.Apply, appearanceID);
+				C_Transmog.SetPending(transmogLocation, pendingInfo);
+
+				if  addon:CheckAltItem(appearanceID) and _G["BW_AltIcon"..slotID] then
+					_G["BW_AltIcon"..slotID]:Show();
+				elseif not addon:CheckAltItem(appearanceID) and _G["BW_AltIcon"..slotID] then
+					_G["BW_AltIcon"..slotID]:Hide();
+				end
+			end
+
+			-- for slots that are be split, undo it
+			if C_Transmog.CanHaveSecondaryAppearanceForSlotID(3) then
+				local TransmogLocation = TransmogUtil.CreateTransmogLocation(3, Enum.TransmogType.Appearance, Enum.TransmogModification.Main);
+				local secondaryTransmogLocation = TransmogUtil.CreateTransmogLocation(3, Enum.TransmogType.Appearance, Enum.TransmogModification.Secondary);
+				local baseSourceID = C_Transmog.GetSlotVisualInfo(TransmogUtil.GetTransmogLocation("SHOULDERSLOT", Enum.TransmogType.Appearance, Enum.TransmogModification.Secondary));
+
+				if offShoulder and offShoulder ~= 0 and offShoulder ~= baseSourceID then
+					local secondaryPendingInfo = TransmogUtil.CreateTransmogPendingInfo(Enum.TransmogPendingType.Apply, offShoulder or Constants.Transmog.NoTransmogID);
+					C_Transmog.SetPending(secondaryTransmogLocation, secondaryPendingInfo);
+				else 
+					--	local pendingInfo = TransmogUtil.CreateTransmogPendingInfo(Enum.TransmogPendingType.ToggleOff);
+					--C_Transmog.SetPending(secondaryTransmogLocation, pendingInfo);
+					C_Transmog.ClearPending(secondaryTransmogLocation);
+
+				end
+			end
+
+			--[[if setData then
+				local TransmogLocation = TransmogUtil.CreateTransmogLocation(16, Enum.TransmogType.Illusion, Enum.TransmogModification.Main)
+				local pendingInfo = TransmogUtil.CreateTransmogPendingInfo(Enum.TransmogPendingType.Apply, setData.mainHandEnchant or 0)
+				C_Transmog.SetPending(TransmogLocation, pendingInfo)
+
+				local TransmogLocation = TransmogUtil.CreateTransmogLocation(17, Enum.TransmogType.Illusion, Enum.TransmogModification.Main)
+				local pendingInfo = TransmogUtil.CreateTransmogPendingInfo(Enum.TransmogPendingType.Apply, setData.offHandEnchant or 0)
+				C_Transmog.SetPending(TransmogLocation, pendingInfo)
+			end]]
+		end
 	end
+
+	local emptySlotData = Sets:GetEmptySlots();
+	local tab = BetterWardrobeCollectionFrame.selectedTransmogTab;
+
+	if addon.Profile.HiddenMog and (setType and setType ~= "SavedExtra" and setType ~= "SavedBlizzard")  then	
+		local clearSlots = Sets:EmptySlots(transmogSources);
+		for i, x in pairs(clearSlots) do
+			local _, source = addon.GetItemSource(x) --C_TransmogCollection.GetItemInfo(x);
+			--C_Transmog.SetPending(i, Enum.TransmogType.Appearance,source);
+			local transmogLocation = TransmogUtil.GetTransmogLocation(i, Enum.TransmogType.Appearance, Enum.TransmogModification.Main);
+			local pendingInfo = TransmogUtil.CreateTransmogPendingInfo(Enum.TransmogPendingType.Apply, source);
+
+			-----C_Transmog.SetPending(transmogLocation, source, Enum.TransmogType.Appearance);
+			C_Transmog.SetPending(transmogLocation, pendingInfo);
+		end
+				
+		for i, x in pairs(transmogSources) do
+			if not C_TransmogCollection.PlayerHasTransmogItemModifiedAppearance(x) and (i ~= 7 or i ~= 4 or i ~= 19) and emptySlotData[i] then
+				local _, source = addon.GetItemSource(emptySlotData[i]) --C_TransmogCollection.GetItemInfo(emptySlotData[i]);
+				--C_Transmog.SetPending(i, Enum.TransmogType.Appearance, source);		
+				local transmogLocation = TransmogUtil.GetTransmogLocation(i, Enum.TransmogType.Appearance, Enum.TransmogModification.Main);
+				local pendingInfo = TransmogUtil.CreateTransmogPendingInfo(Enum.TransmogPendingType.Apply, source);
+				-----C_Transmog.SetPending(transmogLocation, source, Enum.TransmogType.Appearance)
+				C_Transmog.SetPending(transmogLocation, pendingInfo);
+			end
+		end
+	end
+
+	--hide any slots marked as alwayws hide;
+	local alwaysHideSlots = addon.setdb.profile.autoHideSlot;
+	for key, transmogSlot in pairs(TRANSMOG_SLOTS) do
+		local slotID = transmogSlot.location:GetSlotID();
+		if alwaysHideSlots[slotID] then 
+			local transmogLocation = TransmogUtil.GetTransmogLocation(slotID, Enum.TransmogType.Appearance, Enum.TransmogModification.Main);
+			local _, source = addon.GetItemSource(emptySlotData[slotID]); -- C_TransmogCollection.GetItemInfo(emptySlotData[i])
+			local pendingInfo = TransmogUtil.CreateTransmogPendingInfo(Enum.TransmogPendingType.Apply, source);
+
+		-----C_Transmog.SetPending(transmogLocation, source, Enum.TransmogType.Appearance)
+		C_Transmog.SetPending(transmogLocation, pendingInfo);	
+		end
+	end	
 end
 
 function WardrobeSetsTransmogMixin:GetFirstMatchingSetID(sourceIndex)

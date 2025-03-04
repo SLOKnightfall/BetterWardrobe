@@ -1044,3 +1044,30 @@ function addon.GetItemSource(itemID, itemMod)
 		f.model:Hide()
 	return visualID ,sourceID
 end
+
+function addon.HasSubItem(setID)
+			return SetSwaps[setID]
+end --SetSwaps[setID][itemFrame.sourceID] then
+
+function addon.GetSubItem(sourceID, setID)
+	local newSource = subitemlist[sourceID]
+	if newSource then
+		SetSwaps[setID] = SetSwaps[setID] or {}
+		SetSwaps[setID][newSource] = true
+		return subitemlist[sourceID]
+	end
+end
+
+local SetSwaps = {}
+function addon.HasSubItem(setID)
+	return SetSwaps[setID]
+end --SetSwaps[setID][itemFrame.sourceID] then
+
+function addon.GetSubItem(sourceID, setID)
+	local newSource = subitemlist[sourceID]
+	if newSource then
+		SetSwaps[setID] = SetSwaps[setID] or {}
+		SetSwaps[setID][newSource] = true
+		return subitemlist[sourceID]
+	end
+end
