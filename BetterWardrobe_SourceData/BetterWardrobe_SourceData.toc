@@ -3,6 +3,8 @@
 ## Version: @project-version@
 ## Author: SLOKnightfall
 ## Notes: 
+## Category: Transmog
+## Group: BetterWardrobe
 ## LoadOnDemand: 1
 ## DefaultState: enabled
 
