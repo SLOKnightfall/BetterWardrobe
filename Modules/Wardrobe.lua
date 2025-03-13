@@ -4555,7 +4555,6 @@ function BetterWardrobeSetsDataProviderMixin:GetBaseSets(filter)
 
 
 	if ( not self.baseSets ) then
-		print("building")
 		--self.baseSets = addon.BaseList --C_TransmogSets.GetBaseSets();
 		self.baseSets = addon:FilterSets(addon.BaseList)
 		self:DetermineFavorites();
