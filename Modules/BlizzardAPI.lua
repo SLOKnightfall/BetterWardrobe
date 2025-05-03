@@ -130,10 +130,10 @@ function addon.C_TransmogSets.GetSetPrimaryAppearances(setID)
 
 	else
 	--elseif setType == "extraset" then
-		 local setInfo = addon.C_TransmogSets.GetSetInfo(setID)
+		  setInfo = addon.C_TransmogSets.GetSetInfo(setID)
 		 local setSources = setInfo.sources
 
-		local primaryAppearances = {}
+		 primaryAppearances = {}
 		for appearanceID, collected in pairs(setSources) do
 			local data = {["appearanceID"] = appearanceID, ["collected"] = collected}
 			tinsert(primaryAppearances, data)

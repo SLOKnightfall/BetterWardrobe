@@ -573,6 +573,7 @@ local function loadAltsSavedSets(profile)
 				for index, sourceID in pairs(data.sources) do 
 					--local sourceInfo = C_TransmogCollection.GetSourceInfo(sourceID)
 					data[index] =  sourceID
+
 				--	if sourceInfo and sourceInfo.invType then  
 					--	local appearanceID = sourceInfo.visualID
 						--local itemID = sourceInfo.itemID
@@ -799,8 +800,9 @@ function addon.GetSavedList()
 			local outfitItemTransmogInfoList = C_TransmogCollection.GetOutfitItemTransmogInfoList(data.outfitID - 5000);
 			info.sources = {}
 			for i, infoList in pairs(outfitItemTransmogInfoList) do
-				--info.sources[i] = infoList.appearanceID
-				info.sources[infoList.appearanceID] = true
+				info.sources[i] = infoList.appearanceID
+				--info.sources[infoList.appearanceID] = true
+
 			end
 
 		elseif data.setType == "SavedExtra" then
@@ -819,7 +821,7 @@ function addon.GetSavedList()
 						local itemMod = sourceInfo.itemModID
 						info.itemData = info.itemData or {}
 						info.itemData[slot] = {"'"..itemID..":"..itemMod.."'", sourceID, appearanceID}
-						info.sources[slotID] = sourceInfo.sourceID
+						info.sources[sourceInfo.sourceID] = true
 					end
 				end
 

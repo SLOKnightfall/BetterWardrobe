@@ -4434,14 +4434,13 @@ end
 
 local lasttab
 function WardrobeSetsDataProviderMixin:GetBaseSets()
-
 	local filteredSets = {}
 	if 	BetterWardrobeCollectionFrame:CheckTab(4) then
-		basesets = self.baseSavedSets;
-		if not self.baseSavedSets then 
+		--basesets = self.baseSavedSets;
+		--if not self.baseSavedSets then 
 			self.baseSavedSets = addon.GetSavedList()
 			self:SortSets(self.baseSavedSets)
-		end
+		--end
 		return self.baseSavedSets;
 	end
 
@@ -4709,6 +4708,8 @@ function WardrobeSetsDataProviderMixin:GetSortedSetSources(setID)
 		end
 	end
 	table.sort(returnTable, comparison);
+zzz= returnTable
+
 	return returnTable;
 end
 
@@ -4935,6 +4936,8 @@ end
 
 function WardrobeSetsCollectionMixin:DisplaySet(setID)
 	local setInfo = (setID and addon.C_TransmogSets.GetSetInfo(setID)) or nil;
+	local buildID = (select(4, GetBuildInfo())) or nil;
+
 	if ( not setInfo ) then
 		self.DetailsFrame:Hide();
 		self.Model:Hide();
@@ -5020,10 +5023,10 @@ function WardrobeSetsCollectionMixin:DisplaySet(setID)
 		self.DetailsFrame.HolidayLabel:SetText(setID);
 	--@end-debug@
 
-	--if ((setInfo.description == ELITE) and setInfo.patchID < buildID) or (setID <= 1446 and setID >=1436) then
-	--	setInfo.noLongerObtainable = true;
-		--setInfo.limitedTimeSet = nil;
-	--end
+	if ((setInfo.description == ELITE) and setInfo.patchID < buildID) or (setID <= 1446 and setID >=1436) then
+		setInfo.noLongerObtainable = true;
+		setInfo.limitedTimeSet = nil;
+	end
 
 	if setInfo.limitedTimeSet then
 		self.DetailsFrame.LimitedSet.Text:SetText(TRANSMOG_SET_LIMITED_TIME_SET);
@@ -5061,7 +5064,7 @@ function WardrobeSetsCollectionMixin:DisplaySet(setID)
 		self.DetailsFrame.Faction.Alliance:Hide()
 	end
 
-	local newSourceIDs = C_TransmogSets.GetSetNewSources(setID);
+	local newSourceIDs = C_TransmogSets.GetSetNewSources(setID) or addon.GetSetNewSources(setID);
 
 	self.DetailsFrame.itemFramesPool:ReleaseAll();
 	self.Model:Undress();
@@ -5172,7 +5175,13 @@ function WardrobeSetsCollectionMixin:DisplaySet(setID)
 		end
 
 		self:SetItemFrameQuality(itemFrame);
-		itemFrame:SetPoint("TOP", self.DetailsFrame, "TOP", xOffset + (i - 1) * BUTTON_SPACE, -94);
+		self:SetItemUseability(itemFrame);
+
+		if i <= 10 then
+			itemFrame:SetPoint("TOP", self.DetailsFrame, "TOP", xOffset + (i - 1) * BUTTON_SPACE, yOffset1);
+		else
+			itemFrame:SetPoint("TOP", self.DetailsFrame, "TOP", xOffset2 + (i - 11) * BUTTON_SPACE, yOffset2);
+		end
 		itemFrame:Show();
 
 		local invType = sortedSources[i].invType - 1;
@@ -5187,6 +5196,38 @@ function WardrobeSetsCollectionMixin:DisplaySet(setID)
 		end
 	end
 
+
+--Check for secondary Shoulder;
+	local setTransmogInfo = C_TransmogCollection.GetOutfitItemTransmogInfoList(addon:GetBlizzID(setID)) or {};
+	if setTransmogInfo and setTransmogInfo[3] and setTransmogInfo[3].secondaryAppearanceID ~= 0 then
+		local itemTransmogInfo = ItemUtil.CreateItemTransmogInfo(setTransmogInfo[3].appearanceID, setTransmogInfo[3].secondaryAppearanceID, 0);
+		self.Model:SetItemTransmogInfo(itemTransmogInfo, 3, false);
+	elseif (mainShoulder and offShoulder) then 
+		local itemTransmogInfo = ItemUtil.CreateItemTransmogInfo(mainShoulder, offShoulder, 0);
+		self.Model:SetItemTransmogInfo(itemTransmogInfo, 3, false);
+	end
+
+	if setInfo.mainHandEnchant or setInfo.offHandEnchant then 
+		if mainHand then 
+			local itemTransmogInfo = ItemUtil.CreateItemTransmogInfo(mainHand, 0, setInfo.mainHandEnchant);
+			self.Model:SetItemTransmogInfo(itemTransmogInfo,16, false);
+		end
+		if offHand then 
+			itemTransmogInfo = ItemUtil.CreateItemTransmogInfo(offHand, 0, setInfo.offHandEnchant);
+			self.Model:SetItemTransmogInfo(itemTransmogInfo,17, false);
+		end
+	elseif  setTransmogInfo and setTransmogInfo[16] or setTransmogInfo[17] then 
+
+		if setTransmogInfo and setTransmogInfo[16] and setTransmogInfo[16].illusionID then
+			local itemTransmogInfo = ItemUtil.CreateItemTransmogInfo(setTransmogInfo[16].appearanceID, 0, setTransmogInfo[16].illusionID);
+			self.Model:SetItemTransmogInfo(itemTransmogInfo, 3, false);
+		end
+		if setTransmogInfo and setTransmogInfo[17] and setTransmogInfo[17].illusionID then
+			local itemTransmogInfo = ItemUtil.CreateItemTransmogInfo(setTransmogInfo[17].appearanceID, 0, setTransmogInfo[17].illusionID);
+			self.Model:SetItemTransmogInfo(itemTransmogInfo, 3, false);
+		end
+	end
+	
 	-- variant sets
 	local showVariantSetsDropdown = false;
 	local baseSetID = addon.C_TransmogSets.GetBaseSetID(setID);
