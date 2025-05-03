@@ -160,10 +160,13 @@ end
 
 
 function addon.C_TransmogSets.SetIsFavorite(setID, value)
+	local favorite, isGroupFavorite = C_TransmogSets.GetIsFavorite(setID) or addon.favoritesDB.profile.extraset[setID];
+
 	local setType = DetermineSetType(setID)
-	zz = addon.C_TransmogSets.GetSetInfo(4227)
 	if setType == "set" then
 		return C_TransmogSets.SetIsFavorite(setID, value)
+	else
+		addon.favoritesDB.profile.extraset[setID] = value;
 	end
 end
 
@@ -844,4 +847,8 @@ end
 
 function addon.C_TransmogSets.GetUsableSets()
 	return addon.fullList
+end
+
+function addon:GetBlizzID(setID)
+	return setID-5000
 end

@@ -324,6 +324,13 @@ function BuildBlizzSets()
 
 				if data.label == tradingPostGlobalString then
 					data.customGroups = data.name
+				end
+				
+				if addon.Profile.IgnoreClassRestrictions then
+					local className = (data.classMask and addon.Globals.CLASS_NAMES[data.classMask])
+					if data.classMask ~= 16383 and data.classMask ~= 0 then
+						data.customGroups = data.name..data.classMask
+					end
 				end				
 			
 				local subSet = false;

@@ -3401,7 +3401,7 @@ function WardrobeItemsCollectionMixin:RefreshAppearanceTooltip()
 	end
 
 	local chosenSourceID = self:GetChosenVisualSource(self.tooltipVisualID);	
-	local warningString = CollectionWardrobeUtil.GetBestVisibilityWarning(self.tooltipModel, self.transmogLocation, self.tooltipVisualID);	
+	local warningString = CollectionWardrobeUtil.GetBestVisibilityWarning(self.tooltipModel, self.transmogLocation, sources);
 	self:GetParent():SetAppearanceTooltip(self, sources, chosenSourceID, warningString);
 end
 
@@ -3917,7 +3917,7 @@ function WardrobeSetsTransmogModelMixin:OnMouseDown(button)
 	if ( button == "LeftButton" ) then
 		self:GetParent():SelectSet(self.setID);
 		PlaySound(SOUNDKIT.UI_TRANSMOG_ITEM_CLICK);
-		end
+	end
 end
 
 function WardrobeSetsTransmogModelMixin:OnMouseUp(button)
@@ -3925,7 +3925,9 @@ function WardrobeSetsTransmogModelMixin:OnMouseUp(button)
 		MenuUtil.CreateContextMenu(self, function(owner, rootDescription)
 			rootDescription:SetTag("MENU_WARDROBE_SETS_MODEL_FILTER");
 
-			local favorite, isGroupFavorite = addon.C_TransmogSets.GetIsFavorite(self.setID);
+			--local favorite, isGroupFavorite = addon.C_TransmogSets.GetIsFavorite(self.setID);
+			local favorite, isGroupFavorite = C_TransmogSets.GetIsFavorite(setID) or addon.favoritesDB.profile.extraset[setID];
+
 			if favorite then
 				rootDescription:CreateButton(TRANSMOG_ITEM_UNSET_FAVORITE, function()
 					addon.C_TransmogSets.SetIsFavorite(self.setID, false);
@@ -4637,19 +4639,23 @@ end
 
 local NewVisualIDs = {}
 function BetterWardrobeSetsDataProviderMixin:SetHasNewSources(setID)
-	if setID and setID >= 5000 then
-		local sources = self:GetSetSources(setID);
-		for sourceID,_ in pairs(sources) do
-			local visID = C_TransmogCollection.GetSourceInfo(sourceID).visualID;
-			for i=1,#NewVisualIDs do
-				if visID == NewVisualIDs[i] then
-					return true;
+	if BetterWardrobeCollectionFrame.selectedCollectionTab == TAB_SAVED_SETS then
+	else
+
+		if setID and setID >= 5000 then
+			local sources = self:GetSetSources(setID);
+			for sourceID,_ in pairs(sources) do
+				local visID = C_TransmogCollection.GetSourceInfo(sourceID).visualID;
+				for i=1,#NewVisualIDs do
+					if visID == NewVisualIDs[i] then
+						return true;
+					end
 				end
 			end
+			return false;
+		elseif setID then
+			return C_TransmogSets.SetHasNewSources(setID);
 		end
-		return false;
-	elseif setID then
-		return C_TransmogSets.SetHasNewSources(setID);
 	end
 end
 
@@ -5367,7 +5373,7 @@ function WardrobeSetsCollectionMixin:RefreshAppearanceTooltip()
 		tinsert(sources, sourceInfo);
 	end
 	CollectionWardrobeUtil.SortSources(sources, sources[1].visualID, self.tooltipPrimarySourceID); 
-	local warningString = CollectionWardrobeUtil.GetBestVisibilityWarning(self.Model, self.transmogLocation, sources[1].visualID);	
+	local warningString = CollectionWardrobeUtil.GetBestVisibilityWarning(self.tooltipModel, self.transmogLocation, sources);	
 	self:GetParent():SetAppearanceTooltip(self, sources, self.tooltipPrimarySourceID, warningString, self.tooltipSlot);
 end
 
@@ -5532,9 +5538,11 @@ function WardrobeSetsScrollFrameButtonMixin:Init(elementData)
 	end
 
 	local subName = gsub(displayData.name, " %(Recolor%)", "")
-	--self.Name:SetText(subName..((displayData.className) and " ("..displayData.className..")" or "") );
-	self.Name:SetText(subName );
-
+	if addon.Profile.IgnoreClassRestrictions then 
+		self.Name:SetText(subName..((displayData.className) and " ("..displayData.className..")" or "") );
+	else
+		self.Name:SetText(subName );
+	end
 	local topSourcesCollected, topSourcesTotal = SetsDataProvider:GetSetSourceTopCounts(displayData.setID);
 	if topSourcesCollected == topSourcesTotal then
 			--print(topSourcesCollected)
@@ -5554,7 +5562,7 @@ function WardrobeSetsScrollFrameButtonMixin:Init(elementData)
 	self.IconFrame:SetIconDesaturation((topSourcesCollected == 0) and 1 or 0);
 	self.IconFrame:SetIconCoverShown(not setCollected);
 	self.IconFrame:SetIconColor(displayData.validForCharacter and HIGHLIGHT_FONT_COLOR or RED_FONT_COLOR);
-	self.IconFrame:SetFavoriteIconShown(elementData.favoriteSetID)
+	self.IconFrame:SetFavoriteIconShown(elementData.favoriteSetID or addon.favoritesDB.profile.extraset[elementData.setID])
 	self.New:SetShown(SetsDataProvider:IsBaseSetNew(elementData.setID));
 	self.setID = elementData.setID;
 	self.IconFrame.HideVisualIcon:SetShown(addon.HiddenAppearanceDB.profile.set[displayData.setID]);
@@ -5631,12 +5639,12 @@ function WardrobeSetsScrollFrameButtonMixin:OnClick(buttonName, down)
 
 				local text;
 				local targetSetID;
-				local favorite = baseSet.favoriteSetID ~= nil;
+				local favorite = baseSet.favoriteSetID ~= nil or addon.favoritesDB.profile.extraset[baseSetID];
 				if favorite then
-					targetSetID = baseSet.favoriteSetID;
+					targetSetID = baseSet.favoriteSetID or baseSetID;
 					if useDescription then
 						local setInfo = addon.C_TransmogSets.GetSetInfo(baseSet.favoriteSetID);
-						text = format(TRANSMOG_SETS_UNFAVORITE_WITH_DESCRIPTION, setInfo.description or setInfo.name );
+						text = format(TRANSMOG_SETS_UNFAVORITE_WITH_DESCRIPTION, setInfo.description or setInfo.name or baseSet.name );
 					else
 						text = TRANSMOG_ITEM_UNSET_FAVORITE;
 					end
@@ -6183,7 +6191,7 @@ function WardrobeSetsTransmogMixin:UpdateSets()
 			elseif setType == "SavedExtra" then 
 				model:Undress()
 				local primaryAppearances = {}
-				local sourceData = SetsDataProvider:GetSetSources(set.setID)
+				 sourceData = SetsDataProvider:GetSetSources(set.setID)
 				local tab = BetterWardrobeCollectionFrame.selectedTransmogTab;
 				for _, sourceID in ipairs(sourceData) do
 					if (tab == 4 and not BetterWardrobeVisualToggle.VisualMode) or
@@ -6381,34 +6389,6 @@ function WardrobeSetsTransmogMixin:LoadSet(setID)
 							end
 						end
 					end
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 				end
 			end
 		end
