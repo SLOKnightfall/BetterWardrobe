@@ -799,7 +799,8 @@ function addon.GetSavedList()
 			local outfitItemTransmogInfoList = C_TransmogCollection.GetOutfitItemTransmogInfoList(data.outfitID - 5000);
 			info.sources = {}
 			for i, infoList in pairs(outfitItemTransmogInfoList) do
-				info.sources[i] = infoList.appearanceID
+				--info.sources[i] = infoList.appearanceID
+				info.sources[infoList.appearanceID] = true
 			end
 
 		elseif data.setType == "SavedExtra" then
