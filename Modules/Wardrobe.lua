@@ -6257,14 +6257,16 @@ function WardrobeSetsTransmogMixin:UpdateSets()
 			elseif setType == "SavedExtra" then 
 				model:Undress()
 				local primaryAppearances = {}
-				local sourceData = SetsDataProvider:GetSetSources(set.setID)
+				 sourceData = SetsDataProvider:GetSetSources(set.setID)
 				local tab = BetterWardrobeCollectionFrame.selectedTransmogTab;
-				for _, sourceID in ipairs(sourceData) do
+				for sourceID, val in pairs(sourceData) do
 					if (tab == 4 and not BetterWardrobeVisualToggle.VisualMode) or
 								(CollectionsJournal:IsShown()) or
 								(not addon.Profile.HideMissing and (not BetterWardrobeVisualToggle.VisualMode or (Sets.isMogKnown(sourceID) and BetterWardrobeVisualToggle.VisualMode))) or
 								(addon.Profile.HideMissing and (BetterWardrobeVisualToggle.VisualMode or Sets.isMogKnown(sourceID))) then
-						model:TryOn(sourceID)
+						if val ~= 0 then
+							model:TryOn(sourceID)
+						end
 					end
 
 					if not hasAlternateForm and addon:CheckAltItem(sourceID) then
@@ -6429,8 +6431,6 @@ function WardrobeSetsTransmogMixin:LoadSet(setID)
 
 	local setType = addon.GetSetType(setID);
 
-
-
 	--Default Blizzard Saved sets;
 	if setType == "SavedBlizzard" then
 		local setSources = SetsDataProvider:GetSetSources(setID);
@@ -6500,7 +6500,7 @@ function WardrobeSetsTransmogMixin:LoadSet(setID)
 	 local alwaysHideSlots = addon.setdb.profile.autoHideSlot;
 
 		if setData.setType == "Blizzard" then
-		local sources = setData.sources--GetSetSources(setID);
+			local sources = setData.sources--GetSetSources(setID);
 			for sourceID,_ in pairs(sources) do
 				local sourceInfo = C_TransmogCollection.GetSourceInfo(sourceID);
 				local slot = C_Transmog.GetSlotForInventoryType(sourceInfo.invType);
@@ -6518,6 +6518,31 @@ function WardrobeSetsTransmogMixin:LoadSet(setID)
 					end
 				end
 			end
+
+		elseif setData.setType == "SavedBlizzard" then
+			local sources  = C_TransmogCollection.GetOutfitItemTransmogInfoList(addon:GetBlizzID(setID))
+			for _, sourceData in pairs(sources) do
+
+				local sourceID = sourceData.appearanceID
+				local sourceInfo = C_TransmogCollection.GetSourceInfo(sourceID);
+				if sourceInfo then 
+					local slot = C_Transmog.GetSlotForInventoryType(sourceInfo.invType);
+					if not alwaysHideSlots[slot] then
+						local tmogLocation = TransmogUtil.CreateTransmogLocation(slot, Enum.TransmogType.Appearance, Enum.TransmogModification.Main);
+						local slotSources = C_TransmogCollection.GetAppearanceSources(sourceInfo.visualID, sourceInfo.categoryID, tmogLocation);
+						if not slotSources then return end
+						CollectionWardrobeUtil.SortSources(slotSources, sourceInfo.visualID);
+						local index = CollectionWardrobeUtil.GetDefaultSourceIndex(slotSources, sourceID);
+						transmogSources[slot] = slotSources[index].sourceID;
+						for i, slotSourceInfo in ipairs(slotSources) do
+							if ( not slotSourceInfo.name ) then
+								waitingOnData = true;
+							end
+						end
+					end
+				end
+			end
+
 		--Load extra and extended sets
 		else
 			if setData.itemData then 
