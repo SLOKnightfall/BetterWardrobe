@@ -852,3 +852,13 @@ end
 function addon:GetBlizzID(setID)
 	return setID-5000
 end
+
+function addon.C_TransmogSets.GetSourceIDsForSlot(setID, slotID)
+	 setData = addon.GetSetInfo(setID)
+	 local setType = DetermineSetType(setID)
+	 if setType == "set" then
+		 return C_TransmogSets.GetSourceIDsForSlot(setID, slotID);
+	else
+		
+	end
+end

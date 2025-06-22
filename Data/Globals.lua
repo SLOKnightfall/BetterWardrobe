@@ -334,9 +334,9 @@ Globals.EmptyArmor = {
 	[7] = 216696, --pants
 	[8] = 168664,
 	[9] = 168665, --wrist
-	[10] = 158329, --handr
+	[10] = 158329, --hand
 	[15] = 134111, --cloak
-	[19] = 142504, --tabgaard
+	[19] = 142504, --tabard
 }
 
 Globals.DEFAULT = 1

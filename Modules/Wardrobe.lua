@@ -6175,7 +6175,9 @@ end
 function WardrobeSetsTransmogMixin:Refresh(resetSelection)
 	self.appliedSetID = self:GetFirstMatchingSetID(self.APPLIED_SOURCE_INDEX);
 	if ( resetSelection ) then
-		self.selectedSetID = self:GetFirstMatchingSetID(self.SELECTED_SOURCE_INDEX);
+		if not self.selectedSetID then 
+			self.selectedSetID = self:GetFirstMatchingSetID(self.SELECTED_SOURCE_INDEX);
+		end
 		self:ResetPage();
 	else
 		self:UpdateSets();
@@ -6224,6 +6226,7 @@ function WardrobeSetsTransmogMixin:UpdateSets()
 	self.PagingFrame:SetMaxPages(ceil(#usableSets / self.PAGE_SIZE));
 	local pendingTransmogModelFrame = nil;
 	local indexOffset = (self.PagingFrame:GetCurrentPage() - 1) * self.PAGE_SIZE;
+	local hasAlternateForm = false;
 	for i = 1, self.PAGE_SIZE do
 		local model = self.Models[i];
 		local index = i + indexOffset;
@@ -6231,6 +6234,8 @@ function WardrobeSetsTransmogMixin:UpdateSets()
 		if ( set ) then
 			SetModelUnit(model);
 			model:Show();
+			model.AltItems:Hide()
+
 			local setType = set.setType
 
 			if setType == "SavedBlizzard" then 
@@ -6252,7 +6257,7 @@ function WardrobeSetsTransmogMixin:UpdateSets()
 			elseif setType == "SavedExtra" then 
 				model:Undress()
 				local primaryAppearances = {}
-				 sourceData = SetsDataProvider:GetSetSources(set.setID)
+				local sourceData = SetsDataProvider:GetSetSources(set.setID)
 				local tab = BetterWardrobeCollectionFrame.selectedTransmogTab;
 				for _, sourceID in ipairs(sourceData) do
 					if (tab == 4 and not BetterWardrobeVisualToggle.VisualMode) or
@@ -6600,29 +6605,50 @@ function WardrobeSetsTransmogMixin:GetFirstMatchingSetID(sourceIndex)
 		if not button.transmogLocation:IsSecondary() then
 			local sourceID = select(sourceIndex, TransmogUtil.GetInfoForEquippedSlot(button.transmogLocation));
 			if ( sourceID ~= Constants.Transmog.NoTransmogID ) then
-				transmogSourceIDs[button.transmogLocation:GetSlotID()] = sourceID;
+				local slot = button.transmogLocation:GetSlotID()
+				if slot < 15 then 
+					transmogSourceIDs[button.transmogLocation:GetSlotID()] = sourceID;
+				end
 			end
 		end
 	end
+	--Ignore the shirt slot
+	transmogSourceIDs[4] = nill
 
 	local usableSets = SetsDataProvider:GetUsableSets();
 	for _, set in ipairs(usableSets) do
 		local setMatched = false;
+		local slotMatched = false
 		for slotID, transmogSourceID in pairs(transmogSourceIDs) do
-			local sourceIDs = C_TransmogSets.GetSourceIDsForSlot(set.setID, slotID) or {}
+			local sourceIDs = addon.C_TransmogSets.GetSourceIDsForSlot(set.setID, slotID) or {}
 			-- if there are no sources for a slot, that slot is considered matched
-			local slotMatched = (#sourceIDs == 0);
-			for _, sourceID in ipairs(sourceIDs) do
-				if ( transmogSourceID == sourceID ) then
-					slotMatched = true;
-					break;
+			slotMatched = (#sourceIDs == 0);
+
+			if not slotMatched then 
+				for _, sourceID in ipairs(sourceIDs) do
+					if ( transmogSourceID == sourceID ) then
+						slotMatched = true;
+						break;
+					end
 				end
 			end
+
+			--Check to see if the slot is set to an hidden armor piece
+			local empty = addon.Globals.EmptyArmor[slotID]
+			if empty and not slotMatched then 
+			 	local _, source = addon.GetItemSource(empty)
+				if ( transmogSourceID == source ) then
+					slotMatched = true;
+
+				end
+			end
+
 			setMatched = slotMatched;
 			if ( not setMatched ) then
 				break;
 			end
 		end
+		
 		if ( setMatched ) then
 			return set.setID;
 		end
