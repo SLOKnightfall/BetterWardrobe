@@ -109,9 +109,6 @@ function UI:CreateButtons()
 	local f = CreateFrame("Frame", "BW_AltIcon6", WardrobeTransmogFrame.WaistButton, "AltItemtemplate")
 	local f = CreateFrame("Frame", "BW_AltIcon7", WardrobeTransmogFrame.LegsButton, "AltItemtemplate")
 	local f = CreateFrame("Frame", "BW_AltIcon8", WardrobeTransmogFrame.FeetButton, "AltItemtemplate")
-
-
-
 end
 
 

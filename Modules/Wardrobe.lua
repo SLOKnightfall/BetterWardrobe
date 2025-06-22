@@ -4513,6 +4513,27 @@ function WardrobeSetsDataProviderMixin:GetUsableSets()
 			end
 		end
 	end
+
+	--Filter out sets that do not meet the count limit
+	local countData;
+	local sets = self.usableSets
+	local cutoffSets = {}
+	
+	sets = addon:FilterSets(sets)
+	sets = addon:SearchSets(sets)
+	for _, data in pairs(sets) do
+		local topSourcesCollected, topSourcesTotal;
+		topSourcesCollected, topSourcesTotal = self:GetSetSourceCounts(data.setID)
+		local cutoffLimit = (Profile.ShowIncomplete and ((topSourcesTotal <= Profile.PartialLimit and topSourcesTotal) or  Profile.PartialLimit)) or topSourcesTotal --self:GetSetSourceCounts(set.setID)
+
+		if (BetterWardrobeVisualToggle.viewAll and BetterWardrobeVisualToggle.VisualMode) or (not atTransmogrifier and BetterWardrobeVisualToggle.VisualMode) or topSourcesCollected >= cutoffLimit  and topSourcesTotal > 0 then --and not C_TransmogSets.IsSetUsable(set.setID) then
+			tinsert(cutoffSets, data)
+		end
+
+		self:SortSets(cutoffSets)
+	end
+
+	self.usableSets = cutoffSets
 	return self.usableSets;
 end
 
@@ -4708,7 +4729,6 @@ function WardrobeSetsDataProviderMixin:GetSortedSetSources(setID)
 		end
 	end
 	table.sort(returnTable, comparison);
-zzz= returnTable
 
 	return returnTable;
 end
@@ -6257,8 +6277,6 @@ function WardrobeSetsTransmogMixin:UpdateSets()
 					--local sourceData = GetSetSourceData(set.setID, set.sources);
 					local sources = SetsDataProvider:GetSetSources(set.setID);
 
-
-
 					for sourceID in pairs(sources) do
 						--if (not Profile.HideMissing and not BW_WardrobeToggle.VisualMode) or (Profile.HideMissing and BW_WardrobeToggle.VisualMode) or (Profile.HideMissing and isMogKnown(sourceID)) then 
 						if (not addon.Profile.HideMissing and (not BetterWardrobeVisualToggle.VisualMode or (Sets.isMogKnown(sourceID) and BetterWardrobeVisualToggle.VisualMode))) or 
@@ -6406,6 +6424,8 @@ function WardrobeSetsTransmogMixin:LoadSet(setID)
 
 	local setType = addon.GetSetType(setID);
 
+
+
 	--Default Blizzard Saved sets;
 	if setType == "SavedBlizzard" then
 		local setSources = SetsDataProvider:GetSetSources(setID);
@@ -6442,22 +6462,54 @@ function WardrobeSetsTransmogMixin:LoadSet(setID)
 		local mainHandEnchant = setData.mainHandEnchant or 0;
 		local offHandEnchant = setData.offHandEnchant or 0;
 
+		local emptySlotData = Sets:GetEmptySlots();
+		local tab = BetterWardrobeCollectionFrame.selectedTransmogTab;
+
+		--Set all the slot to hidden items first so it doesn't accidentally overwrite items
+		if addon.Profile.HiddenMog and (setData.setType and setData.setType ~= "SavedExtra" and setData.setType ~= "SavedBlizzard")  then	
+
+		local clearSlots = Sets:EmptySlots(transmogSources);
+		for i, x in pairs(clearSlots) do
+			local _, source = addon.GetItemSource(x) --C_TransmogCollection.GetItemInfo(x);
+			--C_Transmog.SetPending(i, Enum.TransmogType.Appearance,source);
+			local transmogLocation = TransmogUtil.GetTransmogLocation(i, Enum.TransmogType.Appearance, Enum.TransmogModification.Main);
+			local pendingInfo = TransmogUtil.CreateTransmogPendingInfo(Enum.TransmogPendingType.Apply, source);
+
+			-----C_Transmog.SetPending(transmogLocation, source, Enum.TransmogType.Appearance);
+			C_Transmog.SetPending(transmogLocation, pendingInfo);
+		end
+				
+		--for i, x in pairs(transmogSources) do
+			--if not C_TransmogCollection.PlayerHasTransmogItemModifiedAppearance(x) and (i ~= 7 or i ~= 4 or i ~= 19) and emptySlotData[i] then
+				--local _, source = addon.GetItemSource(emptySlotData[i]) --C_TransmogCollection.GetItemInfo(emptySlotData[i]);
+				--C_Transmog.SetPending(i, Enum.TransmogType.Appearance, source);		
+				--local transmogLocation = TransmogUtil.GetTransmogLocation(i, Enum.TransmogType.Appearance, Enum.TransmogModification.Main);
+				--local pendingInfo = TransmogUtil.CreateTransmogPendingInfo(Enum.TransmogPendingType.Apply, source);
+				-----C_Transmog.SetPending(transmogLocation, source, Enum.TransmogType.Appearance)
+				--C_Transmog.SetPending(transmogLocation, pendingInfo);
+			--end
+		--end
+	end
+
 		--Load Default Blizzard set
+	 local alwaysHideSlots = addon.setdb.profile.autoHideSlot;
 
 		if setData.setType == "Blizzard" then
 		local sources = setData.sources--GetSetSources(setID);
 			for sourceID,_ in pairs(sources) do
 				local sourceInfo = C_TransmogCollection.GetSourceInfo(sourceID);
 				local slot = C_Transmog.GetSlotForInventoryType(sourceInfo.invType);
-				local tmogLocation = TransmogUtil.CreateTransmogLocation(slot, Enum.TransmogType.Appearance, Enum.TransmogModification.Main);
-				local slotSources = C_TransmogCollection.GetAppearanceSources(sourceInfo.visualID, sourceInfo.categoryID, tmogLocation);
-				if not slotSources then return end
-				CollectionWardrobeUtil.SortSources(slotSources, sourceInfo.visualID);
-				local index = CollectionWardrobeUtil.GetDefaultSourceIndex(slotSources, sourceID);
-				transmogSources[slot] = slotSources[index].sourceID;
-				for i, slotSourceInfo in ipairs(slotSources) do
-					if ( not slotSourceInfo.name ) then
-						waitingOnData = true;
+				if not alwaysHideSlots[slot] then
+					local tmogLocation = TransmogUtil.CreateTransmogLocation(slot, Enum.TransmogType.Appearance, Enum.TransmogModification.Main);
+					local slotSources = C_TransmogCollection.GetAppearanceSources(sourceInfo.visualID, sourceInfo.categoryID, tmogLocation);
+					if not slotSources then return end
+					CollectionWardrobeUtil.SortSources(slotSources, sourceInfo.visualID);
+					local index = CollectionWardrobeUtil.GetDefaultSourceIndex(slotSources, sourceID);
+					transmogSources[slot] = slotSources[index].sourceID;
+					for i, slotSourceInfo in ipairs(slotSources) do
+						if ( not slotSourceInfo.name ) then
+							waitingOnData = true;
+						end
 					end
 				end
 			end
@@ -6468,10 +6520,9 @@ function WardrobeSetsTransmogMixin:LoadSet(setID)
 					local sourceID = slotData[2];
 					local sourceInfo = C_TransmogCollection.GetSourceInfo(sourceID);
 					if sourceInfo then 
-
 						local appearanceID = slotData[3];
 						local slot = C_Transmog.GetSlotForInventoryType(sourceInfo.invType);
-						if slot then 
+						if slot and not alwaysHideSlots[slot] then
 							local _, visualID, _, _, _, itemLink = C_TransmogCollection.GetAppearanceSourceInfo(sourceID);
 							local sources = (sourceInfo and itemLink and C_TransmogCollection.GetAppearanceSources(sourceInfo.visualID, addon.GetItemCategory(sourceInfo.visualID), addon.GetTransmogLocation(itemLink)) );
 							--local sources = sourceInfo and C_TransmogCollection.GetAppearanceSources(sourceInfo.visualID);
@@ -6541,47 +6592,6 @@ function WardrobeSetsTransmogMixin:LoadSet(setID)
 			end]]
 		end
 	end
-
-	local emptySlotData = Sets:GetEmptySlots();
-	local tab = BetterWardrobeCollectionFrame.selectedTransmogTab;
-
-	if addon.Profile.HiddenMog and (setType and setType ~= "SavedExtra" and setType ~= "SavedBlizzard")  then	
-		local clearSlots = Sets:EmptySlots(transmogSources);
-		for i, x in pairs(clearSlots) do
-			local _, source = addon.GetItemSource(x) --C_TransmogCollection.GetItemInfo(x);
-			--C_Transmog.SetPending(i, Enum.TransmogType.Appearance,source);
-			local transmogLocation = TransmogUtil.GetTransmogLocation(i, Enum.TransmogType.Appearance, Enum.TransmogModification.Main);
-			local pendingInfo = TransmogUtil.CreateTransmogPendingInfo(Enum.TransmogPendingType.Apply, source);
-
-			-----C_Transmog.SetPending(transmogLocation, source, Enum.TransmogType.Appearance);
-			C_Transmog.SetPending(transmogLocation, pendingInfo);
-		end
-				
-		for i, x in pairs(transmogSources) do
-			if not C_TransmogCollection.PlayerHasTransmogItemModifiedAppearance(x) and (i ~= 7 or i ~= 4 or i ~= 19) and emptySlotData[i] then
-				local _, source = addon.GetItemSource(emptySlotData[i]) --C_TransmogCollection.GetItemInfo(emptySlotData[i]);
-				--C_Transmog.SetPending(i, Enum.TransmogType.Appearance, source);		
-				local transmogLocation = TransmogUtil.GetTransmogLocation(i, Enum.TransmogType.Appearance, Enum.TransmogModification.Main);
-				local pendingInfo = TransmogUtil.CreateTransmogPendingInfo(Enum.TransmogPendingType.Apply, source);
-				-----C_Transmog.SetPending(transmogLocation, source, Enum.TransmogType.Appearance)
-				C_Transmog.SetPending(transmogLocation, pendingInfo);
-			end
-		end
-	end
-
-	--hide any slots marked as alwayws hide;
-	local alwaysHideSlots = addon.setdb.profile.autoHideSlot;
-	for key, transmogSlot in pairs(TRANSMOG_SLOTS) do
-		local slotID = transmogSlot.location:GetSlotID();
-		if alwaysHideSlots[slotID] then 
-			local transmogLocation = TransmogUtil.GetTransmogLocation(slotID, Enum.TransmogType.Appearance, Enum.TransmogModification.Main);
-			local _, source = addon.GetItemSource(emptySlotData[slotID]); -- C_TransmogCollection.GetItemInfo(emptySlotData[i])
-			local pendingInfo = TransmogUtil.CreateTransmogPendingInfo(Enum.TransmogPendingType.Apply, source);
-
-		-----C_Transmog.SetPending(transmogLocation, source, Enum.TransmogType.Appearance)
-		C_Transmog.SetPending(transmogLocation, pendingInfo);	
-		end
-	end	
 end
 
 function WardrobeSetsTransmogMixin:GetFirstMatchingSetID(sourceIndex)
@@ -6734,7 +6744,7 @@ function BetterWardrobeTransmogOptionsDropdownMixin:OnLoad()
 				addon.Profile.ShowHidden = not addon.Profile.ShowHidden;
 				if BetterWardrobeCollectionFrame.selectedTransmogTab == 1 then
 					BetterWardrobeCollectionFrame.ItemsCollectionFrame:RefreshVisualsList();
-					BetterWardrobeCollectionFrame.SetsTransmogFrame:OnSearchUpdate();
+					BetterWardrobeCollectionFrame.ItemsCollectionFrame:OnSearchUpdate();
 					BetterWardrobeCollectionFrame:SetTab(2);
 					BetterWardrobeCollectionFrame:SetTab(1);
 
