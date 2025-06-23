@@ -1483,8 +1483,9 @@ function WardrobeCollectionFrameMixin:InitItemsFilterButton()
 	end
 end
 
-local FILTER_SOURCES = {L["MISC"], L["Classic Set"], L["Quest Set"], L["Dungeon Set"], L["Raid Set"], L["Recolor"], L["PvP"],L["Garrison"], L["Island Expedition"], L["Warfronts"], L["Covenants"], L["Trading Post"], L["Holiday"], L["NOTE_119"],L["NOTE_120"]}
+local FILTER_SOURCES = {"Trash", L["MISC"], L["Classic Set"], L["Quest Set"], L["Dungeon Set"], L["Raid Set"], L["Recolor"],L["Garrison"], L["Island Expedition"], L["Warfronts"], L["Covenants"], L["Trading Post"], L["Holiday"], L["NOTE_119"],L["NOTE_120"]}
 local EXPANSIONS = {EXPANSION_NAME0, EXPANSION_NAME1, EXPANSION_NAME2, EXPANSION_NAME3, EXPANSION_NAME4, EXPANSION_NAME5, EXPANSION_NAME6, EXPANSION_NAME7, EXPANSION_NAME8, EXPANSION_NAME9,EXPANSION_NAME10}
+local FILTER_EXTRA_SOURCES = {"Trash", L["MISC"], L["Classic Set"], L["Quest Set"], L["Dungeon Set"], L["Garrison"], L["Island Expedition"], L["Warfronts"], L["Trading Post"], L["Holiday"]}
 
 addon.Filters = {
 	["Base"] = {
@@ -1509,7 +1510,7 @@ local xpacSelection = addon.Filters.Base.xpacSelection;
 local sets = {"Base", "Extra"}
 
 for i, types in ipairs(sets) do
-	for i = 1, #FILTER_SOURCES do
+	for i = 1, #FILTER_EXTRA_SOURCES do
 		addon.Filters[types].filterSelection[i] = true;
 	end
 
@@ -1545,7 +1546,7 @@ function WardrobeCollectionFrameMixin:InitBaseSetsFilterButton()
 			if not xpacSelection[index] then return false end
 		end
 
-		for index = 1,  #FILTER_SOURCES do
+		for index = 1,  #FILTER_EXTRA_SOURCES do
 			if not filterSelection[index] then return false end
 		end
 
@@ -1610,7 +1611,7 @@ function WardrobeCollectionFrameMixin:InitBaseSetsFilterButton()
 	end
 
 	local function sourceCheckAll(value)
-		for index = 1,  #FILTER_SOURCES do
+		for index = 1,  #FILTER_EXTRA_SOURCES do
 			filterSelection[index] = value;
 		end
 	end
@@ -1648,9 +1649,13 @@ function WardrobeCollectionFrameMixin:InitBaseSetsFilterButton()
 		rootDescription:CreateCheckbox(COLLECTED, C_TransmogSets.GetBaseSetsFilter, GetBaseSetsFilter, LE_TRANSMOG_SET_FILTER_COLLECTED);
 		rootDescription:CreateCheckbox(NOT_COLLECTED, C_TransmogSets.GetBaseSetsFilter, GetBaseSetsFilter, LE_TRANSMOG_SET_FILTER_UNCOLLECTED);
 		rootDescription:CreateDivider();
-		rootDescription:CreateCheckbox(TRANSMOG_SET_PVE, C_TransmogSets.GetBaseSetsFilter, GetBaseSetsFilter, LE_TRANSMOG_SET_FILTER_PVE);
-		rootDescription:CreateCheckbox(TRANSMOG_SET_PVP, C_TransmogSets.GetBaseSetsFilter, GetBaseSetsFilter, LE_TRANSMOG_SET_FILTER_PVP);
-		rootDescription:CreateDivider();
+
+
+	if BetterWardrobeCollectionFrame.selectedCollectionTab == 2 then 
+			rootDescription:CreateCheckbox(TRANSMOG_SET_PVE, C_TransmogSets.GetBaseSetsFilter, GetBaseSetsFilter, LE_TRANSMOG_SET_FILTER_PVE);
+			rootDescription:CreateCheckbox(TRANSMOG_SET_PVP, C_TransmogSets.GetBaseSetsFilter, GetBaseSetsFilter, LE_TRANSMOG_SET_FILTER_PVP);
+			rootDescription:CreateDivider();
+	end
 
 	if BetterWardrobeCollectionFrame.selectedCollectionTab == 3 then 
 
@@ -1668,9 +1673,9 @@ function WardrobeCollectionFrameMixin:InitBaseSetsFilterButton()
 
 		submenu:CreateDivider();
 
-		for index = 1,  #FILTER_SOURCES do
+		for index = 1,  #FILTER_EXTRA_SOURCES do
 			local filterIndex = index;
-			submenu:CreateCheckbox(FILTER_SOURCES[index], 
+			submenu:CreateCheckbox(FILTER_EXTRA_SOURCES[index], 
 				function() return filterSelection[index] end,
 				function() 
 					filterSelection[index] = not filterSelection[index];
@@ -1736,6 +1741,8 @@ function WardrobeCollectionFrameMixin:InitBaseSetsFilterButton()
 					index);
 			end
 		end
+		submenu:CreateDivider();
+	 	submenu = rootDescription:CreateButton("Sorting");
 
 		rootDescription:CreateDivider();
 	 	submenu = rootDescription:CreateButton("Options");
@@ -5638,7 +5645,7 @@ function WardrobeSetsScrollFrameButtonMixin:Init(elementData)
 	self.setID = elementData.setID;
 	self.IconFrame.HideVisualIcon:SetShown(addon.HiddenAppearanceDB.profile.set[displayData.setID]);
 
-	self.Store:SetShown((addon.MiscSets.TRADINGPOST_SETS[self.setID] or displayData.filter == 12) and addon.Profile.ShowShopIcon);
+	self.Store:SetShown((addon.MiscSets.TRADINGPOST_SETS[self.setID] or displayData.filter == 9) and addon.Profile.ShowShopIcon);
 	if addon.Profile.ShopIconPosition == "Right" then
 		self.Store:ClearAllPoints();
 		self.Store:SetPoint("TOPRIGHT", 0, -25);

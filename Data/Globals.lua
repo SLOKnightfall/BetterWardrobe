@@ -376,3 +376,19 @@ Globals.colors = {
 	["silver"] = {192, 192, 192},
 	["white"] = {255, 255, 255},
 }
+
+addon.Filter = {
+["TRASH"] = 1,
+["MISC"] = 2,
+["CLASSIC"] = 3,
+["QUEST"] = 4,
+["DUNGEON"] = 5,
+["RAID"] = 0,
+["RECOLOR"] = 0,
+["GARRISON"] = 6,
+["ISLAND"] = 7,
+["HOLIDAY"] = 10,
+["TPOST"] = 9,
+["COVENANT"] = 0,
+["WARFRONT"] = 8,	
+}

@@ -230,26 +230,26 @@ function BuildBlizzSets()
 		
 			data.tab = 2
 			--PvP Sets
-			if data.PvP then 
-				data.filter = 7
+			--if data.PvP then 
+				--data.filter = 7
 
 			--Covenant Sets
-			elseif data.setID <= 2221 and data.setID >= 2015 then 
-				data.filter = 11
-				data.tab = 2
+			--elseif data.setID <= 2221 and data.setID >= 2015 then 
+				--data.filter = 11
+				--data.tab = 2
 
 			--Shop & Trading Post
-			elseif addon.MiscSets.TRADINGPOST_SETS[data.setID]  or (data.label and string.find(data.label, inGameShopGlobalString))  or (data.label and string.find(data.label, tradingPostGlobalString))  
+			if addon.MiscSets.TRADINGPOST_SETS[data.setID]  or (data.label and string.find(data.label, inGameShopGlobalString))  or (data.label and string.find(data.label, tradingPostGlobalString))  
 				or (data.description and string.find(data.description, inGameShopGlobalString))  or (data.description and string.find(data.description, tradingPostGlobalString)) then
 				--data.tab = 3
-				data.filter = 12
+				data.filter = 9
 
 			--Raid Sets
-			elseif data.description then 
-				data.filter = 5
+			--elseif data.description then 
+				--data.filter = 5
 
 			else
-				data.filter = 1
+				data.filter = 2
 				--data.tab = 3
 			end
 
@@ -420,7 +420,7 @@ local function BuildArmorDB()
 
 		for id, data in pairs(data) do
 			if (data.requiredFaction and data.requiredFaction == GetFactionID(playerFaction) or data.requiredFaction == nil) and 
-				(not data.BuildBlizzSets and (data.filter ~= 5 and data.filter ~= 7 and data.filter ~= 11)) and  UseSet(data) then 
+				(not data.BuildBlizzSets and  UseSet(data)) then 
 				--data.isHeritageArmor = string.find(data.name, "Heritage")
 
 				local classInfo = CLASS_INFO[playerClass]
