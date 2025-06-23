@@ -1254,6 +1254,7 @@ function WardrobeCollectionFrameMixin:SetTab(tabID)
 		self:InitItemsFilterButton();
 
 		self.SearchBox:Show()
+		BW_SortSavedDropDown:Hide()
 
 		BW_SortDropDown:Show()
 		BW_SortDropDown:ClearAllPoints()
@@ -1358,7 +1359,7 @@ function WardrobeCollectionFrameMixin:SetTab(tabID)
 			self.SearchBox:Hide()
 			self.ClassDropdown:Hide()
 			self.SavedOutfitDropDown:Show()
-
+			BW_SortSavedDropDown:Show()
 			local savedCount = #addon.GetSavedList()
 			--WardrobeCollectionFrame_UpdateProgressBar(savedCount, savedCount)
 
@@ -1367,10 +1368,18 @@ function WardrobeCollectionFrameMixin:SetTab(tabID)
 
 			sortValue = addon.setdb.profile.sorting
 
+			if atTransmogrifier  then
+				BW_SortSavedDropDown:ClearAllPoints()
+				BW_SortSavedDropDown:SetPoint("BOTTOMLEFT", 53, 20);
+			else
+				BW_SortSavedDropDown:ClearAllPoints()
+				BW_SortSavedDropDown:SetPoint("TOPLEFT", 10, -67);
+			end
 
 		else
 			--db.sortDropdown = BW_SortDropDown.selectedValue;
 			--sortValue = db.sortDropdown
+
 		end
 	end
 
@@ -4439,7 +4448,7 @@ function WardrobeSetsDataProviderMixin:GetBaseSets()
 		--basesets = self.baseSavedSets;
 		--if not self.baseSavedSets then 
 			self.baseSavedSets = addon.GetSavedList()
-			self:SortSets(self.baseSavedSets)
+			addon.SortDropdown(self.baseSavedSets)
 		--end
 		return self.baseSavedSets;
 	end
@@ -4480,10 +4489,11 @@ function WardrobeSetsDataProviderMixin:GetUsableSets()
 
 	if BetterWardrobeCollectionFrame:CheckTab(4) then
 
-		if ( not self.usableSavedSets ) then
+		--if ( not self.usableSavedSets ) then
 			self.usableSavedSets = addon.GetSavedList()
-			self:SortSets(self.usableSavedSets)
-		end
+			addon.SortDropdown(self.usableSavedSets)
+
+		--end
 		
 		return self.usableSavedSets;
 	end

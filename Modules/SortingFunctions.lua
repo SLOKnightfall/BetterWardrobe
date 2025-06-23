@@ -508,7 +508,7 @@ local function SortSavedSetsAlphabetical(self, sets)
 			return groupFavorite1
 		end
 
-		return SortOrder(string.lower(set1.name), string.lower(set2.name))
+		return SortOrder(string.lower(set2.name), string.lower(set1.name))
 	end
 
 	table.sort(sets, comparison)
@@ -634,6 +634,7 @@ local SET_SORTING = {
 local SAVED_SET_SORTING = {
 	[DEFAULT] = function( data)
 		SortSavedSets(self, data)
+		--SortSavedSetsAlphabetical(self, data)
 	end,
 
 	[ALPHABETIC] = function( data)
@@ -672,7 +673,7 @@ function addon.SortSet(sets)
 		SET_SORTING[addon.sortDB.sortDropdown](sets)
 
 	elseif CheckTab(TAB_SAVED_SETS) then
-		SAVED_SET_SORTING[addon.setdb.profile.sorting](sets)
+		SAVED_SET_SORTING[addon.Profile.SortSavedDB](sets)
 	end
 end
 
@@ -739,5 +740,8 @@ end
 
 function addon.SortDropdown(sets)
  	if not sets  then return end
-	SortSavedSets(self, sets, false, true)
+
+ 	SAVED_SET_SORTING[addon.Profile.SortSavedDB](sets)
+	--SortSavedSets(self, sets, false, true)
 end
+

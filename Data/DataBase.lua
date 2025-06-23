@@ -618,6 +618,7 @@ function addon.GetOutfits(character)
 	local profile = addon.SelecteSavedList 
 	local FullList = {}
 	local savedOutfits
+	local index = 1
 	if addon.SelecteSavedList and not character then 
 		FullList = loadAltsSavedSets(profile)
 	else
@@ -635,6 +636,8 @@ function addon.GetOutfits(character)
 			data.label = L["Saved Set"]
 			FullList[i] = data
 			data.validForCharacter = true
+			data.uiOrder = index * 100
+			index = index + 1
 		end
 
 		--Extended Sets
@@ -731,6 +734,8 @@ function addon.GetOutfits(character)
 				data.itemTransmogInfoList = nil
 				data.items = nil
 				data.itemData = nil
+				data.uiOrder = index * 100
+				index = index + 1
 		
 				tinsert(FullList, data)
 			end
@@ -781,7 +786,8 @@ function addon.GetSavedList()
 		info.limitedTimeSet = false
 		info.patchID = 0
 		info.setID = data.setID or (data.outfitID)
-		info.uiOrder = data.uiOrder or (data.index * 100)
+		info.uiOrder = data.uiOrder
+
 		info.icon = data.icon
 		info.isClass = true
 		info.mainShoulder = data[3] or 0

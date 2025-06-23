@@ -272,6 +272,8 @@ function BetterWardrobeOutfitDropdownMixin:InitOutfitDropdown()
 		end);
 
 		local outfits = addon.GetOutfits(true)
+		--local outfits = addon.GetSavedList()
+		addon.SortDropdown(outfits)
 		for i = 1, #outfits do
 			local outfit = outfits[i]
 

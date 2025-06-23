@@ -952,6 +952,17 @@
 				</Scripts>
 			</DropdownButton>
 
+			<DropdownButton parentKey="SortSavedDropdown" name = "BW_SortSavedDropDown" inherits="WowStyle1DropdownTemplate" mixin="BetterWardrobeCollectionSavedSortDropdownMixin">
+				<Anchors>
+					<Anchor point="TOPLEFT" x = "10" y="-70"/>
+				</Anchors>
+				<Scripts>
+					<OnLoad method="OnLoad"/>
+					<OnShow method="OnShow"/>
+					<OnHide method="OnHide"/>
+				</Scripts>
+			</DropdownButton>
+
 			<DropdownButton parentKey="SavedOutfitDropDown" name = "BW_SavedOutfitDropDown" inherits="WowStyle1DropdownTemplate" mixin="BetterWardrobeCollectionSavedOutfitDropdownMixin">
 				<Anchors>
 					<Anchor point="RIGHT" relativeKey="$parent.ClassDropdown" relativePoint="RIGHT" x="0" y="0"/>

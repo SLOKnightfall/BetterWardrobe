@@ -1093,6 +1093,7 @@ local defaults = {
 		AutoApply = false,
 		ShopIconPosition = "Right",
 		RemixIconPosition = "Right",
+		SortSavedDB = 1,
 
 	}
 }
