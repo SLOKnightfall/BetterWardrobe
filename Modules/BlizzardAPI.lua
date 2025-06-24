@@ -68,7 +68,7 @@ addon.GetTransmogLocation = GetTransmogLocation
 --Determines type of set based on setID
 local function DetermineSetType(setID)
 
-	local setData = dd(setID) --addon.GetSetType(setID)
+	local setData = addon.getFullList(setID) --addon.GetSetType(setID)
 	 local setType = setData and setData.setType
 	--Default Blizzard Set
 	if not setType or setType == "Blizzard"then
@@ -153,8 +153,8 @@ function addon.C_TransmogSets.GetSetInfo(setID)
 
 --else
 	--elseif setType == "extraset" then
-		ddd = dd(setID)
-		return dd(setID) --addon.GetSetInfo(setID)
+		ddd = addon.getFullList(setID)
+		return addon.getFullList(setID) --addon.GetSetInfo(setID)
 	--end
 end
 

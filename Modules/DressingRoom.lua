@@ -796,7 +796,7 @@ function BetterDressUpOutfitMixin:LoadOutfit(outfitID)
 		local outfitID = addon:GetBlizzID(outfitID)
 		DressUpItemTransmogInfoList(C_TransmogCollection.GetOutfitItemTransmogInfoList(outfitID))
 	else
-		local outfit = addon.GetSetInfo(outfitID)
+		local outfit = addon.C_TransmogSets.GetSetInfo(outfitID)
 		local itemTransmogInfoList = {}
 
 

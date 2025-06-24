@@ -1256,51 +1256,6 @@ local function UpdateDB()
 	end
 end
 
---Updates the db to reflect new set indexes
-local function UpdateDB_8_4()
-	BetterWardrobe_Updates = BetterWardrobe_Updates or {}
-
-	if not BetterWardrobe_Updates["8_4"] then
-		local characterDB = BetterWardrobe_CharacterData
-		local listDB = BetterWardrobe_ListData
-		local favoriteDB = listDB.favoritesDB or {}
-		local hiddenDB = listDB.HiddenAppearanceDB or {}
-
-		if not favoriteDB.profiles then BetterWardrobe_Updates["8_4"] = true; return end
-
-		for profile, data in pairs(favoriteDB.profiles) do
-			local extraSets = {}
-			if data.extraset then
-				for setid, value in pairs(data.extraset) do
-					if setid > 100000 then
-						extraSets[setid / 100000] = value
-					else
-						extraSets[setid + 10000] = value
-					end
-				end
-				data.extraset = extraSets
-			end
-		end
-
-		for profile, data in pairs(hiddenDB.profiles) do
-			local extraSets = {}
-			if data.extraset then
-				for setid, value in pairs(data.extraset) do
-					if setid > 100000 then
-						extraSets[setid / 100000] = value
-
-					else
-						extraSets[setid + 10000] = value
-					end
-				end
-
-				data.extraset = extraSets
-			end
-		end
-
-		BetterWardrobe_Updates["8_4"] = true
-	end
-end
 
 ---Updates Profile after changes
 function addon:RefreshConfig()
@@ -1340,9 +1295,6 @@ function addon:OnInitialize()
 	listDB.OutfitDB = listDB.OutfitDB or {}
 
 	UpdateDB()
-	UpdateDB_8_4()
-
-
 
 --Create all the profiled DB
 	self.db = LibStub("AceDB-3.0"):New("BetterWardrobe_Options", defaults, true)
@@ -1365,8 +1317,6 @@ function addon:OnInitialize()
 
 	self.collectionCache = LibStub("AceDB-3.0"):New("BetterWardrobe_CollectionCache", collection_cache_defaults, true)
 	self.tabOverwrite = LibStub("AceDB-3.0"):New("BetterWardrobe_TabOverwrite", tabOverwrite_defaults, true)
-
-	xx =  self.tabOverwrite
 
 	local profile = self.setdb:GetCurrentProfile()
 	--self.setdb.global[profile] = self.setdb.char
@@ -1424,7 +1374,7 @@ function addon:OnEnable()
 
 	addon.Init:InitDB()
 	--addon.Init:BuildTooltips()
-	----addon.Init:DressingRoom()
+	addon.Init:DressingRoom()
 	--addon.Init.LoadCollectionListModule()
 	--BW_ColectionListFrameTemplate
 	--addon.Init:BuildTooltips()

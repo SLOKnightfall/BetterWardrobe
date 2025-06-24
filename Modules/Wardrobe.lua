@@ -5540,7 +5540,6 @@ local function variantsTooltip(elementData, variantSets)
 end
 
 function WardrobeSetsCollectionMixin:OpenInDressingRoom(setID)
-
 	if DressUpFrame:IsShown() then 
 	else
 		DressUpFrame_Show(DressUpFrame)
@@ -5550,7 +5549,7 @@ function WardrobeSetsCollectionMixin:OpenInDressingRoom(setID)
 	end
 		
 	--local setType = tabType[addon.GetTab()]
-	setInfo = dd(setID) --addon:GetSetInfo(setID)
+	local setInfo = addon.getFullList(setID) --addon:GetSetInfo(setID)
 	local setType = setInfo.setType;
 
 	--local setType = addon.QueueList[1]
@@ -5570,7 +5569,7 @@ function WardrobeSetsCollectionMixin:OpenInDressingRoom(setID)
 			sources[data.appearanceID] = false
 		end
 
-	elseif setType == "ExtraSet" then
+	else--if setType == "ExtraSet" then
 		sources = setInfo.sources
 	end
 
@@ -6344,7 +6343,7 @@ function WardrobeSetsTransmogMixin:UpdateSets()
 			local topSourcesCollected, topSourcesTotal;
 				topSourcesCollected, topSourcesTotal = SetsDataProvider:GetSetSourceCounts(set.setID) 
 	 
-				 setInfo = dd(set.setID);
+				 setInfo = addon.getFullList(set.setID);
 				if setInfo then 
 
 					local isFavorite = C_TransmogSets.GetIsFavorite(set.setID) or addon.favoritesDB.profile.extraset[set.setID];
@@ -6477,7 +6476,7 @@ function WardrobeSetsTransmogMixin:LoadSet(setID)
 		end
 		C_Transmog.LoadOutfit(addon:GetBlizzID(setID))
 	else
-		 setData = addon.C_TransmogSets.GetSetInfo(setID);
+		local setData = addon.C_TransmogSets.GetSetInfo(setID);
 		if not setData or setType == "Unknown" then return end
 
 		local offShoulder = setData.offShoulder or 0;

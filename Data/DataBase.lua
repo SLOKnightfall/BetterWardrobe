@@ -553,7 +553,7 @@ end
 		BuildArmorDB()
 		--addon.Init:BuildDB()
 		addon.BuildClassArtifactAppearanceList()
-		----addon.GetSavedList()
+		addon.GetSavedList()
 	end
 local savedSetID = 0
 --Loads an alt character's saved sets from the DB
@@ -1013,7 +1013,7 @@ function addon.GetSetType(outfitID)
 	----return outfitID < MAX_DEFAULT_OUTFITS  -- #C_TransmogCollection.GetOutfits()--MAX_DEFAULT_OUTFITS 
 end
 
-function dd(id)
+function addon.getFullList(id)
 	return fullList[id]
 end
 
