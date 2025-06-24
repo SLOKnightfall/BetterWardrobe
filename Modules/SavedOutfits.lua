@@ -17,8 +17,8 @@ end
 
 
 local function IsDefaultSet(outfitID)
-	return addon.IsDefaultSet(outfitID)
-	--return outfitID < MAX_DEFAULT_OUTFITS  -- #C_TransmogCollection.GetOutfits()--MAX_DEFAULT_OUTFITS 
+--	return addon.IsDefaultSet(outfitID)
+	return outfitID < MAX_DEFAULT_OUTFITS  -- #C_TransmogCollection.GetOutfits()--MAX_DEFAULT_OUTFITS 
 end
 
 
@@ -216,11 +216,13 @@ function BetterWardrobeOutfitDropdownMixin:OnEvent(event)
 end
 
 function BetterWardrobeOutfitDropdownMixin:UpdateSaveButton()
-	if self:GetSelectedOutfitID() then
-		self.SaveButton:SetEnabled(not self:IsOutfitDressed());
-	else
-		self.SaveButton:SetEnabled(false);
-	end
+	--if self:GetSelectedOutfitID() then
+				self.SaveButton:SetEnabled(true)
+
+		--self.SaveButton:SetEnabled(not self:IsOutfitDressed());
+	--else
+		--self.SaveButton:SetEnabled(false);
+	--end
 end
 
 function BetterWardrobeOutfitDropdownMixin:OnOutfitSaved(outfitID)
@@ -688,6 +690,7 @@ function BetterWardrobeOutfitManager:EvaluateAppearances()
 end
 
 function BetterWardrobeOutfitManager:EvaluateSaveState()
+	print("eval")
 	--if self.hasAnyPendingAppearances then
 		-- wait
 		--if ( not StaticPopup_Visible("TRANSMOG_OUTFIT_CHECKING_APPEARANCES") ) then
@@ -704,6 +707,7 @@ function BetterWardrobeOutfitManager:EvaluateSaveState()
 			BetterWardrobeOutfitManager:ShowPopup("TRANSMOG_OUTFIT_SOME_INVALID_APPEARANCES");
 		else
 			BetterWardrobeOutfitManager:ContinueWithSave();
+			print("con")
 		end
 	--end
 end
@@ -718,24 +722,25 @@ function BetterWardrobeOutfitManager:ContinueWithSave()
 		end
 		BetterWardrobeOutfitManager:ClosePopups()
 	elseif self.outfitID then
-			addon.OutfitDB.char.outfits[LookupIndexFromID(self.outfitID)]  = addon.OutfitDB.char.outfits[LookupIndexFromID(self.outfitID)] or {}
-			outfit = addon.OutfitDB.char.outfits[LookupIndexFromID(self.outfitID)]
-			--outfit.itemTransmogInfoList =  self.itemTransmogInfoList or {}
-			local itemData = {}
-			for i, data in pairs(self.itemTransmogInfoList) do
-				local sourceInfo = C_TransmogCollection.GetSourceInfo(data.appearanceID)
-				if sourceInfo then
-					local appearanceID = sourceInfo.visualID
-					local itemID = sourceInfo.itemID
-					local itemMod = sourceInfo.itemModID
-					local sourceID = sourceInfo.sourceID
-					itemData[i] = {"'"..itemID..":"..itemMod.."'", sourceID, appearanceID}
-				end
-			end
+		addon.OutfitDB.char.outfits[LookupIndexFromID(self.outfitID)]  = addon.OutfitDB.char.outfits[LookupIndexFromID(self.outfitID)] or {}
+		local outfit = addon.OutfitDB.char.outfits[LookupIndexFromID(self.outfitID)]
+		--outfit.itemTransmogInfoList =  self.itemTransmogInfoList or {}
 
-			outfit.itemData = itemData
-			BetterWardrobeOutfitManager:ClosePopups()
-			addon.GetSavedList()
+		local itemData = {};
+		for i, data in pairs(self.itemTransmogInfoList) do
+			outfit[i] = data.appearanceID;
+			if i == 3 then
+				outfit["offShoulder"] = data.secondaryAppearanceID or 0;
+			elseif i == 16 then 
+				outfit["mainHandEnchant"] = data.illusionID or 0;
+			elseif i == 17 then 
+				outfit["offHandEnchant"] = data.illusionID or 0;
+			end
+		end
+
+		outfit.itemData = itemData
+		BetterWardrobeOutfitManager:ClosePopups()
+		addon.GetSavedList()
 
 	else
 		-- this is a new outfit

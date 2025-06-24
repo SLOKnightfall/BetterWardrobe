@@ -777,6 +777,7 @@ function BetterDressUpOutfitMixin:GetItemTransmogInfoList()
 end
 
 function BetterDressUpOutfitMixin:LoadOutfit(outfitID)
+	print("jj")
 	if not outfitID then
 		return false
 	end

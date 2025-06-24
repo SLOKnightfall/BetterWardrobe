@@ -1566,7 +1566,7 @@
 									</OnClick>
 								</Scripts>
 							</Button>
-							<Button parentKey="BW_ChangeTabButton" inherits="SquareIconButtonTemplate" >
+							<Button parentKey="BW_ChangeTabButton" inherits="SquareIconButtonTemplate" hidden = "true" >
 								<Size x="32" y="32"/>
 								<Anchors>
 									<Anchor point="TOPRIGHT" x="3" y="-20"/>

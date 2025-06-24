@@ -6489,31 +6489,31 @@ function WardrobeSetsTransmogMixin:LoadSet(setID)
 		--Set all the slot to hidden items first so it doesn't accidentally overwrite items
 		if addon.Profile.HiddenMog and (setData.setType and setData.setType ~= "SavedExtra" and setData.setType ~= "SavedBlizzard")  then	
 
-		local clearSlots = Sets:EmptySlots(transmogSources);
-		for i, x in pairs(clearSlots) do
-			local _, source = addon.GetItemSource(x) --C_TransmogCollection.GetItemInfo(x);
-			--C_Transmog.SetPending(i, Enum.TransmogType.Appearance,source);
-			local transmogLocation = TransmogUtil.GetTransmogLocation(i, Enum.TransmogType.Appearance, Enum.TransmogModification.Main);
-			local pendingInfo = TransmogUtil.CreateTransmogPendingInfo(Enum.TransmogPendingType.Apply, source);
+			local clearSlots = Sets:EmptySlots(transmogSources);
+			for i, x in pairs(clearSlots) do
+				local _, source = addon.GetItemSource(x) --C_TransmogCollection.GetItemInfo(x);
+				--C_Transmog.SetPending(i, Enum.TransmogType.Appearance,source);
+				local transmogLocation = TransmogUtil.GetTransmogLocation(i, Enum.TransmogType.Appearance, Enum.TransmogModification.Main);
+				local pendingInfo = TransmogUtil.CreateTransmogPendingInfo(Enum.TransmogPendingType.Apply, source);
 
-			-----C_Transmog.SetPending(transmogLocation, source, Enum.TransmogType.Appearance);
-			C_Transmog.SetPending(transmogLocation, pendingInfo);
-		end
-				
-		--for i, x in pairs(transmogSources) do
-			--if not C_TransmogCollection.PlayerHasTransmogItemModifiedAppearance(x) and (i ~= 7 or i ~= 4 or i ~= 19) and emptySlotData[i] then
-				--local _, source = addon.GetItemSource(emptySlotData[i]) --C_TransmogCollection.GetItemInfo(emptySlotData[i]);
-				--C_Transmog.SetPending(i, Enum.TransmogType.Appearance, source);		
-				--local transmogLocation = TransmogUtil.GetTransmogLocation(i, Enum.TransmogType.Appearance, Enum.TransmogModification.Main);
-				--local pendingInfo = TransmogUtil.CreateTransmogPendingInfo(Enum.TransmogPendingType.Apply, source);
-				-----C_Transmog.SetPending(transmogLocation, source, Enum.TransmogType.Appearance)
-				--C_Transmog.SetPending(transmogLocation, pendingInfo);
+				-----C_Transmog.SetPending(transmogLocation, source, Enum.TransmogType.Appearance);
+				C_Transmog.SetPending(transmogLocation, pendingInfo);
+			end
+					
+			--for i, x in pairs(transmogSources) do
+				--if not C_TransmogCollection.PlayerHasTransmogItemModifiedAppearance(x) and (i ~= 7 or i ~= 4 or i ~= 19) and emptySlotData[i] then
+					--local _, source = addon.GetItemSource(emptySlotData[i]) --C_TransmogCollection.GetItemInfo(emptySlotData[i]);
+					--C_Transmog.SetPending(i, Enum.TransmogType.Appearance, source);		
+					--local transmogLocation = TransmogUtil.GetTransmogLocation(i, Enum.TransmogType.Appearance, Enum.TransmogModification.Main);
+					--local pendingInfo = TransmogUtil.CreateTransmogPendingInfo(Enum.TransmogPendingType.Apply, source);
+					-----C_Transmog.SetPending(transmogLocation, source, Enum.TransmogType.Appearance)
+					--C_Transmog.SetPending(transmogLocation, pendingInfo);
+				--end
 			--end
-		--end
-	end
+		end
 
 		--Load Default Blizzard set
-	 local alwaysHideSlots = addon.setdb.profile.autoHideSlot;
+		local alwaysHideSlots = addon.setdb.profile.autoHideSlot;
 
 		if setData.setType == "Blizzard" then
 			local sources = setData.sources--GetSetSources(setID);
@@ -6627,7 +6627,7 @@ function WardrobeSetsTransmogMixin:LoadSet(setID)
 				end
 			end
 
-			--[[if setData then
+			if setData then
 				local TransmogLocation = TransmogUtil.CreateTransmogLocation(16, Enum.TransmogType.Illusion, Enum.TransmogModification.Main)
 				local pendingInfo = TransmogUtil.CreateTransmogPendingInfo(Enum.TransmogPendingType.Apply, setData.mainHandEnchant or 0)
 				C_Transmog.SetPending(TransmogLocation, pendingInfo)
@@ -6635,7 +6635,7 @@ function WardrobeSetsTransmogMixin:LoadSet(setID)
 				local TransmogLocation = TransmogUtil.CreateTransmogLocation(17, Enum.TransmogType.Illusion, Enum.TransmogModification.Main)
 				local pendingInfo = TransmogUtil.CreateTransmogPendingInfo(Enum.TransmogPendingType.Apply, setData.offHandEnchant or 0)
 				C_Transmog.SetPending(TransmogLocation, pendingInfo)
-			end]]
+			end
 		end
 	end
 end
