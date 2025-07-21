@@ -1226,6 +1226,7 @@ function WardrobeCollectionFrameMixin:SetTab(tabID)
 	self.SetsTransmogFrame:Hide();
 	self.SavedOutfitDropDown:Hide();
 	addon.ColorFilterFrame:Hide()
+	BW_SortSavedDropDown:Hide()
 
 	BetterWardrobeVisualToggle:Hide() --until toggle gets fixed
 
@@ -1254,7 +1255,6 @@ function WardrobeCollectionFrameMixin:SetTab(tabID)
 		self:InitItemsFilterButton();
 
 		self.SearchBox:Show()
-		BW_SortSavedDropDown:Hide()
 
 		BW_SortDropDown:Show()
 		BW_SortDropDown:ClearAllPoints()
@@ -4730,11 +4730,13 @@ function WardrobeSetsDataProviderMixin:GetSortedSetSources(setID)
 	local returnTable = { };
 	local sourceData = self:GetSetSourceData(setID);
 	for i, primaryAppearance in ipairs(sourceData.primaryAppearances) do
-		local sourceID = primaryAppearance.appearanceID;
-		local sourceInfo = C_TransmogCollection.GetSourceInfo(sourceID);
-		if ( sourceInfo ) then
-			local sortOrder = EJ_GetInvTypeSortOrder(sourceInfo.invType);
-			tinsert(returnTable, { sourceID = sourceID, collected = primaryAppearance.collected, sortOrder = sortOrder, itemID = sourceInfo.itemID, invType = sourceInfo.invType });
+		if (type(primaryAppearance.collected) == "boolean") then 
+			local sourceID = primaryAppearance.appearanceID;
+			local sourceInfo = C_TransmogCollection.GetSourceInfo(sourceID);
+			if ( sourceInfo ) then
+				local sortOrder = EJ_GetInvTypeSortOrder(sourceInfo.invType);
+				tinsert(returnTable, { sourceID = sourceID, collected = primaryAppearance.collected, sortOrder = sortOrder, itemID = sourceInfo.itemID, invType = sourceInfo.invType });
+			end
 		end
 	end
 
@@ -6821,7 +6823,7 @@ function BetterWardrobeTransmogOptionsDropdownMixin:OnLoad()
 			end,
 		1);
 
-		if BetterWardrobeCollectionFrame.selectedTransmogTab == 2 or BetterWardrobeCollectionFrame.selectedTransmogTab == 3 then
+		if BetterWardrobeCollectionFrame.selectedTransmogTab == 2 or BetterWardrobeCollectionFrame.selectedTransmogTab == 3 or BetterWardrobeCollectionFrame.selectedTransmogTab == 4 then
 
 			rootDescription:CreateRadio(L["Use Hidden Item for Unavilable Items"], function() return addon.Profile.HiddenMog; end,
 				function()
@@ -6829,64 +6831,67 @@ function BetterWardrobeTransmogOptionsDropdownMixin:OnLoad()
 					BetterWardrobeCollectionFrame.SetsTransmogFrame:OnSearchUpdate();
 				end,
 			7);
-			rootDescription:CreateRadio(L["Show Incomplete Sets"], function() return addon.Profile.ShowIncomplete end, 
-				function()
-					addon.Profile.ShowIncomplete = not addon.Profile.ShowIncomplete;
-					BetterWardrobeCollectionFrame.SetsTransmogFrame:OnSearchUpdate();
-				end, 
-			1);
+			if BetterWardrobeCollectionFrame.selectedTransmogTab == 2 or BetterWardrobeCollectionFrame.selectedTransmogTab == 3 then
 
-			if addon.Profile.ShowIncomplete then
-				rootDescription:CreateRadio(L["Hide Missing Set Pieces at Transmog Vendor"], function() return addon.Profile.HideMissing; end, 
+				rootDescription:CreateRadio(L["Show Incomplete Sets"], function() return addon.Profile.ShowIncomplete end, 
 					function()
-						addon.Profile.HideMissing = not addon.Profile.HideMissing;
+						addon.Profile.ShowIncomplete = not addon.Profile.ShowIncomplete;
 						BetterWardrobeCollectionFrame.SetsTransmogFrame:OnSearchUpdate();
-						BetterWardrobeCollectionFrame.SetsTransmogFrame:UpdateSets();
-					end,
-				4);
+					end, 
+				1);
 
-				local submenu = rootDescription:CreateButton("Include:");
-				submenu:CreateButton(CHECK_ALL, 
-					function()
-						for index in pairs(locationDropDown) do
-							addon.includeLocation[index] = true;
+				if addon.Profile.ShowIncomplete then
+					rootDescription:CreateRadio(L["Hide Missing Set Pieces at Transmog Vendor"], function() return addon.Profile.HideMissing; end, 
+						function()
+							addon.Profile.HideMissing = not addon.Profile.HideMissing;
+							BetterWardrobeCollectionFrame.SetsTransmogFrame:OnSearchUpdate();
+							BetterWardrobeCollectionFrame.SetsTransmogFrame:UpdateSets();
+						end,
+					4);
+
+					local submenu = rootDescription:CreateButton("Include:");
+					submenu:CreateButton(CHECK_ALL, 
+						function()
+							for index in pairs(locationDropDown) do
+								addon.includeLocation[index] = true;
+							end
+							BetterWardrobeCollectionFrame.SetsTransmogFrame:OnSearchUpdate();
 						end
-						BetterWardrobeCollectionFrame.SetsTransmogFrame:OnSearchUpdate();
-					end
-				);
+					);
 
-				submenu:CreateButton(UNCHECK_ALL, 
-					function()
-						for index in pairs(locationDropDown) do
-							addon.includeLocation[index] = false;
+					submenu:CreateButton(UNCHECK_ALL, 
+						function()
+							for index in pairs(locationDropDown) do
+								addon.includeLocation[index] = false;
+							end
+							BetterWardrobeCollectionFrame.SetsTransmogFrame:OnSearchUpdate();
 						end
-						BetterWardrobeCollectionFrame.SetsTransmogFrame:OnSearchUpdate();
+					);
+
+					for index, id in pairs(locationDropDown) do
+						if index ~= 21 then --Skip "robe" type
+							submenu:CreateCheckbox(id, function() return addon.includeLocation[index]; end, 
+								function()
+									addon.includeLocation[index] = value;
+									if index == 6 then
+										addon.includeLocation[21] = value;
+									end
+
+									BetterWardrobeCollectionFrame.SetsTransmogFrame:OnSearchUpdate();
+								end, 
+							index);
+						end
 					end
-				);
 
-				for index, id in pairs(locationDropDown) do
-					if index ~= 21 then --Skip "robe" type
-						submenu:CreateCheckbox(id, function() return addon.includeLocation[index]; end, 
-							function()
-								addon.includeLocation[index] = value;
-								if index == 6 then
-									addon.includeLocation[21] = value;
-								end
-
-								BetterWardrobeCollectionFrame.SetsTransmogFrame:OnSearchUpdate();
+					submenu = rootDescription:CreateButton("Cutoff:");
+					for index = 1, 9 do
+						submenu:CreateCheckbox(index, function() return index == addon.Profile.PartialLimit end, 
+							function() 
+								addon.Profile.PartialLimit = index
+								BetterWardrobeCollectionFrame.SetsTransmogFrame:OnSearchUpdate()
 							end, 
 						index);
 					end
-				end
-
-				submenu = rootDescription:CreateButton("Cutoff:");
-				for index = 1, 9 do
-					submenu:CreateCheckbox(index, function() return index == addon.Profile.PartialLimit end, 
-						function() 
-							addon.Profile.PartialLimit = index
-							BetterWardrobeCollectionFrame.SetsTransmogFrame:OnSearchUpdate()
-						end, 
-					index);
 				end
 			end
 		end
@@ -7067,7 +7072,7 @@ end
 function BetterWardrobeCollectionSavedOutfitDropdownMixin:OnHide()
 	WardrobeFrame:UnregisterCallback(BetterWardrobeFrameMixin.Event.OnCollectionTabChanged, self);
 end
-
+zz={}
 function BetterWardrobeCollectionSavedOutfitDropdownMixin:Refresh()
 	self:SetupMenu(function(dropdown, rootDescription)
 		rootDescription:SetTag("BW_SAVED_SETS");
@@ -7100,7 +7105,9 @@ function BetterWardrobeCollectionSavedOutfitDropdownMixin:Refresh()
 
 		local temp = {}
 		for name, data in pairs(addon.setdb.global.sets) do
-			table.insert(temp, name);
+			if #data > 0 then
+				table.insert(temp, name);
+			end
 		end
 
 		table.sort(temp, function(a,b) return (a) < (b) end);
