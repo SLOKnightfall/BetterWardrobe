@@ -70,6 +70,7 @@ function addon:ClearCache()
 	wipe(baseIDs)
 	wipe(variantSets)
 	wipe(variantIDs)
+	wipe(addon.transmogList)
 end
 
 local function GetFactionID(faction)
@@ -808,7 +809,6 @@ function addon.GetSavedList()
 			for i, infoList in pairs(outfitItemTransmogInfoList) do
 				info.sources[i] = infoList.appearanceID
 				info.sources[infoList.appearanceID] = true
-xx=info.sources
 			end
 
 		elseif data.setType == "SavedExtra" then

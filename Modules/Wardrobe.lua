@@ -5739,6 +5739,7 @@ function WardrobeSetsScrollFrameButtonMixin:OnClick(buttonName, down)
 
 				rootDescription:CreateButton(text, function()
 					addon.C_TransmogSets.SetIsFavorite(targetSetID, not favorite);
+					addon.C_TransmogSets.SetIsFavorite(baseSetID, not favorite);
 					addon.Init:InitDB()
 					RefreshLists()
 				end);
@@ -7072,7 +7073,7 @@ end
 function BetterWardrobeCollectionSavedOutfitDropdownMixin:OnHide()
 	WardrobeFrame:UnregisterCallback(BetterWardrobeFrameMixin.Event.OnCollectionTabChanged, self);
 end
-zz={}
+
 function BetterWardrobeCollectionSavedOutfitDropdownMixin:Refresh()
 	self:SetupMenu(function(dropdown, rootDescription)
 		rootDescription:SetTag("BW_SAVED_SETS");

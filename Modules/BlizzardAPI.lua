@@ -160,7 +160,7 @@ end
 
 
 function addon.C_TransmogSets.SetIsFavorite(setID, value)
-	local favorite, isGroupFavorite = C_TransmogSets.GetIsFavorite(setID) or addon.favoritesDB.profile.extraset[setID];
+	 local favorite, isGroupFavorite = C_TransmogSets.GetIsFavorite(setID) or addon.favoritesDB.profile.extraset[setID];
 
 	local setType = DetermineSetType(setID)
 	if setType == "set" then

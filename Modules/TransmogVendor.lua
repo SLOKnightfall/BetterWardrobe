@@ -150,8 +150,6 @@ for i, location in pairs(locationDropDown) do
 	addon.includeLocation[i] = true
 end
 
-
-
 -- Base Transmog Sets Window Upates
 function UI.ExtendTransmogView(reset)
 	if WardrobeFrame and addon.TransmogVendorSizeUpdated and not reset  or not WardrobeFrame then return end
@@ -211,14 +209,14 @@ function UI.ExtendTransmogView(reset)
 		WardrobeTransmogFrame.ModelScene.ControlFrame:SetPoint("TOP", WardrobeTransmogFrame, "TOP", 0, -4)
 
 		--BetterWardrobeOutfitDropDown:ClearAllPoints()
-	--BetterWardrobeOutfitDropDown:SetPoint("TOPLEFT", WardrobeTransmogFrame, 35, 28)
+		--BetterWardrobeOutfitDropDown:SetPoint("TOPLEFT", WardrobeTransmogFrame, 35, 28)
 		--BW_LoadQueueButton:ClearAllPoints()
 		--BW_LoadQueueButton:SetPoint("TOPLEFT", BetterWardrobeOutfitDropDown, "TOPRIGHT", 85, -5)
 		BetterWardrobeTMOutfitDropDown:ClearAllPoints()
 		BetterWardrobeTMOutfitDropDown:SetPoint("TOPLEFT", 50, 28)
 
 		if UIPanelWindows["WardrobeFrame"] then 
-		UIPanelWindows["WardrobeFrame"].width = 1280
+			UIPanelWindows["WardrobeFrame"].width = 1280
 		else 
 			UIPanelWindows["WardrobeFrame"] ={ area = "left", pushable = 0,	width = 1280 };
 		end
