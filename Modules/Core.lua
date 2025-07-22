@@ -1366,6 +1366,13 @@ function addon:OnInitialize()
 	end
 end
 
+
+local function AddonBlockedHandler(event, eventAddonName)
+	if event == 'ADDON_ACTION_FORBIDDEN' and strmatch(eventAddonName, addonName) then
+		StaticPopup_Hide(event)
+	end
+end
+
 local initialize
 function addon:OnEnable()
 	_,playerClass, classID = UnitClass("player")
@@ -1387,6 +1394,10 @@ function addon:OnEnable()
 	addon:RegisterEvent("TRANSMOG_COLLECTION_SOURCE_REMOVED", "EventHandler")
 	addon:RegisterEvent("TRANSMOG_COLLECTION_SOURCE_ADDED", "EventHandler")
 	addon:RegisterEvent("PLAYER_ENTERING_WORLD", "EventHandler")
+
+	addon:RegisterEvent("ADDON_ACTION_FORBIDDEN", AddonBlockedHandler)
+	addon:RegisterEvent("ADDON_ACTION_BLOCKED", AddonBlockedHandler)
+
 
 	--Cache any default Blizz Saved Sets
 	addon.StoreBlizzardSets()
