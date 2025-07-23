@@ -4,6 +4,7 @@ on:
   push:
     branches:
       - master
+      - 6.0_Updates
     tags:
       - '*' # Looks like BetterWardrobe just uses semvar for its release tags. This could probably be improved to use regex so you don't accidentally publish something that shouldn't be.
     paths-ignore:
