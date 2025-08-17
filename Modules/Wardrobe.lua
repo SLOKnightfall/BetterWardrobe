@@ -4760,14 +4760,12 @@ function BetterWardrobeSetsDataProviderMixin:SetHasNewSources(setID)
 	if setID and setID >= 5000 then
 		local sources = self:GetSetSources(setID);
 		for sourceID,_ in pairs(sources) do
-            if C_TransmogCollection.GetSourceInfo(sourceID) ~= nil then
-                local visID = C_TransmogCollection.GetSourceInfo(sourceID).visualID;
-                for i=1,#NewVisualIDs do
-                    if visID == NewVisualIDs[i] then
-                        return true;
-                    end
-                end
-            end
+			local visID = C_TransmogCollection.GetSourceInfo(sourceID).visualID;
+			for i=1,#NewVisualIDs do
+				if visID == NewVisualIDs[i] then
+					return true;
+				end
+			end
 		end
 		return false;
 	elseif setID then
