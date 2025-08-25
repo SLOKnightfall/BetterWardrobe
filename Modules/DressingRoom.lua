@@ -792,7 +792,7 @@ function BetterDressUpOutfitMixin:LoadOutfit(outfitID)
 	DressingRoom:Update()
 	import = true
 	local setType = addon.GetSetType(outfitID)
-	if setType == "SavedBlizzard"  or (outfitID >= 5000 and outfitID <= 5020) then
+	if setType == "SavedBlizzard"  or (outfitID >= 500000 and outfitID <= 500020) then
 		local outfitID = addon:GetBlizzID(outfitID)
 		DressUpItemTransmogInfoList(C_TransmogCollection.GetOutfitItemTransmogInfoList(outfitID))
 	else

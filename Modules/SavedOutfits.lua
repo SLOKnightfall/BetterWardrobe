@@ -361,7 +361,7 @@ function BetterWardrobeOutfitDropdownMixin:IsOutfitDressed()
 	end
 
 	--if addon.GetSetType(self.selectedOutfitID) == "SavedBlizzard" then 
-	if self.selectedOutfitID >= 5000 and self.selectedOutfitID <= 5020 then 
+	if self.selectedOutfitID >= 500000 and self.selectedOutfitID <= 500020 then 
 		local selectedOutfitID = addon:GetBlizzID(self.selectedOutfitID);
 		local outfitItemTransmogInfoList = C_TransmogCollection.GetOutfitItemTransmogInfoList(selectedOutfitID);
 		if not outfitItemTransmogInfoList then
