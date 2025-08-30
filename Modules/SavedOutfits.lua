@@ -8,7 +8,29 @@ local MAX_DEFAULT_OUTFITS = C_TransmogCollection.GetNumMaxOutfits()
 
 --Coresponds to wardrobeOutfits
 
+-- Safely get the dialog's edit box across client versions
+local function GetPopupEditBox(frame)
+	-- prefer a method if Blizzard ever adds one
+	if frame and frame.GetEditBox then
+		local ok, eb = pcall(frame.GetEditBox, frame)
+		if ok and eb then return eb end
+	end
+	return (frame and frame.editBox) or (frame and frame.EditBox) or nil
+end
 
+local function GetPopupButton(frame, index)
+	if not frame then return nil end
+	-- Old style
+	if frame["button"..index] then return frame["button"..index] end
+	-- New style
+	if frame.Buttons and frame.Buttons[index] then return frame.Buttons[index] end
+	-- Fallback on Blizzard helper if available
+	if StaticPopup_GetButton then
+		local ok, btn = pcall(StaticPopup_GetButton, frame, index)
+		if ok then return btn end
+	end
+	return nil
+end
 
 local function GetTableIndex(index)
 	local numOutfits = #C_TransmogCollection.GetOutfits()
@@ -65,25 +87,42 @@ StaticPopupDialogs["BW_NAME_TRANSMOG_OUTFIT"] = {
 	hideOnEscape = 1,
 	hasEditBox = 1,
 	maxLetters = 31,
+	OnAccept = function(self)
+		local eb = GetPopupEditBox(self)
+		BetterWardrobeOutfitManager:NameOutfit(eb and eb:GetText() or "", self.data)
+	end,
 	OnShow = function(self)
-		self.button1:Disable()
-		self.button2:Enable()
-		self.editBox:SetFocus()
-	end,
-	OnHide = function(self)
-		self.editBox:SetText("")
-	end,
-	EditBoxOnEnterPressed = function(self)
-		if (self:GetParent().button1:IsEnabled()) then
-			StaticPopup_OnClick(self:GetParent(), 1)
+		local btn1 = GetPopupButton(self, 1)
+		local btn2 = GetPopupButton(self, 2)
+		if btn1 then btn1:Disable() end
+		if btn2 then btn2:Enable() end
+
+		local eb = GetPopupEditBox(self)
+		if eb then
+			eb:SetFocus()
+			eb:HighlightText()
 		end
 	end,
-	EditBoxOnTextChanged = function (self)
+	OnHide = function(self)
+		local eb = GetPopupEditBox(self)
+		if eb then eb:SetText("") end
+	end,
+	EditBoxOnTextChanged = function(self)
 		local parent = self:GetParent()
-		if (parent.editBox:GetText() ~= "") then
-			parent.button1:Enable()
-		else
-			parent.button1:Disable()
+		local btn1 = GetPopupButton(parent, 1)
+		if btn1 then
+			if self:GetText() ~= "" then
+				btn1:Enable()
+			else
+				btn1:Disable()
+			end
+		end
+	end,
+	EditBoxOnEnterPressed = function(self)
+		local parent = self:GetParent()
+		local btn1 = GetPopupButton(parent, 1)
+		if btn1 and btn1:IsEnabled() then
+			StaticPopup_OnClick(parent, 1)
 		end
 	end,
 	EditBoxOnEscapePressed = function(self)
@@ -145,8 +184,13 @@ StaticPopupDialogs["BW_CONFIRM_OVERWRITE_TRANSMOG_OUTFIT"] = {
 		local name = self.data
 		self:Hide()
 		local dialog = StaticPopup_Show("BW_NAME_TRANSMOG_OUTFIT")
-		if (dialog) then
-			self.editBox:SetText(name)
+		if dialog then
+			local eb = GetPopupEditBox(dialog)
+			if eb then
+				eb:SetText(name)
+				eb:SetFocus()
+				eb:HighlightText()
+			end
 		end
 	end,
 	hideOnEscape = 1,
