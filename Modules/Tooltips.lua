@@ -419,7 +419,7 @@ function preview:ShowPreview(itemLink, parent)
 
 	local isAppropriate = LAI:IsAppropriate(id)
 	if addon.Profile.ShowOwnedItemTooltips and not isAppropriate then
-		addDoubleLine(GameTooltip, L["|TInterface\\RaidFrame\\ReadyCheck-NotReady:0|t %s%s"]:format("|cffff0000", L["Your class can't transmogrify this item"]))	
+		--addDoubleLine(GameTooltip, L["|TInterface\\RaidFrame\\ReadyCheck-NotReady:0|t %s%s"]:format("|cffff0000", L["Your class can't transmogrify this item"]))	
 	end
 
 	if addon.Profile.ShowTooltips and not found_tooltipinfo then
