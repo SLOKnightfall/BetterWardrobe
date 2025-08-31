@@ -57,37 +57,37 @@ StaticPopupDialogs["BW_NAME_TRANSMOG_OUTFIT"] = {
 	text = TRANSMOG_OUTFIT_NAME,
 	button1 = SAVE,
 	button2 = CANCEL,
-	OnAccept = function(self)
-		BetterWardrobeOutfitManager:NameOutfit(self.editBox:GetText(), self.data)
+	OnAccept = function(dialog, data)
+		BetterWardrobeOutfitManager:NameOutfit(dialog:GetEditBox():GetText(), data)
 	end,
 	timeout = 0,
 	whileDead = 1,
 	hideOnEscape = 1,
 	hasEditBox = 1,
 	maxLetters = 31,
-	OnShow = function(self)
-		self.button1:Disable()
-		self.button2:Enable()
-		self.editBox:SetFocus()
+	OnShow = function(dialog, data)
+		dialog:GetButton1():Disable();
+		dialog:GetButton2():Enable();
+		dialog:GetEditBox():SetFocus();
 	end,
-	OnHide = function(self)
-		self.editBox:SetText("")
+	OnHide = function(dialog, data)
+		dialog:GetEditBox():SetText("")
 	end,
-	EditBoxOnEnterPressed = function(self)
-		if (self:GetParent().button1:IsEnabled()) then
-			StaticPopup_OnClick(self:GetParent(), 1)
+	EditBoxOnEnterPressed = function(editBox, data)
+		if (editBox:GetParent():GetButton1():IsEnabled()) then
+			StaticPopup_OnClick(editBox:GetParent(), 1)
 		end
 	end,
-	EditBoxOnTextChanged = function (self)
-		local parent = self:GetParent()
-		if (parent.editBox:GetText() ~= "") then
-			parent.button1:Enable()
+	EditBoxOnTextChanged = function (editBox, data)
+		local parent = editBox:GetParent()
+		if (parent:GetEditBox():GetText() ~= "") then
+			parent:GetButton1():Enable()
 		else
-			parent.button1:Disable()
+			parent:GetButton1():Disable()
 		end
 	end,
-	EditBoxOnEscapePressed = function(self)
-		self:GetParent():Hide()
+	EditBoxOnEscapePressed = function(editBox, data)
+		editBox:GetParent():Hide()
 	end
 }
 
@@ -96,8 +96,8 @@ StaticPopupDialogs["BW_CONFIRM_DELETE_TRANSMOG_OUTFIT"] = {
 	text = TRANSMOG_OUTFIT_CONFIRM_DELETE,
 	button1 = YES,
 	button2 = NO,
-	OnAccept = function (self) BetterWardrobeOutfitManager:DeleteOutfit(self.data) end,
-	OnCancel = function (self) end,
+	OnAccept = function (dialog, data) BetterWardrobeOutfitManager:DeleteOutfit(data) end,
+	OnCancel = function (dialog, data) end,
 	hideOnEscape = 1,
 	timeout = 0,
 	whileDead = 1,
@@ -108,14 +108,14 @@ StaticPopupDialogs["BW_TRANSMOG_OUTFIT_SOME_INVALID_APPEARANCES"] = {
 	text = TRANSMOG_OUTFIT_SOME_INVALID_APPEARANCES,
 	button1 = OKAY,
 	button2 = CANCEL,
-	OnShow = function(self)
+	OnShow = function(dialog, data)
 		if (BetterWardrobeOutfitManager.name) then
-			self.button1:SetText(SAVE)
+			dialog:GetButton1():SetText(SAVE)
 		else
-			self.button1:SetText(CONTINUE)
+			dialog:GetButton1():SetText(CONTINUE)
 		end
 	end,
-	OnAccept = function(self)
+	OnAccept = function(dialog, data)
 		BetterWardrobeOutfitManager:ContinueWithSave()
 	end,
 	hideOnEscape = 1,
@@ -129,11 +129,11 @@ StaticPopupDialogs["BW_CONFIRM_OVERWRITE_TRANSMOG_OUTFIT"] = {
 	text = TRANSMOG_OUTFIT_CONFIRM_OVERWRITE,
 	button1 = YES,
 	button2 = NO,
-	OnAccept = function (self) 
-		local name = self.data
+	OnAccept = function (dialog, data) 
+		local name = data
 		BetterWardrobeOutfitManager:DeleteOutfit(overwriteID)
 		overwriteID = nil
-		BetterWardrobeOutfitManager:NewOutfit(self.data)
+		BetterWardrobeOutfitManager:NewOutfit(data)
 		--BetterWardrobeOutfitManager:SaveOutfit(self.data)
 		--if DressUpFrame:IsShown() then --todo fix
 			--BW_DressingRoomOutfitFrameMixin:SaveOutfit(self.data)
@@ -141,12 +141,12 @@ StaticPopupDialogs["BW_CONFIRM_OVERWRITE_TRANSMOG_OUTFIT"] = {
 			--BetterWardrobeOutfitManager:NewOutfit(self.data)
 		--end
 	end,
-	OnCancel = function (self)
-		local name = self.data
-		self:Hide()
-		local dialog = StaticPopup_Show("BW_NAME_TRANSMOG_OUTFIT")
-		if (dialog) then
-			self.editBox:SetText(name)
+	OnCancel = function (dialog, data)
+		local name = data
+		dialog:Hide()
+		local tmpDialog = StaticPopup_Show("BW_NAME_TRANSMOG_OUTFIT")
+		if (tmpDialog) then
+			dialog:GetEditBox():SetText(name)
 		end
 	end,
 	hideOnEscape = 1,

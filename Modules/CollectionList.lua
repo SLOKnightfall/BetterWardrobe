@@ -661,18 +661,18 @@ StaticPopupDialogs["BETTER_WARDROBE_COLLECTIONLIST_ITEM_POPUP"] = {
 	maxLetters = 512,
 	editBoxWidth = 260,
 	OnShow = function() if LISTWINDOW then LISTWINDOW:Hide() end end,
-	OnAccept = function(self)
+	OnAccept = function(dialog, data)
 
-		local itemID = self.editBox:GetText()
+		local itemID = dialog:GetEditBox():GetText()
 		if not itemID then  return false end
 		local appearanceID, sourceID = C_TransmogCollection.GetItemInfo(tonumber(itemID))
 		if not appearanceID then return false end
 
 		CollectionList:UpdateList("item", appearanceID, true)
 		end,
-	EditBoxOnEnterPressed = function(self)
-		if self:GetParent().button1:IsEnabled() then
-			StaticPopup_OnClick(self:GetParent(), 1)
+	EditBoxOnEnterPressed = function(editBox, data)
+		if editBox:GetParent():GetButton1():IsEnabled() then
+			StaticPopup_OnClick(editBox:GetParent(), 1)
 		end
 	end,
 	EditBoxOnEscapePressed = HideParentPanel,
@@ -685,8 +685,8 @@ StaticPopupDialogs["BW_NAME_COLLECTION"] = {
 	text = L["List Name"],
 	button1 = SAVE,
 	button2 = CANCEL,
-	OnAccept = function(self)
-		local name = self.editBox:GetText()
+	OnAccept = function(dialog, data)
+		local name = dialog:GetEditBox():GetText()
 		if action == "add" then
 			CollectionList:AddList(name)
 		elseif action == "rename" then
@@ -699,28 +699,28 @@ StaticPopupDialogs["BW_NAME_COLLECTION"] = {
 	hideOnEscape = 1,
 	hasEditBox = 1,
 	maxLetters = 31,
-	OnShow = function(self)
-		self.button1:Disable()
-		self.button2:Enable()
-		self.editBox:SetFocus()
+	OnShow = function(dialog, data)
+		dialog:GetButton1():Disable()
+		dialog:GetButton2():Enable()
+		dialog:GetEditBox():SetFocus()
 	end,
-	OnHide = function(self)
-		self.editBox:SetText("")
+	OnHide = function(dialog, data)
+		dialog:GetEditBox():SetText("")
 	end,
-	EditBoxOnEnterPressed = function(self)
-		if self:GetParent().button1:IsEnabled() then
-			StaticPopup_OnClick(self:GetParent(), 1)
+	EditBoxOnEnterPressed = function(editBox, data)
+		if editBox:GetParent():GetButton1():IsEnabled() then
+			StaticPopup_OnClick(editBox:GetParent(), 1)
 		end
 	end,
-	EditBoxOnTextChanged = function (self)
-		local parent = self:GetParent()
-		if parent.editBox:GetText() ~= "" then
-			parent.button1:Enable()
+	EditBoxOnTextChanged = function (editBox, data)
+		local parent = editBox:GetParent()
+		if parent.GetEditBox():GetText() ~= "" then
+			parent:GetButton1():Enable()
 		else
-			parent.button1:Disable()
+			parent:GetButton1():Disable()
 		end
 	end,
-	EditBoxOnEscapePressed = function(self)
-		self:GetParent():Hide()
+	EditBoxOnEscapePressed = function(editBox, data)
+		editBox:GetParent():Hide()
 	end
 }
