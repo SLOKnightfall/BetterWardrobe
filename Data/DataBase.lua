@@ -718,7 +718,7 @@ end
 	local MAX_DEFAULT_OUTFITS = C_TransmogCollection.GetNumMaxOutfits()
 
 	function addon:GetBlizzID(outfitID)
-		return outfitID - 5000
+		return outfitID - 500000
 	end
 
 	local profileCache = {}
@@ -795,7 +795,7 @@ end
 				local name, icon = C_TransmogCollection.GetOutfitInfo(outfitID);
 				data.setType = "SavedBlizzard"
 				data.index = i
-				data.outfitID = outfitID + 5000
+				data.outfitID = outfitID + 500000
 				data.name = name
 				data.icon = icon
 				data.label = L["Saved Set"]
@@ -806,7 +806,7 @@ end
 			--Extended Sets
 			if addon.OutfitDB.char.outfits then 
 				for i, data in ipairs(addon.OutfitDB.char.outfits) do
-					data.outfitID = MAX_DEFAULT_OUTFITS + i + 5000
+					data.outfitID = MAX_DEFAULT_OUTFITS + i + 500000
 					data.index = i
 					data.name = addon.OutfitDB.char.outfits[i].name
 					local sourceInfo
@@ -942,7 +942,7 @@ end
 	end
 
 	function addon.GetSetType(outfitID)
-			if outfitID >= 5000 and outfitID < (5000 + MAX_DEFAULT_OUTFITS) then return "SavedBlizzard" end
+			if outfitID >= 500000 and outfitID < (500000 + MAX_DEFAULT_OUTFITS) then return "SavedBlizzard" end
 
 			local setData = addon.GetSetInfo(outfitID)
 		return setData and setData.setType or nil
@@ -1010,7 +1010,7 @@ end
 				info.savedSet = true
 
 				if data.setType == "SavedBlizzard" then 
-					local outfitItemTransmogInfoList = C_TransmogCollection.GetOutfitItemTransmogInfoList(data.outfitID - 5000);
+					local outfitItemTransmogInfoList = C_TransmogCollection.GetOutfitItemTransmogInfoList(data.outfitID - 500000);
 					info.sources = {}
 					for i, infoList in pairs(outfitItemTransmogInfoList) do
 						info.sources[i] = infoList.appearanceID
