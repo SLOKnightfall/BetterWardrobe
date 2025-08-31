@@ -1334,10 +1334,10 @@ StaticPopupDialogs["BETTER_WARDROBE_SUBITEM_WRONG_LOCATION_POPUP"] = {
 	text = "Item Locations Do Not Match",
 	button1 = OKAY,
 	button2 = CANCEL,
-	OnShow = function(self)
+	OnShow = function(dialog, data)
 
 	end,
-	OnAccept = function(self)
+	OnAccept = function(dialog, data)
 	end,
 	hideOnEscape = 1,
 	timeout = 0,
@@ -1349,10 +1349,10 @@ StaticPopupDialogs["BETTER_WARDROBE_SUBITEM_INVALID_POPUP"] = {
 	text = "Sub Item is",
 	button1 = OKAY,
 	button2 = CANCEL,
-	OnShow = function(self)
+	OnShow = function(dialog, data)
 
 	end,
-	OnAccept = function(self)
+	OnAccept = function(dialog, data)
 	end,
 	hideOnEscape = 1,
 	timeout = 0,

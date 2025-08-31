@@ -76,20 +76,20 @@ StaticPopupDialogs["BETTER_WARDROBE_IMPORT_SET_POPUP"] = {
 	hasEditBox = true,
 	maxLetters = 512,
 	editBoxWidth = 260,
-	OnShow = function(self)
+	OnShow = function(dialog, data)
 		if LISTWINDOW then LISTWINDOW:Hide() end
-		self.editBox:SetText("")
+		dialog:GetEditBox():SetText("")
 	end,
-	EditBoxOnEnterPressed = function(self)
-		if (self:GetParent().button1:IsEnabled()) then
-			StaticPopup_OnClick(self:GetParent(), 1)
+	EditBoxOnEnterPressed = function(editBox, data)
+		if (editBox:GetParent().GetButton1():IsEnabled()) then
+			StaticPopup_OnClick(editBox:GetParent(), 1)
 		end
 	end,
-	OnAccept = function(self)
+	OnAccept = function(dialog, data)
 		if importFrom == "tmog"  then 
-			IE.ImportTransmogVendorSet(self.editBox:GetText())
+			IE.ImportTransmogVendorSet(dialog:GetEditBox():GetText())
 		else
-			ImportSet(self.editBox:GetText());
+			ImportSet(dialog:GetEditBox():GetText());
 		end
 		importFrom = nil
 	end,
@@ -124,17 +124,17 @@ StaticPopupDialogs["BETTER_WARDROBE_IMPORT_ITEM_POPUP"] = {
 	maxLetters = 512,
 	editBoxWidth = 260,
 	OnShow = function() if LISTWINDOW then LISTWINDOW:Hide() end end,
-	OnAccept = function(self)
+	OnAccept = function(dialog, data)
 		if importFrom == "Transmog" then 
-			ImportItemTransMogVendor(self.editBox:GetText())
+			ImportItemTransMogVendor(dialog:GetEditBox():GetText())
 		else
-			ImportItem(self.editBox:GetText());
+			ImportItem(dialog:GetEditBox():GetText());
 		end
 		importFrom = nil
 	end,
-	EditBoxOnEnterPressed = function(self)
-		if (self:GetParent().button1:IsEnabled()) then
-			StaticPopup_OnClick(self:GetParent(), 1)
+	EditBoxOnEnterPressed = function(editBox, data)
+		if (editBox:GetParent():GetButton1():IsEnabled()) then
+			StaticPopup_OnClick(editBox:GetParent(), 1)
 		end
 	end,
 	EditBoxOnEscapePressed = HideParentPanel;
