@@ -5,7 +5,7 @@ local L = LibStub("AceLocale-3.0"):GetLocale(addonName)
 
 
 local MAX_DEFAULT_OUTFITS = C_TransmogCollection.GetNumMaxOutfits()
-
+local SAVED_SET_OFFSET = addon.Globals.SAVED_SET_OFFSET
 --Coresponds to wardrobeOutfits
 
 
@@ -361,7 +361,7 @@ function BetterWardrobeOutfitDropdownMixin:IsOutfitDressed()
 	end
 
 	--if addon.GetSetType(self.selectedOutfitID) == "SavedBlizzard" then 
-	if self.selectedOutfitID >= 500000 and self.selectedOutfitID <= 500020 then 
+	if self.selectedOutfitID >= MAX_DEFAULT_OUTFITS and self.selectedOutfitID <= (SAVED_SET_OFFSET + MAX_DEFAULT_OUTFITS) then 
 		local selectedOutfitID = addon:GetBlizzID(self.selectedOutfitID);
 		local outfitItemTransmogInfoList = C_TransmogCollection.GetOutfitItemTransmogInfoList(selectedOutfitID);
 		if not outfitItemTransmogInfoList then

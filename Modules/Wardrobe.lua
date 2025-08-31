@@ -1480,9 +1480,14 @@ function BetterWardrobeCollectionFrameMixin:InitItemsFilterButton()
 	end
 end
 
-local FILTER_SOURCES = {L["MISC"], L["Classic Set"], L["Quest Set"], L["Dungeon Set"], L["Raid Set"], L["Recolor"], L["PvP"],L["Garrison"], L["Island Expedition"], L["Warfronts"], L["Covenants"], L["Trading Post"], L["Holiday"], L["NOTE_119"],L["NOTE_120"]}
-local EXPANSIONS = {EXPANSION_NAME0, EXPANSION_NAME1, EXPANSION_NAME2, EXPANSION_NAME3, EXPANSION_NAME4, EXPANSION_NAME5, EXPANSION_NAME6, EXPANSION_NAME7, EXPANSION_NAME8, EXPANSION_NAME9,EXPANSION_NAME10}
 
+--local FILTER_SOURCES = {"Trash", L["MISC"], L["Classic Set"], L["Quest Set"], L["Dungeon Set"], L["Raid Set"], L["Recolor"],L["Garrison"], L["Island Expedition"], L["Warfronts"], L["Covenants"], L["Trading Post"], L["Holiday"], L["NOTE_119"],L["NOTE_120"]}
+local EXPANSIONS = {EXPANSION_NAME0, EXPANSION_NAME1, EXPANSION_NAME2, EXPANSION_NAME3, EXPANSION_NAME4, EXPANSION_NAME5, EXPANSION_NAME6, EXPANSION_NAME7, EXPANSION_NAME8, EXPANSION_NAME9,EXPANSION_NAME10}
+local FILTER_SOURCES = {"Trash", L["MISC"], L["Classic Set"], L["Quest Set"], L["Dungeon Set"], L["Garrison"], L["Island Expedition"], L["Warfronts"], L["Trading Post"], L["Holiday"]}
+
+--local FILTER_SOURCES = {L["MISC"], L["Classic Set"], L["Quest Set"], L["Dungeon Set"], L["Raid Set"], L["Recolor"], L["PvP"],L["Garrison"], L["Island Expedition"], L["Warfronts"], L["Covenants"], L["Trading Post"], L["Holiday"], L["NOTE_119"],L["NOTE_120"]}
+--local EXPANSIONS = {EXPANSION_NAME0, EXPANSION_NAME1, EXPANSION_NAME2, EXPANSION_NAME3, EXPANSION_NAME4, EXPANSION_NAME5, EXPANSION_NAME6, EXPANSION_NAME7, EXPANSION_NAME8, EXPANSION_NAME9,EXPANSION_NAME10}
+ 
 addon.Filters = {
 	["Base"] = {
 		["filterCollected"] = {true, true},
@@ -6374,13 +6379,7 @@ function BetterWardrobeSetsScrollFrameButtonMixin:Init(elementData)
 		end
 	--end
 
-	if #variantSets <= 1  or (C_AddOns.IsAddOnLoaded("CanIMogIt") and CanIMogItOptions["showSetInfo"]) then
-		self.Variants:Hide()
-		self.Variants.Count:SetText(0)
-	else
-		self.Variants:Show()
-		self.Variants.Count:SetText(#variantSets)
-	end
+
 
 	local subName = gsub(displayData.name, " %(Recolor%)", "")
 	----self.Name:SetText(subName..((displayData.className) and " ("..displayData.className..")" or "") );
@@ -6405,7 +6404,28 @@ function BetterWardrobeSetsScrollFrameButtonMixin:Init(elementData)
 	self.IconFrame:SetFavoriteIconShown(elementData.favoriteSetID)
 	self.setID = elementData.setID;
 
-	self.Store:SetShown(addon.MiscSets.TRADINGPOST_SETS[self.setID] or displayData.filter == 12);
+	if #variantSets <= 1  or (C_AddOns.IsAddOnLoaded("CanIMogIt") and CanIMogItOptions["showSetInfo"]) then
+		self.Variants:Hide()
+		self.Variants.Count:SetText("")
+	else
+		self.Variants:Show()
+		self.Variants.Count:SetText(#variantSets)
+	end
+
+	self.Store:SetShown((addon.MiscSets.TRADINGPOST_SETS[self.setID] or displayData.filter == 9) and addon.Profile.ShowShopIcon);
+	if not C_AddOns.IsAddOnLoaded("CanIMogIt")then
+		self.Store:ClearAllPoints();
+		self.Store:SetPoint("TOPRIGHT", 0, -25);
+
+	else
+		self.Store:ClearAllPoints();
+		self.Store:SetPoint("TOPRIGHT",self.IconFrame, 5, -25);
+		self.Store:SetFrameLevel(560);
+		self.Remix:SetPoint("TOPRIGHT",self.IconFrame, 5, -25);
+		self.Remix:SetFrameLevel(560);
+
+	end
+
 	self.Remix:SetShown(addon.MiscSets.REMIX_SETS[self.setID] );
 	self.EditButton:Hide();
 

@@ -4,6 +4,9 @@ addon.ArmorSets = addon.ArmorSets or {}
 local ItemDB = {}
 local Globals = addon.Globals
 
+local SAVED_SET_OFFSET = 500000.
+addon.Globals.SAVED_SET_OFFSET = SAVED_SET_OFFSET
+
 local L = LibStub("AceLocale-3.0"):GetLocale(addonName)
 local _, playerClass, classID = UnitClass("player")
 --local role = GetFilteredRole()
@@ -272,12 +275,12 @@ function BuildBlizzSets()
 			data.tab = 2
 			--PvP Sets
 			if data.PvP then 
-				data.filter = 7
+				--data.filter = 7
 
 			--Covenant Sets
 			elseif data.setID <= 2221 and data.setID >= 2015 then 
-				data.filter = 11
-				data.tab = 2
+				--data.filter = 11
+				--data.tab = 2
 
 			--Shop & Trading Post
 			elseif addon.MiscSets.TRADINGPOST_SETS[data.setID]  or (data.label and string.find(data.label, inGameShopGlobalString))  or (data.label and string.find(data.label, tradingPostGlobalString))  
@@ -287,10 +290,10 @@ function BuildBlizzSets()
 
 			--Raid Sets
 			elseif data.description then 
-				data.filter = 5
+				--data.filter = 5
 
 			else
-				data.filter = 1
+				data.filter = 2
 				data.tab = 3
 			end
 
@@ -453,7 +456,9 @@ do
 			for id, data in pairs(data) do
 				--print(UseSet(data))
 				if (data.requiredFaction and data.requiredFaction == GetFactionID(playerFaction) or data.requiredFaction == nil) and 
-					(not data.BuildBlizzSets and (data.filter ~= 5 and data.filter ~= 7 and data.filter ~= 11)) and  UseSet(data) then 
+					--(not data.BuildBlizzSets and (data.filter ~= 5 and data.filter ~= 7 and data.filter ~= 11)) and  UseSet(data) then 
+					(not data.BuildBlizzSets ) and  UseSet(data) then 
+
 					--data.isHeritageArmor = string.find(data.name, "Heritage")
 
 					local classInfo = CLASS_INFO[playerClass]
@@ -718,7 +723,7 @@ end
 	local MAX_DEFAULT_OUTFITS = C_TransmogCollection.GetNumMaxOutfits()
 
 	function addon:GetBlizzID(outfitID)
-		return outfitID - 500000
+		return outfitID - SAVED_SET_OFFSET
 	end
 
 	local profileCache = {}
@@ -795,7 +800,7 @@ end
 				local name, icon = C_TransmogCollection.GetOutfitInfo(outfitID);
 				data.setType = "SavedBlizzard"
 				data.index = i
-				data.outfitID = outfitID + 500000
+				data.outfitID = outfitID + SAVED_SET_OFFSET
 				data.name = name
 				data.icon = icon
 				data.label = L["Saved Set"]
@@ -806,7 +811,7 @@ end
 			--Extended Sets
 			if addon.OutfitDB.char.outfits then 
 				for i, data in ipairs(addon.OutfitDB.char.outfits) do
-					data.outfitID = MAX_DEFAULT_OUTFITS + i + 500000
+					data.outfitID = MAX_DEFAULT_OUTFITS + i + SAVED_SET_OFFSET
 					data.index = i
 					data.name = addon.OutfitDB.char.outfits[i].name
 					local sourceInfo
@@ -942,7 +947,7 @@ end
 	end
 
 	function addon.GetSetType(outfitID)
-			if outfitID >= 500000 and outfitID < (500000 + MAX_DEFAULT_OUTFITS) then return "SavedBlizzard" end
+			if outfitID >= SAVED_SET_OFFSET and outfitID < (SAVED_SET_OFFSET + MAX_DEFAULT_OUTFITS) then return "SavedBlizzard" end
 
 			local setData = addon.GetSetInfo(outfitID)
 		return setData and setData.setType or nil
@@ -1010,7 +1015,7 @@ end
 				info.savedSet = true
 
 				if data.setType == "SavedBlizzard" then 
-					local outfitItemTransmogInfoList = C_TransmogCollection.GetOutfitItemTransmogInfoList(data.outfitID - 500000);
+					local outfitItemTransmogInfoList = C_TransmogCollection.GetOutfitItemTransmogInfoList(data.outfitID - SAVED_SET_OFFSET);
 					info.sources = {}
 					for i, infoList in pairs(outfitItemTransmogInfoList) do
 						info.sources[i] = infoList.appearanceID
