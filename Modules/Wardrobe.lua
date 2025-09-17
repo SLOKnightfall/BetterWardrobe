@@ -7186,10 +7186,10 @@ function BetterWardrobeSetsTransmogMixin:UpdateSets()
 
 					--model.SetInfo.setName:SetText((addon.Profile.ShowNames and setInfo["name"].."\n"..(setInfo["description"] or "")) or "")
 
-					color = RED_FONT_COLOR;
-					color.r = 1
-					color.g = 1
-					color.b = 1
+					--color = RED_FONT_COLOR;
+					--color.r = 1
+					--color.g = 1
+					--color.b = 1
 
 
 
