@@ -1,4 +1,4 @@
-## Interface: 110200
+## Interface: 110205, 110207
 ## Category: Transmog
 ## Title: BetterWardrobe (@project-version@)
 ## Version: @project-version@
