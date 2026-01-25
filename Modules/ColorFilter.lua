@@ -133,8 +133,10 @@ local function SelectColor()
 
 		local ItemsCollectionFrame = BetterWardrobeCollectionFrame.ItemsCollectionFrame
 		local R2, G2, B2 = ColorPickerFrame:GetColorRGB()
+		ColorPickerFrame.previousValues = {R2, G2, B2,1}; 
 		if (R1 == R2) and (G1 == G2) and (B1 == B2) and (cat1 == ItemsCollectionFrame.activeCategory) then
-			return
+			print("X")
+			--return
 		end
 
 		R1, G1, B1, cat1 = R2, G2, B2, ItemsCollectionFrame.activeCategory
@@ -187,6 +189,8 @@ local function SelectColor()
 	ColorPickerFrame.cancelFunc = function() resetFilters() end
 	--ColorPickerFrame:SetColorRGB(.64,.64,.64,1)
 	ColorPickerFrame:Show()
+	--ColorPickerFrame.Content.ColorSwatchOriginal:Hide()
+
 end
 
 function addon.Init:InitFilterButtons()
