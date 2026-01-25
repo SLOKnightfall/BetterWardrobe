@@ -177,13 +177,12 @@ function BetterWardrobeSetsCollectionListMixin:Toggle(toggleState)
 	if (IsShiftKeyDown()) then
 		CollectionList:GenerateListView()
 	else
-		local atTransmogrifier = C_Transmog.IsAtTransmogNPC()
-		local transmogLocation = TransmogUtil.GetTransmogLocation("HEADSLOT", Enum.TransmogType.Appearance, Enum.TransmogModification.Main)
+		local isSecondary = false;
+		local transmogLocation = TransmogUtil.GetTransmogLocation("HEADSLOT", Enum.TransmogType.Appearance, isSecondary)
 		BetterWardrobeCollectionFrame.ItemsCollectionFrame:SetActiveSlot(transmogLocation)
-		--BetterWardrobeCollectionFrame.ItemsCollectionFrame:SetActiveSlot("HEADSLOT", Enum.TransmogType.Appearance)
 		BetterWardrobeCollectionFrame.ItemsCollectionFrame:RefreshVisualsList()
 		BetterWardrobeCollectionFrame.ItemsCollectionFrame:UpdateItems()
-		BetterWardrobeCollectionFrame.ItemsCollectionFrame.SlotsFrame:SetShown(not toggleState and not atTransmogrifier)
+		BetterWardrobeCollectionFrame.ItemsCollectionFrame.SlotsFrame:SetShown(not toggleState)
 		--WardrobeCollectionFrameWeaponDropDown:SetShown(not toggleState)
 		self.CollectionListTitle:SetShown(toggleState)
 		local listcount = CollectionList:ListCount("item")
@@ -215,12 +214,15 @@ function addon:IsWeaponCat()
 	return BW_CollectionListButton.ToggleState and CollectionList.Category and CollectionList.Category > 100
 end
 
-local catchAll = TransmogUtil.GetTransmogLocation("HEADSLOT", Enum.TransmogType.Appearance, Enum.TransmogModification.Main)
+local isSecondary = false;
+local catchAll = TransmogUtil.GetTransmogLocation("HEADSLOT", Enum.TransmogType.Appearance, isSecondary)
+
 --function WardrobeItemsCollectionMixin:SetActiveSlot(transmogLocation, category, ignorePreviousSlot)
 local function slotOnClick(self, transmogLocation)
 	local slotButtons = self.parent.Buttons
 	for i = 1, #slotButtons do
 		local button = slotButtons[i]
+		print(self.transmogLocation)
 		button.SelectedTexture:SetShown(button.transmogLocation:IsEqual(self.transmogLocation))
 	end
 
@@ -281,7 +283,8 @@ function BetterWardrobeSetsCollectionListMixin:CreateSlotButtons()
 			xOffset = spacingNoSmallButton
 			lastButton = button
 			button.parent = parentFrame
-			button.transmogLocation = TransmogUtil.GetTransmogLocation(button.slot, button.transmogType, button.modification)
+			print(button.transmogType)
+			button.transmogLocation = TransmogUtil.GetTransmogLocation(button.slot, button.transmogType, false)
 			button:SetScript("OnClick", function(button)  slotOnClick(button , button.transmogLocation) end)
 		end
 	end

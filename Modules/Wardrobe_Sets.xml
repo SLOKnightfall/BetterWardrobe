@@ -1,0 +1,329 @@
+<Ui xmlns="http://www.blizzard.com/wow/ui/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.blizzard.com/wow/ui/
+..\..\..\..\..\..\WoW\Data\Interface\AddOns\Blizzard_SharedXML\UI.xsd">
+	<Script file="Wardrobe_Sets.lua"/>
+
+	<Button name="BetterWardrobeSetsScrollFrameButtonTemplate" mixin="BetterWardrobeSetsScrollFrameButtonMixin" registerForClicks="LeftButtonUp,RightButtonUp" virtual="true">
+		<Size x="208" y="46"/>
+		<Frames>
+			<Frame parentKey="IconFrame" mixin="BetterWardrobeSetsScrollFrameButtonIconFrameMixin">
+				<Size x="38" y="38"/>
+				<Anchors>
+					<Anchor point="LEFT" x="-42" y="0"/>
+				</Anchors>
+				<Layers>
+					<Layer level="ARTWORK">
+						<Texture parentKey="Icon" setAllPoints="true"/>
+					</Layer>
+					<Layer level="OVERLAY" textureSubLevel="-1">
+						<Texture parentKey="Cover" setAllPoints="true">
+							<Color r="0" g="0" b="0" a="0.7"/>
+						</Texture>
+					</Layer>
+					<Layer level="OVERLAY" textureSubLevel="1">
+						<Texture parentKey="Favorite" atlas="PetJournal-FavoritesIcon" useAtlasSize="true" >
+							<Anchors>
+								<Anchor point="TOPLEFT" x="-8" y="8"/>
+							</Anchors>
+						</Texture>
+					</Layer>
+				</Layers>
+				<Scripts>
+					<OnEnter method="OnEnter"/>
+					<OnLeave method="OnLeave"/>
+				</Scripts>
+			</Frame>
+		</Frames>
+		<Layers>
+			<Layer level="BACKGROUND">
+				<Texture atlas="PetList-ButtonBackground" parentKey="Background"/>
+			</Layer>
+			<Layer level="ARTWORK">
+				<FontString parentKey="Name" inherits="GameFontNormal" justifyH="LEFT" maxLines="2">
+					<Size x="190" y="0"/>
+					<Anchors>
+						<Anchor point="LEFT" x="6" y="6"/>
+					</Anchors>
+				</FontString>
+				<FontString parentKey="Label" inherits="GameFontDisableSmallLeft" justifyH="LEFT" maxLines="1">
+					<Size x="190" y="0"/>
+					<Anchors>
+						<Anchor point="TOPLEFT" relativeKey="$parent.Name" relativePoint="BOTTOMLEFT" x="0" y="-2"/>
+					</Anchors>
+					<Color r="0.329" g="0.329" b="0.329"/>
+				</FontString>
+				<Texture parentKey="ProgressBar">
+					<Size x="204" y="2"/>
+					<Anchors>
+						<Anchor point="TOPLEFT" relativeKey="$parent.Background" relativePoint="BOTTOMLEFT" x="2" y="4"/>
+					</Anchors>
+					<Color r="0.0118" g="0.247" b="0.00392" a="1"/>
+				</Texture>
+			</Layer>
+			<Layer level="OVERLAY">
+				<Texture parentKey="SelectedTexture" atlas="PetList-ButtonSelect" hidden="true"/>
+				<Texture parentKey="New" atlas="GarrMission-AbilityHighlight" alphaMode="ADD" hidden="true">
+					<Size x="56" y="56"/>
+					<Anchors>
+						<Anchor point="CENTER" relativeKey="$parent.IconFrame"/>
+					</Anchors>
+				</Texture>
+			</Layer>
+			<Layer level="HIGHLIGHT">
+				<Texture parentKey="HighlightTexture" atlas="PetList-ButtonHighlight" setAllPoints="true"/>
+			</Layer>
+		</Layers>
+		<Scripts>
+			<OnClick method="OnClick"/>
+		</Scripts>
+		<Frames>
+
+			<Frame parentKey="Variants" mixin = "BetterWardrobeSetsDetailsAltItemMixin" hidden="false">
+				<Size x="35" y="15"/>
+				<Anchors>
+					<Anchor point="TOPRIGHT" relativeKey="$parent" x="5" y = "5"/>
+				</Anchors>
+				<Layers>
+					<Layer level="ARTWORK">
+						<Texture parentKey="Icon" file="Interface\CHATFRAME\UI-InChatFriendsArrow">
+							<Size x="15" y="15"/>
+							<Anchors>
+								<Anchor point="RIGHT" relativeKey="$parent" relativePoint="RIGHT" x="2" y="-7"/>
+							</Anchors>
+						</Texture>
+						<FontString parentKey="Count" inherits="GameFontDisableSmallLeft" justifyH="CENTER" maxLines="1" text="0">
+							<Size x="20" y="20"/>
+							<Anchors>
+								<Anchor point="TOPRIGHT" relativeKey="$parent.IconFrame" relativePoint="TOPRIGHT"  x="-7" y="-3"/>
+							</Anchors>
+						</FontString>
+					</Layer>
+				</Layers>
+				<Scripts>
+					<OnEnter>
+						GameTooltip:SetOwner(self, "ANCHOR_RIGHT");
+						GameTooltip:SetText(self:GetParent().variantInfo or "");
+					</OnEnter>
+					<OnLeave>
+						GameTooltip_Hide();
+					</OnLeave>
+
+				</Scripts>
+			</Frame>
+			<Frame parentKey="Remix" hidden="true">
+				<Size x="20" y="20"/>
+				<Anchors>
+					<Anchor point="TOPRIGHT" relativeKey="$parent" x="0" y = "-25"/>
+				</Anchors>
+				<Layers>
+					<Layer level="ARTWORK">
+						<Texture parentKey="Icon" file="Interface\Timer\Panda-Logo">
+							<Size x="20" y="20"/>
+							<Anchors>
+								<Anchor point="BOTTOMLEFT" relativeKey="$parent" relativePoint="BOTTOMLEFT" x="0" y="0"/>
+							</Anchors>
+						</Texture>	
+
+					</Layer>
+				</Layers>
+			</Frame>
+			<Frame parentKey="Store" hidden="true">
+				<Size x="20" y="20"/>
+				<Anchors>
+					<Anchor point="TOPRIGHT" relativeKey="$parent" x="0" y = "-25"/>
+				</Anchors>
+				<Layers>
+					<Layer level="ARTWORK">
+						<Texture parentKey="Icon" atlas="trading-post-minimap-icon">
+							<Size x="20" y="20"/>
+							<Anchors>
+								<Anchor point="BOTTOMLEFT" relativeKey="$parent" relativePoint="BOTTOMLEFT" x="0" y="0"/>
+							</Anchors>
+						</Texture>	
+
+					</Layer>
+				</Layers>
+			</Frame>
+			<Frame inherits="BetterWardrobeIconsTemplate" />
+			<Button parentKey="EditButton" inherits="BetterWardrobeOutfitButtonButtonTemplate" hidden = "true">
+				<KeyValues>
+					<KeyValue key="tooltipText" value="Options" type="string"/>
+				</KeyValues>
+				<Size x="16" y="16"/>
+				<Anchors>
+					<Anchor point="RIGHT" x="-2"/>
+				</Anchors>
+				<Layers>
+					<Layer level="ARTWORK">
+						<Texture file="Interface\WorldMap\GEAR_64GREY" alpha="0.5" parentKey="texture"/>
+					</Layer>
+				</Layers>
+				<Scripts>
+					<OnClick>
+						local name = self:GetParent().Name:GetText()
+						print(self:GetParent().setID)
+						PlaySound(SOUNDKIT.IG_MAINMENU_OPTION_CHECKBOX_ON);
+						BetterWardrobeOutfitEditFrame:ShowForOutfit(self:GetParent().setID, name, self);
+					</OnClick>
+
+					<OnEnter>
+						self.texture:SetAlpha(1.0);
+						GameTooltip:SetOwner(self, "ANCHOR_RIGHT");
+						GameTooltip:SetText(self.tooltipText);
+					</OnEnter>
+					<OnLeave>
+						self.texture:SetAlpha(0.5);
+						GameTooltip_Hide();
+					</OnLeave>
+
+				</Scripts>
+			</Button>
+		</Frames>
+		<Scripts>
+			<OnClick method="OnClick"/>
+			<OnLoad>
+				self.CollectionListVisual.Hidden:ClearAllPoints()
+				self.CollectionListVisual.Hidden:SetPoint("CENTER", self.Icon, "CENTER", 0, 0)
+				self.CollectionListVisual.Collection:ClearAllPoints()
+				self.CollectionListVisual.Collection:SetPoint("BOTTOMRIGHT", self.Icon, "BOTTOMRIGHT", 2, -3)
+				self.CollectionListVisual.Unavailable:ClearAllPoints()
+				self.CollectionListVisual.Unavailable:SetPoint("TOPRIGHT", self.Icon, "TOPRIGHT", 5, 3)
+				self.CollectionListVisual.UnavailableItems:ClearAllPoints()
+				self.CollectionListVisual.UnavailableItems:SetPoint("TOPRIGHT", self.Icon, "TOPRIGHT", 5, 3)
+			</OnLoad>
+		</Scripts>
+	</Button>
+
+	<Frame name="BetterWardrobeSetsDetailsItemFrameTemplate" mixin="BetterWardrobeSetsDetailsItemMixin" virtual="true">
+		<Size x="32" y="32"/>
+		<Layers>
+			<Layer level="BORDER">
+				<Texture parentKey="Icon">
+					<Size x="28" y="28"/>
+					<Anchors>
+						<Anchor point="CENTER"/>
+					</Anchors>
+				</Texture>
+			</Layer>
+			<Layer level="OVERLAY">
+
+				<Texture parentKey="IconBorder" atlas="loottab-set-itemborder-green" useAtlasSize="true">
+					<Anchors>
+						<Anchor point="RIGHT" relativeKey="$parent.Icon" relativePoint="CENTER" x="20" y="1"/>
+					</Anchors>
+				</Texture>
+				<Texture parentKey="New" atlas="GarrMission-AbilityHighlight" alphaMode="ADD" hidden="true">
+					<Size x="48" y="48"/>
+					<Anchors>
+						<Anchor point="CENTER"/>
+					</Anchors>
+					<Animations>
+						<AnimationGroup parentKey="Anim" looping="REPEAT">
+							<Alpha duration="1" order="1" fromAlpha="0.8" toAlpha="1"/>
+							<Alpha duration="1" order="2" fromAlpha="1" toAlpha="0.8"/>
+						</AnimationGroup>
+					</Animations>
+				</Texture>
+
+			</Layer>
+		</Layers>
+		<Frames>
+			<Frame parentKey="Replacement"  frameLevel="75" hidden="true">
+				<Size x="60" y="60"/>
+
+				<Anchors>
+						<Anchor point="CENTER" relativeKey="$parent.Icon" relativePoint="CENTER" x="0" y = "0" />
+				</Anchors>
+					<Layers>
+						<Layer level="OVERLAY">
+					<Texture  file="Interface\artifacts\ArtifactPower-QuestBorder"  alphaMode="BLEND" >
+					<Size x="60" y="60"/>
+					<Anchors>
+					</Anchors>
+				</Texture>						
+			</Layer>
+					</Layers>
+			</Frame>
+			<Frame parentKey="CanUse" mixin = "BetterWardrobeSetsDetailsItemUseabiltiyMixin" hidden="true">
+				<Size x="25" y="25"/>
+
+				<Anchors>
+					<Anchor point="TOP" relativeKey="$parent" x="0" y = "15"/>
+				</Anchors>
+					<Layers>
+						<Layer level="OVERLAY">
+							<Texture parentKey="Icon" atlas="PlayerRaidBlip" useAtlasSize="false" hidden="false" setAllPoints = "true" />
+						</Layer>
+					</Layers>
+				<Scripts>
+					<OnEnter method="OnEnter"/>
+					<OnLeave method="OnLeave"/>
+				</Scripts>
+			</Frame>
+
+			<Frame parentKey="AltItem" mixin = "BetterWardrobeSetsDetailsAltItemMixin" hidden="true">
+				<Size x="25" y="10"/>
+
+				<Anchors>
+					<Anchor point="BOTTOM" relativeKey="$parent" x="0" y = "-5"/>
+				</Anchors>
+					<Layers>
+						<Layer level="OVERLAY">
+							
+						<Texture parentKey="AltIconRight" file="Interface\BUTTONS\UI-SpellbookIcon-NextPage-Up" >
+							<Size x="15" y="15"/>
+							<Anchors>
+								<Anchor point="BOTTOMRIGHT" relativeKey="$parent.IconFrame" relativePoint="BOTTOMRIGHT" x='0' y='-5'/>
+							</Anchors>
+
+						</Texture>
+							<Texture parentKey="AltIconLeft" file="Interface\BUTTONS\UI-SpellbookIcon-PrevPage-Up" >
+							<Size x="15" y="15"/>
+							<Anchors>
+								<Anchor point="BOTTOMLEFT" relativeKey="$parent.IconFrame" relativePoint="BOTTOMLEFT" x='0' y='-5'/>
+							</Anchors>
+
+						</Texture>
+						</Layer>
+					</Layers>
+				<Scripts>
+					<OnMouseDown method="OnMouseDown"/>
+				</Scripts>
+			</Frame>
+
+			<Frame parentKey="Favorite" setAllPoints="true">
+				<Layers>
+					<Layer level="ARTWORK">
+						<Texture parentKey="Icon" atlas="collections-icon-favorites" useAtlasSize="true" hidden="true">
+							<Anchors>
+								<Anchor point="TOPLEFT" x="-12" y="13" relativePoint="TOPLEFT"/>
+							</Anchors>
+						</Texture>
+					</Layer>
+				</Layers>
+			</Frame>
+			<Frame parentKey="HideVisual" setAllPoints="true">
+				<Layers>
+					<Layer level="ARTWORK">
+						<Texture parentKey="Icon" atlas="transmog-icon-hidden" useAtlasSize="true" hidden="true">
+							<Anchors>
+								<Anchor point="TOPLEFT" x="-12" y="13" relativePoint="TOPLEFT"/>
+							</Anchors>
+						</Texture>
+					</Layer>
+				</Layers>
+			</Frame>
+		</Frames>
+		<Scripts>
+			<OnShow method="OnShow"/>
+			<OnHide method="OnHide"/>
+			<OnEvent method="OnEvent"/>
+			<OnEnter method="OnEnter"/>
+			<OnLeave method="OnLeave"/>
+			<OnMouseDown method="OnMouseDown"/>
+			<OnMouseUp method="OnMouseUp"/>
+		</Scripts>
+	</Frame>
+
+
+	
+</Ui>

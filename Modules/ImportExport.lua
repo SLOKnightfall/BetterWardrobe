@@ -233,3 +233,4 @@ function BW_TransmogVendorExportButton_OnClick(self)
 end
 
 --/run local function f(i,b)DressUpItemLink("item:"..i.."::::::::::::9:"..b);end;f(27457,0);f(27489,0);f(27539,0);f(27548,0);f(27748,0);f(27790,0);f(27897,0);f(28221,0);
+
