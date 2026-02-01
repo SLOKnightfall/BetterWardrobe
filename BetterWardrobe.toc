@@ -38,19 +38,19 @@ Locale\zhTW.lua
 #Core files
 Data\Globals.lua
 
-Modules\CollectionTemplates.xml
-Modules\Templates.xml
+#Modules\CollectionTemplates.xml
+#Modules\Templates.xml
 Modules\Core.lua
-Data\DataBase.lua
-Data\Mail.lua
-Data\MISC.lua
-Data\test.lua
+#Data\DataBase.lua
+#Data\Mail.lua
+#Data\MISC.lua
+#Data\test.lua
 
 
-Modules\ImportExport.lua
+#Modules\ImportExport.lua
 Modules\SavedOutfitsViewer.xml
-Modules\TransmogShared.lua
+#Modules\TransmogShared.lua
 #Modules\Transmog.xml
-Modules\Wardrobe_Sets.xml
-Modules\Wardrobe.xml
-Modules\CollectionList.xml
+#Modules\Wardrobe_Sets.xml
+#Modules\Wardrobe.xml
+#Modules\CollectionList.xml

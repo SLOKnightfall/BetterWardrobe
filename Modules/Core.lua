@@ -1357,6 +1357,28 @@ function addon:OnEnable()
 	addon.Profile = self.db.profile
 	Profile = addon.Profile
 
+	initialize = true
+
+	if not C_AddOns.IsAddOnLoaded("Blizzard_Collections") then
+  		C_AddOns.LoadAddOn("Blizzard_Collections")
+	end
+
+		if not C_AddOns.IsAddOnLoaded("Blizzard_Transmog") then
+  		C_AddOns.LoadAddOn("Blizzard_Transmog")
+	end
+
+		C_Timer.After(0, function()
+		CreateCustomSetsButton()
+		self:HookCustomSetsOnHide()
+
+	end)
+end
+
+function addon:OnEnable_Old()
+	_,playerClass, classID = UnitClass("player")
+	addon.Profile = self.db.profile
+	Profile = addon.Profile
+
 	addon.Init:InitDB()
 	--addon.Init:BuildTooltips()
 	----addon.Init:DressingRoom()
