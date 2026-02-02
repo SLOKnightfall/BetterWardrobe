@@ -39,10 +39,10 @@ function addon:OnCustomSetsHide()
 	end
 end
 
-function CreateCustomSetsButton()
+function addon:CreateCustomSetsButton()
 	local frame = GetCustomSetsFrame()
 	if not frame then
-		C_Timer.After(1, CreateCustomSetsButton)
+		C_Timer.After(1, addon.CreateCustomSetsButton)
 		return
 	end
 
@@ -64,6 +64,87 @@ function CreateCustomSetsButton()
 	frame.BW_SavedSetsButton = btn
 end
 
+local CameraTranslate = {
+    ["BloodElf2"]           = { 0.058,  0.68,  0.05 },
+    ["BloodElf3"]           = { 0.058,  0.98, -0.05 },
+
+    ["DarkIronDwarf2"]      = {-0.012,  0.28, -0.45 },
+    ["DarkIronDwarf3"]      = { 0.038,  0.78, -0.48 },
+
+    ["Draenei2"]            = {-0.092, -0.72,  0.25 },
+    ["Draenei3"]            = {-0.042,  1.23,  0.35 },
+
+    ["Dracthyr2"]           = {-0.862, -0.52,  0.65 },
+    ["Dracthyr3"]           = {-0.862, -0.52,  0.65 },
+
+    ["Dwarf2"]              = { 0.038,  0.28, -0.45 },
+    ["Dwarf3"]              = { 0.008,  0.78, -0.48 },
+
+    ["EarthenDwarf2"]       = { 0.038,  0.28, -0.45 },
+    ["EarthenDwarf3"]       = { 0.008,  0.78, -0.48 },
+
+    ["Gnome2"]              = { 0.108,  1.28, -0.85 },
+    ["Gnome3"]              = {-0.112,  1.08, -0.90 },
+
+    ["Goblin2"]             = { 0.108,  0.98, -0.75 },
+    ["Goblin3"]             = {-0.112,  0.78, -0.68 },
+
+    ["Harronir2"]           = {-0.042,  0.88,  0.40 },
+    ["Harronir3"]           = { 0.058,  1.08,  0.25 },
+
+    ["HighmountainTauren2"] = {-0.012, -1.32,  0.35 },
+    ["HighmountainTauren3"] = {-0.242, -0.52,  0.35 },
+
+    ["Human2"]              = { 0.058,  0.48, -0.05 },
+    ["Human3"]              = { 0.058,  0.98, -0.05 },
+
+    ["KulTiran2"]           = { 0.108, -0.02,  0.45 },
+    ["KulTiran3"]           = { 0.038,  0.68,  0.45 },
+
+    ["LightforgedDraenei2"] = {-0.092, -0.72,  0.25 },
+    ["LightforgedDraenei3"] = {-0.042,  0.98,  0.35 },
+
+    ["MagharOrc2"]          = { 0.158, -0.82, -0.05 },
+    ["MagharOrc3"]          = {-0.092,  0.58,  0.00 },
+
+    ["Mechagnome2"]         = { 0.038,  1.18, -0.85 },
+    ["Mechagnome3"]         = {-0.062,  1.18, -0.90 },
+
+    ["Nightborne2"]         = { 0.108, -0.02,  0.35 },
+    ["Nightborne3"]         = { 0.108,  0.73,  0.30 },
+
+    ["NightElf2"]           = {-0.042, -0.02,  0.35 },
+    ["NightElf3"]           = { 0.058,  0.73,  0.30 },
+
+    ["Orc2"]                = { 0.058, -0.82, -0.05 },
+    ["Orc3"]                = {-0.092,  0.58,  0.00 },
+    ["Orc4"]                = {-0.092, -0.82, -0.05 },
+
+    ["Pandaren2"]           = {-0.242, -1.02,  0.05 },
+    ["Pandaren3"]           = {-0.192, -0.42,  0.05 },
+
+    ["Scourge2"]            = {-0.042,  0.58, -0.15 },
+    ["Scourge3"]            = { 0.178,  0.98, -0.10 },
+
+    ["Tauren2"]             = {-0.012, -1.32,  0.35 },
+    ["Tauren3"]             = {-0.242, -0.52,  0.35 },
+
+    ["Troll2"]              = { 0.278,  0.08,  0.15 },
+    ["Troll3"]              = {-0.012,  0.68,  0.35 },
+
+    ["VoidElf2"]            = { 0.058,  0.68,  0.05 },
+    ["VoidElf3"]            = { 0.058,  0.98, -0.05 },
+
+    ["Vulpera2"]            = {-0.112,  0.68, -0.75 },
+    ["Vulpera3"]            = {-0.112,  0.68, -0.70 },
+
+    ["Worgen2"]             = { 0.158, -0.72,  0.15 },
+    ["Worgen3"]             = { 0.008,  0.08,  0.25 },
+
+    ["ZandalariTroll2"]     = { 0.058, -0.17,  0.60 },
+    ["ZandalariTroll3"]     = {-0.142,  0.38,  0.75 },
+}
+
 function SavedSetsFrame:ShowFrame()
 	if self.SavedListFrame:IsShown() then
 		self.SavedListFrame:Hide()
@@ -73,6 +154,11 @@ function SavedSetsFrame:ShowFrame()
 
 	TransmogFrame.WardrobeCollection.TabContent.CustomSetsFrame.PagedContent:Hide()
 
+	local _, race = UnitRace("player")
+	local sex = UnitSex("player")
+	local key = race..sex
+	local baseCamera = { -0.108, -2.78, 1.55 }
+
 	local _, alteredForm = C_PlayerInfo.GetAlternateFormInfo()
 	for i = 1, 9 do
 		local model = self.Models[i]
@@ -80,9 +166,21 @@ function SavedSetsFrame:ShowFrame()
 		model.actor:SetYaw(-1.5)
 		model:SetPaused(true)
 		model:SetCameraOrientationByAxisVectors(0, 1, 0, -1, 0, 0, 0, 0, 1)
-		local detailsCameraID, transmogCameraID = C_TransmogSets.GetCameraIDs()
-		local x, y, z, yaw = GetUICameraInfo(transmogCameraID)
-		model:SetCameraPosition(-y, -x, -z)
+
+		local file = model.actor:GetModelFileID()
+		if file == 1968587 then
+			key = "Orc4"
+		elseif file == 4395382 then
+			key = "BloodElf"..sex
+		elseif file == 1000764 or file == 1011653 or file == 4220448 then
+			key = "Human"..sex
+		end
+
+		local x = CameraTranslate[key][1] + baseCamera[1]
+		local y = CameraTranslate[key][2] + baseCamera[2]
+		local z = CameraTranslate[key][3] + baseCamera[3]
+
+		model:SetCameraPosition(x,y,z)
 	end
 
 	self.SavedListFrame:Show()
@@ -111,17 +209,6 @@ function SavedSetsFrame:FrameCreate()
 		frame.TitleText:SetText("Saved Sets")
 	end
 
-	-- Close button provided by the template
-	if frame.CloseButton then
-		frame.CloseButton:SetScript("OnClick", function()
-			frame:Hide()
-			local cs = GetCustomSetsFrame()
-			if cs and cs.PagedContent then
-				cs.PagedContent:Show()
-			end
-		end)
-	end
-
 	---------------------------------------------------------
 	-- MODEL GRID (3x3)
 	---------------------------------------------------------
@@ -146,13 +233,20 @@ function SavedSetsFrame:FrameCreate()
 			bg:SetAllPoints()
 			bg:SetBackdrop({
 				bgFile = "Interface/Tooltips/UI-Tooltip-Background",
-				edgeFile = "Interface/Tooltips/UI-Tooltip-Border",
 				tile = true, tileSize = 16, edgeSize = 16,
 				insets = { left = 1, right = 1, top = 1, bottom = 1 }
 			})
 			bg:SetBackdropBorderColor(1, 0.82, 0, 1)
 			bg:SetBackdropColor(0, 0, 0, 1) -- black background
 
+			local edge = CreateFrame("Frame", nil, model, "BackdropTemplate")
+			edge:SetAllPoints()
+			edge:SetBackdrop({
+				edgeFile = "Interface/Tooltips/UI-Tooltip-Border",
+				tile = true, tileSize = 16, edgeSize = 16,
+				insets = { left = 1, right = 1, top = 1, bottom = 1 }
+			})
+			edge:SetBackdropBorderColor(1, 0.82, 0, 1)
 			-- Make sure the border is BEHIND the model
 			bg:SetFrameLevel(model:GetFrameLevel() - 1)
 
@@ -284,7 +378,6 @@ function SavedSetsFrame:OnClick(frame, button)
 		SavedSetsFrame:ApplyOutfit(index)
 	end
 end
-
 
 function SavedSetsFrame:OnShow()
 	self.NumPages = math.ceil(#addon.OutfitDB.char.outfits / 9)

@@ -1368,7 +1368,7 @@ function addon:OnEnable()
 	end
 
 		C_Timer.After(0, function()
-		CreateCustomSetsButton()
+		addon:CreateCustomSetsButton()
 		self:HookCustomSetsOnHide()
 
 	end)
