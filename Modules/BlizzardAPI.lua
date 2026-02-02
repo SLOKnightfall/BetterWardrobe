@@ -61,10 +61,12 @@ local function GetItemCategory(appearanceID)
 	return (appearanceID and C_TransmogCollection.GetCategoryForItem(appearanceID)) or 0
 end
 addon.GetItemCategory = GetItemCategory
+
 local function GetTransmogLocation(itemLinkOrID)
 	return TransmogUtil.GetTransmogLocation(GetItemSlot(itemLinkOrID), Enum.TransmogType.Appearance, Enum.TransmogModification.Main)
 end
 addon.GetTransmogLocation = GetTransmogLocation
+
 --Determines type of set based on setID
 local function DetermineSetType(setID)
 

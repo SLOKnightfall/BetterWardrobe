@@ -1,8 +1,8 @@
-## Interface: 120000, 120001
-## Category: Transmog
+## Interface: 120000,120001
 ## Title: BetterWardrobe (@project-version@)
 ## Version: @project-version@
 ## Author: SLOKnightfall
+## Notes: 
 ## Notes:
 ## OptionalDeps: MogIt, CanIMogIt, LegionWardrobe, WardrobeEnhanced, Rarity, TransmogOutfits, ExtendedSets, ElvUI, PetTracker, PetTrackerJournal
 ## SavedVariables: BetterWardrobe_Options, BetterWardrobe_CharacterData, BetterWardrobe_SavedSetData, BetterWardrobe_SubstituteItemData, BetterWardrobe_ListData, BetterWardrobe_Mogitdata, BetterWardrobe_Updates, BTT
@@ -38,59 +38,20 @@ Locale\zhTW.lua
 
 #Core files
 Data\Globals.lua
-Modules\CollectionTemplates.xml
-Modules\Templates.xml
+
+#Modules\CollectionTemplates.xml
+#Modules\Templates.xml
 Modules\Core.lua
-#Modules\Celebrate.xml
-#Data files
-#Data\ColorData.lua
-Data\CameraData.lua
-Data\AppearanceData.lua
-Data\ArtifactData.lua
-#Data\SourceData.lua
-Patrons.lua
-
-Data\DataBase.lua
-Data\CLOTH.lua
-Data\LEATHER.lua
-Data\MAIL.lua
-Data\PLATE.lua
-Data\COSMETIC.lua
-Data\MISC.lua
-Data\SetOverrides.lua
-#@debug@
-Data\test.lua
-#@end-debug@
+#Data\DataBase.lua
+#Data\Mail.lua
+#Data\MISC.lua
+#Data\test.lua
 
 
-#Modules
-Modules\BlizzardAPI.lua
-Modules\ArtifactAppearances.lua
-Modules\SavedOutfits.xml
-Modules\DressingRoom.xml
-Modules\Wardrobe.xml
-Modules\ColorFilter.lua
-#Modules\PreviewWindows.lua
-
-Modules\CollectionList.xml
-Modules\Sources.lua
-
-Modules\TransmogVendor.xml
-
-Modules\ImportExport.lua
-Modules\Tooltips.lua
-Modules\SortingFunctions.lua
-
-#3rd party addon compatability
-Plugins\ElvUI.lua
-Plugins\CanIMogIt.lua
-Plugins\MogIt.lua
-Plugins\WardrobeEnhanced.lua
-Plugins\TransmogOutfits.lua
-Plugins\ExtendedTransmog.lua
-Plugins\PetTrackerJournal.lua
-
-#@do-not-package@
-#Testing
-#UnitTests\DataBase.lua
-#@end-do-not-package@
+#Modules\ImportExport.lua
+Modules\SavedOutfitsViewer.xml
+#Modules\TransmogShared.lua
+#Modules\Transmog.xml
+#Modules\Wardrobe_Sets.xml
+#Modules\Wardrobe.xml
+#Modules\CollectionList.xml

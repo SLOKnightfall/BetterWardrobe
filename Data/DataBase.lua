@@ -43,7 +43,7 @@ local hiddenSet ={
 	--["itemTransmogInfo"] = {}  --TODO Populate
 }
 local ALT_SET_DATA = {}
-local SET_INDEX = {}
+ SET_INDEX = {}
 local ArmorDB = {}
 local collectedAppearances = {}
 
@@ -122,48 +122,6 @@ local function AddVariantToBaseSet(set, newBaseID)
 	variantSets[set.setID] = nil;
 end
 
-
---TODO Still Needed?
-local function SetClassIDs(armorType)
-	local localizedClass, _, classInd = UnitClass('player');
-	local ClassArmorType = addon.Globals.ClassArmorType
-	if armorType then
-		if armorType == ClassArmorType[classInd] then
-			ClassName = localizedClass;
-			ClassIndex = classInd;
-			return;
-		end
-	
-		for i,j in pairs(ClassArmorType) do
-			if j == armorType then ClassName, _, ClassIndex = GetClassInfo(i); break; end;
-		end
-		
-	else
-		ClassName = localizedClass;
-		ClassIndex = classInd;
-		_,_,currentRaceID = UnitRace('player');
-	end
-end
-
---TODO Still Needed?
-function addon:AddSetSource(setID, sources)
-	for sourceID, _ in pairs(sources) do
-		if not sourceID then 
-			return;
-		end;
-		local sourceInfo = C_TransmogCollection.GetSourceInfo(sourceID);
-		if not sourceInfo then 
-			return;
-		end
-		local visualID = sourceInfo.visualID;
-		if SetIDSource[visualID] then
-			table.insert(SetIDSource[visualID], setID);
-		else
-			SetIDSource[visualID] = {setID};
-		end;
-	end
-end
-
 local function UseSet(data)
 	local dropdownClass = C_TransmogSets.GetTransmogSetsClassFilter();
 	local selectedArmorType = dropdownClass or playerClass;
@@ -174,7 +132,7 @@ local function UseSet(data)
 	local correctFaction = false
 	local ClassArmorTypeMask = addon.Globals.ClassArmorMask[tonumber(selectedArmorType)]
 	local correctHeratiage = false
-	local heritageSets = addon.MiscSets.HeritageSets
+	local heritageSets = {} -----addon.MiscSets.HeritageSets
 
 	if heritageSets[data.setID] and heritageSets[data.setID] == playerRace  then
 		correctHeratiage = true;
@@ -196,28 +154,10 @@ local function UseSet(data)
 					end
 				end
 			else
-					local classInfo = CLASS_INFO[playerClass]
-					local className = (classMask and GetClassInfo(classMask)) or nil
-					correctClass = data.classMask == classInfo[1] or not data.classMask
+				local classInfo = CLASS_INFO[playerClass]
+				local className = (classMask and GetClassInfo(classMask)) or nil
+				correctClass = data.classMask == classInfo[1] or not data.classMask
 			end
-			--[[
-		else
-			if data.setType == "Blizzard" then 
-				--zz = data
-				--print(data.armorType)
-
-				--print(data.classMask)
-				--if data.classMask == 400 then print(data.name) end
-				for i = 1, #ClassArmorTypeMask do
-					if data.classMask == ClassArmorTypeMask[i] then
-
-						correctClass = true;
-						break;
-					end
-				end
-			end
-		end
-		]]--
 	end
 
 	if addon.Profile.CurrentFactionSets and (data.requiredFaction and GetFactionID(data.requiredFaction) == GetFactionID(playerFaction) or data.requiredFaction == nil) 
@@ -249,7 +189,6 @@ function BuildBlizzSets()
 	local allSets = C_TransmogSets.GetAllSets()
 	for i, data in ipairs(allSets) do
 		data.setType = "Blizzard"
-
 		if not (data.name == "PH") and UseSet(data) then
 			data.expansionID  = data.expansionID + 1
 			data.BuildBlizzSets = true
@@ -266,6 +205,7 @@ function BuildBlizzSets()
 			elseif data.classMask == 32 then
 				data.classMask = 35
 			end
+
 
 			if data.classMask and Globals.CLASS_MASK_TO_ID[data.classMask] then 
 				data.classID = Globals.CLASS_MASK_TO_ID[data.classMask]
@@ -412,6 +352,7 @@ function BuildBlizzSets()
 		end
 	end
 end
+
 
 local function getClassMask(mask)
 	for i, d in pairs(addon.Globals.CLASS_INFO) do 
@@ -645,34 +586,32 @@ do
 	end 
 
 
-function addon.Init:UpdateCollectedAppearances()
-	for i = FIRST_TRANSMOG_COLLECTION_WEAPON_TYPE, LAST_TRANSMOG_COLLECTION_WEAPON_TYPE - 1 do
-		local location = TransmogUtil.GetTransmogLocation(addon.Globals.CATEGORYID_TO_NAME[i], Enum.TransmogType.Appearance, Enum.TransmogModification.Main)
-		local appearances = C_TransmogCollection.GetCategoryAppearances(i, location)
-		for _, appearance in pairs(appearances) do
-			local sources = C_TransmogCollection.GetAppearanceSources(appearance.visualID, i, location)
-			for _, source in pairs(sources) do
-				if source.isCollected then
-					collectedAppearances[appearance.visualID] = true
-					break
+	function addon.Init:UpdateCollectedAppearances()
+		for i = FIRST_TRANSMOG_COLLECTION_WEAPON_TYPE, LAST_TRANSMOG_COLLECTION_WEAPON_TYPE - 1 do
+			local location = TransmogUtil.GetTransmogLocation(addon.Globals.CATEGORYID_TO_NAME[i], Enum.TransmogType.Appearance, Enum.TransmogModification.Main)
+			local appearances = C_TransmogCollection.GetCategoryAppearances(i, location)
+			for _, appearance in pairs(appearances) do
+				local sources = C_TransmogCollection.GetAppearanceSources(appearance.visualID, i, location)
+				for _, source in pairs(sources) do
+					if source.isCollected then
+						collectedAppearances[appearance.visualID] = true
+						break
+					end
 				end
 			end
 		end
 	end
-end
-
 
 	function addon.Init:InitDB()
 		addon:ClearCache()
-		buildSetSubstitutions()
+		--buildSetSubstitutions()
 
 		BuildArmorDB()
 		--addon.Init:BuildDB()
-		addon.BuildClassArtifactAppearanceList()
-		addon.GetSavedList()
+		--addon.BuildClassArtifactAppearanceList()
+		--addon.GetSavedList()
 	end
-
-
+	
 	function addon.Init:BuildDB()
 		addon.SetsDataProvider:ClearSets();
 		--buildSetSubstitutions()
@@ -702,7 +641,7 @@ end
 		wipe(addon.ArmorSetModCache)
 		wipe(SET_INDEX)
 		wipe(fullList)
-		addon.ClearArtifactData()
+		-----addon.ClearArtifactData()
 		addon.SavedSetCache =  nil
 
 		wipe(baseListLabels)
@@ -720,7 +659,7 @@ end
 		return baseIDs
 	end
 
-	local MAX_DEFAULT_OUTFITS = C_TransmogCollection.GetNumMaxOutfits()
+	local MAX_DEFAULT_OUTFITS = 20 --C_TransmogCollection.GetNumMaxOutfits()
 
 	function addon:GetBlizzID(outfitID)
 		return outfitID - SAVED_SET_OFFSET
@@ -1296,7 +1235,7 @@ end
 				f.model:Show()
 				f.model:Undress()
 				f.model:TryOn(itemlink)
-				local  TransmogInfoList = DressUpOutfitMixin:GetItemTransmogInfoList()
+				local  TransmogInfoList = f.model:GetItemTransmogInfoList()
 				for i = 1, 19 do
 					local source = 10000---- f.model:GetSlotTransmogSources(i)
 					if source ~= 0 then
