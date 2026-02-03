@@ -58,6 +58,7 @@ function addon:CreateCustomSetsButton()
 	btn:SetScript("OnClick", function()
 		SavedSetsFrame:ShowFrame()
 	end)
+	btn:SetFrameLevel(frame:GetFrameLevel() + 10)
 
 	SavedSetsFrame:FrameCreate()
 
@@ -331,6 +332,10 @@ function SavedSetsFrame:UpdateOutfit(slot, type, appearance)
 	
 		if (categoryID >= 12 and categoryID <= 17 ) or  categoryID == 28 then
 			option = Enum.TransmogOutfitSlotOption.OneHandedWeapon
+		elseif categoryID == 18 then
+			option = Enum.TransmogOutfitSlotOption.Shield
+		elseif categoryID == 19 then
+			option = Enum.TransmogOutfitSlotOption.OffHand
 		elseif categoryID >= 20 and categoryID <= 24  then
 			if spec == 72 then
 				option = Enum.TransmogOutfitSlotOption.FuryTwoHandedWeapon
@@ -338,10 +343,6 @@ function SavedSetsFrame:UpdateOutfit(slot, type, appearance)
 			option = Enum.TransmogOutfitSlotOption.TwoHandedWeapon
 		elseif categoryID >= 25 and categoryID <= 27  then
 			option = Enum.TransmogOutfitSlotOption.RangedWeapon
-		elseif categoryID == 19 then
-			option = Enum.TransmogOutfitSlotOption.OffHand
-		elseif categoryID == 18 then
-			option = Enum.TransmogOutfitSlotOption.Shield
 		end
 	end
 
@@ -380,7 +381,8 @@ function SavedSetsFrame:OnClick(frame, button)
 end
 
 function SavedSetsFrame:OnShow()
-	self.NumPages = math.ceil(#addon.OutfitDB.char.outfits / 9)
+	local count = (addon.OutfitDB.char.outfits and #addon.OutfitDB.char.outfits) or 1
+	self.NumPages = math.ceil( count / 9)
 	self.Page = self.Page or 1
 	if self.NumPages <= 0 then
 		self.NumPages = 1

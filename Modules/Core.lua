@@ -1367,7 +1367,7 @@ function addon:OnEnable()
   		C_AddOns.LoadAddOn("Blizzard_Transmog")
 	end
 
-		C_Timer.After(0, function()
+		C_Timer.After(2, function()
 		addon:CreateCustomSetsButton()
 		self:HookCustomSetsOnHide()
 
