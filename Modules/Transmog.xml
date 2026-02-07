@@ -1,0 +1,627 @@
+<Ui xmlns="http://www.blizzard.com/wow/ui/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.blizzard.com/wow/ui/
+..\..\..\..\..\WoW\Data\Interface\AddOns\Blizzard_SharedXML\UI.xsd">
+	<Script file="Transmog.lua"/>
+
+	<Frame name="WardrobeCollection2Template" mixin="BW_TransmogWardrobeMixin" inherits="TabSystemOwnerTemplate" Toplevel="true" enableMouse="true" hidden="true" virtual="true" >
+		<Size x="644" y="860"/>
+		<Anchors>
+			<Anchor point="TOPLEFT" />
+		</Anchors>
+		<Layers>
+			<Layer level="BACKGROUND">
+				<Texture parentKey="Background" atlas="transmog-outfit-darkbg" setAllPoints="true"/>
+			</Layer>
+		</Layers>
+		<Frames>
+			<Frame parentKey="TabHeaders" inherits="TabSystemTemplate">
+				<KeyValues>
+					<KeyValue key="minTabWidth" value="95" type="number"/>
+					<KeyValue key="maxTabWidth" value="170" type="number"/>
+					<KeyValue key="tabTemplate" value="TransmogWardrobeCollectionTabTemplate" type="string"/>
+					<KeyValue key="tabSelectSound" value="SOUNDKIT.UI_TRANSMOG_CATEGORIES_CLICK" type="global"/>
+				</KeyValues>
+				<Anchors>
+					<Anchor point="TOPLEFT" x="32" y="-12"/>
+				</Anchors>
+			</Frame>
+			<Frame parentKey="TabContent" frameLevel="100">
+				<Size x="644" y="823"/>
+				<Anchors>
+					<Anchor point="TOPLEFT" x="0" y="-35"/>
+				</Anchors>
+				<Layers>
+					<Layer level="BACKGROUND">
+						<Texture parentKey="Background" atlas="transmog-tabs-frame-bg" useAtlasSize="true">
+							<Anchors>
+								<Anchor point="TOPLEFT" x="4" y="-4"/>
+							</Anchors>
+						</Texture>
+						<Texture parentKey="Border" atlas="transmog-tabs-frame">
+							<Size x="661" y="841"/>
+							<Anchors>
+								<Anchor point="TOPLEFT" x="-11" y="12"/>
+							</Anchors>
+						</Texture>
+					</Layer>
+				</Layers>
+				<Frames>
+							<Frame parentKey="ItemsFrame" mixin="BW_TransmogWardrobeItemsMixin" setAllPoints="true">
+								<KeyValues>
+									<KeyValue key="searchType" value="Enum.TransmogSearchType.Items" type="global"/>
+								</KeyValues>
+								<Layers>
+									<Layer level="OVERLAY">
+										<FontString parentKey="ActiveSlotTitle" inherits="GameFontHighlightHuge" justifyH="LEFT">
+											<Anchors>
+												<Anchor point="TOPLEFT" x="23" y="-58"/>
+											</Anchors>
+										</FontString>
+										<Texture parentKey="Divider" atlas="transmog-tabs-header-line" useAtlasSize="true" alpha="0.1">
+											<Anchors>
+												<Anchor point="TOPLEFT" relativeKey="$parent.ActiveSlotTitle" relativePoint="BOTTOMLEFT" x="0" y="-2"/>
+											</Anchors>
+										</Texture>
+									</Layer>
+								</Layers>
+								<Frames>
+									<DropdownButton parentKey="FilterButton" inherits="WowStyle1FilterDropdownTemplate">
+										<KeyValues>
+											<KeyValue key="resizeToText" type="boolean" value="false"/>
+										</KeyValues>
+										<Anchors>
+											<Anchor point="TOPRIGHT" x="-29" y="-24"/>
+										</Anchors>
+									</DropdownButton>
+									<EditBox parentKey="SearchBox" inherits="TransmogSearchBoxTemplate">
+										<Anchors>
+											<Anchor point="TOPRIGHT" relativeKey="$parent.FilterButton" relativePoint="TOPLEFT" x="-10" y="1"/>
+										</Anchors>
+									</EditBox>
+									<DropdownButton parentKey="WeaponDropdown" inherits="WowStyle1DropdownTemplate" hidden="false">
+										<Anchors>
+											<Anchor point="TOPRIGHT" x="-31" y="-106"/>
+										</Anchors>
+									</DropdownButton>
+									<Button parentKey="DisplayTypeUnassignedButton" inherits="DisplayTypeButtonTemplate" text="TRANSMOG_SLOT_DISPLAY_TYPE_UNASSIGNED">
+										<Anchors>
+											<Anchor point="TOPLEFT" relativeKey="$parent.ActiveSlotTitle" relativePoint="BOTTOMLEFT" x="16" y="-21"/>
+										</Anchors>
+									</Button>
+									<Button parentKey="DisplayTypeEquippedButton" inherits="DisplayTypeButtonTemplate" text="TRANSMOG_SLOT_DISPLAY_TYPE_EQUIPPED">
+										<Anchors>
+											<Anchor point="TOPLEFT" relativeKey="$parent.DisplayTypeUnassignedButton" relativePoint="TOPRIGHT" x="25" y="0"/>
+										</Anchors>
+									</Button>
+									<Frame parentKey="PagedContent" inherits="PagedNaturalSizeGridContentFrameTemplate">
+										<KeyValues>
+											<KeyValue key="viewsPerPage" value="1" type="number"/>
+											<KeyValue key="xPadding" value="20" type="number"/>
+											<KeyValue key="yPadding" value="20" type="number"/>
+										</KeyValues>
+										<Anchors>
+											<Anchor point="TOPLEFT" x="30" y="-163"/>
+											<Anchor point="BOTTOMRIGHT" x="-30" y="10"/>
+										</Anchors>
+										<Frames>
+											<Frame parentKey="View" parentArray="ViewFrames" setAllPoints="true"/>
+											<Frame parentKey="PagingControls" inherits="PagingControlsHorizontalTemplate">
+												<KeyValues>
+													<KeyValue key="layoutIndex" value="2" type="number"/>
+													<KeyValue key="bottomPadding" value="3" type="number"/>
+													<KeyValue key="prevPageSound" value="SOUNDKIT.UI_TRANSMOG_PAGE_TURN" type="global"/>
+													<KeyValue key="nextPageSound" value="SOUNDKIT.UI_TRANSMOG_PAGE_TURN" type="global"/>
+												</KeyValues>
+												<Anchors>
+													<Anchor point="BOTTOM"/>
+												</Anchors>
+											</Frame>
+										</Frames>
+									</Frame>
+									<Frame parentKey="SecondaryAppearanceToggle">
+										<Size x="30" y="29"/>
+										<Anchors>
+											<Anchor point="BOTTOMLEFT" x="27" y="20"/>
+										</Anchors>
+										<Frames>
+											<CheckButton parentKey="Checkbox" inherits="MinimalCheckboxArtTemplate" setAllPoints="true"/>
+										</Frames>
+										<Layers>
+											<Layer level="ARTWORK">
+												<FontString parentKey="Text" inherits="GameFontNormal" justifyH="LEFT" text="TRANSMOGRIFY_RIGHT_SHOULDER">
+													<Size x="140"/>
+													<Anchors>
+														<Anchor point="LEFT" relativeKey="$parent.Checkbox" relativePoint="RIGHT" x="4"/>
+													</Anchors>
+												</FontString>
+											</Layer>
+										</Layers>
+									</Frame>
+								</Frames>
+								<Scripts>
+									<OnLoad method="OnLoad"/>
+									<OnShow method="OnShow"/>
+									<OnHide method="OnHide"/>
+									<OnEvent method="OnEvent"/>
+								</Scripts>
+							</Frame>
+
+					<Frame parentKey="ExtraSetsFrame" mixin="BW_TransmogWardrobeSetsMixin" setAllPoints="true">
+						<KeyValues>
+							<KeyValue key="searchType" value="Enum.TransmogSearchType.UsableSets" type="global"/>
+						</KeyValues>
+						<Frames>
+							<DropdownButton parentKey="FilterButton" inherits="WowStyle1FilterDropdownTemplate">
+								<KeyValues>
+									<KeyValue key="resizeToText" type="boolean" value="false"/>
+								</KeyValues>
+								<Anchors>
+									<Anchor point="TOPRIGHT" x="-29" y="-24"/>
+								</Anchors>
+							</DropdownButton>
+							<EditBox parentKey="SearchBox" inherits="TransmogSearchBoxTemplate">
+								<Anchors>
+									<Anchor point="TOPRIGHT" relativeKey="$parent.FilterButton" relativePoint="TOPLEFT" x="-10" y="1"/>
+								</Anchors>
+							</EditBox>
+							<Frame parentKey="PagedContent" inherits="PagedNaturalSizeGridContentFrameTemplate">
+								<KeyValues>
+									<KeyValue key="viewsPerPage" value="1" type="number"/>
+									<KeyValue key="xPadding" value="27" type="number"/>
+									<KeyValue key="yPadding" value="19" type="number"/>
+								</KeyValues>
+								<Anchors>
+									<Anchor point="TOPLEFT" x="26" y="-72"/>
+									<Anchor point="BOTTOMRIGHT" x="-26" y="10"/>
+								</Anchors>
+								<Frames>
+									<Frame parentKey="View" parentArray="ViewFrames" setAllPoints="true"/>
+									<Frame parentKey="PagingControls" inherits="PagingControlsHorizontalTemplate">
+										<KeyValues>
+											<KeyValue key="layoutIndex" value="2" type="number"/>
+											<KeyValue key="bottomPadding" value="3" type="number"/>
+											<KeyValue key="prevPageSound" value="SOUNDKIT.UI_TRANSMOG_PAGE_TURN" type="global"/>
+											<KeyValue key="nextPageSound" value="SOUNDKIT.UI_TRANSMOG_PAGE_TURN" type="global"/>
+										</KeyValues>
+										<Anchors>
+											<Anchor point="BOTTOM"/>
+										</Anchors>
+									</Frame>
+								</Frames>
+							</Frame>
+						</Frames>
+						<Scripts>
+							<OnLoad method="OnLoad"/>
+							<OnShow method="OnShow"/>
+							<OnHide method="OnHide"/>
+							<OnEvent method="OnEvent"/>
+						</Scripts>
+					</Frame>
+					<Frame parentKey="CustomSetsFrame2" mixin="BW_TransmogWardrobeCustomSetsMixin" setAllPoints="true">
+						<Frames>
+							<Button parentKey="NewCustomSetButton" inherits="SharedButtonTemplate" text="TRANSMOG_CUSTOM_SET_NEW">
+								<Size x="160" y="32"/>
+								<Anchors>
+									<Anchor point="TOPLEFT" x="22" y="-22"/>
+								</Anchors>
+								<ButtonText parentKey="Text" inherits="GameFontNormal" wordwrap="false">
+									<Anchors>
+										<Anchor point="LEFT" x="10" y="0"/>
+										<Anchor point="RIGHT" x="-10" y="0"/>
+									</Anchors>
+								</ButtonText>
+							</Button>
+							<Frame parentKey="PagedContent" inherits="PagedNaturalSizeGridContentFrameTemplate">
+								<KeyValues>
+									<KeyValue key="viewsPerPage" value="1" type="number"/>
+									<KeyValue key="xPadding" value="27" type="number"/>
+									<KeyValue key="yPadding" value="19" type="number"/>
+								</KeyValues>
+								<Anchors>
+									<Anchor point="TOPLEFT" x="26" y="-72"/>
+									<Anchor point="BOTTOMRIGHT" x="-26" y="10"/>
+								</Anchors>
+								<Frames>
+									<Frame parentKey="View" parentArray="ViewFrames" setAllPoints="true"/>
+									<Frame parentKey="PagingControls" inherits="PagingControlsHorizontalTemplate">
+										<KeyValues>
+											<KeyValue key="layoutIndex" value="2" type="number"/>
+											<KeyValue key="bottomPadding" value="3" type="number"/>
+											<KeyValue key="prevPageSound" value="SOUNDKIT.UI_TRANSMOG_PAGE_TURN" type="global"/>
+											<KeyValue key="nextPageSound" value="SOUNDKIT.UI_TRANSMOG_PAGE_TURN" type="global"/>
+										</KeyValues>
+										<Anchors>
+											<Anchor point="BOTTOM"/>
+										</Anchors>
+									</Frame>
+								</Frames>
+							</Frame>
+						</Frames>
+						<Scripts>
+							<OnLoad method="OnLoad"/>
+							<OnShow method="OnShow"/>
+							<OnHide method="OnHide"/>
+							<OnEvent method="OnEvent"/>
+						</Scripts>
+					</Frame>
+
+				</Frames>
+			</Frame>
+		</Frames>
+		<Scripts>
+			<OnLoad method="OnLoad"/>
+			<OnShow method="OnShow"/>
+			<OnHide method="OnHide"/>
+		</Scripts>
+	</Frame>
+
+		<Frame name="WardrobeCollection3Template" mixin="BW_TransmogWardrobeMixin" inherits="TabSystemOwnerTemplate" Toplevel="true" enableMouse="true" hidden="true" virtual="true" >
+		<Size x="644" y="860"/>
+		<Anchors>
+			<Anchor point="TOPLEFT" />
+		</Anchors>
+		<Layers>
+			<Layer level="BACKGROUND">
+				<Texture parentKey="Background" atlas="transmog-outfit-darkbg" setAllPoints="true"/>
+			</Layer>
+		</Layers>
+		<Frames>
+			<Frame parentKey="TabHeaders" inherits="TabSystemTemplate">
+				<KeyValues>
+					<KeyValue key="minTabWidth" value="95" type="number"/>
+					<KeyValue key="maxTabWidth" value="170" type="number"/>
+					<KeyValue key="tabTemplate" value="TransmogWardrobeCollectionTabTemplate" type="string"/>
+					<KeyValue key="tabSelectSound" value="SOUNDKIT.UI_TRANSMOG_CATEGORIES_CLICK" type="global"/>
+				</KeyValues>
+				<Anchors>
+					<Anchor point="TOPLEFT" x="32" y="-12"/>
+				</Anchors>
+			</Frame>
+			<Frame parentKey="TabContent" frameLevel="100">
+				<Size x="644" y="823"/>
+				<Anchors>
+					<Anchor point="TOPLEFT" x="0" y="-35"/>
+				</Anchors>
+				<Layers>
+					<Layer level="BACKGROUND">
+						<Texture parentKey="Background" atlas="transmog-tabs-frame-bg" useAtlasSize="true">
+							<Anchors>
+								<Anchor point="TOPLEFT" x="4" y="-4"/>
+							</Anchors>
+						</Texture>
+						<Texture parentKey="Border" atlas="transmog-tabs-frame">
+							<Size x="661" y="841"/>
+							<Anchors>
+								<Anchor point="TOPLEFT" x="-11" y="12"/>
+							</Anchors>
+						</Texture>
+					</Layer>
+				</Layers>
+				<Frames>
+							
+
+					<Frame parentKey="ExtraSetsFrame" mixin="BW_TransmogWardrobeSetsMixin" setAllPoints="true">
+						<KeyValues>
+							<KeyValue key="searchType" value="Enum.TransmogSearchType.UsableSets" type="global"/>
+						</KeyValues>
+						<Frames>
+							<DropdownButton parentKey="FilterButton" inherits="WowStyle1FilterDropdownTemplate">
+								<KeyValues>
+									<KeyValue key="resizeToText" type="boolean" value="false"/>
+								</KeyValues>
+								<Anchors>
+									<Anchor point="TOPRIGHT" x="-29" y="-24"/>
+								</Anchors>
+							</DropdownButton>
+							<EditBox parentKey="SearchBox" inherits="TransmogSearchBoxTemplate">
+								<Anchors>
+									<Anchor point="TOPRIGHT" relativeKey="$parent.FilterButton" relativePoint="TOPLEFT" x="-10" y="1"/>
+								</Anchors>
+							</EditBox>
+							<Frame parentKey="PagedContent" inherits="PagedNaturalSizeGridContentFrameTemplate">
+								<KeyValues>
+									<KeyValue key="viewsPerPage" value="1" type="number"/>
+									<KeyValue key="xPadding" value="27" type="number"/>
+									<KeyValue key="yPadding" value="19" type="number"/>
+								</KeyValues>
+								<Anchors>
+									<Anchor point="TOPLEFT" x="26" y="-72"/>
+									<Anchor point="BOTTOMRIGHT" x="-26" y="10"/>
+								</Anchors>
+								<Frames>
+									<Frame parentKey="View" parentArray="ViewFrames" setAllPoints="true"/>
+									<Frame parentKey="PagingControls" inherits="PagingControlsHorizontalTemplate">
+										<KeyValues>
+											<KeyValue key="layoutIndex" value="2" type="number"/>
+											<KeyValue key="bottomPadding" value="3" type="number"/>
+											<KeyValue key="prevPageSound" value="SOUNDKIT.UI_TRANSMOG_PAGE_TURN" type="global"/>
+											<KeyValue key="nextPageSound" value="SOUNDKIT.UI_TRANSMOG_PAGE_TURN" type="global"/>
+										</KeyValues>
+										<Anchors>
+											<Anchor point="BOTTOM"/>
+										</Anchors>
+									</Frame>
+								</Frames>
+							</Frame>
+						</Frames>
+						<Scripts>
+							<OnLoad method="OnLoad"/>
+							<OnShow method="OnShow"/>
+							<OnHide method="OnHide"/>
+							<OnEvent method="OnEvent"/>
+						</Scripts>
+					</Frame>
+					<Frame parentKey="CustomSetsFrame2" mixin="BW_TransmogWardrobeCustomSetsMixin" setAllPoints="true">
+						<Frames>
+							<Button parentKey="NewCustomSetButton" inherits="SharedButtonTemplate" text="TRANSMOG_CUSTOM_SET_NEW">
+								<Size x="160" y="32"/>
+								<Anchors>
+									<Anchor point="TOPLEFT" x="22" y="-22"/>
+								</Anchors>
+								<ButtonText parentKey="Text" inherits="GameFontNormal" wordwrap="false">
+									<Anchors>
+										<Anchor point="LEFT" x="10" y="0"/>
+										<Anchor point="RIGHT" x="-10" y="0"/>
+									</Anchors>
+								</ButtonText>
+							</Button>
+							<Frame parentKey="PagedContent" inherits="PagedNaturalSizeGridContentFrameTemplate">
+								<KeyValues>
+									<KeyValue key="viewsPerPage" value="1" type="number"/>
+									<KeyValue key="xPadding" value="27" type="number"/>
+									<KeyValue key="yPadding" value="19" type="number"/>
+								</KeyValues>
+								<Anchors>
+									<Anchor point="TOPLEFT" x="26" y="-72"/>
+									<Anchor point="BOTTOMRIGHT" x="-26" y="10"/>
+								</Anchors>
+								<Frames>
+									<Frame parentKey="View" parentArray="ViewFrames" setAllPoints="true"/>
+									<Frame parentKey="PagingControls" inherits="BW_PagingControlsHorizontalTemplate">
+										<KeyValues>
+											<KeyValue key="layoutIndex" value="2" type="number"/>
+											<KeyValue key="bottomPadding" value="3" type="number"/>
+											<KeyValue key="prevPageSound" value="SOUNDKIT.UI_TRANSMOG_PAGE_TURN" type="global"/>
+											<KeyValue key="nextPageSound" value="SOUNDKIT.UI_TRANSMOG_PAGE_TURN" type="global"/>
+										</KeyValues>
+										<Anchors>
+											<Anchor point="BOTTOM"/>
+										</Anchors>
+									</Frame>
+								</Frames>
+							</Frame>
+						</Frames>
+						<Scripts>
+							<OnLoad method="OnLoad"/>
+							<OnShow method="OnShow"/>
+							<OnHide method="OnHide"/>
+							<OnEvent method="OnEvent"/>
+						</Scripts>
+					</Frame>
+
+				</Frames>
+			</Frame>
+		</Frames>
+		<Scripts>
+			<OnLoad method="OnLoad"/>
+			<OnShow method="OnShow"/>
+			<OnHide method="OnHide"/>
+		</Scripts>
+	</Frame>
+
+
+					<Frame name="CustomSetsFrame2" mixin="BW_TransmogWardrobeCustomSetsMixin" setAllPoints="true" virtual="true">
+						<Size x="644" y="823"/>
+						<Frames>
+							<Button parentKey="NewCustomSetButton" inherits="SharedButtonTemplate" text="TRANSMOG_CUSTOM_SET_NEW">
+								<Size x="160" y="32"/>
+								<Anchors>
+									<Anchor point="TOPLEFT" x="22" y="-22"/>
+								</Anchors>
+								<ButtonText parentKey="Text" inherits="GameFontNormal" wordwrap="false">
+									<Anchors>
+										<Anchor point="LEFT" x="10" y="0"/>
+										<Anchor point="RIGHT" x="-10" y="0"/>
+									</Anchors>
+								</ButtonText>
+							</Button>
+							<Frame parentKey="PagedContent" inherits="PagedNaturalSizeGridContentFrameTemplate">
+								<KeyValues>
+									<KeyValue key="viewsPerPage" value="1" type="number"/>
+									<KeyValue key="xPadding" value="27" type="number"/>
+									<KeyValue key="yPadding" value="19" type="number"/>
+								</KeyValues>
+								<Anchors>
+									<Anchor point="TOPLEFT" x="26" y="-72"/>
+									<Anchor point="BOTTOMRIGHT" x="-26" y="10"/>
+								</Anchors>
+								<Frames>
+									<Frame parentKey="View" parentArray="ViewFrames" setAllPoints="true"/>
+									<Frame parentKey="PagingControls" inherits="BW_PagingControlsHorizontalTemplate">
+										<KeyValues>
+											<KeyValue key="layoutIndex" value="2" type="number"/>
+											<KeyValue key="bottomPadding" value="3" type="number"/>
+											<KeyValue key="prevPageSound" value="SOUNDKIT.UI_TRANSMOG_PAGE_TURN" type="global"/>
+											<KeyValue key="nextPageSound" value="SOUNDKIT.UI_TRANSMOG_PAGE_TURN" type="global"/>
+										</KeyValues>
+										<Anchors>
+											<Anchor point="BOTTOM"/>
+										</Anchors>
+									</Frame>
+								</Frames>
+							</Frame>
+						</Frames>
+						<Scripts>
+							<OnLoad method="OnLoad"/>
+							<OnShow method="OnShow"/>
+							<OnHide method="OnHide"/>
+							<OnEvent method="OnEvent"/>
+						</Scripts>
+					</Frame>
+
+
+	<Frame name="ExtraSetsFrameTemplate" mixin="BW_TransmogWardrobeSetsMixin" setAllPoints="true" virtual="true" >
+		<Size x="644" y="823"/>
+		<KeyValues>
+			<KeyValue key="searchType" value="Enum.TransmogSearchType.UsableSets" type="global"/>
+		</KeyValues>
+		<Frames>
+			<DropdownButton parentKey="FilterButton" inherits="WowStyle1FilterDropdownTemplate">
+				<KeyValues>
+					<KeyValue key="resizeToText" type="boolean" value="false"/>
+				</KeyValues>
+				<Anchors>
+					<Anchor point="TOPRIGHT" x="-29" y="-24"/>
+				</Anchors>
+			</DropdownButton>
+			<EditBox parentKey="SearchBox" inherits="TransmogSearchBoxTemplate">
+				<Anchors>
+					<Anchor point="TOPRIGHT" relativeKey="$parent.FilterButton" relativePoint="TOPLEFT" x="-10" y="1"/>
+				</Anchors>
+			</EditBox>
+			<Frame parentKey="PagedContent" inherits="PagedNaturalSizeGridContentFrameTemplate">
+				<KeyValues>
+					<KeyValue key="viewsPerPage" value="1" type="number"/>
+					<KeyValue key="xPadding" value="27" type="number"/>
+					<KeyValue key="yPadding" value="19" type="number"/>
+				</KeyValues>
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeKey="$parent" relativePoint="TOPLEFT" x="26" y="-72"/>
+					<Anchor point="BOTTOMRIGHT" relativeKey="$parent" relativePoint="BOTTOMRIGHT" x="-26" y="10"/>
+				</Anchors>
+				<Frames>
+					<Frame parentKey="View" parentArray="ViewFrames" setAllPoints="true"/>
+					<Frame parentKey="PagingControls" inherits="BW_PagingControlsHorizontalTemplate">
+						<KeyValues>
+							<KeyValue key="layoutIndex" value="2" type="number"/>
+							<KeyValue key="bottomPadding" value="3" type="number"/>
+							<KeyValue key="prevPageSound" value="SOUNDKIT.UI_TRANSMOG_PAGE_TURN" type="global"/>
+							<KeyValue key="nextPageSound" value="SOUNDKIT.UI_TRANSMOG_PAGE_TURN" type="global"/>
+						</KeyValues>
+						<Anchors>
+							<Anchor point="BOTTOM"/>
+						</Anchors>
+					</Frame>
+				</Frames>
+			</Frame>
+		</Frames>
+		<Scripts>
+			<OnLoad method="OnLoad"/>
+			<OnShow method="OnShow"/>
+			<OnHide method="OnHide"/>
+			<OnEvent method="OnEvent"/>
+		</Scripts>
+	</Frame>
+
+
+	<Frame name="BW_PagingControlsHorizontalTemplate" inherits="HorizontalLayoutFrame, PagingControlsTemplate" virtual="true">
+		<KeyValues>
+			<KeyValue key="spacing" value="5" type="number"/>
+		</KeyValues>
+		<Size x="140" y="32"/>
+		<Layers>
+			<Layer level="ARTWORK">
+				<!-- Page text now comes AFTER the edit box -->
+				<FontString parentKey="PageText" inherits="PageTextTemplate">
+					<KeyValues>
+						<KeyValue key="layoutIndex" value="2" type="number"/>
+					</KeyValues>
+				</FontString>
+			</Layer>
+		</Layers>
+		<Frames>
+			<!-- NEW: Page number input box -->
+			<EditBox parentKey="PageInput" inherits="InputBoxTemplate">
+				<Size x="30" y="32"/>
+				<Anchors>
+					<Anchor point="CENTER"/>
+				</Anchors>
+				<KeyValues>
+					<KeyValue key="layoutIndex" value="1" type="number"/>
+				</KeyValues>
+				<Scripts>
+					<OnLoad> 
+						self:SetAutoFocus(false) 
+					</OnLoad> 
+					<OnEnterPressed>
+						-- Convert text to number and call your paging logic
+						local page = tonumber(self:GetText())
+						local currParent = self:GetParent();
+						if page then
+							local pageChanged = currParent:SetCurrentPage(page);
+							if pageChanged and currParent.nextPageSound then
+								PlaySound(currParent.nextPageSound);
+							end
+						end
+						self:ClearFocus()
+						self:SetText("")
+					</OnEnterPressed>
+				</Scripts>
+			</EditBox>
+			<!-- First page -->
+			<Button parentKey="FirstPageButton" inherits="BW_PagingControlsFirstPageButtonTemplate">
+				<KeyValues>
+					<KeyValue key="layoutIndex" value="3" type="number"/>
+				</KeyValues>
+			   <Scripts>
+
+					<OnClick>
+						-- Convert text to number and call your paging logic
+						local currParent = self:GetParent();
+						local pageChanged = currParent:SetCurrentPage(1);
+						if pageChanged and currParent.nextPageSound then
+							PlaySound(currParent.nextPageSound);
+						end
+					</OnClick>
+			   </Scripts>
+
+			</Button>
+
+			<!-- Previous page -->
+			<Button parentKey="PrevPageButton" inherits="PagingControlsPrevPageButtonTemplate">
+				<KeyValues>
+					<KeyValue key="layoutIndex" value="4" type="number"/>
+				</KeyValues>
+			</Button>
+
+			<!-- Next page -->
+			<Button parentKey="NextPageButton" inherits="PagingControlsNextPageButtonTemplate">
+				<KeyValues>
+					<KeyValue key="layoutIndex" value="5" type="number"/>
+				</KeyValues>
+			</Button>
+
+			<!-- Last page -->
+			<Button parentKey="LastPageButton" inherits="BW_PagingControlsLastPageButtonTemplate">
+				<KeyValues>
+					<KeyValue key="layoutIndex" value="6" type="number"/>
+				</KeyValues>
+				<Scripts>
+					<OnClick>
+						-- Convert text to number and call your paging logic
+						local currParent = self:GetParent();
+						local pageChanged = currParent:SetCurrentPage(currParent.maxPages);
+						if pageChanged and currParent.nextPageSound then
+							PlaySound(currParent.nextPageSound);
+						end
+					</OnClick>
+				</Scripts>
+			</Button>
+
+		</Frames>
+	</Frame>
+
+	<Button name="BW_PagingControlsFirstPageButtonTemplate" virtual="true">
+		<Size x="32" y="32"/>
+		<NormalTexture file="Interface\TIMEMANAGER\RWButton"/>
+		<HighlightTexture file="Interface\Buttons\UI-Common-MouseHilight" alphaMode="ADD"/>
+	</Button>
+
+	<Button name="BW_PagingControlsLastPageButtonTemplate" virtual="true">
+		<Size x="32" y="32"/>
+		<NormalTexture file="Interface\TIMEMANAGER\FFButton"/>
+		<HighlightTexture file="Interface\Buttons\UI-Common-MouseHilight" alphaMode="ADD"/>
+	</Button>
+
+
+
+</Ui>

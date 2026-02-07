@@ -42,6 +42,7 @@ Modules\CollectionTemplates.xml
 Modules\Templates.xml
 Modules\Core.lua
 Data\DataBase.lua
+Data\Cloth.lua
 Data\Mail.lua
 Data\MISC.lua
 Data\test.lua
@@ -50,7 +51,9 @@ Data\test.lua
 Modules\ImportExport.lua
 Modules\SavedOutfitsViewer.xml
 Modules\TransmogShared.lua
-#Modules\Transmog.xml
+Modules\TransmogTemplates.xml
+
+Modules\Transmog.xml
 Modules\Wardrobe_Sets.xml
 Modules\Wardrobe.xml
 Modules\CollectionList.xml
