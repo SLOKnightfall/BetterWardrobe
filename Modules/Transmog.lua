@@ -1,5 +1,7 @@
 local addonName, addon = ...
+local L = LibStub("AceLocale-3.0"):GetLocale(addonName)
 
+--[[
 StaticPopupDialogs["CONFIRM_BUY_OUTFIT_SLOT"] = {
 	text = CONFIRM_BUY_OUTFIT_SLOT,
 	button1 = YES,
@@ -1197,9 +1199,6 @@ function TransmogWardrobeMixin:OnLoad()
 	TransmogFrame.WardrobeCollection.TabHeaders.extrasetsTabID = TransmogFrame.WardrobeCollection:AddNamedTab("EXTRA SETS", TransmogFrame.WardrobeCollection.TabContent.SetsFrame);
 	self.custmSetsTabID = self:AddNamedTab(TRANSMOG_TAB_CUSTOM_SETS, self.TabContent.CustomSetsFrame);
 	--self.situationsTabID = self:AddNamedTab(TRANSMOG_TAB_SITUATIONS, self.TabContent.SituationsFrame);
-TransmogFrame.WardrobeCollection.TabHeaders.extrasetsTabID = 3
-TransmogFrame.WardrobeCollection.TabHeaders.custmSetsTabID = 4
-TransmogFrame.WardrobeCollection.TabHeaders.situationsTabID = 5
 	self:UpdateTabs();
 	--tf2.WardrobeCollection.TabContent.ItemsFrame:Init(TransmogFrame.WardrobeCollection)
 	--self.TabContent.ItemsFrame:Init(self.wardrobeCollection)
@@ -2086,7 +2085,7 @@ end
 function TransmogWardrobeItemsMixin:GetSlotFrameCallback(slot, type)
 	 --self.wardrobeCollection.GetSlotFrameCallback(slot, type);
 end
-
+]]--
 
 local TransmogWardrobeSetsMixin = {
 	DYNAMIC_EVENTS = {
@@ -2156,6 +2155,17 @@ function TransmogWardrobeSetsMixin:Init(wardrobeCollection)
 	self.wardrobeCollection = wardrobeCollection;
 end
 
+local EXPANSIONS = {EXPANSION_NAME0, EXPANSION_NAME1, EXPANSION_NAME2, EXPANSION_NAME3, EXPANSION_NAME4, EXPANSION_NAME5, EXPANSION_NAME6, EXPANSION_NAME7, EXPANSION_NAME8, EXPANSION_NAME9,EXPANSION_NAME10}
+local xpacSelection = {}
+
+local function xpackCheckAll(value)
+	for index = 1, #EXPANSIONS do
+		xpacSelection[index] = value;
+	end
+end
+
+xpackCheckAll(true)
+
 function TransmogWardrobeSetsMixin:InitFilterButton()
 	self.FilterButton:SetupMenu(function(_dropdown, rootDescription)
 		rootDescription:SetTag("MENU_TRANSMOG_SETS_FILTER");
@@ -2167,8 +2177,61 @@ function TransmogWardrobeSetsMixin:InitFilterButton()
 		rootDescription:CreateCheckbox(COLLECTED, C_TransmogSets.GetSetsFilter, SetSetsFilter, LE_TRANSMOG_SET_FILTER_COLLECTED);
 		rootDescription:CreateCheckbox(NOT_COLLECTED, C_TransmogSets.GetSetsFilter, SetSetsFilter, LE_TRANSMOG_SET_FILTER_UNCOLLECTED);
 		rootDescription:CreateDivider();
-		rootDescription:CreateCheckbox(TRANSMOG_SET_PVE, C_TransmogSets.GetSetsFilter, SetSetsFilter, LE_TRANSMOG_SET_FILTER_PVE);
-		rootDescription:CreateCheckbox(TRANSMOG_SET_PVP, C_TransmogSets.GetSetsFilter, SetSetsFilter, LE_TRANSMOG_SET_FILTER_PVP);
+
+		rootDescription:CreateCheckbox(L["Show Hidden Items"], function() return addon.Profile.ShowHidden; end, 
+			function()
+				addon.Profile.ShowHidden = not addon.Profile.ShowHidden;
+				self:RefreshCollectionEntries()
+			end,
+		1);
+
+		rootDescription:CreateCheckbox(L["Ignore Class Restriction Filter"], function() return addon.Profile.IgnoreClassRestrictions; end, 
+			function()
+				addon.Profile.IgnoreClassRestrictions = not addon.Profile.IgnoreClassRestrictions;
+				addon.Init:InitDB()
+
+				self:RefreshCollectionEntries()
+			end,
+		1);
+
+		rootDescription:CreateDivider();
+
+		local tab = TransmogFrame.WardrobeCollection:GetTab()
+		if tab == 5 then
+			rootDescription:CreateCheckbox(TRANSMOG_SET_PVE, C_TransmogSets.GetSetsFilter, SetSetsFilter, LE_TRANSMOG_SET_FILTER_PVE);
+			rootDescription:CreateCheckbox(TRANSMOG_SET_PVP, C_TransmogSets.GetSetsFilter, SetSetsFilter, LE_TRANSMOG_SET_FILTER_PVP);
+			rootDescription:CreateDivider();
+		end
+
+		local submenu = rootDescription:CreateButton(L["Expansion"]);
+		submenu:CreateButton(CHECK_ALL, function()
+			xpackCheckAll(true)
+			self:RefreshCollectionEntries()
+
+		end);
+
+		submenu:CreateButton(UNCHECK_ALL, function()
+			xpackCheckAll(false)
+			self:RefreshCollectionEntries()
+
+		end);
+
+		submenu:CreateDivider();
+		
+		local numSources = #EXPANSIONS
+		for index = 1, numSources do
+			local filterIndex = index;
+			submenu:CreateCheckbox(EXPANSIONS[index],	
+				function()
+					return xpacSelection[index]
+				end,
+				function()
+					xpacSelection[index] = not xpacSelection[index];
+					self:RefreshCollectionEntries()
+
+				end,
+			index);
+		end
 	end);
 
 	self.FilterButton:SetIsDefaultCallback(function()
@@ -2192,12 +2255,12 @@ end
 
 local function getSources(data)
 	local sources = {}
-	sources.primaryAppearances={}
+	sources.primaryAppearances = {}
 	local dataSources = data.sources
 	local count = 0
 	local index = 1
 	for source, collected in pairs(dataSources) do 
-		sources.primaryAppearances[index] ={
+		sources.primaryAppearances[index] = {
 	      collected = collected,
 	      appearanceID = source
 	    }
@@ -2209,49 +2272,112 @@ local function getSources(data)
 	return sources, count, index-1
 end
 
---local 
---for i, d in ipairs(sources) do
+local function isValidFilter(data)
+	local expansion = xpacSelection[data.expansionID]
+	local collected = C_TransmogSets.GetSetsFilter(LE_TRANSMOG_SET_FILTER_COLLECTED) and data.collected == data.pieces
+	local uncollected = C_TransmogSets.GetSetsFilter(LE_TRANSMOG_SET_FILTER_UNCOLLECTED) and data.collected ~= data.pieces
+	--local pvp = C_TransmogSets.GetSetsFilter(LE_TRANSMOG_SET_FILTER_PVE)
+	--local pve = C_TransmogSets.GetSetsFilter(LE_TRANSMOG_SET_FILTER_PVP)
+	local setType = "set"
+	local tab = TransmogFrame.WardrobeCollection:GetTab()
+	if tab == 6 then
+		setType = "extraset"
+	end
+	local hasPieces = (data.pieces and data.pieces > 0)
+	local hidden = (addon.Profile.ShowHidden and false) or ( not addon.Profile.ShowHidden and addon.HiddenAppearanceDB.profile[setType][data.setID])
+	local searhText = addon:SearchSets(data)
+	--if tab == 5 then
+		--return expansion and not hidden
+	--end
+
+	return expansion and (collected or uncollected) and searhText and not hidden and hasPieces
+end
+
 
 function TransmogWardrobeSetsMixin:RefreshCollectionEntries()
 	self.setsDataProvider:ClearSets();
 
 	local collectionElements = {};
 	local tab = TransmogFrame.WardrobeCollection:GetTab()
-	print(tab)
-
 	if tab == 6 then
 		local availableSets = addon.fullList -- self.setsDataProvider:GetAvailableSets();
-
 		for _index, availableSet in pairs(availableSets) do
 			if availableSet.setType ~= "Blizzard" then 
 				local sourceData, collected, pieces = getSources(availableSet)
+				availableSet.numCollected = collected
+				availableSet.numTotal = pieces
 				local element = {
 					templateKey = "COLLECTION_SET",
 					set = availableSet,
-					sourceData = sourceData,--self.setsDataProvider:GetSetSourceData(availableSet.setID),
+					sourceData = sourceData,
 					collected = collected,
 					pieces = pieces,
 					collectionFrame = self,
-					name = availableSet.name
+					name = availableSet.name,
+					setID = availableSet.setID,
+					hidden = addon.HiddenAppearanceDB.profile["extraset"][availableSet.setID],
+					favorite = addon.favoritesDB.profile.extraset[availableSet.setID],
+					setType = "Extra",
+					expansionID = availableSet.expansionID,
+					label = availableSet.label,
 				};
-				table.insert(collectionElements, element);
+				local validFilter = isValidFilter(element)
+				if validFilter then 
+					table.insert(collectionElements, element);
+				end
 			else
 			end
 		end
+
 	elseif tab == 5 then
-		 availableSets = self.setsDataProvider:GetAvailableSets();
-				for _index, availableSet in ipairs(availableSets) do
-					local element = {
-						templateKey = "COLLECTION_SET",
-						set = availableSet,
-						sourceData = self.setsDataProvider:GetSetSourceData(availableSet.setID),
-						collectionFrame = self,
-						name = availableSet.name,
-					};
+		local availableSets = addon.fullList --self.setsDataProvider:GetAvailableSets();
+
+		for _index, availableSet in pairs(availableSets) do
+			if availableSet.setType == "Blizzard" then 
+
+				local data = self.setsDataProvider:GetSetSourceData(availableSet.setID)
+				local element = {
+					templateKey = "COLLECTION_SET",
+					set = availableSet,
+					sourceData = data,
+					collected = data.numCollected,
+					pieces = data.numTotal,
+					collectionFrame = self,
+					name = availableSet.name,
+					setID = availableSet.setID,
+					hidden = addon.HiddenAppearanceDB.profile["set"][availableSet.setID],
+					favorite = C_TransmogSets.GetIsFavorite(availableSet.setID) or false,
+					setType = "Blizzard",
+					expansionID = availableSet.expansionID,
+					label = availableSet.label,
+				};
+				availableSet.expansionID = availableSet.expansionID
+				local validFilter = isValidFilter(element)
+				if validFilter then 
 					table.insert(collectionElements, element);
 				end
-	
+			end
+		end
 	end
+
+	local compareEntries = function(element1, element2)
+
+		if element1.favorite ~= element2.favorite then
+			return element1.favorite;
+		end
+
+		local collected1 = element1.collected == element1.pieces
+		local collected2 = element2.collected == element2.pieces
+		if collected1 ~= collected2 then
+			return collected1;
+		end
+
+		local customSetName1, _customSetIcon1 = element1.name;
+		local customSetName2, _customSetIcon2 = element2.name;
+		return customSetName1 < customSetName2;
+	end
+	table.sort(collectionElements, compareEntries);
+
 
 	local collectionData = {{elements = collectionElements}};
 	local dataProvider = CreateDataProvider(collectionData);
@@ -2331,12 +2457,22 @@ local TransmogWardrobeCustomSetsMixin = {
 };
 
 BW_TransmogWardrobeCustomSetsMixin = TransmogWardrobeCustomSetsMixin
+
 function TransmogWardrobeCustomSetsMixin:OnLoad()
 	self.PagedContent:SetElementTemplateData(self.COLLECTION_TEMPLATES);
 
 	self.NewCustomSetButton:SetScript("OnClick", function()
 		local data = { name = "", customSetID = nil, itemTransmogInfoList = self:GetItemTransmogInfoListCallback() };
-		StaticPopup_Show("TRANSMOG_CUSTOM_SET_NAME", nil, nil, data);
+
+		local customSets = C_TransmogCollection.GetCustomSets();
+		--Use Ingame Manager if below cap
+		if #customSets <= 24  then
+			StaticPopup_Show("TRANSMOG_CUSTOM_SET_NAME", nil, nil, data);
+		else
+			local data = { name = "", customSetID = nil, itemTransmogInfoList = self:GetItemTransmogInfoListCallback() };
+			StaticPopup_Show("BW_TRANSMOG_CUSTOM_SET_NAME", nil, nil, data);
+		end
+
 	end);
 
 	self.NewCustomSetButton:SetScript("OnEnter", function(button)
@@ -2446,7 +2582,9 @@ function TransmogWardrobeCustomSetsMixin:RefreshCollectionEntries()
 			customSetID = customSetID,
 			isCollected = isCollected,
 			collectionFrame = self,
-			setType = "Blizzard"
+			setType = "Blizzard",
+			hidden = false,
+			favorite = false,
 
 		};
 		table.insert(collectionElements, element);
@@ -2463,7 +2601,9 @@ function TransmogWardrobeCustomSetsMixin:RefreshCollectionEntries()
 			customSetID = index,
 			isCollected = isCollected,
 			collectionFrame = self,
-			setType = "Extra"
+			setType = "Extra",
+			hidden = false,
+			favorite = false,
 		};
 		table.insert(collectionElements, element);
 		index = index + 1
@@ -2541,12 +2681,12 @@ function TransmogWardrobeCustomSetsMixin:SetOutfitSlotSavedState(outfitSlotSaved
 end
 
 function TransmogWardrobeCustomSetsMixin:GetCurrentTransmogInfoCallback()
-	--return 	TransmogFrame.WardrobeCollection.TabContent.CustomSetsFrame.wardrobeCollection.GetItemTransmogInfoListCallback();
+	return 	self.wardrobeCollection.GetItemTransmogInfoListCallback();
 
 end
 
 function TransmogWardrobeCustomSetsMixin:GetItemTransmogInfoListCallback()
-	--return TransmogFrame.WardrobeCollection.TabContent.CustomSetsFrame.wardrobeCollection.GetItemTransmogInfoListCallback();
+	return self.wardrobeCollection.GetItemTransmogInfoListCallback();
 end
 
 --[[
@@ -2658,3 +2798,54 @@ function TransmogWardrobeSituationsMixin:Refresh()
 	self.UndoButton:SetShown(hasPending);
 end
 ]]--
+
+BW_DressingRoomButtonMixin = {}
+
+--Creates the various buttons used on the Collection Journal
+function addon:CreateButtons()
+	--Load Queue Button
+	local BW_LoadQueueButton = CreateFrame("Button", "BW_LoadQueueButton", TransmogFrame.CharacterPreview, "BetterWardrobeButtonTemplate")
+	BW_LoadQueueButton.Icon:SetTexture("Interface\\Buttons\\UI-OptionsButton")
+	BW_LoadQueueButton:SetPoint("TOPLEFT", TransmogFrame.CharacterPreview, "TOPLEFT", 20,-5)
+	BW_LoadQueueButton.buttonID = "Import"
+	BW_LoadQueueButton:SetScript("OnClick", function(self) BW_TransmogVendorExportButton_OnClick(self) end)
+	--BW_LoadQueueButton:SetScript("OnEnter",  function(self) BW_DressingRoomButtonMixin:OnEnter(self) end)
+	BW_LoadQueueButton:SetSize(20, 20)
+
+	--Randomize Button, Mixin defined in Randomizer.lua
+	local BW_RandomizeButton = CreateFrame("Button", "BW_RandomizeButton", TransmogFrame.CharacterPreview, "BetterWardrobeButtonTemplate")
+	BW_RandomizeButton.Icon:SetTexture("Interface\\Buttons\\UI-GroupLoot-Dice-Up")
+	--Mixin(BW_RandomizeButton, BW_RandomizeButtonMixin)
+	BW_RandomizeButton:SetPoint("TOPLEFT", BW_LoadQueueButton, "TOPRIGHT" , 0, 0)
+	BW_RandomizeButton:SetScript("OnMouseUp", BW_RandomizeButton.OnMouseUp)
+	BW_RandomizeButton:SetScript("OnMouseDown", BW_RandomizeButton.OnMouseDown)
+	BW_RandomizeButton:SetScript("OnEnter", BW_RandomizeButton.OnEnter)
+
+	local BW_SlotHideButton = CreateFrame("Button", "BW_SlotHideButton", TransmogFrame.CharacterPreview, "BetterWardrobeButtonTemplate")
+	BW_SlotHideButton.buttonID = "HideSlot"
+	BW_SlotHideButton:SetScript("OnEnter", function(self) BW_DressingRoomButtonMixin:OnEnter() end)
+	
+	BW_SlotHideButton.Icon:SetTexture("Interface\\PvPRankBadges\\PvPRank12")
+	--Mixin(BW_SlotHideButton, BW_SlotHideButtonMixin)
+	BW_SlotHideButton:SetPoint("TOPLEFT", BW_RandomizeButton, "TOPRIGHT" , 0, 0)
+	BW_SlotHideButton:SetScript("OnClick", function(self) UI:HideSlotMenu_OnClick(self) end)
+
+	--BW_SlotHideButton:SetScript("OnMouseUp", BW_SlotHideButton.OnMouseUp)
+	--BW_SlotHideButton:SetScript("OnMouseDown", BW_SlotHideButton.OnMouseDown)
+	--BW_SlotHideButton:SetScript("OnEnter", BW_SlotHideButton.OnEnter)
+
+	----local BW_TransmogOptionsDropDown= CreateFrame("Frame", "BW_TransmogOptionsDropDown", BetterWardrobeCollectionFrame, "BW_UIDropDownMenuTemplate")
+	----BW_TransmogOptionsDropDown = BW_TransmogOptionsDropDown
+--[[
+	local f = CreateFrame("Frame", "BW_AltIcon1", WardrobeTransmogFrame.HeadButton, "AltItemtemplate")
+	local f = CreateFrame("Frame", "BW_AltIcon3", WardrobeTransmogFrame.ShoulderButton, "AltItemtemplate")
+	local f = CreateFrame("Frame", "BW_AltIcon15", WardrobeTransmogFrame.BackButton, "AltItemtemplate")
+	local f = CreateFrame("Frame", "BW_AltIcon5", WardrobeTransmogFrame.ChestButton, "AltItemtemplate")
+	local f = CreateFrame("Frame", "BW_AltIcon9", WardrobeTransmogFrame.WristButton, "AltItemtemplate")
+	local f = CreateFrame("Frame", "BW_AltIcon10", WardrobeTransmogFrame.HandsButton, "AltItemtemplate")
+	local f = CreateFrame("Frame", "BW_AltIcon6", WardrobeTransmogFrame.WaistButton, "AltItemtemplate")
+	local f = CreateFrame("Frame", "BW_AltIcon7", WardrobeTransmogFrame.LegsButton, "AltItemtemplate")
+	local f = CreateFrame("Frame", "BW_AltIcon8", WardrobeTransmogFrame.FeetButton, "AltItemtemplate")
+	]]--
+end
+

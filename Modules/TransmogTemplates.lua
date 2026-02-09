@@ -1,5 +1,6 @@
 local addonName, addon = ...
 
+--[[
 TransmogOutfitEntryMixin = {
 	DYNAMIC_EVENTS = {
 		"SPELL_UPDATE_COOLDOWN"
@@ -796,18 +797,21 @@ function TransmogIllusionSlotMixin:Update()
 end
 
 
-TransmogWardrobeCollectionTabMixin = {};
+local TransmogWardrobeCollectionTabMixin = {};
+BW_TransmogWardrobeCollectionTabMixin = TransmogWardrobeCollectionTabMixin
 
 function TransmogWardrobeCollectionTabMixin:SetTabSelected(isSelected)
 	TabSystemButtonArtMixin.SetTabSelected(self, isSelected);
 
 	self.SelectedHighlight:SetShown(isSelected);
 end
+]]--
 
-
-TransmogSearchBoxMixin = {
+local TransmogSearchBoxMixin = {
 	WARDROBE_SEARCH_DELAY = 0.6;
 };
+
+BW_TransmogSearchBoxMixin = TransmogSearchBoxMixin
 
 function TransmogSearchBoxMixin:OnHide()
 	self:SetText("");
@@ -857,15 +861,48 @@ function TransmogSearchBoxMixin:Reset()
 	C_TransmogCollection.ClearSearch(self.searchType);
 end
 
+function addon:SearchSets(data)
+	local tab = TransmogFrame and TransmogFrame.WardrobeCollection:GetTab()
+	if not tab then return  false end
+
+	local query = TransmogFrame and TransmogFrame.WardrobeCollection.TabContent.ExtraSetsFrame.SearchBox:GetText()  or ""
+	
+	if tab == 5 then
+		query = TransmogFrame and TransmogFrame.WardrobeCollection.TabContent.SetsFrame2.SearchBox:GetText()  or ""
+	end
+
+	if query == "" then return true end
+	query = string.lower(query)
+
+	local name = data.name and string.find(string.lower(data.name), query, 1, true) 
+	local label = data.label and string.find(string.lower(data.label), query, 1, true)
+	if name then
+		return true
+	end
+
+	if label then
+		return true
+	end
+
+	return false
+end
+
 function TransmogSearchBoxMixin:UpdateSearch()
 	if not self.searchType then
 		return;
 	end
 
+	local tab = TransmogFrame.WardrobeCollection:GetTab()
+
 	if self:GetText() == "" then
 		C_TransmogCollection.ClearSearch(self.searchType);
+		TransmogFrame.WardrobeCollection.TabContent.ExtraSetsFrame:RefreshCollectionEntries()
 	else
-		C_TransmogCollection.SetSearch(self.searchType, self:GetText());
+		if tab == 5 then
+			C_TransmogCollection.SetSearch(self.searchType, self:GetText());
+		else
+			TransmogFrame.WardrobeCollection.TabContent.ExtraSetsFrame:RefreshCollectionEntries()
+		end
 	end
 
 	-- Restart search tracking.
@@ -874,8 +911,8 @@ function TransmogSearchBoxMixin:UpdateSearch()
 	self.checkProgress = true;
 end
 
-
-TransmogSearchBoxProgressMixin = {
+--[[
+local TransmogSearchBoxProgressMixin = {
 	MIN_VALUE = 0;
 	MAX_VALUE = 1000;
 };
@@ -929,7 +966,6 @@ function TransmogSearchBoxProgressMixin:ShowProgressBar()
 	self.updateProgressBar = true;
 	self:Show();
 end
-
 
 local TransmogItemModelMixin = CreateFromMixins(ItemModelBaseMixin);
 BW_TransmogItemModelMixin = TransmogItemModelMixin
@@ -1256,6 +1292,8 @@ function TransmogItemModelMixin:ShouldLocationUseDefaultVisual()
 	return useDefaultVisual;
 end
 
+]]--
+
 local function UpdateOutfit(slot, type, appearance)
 	if not appearance then return end
 	local info = C_TransmogCollection.GetSourceInfo(appearance)
@@ -1316,12 +1354,14 @@ local function getSourceSlots(data)
 	return sources
 end
 
-TransmogSetBaseModelMixin = {
+local TransmogSetBaseModelMixin = {
 	DYNAMIC_EVENTS = {
 		"VIEWED_TRANSMOG_OUTFIT_SLOT_REFRESH",
 		"PLAYER_EQUIPMENT_CHANGED"
 	};
 };
+
+BW_TransmogSetBaseModelMixin = TransmogSetBaseModelMixin
 
 function TransmogSetBaseModelMixin:OnLoad()
 	self:SetAutoDress(false);
@@ -1408,13 +1448,21 @@ function TransmogSetModelMixin:OnMouseDown(button)
 	end
 
 	if button == "LeftButton" then
-		print("click")
 		local sources = getSourceSlots(self.elementData.sourceData.primaryAppearances)
 		ApplyOutfit(sources)
 		PlaySound(SOUNDKIT.UI_TRANSMOG_ITEM_CLICK);
 	end
 end
 
+--Function for creating a link in chat for sharing a set as an outfit.
+local function LinkSetInChat(itemTransmogInfoList)
+  local hyperlink = C_TransmogCollection.GetCustomSetHyperlinkFromItemTransmogInfoList(itemTransmogInfoList)
+  if not ChatEdit_InsertLink(hyperlink) then
+    ChatFrame_OpenChat(hyperlink);
+  end
+end
+
+--(Modified)
 function TransmogSetModelMixin:OnMouseUp(button)
 	if not self.elementData then
 		return;
@@ -1427,19 +1475,80 @@ function TransmogSetModelMixin:OnMouseUp(button)
 	MenuUtil.CreateContextMenu(self, function(_owner, rootDescription)
 		rootDescription:SetTag("MENU_TRANSMOG_SETS_MODEL_FILTER");
 
-		local isFavorite, isGroupFavorite = C_TransmogSets.GetIsFavorite(self.elementData.set.setID);
+		local isFavorite, isGroupFavorite = false, false
+		local setType = self.elementData.setType
+
+		if setType == "Blizzard" then
+			isFavorite, isGroupFavorite = C_TransmogSets.GetIsFavorite(self.elementData.set.setID);
+			setType = "set"
+		else
+			isFavorite, isGroupFavorite =  addon.favoritesDB.profile.extraset[self.elementData.set.setID], true --C_TransmogSets.GetIsFavorite(self.elementData.set.setID);
+			setType = "extraset"
+		end
+
+		local isHidden = self.elementData.hidden
+		local text = isHidden and SHOW or HIDE;
+		rootDescription:CreateButton(text, function()
+			addon.HiddenAppearanceDB.profile[setType][self.elementData.setID] = not isHidden
+			TransmogFrame.WardrobeCollection.TabContent.SetsFrame2:RefreshCollectionEntries()
+			TransmogFrame.WardrobeCollection.TabContent.ExtraSetsFrame:RefreshCollectionEntries()
+		end);
+
+
+		--TODO: handle extra set
+		--check if extra set
+		--selecte extra set
+
 		local text = isFavorite and TRANSMOG_ITEM_UNSET_FAVORITE or TRANSMOG_ITEM_SET_FAVORITE;
 		rootDescription:CreateButton(text, function()
 			self:ToggleFavorite(not isFavorite, isGroupFavorite);
 		end);
 
 		rootDescription:CreateButton(TRANSMOG_SET_OPEN_COLLECTION, function()
-			TransmogUtil.OpenCollectionToSet(self.elementData.set.setID);
+			if self.elementData.setType == "Blizzard" then
+				TransmogUtil.OpenCollectionToSet(self.elementData.set.setID);
+			else
+				--TransmogUtil.OpenCollectionToSet(self.elementData.setID);
+				if TransmogUtil.OpenCollectionUI() then
+				
+					BetterWardrobeCollectionFrame:SetTab(3)
+						C_Timer.After(0.5, function() 
+							BetterWardrobeCollectionFrame:GoToSet(self.elementData.setID); 
+						end)
+				end
+
+			end
+		end)
+
+--TODO: ENabl
+--[[
+		--local itemTransmogInfoList = self.elementData.collectionFrame:GetItemTransmogInfoListCallback();
+		--if DressUpFrameLinkingSupported() then
+			rootDescription:CreateButton("Link in Chat", function()
+				if self.elementData.setType == "Blizzard" then
+					if self.elementData.setID then
+						--LinkSetInChat(C_TransmogCollection.GetCustomSetItemTransmogInfoList(self.elementData.setID));
+					end
+				else
+					 transmogInfo = {}
+					customSetTransmogInfo = self.elementData
+					for slotID, itemTransmogInfo in ipairs(customSetTransmogInfo.sourceData.primaryAppearances) do
+						print(slotID)
+						if itemTransmogInfo then
+							 itemTransmogInfo2 = ItemUtil.CreateItemTransmogInfo(itemTransmogInfo.appearanceID);
+							transmogInfo[slotID] = itemTransmogInfo2
+						end
+					end
+					LinkSetInChat(transmogInfo)
+									end
+			end);
+		--end
+]]--
 		end);
-	end);
+		
 end
 
--- Overridden.
+-- Overridden. (modified)
 function TransmogSetModelMixin:UpdateSet()
 	if not self.elementData then
 		return;
@@ -1498,10 +1607,11 @@ function TransmogSetModelMixin:UpdateSet()
 	end
 
 	-- Icons
-	self.Favorite.Icon:SetShown(self.elementData.set.favorite);
+	self.Favorite.Icon:SetShown(self.elementData.favorite);
+	self.HiddenVisual.Icon:SetShown(self.elementData.hidden);
 end
 
--- Overridden.
+-- Overridden. (modified)
 function TransmogSetModelMixin:RefreshTooltip()
 	if not self.elementData then
 		return;
@@ -1545,13 +1655,8 @@ function TransmogSetModelMixin:RefreshTooltip()
 	if collected  then
 		GameTooltip_AddHighlightLine(GameTooltip, TRANSMOG_SET_COMPLETE);
 	else
-		if not self.elementData.set.collected then
-			local text = string.format("%s(%d/%d)", TRANSMOG_SET_INCOMPLETE, self.elementData.collected, self.elementData.pieces)
-			GameTooltip_AddDisabledLine(GameTooltip, text);
-		else
-			GameTooltip_AddDisabledLine(GameTooltip, TRANSMOG_SET_INCOMPLETE);
-		end
-
+		local text = string.format("%s (%d/%d)", TRANSMOG_SET_INCOMPLETE, self.elementData.collected, self.elementData.pieces)
+		GameTooltip_AddDisabledLine(GameTooltip, text);
 	end
 
 	GameTooltip:Show();
@@ -1576,17 +1681,23 @@ function TransmogSetModelMixin:ToggleFavorite(setFavorite, isGroupFavorite)
 		return;
 	end
 
-	local setID = self.elementData.set.setID;
-	if setFavorite and isGroupFavorite then
-		local baseSetID = C_TransmogSets.GetBaseSetID(setID);
-		C_TransmogSets.SetIsFavorite(baseSetID, false);
+	local setID = self.elementData.setID;
+	if self.elementData.setType == "Blizzard" then
+		if setFavorite and isGroupFavorite then
+			local baseSetID = C_TransmogSets.GetBaseSetID(setID);
+			C_TransmogSets.SetIsFavorite(baseSetID, false);
 
-		for _index, variantSet in ipairs(C_TransmogSets.GetVariantSets(baseSetID)) do
-			C_TransmogSets.SetIsFavorite(variantSet.setID, false);
+			for _index, variantSet in ipairs(C_TransmogSets.GetVariantSets(baseSetID)) do
+				C_TransmogSets.SetIsFavorite(variantSet.setID, false);
+			end
 		end
+
+		C_TransmogSets.SetIsFavorite(setID, setFavorite);
+	else
+		addon.favoritesDB.profile.extraset[setID] = not addon.favoritesDB.profile.extraset[setID]
+		TransmogFrame.WardrobeCollection.TabContent.ExtraSetsFrame:RefreshCollectionEntries()
 	end
 
-	C_TransmogSets.SetIsFavorite(setID, setFavorite);
 end
 
 local TransmogCustomSetModelMixin = {};
@@ -1603,12 +1714,13 @@ function TransmogCustomSetModelMixin:OnMouseDown(button)
 			C_TransmogOutfitInfo.SetOutfitToCustomSet(self.elementData.customSetID);
 		else
 			local outfit = addon.OutfitDB.char.outfits[self.elementData.customSetID]
-
 			ApplyOutfit(outfit)
 		end
 	end
 end
 
+
+--TODO Extra Custom sEt handleer
 function TransmogCustomSetModelMixin:OnMouseUp(button)
 	if not self.elementData then
 		return;
@@ -1621,17 +1733,57 @@ function TransmogCustomSetModelMixin:OnMouseUp(button)
 	MenuUtil.CreateContextMenu(self, function(_owner, rootDescription)
 		rootDescription:SetTag("MENU_TRANSMOG_CUSTOM_SETS_MODEL_FILTER");
 
+		local itemTransmogInfoList = self.elementData.collectionFrame:GetItemTransmogInfoListCallback();
 		if DressUpFrameLinkingSupported() then
 			rootDescription:CreateButton(TRANSMOG_CUSTOM_SET_DRESSING_ROOM, function()
-				DressUpFrame:ShowCustomSet(self.elementData.customSetID);
+				if self.elementData.setType == "Blizzard" then
+					DressUpFrame:ShowCustomSet(self.elementData.customSetID);
+				else
+					local transmogInfo = {}
+					local customSetTransmogInfo = addon.OutfitDB.char.outfits[self.elementData.customSetID]
+					for slotID, itemTransmogInfo in ipairs(customSetTransmogInfo) do
+						if itemTransmogInfo then
+							local itemTransmogInfo2 = ItemUtil.CreateItemTransmogInfo(itemTransmogInfo);
+							transmogInfo[slotID] = itemTransmogInfo2
+						end
+					end
+					DressUpItemTransmogInfoList(transmogInfo);
+				end
+			end);
+		end
+
+		local itemTransmogInfoList = self.elementData.collectionFrame:GetItemTransmogInfoListCallback();
+		if DressUpFrameLinkingSupported() then
+			rootDescription:CreateButton("Link in Chat", function()
+				if self.elementData.setType == "Blizzard" then
+					if self.elementData.customSetID then
+						LinkSetInChat(C_TransmogCollection.GetCustomSetItemTransmogInfoList(self.elementData.customSetID));
+					end
+				else
+					local transmogInfo = {}
+					local customSetTransmogInfo = addon.OutfitDB.char.outfits[self.elementData.customSetID]
+					for slotID, itemTransmogInfo in ipairs(customSetTransmogInfo) do
+						if itemTransmogInfo then
+							local itemTransmogInfo2 = ItemUtil.CreateItemTransmogInfo(itemTransmogInfo);
+							transmogInfo[slotID] = itemTransmogInfo2
+						end
+					end
+					LinkSetInChat(transmogInfo)
+				end
 			end);
 		end
 
 		local itemTransmogInfoList = self.elementData.collectionFrame:GetItemTransmogInfoListCallback();
 		rootDescription:CreateButton(TRANSMOG_CUSTOM_SET_RENAME, function()
-			local name, _icon = C_TransmogCollection.GetCustomSetInfo(self.elementData.customSetID);
-			local data = { name = name, customSetID = self.elementData.customSetID, itemTransmogInfoList = itemTransmogInfoList };
-			StaticPopup_Show("TRANSMOG_CUSTOM_SET_NAME", nil, nil, data);
+			if self.elementData.setType == "Blizzard" then
+				local name, _icon = C_TransmogCollection.GetCustomSetInfo(self.elementData.customSetID);
+				local data = { name = name, customSetID = self.elementData.customSetID, itemTransmogInfoList = itemTransmogInfoList };
+				StaticPopup_Show("TRANSMOG_CUSTOM_SET_NAME", nil, nil, data);
+			else
+				local name = addon.OutfitDB.char.outfits[self.elementData.customSetID];
+				local data = { name = name, customSetID = self.elementData.customSetID, itemTransmogInfoList = itemTransmogInfoList };
+				StaticPopup_Show("BW_TRANSMOG_CUSTOM_SET_NAME", nil, nil, data);
+			end
 		end);
 
 		local hasValidAppearance = TransmogUtil.IsValidItemTransmogInfoList(itemTransmogInfoList);
@@ -1639,20 +1791,33 @@ function TransmogCustomSetModelMixin:OnMouseUp(button)
 			rootDescription:CreateDivider();
 
 			rootDescription:CreateButton(TRANSMOG_CUSTOM_SET_REPLACE, function()
-				C_TransmogCollection.ModifyCustomSet(self.elementData.customSetID, itemTransmogInfoList);
+				if self.elementData.setType == "Blizzard" then
+					C_TransmogCollection.ModifyCustomSet(self.elementData.customSetID, itemTransmogInfoList);
+				else
+					addon:ModifyCustomSet(self.elementData.customSetID, itemTransmogInfoList);
+				end
 			end);
 		end
 
 		rootDescription:CreateDivider();
 
 		rootDescription:CreateButton(RED_FONT_COLOR:WrapTextInColorCode(TRANSMOG_CUSTOM_SET_DELETE), function()
-			local name, _icon = C_TransmogCollection.GetCustomSetInfo(self.elementData.customSetID);
-			StaticPopup_Show("CONFIRM_DELETE_TRANSMOG_CUSTOM_SET", name, nil, self.elementData.customSetID);
+
+			if self.elementData.setType == "Blizzard" then
+				local name, _icon = C_TransmogCollection.GetCustomSetInfo(self.elementData.customSetID);
+				StaticPopup_Show("CONFIRM_DELETE_TRANSMOG_CUSTOM_SET", name, nil, self.elementData.customSetID);
+			else
+				local name = addon.OutfitDB.char.outfits[self.elementData.customSetID].name or "x";
+				print(name)
+				StaticPopup_Show("BW_CONFIRM_DELETE_TRANSMOG_OUTFIT", name, nil, self.elementData.customSetID);
+				--BW_CONFIRM_DELETE_TRANSMOG_OUTFIT
+			end
+
 		end);
 	end);
 end
 
--- Overridden.
+-- Overridden. (Modified)
 function TransmogCustomSetModelMixin:UpdateSet()
 	if not self.elementData then
 		return;
@@ -1721,6 +1886,9 @@ function TransmogCustomSetModelMixin:UpdateSet()
 		self.PendingFrame.Anim:Stop();
 		self.PendingFrame:Hide();
 	end
+	self.Favorite.Icon:SetShown(false);
+	self.HiddenVisual.Icon:SetShown(false);
+
 end
 
 -- Overridden.
@@ -1757,6 +1925,7 @@ function TransmogCustomSetModelMixin.Reset(framePool, self)
 	self.elementData = nil;
 end
 
+--[[
 
 TransmogSituationMixin = {
 	DROPDOWN_WIDTH = 305;
@@ -1824,3 +1993,5 @@ function TransmogSituationMixin:IsValid()
 	local _previousRadio, _nextRadio, selections = self.Dropdown:CollectSelectionData();
 	return #selections > 0;
 end
+
+]]--

@@ -17,7 +17,7 @@
 				<KeyValues>
 					<KeyValue key="minTabWidth" value="95" type="number"/>
 					<KeyValue key="maxTabWidth" value="170" type="number"/>
-					<KeyValue key="tabTemplate" value="TransmogWardrobeCollectionTabTemplate" type="string"/>
+					<KeyValue key="tabTemplate" value="BW_TransmogWardrobeCollectionTabTemplate" type="string"/>
 					<KeyValue key="tabSelectSound" value="SOUNDKIT.UI_TRANSMOG_CATEGORIES_CLICK" type="global"/>
 				</KeyValues>
 				<Anchors>
@@ -72,7 +72,7 @@
 											<Anchor point="TOPRIGHT" x="-29" y="-24"/>
 										</Anchors>
 									</DropdownButton>
-									<EditBox parentKey="SearchBox" inherits="TransmogSearchBoxTemplate">
+									<EditBox parentKey="SearchBox" inherits="BW_TransmogSearchBoxTemplate">
 										<Anchors>
 											<Anchor point="TOPRIGHT" relativeKey="$parent.FilterButton" relativePoint="TOPLEFT" x="-10" y="1"/>
 										</Anchors>
@@ -158,7 +158,7 @@
 									<Anchor point="TOPRIGHT" x="-29" y="-24"/>
 								</Anchors>
 							</DropdownButton>
-							<EditBox parentKey="SearchBox" inherits="TransmogSearchBoxTemplate">
+							<EditBox parentKey="SearchBox" inherits="BW_TransmogSearchBoxTemplate">
 								<Anchors>
 									<Anchor point="TOPRIGHT" relativeKey="$parent.FilterButton" relativePoint="TOPLEFT" x="-10" y="1"/>
 								</Anchors>
@@ -269,7 +269,7 @@
 				<KeyValues>
 					<KeyValue key="minTabWidth" value="95" type="number"/>
 					<KeyValue key="maxTabWidth" value="170" type="number"/>
-					<KeyValue key="tabTemplate" value="TransmogWardrobeCollectionTabTemplate" type="string"/>
+					<KeyValue key="tabTemplate" value="BW_TransmogWardrobeCollectionTabTemplate" type="string"/>
 					<KeyValue key="tabSelectSound" value="SOUNDKIT.UI_TRANSMOG_CATEGORIES_CLICK" type="global"/>
 				</KeyValues>
 				<Anchors>
@@ -312,7 +312,7 @@
 									<Anchor point="TOPRIGHT" x="-29" y="-24"/>
 								</Anchors>
 							</DropdownButton>
-							<EditBox parentKey="SearchBox" inherits="TransmogSearchBoxTemplate">
+							<EditBox parentKey="SearchBox" inherits="BW_TransmogSearchBoxTemplate">
 								<Anchors>
 									<Anchor point="TOPRIGHT" relativeKey="$parent.FilterButton" relativePoint="TOPLEFT" x="-10" y="1"/>
 								</Anchors>
@@ -473,7 +473,7 @@
 					<Anchor point="TOPRIGHT" x="-29" y="-24"/>
 				</Anchors>
 			</DropdownButton>
-			<EditBox parentKey="SearchBox" inherits="TransmogSearchBoxTemplate">
+			<EditBox parentKey="SearchBox" inherits="BW_TransmogSearchBoxTemplate">
 				<Anchors>
 					<Anchor point="TOPRIGHT" relativeKey="$parent.FilterButton" relativePoint="TOPLEFT" x="-10" y="1"/>
 				</Anchors>
@@ -621,7 +621,6 @@
 		<NormalTexture file="Interface\TIMEMANAGER\FFButton"/>
 		<HighlightTexture file="Interface\Buttons\UI-Common-MouseHilight" alphaMode="ADD"/>
 	</Button>
-
 
 
 </Ui>

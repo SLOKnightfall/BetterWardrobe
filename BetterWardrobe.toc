@@ -47,9 +47,9 @@ Data\Mail.lua
 Data\MISC.lua
 Data\test.lua
 
-
+Modules\SavedOutfits.xml
 Modules\ImportExport.lua
-Modules\SavedOutfitsViewer.xml
+#Modules\SavedOutfitsViewer.xml
 Modules\TransmogShared.lua
 Modules\TransmogTemplates.xml
 

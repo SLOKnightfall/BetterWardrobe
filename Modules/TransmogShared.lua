@@ -125,6 +125,15 @@ function WardrobeSetsDataProviderMixin:GetBaseSets()
 		self.baseSets = baseSets --C_TransmogSets.GetBaseSets();
 		self:DetermineFavorites();
 
+		local tabFilter = {}
+		local tab = addon.GetTab()
+		for i, data in ipairs(self.baseSets) do
+			if data.tab == tab then
+				tinsert(tabFilter, data)
+			end
+		end
+		self.baseSets = tabFilter
+
 		local reverseUIOrder = false;
 		local ignorePatchID = false;
 		local ignoreCollected = true;
@@ -196,7 +205,7 @@ function WardrobeSetsDataProviderMixin:GetVariantSets(baseSetID)
 
 	local variantSets = self.variantSets[baseSetID];
 	if not variantSets then
-		variantSets = C_TransmogSets.GetVariantSets(baseSetID) or {};
+		variantSets = addon.VariantSets[baseSetID] or {} --C_TransmogSets.GetVariantSets(baseSetID) or {};
 		self.variantSets[baseSetID] = variantSets;
 		if #variantSets > 0 then
 			-- Add base to variants and sort.

@@ -2,7 +2,7 @@
 ..\..\..\..\..\WoW\Data\Interface\AddOns\Blizzard_SharedXML\UI.xsd">
 	<Script file="TransmogTemplates.lua"/>
 
-	<Frame name="TransmogOutfitEntryTemplate" mixin="TransmogOutfitEntryMixin" virtual="true">
+	<Frame name="BW_TransmogOutfitEntryTemplate" mixin="TransmogOutfitEntryMixin" virtual="true">
 		<Size y="45"/>
 		<Anchors>
 			<Anchor point="TOPLEFT"/>
@@ -154,7 +154,7 @@
 		</Scripts>
 	</Frame>
 
-	<Button name="TransmogAppearanceSlotTemplate" mixin="TransmogAppearanceSlotMixin" motionScriptsWhileDisabled="true" registerForClicks="LeftButtonUp, RightButtonUp" virtual="true">
+	<Button name="BW_TransmogAppearanceSlotTemplate" mixin="TransmogAppearanceSlotMixin" motionScriptsWhileDisabled="true" registerForClicks="LeftButtonUp, RightButtonUp" virtual="true">
 		<Size x="59" y="59"/>
 		<Layers>
 			<Layer level="BACKGROUND">
@@ -378,7 +378,7 @@
 		</Scripts>
 	</Button>
 
-	<Button name="TransmogIllusionSlotTemplate" mixin="TransmogIllusionSlotMixin" motionScriptsWhileDisabled="true" registerForClicks="LeftButtonUp, RightButtonUp" virtual="true">
+	<Button name="BW_TransmogIllusionSlotTemplate" mixin="TransmogIllusionSlotMixin" motionScriptsWhileDisabled="true" registerForClicks="LeftButtonUp, RightButtonUp" virtual="true">
 		<Size x="42" y="42"/>
 		<Layers>
 			<Layer level="BACKGROUND">
@@ -591,7 +591,7 @@
 		</Scripts>
 	</Button>
 
-	<Button name="TransmogWardrobeCollectionTabTemplate" mixin="TransmogWardrobeCollectionTabMixin" inherits="TabSystemTopButtonTemplate" virtual="true">
+	<Button name="BW_TransmogWardrobeCollectionTabTemplate" mixin="BW_TransmogWardrobeCollectionTabMixin" inherits="TabSystemTopButtonTemplate" virtual="true">
 		<KeyValues>
 			<KeyValue key="selectedFontObject" value="GameFontHighlight" type="string"/>
 			<KeyValue key="unselectedFontObject" value="GameFontNormal" type="string"/>
@@ -616,7 +616,7 @@
 		<HighlightFont style="GameFontHighlight"/>
 	</Button>
 
-	<EditBox name="TransmogSearchBoxTemplate" mixin="TransmogSearchBoxMixin" inherits="SearchBoxNineSliceTemplate" letters="40" virtual="true">
+	<EditBox name="BW_TransmogSearchBoxTemplate" mixin="BW_TransmogSearchBoxMixin" inherits="SearchBoxNineSliceTemplate" letters="40" virtual="true">
 		<Size x="142" y="19"/>
 		<Frames>
 			<Frame parentKey="ProgressFrame" mixin="TransmogSearchBoxProgressMixin" hidden="true">
@@ -723,7 +723,7 @@
 		</Scripts>
 	</EditBox>
 
-	<Button name="DisplayTypeButtonTemplate" motionScriptsWhileDisabled="true" virtual="true">
+	<Button name="BW_DisplayTypeButtonTemplate" motionScriptsWhileDisabled="true" virtual="true">
 		<Size x="188" y="36"/>
 		<Layers>
 			<Layer level="OVERLAY">
@@ -1072,7 +1072,7 @@
 		</Scripts>
 	</DressUpModel>
 
-	<DressUpModel name="BW_TransmogSetBaseModelTemplate" mixin="TransmogSetBaseModelMixin" virtual="true">
+	<DressUpModel name="BW_TransmogSetBaseModelTemplate" mixin="BW_TransmogSetBaseModelMixin" virtual="true">
 		<Size x="178" y="218"/>
 		<Layers>
 			<Layer level="BACKGROUND">
@@ -1294,7 +1294,18 @@
 					</Layer>
 				</Layers>
 			</Frame>
+			<Frame parentKey="HiddenVisual" setAllPoints="true">
+				<Layers>
+					<Layer level="ARTWORK">
+						<Texture parentKey="Icon" atlas="transmog-icon-hidden" useAtlasSize="true" hidden="false">
+							<Anchors>
+								<Anchor point="TOP"/>
+							</Anchors>
+						</Texture>
 
+					</Layer>
+				</Layers>
+			</Frame>
 		</Frames>
 		<Scripts>
 			<OnLoad method="OnLoad"/>
@@ -1321,7 +1332,7 @@
 		</Scripts>
 	</DressUpModel>
 
-	<Frame name="TransmogSituationTemplate" mixin="TransmogSituationMixin" virtual="true">
+	<Frame name="BW_TransmogSituationTemplate" mixin="TransmogSituationMixin" virtual="true">
 		<Size x="554" y="50"/>
 		<Layers>
 			<Layer level="OVERLAY">
@@ -1344,4 +1355,23 @@
 			<OnLoad method="OnLoad"/>
 		</Scripts>
 	</Frame>
+
+	<Button name ="BetterWardrobeButtonTemplate" inherits="SquareIconButtonTemplate" mixin="BW_DressingRoomButtonMixin" virtual="true" hidden="false">
+		<Size x="20" y="20"/>
+		<Layers>
+			<Layer level="ARTWORK">
+				<Texture parentKey="Icon" file="Interface\Buttons\UI-OptionsButton">
+					<Size x="12" y="12"/>
+					<Anchors>
+						<Anchor point="CENTER"/>
+					</Anchors>
+				</Texture>
+			</Layer>
+		</Layers>
+		<HighlightTexture file="Interface\Buttons\UI-Common-MouseHilight" alphaMode="ADD"/>
+		<Scripts>
+				<OnClick method="OnEnter" />
+				<OnLeave method="OnLeave" />
+		</Scripts>
+	</Button>
 </Ui>

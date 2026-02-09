@@ -7,7 +7,7 @@ local DressingRoom = {}
 local DressUpModel
 local SLOT_BUTTON_INDEX = {}
 local INVENTORY_SLOT_NAMES = addon.Globals.INVENTORY_SLOT_NAMES
-
+local SET_OFFSET = addon.Globals.SET_OFFSET
 local import = false
 local useCharacterSources = true
 
@@ -792,7 +792,7 @@ function BetterDressUpOutfitMixin:LoadOutfit(outfitID)
 	DressingRoom:Update()
 	import = true
 	local setType = addon.GetSetType(outfitID)
-	if setType == "SavedBlizzard"  or (outfitID >= 5000 and outfitID <= 5020) then
+	if setType == "SavedBlizzard"  or (outfitID >= SET_OFFSET and outfitID <= SET_OFFSET+25) then
 		local outfitID = addon:GetBlizzID(outfitID)
 		DressUpItemTransmogInfoList(C_TransmogCollection.GetOutfitItemTransmogInfoList(outfitID))
 	else

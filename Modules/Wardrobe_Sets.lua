@@ -150,7 +150,16 @@ function WardrobeSetsCollectionMixin:OnShow()
 			return;
 		end
 
-		local baseSetID = C_TransmogSets.GetBaseSetID(selectedSetID);
+		--local baseSet = SetsDataProvider:GetBaseSetByID(selectedSetID);
+		--if BetterWardrobeCollectionFrame.selectedCollectionTab ~= 4 then
+		--variantSets = addon.VariantSets[baseSet.baseSetID] or {}--C_TransmogSets.GetVariantSets(baseSet.baseSetID) or {};
+		--if #variantSets > 0 then
+			-- variant sets are already filtered for visibility (won't get a hiddenUntilCollected one unless it's collected)
+			-- any set will do so just picking first one
+			--displayData = variantSets[1];
+		--end
+
+		local baseSetID = SetsDataProvider:GetBaseSetByID(selectedSetID); --C_TransmogSets.GetBaseSetID(selectedSetID);
 
 		local function IsSelected(variantSet)
 			return variantSet.setID == self:GetSelectedSetID();
@@ -163,8 +172,11 @@ function WardrobeSetsCollectionMixin:OnShow()
 			self.DetailsFrame.VariantSetsDropdown:SetText(desc);
 		end
 
-		for index, variantSet in ipairs(SetsDataProvider:GetVariantSets(baseSetID)) do
+		if not baseSetID then return end
+
+		for index, variantSet in ipairs(SetsDataProvider:GetVariantSets(baseSetID.baseSetID)) do
 			--if not variantSet.hiddenUntilCollected or variantSet.collected then
+
 				local numSourcesCollected, numSourcesTotal = SetsDataProvider:GetSetSourceCounts(variantSet.setID);
 				local colorCode = IN_PROGRESS_FONT_COLOR_CODE;
 				if numSourcesCollected == numSourcesTotal then
@@ -399,7 +411,9 @@ function WardrobeSetsCollectionMixin:DisplaySet(setID)
 
 	-- variant sets
 	local showVariantSetsDropdown = false;
-	local baseSetID = C_TransmogSets.GetBaseSetID(setID);
+	--local baseSetID = C_TransmogSets.GetBaseSetID(setID);
+	local baseSetID = SetsDataProvider:GetBaseSetByID(setID).baseSetID;
+
 	local variantSets = SetsDataProvider:GetVariantSets(baseSetID);
 	if variantSets then
 		local numVisibleSets = 0;
@@ -568,10 +582,15 @@ end
 function WardrobeSetsCollectionMixin:SelectSet(setID)
 	self.selectedSetID = setID;
 
-	local baseSetID = C_TransmogSets.GetBaseSetID(setID);
-	local variantSets = SetsDataProvider:GetVariantSets(baseSetID);
-	if ( #variantSets > 0 ) then
-		self.selectedVariantSets[baseSetID] = setID;
+	local tab = addon.GetTab()
+	if tab == 2 then
+		local baseSetID = C_TransmogSets.GetBaseSetID(setID);
+		local variantSets = SetsDataProvider:GetVariantSets(baseSetID);
+		if ( #variantSets > 0 ) then
+			self.selectedVariantSets[baseSetID] = setID;
+		end
+	elseif tab == 3 then
+		--TODO: Extended stet
 	end
 
 	self.ListContainer:SelectElementDataMatchingSetID(baseSetID);
@@ -702,7 +721,8 @@ end
 
 function BetterWardrobeSetsCollectionMixin:LinkSet(setID)
 	local playerActor = self.Model
-	 z = playerActor and playerActor:GetItemTransmogInfoList();
+	
+	local itemTransmogInfoList = playerActor and playerActor:GetItemTransmogInfoList();
 	if not itemTransmogInfoList then
 		return;
 	end
@@ -717,18 +737,48 @@ end
 local WardrobeSetsScrollFrameButtonMixin = {};
 BetterWardrobeSetsScrollFrameButtonMixin = WardrobeSetsScrollFrameButtonMixin
 
+local function variantsTooltip(elementData, variantSets)
+	if BetterWardrobeCollectionFrame.selectedCollectionTab == 4 then
+		return ""
+	end
+	if not variantSets then return "" end
+	local  ratioText = ""
+	--table.sort(variantSets, function(a,b) return (a.name) < (b.name) end);
+
+	for i, setdata in ipairs(variantSets) do
+		local have, total = addon.SetsDataProvider:GetSetSourceCounts(setdata.setID)
+		text = setdata.description or setdata.name
+		 ratioText =  ratioText..text..": ".. have .. "/" .. total.."\n"
+	end
+
+	return ratioText
+end
+
 function WardrobeSetsScrollFrameButtonMixin:Init(elementData)
 	local displayData = elementData;
-	-- if the base set is hiddenUntilCollected and not collected, it's showing up because one of its variant sets is collected
-	-- in that case use any variant set to populate the info in the list
-	--if elementData.hiddenUntilCollected and not elementData.collected then
-		--local variantSets = C_TransmogSets.GetVariantSets(elementData.setID);
-		--if variantSets then
+
+	--local variantSets
+	local baseSet = SetsDataProvider:GetBaseSetByID(elementData.setID);
+	if BetterWardrobeCollectionFrame.selectedCollectionTab ~= 4 then
+		variantSets = addon.VariantSets[baseSet.baseSetID] or {}--C_TransmogSets.GetVariantSets(baseSet.baseSetID) or {};
+		if #variantSets > 0 then
 			-- variant sets are already filtered for visibility (won't get a hiddenUntilCollected one unless it's collected)
 			-- any set will do so just picking first one
-			--displayData = variantSets[1];
-		--end
-	--end
+			displayData = variantSets[1];
+		end
+	
+		if #variantSets <= 1  or (C_AddOns.IsAddOnLoaded("CanIMogIt") and CanIMogItOptions["showSetInfo"]) then
+			self.Variants:Hide()
+			self.Variants.Count:SetText(0)
+		else
+			self.Variants:Show()
+			self.Variants.Count:SetText(#variantSets)
+		end
+	else
+		self.Variants:Hide()
+		self.Variants.Count:SetText(0)
+	end
+
 	self.Name:SetText(displayData.name);
 	local topSourcesCollected, topSourcesTotal = SetsDataProvider:GetSetSourceTopCounts(displayData.setID);
 	-- progress visuals use the top collected progress, so collected visuals should reflect the top completion status as well
@@ -755,7 +805,7 @@ function WardrobeSetsScrollFrameButtonMixin:Init(elementData)
 		self.ProgressBar:Show();
 		self.ProgressBar:SetWidth(SET_PROGRESS_BAR_MAX_WIDTH * topSourcesCollected / topSourcesTotal);
 	end
-
+	self.variantInfo = variantsTooltip(elementData, variantSets);
 	self:SetSelected(SelectionBehaviorMixin.IsElementDataIntrusiveSelected(elementData));
 end
 

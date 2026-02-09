@@ -157,11 +157,8 @@ local WARDROBE_MODEL_SETUP_GEAR = {
 }
 
 
-
 local WardrobeCollectionFrameMixin = { };
 BetterWardrobeCollectionFrameMixin = WardrobeCollectionFrameMixin
-
-
 
 function WardrobeCollectionFrameMixin:ClickTab(tab)
 	self:SetTab(tab:GetID());
@@ -347,7 +344,6 @@ end
 
 addon.RefreshLists = RefreshLists;
 local locationDropDown = addon.Globals.locationDropDown;
-
 
 function WardrobeCollectionFrameMixin:InitItemsFilterButton()
 	-- Source filters are in a submenu when unless we're at a transmogrifier.
@@ -840,7 +836,9 @@ function WardrobeCollectionFrameMixin:GoToItem(sourceID)
 end
 
 function WardrobeCollectionFrameMixin:GoToSet(setID)
-	self:SetTab(WARDROBE_TAB_SETS);
+	--self:SetTab(WARDROBE_TAB_SETS);
+
+	--TODO: Handle extra set
 	local classID = C_TransmogSets.GetValidClassForSet(setID);
 	if classID then
 		C_TransmogSets.SetTransmogSetsClassFilter(classID);
