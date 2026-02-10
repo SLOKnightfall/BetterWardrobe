@@ -5,6 +5,7 @@ local L = LibStub("AceLocale-3.0"):GetLocale(addonName)
 --Stubs to for when MogIt is not loaded
 local TransmogOutfits = {}
 addon.TransmogOutfits = TransmogOutfits
+local SET_OFFSET = addon.Globals.SET_OFFSET
 
 function TransmogOutfits.GetOutfits() return {} end
 
@@ -175,7 +176,7 @@ end
 local MAX_DEFAULT_OUTFITS = C_TransmogCollection.GetNumMaxOutfits()
 local function IsDefaultSet(outfitID)
 	
-	return outfitID - 5000 < MAX_DEFAULT_OUTFITS  -- #C_TransmogCollection.GetOutfits()--MAX_DEFAULT_OUTFITS 
+	return outfitID - SET_OFFSET < MAX_DEFAULT_OUTFITS  -- #C_TransmogCollection.GetOutfits()--MAX_DEFAULT_OUTFITS 
 end
 
 function TransmogOutfits:CopySet(setID)

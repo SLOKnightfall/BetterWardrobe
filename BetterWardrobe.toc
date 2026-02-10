@@ -1,9 +1,8 @@
-## Interface: 120000,120001
+## Interface: 120000, 120001
 ## Title: BetterWardrobe (@project-version@)
 ## Version: @project-version@
 ## Author: SLOKnightfall
 ## Notes: 
-## Notes:
 ## OptionalDeps: MogIt, CanIMogIt, LegionWardrobe, WardrobeEnhanced, Rarity, TransmogOutfits, ExtendedSets, ElvUI, PetTracker, PetTrackerJournal
 ## SavedVariables: BetterWardrobe_Options, BetterWardrobe_CharacterData, BetterWardrobe_SavedSetData, BetterWardrobe_SubstituteItemData, BetterWardrobe_ListData, BetterWardrobe_Mogitdata, BetterWardrobe_Updates, BTT
 ## X-Curse-Project-ID: 401253
@@ -39,19 +38,22 @@ Locale\zhTW.lua
 #Core files
 Data\Globals.lua
 
-#Modules\CollectionTemplates.xml
-#Modules\Templates.xml
+Modules\CollectionTemplates.xml
+Modules\Templates.xml
 Modules\Core.lua
-#Data\DataBase.lua
-#Data\Mail.lua
-#Data\MISC.lua
-#Data\test.lua
+Data\DataBase.lua
+Data\Cloth.lua
+Data\Mail.lua
+Data\MISC.lua
+Data\test.lua
 
+Modules\SavedOutfits.xml
+Modules\ImportExport.lua
+#Modules\SavedOutfitsViewer.xml
+Modules\TransmogShared.lua
+Modules\TransmogTemplates.xml
 
-#Modules\ImportExport.lua
-Modules\SavedOutfitsViewer.xml
-#Modules\TransmogShared.lua
-#Modules\Transmog.xml
-#Modules\Wardrobe_Sets.xml
-#Modules\Wardrobe.xml
-#Modules\CollectionList.xml
+Modules\Transmog.xml
+Modules\Wardrobe_Sets.xml
+Modules\Wardrobe.xml
+Modules\CollectionList.xml

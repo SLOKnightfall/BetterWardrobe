@@ -2,7 +2,7 @@ local addonName, addon = ...;
 ---addon = LibStub("AceAddon-3.0"):NewAddon(addon, addonName, "AceEvent-3.0", "AceConsole-3.0", "AceHook-3.0");
 addon = LibStub("AceAddon-3.0"):GetAddon(addonName);
 
-StaticPopupDialogs["TRANSMOG_FAVORITE_WARNING"] = {
+StaticPopupDialogs["TRANSMOG_FAVORITE_WARNING2"] = {
 	text = TRANSMOG_FAVORITE_LOSE_REFUND_AND_TRADE,
 	button1 = OKAY,
 	button2 = CANCEL,
@@ -15,7 +15,7 @@ StaticPopupDialogs["TRANSMOG_FAVORITE_WARNING"] = {
 	hideOnEscape = 1
 };
 
-TransmogSlotOrder = {
+local TransmogSlotOrder = {
 	INVSLOT_HEAD,
 	INVSLOT_SHOULDER,
 	INVSLOT_BACK,
@@ -82,6 +82,7 @@ local NUM_CUSTOM_SET_SLASH_COMMAND_VALUES = 17;
 
 local WardrobeSetsDataProviderMixin = {};
 BetterWardrobeSetsDataProviderMixin = WardrobeSetsDataProviderMixin
+
 addon.SetsDataProvider = BetterWardrobeSetsDataProviderMixin
 function WardrobeSetsDataProviderMixin:SortSets(sets, reverseUIOrder, ignorePatchID)
 	local comparison = function(set1, set2)
@@ -123,6 +124,15 @@ function WardrobeSetsDataProviderMixin:GetBaseSets()
 		local baseSets = addon.BaseList
 		self.baseSets = baseSets --C_TransmogSets.GetBaseSets();
 		self:DetermineFavorites();
+
+		local tabFilter = {}
+		local tab = addon.GetTab()
+		for i, data in ipairs(self.baseSets) do
+			if data.tab == tab then
+				tinsert(tabFilter, data)
+			end
+		end
+		self.baseSets = tabFilter
 
 		local reverseUIOrder = false;
 		local ignorePatchID = false;
@@ -195,7 +205,7 @@ function WardrobeSetsDataProviderMixin:GetVariantSets(baseSetID)
 
 	local variantSets = self.variantSets[baseSetID];
 	if not variantSets then
-		variantSets = C_TransmogSets.GetVariantSets(baseSetID) or {};
+		variantSets = addon.VariantSets[baseSetID] or {} --C_TransmogSets.GetVariantSets(baseSetID) or {};
 		self.variantSets[baseSetID] = variantSets;
 		if #variantSets > 0 then
 			-- Add base to variants and sort.

@@ -6,6 +6,8 @@ local Globals = {}
 
 addon.Globals = Globals
 
+addon.Globals.SET_OFFSET = 20000
+
 Globals.ARMOR_MASK = {
 	CLOTH = 400,
 	LEATHER = 3592,

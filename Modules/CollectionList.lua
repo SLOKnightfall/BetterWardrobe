@@ -222,7 +222,7 @@ local function slotOnClick(self, transmogLocation)
 	local slotButtons = self.parent.Buttons
 	for i = 1, #slotButtons do
 		local button = slotButtons[i]
-		print(self.transmogLocation)
+		----print(self.transmogLocation)
 		button.SelectedTexture:SetShown(button.transmogLocation:IsEqual(self.transmogLocation))
 	end
 
@@ -283,7 +283,7 @@ function BetterWardrobeSetsCollectionListMixin:CreateSlotButtons()
 			xOffset = spacingNoSmallButton
 			lastButton = button
 			button.parent = parentFrame
-			print(button.transmogType)
+		----print(button.transmogType)
 			button.transmogLocation = TransmogUtil.GetTransmogLocation(button.slot, button.transmogType, false)
 			button:SetScript("OnClick", function(button)  slotOnClick(button , button.transmogLocation) end)
 		end

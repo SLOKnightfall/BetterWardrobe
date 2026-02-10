@@ -1357,28 +1357,6 @@ function addon:OnEnable()
 	addon.Profile = self.db.profile
 	Profile = addon.Profile
 
-	initialize = true
-
-	if not C_AddOns.IsAddOnLoaded("Blizzard_Collections") then
-  		C_AddOns.LoadAddOn("Blizzard_Collections")
-	end
-
-		if not C_AddOns.IsAddOnLoaded("Blizzard_Transmog") then
-  		C_AddOns.LoadAddOn("Blizzard_Transmog")
-	end
-
-		C_Timer.After(2, function()
-		addon:CreateCustomSetsButton()
-		self:HookCustomSetsOnHide()
-
-	end)
-end
-
-function addon:OnEnable_Old()
-	_,playerClass, classID = UnitClass("player")
-	addon.Profile = self.db.profile
-	Profile = addon.Profile
-
 	addon.Init:InitDB()
 	--addon.Init:BuildTooltips()
 	----addon.Init:DressingRoom()
@@ -1407,8 +1385,8 @@ function addon:OnEnable_Old()
   		C_AddOns.LoadAddOn("Blizzard_Transmog")
 	end
 
-	C_Timer.After(1, function() addon.Init:LoadModules() end)
-	self:HookCustomSetsOnHide()
+	--C_Timer.After(1, function() addon.Init:LoadModules() end)
+	--self:HookCustomSetsOnHide()
 end
 
 --Hides default collection window when at transmog vendor
@@ -1437,7 +1415,7 @@ function addon.Init:LoadModules()
 
 	-----C_Timer.After(0, function() addon.Init:UpdateWardrobeEnhanced() end)
 
-	local f = CreateFrame("Frame", "BetterWardrobeCollectionFrame", UIParent, "BetterWardrobeCollectionFrameTemplate" )
+	local f = CreateFrame("Frame", "BetterWardrobeCollectionFrame", TransmogFrame.WardrobeCollection, "BetterWardrobeCollectionFrameTemplate" )
 	addon:setFrames()
 	--Hooks into the colection tabs and sets Better Wardobe when viewing the wardrobe collection
 	addon:SecureHook(nil, "CollectionsJournal_UpdateSelectedTab", function(self)
@@ -1483,14 +1461,13 @@ function addon.Init:LoadModules()
 
 	C_Timer.After(0, function()
 		----addon:UpdatePetTracker()
-		addon.Init:initCollectionList()
-	 	addon.Init:BuildCollectionList()
+		----addon.Init:initCollectionList()
+	 	----addon.Init:BuildCollectionList()
 		----addon.Init:BuildTransmogVendorUI()
 		----addon:UpdateCanIMogIt()
 		----addon:InitExtendedSetsSwap()
-		addon.Init:InitFilterButtons()
 
-		CreateCustomSetsButton()
+		--==addon:CreateCustomSetsButton()
 
 
 		local selected = CollectionsJournal_GetTab(CollectionsJournal)
@@ -1503,6 +1480,16 @@ function addon.Init:LoadModules()
 	end)
 end
 
+function UpdateTabs()
+	TransmogFrame.WardrobeCollection.TabHeaders:SetTabShown(TransmogFrame.WardrobeCollection.itemsTabID, true);
+	TransmogFrame.WardrobeCollection.TabHeaders:SetTabShown(TransmogFrame.WardrobeCollection.setsTabID, false);
+	TransmogFrame.WardrobeCollection.TabHeaders:SetTabShown(TransmogFrame.WardrobeCollection.custmSetsTabID, false);
+	TransmogFrame.WardrobeCollection.TabHeaders:SetTabShown(TransmogFrame.WardrobeCollection.situationsTabID, false);
+
+	--TransmogFrame.WardrobeCollection.TabHeaders:SetTabShown(TransmogFrame.WardrobeCollection.setsFrame2TabID, true);
+	--TransmogFrame.WardrobeCollection.TabHeaders:SetTabShown(TransmogFrame.WardrobeCollection.extracustomsetsTabID, true);
+end
+
 function addon:EventHandler(event, ...)
 	if event == "ADDON_LOADED" and ... == "Blizzard_Collections" then
 		addon:SendMessage("BW_ADDON_LOADED")
@@ -1512,6 +1499,76 @@ function addon:EventHandler(event, ...)
 
 	elseif event == "PLAYER_ENTERING_WORLD" then
 		addon:SendMessage("BW_OnPlayerEnterWorld")
+
+
+		if not C_AddOns.IsAddOnLoaded("Blizzard_TransmogShared") then
+  		C_AddOns.LoadAddOn("Blizzard_TransmogShared")
+
+	end
+
+		if not C_AddOns.IsAddOnLoaded("Blizzard_Transmog") then
+  		C_AddOns.LoadAddOn("Blizzard_Transmog")
+
+	end
+
+
+		C_Timer.After(1, function() 
+			if not TransmogFrame.WardrobeCollection.TabContent.SetsFrame2 then
+
+				
+
+				--local f = CreateFrame("Frame", nil, TransmogFrame.WardrobeCollection,"BW_TabHeadersTemplate")
+
+					--TabSystemOwnerMixin.OnLoad(TransmogFrame.WardrobeCollection);
+					--TransmogFrame.WardrobeCollection.TabHeaders:Hide()
+					--TransmogFrame.WardrobeCollection.TabHeaders = f
+		--TransmogFrame.WardrobeCollection:SetTabSystem(TransmogFrame.WardrobeCollection.TabHeaders)
+
+				--TransmogFrame.WardrobeCollection.TabHeaders=f
+
+				--TransmogFrame.WardrobeCollection:GetTabButton(1)
+
+				--TransmogFrame.WardrobeCollection:GetElementsForTab(1)
+
+				--TransmogFrame.WardrobeCollection:OnLoad()
+
+				--self.internalTabTracker = CreateAndInitFromMixin(TabSystemTrackerMixin)
+
+
+				--TransmogFrame.WardrobeCollection.TabHeaders.itemsTabID2 = TransmogFrame.WardrobeCollection:AddNamedTab(TRANSMOG_TAB_ITEMS, TransmogFrame.WardrobeCollection.TabContent.ItemsFrame);
+
+				local f = CreateFrame("Frame", nil, TransmogFrame.WardrobeCollection.TabContent,"ExtraSetsFrameTemplate")
+				TransmogFrame.WardrobeCollection.TabContent.SetsFrame2 = f
+				TransmogFrame.WardrobeCollection.TabHeaders.setsFrame2TabID = TransmogFrame.WardrobeCollection:AddNamedTab(L["Sets"],  TransmogFrame.WardrobeCollection.TabContent.SetsFrame2);
+				TransmogFrame.WardrobeCollection.TabContent.SetsFrame2:Init(TransmogFrame.WardrobeCollection)
+
+				local f = CreateFrame("Frame", nil, TransmogFrame.WardrobeCollection.TabContent,"ExtraSetsFrameTemplate")
+				TransmogFrame.WardrobeCollection.TabContent.ExtraSetsFrame = f
+				TransmogFrame.WardrobeCollection.TabHeaders.extrasetsTabID = TransmogFrame.WardrobeCollection:AddNamedTab(L["Extra Sets"],  TransmogFrame.WardrobeCollection.TabContent.ExtraSetsFrame);
+				TransmogFrame.WardrobeCollection.TabContent.ExtraSetsFrame:Init(TransmogFrame.WardrobeCollection)
+
+				local f = CreateFrame("Frame", nil, TransmogFrame.WardrobeCollection.TabContent,"CustomSetsFrame2")
+				TransmogFrame.WardrobeCollection.TabContent.ExtraCustomSetsFrame = f
+				TransmogFrame.WardrobeCollection.TabHeaders.extracustomsetsTabID = TransmogFrame.WardrobeCollection:AddNamedTab(TRANSMOG_TAB_CUSTOM_SETS,  TransmogFrame.WardrobeCollection.TabContent.ExtraCustomSetsFrame);
+				TransmogFrame.WardrobeCollection.TabContent.ExtraCustomSetsFrame:Init(TransmogFrame.WardrobeCollection)
+
+				TransmogFrame.WardrobeCollection.TabHeaders.situationsTabID2 = TransmogFrame.WardrobeCollection:AddNamedTab(TRANSMOG_TAB_SITUATIONS, TransmogFrame.WardrobeCollection.TabContent.SituationsFrame);
+
+				UpdateTabs();
+		--TransmogFrame.WardrobeCollection.TabContent.ItemsFrame:Init(TransmogFrame.WardrobeCollection);
+		--TransmogFrame.WardrobeCollection.TabContent.SetsFrame:Init(TransmogFrame.WardrobeCollection);
+		--TransmogFrame.WardrobeCollection.TabContent.CustomSetsFrame:Init(TransmogFrame.WardrobeCollection);
+				local f = CreateFrame("Frame", nil, TransmogFrame.WardrobeCollection.TabContent.ItemsFrame.PagedContent,"BW_PagingControlsHorizontalTemplate")
+				f:ClearAllPoints()
+				f:SetPoint("TOPLEFT", TransmogFrame.WardrobeCollection.TabContent.ItemsFrame.PagedContent, "BOTTOM", -145, 40)
+				TransmogFrame.WardrobeCollection.TabContent.ItemsFrame.PagedContent.PagingControls:Hide()
+				TransmogFrame.WardrobeCollection.TabContent.ItemsFrame.PagedContent.PagingControls = f
+
+			end
+
+					--addon:CreateButtons()
+		 end)
+
 		----C_Timer.After(1, function() addon:ResetSetsCollectionFrame() end)
 		--C_Timer.After(15, function() addon.Init:UpdateCollectedAppearances() end)
 

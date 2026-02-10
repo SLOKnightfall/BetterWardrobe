@@ -4,8 +4,8 @@ addon = LibStub("AceAddon-3.0"):GetAddon(addonName)
 local L = LibStub("AceLocale-3.0"):GetLocale(addonName)
 
 
-local MAX_DEFAULT_OUTFITS = C_TransmogCollection.GetNumMaxOutfits()
-local SAVED_SET_OFFSET = addon.Globals.SAVED_SET_OFFSET
+local MAX_DEFAULT_OUTFITS = 25 --C_TransmogCollection.GetNumMaxOutfits()
+local SET_OFFSET = addon.Globals.SET_OFFSET
 --Coresponds to wardrobeOutfits
 
 
@@ -33,9 +33,10 @@ function LookupOutfitIDFromName(name)
 end
 
 function LookupIndexFromID(outfitID)
-	local outfits = addon.GetOutfits(true)
+	 local outfits = addon.GetOutfits(true)
 	for i, data in ipairs(outfits) do
-		if data.outfitID == outfitID then
+
+		if data.index == outfitID then
 			return data.index
 		end
 	end
@@ -102,6 +103,18 @@ StaticPopupDialogs["BW_CONFIRM_DELETE_TRANSMOG_OUTFIT"] = {
 	timeout = 0,
 	whileDead = 1,
 }
+
+StaticPopupDialogs["BW_CONFIRM_DELETE_TRANSMOG_CUSTOM_SET"] = {
+	text = TRANSMOG_CUSTOM_SET_CONFIRM_DELETE,
+	button1 = YES,
+	button2 = NO,
+	OnAccept = function (self) BetterWardrobeOutfitManager:DeleteOutfit(self.data) end,
+	OnCancel = function(dialog, data) end,
+	hideOnEscape = 1,
+	timeout = 0,
+	whileDead = 1,
+};
+
 
 StaticPopupDialogs["BW_TRANSMOG_OUTFIT_SOME_INVALID_APPEARANCES"] = {
 	preferredIndex = 3,
@@ -361,7 +374,8 @@ function BetterWardrobeOutfitDropdownMixin:IsOutfitDressed()
 	end
 
 	--if addon.GetSetType(self.selectedOutfitID) == "SavedBlizzard" then 
-	if self.selectedOutfitID >= MAX_DEFAULT_OUTFITS and self.selectedOutfitID <= (SAVED_SET_OFFSET + MAX_DEFAULT_OUTFITS) then 
+
+	if self.selectedOutfitID >= SET_OFFSET and self.selectedOutfitID <= SET_OFFSET+25 then 
 		local selectedOutfitID = addon:GetBlizzID(self.selectedOutfitID);
 		local outfitItemTransmogInfoList = C_TransmogCollection.GetOutfitItemTransmogInfoList(selectedOutfitID);
 		if not outfitItemTransmogInfoList then
@@ -429,7 +443,11 @@ BetterWardrobeOutfitManager.popups = {
 	"BW_TRANSMOG_OUTFIT_SOME_INVALID_APPEARANCES",
 	"TRANSMOG_OUTFIT_ALL_INVALID_APPEARANCES",
 	"BETTER_WARDROBE_IMPORT_ITEM_POPUP",
-	"BETTER_WARDROBE_IMPORT_SET_POPUP"
+	"BETTER_WARDROBE_IMPORT_SET_POPUP",
+	"BW_TRANSMOG_CUSTOM_SET_CONFIRM_OVERWRITE",
+	"BW_TRANSMOG_CUSTOM_SET_NAME",
+	"BW_CONFIRM_DELETE_TRANSMOG_CUSTOM_SET"
+
 }
 
 local OUTFIT_FRAME_MIN_STRING_WIDTH = 152;
@@ -500,35 +518,15 @@ function BetterWardrobeOutfitManager:NewOutfit(name)
 end
 
 function BetterWardrobeOutfitManager:DeleteOutfit(outfitID)
-	if IsDefaultSet(outfitID) then
-		C_TransmogCollection.DeleteOutfit(addon:GetBlizzID(outfitID))
-	else
+	--if IsDefaultSet(outfitID) then
+	--	C_TransmogCollection.DeleteOutfit(addon:GetBlizzID(outfitID))
+	--else
 		tremove(addon.OutfitDB.char.outfits, LookupIndexFromID(outfitID))
-	end
-
-
---[[---TODO:CHeck
-	if GetCVarBool("transmogCurrentSpecOnly") then
-		local specIndex = GetSpecialization()
-
-		if addon.IsDefaultSet(outfitID) then
-			SetCVar("lastTransmogOutfitIDSpec"..specIndex, value)
-
-
-		local value = addon.OutfitDB.char.lastTransmogOutfitIDSpec[specIndex]
-		if type(value) == number and value > 0 then  addon.OutfitDB.char.lastTransmogOutfitIDSpec[specIndex] = value - 1 end
-
-		--SetCVar("lastTransmogOutfitIDSpec"..specIndex, value)
-	else
-		for specIndex = 1, GetNumSpecializations() do
-			--SetCVar("lastTransmogOutfitIDSpec"..specIndex, value)
-		local value = addon.OutfitDB.char.lastTransmogOutfitIDSpec[specIndex]
-		if type(value) == number and value > 0  then  addon.OutfitDB.char.lastTransmogOutfitIDSpec[specIndex] = value - 1 end
-		end
-	end]]
+	--end
 
 	--addon.setdb.global.sets[addon.setdb:GetCurrentProfile()] = addon.GetSavedList()
-	addon.setdb.global.sets[addon.setdb:GetCurrentProfile()] = addon.StoreBlizzardSets();
+	-----addon.setdb.global.sets[addon.setdb:GetCurrentProfile()] = addon.StoreBlizzardSets();
+	TransmogFrame.WardrobeCollection.TabContent.ExtraCustomSetsFrame:RefreshCollectionEntries()
 
 	addon:SendMessage("BW_TRANSMOG_COLLECTION_UPDATED");
 end
@@ -808,3 +806,172 @@ function BetterWardrobeOutfitCheckAppearancesMixin:OnUpdate()
 	end
 end
 
+
+
+--Midnight
+
+local function isDefaultSet()
+	local customSets = C_TransmogCollection.GetCustomSets();
+	--Use Ingame Manager if below cap
+	if #customSets <= 24  then
+		return true
+	end
+	return false
+end
+
+
+
+function addon:ModifyCustomSet(customSetIDToRename, dialogData)
+	local icon;
+	for _slotID, itemTransmogInfo in ipairs(dialogData) do
+		local appearanceID = itemTransmogInfo.appearanceID;
+		if appearanceID ~= Constants.Transmog.NoTransmogID then
+			local appearanceSourceInfo = C_TransmogCollection.GetAppearanceSourceInfo(appearanceID);
+			if appearanceSourceInfo and appearanceSourceInfo.icon then
+				icon = appearanceSourceInfo.icon;
+				break;
+			end
+		end
+	end
+	local outfit = addon.OutfitDB.char.outfits[LookupIndexFromID(customSetIDToRename)];
+	local itemData = {};
+	for i, data in pairs(dialogData) do
+		outfit[i] = data.appearanceID;
+		if i == 3 then
+			outfit["offShoulder"] = data.secondaryAppearanceID or 0;
+		elseif i == 16 then 
+			outfit["mainHandEnchant"] = data.illusionID or 0;
+		elseif i == 17 then 
+			outfit["offHandEnchant"] = data.illusionID or 0;
+		end
+	end
+
+	TransmogFrame.WardrobeCollection.TabContent.ExtraCustomSetsFrame:RefreshCollectionEntries()
+
+	BetterWardrobeOutfitManager:ClosePopups();
+
+
+end
+
+local function NameExtraCustomSet(newName, customSetIDToRename, dialogData)
+	print("Saved ExtendedSet")
+
+	local icon;
+	for _slotID, itemTransmogInfo in ipairs(WardrobeCustomSetManager.itemTransmogInfoList) do
+		local appearanceID = itemTransmogInfo.appearanceID;
+		if appearanceID ~= Constants.Transmog.NoTransmogID then
+			local appearanceSourceInfo = C_TransmogCollection.GetAppearanceSourceInfo(appearanceID);
+			if appearanceSourceInfo and appearanceSourceInfo.icon then
+				icon = appearanceSourceInfo.icon;
+				break;
+			end
+		end
+	end
+	local outfit
+	if customSetIDToRename then 
+		addon.OutfitDB.char.outfits[LookupIndexFromID(customSetIDToRename)]  = addon.OutfitDB.char.outfits[LookupIndexFromID(customSetIDToRename)] or {};
+		outfit = addon.OutfitDB.char.outfits[LookupIndexFromID(customSetIDToRename)];
+		outfit["name"] = newName;
+		TransmogFrame.WardrobeCollection.TabContent.ExtraCustomSetsFrame:RefreshCollectionEntries()
+
+		BetterWardrobeOutfitManager:ClosePopups();
+		return
+	else
+		tinsert(addon.OutfitDB.char.outfits, {});
+		outfit = addon.OutfitDB.char.outfits[#addon.OutfitDB.char.outfits];
+	end
+	outfit["name"] = newName;
+	outfit["icon"] = icon;
+
+	local itemData = {};
+	for i, data in pairs(WardrobeCustomSetManager.itemTransmogInfoList) do
+		outfit[i] = data.appearanceID;
+		if i == 3 then
+			outfit["offShoulder"] = data.secondaryAppearanceID or 0;
+		elseif i == 16 then 
+			outfit["mainHandEnchant"] = data.illusionID or 0;
+		elseif i == 17 then 
+			outfit["offHandEnchant"] = data.illusionID or 0;
+		end
+	end
+
+	TransmogFrame.WardrobeCollection.TabContent.ExtraCustomSetsFrame:RefreshCollectionEntries()
+
+	BetterWardrobeOutfitManager:ClosePopups();
+
+end
+
+-- data (can be nil):
+-- name - Starting text for the edit box.
+-- customSetID - Set if editing an existing custom set, nil if new custom set flow.
+-- itemTransmogInfoList - Transmog info list to populate any custom set with (overriding existing or adding a new custom set).
+StaticPopupDialogs["BW_TRANSMOG_CUSTOM_SET_NAME"] = {
+	text = TRANSMOG_CUSTOM_SET_NAME.."!",
+	button1 = SAVE,
+	button2 = CANCEL,
+	OnAccept = function(dialog, data)
+		local customSetID = nil;
+		if data then
+			customSetID = data.customSetID;
+		end
+		NameExtraCustomSet(dialog:GetEditBox():GetText(), customSetID, data)
+	end,
+	timeout = 0,
+	whileDead = 1,
+	hideOnEscape = 1,
+	hasEditBox = 1,
+	maxLetters = 31,
+	OnShow = function(dialog, data)
+		dialog:GetButton1():Disable();
+		dialog:GetButton2():Enable();
+		dialog:GetEditBox():SetFocus();
+
+		if data then
+			WardrobeCustomSetManager:SetItemTransmogInfoList(data.itemTransmogInfoList);
+			dialog:GetEditBox():SetText(data.name.name);
+		end
+	end,
+	OnHide = function(dialog, data)
+		dialog:GetEditBox():SetText("");
+	end,
+	EditBoxOnEnterPressed = function(editBox, data)
+		if editBox:GetParent():GetButton1():IsEnabled() then
+			StaticPopup_OnClick(editBox:GetParent(), 1);
+		end
+
+	end,
+	EditBoxOnTextChanged = function(editBox, data)
+		local dialog = editBox:GetParent();
+		local button1 = dialog:GetButton1();
+
+		local enabled = UserEditBoxNonEmpty(editBox);
+		if data then
+			enabled = editBox:GetText() ~= data.name;
+		end
+		button1:SetEnabled(enabled);
+	end,
+	EditBoxOnEscapePressed = StaticPopup_StandardEditBoxOnEscapePressed,
+};
+
+-- data:
+-- name - Starting text for BW_TRANSMOG_CUSTOM_SET_NAME's edit box if cancelled.
+-- customSetID - What custom set to override if accepted.
+-- itemTransmogInfoList - Transmog info list to pass back to BW_TRANSMOG_CUSTOM_SET_NAME if cancelled.
+StaticPopupDialogs["BW_TRANSMOG_CUSTOM_SET_CONFIRM_OVERWRITE"] = {
+	text = TRANSMOG_CUSTOM_SET_CONFIRM_OVERWRITE.."!",
+	button1 = YES,
+	button2 = NO,
+	OnAccept = function(dialog, data)
+		OverwriteExtraCustomSet(data.customSetID);
+	end,
+	OnCancel = function(dialog, data)
+		dialog:Hide();
+		-- Clear customSetID when going back, as we no longer want to override that existing custom set.
+		local nameData = { name = data.name, customSetID = nil, itemTransmogInfoList = data.itemTransmogInfoList };
+		StaticPopup_Show("BW_TRANSMOG_CUSTOM_SET_NAME", nil, nil, nameData);
+	end,
+	hideOnEscape = 1,
+	timeout = 0,
+	whileDead = 1,
+	noCancelOnEscape = 1,
+};
