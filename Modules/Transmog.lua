@@ -2197,10 +2197,11 @@ function TransmogWardrobeSetsMixin:InitFilterButton()
 		rootDescription:CreateDivider();
 
 		local tab = TransmogFrame.WardrobeCollection:GetTab()
-		if tab == 5 then
-			rootDescription:CreateCheckbox(TRANSMOG_SET_PVE, C_TransmogSets.GetSetsFilter, SetSetsFilter, LE_TRANSMOG_SET_FILTER_PVE);
-			rootDescription:CreateCheckbox(TRANSMOG_SET_PVP, C_TransmogSets.GetSetsFilter, SetSetsFilter, LE_TRANSMOG_SET_FILTER_PVP);
-			rootDescription:CreateDivider();
+		--if tab == 5 then
+		if TransmogFrame.WardrobeCollection.TabContent.ExtraSetsFrame and TransmogFrame.WardrobeCollection.TabContent.ExtraSetsFrame:IsShown() then
+			--rootDescription:CreateCheckbox(TRANSMOG_SET_PVE, C_TransmogSets.GetSetsFilter, SetSetsFilter, LE_TRANSMOG_SET_FILTER_PVE);
+			--rootDescription:CreateCheckbox(TRANSMOG_SET_PVP, C_TransmogSets.GetSetsFilter, SetSetsFilter, LE_TRANSMOG_SET_FILTER_PVP);
+			--rootDescription:CreateDivider();
 		end
 
 		local submenu = rootDescription:CreateButton(L["Expansion"]);
@@ -2280,7 +2281,7 @@ local function isValidFilter(data)
 	--local pve = C_TransmogSets.GetSetsFilter(LE_TRANSMOG_SET_FILTER_PVP)
 	local setType = "set"
 	local tab = TransmogFrame.WardrobeCollection:GetTab()
-	if tab == 6 then
+	if TransmogFrame.WardrobeCollection.TabContent.ExtraSetsFrame:IsShown() then
 		setType = "extraset"
 	end
 	local hasPieces = (data.pieces and data.pieces > 0)

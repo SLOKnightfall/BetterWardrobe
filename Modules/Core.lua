@@ -1480,7 +1480,8 @@ function addon.Init:LoadModules()
 	end)
 end
 
-function UpdateTabs()
+ function addon:UpdateTabs()
+	
 	TransmogFrame.WardrobeCollection.TabHeaders:SetTabShown(TransmogFrame.WardrobeCollection.itemsTabID, true);
 	TransmogFrame.WardrobeCollection.TabHeaders:SetTabShown(TransmogFrame.WardrobeCollection.setsTabID, false);
 	TransmogFrame.WardrobeCollection.TabHeaders:SetTabShown(TransmogFrame.WardrobeCollection.custmSetsTabID, false);
@@ -1504,12 +1505,12 @@ function addon:EventHandler(event, ...)
 		if not C_AddOns.IsAddOnLoaded("Blizzard_TransmogShared") then
   		C_AddOns.LoadAddOn("Blizzard_TransmogShared")
 
-	end
+		end
 
 		if not C_AddOns.IsAddOnLoaded("Blizzard_Transmog") then
   		C_AddOns.LoadAddOn("Blizzard_Transmog")
 
-	end
+		end
 
 
 		C_Timer.After(1, function() 
@@ -1554,7 +1555,7 @@ function addon:EventHandler(event, ...)
 
 				TransmogFrame.WardrobeCollection.TabHeaders.situationsTabID2 = TransmogFrame.WardrobeCollection:AddNamedTab(TRANSMOG_TAB_SITUATIONS, TransmogFrame.WardrobeCollection.TabContent.SituationsFrame);
 
-				UpdateTabs();
+				
 		--TransmogFrame.WardrobeCollection.TabContent.ItemsFrame:Init(TransmogFrame.WardrobeCollection);
 		--TransmogFrame.WardrobeCollection.TabContent.SetsFrame:Init(TransmogFrame.WardrobeCollection);
 		--TransmogFrame.WardrobeCollection.TabContent.CustomSetsFrame:Init(TransmogFrame.WardrobeCollection);
@@ -1564,8 +1565,9 @@ function addon:EventHandler(event, ...)
 				TransmogFrame.WardrobeCollection.TabContent.ItemsFrame.PagedContent.PagingControls:Hide()
 				TransmogFrame.WardrobeCollection.TabContent.ItemsFrame.PagedContent.PagingControls = f
 
+				 self:HookScript(TransmogFrame, "OnShow", function() addon:UpdateTabs(); end)
 			end
-
+				addon:UpdateTabs();
 					--addon:CreateButtons()
 		 end)
 

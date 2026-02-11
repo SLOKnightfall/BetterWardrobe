@@ -397,7 +397,7 @@ do
 		BuildBlizzSets()
 
 		--@debug@
-			addon:AddTestSets()
+			--addon:AddTestSets()
 		--@end-debug@
 
 
