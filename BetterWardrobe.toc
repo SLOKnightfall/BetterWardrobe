@@ -44,6 +44,8 @@ Modules\Core.lua
 Data\DataBase.lua
 Data\Cloth.lua
 Data\Mail.lua
+Data\Leather.lua
+Data\Plate.lua
 Data\MISC.lua
 #Data\test.lua
 
