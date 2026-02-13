@@ -1565,7 +1565,7 @@ function addon:EventHandler(event, ...)
 				TransmogFrame.WardrobeCollection.TabContent.ItemsFrame.PagedContent.PagingControls:Hide()
 				TransmogFrame.WardrobeCollection.TabContent.ItemsFrame.PagedContent.PagingControls = f
 
-				 self:HookScript(TransmogFrame, "OnShow", function() addon:UpdateTabs(); end)
+				 self:HookScript(TransmogFrame, "OnShow", function() C_Timer.After(.1, function() addon:UpdateTabs(); end) end)
 			end
 				addon:UpdateTabs();
 					--addon:CreateButtons()
