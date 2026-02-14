@@ -47,7 +47,9 @@ Data\Mail.lua
 Data\Leather.lua
 Data\Plate.lua
 Data\MISC.lua
-#Data\test.lua
+#@debug@
+Data\test.lua
+#@end-debug@
 
 Modules\SavedOutfits.xml
 Modules\ImportExport.lua
@@ -59,3 +61,4 @@ Modules\Transmog.xml
 Modules\Wardrobe_Sets.xml
 Modules\Wardrobe.xml
 Modules\CollectionList.xml
+
