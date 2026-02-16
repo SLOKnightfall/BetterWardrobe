@@ -30,6 +30,7 @@ local IN_PROGRESS_FONT_COLOR_CODE = addon.Globals.IN_PROGRESS_FONT_COLOR_CODE;
 local COLLECTION_LIST_WIDTH = addon.Globals.COLLECTION_LIST_WIDTH;
 
 local tabType = {"item", "set", "extraset"}
+local armorTypes = {"Cloth","Leather","Mail","Plate"}
 
 addon.useAltSet = false;
 
@@ -188,7 +189,6 @@ function WardrobeCollectionFrameMixin:SetTab(tabID)
 
 
 	if tabID == WARDROBE_TAB_ITEMS then
-
 		BetterWardrobeVisualToggle:Hide()
 		-----addon.ColorFilterFrame:Show()
 		if BW_ColectionListFrame then 
@@ -216,14 +216,13 @@ function WardrobeCollectionFrameMixin:SetTab(tabID)
 		BW_SortDropDown:ClearAllPoints()
 
 		local _, isWeapon = C_TransmogCollection.GetCategoryInfo((BetterWardrobeCollectionFrame and BetterWardrobeCollectionFrame.ItemsCollectionFrame:GetActiveCategory()) or 1)
-		local yOffset = (atTransmogrifier and (isWeapon and 55 or 32)) or LegionWardrobeY;
+		local yOffset =  LegionWardrobeY;
 
 		self.ClassDropdown:Show();
 
 		BetterWardrobeCollectionFrame.ItemsCollectionFrame.ApplyOnClickCheckbox:Show();
 		BW_SortDropDown:SetPoint("TOPRIGHT", self.ItemsCollectionFrame.SlotsFrame, "TOPLEFT", -12, -35);
 
-		----BetterWardrobeCollectionFrame.ItemsCollectionFrame.WeaponDropdown:SetPoint("TOPRIGHT", -32, -25)
 		if ElvUI then 
 			BetterWardrobeCollectionFrame.AlteredFormSwapButton:ClearAllPoints()
 			BetterWardrobeCollectionFrame.AlteredFormSwapButton:SetPoint("TOPRIGHT",self:GetParent(), "TOPRIGHT", -13,-55)
@@ -236,7 +235,7 @@ function WardrobeCollectionFrameMixin:SetTab(tabID)
 	
 
 	elseif tabID == WARDROBE_TAB_SETS or tabID == WARDROBE_TAB_EXTRASETS or tabID == WARDROBE_TAB_SAVED_SETS  then
-		--BetterWardrobeVisualToggle:Show()
+		BetterWardrobeVisualToggle:Show()
 		BW_SortDropDown:Hide()
 		if BW_ColectionListFrame then 
 			BW_ColectionListFrame:Hide()
@@ -260,7 +259,7 @@ function WardrobeCollectionFrameMixin:SetTab(tabID)
 		self.ClassDropdown:ClearAllPoints();
 		self.ClassDropdown:SetPoint("BOTTOMRIGHT", self.SetsCollectionFrame, "TOPRIGHT", -9, 4);
 
-		self.SetsCollectionFrame:SetShown(not atTransmogrifier);
+		self.SetsCollectionFrame:SetShown(true);
 		local sortValue
 		if tabID == WARDROBE_TAB_SAVED_SETS then 
 			BW_SortDropDown:Hide()
@@ -381,6 +380,16 @@ function WardrobeCollectionFrameMixin:InitItemsFilterButton()
 		return C_TransmogCollection.SetDefaultFilters();
 	end);
 
+	local function shouldShowHidden()
+		return addon.Profile.ShowHidden;
+	end
+
+	local function setShowHidden()
+		addon.Profile.ShowHidden = not addon.Profile.ShowHidden;
+		BetterWardrobeCollectionFrame.ItemsCollectionFrame:RefreshVisualsList();
+		BetterWardrobeCollectionFrame.ItemsCollectionFrame:UpdateItems();
+	end
+
 	self.FilterButton:SetupMenu(function(dropdown, rootDescription)
 		rootDescription:SetTag("MENU_WARDROBE_FILTER");
 
@@ -402,6 +411,11 @@ function WardrobeCollectionFrameMixin:InitItemsFilterButton()
 
 		local submenu = rootDescription:CreateButton(SOURCES);
 		CreateSourceFilters(submenu);
+
+		rootDescription:CreateDivider();
+	 	submenu = rootDescription:CreateButton("Options");
+		submenu:CreateCheckbox(L["Show Hidden Items"], shouldShowHidden, setShowHidden);
+		
 	end);
 end
 
@@ -1222,7 +1236,7 @@ function WardrobeItemsCollectionMixin:OnMouseWheel(delta)
 end
 
 --need to handle clicks and keys
-function BetterWardrobeItemsCollectionMixin:CanHandleKey(key)
+function WardrobeItemsCollectionMixin:CanHandleKey(key)
 	if ( C_Transmog.IsAtTransmogNPC() and (key == WARDROBE_PREV_VISUAL_KEY or key == WARDROBE_NEXT_VISUAL_KEY or key == WARDROBE_UP_VISUAL_KEY or key == WARDROBE_DOWN_VISUAL_KEY) ) then
 		return true;
 	end
@@ -1423,6 +1437,10 @@ function WardrobeItemsCollectionMixin:UpdateWeaponDropdown()
 		_name, isActiveCategoryWeapon = C_TransmogCollection.GetCategoryInfo(self:GetActiveCategory());
 	end
 
+	if self:GetActiveCategory() == 29 then
+		isActiveCategoryWeapon = true;
+	end
+
 	self.WeaponDropdown:SetShown(isActiveCategoryWeapon);
 
 	if not isActiveCategoryWeapon then
@@ -1446,9 +1464,19 @@ function WardrobeItemsCollectionMixin:UpdateWeaponDropdown()
 		local isForMainHand = transmogLocation:IsMainHand();
 		local isForOffHand = transmogLocation:IsOffHand();
 
+		--Fix for Artifacts not always being listed
 		for categoryID = FIRST_TRANSMOG_COLLECTION_WEAPON_TYPE, LAST_TRANSMOG_COLLECTION_WEAPON_TYPE do
-			local name, isWeapon, _canEnchant, canMainHand, canOffHand = C_TransmogCollection.GetCategoryInfo(categoryID);
-			if name and isWeapon and ((isForMainHand and canMainHand) or (isForOffHand and canOffHand)) then
+			local name, isWeapon, canEnchant, canMainHand, canOffHand = C_TransmogCollection.GetCategoryInfo(categoryID);
+			if name and isWeapon then
+				if (isForMainHand and canMainHand) or (isForOffHand and canOffHand) then
+					if not checkCategory or C_TransmogCollection.IsCategoryValidForItem(categoryID, equippedItemID) or categoryID == Enum.TransmogCollectionType.Paired then 
+						rootDescription:CreateRadio(name, IsSelected, SetSelected, categoryID);
+					end
+				end
+			end
+
+			if categoryID == LAST_TRANSMOG_COLLECTION_WEAPON_TYPE and not name then
+				local name = "Legion Artifacts";
 				rootDescription:CreateRadio(name, IsSelected, SetSelected, categoryID);
 			end
 		end
@@ -1851,7 +1879,17 @@ function WardrobeItemsCollectionMixin:SetAppearanceTooltip(frame)
 	GameTooltip:SetOwner(frame, "ANCHOR_RIGHT");
 	self.tooltipModel = frame;
 	self.tooltipVisualID = frame.visualInfo.visualID;
-	self:RefreshAppearanceTooltip();
+
+	if self.activeCategory == Enum.TransmogCollectionType.Paired then 
+		if ( not self.tooltipVisualID ) then
+			return;
+		end
+
+		addon.SetArtifactAppearanceTooltip(self, frame.visualInfo)
+	else
+		self:RefreshAppearanceTooltip()
+	end
+
 end
 
 function WardrobeItemsCollectionMixin:RefreshAppearanceTooltip()
@@ -2282,6 +2320,40 @@ function WardrobeItemModelMixin:Reload(reloadSlot)
 				end
 			end
 		end
+
+		local _, raceFilename = UnitRace("player");
+		local sex = UnitSex("player") 
+		if (raceFilename == "Dracthyr" or raceFilename == "Worgen") then
+			local inNativeForm = C_UnitAuras.WantsAlteredForm("player");
+			self:SetUseTransmogSkin(false)
+			local modelID, altModelID;
+			if raceFilename == "Worgen" then
+				if sex == 3 then
+					modelID = 307453;
+					altModelID = 1000764;
+				else
+					modelID = 307454;
+					altModelID = 1011653;
+				end
+			elseif raceFilename == "Dracthyr" then
+				if sex == 3 then
+					modelID = 4207724;
+					altModelID = 4220448;
+				else
+					modelID = 4207724;
+					altModelID = 4395382;
+				end
+			end
+
+			if inNativeForm and not addon.useNativeForm then
+				self:SetUnit("player", false, false);
+				self:SetModel(altModelID);
+
+			elseif not inNativeForm and addon.useNativeForm then
+				self:SetUnit("player", false, true);
+				self:SetModel(modelID);
+			end
+		end
 		self:SetKeepModelOnHide(true);
 		self.cameraID = nil;
 		self.needsReload = nil;
@@ -2398,9 +2470,30 @@ function WardrobeCollectionClassDropdownMixin:SetClassFilter(classID)
 		C_TransmogCollection.SetClassFilter(classID);
 	elseif searchType == Enum.TransmogSearchType.BaseSets then
 		C_TransmogSets.SetTransmogSetsClassFilter(classID);
+		addon.Init:InitDB()
 	end
 
 	self:Refresh();
+end
+
+local _,_,playerClass = UnitClass("player")
+addon.armorTypeFilter = addon.Globals.ClassArmorType[playerClass]
+function WardrobeCollectionClassDropdownMixin:SetArmorTypeFilter(armorType)
+	local searchType = WardrobeCollectionFrame:GetSearchType();
+	if searchType == Enum.TransmogSearchType.BaseSets then
+		addon.armorTypeFilter = armorType;
+		addon.Init:InitDB();
+		RefreshLists();
+	end
+	
+	self:Refresh();
+end
+
+function WardrobeCollectionClassDropdownMixin:GetArmorTypeFilter()
+	local searchType = WardrobeCollectionFrame:GetSearchType();
+	if searchType == Enum.TransmogSearchType.BaseSets then
+		return addon.armorTypeFilter;
+	end
 end
 
 function WardrobeCollectionClassDropdownMixin:Refresh()
@@ -2429,9 +2522,29 @@ function WardrobeCollectionClassDropdownMixin:Refresh()
 			self:SetClassFilter(classInfo.classID); 
 		end;
 
-		for classID = 1, GetNumClasses() do
-			local classInfo = C_CreatureInfo.GetClassInfo(classID);
-			rootDescription:CreateRadio(classInfo.className, IsClassFilterSet, SetClassFilter, classInfo);
+		local function IsArmorTypeFilterSet(armorType)
+		if (addon.Profile.IgnoreClassRestrictions and addon.GetTab() ~= 1)  then
+				return self:GetArmorTypeFilter() == armorType; 
+			elseif not addon.Profile.IgnoreClassRestrictions and addon.GetTab() ~= 1 then 
+				return false
+			end
+		end;
+
+		local function SetArmorTypeFilter(armorType)
+			self:SetArmorTypeFilter(armorType); 
+		end;
+
+		if addon.Profile.IgnoreClassRestrictions and addon.GetTab() ~= 1 then 
+			rootDescription:CreateRadio("Cloth", IsArmorTypeFilterSet, SetArmorTypeFilter, 1);
+			rootDescription:CreateRadio("Leather", IsArmorTypeFilterSet, SetArmorTypeFilter, 2);
+			rootDescription:CreateRadio("Mail", IsArmorTypeFilterSet, SetArmorTypeFilter, 3);
+			rootDescription:CreateRadio("Plate", IsArmorTypeFilterSet, SetArmorTypeFilter, 4);
+		else
+			for classID = 1, GetNumClasses() do
+				local classInfo = C_CreatureInfo.GetClassInfo(classID);
+				rootDescription:CreateRadio(classInfo.className, IsClassFilterSet, SetClassFilter, classInfo);
+			end
+			--dropdown:SetText(classInfo)
 		end
 	end);
 end

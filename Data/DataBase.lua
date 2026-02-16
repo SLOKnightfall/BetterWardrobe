@@ -241,7 +241,7 @@ function BuildBlizzSets()
 			--Shop & Trading Post
 			elseif addon.MiscSets.TRADINGPOST_SETS[data.setID]  or (data.label and string.find(data.label, inGameShopGlobalString))  or (data.label and string.find(data.label, tradingPostGlobalString))  
 				or (data.description and string.find(data.description, inGameShopGlobalString))  or (data.description and string.find(data.description, tradingPostGlobalString)) then
-				data.tab = 3
+				--data.tab = 3
 				data.filter = 12
 
 			--Raid Sets
@@ -249,8 +249,8 @@ function BuildBlizzSets()
 				--data.filter = 5
 
 			else
-				data.filter = 2
-				data.tab = 3
+				--data.filter = 2
+				--data.tab = 3
 			end
 
 				--Fix set description
@@ -623,7 +623,7 @@ do
 
 		BuildArmorDB()
 		--addon.Init:BuildDB()
-		--addon.BuildClassArtifactAppearanceList()
+		addon.BuildClassArtifactAppearanceList()
 		--addon.GetSavedList()
 	end
 	

@@ -1358,6 +1358,7 @@ function addon:OnEnable()
 	Profile = addon.Profile
 
 	addon.Init:InitDB()
+
 	--addon.Init:BuildTooltips()
 	----addon.Init:DressingRoom()
 	--addon.Init.LoadCollectionListModule()
@@ -1385,7 +1386,7 @@ function addon:OnEnable()
   		C_AddOns.LoadAddOn("Blizzard_Transmog")
 	end
 
-	--C_Timer.After(1, function() addon.Init:LoadModules() end)
+	C_Timer.After(1, function() addon.Init:LoadModules() end)
 	--self:HookCustomSetsOnHide()
 end
 
@@ -1417,6 +1418,7 @@ function addon.Init:LoadModules()
 
 	local f = CreateFrame("Frame", "BetterWardrobeCollectionFrame", TransmogFrame.WardrobeCollection, "BetterWardrobeCollectionFrameTemplate" )
 	addon:setFrames()
+	addon.Init:InitFilterButtons()
 	--Hooks into the colection tabs and sets Better Wardobe when viewing the wardrobe collection
 	addon:SecureHook(nil, "CollectionsJournal_UpdateSelectedTab", function(self)
 		local selected = CollectionsJournal_GetTab(self)
@@ -1444,6 +1446,7 @@ function addon.Init:LoadModules()
 	end)
 
 	--addon.Init:LoadWardrobeModule()
+	
 
 	--[[
 	WardrobeFrame:HookScript("OnShow",  function() UpdateTransmogVendor() end)
@@ -1561,7 +1564,7 @@ function addon:EventHandler(event, ...)
 		--TransmogFrame.WardrobeCollection.TabContent.CustomSetsFrame:Init(TransmogFrame.WardrobeCollection);
 				local f = CreateFrame("Frame", nil, TransmogFrame.WardrobeCollection.TabContent.ItemsFrame.PagedContent,"BW_PagingControlsHorizontalTemplate")
 				f:ClearAllPoints()
-				f:SetPoint("TOPLEFT", TransmogFrame.WardrobeCollection.TabContent.ItemsFrame.PagedContent, "BOTTOM", -145, 40)
+				f:SetPoint("TOPLEFT", TransmogFrame.WardrobeCollection.TabContent.ItemsFrame.PagedContent, "BOTTOM", -120, 40)
 				TransmogFrame.WardrobeCollection.TabContent.ItemsFrame.PagedContent.PagingControls:Hide()
 				TransmogFrame.WardrobeCollection.TabContent.ItemsFrame.PagedContent.PagingControls = f
 

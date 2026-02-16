@@ -194,10 +194,12 @@ local function SelectColor()
 end
 
 function addon.Init:InitFilterButtons()
-	local frame = CreateFrame("Button", nil, BetterWardrobeCollectionFrame)
+	print("init")
+	local frame = CreateFrame("Button", nil, BetterWardrobeCollectionFrame.ItemsCollectionFrame)
 	local atTransmogrifier = C_Transmog.IsAtTransmogNPC();
 	frame:ClearAllPoints()
-	frame:SetPoint("TOPRIGHT", BW_SortDropDown, 30, 0)
+	--frame:SetPoint("TOPRIGHT", BW_SortDropDown, 30, 0)
+	frame:SetPoint("TOPRIGHT", 30, 0)
 	frame:SetSize(25, 25)
 
 

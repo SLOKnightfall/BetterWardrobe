@@ -37,7 +37,10 @@ Locale\zhTW.lua
 
 #Core files
 Data\Globals.lua
+Data\CameraData.lua
+Data\ArtifactData.lua
 
+Modules\BlizzardAPI.lua
 Modules\CollectionTemplates.xml
 Modules\Templates.xml
 Modules\Core.lua
@@ -51,6 +54,7 @@ Data\MISC.lua
 Data\test.lua
 #@end-debug@
 
+Modules\ArtifactAppearances.lua
 Modules\SavedOutfits.xml
 Modules\ImportExport.lua
 #Modules\SavedOutfitsViewer.xml
@@ -60,5 +64,6 @@ Modules\TransmogTemplates.xml
 Modules\Transmog.xml
 Modules\Wardrobe_Sets.xml
 Modules\Wardrobe.xml
+Modules\ColorFilter.lua
 Modules\CollectionList.xml
 

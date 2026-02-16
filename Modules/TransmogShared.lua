@@ -2,6 +2,15 @@ local addonName, addon = ...;
 ---addon = LibStub("AceAddon-3.0"):NewAddon(addon, addonName, "AceEvent-3.0", "AceConsole-3.0", "AceHook-3.0");
 addon = LibStub("AceAddon-3.0"):GetAddon(addonName);
 
+local Blizz_C_TransmogSets = {}
+Blizz_C_TransmogSets.GetSetPrimaryAppearances = C_TransmogSets.GetSetPrimaryAppearances
+Blizz_C_TransmogSets.GetBaseSetID = C_TransmogSets.GetBaseSetID
+local C_TransmogSets = {}
+C_TransmogSets.GetSetPrimaryAppearances = addon.C_TransmogSets.GetSetPrimaryAppearances
+C_TransmogSets.GetBaseSetID = addon.C_TransmogSets.GetBaseSetID
+
+C_TransmogSets.SetHasNewSources = addon.C_TransmogSets.SetHasNewSources
+
 StaticPopupDialogs["TRANSMOG_FAVORITE_WARNING2"] = {
 	text = TRANSMOG_FAVORITE_LOSE_REFUND_AND_TRADE,
 	button1 = OKAY,
@@ -316,7 +325,7 @@ end
 
 function WardrobeSetsDataProviderMixin:GetSortedSetSources(setID)
 	local returnTable = {};
-	local sourceData = self:GetSetSourceData(setID);
+	 sourceData = self:GetSetSourceData(setID);
 	for _index, primaryAppearance in ipairs(sourceData.primaryAppearances) do
 		local sourceID = primaryAppearance.appearanceID;
 		local sourceInfo = C_TransmogCollection.GetSourceInfo(sourceID);
