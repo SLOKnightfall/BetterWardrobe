@@ -50,9 +50,12 @@ Data\Mail.lua
 Data\Leather.lua
 Data\Plate.lua
 Data\MISC.lua
+Data\SetOverrides.lua
 #@debug@
 Data\test.lua
 #@end-debug@
+
+Modules\Tooltips.lua
 
 Modules\ArtifactAppearances.lua
 Modules\SavedOutfits.xml
@@ -66,4 +69,6 @@ Modules\Wardrobe_Sets.xml
 Modules\Wardrobe.xml
 Modules\ColorFilter.lua
 Modules\CollectionList.xml
+
+Modules\SortingFunctions.lua
 

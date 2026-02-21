@@ -47,10 +47,6 @@ function addon:setFrames()
 
 end
 
-function addon:CheckAltItem()
-	return false
-end
-
 local function GetTab(tab)
 	return BetterWardrobeCollectionFrame.selectedCollectionTab
 
@@ -161,6 +157,12 @@ local WARDROBE_MODEL_SETUP_GEAR = {
 local WardrobeCollectionFrameMixin = { };
 BetterWardrobeCollectionFrameMixin = WardrobeCollectionFrameMixin
 
+function WardrobeCollectionFrameMixin:CheckTab(tab)
+	if BetterWardrobeCollectionFrame.selectedCollectionTab == tab then
+		return true;
+	end
+end
+
 function WardrobeCollectionFrameMixin:ClickTab(tab)
 	self:SetTab(tab:GetID());
 	PanelTemplates_ResizeTabsToFit(WardrobeCollectionFrame, WARDROBE_TABS_MAX_WIDTH);
@@ -185,8 +187,9 @@ function WardrobeCollectionFrameMixin:SetTab(tabID)
 	--self.SetsTransmogFrame:Hide();
 	self.SavedOutfitDropDown:Hide();
 	-----addon.ColorFilterFrame:Hide()
-	-----BW_SortSavedDropDown:Hide()
+	---------BW_SortSavedDropDown:Hide()
 
+	BetterWardrobeVisualToggle:Hide()
 
 	if tabID == WARDROBE_TAB_ITEMS then
 		BetterWardrobeVisualToggle:Hide()
@@ -235,7 +238,7 @@ function WardrobeCollectionFrameMixin:SetTab(tabID)
 	
 
 	elseif tabID == WARDROBE_TAB_SETS or tabID == WARDROBE_TAB_EXTRASETS or tabID == WARDROBE_TAB_SAVED_SETS  then
-		BetterWardrobeVisualToggle:Show()
+		--BetterWardrobeVisualToggle:Show()
 		BW_SortDropDown:Hide()
 		if BW_ColectionListFrame then 
 			BW_ColectionListFrame:Hide()
@@ -260,7 +263,9 @@ function WardrobeCollectionFrameMixin:SetTab(tabID)
 		self.ClassDropdown:SetPoint("BOTTOMRIGHT", self.SetsCollectionFrame, "TOPRIGHT", -9, 4);
 
 		self.SetsCollectionFrame:SetShown(true);
-		local sortValue
+
+		local r
+
 		if tabID == WARDROBE_TAB_SAVED_SETS then 
 			BW_SortDropDown:Hide()
 			--BW_SortDropDown:SetPoint("TOPLEFT", BetterWardrobeVisualToggle, "TOPRIGHT", 5, 0)
@@ -271,27 +276,25 @@ function WardrobeCollectionFrameMixin:SetTab(tabID)
 			self.SearchBox:Hide()
 			self.ClassDropdown:Hide()
 			self.SavedOutfitDropDown:Show()
-			BW_SortSavedDropDown:Show()
+			----BW_SortSavedDropDown:Show()
 			local savedCount = #addon.GetSavedList()
-			--WardrobeCollectionFrame_UpdateProgressBar(savedCount, savedCount)
+			WardrobeCollectionFrame:UpdateProgressBar(savedCount, savedCount)
 
 			--tempSorting = BW_SortDropDown.selectedValue
 			--addon.setdb.profile.sorting = BW_SortDropDown.selectedValue
 
 			sortValue = addon.setdb.profile.sorting
 
-			BW_SortSavedDropDown:ClearAllPoints()
-			BW_SortSavedDropDown:SetPoint("TOPLEFT", 10, -67);
+			----BW_SortSavedDropDown:ClearAllPoints()
+			----BW_SortSavedDropDown:SetPoint("TOPLEFT", 10, -67);
 
 
 		else
 			--db.sortDropdown = BW_SortDropDown.selectedValue;
 			--sortValue = db.sortDropdown
-
 		end
 	end
-
-
+	BW_SortDropDown:Hide()
 end
 
 
@@ -312,7 +315,6 @@ addon.Filters = {
 		["filterSelection"] = {},
 		["xpacSelection"] = {},
 	},
-
 }
 
 local filterCollected = addon.Filters.Base.filterCollected;
@@ -337,8 +339,10 @@ end
 
 local function RefreshLists()
 	addon.SetsDataProvider:ClearSets()
+	addon.Init:InitDB()
 	BetterWardrobeCollectionFrame.SetsCollectionFrame:Refresh()
-
+	BetterWardrobeCollectionFrame.SetsCollectionFrame:SetShown(false);
+	BetterWardrobeCollectionFrame.SetsCollectionFrame:SetShown(true);
 end
 
 addon.RefreshLists = RefreshLists;
@@ -489,6 +493,7 @@ function WardrobeCollectionFrameMixin:InitBaseSetsFilterButton()
 		for index = 1, #xpacSelection do
 			xpacSelection[index] = value;
 		end
+		RefreshLists();
 	end
 
 	local function sourceCheckAll(value)
@@ -589,7 +594,6 @@ function WardrobeCollectionFrameMixin:InitBaseSetsFilterButton()
 				function()
 					xpacSelection[index] = not xpacSelection[index];
 					RefreshLists()
-
 				end,
 			index);
 		end

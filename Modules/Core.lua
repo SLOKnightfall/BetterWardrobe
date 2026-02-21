@@ -264,6 +264,8 @@ local options = {
 							width = 1.8,
 							arg = "LargeTransmogArea",
 							desc = L["LargeTransmogArea_Tooltip"],
+							hidden = true,
+
 						},
 						ExtraLargeTransmogArea = {
 							order = 1.2,
@@ -272,6 +274,7 @@ local options = {
 							width = 1.4,
 							arg = "ExtraLargeTransmogArea",
 							desc = L["ExtraLargeTransmogArea_Tooltip"],
+							hidden = true,
 						},
 						ExtraLargeTransmogAreaMax = {
 							order = 1.3,
@@ -285,6 +288,8 @@ local options = {
 							width = 1.6,
 							arg = "ExtraLargeTransmogAreaMax",
 							desc = L["ExtraLargeTransmogAreaMax_Tooltip"],
+							hidden = true,
+
 						},
 						ShowIncomplete = {
 							order = 2,
@@ -335,6 +340,7 @@ local options = {
 					type = "group",
 					inline = true,
 					order = 3,
+					hidden = true,
 					args={
 						Tooltip_Header = {
 							order = 1,
@@ -436,6 +442,7 @@ local options = {
 						inline = true,
 						order = 4,
 						disabled = function() return not addon.Profile.TooltipPreview_Show end,
+						hidden = true,
 						args={
 							Options_Header_2 = {
 							order = 0,
@@ -690,6 +697,7 @@ local options = {
 					inline = true,
 					order = 5,
 					disabled = function() return not addon.Profile.DR_OptionsEnable end,
+					hidden = true,
 					args={
 						Options_Header_2 = {
 							order = 1,

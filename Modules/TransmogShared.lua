@@ -8,8 +8,10 @@ Blizz_C_TransmogSets.GetBaseSetID = C_TransmogSets.GetBaseSetID
 local C_TransmogSets = {}
 C_TransmogSets.GetSetPrimaryAppearances = addon.C_TransmogSets.GetSetPrimaryAppearances
 C_TransmogSets.GetBaseSetID = addon.C_TransmogSets.GetBaseSetID
-
 C_TransmogSets.SetHasNewSources = addon.C_TransmogSets.SetHasNewSources
+C_TransmogSets.GetVariantSets = addon.C_TransmogSets.GetVariantSets
+C_TransmogSets.GetBaseSets = addon.C_TransmogSets.GetBaseSets
+
 
 StaticPopupDialogs["TRANSMOG_FAVORITE_WARNING2"] = {
 	text = TRANSMOG_FAVORITE_LOSE_REFUND_AND_TRADE,
@@ -129,9 +131,19 @@ function WardrobeSetsDataProviderMixin:SortSets(sets, reverseUIOrder, ignorePatc
 end
 
 function WardrobeSetsDataProviderMixin:GetBaseSets()
+	local filteredSets = {}
+
+	if BetterWardrobeCollectionFrame:CheckTab(4) then
+		self.baseSavedSets = addon.GetSavedList()
+		addon.SortDropdown(self.baseSavedSets)
+
+		return self.baseSavedSets;
+	end
+
 	if not self.baseSets then
 		local baseSets = addon.BaseList
-		self.baseSets = baseSets --C_TransmogSets.GetBaseSets();
+		self.baseSets = C_TransmogSets.GetBaseSets();
+		self.baseSets = addon:FilterSets(baseSets)
 		self:DetermineFavorites();
 
 		local tabFilter = {}
@@ -163,6 +175,18 @@ end
 
 -- Usable sets are sets that the player can use that are completed.
 function WardrobeSetsDataProviderMixin:GetUsableSets()
+	local setIDS = {}
+	local Profile = addon.Profile;
+
+	if BetterWardrobeCollectionFrame:CheckTab(4) then
+		if ( not self.usableSavedSets ) then
+			self.usableSavedSets = addon.GetSavedList()
+			self:SortSets(self.usableSavedSets)
+		end
+		
+		return self.usableSavedSets;
+	end
+
 	if not self.usableSets then
 		self.usableSets = C_TransmogSets.GetUsableSets();
 
@@ -214,7 +238,8 @@ function WardrobeSetsDataProviderMixin:GetVariantSets(baseSetID)
 
 	local variantSets = self.variantSets[baseSetID];
 	if not variantSets then
-		variantSets = addon.VariantSets[baseSetID] or {} --C_TransmogSets.GetVariantSets(baseSetID) or {};
+		variantSets = C_TransmogSets.GetVariantSets(baseSetID) or {};
+
 		self.variantSets[baseSetID] = variantSets;
 		if #variantSets > 0 then
 			-- Add base to variants and sort.
@@ -326,6 +351,8 @@ end
 function WardrobeSetsDataProviderMixin:GetSortedSetSources(setID)
 	local returnTable = {};
 	 sourceData = self:GetSetSourceData(setID);
+	 sourceData.primaryAppearances = sourceData.primaryAppearances or sourceData.sources
+
 	for _index, primaryAppearance in ipairs(sourceData.primaryAppearances) do
 		local sourceID = primaryAppearance.appearanceID;
 		local sourceInfo = C_TransmogCollection.GetSourceInfo(sourceID);

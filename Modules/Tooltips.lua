@@ -12,6 +12,12 @@ local offhandSlots = {"INVTYPE_WEAPONOFFHAND", "INVTYPE_SHIELD", "INVTYPE_HOLDAB
 local preview = CreateFrame("Frame", "BW_ProfileTooltip", UIParent, "TooltipBorderedFrameTemplate")
 addon.preview = preview
 
+
+local TP = CreateFrame("GameTooltip", "BW_GameTooltip", nil, "GameTooltipTemplate")
+TP:SetScript("OnLoad", GameTooltip_OnLoad)
+
+
+
 local function IsAppearanceCollected(item)
 	local GetItemInfoInstant = C_Item and C_Item.GetItemInfoInstant
 	local itemID = GetItemInfoInstant(item)

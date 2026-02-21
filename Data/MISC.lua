@@ -207,5 +207,9 @@ addon.MiscSets.HeritageSets = {
 	[3700] = 85, -- Earthen (Dornogal)
 	[3515] = 85, -- Earthen (Freywold)
 	[3702] = 85, -- Earthen (Gundargaz)
+	[5368] = 25, -- Pandaran (Aliance)
+	[5367] = 26, -- Pandaran (Horde)
+
+
 }
 --/dump C_TransmogSets.GetSetInfo(29)

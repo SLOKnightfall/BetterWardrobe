@@ -48,6 +48,9 @@ local ALT_SET_DATA = {}
 local ArmorDB = {}
 local collectedAppearances = {}
 
+local extraSetCount = 0
+local extraSetCollectedCount = 0
+
 
 local function GetFactionID(faction)
 	if type(faction) == "number" then
@@ -80,8 +83,20 @@ local variantSets = {};
 addon.VariantSets = variantSets
 local variantIDs = {};
 addon.VariantIDs = variantIDs
-local fullList = {}
+ fullList = {}
 addon.fullList = fullList
+
+
+function z()
+	local count = 0
+	for i, d in pairs(fullList) do
+		if d.setType == "ExtraSet" then
+			count = count + 1
+		end
+	end
+	print(count)
+end
+
 
 local function AddVariant(set, baseSetID)
 	if not variantSets[baseSetID] then
@@ -133,7 +148,13 @@ local function UseSet(data)
 	local correctFaction = false
 	local ClassArmorTypeMask = addon.Globals.CLASS_MASK[tonumber(selectedArmorType)]
 	local correctHeratiage = false
-	local heritageSets = {} -----addon.MiscSets.HeritageSets
+	local heritageSets = addon.MiscSets.HeritageSets
+
+
+	--wierd artifact sets that were added
+	if (data.setID >= 4575 and data.setID <= 5094)  then
+		return false
+	end
 
 	if heritageSets[data.setID] and heritageSets[data.setID] == playerRace  then
 		correctHeratiage = true;
@@ -442,7 +463,7 @@ do
 					----data.itemAppearance = addon.ItemAppearance[visualID]
 					data.armorType = armorType
 					data.setType = "ExtraSet"
-					data.oldID =	data.setID
+					data.oldID = data.setID
 					data.tab = 3
 
 					local newID = 10000 + id
@@ -522,7 +543,7 @@ do
 					data.sources = {}
 
 					data.newStatus = false
-
+					local isCollected = true
 					for i, itemData in pairs(data.itemData) do
 						if subitemlist[item] then 
 							local replacementID = subitemlist[item]
@@ -535,17 +556,30 @@ do
 						else
 							local info = C_TransmogCollection.GetSourceInfo(itemData[2])
 							data.sources[itemData[2]] = info.isCollected
+							if isCollected then isCollected = info.isCollected end
 						end
+					end
+					data.isCollected = isCollected
+					if isCollected then
+						extraSetCollectedCount = extraSetCollectedCount + 1
 					end
 					data.uiOrder = UIID_Counter[data.expansionID] -- id * 100
 					SET_INDEX[newID] = data
 					ArmorDB[armorType][newID] = data
+
+					extraSetCount = extraSetCount + 1
+
 				end
 			end
 		end
+		--print(extraSetCount)
 		--addon.ArmorSets = nil
 	end
 
+
+function addon:GetCollectedExtraSetCount()
+	return extraSetCollectedCount, extraSetCount
+end
 
 	function addon.IsSetItem(itemLink)
 		if not itemLink then return end
@@ -674,7 +708,7 @@ do
 		return baseIDs
 	end
 
-	local MAX_DEFAULT_OUTFITS = 25 --C_TransmogCollection.GetNumMaxOutfits()
+	local MAX_DEFAULT_OUTFITS = C_TransmogCollection.GetNumMaxCustomSets() --(25
 
 	function addon:GetBlizzID(outfitID)
 
@@ -810,7 +844,7 @@ do
 							data.itemTransmogInfoList = nil
 							data.items = nil
 							data.validForCharacter = true
-				data.icon = icon
+							data.icon = icon
 
 						elseif data.sources and  #data.sources ~= 0 then
 							for item_data, source_data in pairs(data.sources) do 
@@ -928,7 +962,7 @@ do
 			data.name = name
 			data.icon = icon
 
-			local outfitItemTransmogInfoList = C_TransmogCollection.GetOutfitItemTransmogInfoList(outfitID);
+			local outfitItemTransmogInfoList = C_TransmogCollection.GetCustomSetItemTransmogInfoList(outfitID);
 			data.sources = {}
 			for i, list_data in pairs(outfitItemTransmogInfoList) do
 				data.sources[i] = list_data.appearanceID or 0
@@ -979,7 +1013,8 @@ do
 
 				if data.setType == "SavedBlizzard" then 
 
-					local outfitItemTransmogInfoList = C_TransmogCollection.GetOutfitItemTransmogInfoList(data.outfitID - SET_OFFSET);
+					 outfitItemTransmogInfoList = C_TransmogCollection.GetCustomSetItemTransmogInfoList(data.outfitID - SET_OFFSET);
+
 					info.sources = {}
 					for i, infoList in pairs(outfitItemTransmogInfoList) do
 						info.sources[i] = infoList.appearanceID

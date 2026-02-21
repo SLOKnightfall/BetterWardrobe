@@ -861,15 +861,24 @@ function TransmogSearchBoxMixin:Reset()
 	C_TransmogCollection.ClearSearch(self.searchType);
 end
 
-function addon:SearchSets(data)
-	local tab = TransmogFrame and TransmogFrame.WardrobeCollection:GetTab()
-	if not tab then return  false end
 
-	local query = TransmogFrame and TransmogFrame.WardrobeCollection.TabContent.ExtraSetsFrame.SearchBox:GetText()  or ""
-	
-	if tab == 5 then
-		query = TransmogFrame and TransmogFrame.WardrobeCollection.TabContent.SetsFrame2.SearchBox:GetText()  or ""
-	end
+function addon:SearchSets(data)
+	local query = ""
+
+	if TransmogFrame:IsShown() then
+		local tab = TransmogFrame and TransmogFrame.WardrobeCollection:GetTab()
+		if not tab then return  false end
+
+		local query = TransmogFrame and TransmogFrame.WardrobeCollection.TabContent.ExtraSetsFrame.SearchBox:GetText()  or ""
+		
+		if tab == 5 then
+			query = TransmogFrame and TransmogFrame.WardrobeCollection.TabContent.SetsFrame2.SearchBox:GetText()  or ""
+		end
+	else
+		query = BetterWardrobeCollectionFrameSearchBox and BetterWardrobeCollectionFrameSearchBox:GetText()  or ""
+
+
+	end 
 
 	if query == "" then return true end
 	query = string.lower(query)
