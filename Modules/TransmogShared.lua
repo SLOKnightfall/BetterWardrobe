@@ -11,6 +11,7 @@ C_TransmogSets.GetBaseSetID = addon.C_TransmogSets.GetBaseSetID
 C_TransmogSets.SetHasNewSources = addon.C_TransmogSets.SetHasNewSources
 C_TransmogSets.GetVariantSets = addon.C_TransmogSets.GetVariantSets
 C_TransmogSets.GetBaseSets = addon.C_TransmogSets.GetBaseSets
+C_TransmogSets.GetUsableSets = addon.C_TransmogSets.GetUsableSets
 
 
 StaticPopupDialogs["TRANSMOG_FAVORITE_WARNING2"] = {

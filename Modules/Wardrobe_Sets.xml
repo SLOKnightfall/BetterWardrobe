@@ -76,7 +76,6 @@
 			<OnClick method="OnClick"/>
 		</Scripts>
 		<Frames>
-
 			<Frame parentKey="Variants" mixin = "BetterWardrobeSetsDetailsAltItemMixin" hidden="false">
 				<Size x="35" y="15"/>
 				<Anchors>
@@ -160,7 +159,7 @@
 				<Scripts>
 					<OnClick>
 						local name = self:GetParent().Name:GetText()
-						print(self:GetParent().setID)
+						--print(self:GetParent().setID)
 						PlaySound(SOUNDKIT.IG_MAINMENU_OPTION_CHECKBOX_ON);
 						BetterWardrobeOutfitEditFrame:ShowForOutfit(self:GetParent().setID, name, self);
 					</OnClick>
@@ -182,7 +181,7 @@
 			<OnClick method="OnClick"/>
 			<OnLoad>
 				self.CollectionListVisual.Hidden:ClearAllPoints()
-				self.CollectionListVisual.Hidden:SetPoint("CENTER", self.Icon, "CENTER", 0, 0)
+				self.CollectionListVisual.Hidden:SetPoint("CENTER")
 				self.CollectionListVisual.Collection:ClearAllPoints()
 				self.CollectionListVisual.Collection:SetPoint("BOTTOMRIGHT", self.Icon, "BOTTOMRIGHT", 2, -3)
 				self.CollectionListVisual.Unavailable:ClearAllPoints()

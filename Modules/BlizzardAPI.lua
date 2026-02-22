@@ -150,17 +150,21 @@ function addon.C_TransmogSets.GetSourcesForSlot(setID, transmogSlot, data)
 	else
 		local primaryID = SetsData and SetsData.baseSetID or setID
 
-		local category = C_TransmogCollection.GetCategoryForItem(data.tooltipPrimarySourceID)
-		local slot = CollectionWardrobeUtil.GetSlotFromCategoryID(category);
-		local transmogLocation = TransmogUtil.GetTransmogLocation(slot, Enum.TransmogType.Appearance, false);
+		--local category = C_TransmogCollection.GetCategoryForItem(data.tooltipPrimarySourceID)
+		--local slot = CollectionWardrobeUtil.GetSlotFromCategoryID(category);
+		local transmogLocation = TransmogUtil.GetTransmogLocation(transmogSlot, Enum.TransmogType.Appearance, false);
 
 		local sourceInfo = C_TransmogCollection.GetAppearanceSourceInfo(data.tooltipPrimarySourceID)
-		local sources = CollectionWardrobeUtil.GetSortedAppearanceSources(sourceInfo.itemAppearanceID, category, transmogLocation)
+		local sources = {} --CollectionWardrobeUtil.GetSortedAppearanceSources(sourceInfo.itemAppearanceID, category, transmogLocation)
 		
 		return sources or {}
 	end
 end
 
+
+function addon.C_TransmogSets.GetUsableSets()
+	return addon.fullList
+end
 
 local function GetItemSlot(itemLinkOrID)
 	local GetItemInfoInstant = C_Item and C_Item.GetItemInfoInstant

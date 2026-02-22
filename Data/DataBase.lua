@@ -597,15 +597,6 @@ end
 		end
 	end
 
-		local function zz(sourceID)
-			sourceID = 218036
-		if subitemlist[sourceID] then
-			local sourceInfo = C_TransmogCollection.GetSourceInfo(subitemlist[sourceID])
-			print("found")
-			return sourceInfo
-		end
-	end
-
 	local function buildSetSubstitutions()
 		wipe(subitemlist)
 		subitemlist = subitemlist or {}
