@@ -1452,7 +1452,7 @@ end
 	TransmogFrame.WardrobeCollection.TabHeaders:SetTabShown(TransmogFrame.WardrobeCollection.custmSetsTabID, false);
 	TransmogFrame.WardrobeCollection.TabHeaders:SetTabShown(TransmogFrame.WardrobeCollection.situationsTabID, false);
 
-	--TransmogFrame.WardrobeCollection.TabHeaders:SetTabShown(TransmogFrame.WardrobeCollection.setsFrame2TabID, true);
+	--TransmogFrame.WardrobeCollection.TabHeaders:SetTabShown(TransmogFrame.WardrobeCollection.BW_SetsFrame2TabID, true);
 	--TransmogFrame.WardrobeCollection.TabHeaders:SetTabShown(TransmogFrame.WardrobeCollection.extracustomsetsTabID, true);
 end
 
@@ -1479,7 +1479,7 @@ function addon:EventHandler(event, ...)
 
 
 		C_Timer.After(1, function() 
-			if not TransmogFrame.WardrobeCollection.TabContent.SetsFrame2 then
+			if not TransmogFrame.WardrobeCollection.TabContent.BW_SetsFrame2 then
 
 				
 
@@ -1504,19 +1504,19 @@ function addon:EventHandler(event, ...)
 				--TransmogFrame.WardrobeCollection.TabHeaders.itemsTabID2 = TransmogFrame.WardrobeCollection:AddNamedTab(TRANSMOG_TAB_ITEMS, TransmogFrame.WardrobeCollection.TabContent.ItemsFrame);
 
 				local f = CreateFrame("Frame", nil, TransmogFrame.WardrobeCollection.TabContent,"ExtraSetsFrameTemplate")
-				TransmogFrame.WardrobeCollection.TabContent.SetsFrame2 = f
-				TransmogFrame.WardrobeCollection.TabHeaders.setsFrame2TabID = TransmogFrame.WardrobeCollection:AddNamedTab(L["Sets"],  TransmogFrame.WardrobeCollection.TabContent.SetsFrame2);
-				TransmogFrame.WardrobeCollection.TabContent.SetsFrame2:Init(TransmogFrame.WardrobeCollection)
+				TransmogFrame.WardrobeCollection.TabContent.BW_SetsFrame2 = f
+				TransmogFrame.WardrobeCollection.TabHeaders.setsFrame2TabID = TransmogFrame.WardrobeCollection:AddNamedTab(L["Sets"],  TransmogFrame.WardrobeCollection.TabContent.BW_SetsFrame2);
+				TransmogFrame.WardrobeCollection.TabContent.BW_SetsFrame2:Init(TransmogFrame.WardrobeCollection)
 
 				local f = CreateFrame("Frame", nil, TransmogFrame.WardrobeCollection.TabContent,"ExtraSetsFrameTemplate")
-				TransmogFrame.WardrobeCollection.TabContent.ExtraSetsFrame = f
-				TransmogFrame.WardrobeCollection.TabHeaders.extrasetsTabID = TransmogFrame.WardrobeCollection:AddNamedTab(L["Extra Sets"],  TransmogFrame.WardrobeCollection.TabContent.ExtraSetsFrame);
-				TransmogFrame.WardrobeCollection.TabContent.ExtraSetsFrame:Init(TransmogFrame.WardrobeCollection)
+				TransmogFrame.WardrobeCollection.TabContent.BW_ExtraSetsFrame = f
+				TransmogFrame.WardrobeCollection.TabHeaders.extrasetsTabID = TransmogFrame.WardrobeCollection:AddNamedTab(L["Extra Sets"],  TransmogFrame.WardrobeCollection.TabContent.BW_ExtraSetsFrame);
+				TransmogFrame.WardrobeCollection.TabContent.BW_ExtraSetsFrame:Init(TransmogFrame.WardrobeCollection)
 
 				local f = CreateFrame("Frame", nil, TransmogFrame.WardrobeCollection.TabContent,"CustomSetsFrame2")
-				TransmogFrame.WardrobeCollection.TabContent.ExtraCustomSetsFrame = f
-				TransmogFrame.WardrobeCollection.TabHeaders.extracustomsetsTabID = TransmogFrame.WardrobeCollection:AddNamedTab(TRANSMOG_TAB_CUSTOM_SETS,  TransmogFrame.WardrobeCollection.TabContent.ExtraCustomSetsFrame);
-				TransmogFrame.WardrobeCollection.TabContent.ExtraCustomSetsFrame:Init(TransmogFrame.WardrobeCollection)
+				TransmogFrame.WardrobeCollection.TabContent.BW_ExtraCustomSetsFrame = f
+				TransmogFrame.WardrobeCollection.TabHeaders.extracustomsetsTabID = TransmogFrame.WardrobeCollection:AddNamedTab(TRANSMOG_TAB_CUSTOM_SETS,  TransmogFrame.WardrobeCollection.TabContent.BW_ExtraCustomSetsFrame);
+				TransmogFrame.WardrobeCollection.TabContent.BW_ExtraCustomSetsFrame:Init(TransmogFrame.WardrobeCollection)
 
 				TransmogFrame.WardrobeCollection.TabHeaders.situationsTabID2 = TransmogFrame.WardrobeCollection:AddNamedTab(TRANSMOG_TAB_SITUATIONS, TransmogFrame.WardrobeCollection.TabContent.SituationsFrame);
 

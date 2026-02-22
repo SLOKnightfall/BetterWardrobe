@@ -526,7 +526,7 @@ function BetterWardrobeOutfitManager:DeleteOutfit(outfitID)
 
 	--addon.setdb.global.sets[addon.setdb:GetCurrentProfile()] = addon.GetSavedList()
 	-----addon.setdb.global.sets[addon.setdb:GetCurrentProfile()] = addon.StoreBlizzardSets();
-	TransmogFrame.WardrobeCollection.TabContent.ExtraCustomSetsFrame:RefreshCollectionEntries()
+	TransmogFrame.WardrobeCollection.TabContent.BW_ExtraSetsFrame:RefreshCollectionEntries()
 
 	addon:SendMessage("BW_TRANSMOG_COLLECTION_UPDATED");
 end
@@ -846,7 +846,7 @@ function addon:ModifyCustomSet(customSetIDToRename, dialogData)
 		end
 	end
 
-	TransmogFrame.WardrobeCollection.TabContent.ExtraCustomSetsFrame:RefreshCollectionEntries()
+	TransmogFrame.WardrobeCollection.TabContent.BW_ExtraSetsFrame:RefreshCollectionEntries()
 
 	BetterWardrobeOutfitManager:ClosePopups();
 
@@ -872,7 +872,7 @@ local function NameExtraCustomSet(newName, customSetIDToRename, dialogData)
 		addon.OutfitDB.char.outfits[LookupIndexFromID(customSetIDToRename)]  = addon.OutfitDB.char.outfits[LookupIndexFromID(customSetIDToRename)] or {};
 		outfit = addon.OutfitDB.char.outfits[LookupIndexFromID(customSetIDToRename)];
 		outfit["name"] = newName;
-		TransmogFrame.WardrobeCollection.TabContent.ExtraCustomSetsFrame:RefreshCollectionEntries()
+		TransmogFrame.WardrobeCollection.TabContent.BW_ExtraSetsFrame:RefreshCollectionEntries()
 
 		BetterWardrobeOutfitManager:ClosePopups();
 		return
@@ -895,7 +895,7 @@ local function NameExtraCustomSet(newName, customSetIDToRename, dialogData)
 		end
 	end
 
-	TransmogFrame.WardrobeCollection.TabContent.ExtraCustomSetsFrame:RefreshCollectionEntries()
+	TransmogFrame.WardrobeCollection.TabContent.BW_ExtraSetsFrame:RefreshCollectionEntries()
 
 	BetterWardrobeOutfitManager:ClosePopups();
 

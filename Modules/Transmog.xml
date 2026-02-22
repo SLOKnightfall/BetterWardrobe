@@ -145,7 +145,7 @@
 								</Scripts>
 							</Frame>
 
-					<Frame parentKey="ExtraSetsFrame" mixin="BW_TransmogWardrobeSetsMixin" setAllPoints="true">
+					<Frame parentKey="BW_ExtraSetsFrame" mixin="BW_TransmogWardrobeSetsMixin" setAllPoints="true">
 						<KeyValues>
 							<KeyValue key="searchType" value="Enum.TransmogSearchType.UsableSets" type="global"/>
 						</KeyValues>
@@ -299,7 +299,7 @@
 				<Frames>
 							
 
-					<Frame parentKey="ExtraSetsFrame" mixin="BW_TransmogWardrobeSetsMixin" setAllPoints="true">
+					<Frame parentKey="BW_ExtraSetsFrame" mixin="BW_TransmogWardrobeSetsMixin" setAllPoints="true">
 						<KeyValues>
 							<KeyValue key="searchType" value="Enum.TransmogSearchType.UsableSets" type="global"/>
 						</KeyValues>

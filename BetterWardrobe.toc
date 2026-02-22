@@ -72,3 +72,5 @@ Modules\CollectionList.xml
 
 Modules\SortingFunctions.lua
 
+#3rd party addon compatability
+Plugins\ElvUI.lua

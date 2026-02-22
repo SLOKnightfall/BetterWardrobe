@@ -869,10 +869,10 @@ function addon:SearchSets(data)
 		local tab = TransmogFrame and TransmogFrame.WardrobeCollection:GetTab()
 		if not tab then return  false end
 
-		local query = TransmogFrame and TransmogFrame.WardrobeCollection.TabContent.ExtraSetsFrame.SearchBox:GetText()  or ""
+		local query = TransmogFrame and TransmogFrame.WardrobeCollection.TabContent.BW_ExtraSetsFrame.SearchBox:GetText()  or ""
 		
 		if tab == 5 then
-			query = TransmogFrame and TransmogFrame.WardrobeCollection.TabContent.SetsFrame2.SearchBox:GetText()  or ""
+			query = TransmogFrame and TransmogFrame.WardrobeCollection.TabContent.BW_SetsFrame2.SearchBox:GetText()  or ""
 		end
 	else
 		query = BetterWardrobeCollectionFrameSearchBox and BetterWardrobeCollectionFrameSearchBox:GetText()  or ""
@@ -905,12 +905,12 @@ function TransmogSearchBoxMixin:UpdateSearch()
 
 	if self:GetText() == "" then
 		C_TransmogCollection.ClearSearch(self.searchType);
-		TransmogFrame.WardrobeCollection.TabContent.ExtraSetsFrame:RefreshCollectionEntries()
+		TransmogFrame.WardrobeCollection.TabContent.BW_ExtraSetsFrame:RefreshCollectionEntries()
 	else
 		if tab == 5 then
 			C_TransmogCollection.SetSearch(self.searchType, self:GetText());
 		else
-			TransmogFrame.WardrobeCollection.TabContent.ExtraSetsFrame:RefreshCollectionEntries()
+			TransmogFrame.WardrobeCollection.TabContent.BW_ExtraSetsFrame:RefreshCollectionEntries()
 		end
 	end
 
@@ -1499,8 +1499,8 @@ function TransmogSetModelMixin:OnMouseUp(button)
 		local text = isHidden and SHOW or HIDE;
 		rootDescription:CreateButton(text, function()
 			addon.HiddenAppearanceDB.profile[setType][self.elementData.setID] = not isHidden
-			TransmogFrame.WardrobeCollection.TabContent.SetsFrame2:RefreshCollectionEntries()
-			TransmogFrame.WardrobeCollection.TabContent.ExtraSetsFrame:RefreshCollectionEntries()
+			TransmogFrame.WardrobeCollection.TabContent.BW_SetsFrame2:RefreshCollectionEntries()
+			TransmogFrame.WardrobeCollection.TabContent.BW_ExtraSetsFrame:RefreshCollectionEntries()
 		end);
 
 
@@ -1704,7 +1704,7 @@ function TransmogSetModelMixin:ToggleFavorite(setFavorite, isGroupFavorite)
 		C_TransmogSets.SetIsFavorite(setID, setFavorite);
 	else
 		addon.favoritesDB.profile.extraset[setID] = not addon.favoritesDB.profile.extraset[setID]
-		TransmogFrame.WardrobeCollection.TabContent.ExtraSetsFrame:RefreshCollectionEntries()
+		TransmogFrame.WardrobeCollection.TabContent.BW_ExtraSetsFrame:RefreshCollectionEntries()
 	end
 
 end

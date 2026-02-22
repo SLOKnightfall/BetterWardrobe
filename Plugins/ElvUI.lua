@@ -55,15 +55,15 @@ local function SkinTransmogFrames()
 	_G.BetterWardrobeCollectionFrameSearchBox:SetFrameLevel(5)
 	S:HandleDropDownBox(_G.BetterWardrobeCollectionFrame.ClassDropdown, 145)
 	S:HandleDropDownBox(_G.BW_SortDropDown, 145)
-	S:HandleDropDownBox(_G.BW_CollectionList_Dropdown, 145)
-	S:HandleDropDownBox(_G.BW_SavedOutfitDropDown, 145)
-	S:HandleDropDownBox(_G.BW_TransmogOptionsButton, 145)
-	S:HandleDropDownBox(_G.BetterWardrobeTMOutfitDropDown, 145)
-	S:HandleButton(_G.BetterWardrobeTMOutfitDropDown.SaveButton, nil, nil, nil, nil, nil, nil, nil, nil, nil, nil, true, 'right')
+	----S:HandleDropDownBox(_G.BW_CollectionList_Dropdown, 145)
+	----S:HandleDropDownBox(_G.BW_SavedOutfitDropDown, 145)
+	--S:HandleDropDownBox(_G.BW_TransmogOptionsButton, 145)
+	--S:HandleDropDownBox(_G.BetterWardrobeTMOutfitDropDown, 145)
+	--S:HandleButton(_G.BetterWardrobeTMOutfitDropDown.SaveButton, nil, nil, nil, nil, nil, nil, nil, nil, nil, nil, true, 'right')
 
-	S:HandleButton(_G.BW_CollectionListButton, nil, nil, nil, nil, nil, nil, nil, nil, nil, nil, true, 'right')
+	--S:HandleButton(_G.BW_CollectionListButton, nil, nil, nil, nil, nil, nil, nil, nil, nil, nil, true, 'right')
 
-	S:HandleButton(_G.BW_CollectionListOptionsButton, nil, nil, nil, nil, nil, nil, nil, nil, nil, nil, true, 'right')
+	--S:HandleButton(_G.BW_CollectionListOptionsButton, nil, nil, nil, nil, nil, nil, nil, nil, nil, nil, true, 'right')
 
 	S:HandleButton(BetterWardrobeCollectionFrame.FilterButton, nil, nil, nil, nil, nil, nil, nil, nil, nil, nil, true, 'right')
 	BetterWardrobeCollectionFrame.FilterButton:Point('LEFT', BetterWardrobeCollectionFrame.searchBox, 'RIGHT', 2, 0)
@@ -175,10 +175,10 @@ local function SkinTransmogFrames()
 	BetterWardrobeCollectionFrame.ItemsCollectionFrame:StripTextures()
 	BetterWardrobeCollectionFrame.ItemsCollectionFrame:SetTemplate('Transparent')
 
-	BetterWardrobeCollectionFrame.SetsTransmogFrame:StripTextures()
-	BetterWardrobeCollectionFrame.SetsTransmogFrame:SetTemplate('Transparent')
-	S:HandleNextPrevButton(BetterWardrobeCollectionFrame.SetsTransmogFrame.PagingFrame.NextPageButton)
-	S:HandleNextPrevButton(BetterWardrobeCollectionFrame.SetsTransmogFrame.PagingFrame.PrevPageButton)
+	----BetterWardrobeCollectionFrame.SetsTransmogFrame:StripTextures()
+	----BetterWardrobeCollectionFrame.SetsTransmogFrame:SetTemplate('Transparent')
+	----:HandleNextPrevButton(BetterWardrobeCollectionFrame.SetsTransmogFrame.PagingFrame.NextPageButton)
+	----S:HandleNextPrevButton(BetterWardrobeCollectionFrame.SetsTransmogFrame.PagingFrame.PrevPageButton)
 
 	local WardrobeOutfitEditFrame = _G.BetterWardrobeOutfitEditFrame
 	WardrobeOutfitEditFrame:StripTextures()
@@ -192,20 +192,82 @@ local function SkinTransmogFrames()
 	--Items
 
 
-	S:HandleButton(_G.BW_CollectionListOptionsButton)
-	BW_CollectionListOptionsButton:SetSize(25,25)
+	----S:HandleButton(_G.BW_CollectionListOptionsButton)
+	----BW_CollectionListOptionsButton:SetSize(25,25)
+----
+	----S:HandleButton(_G.BW_LoadQueueButton)
+	----BW_LoadQueueButton:ClearAllPoints()
+	----BW_LoadQueueButton:Point("TOPLEFT",BetterWardrobeTMOutfitDropDown, "TOPRIGHT", 95, -2)
 
-	S:HandleButton(_G.BW_LoadQueueButton)
-	BW_LoadQueueButton:ClearAllPoints()
-	BW_LoadQueueButton:Point("TOPLEFT",BetterWardrobeTMOutfitDropDown, "TOPRIGHT", 95, -2)
+	----S:HandleButton(_G.BW_RandomizeButton)
+	----BW_RandomizeButton:ClearAllPoints()
+	----BW_RandomizeButton:Point("TOPLEFT",BW_LoadQueueButton, "TOPRIGHT", 5, 0)
 
-	S:HandleButton(_G.BW_RandomizeButton)
-	BW_RandomizeButton:ClearAllPoints()
-	BW_RandomizeButton:Point("TOPLEFT",BW_LoadQueueButton, "TOPRIGHT", 5, 0)
+	----S:HandleButton(_G.BW_SlotHideButton)
+	----BW_SlotHideButton:ClearAllPoints()
+	----BW_SlotHideButton:Point("TOPLEFT",BW_RandomizeButton, "TOPRIGHT", 5, 0)
 
-	S:HandleButton(_G.BW_SlotHideButton)
-	BW_SlotHideButton:ClearAllPoints()
-	BW_SlotHideButton:Point("TOPLEFT",BW_RandomizeButton, "TOPRIGHT", 5, 0)
+	--Transmog frames
+
+
+		for _, tab in next, { TransmogFrame.WardrobeCollection.TabHeaders:GetChildren() } do
+			S:HandleTab(tab)
+		end
+		local frame = TransmogFrame.WardrobeCollection.TabContent.ItemsFrame
+		if frame then
+
+			S:HandleNextPrevButton(frame.PagedContent.PagingControls.PrevPageButton)
+			S:HandleNextPrevButton(frame.PagedContent.PagingControls.NextPageButton)
+			S:HandleNextPrevButton(frame.PagedContent.PagingControls.FirstPageButton)
+			S:HandleNextPrevButton(frame.PagedContent.PagingControls.LastPageButton, "up")
+
+			--hooksecurefunc(frame.PagedContent.PagingControls, 'ShouldClearOnUpdateAfterClean', PageControlsPositionUpdate)
+			--hooksecurefunc(frame.PagedContent.PagingControls, 'ShouldClearOnUpdateAfterClean', PageControlsPositionUpdate)
+		end
+		local frame = TransmogFrame.WardrobeCollection.TabContent.BW_SetsFrame2
+		if frame then
+			S:HandleButton(frame.SearchBox)
+			S:HandleButton(frame.FilterButton, nil, nil, nil, nil, nil, nil, nil, nil, nil, nil, true, 'right')
+
+			S:HandleNextPrevButton(frame.PagedContent.PagingControls.PrevPageButton)
+			S:HandleNextPrevButton(frame.PagedContent.PagingControls.NextPageButton)
+			S:HandleNextPrevButton(frame.PagedContent.PagingControls.FirstPageButton)
+			S:HandleNextPrevButton(frame.PagedContent.PagingControls.LastPageButton, "up")
+			S:HandleEditBox(frame.PagedContent.PagingControls.PageInput)
+
+
+			--hooksecurefunc(frame.PagedContent.PagingControls, 'ShouldClearOnUpdateAfterClean', PageControlsPositionUpdate)
+			--hooksecurefunc(frame.PagedContent.PagingControls, 'ShouldClearOnUpdateAfterClean', PageControlsPositionUpdate)
+		end
+
+		local frame = TransmogFrame.WardrobeCollection.TabContent.BW_ExtraSetsFrame
+		if frame then
+			S:HandleButton(frame.SearchBox)
+			S:HandleButton(frame.FilterButton, nil, nil, nil, nil, nil, nil, nil, nil, nil, nil, true, 'right')
+
+			S:HandleNextPrevButton(frame.PagedContent.PagingControls.PrevPageButton)
+			S:HandleNextPrevButton(frame.PagedContent.PagingControls.NextPageButton)
+			S:HandleNextPrevButton(frame.PagedContent.PagingControls.FirstPageButton)
+			S:HandleNextPrevButton(frame.PagedContent.PagingControls.LastPageButton, "up")
+			S:HandleEditBox(frame.PagedContent.PagingControls.PageInput)
+
+			--hooksecurefunc(frame.PagedContent.PagingControls, 'ShouldClearOnUpdateAfterClean', PageControlsPositionUpdate)
+			--hooksecurefunc(frame.PagedContent.PagingControls, 'ShouldClearOnUpdateAfterClean', PageControlsPositionUpdate)
+		end
+
+		local CustomSetsFrame = TransmogFrame.WardrobeCollection.TabContent.BW_ExtraCustomSetsFrame
+		if CustomSetsFrame then
+			S:HandleButton(CustomSetsFrame.NewCustomSetButton, nil, nil, nil, true, nil, nil, nil, true)
+
+			S:HandleNextPrevButton(CustomSetsFrame.PagedContent.PagingControls.PrevPageButton)
+			S:HandleNextPrevButton(CustomSetsFrame.PagedContent.PagingControls.NextPageButton)
+			S:HandleNextPrevButton(CustomSetsFrame.PagedContent.PagingControls.FirstPageButton)
+			S:HandleNextPrevButton(CustomSetsFrame.PagedContent.PagingControls.LastPageButton, "up")
+			S:HandleEditBox(CustomSetsFrame.PagedContent.PagingControls.PageInput)
+		--	hooksecurefunc(CustomSetsFrame.PagedContent.PagingControls, 'ShouldClearOnUpdateAfterClean', PageControlsPositionUpdate)
+			--hooksecurefunc(CustomSetsFrame.PagedContent.PagingControls, 'ShouldClearOnUpdateAfterClean', PageControlsPositionUpdate)
+
+		end
 end
 
 local function UpdateDressingRoom()
@@ -235,7 +297,7 @@ local function UpdateDressingRoom()
 	--S:HandleButton(BetterWardrobeDressUpFrameDropDown.SaveButton)
 	--BetterWardrobeDressUpFrameDropDown.SaveButton:ClearAllPoints()
 	--BetterWardrobeDressUpFrameDropDown.SaveButton:SetPoint("LEFT", BetterWardrobeDressUpFrameDropDown, "RIGHT", 3, 0)
-
+--[[
 	S:HandleButton(BW_DressingRoomFrame.BW_DressingRoomSettingsButton)
 	BW_DressingRoomFrame.BW_DressingRoomSettingsButton:SetSize(25,25)
 	BW_DressingRoomFrame.BW_DressingRoomSettingsButton:SetPoint("BOTTOMLEFT", 8, 31)
@@ -286,7 +348,7 @@ local function UpdateDressingRoom()
 	S:HandleButton(BW_DressingRoomFrame.BW_DressingRoomSwapFormButton)
 	BW_DressingRoomFrame.BW_DressingRoomSwapFormButton:SetSize(20,20)
 	BW_DressingRoomFrame.BW_DressingRoomSwapFormButton.Portrait:SetSize(20,20)
-
+]]--
 --Need to redo
 	--[[hooksecurefunc(addon, 'DressingRoom_SetItemFrameQuality', function(_, itemFrame)
 				local icon = itemFrame.Icon
