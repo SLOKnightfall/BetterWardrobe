@@ -107,11 +107,16 @@ function addon.C_TransmogSets.SetHasNewSources(setID)
 	if SetsData.setType == "Blizzard" then
 		return C_TransmogSets.SetHasNewSources(setID)
 	else
-		local primaryID = SetsData and SetsData.baseSetID or setID
-	--elseif setType == "extraset" then
-		--zz = addon.GetSetInfo(primaryID)
-
-		--return addon.GetSetInfo(primaryID)
+		local sources = {} --addon.GetSetSources(setID);
+		for sourceID,_ in pairs(sources) do
+			local visID = C_TransmogCollection.GetSourceInfo(sourceID).visualID;
+			for i=1,#NewVisualIDs do
+				if visID == NewVisualIDs[i] then
+					return true;
+				end
+			end
+		end
+		return false; 
 	end
 end
 

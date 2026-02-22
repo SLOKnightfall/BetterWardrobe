@@ -179,14 +179,13 @@ function WardrobeCollectionFrameMixin:SetTab(tabID)
 
 	local ElvUI = C_AddOns.IsAddOnLoaded("ElvUI");
 
-	--self.BW_SetsHideSlotButton:Hide();
+
 	BetterWardrobeVisualToggle.VisualMode = false;
 	self.TransmogOptionsButton:Hide();
 	----self.ItemsCollectionFrame:Hide();
 	self.SetsCollectionFrame:Hide();
 	--self.SetsTransmogFrame:Hide();
 	self.SavedOutfitDropDown:Hide();
-	-----addon.ColorFilterFrame:Hide()
 	---------BW_SortSavedDropDown:Hide()
 
 	BetterWardrobeVisualToggle:Hide()
@@ -605,6 +604,8 @@ function WardrobeCollectionFrameMixin:InitBaseSetsFilterButton()
 
 		local locationDropDown = addon.Globals.locationDropDown;
 
+--TODO:  Enable filter by missing
+--[[
 		local submenu = rootDescription:CreateButton("Missing");
 		submenu:CreateButton(CHECK_ALL, function()
 			missingCheckAll(true)
@@ -631,6 +632,7 @@ function WardrobeCollectionFrameMixin:InitBaseSetsFilterButton()
 			end
 		end
 		submenu:CreateDivider();
+	]]--
 		--TODO: Enable Sorting menu
 	 	--submenu = rootDescription:CreateButton("Sorting");
 

@@ -295,6 +295,11 @@ function WardrobeSetsCollectionMixin:DisplaySet(setID)
 		end
 	end
 
+	--TODO: ENable when fixed
+	self.DetailsFrame.BW_SetsHideSlotButton:Hide();
+	self.DetailsFrame.BW_LinkSetButton:Hide()
+	self.DetailsFrame.BW_OpenDressingRoomButton:Hide()
+
 	self.DetailsFrame.Name:SetText(setInfo.name);
 	if ( self.DetailsFrame.Name:IsTruncated() ) then
 		self.DetailsFrame.Name:Hide();
@@ -1101,7 +1106,7 @@ function WardrobeSetsScrollFrameButtonMixin:OnClick(buttonName, down)
 					--self.setID = self.baseSetID; 
 					ToggleHidden(self, isHidden);
 					addon.Init:InitDB()
-					BetterWardrobeCollectionFrame:SetTab(3);
+					BetterWardrobeCollectionFrame:SetTab(P3);
 					BetterWardrobeCollectionFrame:SetTab(2);
 					--RefreshLists()
 				end);
