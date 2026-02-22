@@ -194,7 +194,6 @@ local function SelectColor()
 end
 
 function addon.Init:InitFilterButtons()
-	print("init")
 	local frame = CreateFrame("Button", nil, BetterWardrobeCollectionFrame.ItemsCollectionFrame)
 	local atTransmogrifier = C_Transmog.IsAtTransmogNPC();
 	frame:ClearAllPoints()

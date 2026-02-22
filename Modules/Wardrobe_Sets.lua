@@ -683,30 +683,36 @@ function WardrobeSetsCollectionMixin:GetDefaultSetIDForBaseSet(baseSetID)
 end
 
 function WardrobeSetsCollectionMixin:SelectSet(setID)
-	self.selectedSetID = setID;
+	if BetterWardrobeCollectionFrame.selectedCollectionTab ~=4 then
 
-	local tab = addon.GetTab()
-	--if tab == 2 then
+		if BetterWardrobeCollectionFrame.selectedCollectionTab == 2 then
+			self.selectedSetID = setID;
+		elseif BetterWardrobeCollectionFrame.selectedCollectionTab == 3 then
+			self.selectedExtraSetID = setID;
+
+		end	
+		--self.selectedSetID = setID;
+
 		local baseSetID = C_TransmogSets.GetBaseSetID(setID);
+
 		local variantSets = SetsDataProvider:GetVariantSets(baseSetID);
 		if ( #variantSets > 0 ) then
 			self.selectedVariantSets[baseSetID] = setID;
 		end
-	--elseif tab == 3 then
-		--TODO: Extended stet
-	--end
 
-	self.ListContainer:SelectElementDataMatchingSetID(baseSetID);
-
-	self:DisplaySet(self:GetSelectedSetID());
+	elseif BetterWardrobeCollectionFrame.selectedCollectionTab == 4 then
+		self.selectedSavedSetID = setID;
+	end
+	--self:Refresh();
+	self:DisplaySet(setID);
 end
 
 function WardrobeSetsCollectionMixin:GetSelectedSetID()
 	if BetterWardrobeCollectionFrame.selectedCollectionTab == 2 then
 		return self.selectedSetID;
 	elseif BetterWardrobeCollectionFrame.selectedCollectionTab == 3 then
-		return self.selectedSetID;
-		--return self.selectedExtraSetID;
+		--return self.selectedSetID;
+		return self.selectedExtraSetID;
 	elseif BetterWardrobeCollectionFrame.selectedCollectionTab == 4 then
 		return self.selectedSavedSetID;
 	end	

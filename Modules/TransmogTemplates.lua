@@ -1817,7 +1817,6 @@ function TransmogCustomSetModelMixin:OnMouseUp(button)
 				StaticPopup_Show("CONFIRM_DELETE_TRANSMOG_CUSTOM_SET", name, nil, self.elementData.customSetID);
 			else
 				local name = addon.OutfitDB.char.outfits[self.elementData.customSetID].name or "x";
-				print(name)
 				StaticPopup_Show("BW_CONFIRM_DELETE_TRANSMOG_OUTFIT", name, nil, self.elementData.customSetID);
 				--BW_CONFIRM_DELETE_TRANSMOG_OUTFIT
 			end

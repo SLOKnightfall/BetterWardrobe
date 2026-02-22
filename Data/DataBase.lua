@@ -99,20 +99,16 @@ end
 
 
 local function AddVariant(set, baseSetID)
-	if not variantSets[baseSetID] then
-		variantSets[baseSetID] = {};
-	end
-	
+	variantSets[baseSetID] = variantSets[baseSetID] or {};
 	set.baseSetID = baseSetID;
 	tinsert(variantSets[baseSetID], set)
+
 	fullList[set.setID] = set
 	variantIDs[set.setID] = baseSetID;
 end
 
 local function AddVariantToBaseSet(set, newBaseID)
-	if not variantSets[newBaseID] then
-		variantSets[newBaseID] = {};
-	end
+	variantSets[baseSetID] = variantSets[baseSetID] or {};
 	
 	local baseID = set.baseSetID;
 	--if not baseID then baseID = set.setID; end
@@ -152,7 +148,7 @@ local function UseSet(data)
 
 
 	--wierd artifact sets that were added
-	if (data.setID >= 4575 and data.setID <= 5094)  then
+	if data.setID >= 4575 and data.setID <= 5094  then
 		return false
 	end
 

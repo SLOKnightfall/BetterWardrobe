@@ -189,7 +189,6 @@ function WardrobeSetsDataProviderMixin:GetUsableSets()
 
 	if not self.usableSets then
 		self.usableSets = C_TransmogSets.GetUsableSets();
-
 		local reverseUIOrder = false;
 		local ignorePatchID = false;
 		local ignoreCollected = true;
@@ -236,24 +235,48 @@ function WardrobeSetsDataProviderMixin:GetVariantSets(baseSetID)
 		self.variantSets = {};
 	end
 
-	local variantSets = self.variantSets[baseSetID];
-	if not variantSets then
-		variantSets = C_TransmogSets.GetVariantSets(baseSetID) or {};
+	if BetterWardrobeCollectionFrame:CheckTab(2) then 
+		local variantSets = self.variantSets[baseSetID];
+		if not variantSets then
+			variantSets = C_TransmogSets.GetVariantSets(baseSetID) or {};
 
-		self.variantSets[baseSetID] = variantSets;
-		if #variantSets > 0 then
-			-- Add base to variants and sort.
-			local baseSet = self:GetBaseSetByID(baseSetID);
-			if baseSet then
-				tinsert(variantSets, baseSet);
+			self.variantSets[baseSetID] = variantSets;
+			if #variantSets > 0 then
+				-- Add base to variants and sort.
+				local baseSet = self:GetBaseSetByID(baseSetID);
+				if baseSet then
+					tinsert(variantSets, baseSet);
+				end
+				local reverseUIOrder = true;
+				local ignorePatchID = true;
+				local ignoreCollected = true;
+				self:SortSets(variantSets, reverseUIOrder, ignorePatchID, ignoreCollected);
 			end
+		end
+		return variantSets or {};
+	else
+		local variantSets = self.variantSets[baseSetID];
+		if ( not variantSets ) then
+
+			local variantSetsAll = addon.VariantSets[addon.VariantIDs[baseSetID]];
+			if not variantSetsAll then
+				variantSetsAll = {};
+			end
+			
+			local variantSets = {};
+			for i=1, #variantSetsAll do
+				tinsert(variantSets, variantSetsAll[i]);
+			end
+
 			local reverseUIOrder = true;
 			local ignorePatchID = true;
-			local ignoreCollected = true;
-			self:SortSets(variantSets, reverseUIOrder, ignorePatchID, ignoreCollected);
+
+			addon.SortVariantSet(variantSets, reverseUIOrder, ignorePatchID);
+			self.variantSets[baseSetID] = variantSets;
 		end
+
+		return variantSets or {};
 	end
-	return variantSets;
 end
 
 function WardrobeSetsDataProviderMixin:GetSetSourceData(setID)
@@ -262,7 +285,7 @@ function WardrobeSetsDataProviderMixin:GetSetSourceData(setID)
 	end
 
 	local sourceData = self.sourceData[setID];
-	if not sourceData then
+	--if not sourceData then
 		local primaryAppearances = C_TransmogSets.GetSetPrimaryAppearances(setID) or {};
 		local numCollected = 0;
 		local numTotal = 0;
@@ -274,7 +297,7 @@ function WardrobeSetsDataProviderMixin:GetSetSourceData(setID)
 		end
 		sourceData = { numCollected = numCollected, numTotal = numTotal, primaryAppearances = primaryAppearances };
 		self.sourceData[setID] = sourceData;
-	end
+	--end
 	return sourceData;
 end
 
@@ -350,8 +373,8 @@ end
 
 function WardrobeSetsDataProviderMixin:GetSortedSetSources(setID)
 	local returnTable = {};
-	 sourceData = self:GetSetSourceData(setID);
-	 sourceData.primaryAppearances = sourceData.primaryAppearances or sourceData.sources
+	local sourceData = self:GetSetSourceData(setID);
+	sourceData.primaryAppearances = sourceData.primaryAppearances or sourceData.sources
 
 	for _index, primaryAppearance in ipairs(sourceData.primaryAppearances) do
 		local sourceID = primaryAppearance.appearanceID;

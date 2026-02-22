@@ -87,8 +87,7 @@ function addon.C_TransmogSets.GetSetPrimaryAppearances(setID)
 	if SetsData.setType == "Blizzard" then
 		return C_TransmogSets.GetSetPrimaryAppearances(setID)
 	else
-		local primaryID = SetsData and SetsData.baseSetID or setID
-		local setInfo  = addon.GetSetInfo(primaryID)
+		local setInfo  = addon.GetSetInfo(setID)
 		local sources = {}
 		for id, collected in pairs(setInfo.sources) do
 			local info = {}
