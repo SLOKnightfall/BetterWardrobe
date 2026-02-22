@@ -135,8 +135,7 @@ local function SelectColor()
 		local R2, G2, B2 = ColorPickerFrame:GetColorRGB()
 		ColorPickerFrame.previousValues = {R2, G2, B2,1}; 
 		if (R1 == R2) and (G1 == G2) and (B1 == B2) and (cat1 == ItemsCollectionFrame.activeCategory) then
-			print("X")
-			--return
+			return
 		end
 
 		R1, G1, B1, cat1 = R2, G2, B2, ItemsCollectionFrame.activeCategory
@@ -189,6 +188,8 @@ local function SelectColor()
 	ColorPickerFrame.cancelFunc = function() resetFilters() end
 	--ColorPickerFrame:SetColorRGB(.64,.64,.64,1)
 	ColorPickerFrame:Show()
+	ColorPickerFrame.Content.ColorSwatchOriginal:Hide()
+
 	--ColorPickerFrame.Content.ColorSwatchOriginal:Hide()
 
 end
@@ -198,12 +199,13 @@ function addon.Init:InitFilterButtons()
 	local atTransmogrifier = C_Transmog.IsAtTransmogNPC();
 	frame:ClearAllPoints()
 	--frame:SetPoint("TOPRIGHT", BW_SortDropDown, 30, 0)
-	frame:SetPoint("TOPRIGHT", 30, 0)
+	frame:SetPoint("TOPRIGHT", BetterWardrobeCollectionFrame.ItemsCollectionFrame.SlotsFrame,"BOTTOMLEFT", 30, -30)
 	frame:SetSize(25, 25)
-
 
 	frame:SetScript("OnHide",function()
 		ColorPickerFrame:Hide()
+		ColorPickerFrame.Content.ColorSwatchOriginal:Show()
+
 		addon.ColorFilterButton.colorSwatch:Hide()
 		BetterWardrobeCollectionFrame.ItemsCollectionFrame.recolors = nil
 		addon.ColorFilterButton.revert:Hide()

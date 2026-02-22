@@ -477,6 +477,11 @@ function WardrobeCollectionFrameMixin:InitBaseSetsFilterButton()
 			WardrobeCollectionFrame.ClassDropdown:SetDefaultText(className)
 
 		end;
+		local tab = addon.GetTab()
+		BetterWardrobeCollectionFrame:SetTab(3);
+		BetterWardrobeCollectionFrame:SetTab(2);
+		BetterWardrobeCollectionFrame:SetTab(tab);
+
 		WardrobeCollectionFrame.ClassDropdown:Update()
 	end
 	local function ShowFactionOnly()
@@ -626,9 +631,10 @@ function WardrobeCollectionFrameMixin:InitBaseSetsFilterButton()
 			end
 		end
 		submenu:CreateDivider();
-	 	submenu = rootDescription:CreateButton("Sorting");
+		--TODO: Enable Sorting menu
+	 	--submenu = rootDescription:CreateButton("Sorting");
 
-		rootDescription:CreateDivider();
+		--rootDescription:CreateDivider();
 	 	submenu = rootDescription:CreateButton("Options");
 
 		submenu:CreateCheckbox(L["Show Hidden Sets"], 
@@ -642,6 +648,7 @@ function WardrobeCollectionFrameMixin:InitBaseSetsFilterButton()
 
 			end, 6);
 
+--[[
 		submenu:CreateDivider();
 		submenu:CreateCheckbox(L["Combine Special Sets"], 
 			function() 
@@ -665,7 +672,7 @@ function WardrobeCollectionFrameMixin:InitBaseSetsFilterButton()
 				RefreshLists()
 
 			end, 6);
-
+]]--
 			submenu:CreateCheckbox(L["Ignore Class Restriction Filter"], ShowIgnoreClassRestrictions, setIgnoreClassRestrictions, 5);
 
 	end);
