@@ -729,7 +729,6 @@ function WardrobeCollectionFrameMixin:HandleFormChanged()
 	end
 end
 
-
 function WardrobeCollectionFrameMixin:OnUpdate()
 	if self.needsFormChangedHandling then
 		self:HandleFormChanged();

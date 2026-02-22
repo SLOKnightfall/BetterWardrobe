@@ -345,6 +345,7 @@ function addon:FilterSets(setList, setType)
 	local missingSelection = addon.Filters.Base.missingSelection
 	local filterSelection = addon.Filters.Base.filterSelection
 	local xpacSelection = addon.Filters.Base.xpacSelection
+	local isHidden = false
 
 	if not filterList then
 		return FilterSets
@@ -366,6 +367,20 @@ function addon:FilterSets(setList, setType)
 
 		local searchSet = addon:SearchSets(data)
 
+		local setType
+		if data.setType == "Blizzard" then
+			setType = "set"
+		elseif data.setType == "ExtraSet" then
+			setType = "extraset"
+		end
+
+		local isHidden = false
+
+		if setType then 
+
+			isHidden = (addon.Profile.ShowHidden and false) or ( not addon.Profile.ShowHidden and addon.HiddenAppearanceDB.profile[setType][data.setID])
+		end
+
 		local collected = count == total
 		if ((filterCollected and collected) or (filterUncollected and not collected)) and
 			((filterPVE and not isPvP) or (filterPVP and isPvP)) and
@@ -373,6 +388,7 @@ function addon:FilterSets(setList, setType)
 			xpacSelection[expansion] and
 			sourcefilter and
 			searchSet and
+			not isHidden and
 			tab then
 			--(not unavailable or (addon.Profile.HideUnavalableSets and unavailable)) then ----and
 			tinsert(FilterSets, data)

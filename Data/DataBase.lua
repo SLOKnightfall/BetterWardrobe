@@ -83,7 +83,7 @@ local variantSets = {};
 addon.VariantSets = variantSets
 local variantIDs = {};
 addon.VariantIDs = variantIDs
- fullList = {}
+local fullList = {}
 addon.fullList = fullList
 
 

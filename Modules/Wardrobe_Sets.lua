@@ -1101,6 +1101,8 @@ function WardrobeSetsScrollFrameButtonMixin:OnClick(buttonName, down)
 					--self.setID = self.baseSetID; 
 					ToggleHidden(self, isHidden);
 					addon.Init:InitDB()
+					BetterWardrobeCollectionFrame:SetTab(3);
+					BetterWardrobeCollectionFrame:SetTab(2);
 					--RefreshLists()
 				end);
 
