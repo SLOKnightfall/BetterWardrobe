@@ -16,8 +16,12 @@ C_TransmogSets.GetSetsContainingSourceID = Bizz_C_TransmogSets.GetSetsContaining
 C_TransmogSets.GetCameraIDs = Bizz_C_TransmogSets.GetCameraIDs
 C_TransmogSets.GetVariantSets = addon.C_TransmogSets.GetVariantSets
 C_TransmogSets.GetSourcesForSlot =  addon.C_TransmogSets.GetSourcesForSlot
-
-
+C_TransmogSets.GetSetsContainingSourceID = addon.C_TransmogSets.GetSetsContainingSourceID
+C_TransmogSets.GetLatestSource = addon.C_TransmogSets.GetLatestSource
+C_TransmogSets.GetSetNewSources = addon.C_TransmogSets.GetSetNewSources
+C_TransmogSets.SetHasNewSourcesForSlot = addon.C_TransmogSets.SetHasNewSourcesForSlot
+C_TransmogSets.GetCameraIDs = addon.C_TransmogSets.GetCameraIDs
+C_TransmogSets.ClearLatestSource = addon.C_TransmogSets.ClearLatestSource
 
 local SET_MODEL_PAN_AND_ZOOM_LIMITS = {
 	["Draenei2"] = { maxZoom = 2.2105259895325, panMaxLeft = -0.56983226537705, panMaxRight = 0.82581323385239, panMaxTop = -0.17342753708363, panMaxBottom = -2.6428601741791 },
@@ -1429,13 +1433,13 @@ function WardrobeSetsDetailsItemMixin:OnEnter()
 
 	if ( self.New:IsShown() ) then
 		self.New:Hide();
+--todo fix 
+	--	local setID = BetterWardrobeCollectionFrame.SetsCollectionFrame:GetSelectedSetID();
+		--C_TransmogSets.ClearSetNewSourcesForSlot(setID, self.transmogSlot);
+		--local baseSetID = C_TransmogSets.GetBaseSetID(setID);
+		--SetsDataProvider:ResetBaseSetNewStatus(baseSetID);
 
-		local setID = BetterWardrobeCollectionFrame.SetsCollectionFrame:GetSelectedSetID();
-		C_TransmogSets.ClearSetNewSourcesForSlot(setID, self.transmogSlot);
-		local baseSetID = C_TransmogSets.GetBaseSetID(setID);
-		SetsDataProvider:ResetBaseSetNewStatus(baseSetID);
-
-		BetterWardrobeCollectionFrame.SetsCollectionFrame.ListContainer:ReinitializeButtonWithBaseSetID(baseSetID);
+		--BetterWardrobeCollectionFrame.SetsCollectionFrame.ListContainer:ReinitializeButtonWithBaseSetID(baseSetID);
 	end
 end
 

@@ -100,6 +100,57 @@ function addon.C_TransmogSets.GetSetPrimaryAppearances(setID)
 	end
 end
 
+function addon.C_TransmogSets.ClearLatestSource()
+	C_TransmogSets.ClearLatestSource()
+end
+
+function addon.C_TransmogSets.GetSetsContainingSourceID(latestSource)
+	local tab = addon.GetTab()
+	if tab == 2 then
+		return C_TransmogSets.GetSetsContainingSourceID(latestSource)
+	else
+
+	--todo:  extrasets	
+	return 
+	end
+end
+function addon.C_TransmogSets.SetHasNewSourcesForSlot(setID, transmogSlot)
+	local tab = addon.GetTab()
+	if tab == 2 then
+		return C_TransmogSets.SetHasNewSourcesForSlot(setID, transmogSlot)
+	else
+
+	--todo:  extrasets	
+	return false
+	end
+end
+
+function addon.C_TransmogSets.GetLatestSource()
+	local tab = addon.GetTab()
+	if tab == 2 then
+		return C_TransmogSets.GetLatestSource()
+	else
+	--todo:  extrasets		
+	end
+end
+
+function addon.C_TransmogSets.GetCameraIDs()
+	return C_TransmogSets.GetCameraIDs();
+end
+
+function addon.C_TransmogSets.GetSetNewSources(setID)
+
+ 	local tab = addon.GetTab()
+	if tab == 2 then
+		return C_TransmogSets.GetSetNewSources(setID)
+
+	else
+	--todo:  extrasets	
+	return {}	
+	end
+end
+
+
 function addon.C_TransmogSets.SetHasNewSources(setID)
 	local SetsData = addon.GetSetInfo(setID)
 

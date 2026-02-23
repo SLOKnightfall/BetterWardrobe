@@ -1133,7 +1133,7 @@ function WardrobeItemsCollectionMixin:CheckLatestAppearance(changeTab)
 		self.jumpToLatestCategoryID = latestAppearanceCategoryID;
 
 		if ( changeTab and not CollectionsJournal:IsShown() ) then
-			CollectionsJournal_SetTab(CollectionsJournal, 5);
+			--CollectionsJournal_SetTab(CollectionsJournal, 5);
 		end
 	end
 end
