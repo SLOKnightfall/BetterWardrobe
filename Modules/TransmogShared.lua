@@ -12,7 +12,7 @@ C_TransmogSets.SetHasNewSources = addon.C_TransmogSets.SetHasNewSources
 C_TransmogSets.GetVariantSets = addon.C_TransmogSets.GetVariantSets
 C_TransmogSets.GetBaseSets = addon.C_TransmogSets.GetBaseSets
 C_TransmogSets.GetUsableSets = addon.C_TransmogSets.GetUsableSets
-
+C_TransmogSets.GetSetInfo = addon.C_TransmogSets.GetSetInfo
 
 StaticPopupDialogs["TRANSMOG_FAVORITE_WARNING2"] = {
 	text = TRANSMOG_FAVORITE_LOSE_REFUND_AND_TRADE,
@@ -166,8 +166,10 @@ end
 
 function WardrobeSetsDataProviderMixin:GetBaseSetByID(baseSetID)
 	local baseSets = self:GetBaseSets();
+
 	for index, baseSet in ipairs(baseSets) do
-		if baseSet.setID == baseSetID then
+		if baseSet.baseSetID == baseSetID then
+
 			return baseSet, index;
 		end
 	end
@@ -237,14 +239,14 @@ function WardrobeSetsDataProviderMixin:GetVariantSets(baseSetID)
 	end
 
 	if BetterWardrobeCollectionFrame:CheckTab(2) then 
-		local variantSets = self.variantSets[baseSetID];
+		local variantSets --= {} --self.variantSets[baseSetID];
 		if not variantSets then
 			variantSets = C_TransmogSets.GetVariantSets(baseSetID) or {};
 
 			self.variantSets[baseSetID] = variantSets;
 			if #variantSets > 0 then
 				-- Add base to variants and sort.
-				local baseSet = self:GetBaseSetByID(baseSetID);
+				local baseSet = C_TransmogSets.GetSetInfo(baseSetID);
 				if baseSet then
 					tinsert(variantSets, baseSet);
 				end

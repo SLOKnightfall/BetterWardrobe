@@ -100,6 +100,17 @@ function addon.C_TransmogSets.GetSetPrimaryAppearances(setID)
 	end
 end
 
+function addon.C_TransmogSets.SetHasNewSources(setID)
+	local tab = addon.GetTab()
+	if tab == 2 then
+		return C_TransmogSets.SetHasNewSources(setID)
+	else
+
+	--todo:  extrasets	
+	return false
+	end
+end
+
 function addon.C_TransmogSets.ClearLatestSource()
 	C_TransmogSets.ClearLatestSource()
 end
@@ -172,7 +183,14 @@ function addon.C_TransmogSets.SetHasNewSources(setID)
 end
 
 function addon.C_TransmogSets.GetBaseSets()
-	return addon.BaseList
+	local tab = addon.GetTab()
+	--if tab == 2 then
+		--return C_TransmogSets.GetBaseSets()
+	--
+		return addon.BaseList
+	--end
+
+
 end
 
 function addon.C_TransmogSets.GetVariantSets(setID)

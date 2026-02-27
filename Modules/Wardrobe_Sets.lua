@@ -22,6 +22,8 @@ C_TransmogSets.GetSetNewSources = addon.C_TransmogSets.GetSetNewSources
 C_TransmogSets.SetHasNewSourcesForSlot = addon.C_TransmogSets.SetHasNewSourcesForSlot
 C_TransmogSets.GetCameraIDs = addon.C_TransmogSets.GetCameraIDs
 C_TransmogSets.ClearLatestSource = addon.C_TransmogSets.ClearLatestSource
+C_TransmogSets.SetHasNewSources = addon.C_TransmogSets.SetHasNewSources
+
 
 local SET_MODEL_PAN_AND_ZOOM_LIMITS = {
 	["Draenei2"] = { maxZoom = 2.2105259895325, panMaxLeft = -0.56983226537705, panMaxRight = 0.82581323385239, panMaxTop = -0.17342753708363, panMaxBottom = -2.6428601741791 },

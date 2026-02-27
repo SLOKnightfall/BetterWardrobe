@@ -209,6 +209,8 @@ addon.MiscSets.HeritageSets = {
 	[3702] = 85, -- Earthen (Gundargaz)
 	[5368] = 25, -- Pandaran (Aliance)
 	[5367] = 26, -- Pandaran (Horde)
+	[5382] = 86, --Harandar
+	[5381] = 91, --Harandar
 
 
 }

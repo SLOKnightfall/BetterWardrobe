@@ -87,17 +87,6 @@ local fullList = {}
 addon.fullList = fullList
 
 
-function z()
-	local count = 0
-	for i, d in pairs(fullList) do
-		if d.setType == "ExtraSet" then
-			count = count + 1
-		end
-	end
-	print(count)
-end
-
-
 local function AddVariant(set, baseSetID)
 	variantSets[baseSetID] = variantSets[baseSetID] or {};
 	set.baseSetID = baseSetID;
