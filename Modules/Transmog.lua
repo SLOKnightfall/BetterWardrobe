@@ -2155,7 +2155,7 @@ function TransmogWardrobeSetsMixin:Init(wardrobeCollection)
 	self.wardrobeCollection = wardrobeCollection;
 end
 
-local EXPANSIONS = {EXPANSION_NAME0, EXPANSION_NAME1, EXPANSION_NAME2, EXPANSION_NAME3, EXPANSION_NAME4, EXPANSION_NAME5, EXPANSION_NAME6, EXPANSION_NAME7, EXPANSION_NAME8, EXPANSION_NAME9,EXPANSION_NAME10}
+local EXPANSIONS = {EXPANSION_NAME0, EXPANSION_NAME1, EXPANSION_NAME2, EXPANSION_NAME3, EXPANSION_NAME4, EXPANSION_NAME5, EXPANSION_NAME6, EXPANSION_NAME7, EXPANSION_NAME8, EXPANSION_NAME9,EXPANSION_NAME10,EXPANSION_NAME11}
 local xpacSelection = {}
 
 local function xpackCheckAll(value)
@@ -2351,6 +2351,8 @@ function TransmogWardrobeSetsMixin:RefreshCollectionEntries()
 					setType = "Blizzard",
 					expansionID = availableSet.expansionID,
 					label = availableSet.label,
+					uiOrder = availableSet.uiOrder,
+
 				};
 				availableSet.expansionID = availableSet.expansionID
 				local validFilter = isValidFilter(element)
@@ -2371,6 +2373,14 @@ function TransmogWardrobeSetsMixin:RefreshCollectionEntries()
 		local collected2 = element2.collected == element2.pieces
 		if collected1 ~= collected2 then
 			return collected1;
+		end
+
+		if element1.expansionID ~= element2.expansionID then
+			return element1.expansionID > element2.expansionID;
+		end
+
+		if element1.uiOrder ~= element2.uiOrder then
+			--return element1.uiOrder > element2.uiOrder;
 		end
 
 		local customSetName1, _customSetIcon1 = element1.name;
@@ -2567,6 +2577,7 @@ function TransmogWardrobeCustomSetsMixin:RefreshCollectionEntries()
 			return element1.isCollected;
 		end
 
+
 		local customSetName1, _customSetIcon1 = C_TransmogCollection.GetCustomSetInfo(element1.customSetID);
 		local customSetName2, _customSetIcon2 = C_TransmogCollection.GetCustomSetInfo(element2.customSetID);
 		return customSetName1 < customSetName2;
@@ -2611,7 +2622,7 @@ function TransmogWardrobeCustomSetsMixin:RefreshCollectionEntries()
 	end
 
 
-	--table.sort(collectionElements, compareEntries);
+	table.sort(collectionElements, compareEntries);
 
 	local collectionData = {{elements = collectionElements}};
 	local dataProvider = CreateDataProvider(collectionData);
