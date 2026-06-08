@@ -506,7 +506,7 @@ function preview:ShowPreview(itemLink, parent)
 					addDoubleLine (GameTooltip," ",L["-%s %s(%d/%d)"]:format(data.name or "", color, collected, total))
 
 					if addon.Profile.ShowDetailedListTooltips then
-						local sources = addon.GetSetsources(data.setID)
+						local sources = addon.GetSetSources(data.setID)
 						for sourceID, collected in pairs(sources) do
 							local sourceInfo = C_TransmogCollection.GetSourceInfo(sourceID)
 							if collected and not addon.Profile.ShowMissingDetailedListTooltips then

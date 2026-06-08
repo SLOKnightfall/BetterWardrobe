@@ -139,7 +139,7 @@ function CollectionList:UpdateList(type, typeID, add, sourceID)
 			setName = C_TransmogSets.GetSetInfo(typeID).name
 		else
 			setInfo = addon.GetSetInfo(typeID)
-			sources = addon.GetSetsources(typeID)
+			sources = addon.GetSetSources(typeID)
 			setName = "name"
 			itemModID = setInfo.mod or 0
 		end
@@ -360,7 +360,7 @@ function CollectionList:OptionButton_OnClick(button)
 
 	end
 	
-	MenuUtil.CreateContextMenu(parent, GeneratorFunction);
+	MenuUtil.CreateContextMenu(button, GeneratorFunction);
 
 end
 

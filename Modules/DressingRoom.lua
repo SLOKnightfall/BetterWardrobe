@@ -578,7 +578,7 @@ local function DressupSettingsButton_OnClick(self)
 		rootDescription:CreateCheckbox(L["Hide Shirt"], function() return Profile.DR_HideShirt end, function() Profile.DR_HideShirt = not Profile.DR_HideShirt end);
 	end
 	
-	MenuUtil.CreateContextMenu(parent, GeneratorFunction);
+	MenuUtil.CreateContextMenu(self, GeneratorFunction);
 end
 
 local function BW_DressingRoomImportButton_OnClick(self)
@@ -632,7 +632,7 @@ local function BW_DressingRoomImportButton_OnClick(self)
 
 		end
 	
-	MenuUtil.CreateContextMenu(parent, GeneratorFunction);
+	MenuUtil.CreateContextMenu(self, GeneratorFunction);
 end
 
 

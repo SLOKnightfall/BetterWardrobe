@@ -1299,7 +1299,7 @@ end
 		return visualID ,sourceID
 	end
 
-	function addon.GetSetsources(setID)
+	function addon.GetSetSources(setID)
 		--return C_TransmogSets.GetSetPrimaryAppearances(setID)
 		return addon.C_TransmogSets.GetSetSources(setID)
 	end
