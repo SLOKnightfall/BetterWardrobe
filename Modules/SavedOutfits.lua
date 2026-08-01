@@ -928,7 +928,7 @@ StaticPopupDialogs["BW_TRANSMOG_CUSTOM_SET_NAME"] = {
 
 		if data then
 			WardrobeCustomSetManager:SetItemTransmogInfoList(data.itemTransmogInfoList);
-			dialog:GetEditBox():SetText(data.name.name);
+			dialog:GetEditBox():SetText(data.name);
 		end
 	end,
 	OnHide = function(dialog, data)

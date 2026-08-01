@@ -1789,7 +1789,7 @@ function TransmogCustomSetModelMixin:OnMouseUp(button)
 				local data = { name = name, customSetID = self.elementData.customSetID, itemTransmogInfoList = itemTransmogInfoList };
 				StaticPopup_Show("TRANSMOG_CUSTOM_SET_NAME", nil, nil, data);
 			else
-				local name = addon.OutfitDB.char.outfits[self.elementData.customSetID];
+				local name = addon.OutfitDB.char.outfits[self.elementData.customSetID].name or "";
 				local data = { name = name, customSetID = self.elementData.customSetID, itemTransmogInfoList = itemTransmogInfoList };
 				StaticPopup_Show("BW_TRANSMOG_CUSTOM_SET_NAME", nil, nil, data);
 			end
