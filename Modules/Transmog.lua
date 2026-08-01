@@ -2572,15 +2572,22 @@ function TransmogWardrobeCustomSetsMixin:RefreshNewCustomSetButton()
 end
 
 function TransmogWardrobeCustomSetsMixin:RefreshCollectionEntries()
+	local getEntryName = function(element)
+		if element.setType == "Blizzard" then
+			local customSetName, _customSetIcon = C_TransmogCollection.GetCustomSetInfo(element.customSetID);
+			return customSetName;
+		else
+			local outfit = addon.OutfitDB.char.outfits[element.customSetID];
+			return outfit and outfit.name;
+		end
+	end
+
 	local compareEntries = function(element1, element2)
 		if element1.isCollected ~= element2.isCollected then
 			return element1.isCollected;
 		end
 
-
-		local customSetName1, _customSetIcon1 = C_TransmogCollection.GetCustomSetInfo(element1.customSetID);
-		local customSetName2, _customSetIcon2 = C_TransmogCollection.GetCustomSetInfo(element2.customSetID);
-		return customSetName1 < customSetName2;
+		return (getEntryName(element1) or "") < (getEntryName(element2) or "");
 	end
 
 	local collectionElements = {};
