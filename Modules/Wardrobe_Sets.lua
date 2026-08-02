@@ -3,19 +3,20 @@ addon = LibStub("AceAddon-3.0"):GetAddon(addonName);
 
 local Bizz_C_TransmogSets = C_TransmogSets
 addon.C_TransmogSets = addon.C_TransmogSets or {}
-local C_TransmogSets = {}
+--Anything not explicitly overridden below falls through to the real Blizzard
+--C_TransmogSets via __index, instead of silently resolving to nil (this used to
+--be a hand-built proxy table that was missing GetSetPrimaryAppearances, IsSetVisible,
+--SetIsFavorite, GetIsFavorite, and ClearSetNewSourcesForSlot -- any call to those
+--would throw "attempt to call a nil value").
+local C_TransmogSets = setmetatable({}, {__index = Bizz_C_TransmogSets})
 local L = LibStub("AceLocale-3.0"):GetLocale(addonName);
 
+--Overrides: these need to be extra/saved-set aware, so they route through addon.C_TransmogSets
 C_TransmogSets.GetSetInfo = addon.C_TransmogSets.GetSetInfo
 C_TransmogSets.GetBaseSetID = addon.C_TransmogSets.GetBaseSetID
-C_TransmogSets.GetSetNewSources = Bizz_C_TransmogSets.GetSetNewSources
 C_TransmogSets.GetFilteredBaseSetsCounts = addon.C_TransmogSets.GetFilteredBaseSetsCounts
-C_TransmogSets.SetHasNewSourcesForSlot = Bizz_C_TransmogSets.SetHasNewSourcesForSlot
-C_TransmogSets.GetLatestSource = Bizz_C_TransmogSets.GetLatestSource
-C_TransmogSets.GetSetsContainingSourceID = Bizz_C_TransmogSets.GetSetsContainingSourceID
-C_TransmogSets.GetCameraIDs = Bizz_C_TransmogSets.GetCameraIDs
 C_TransmogSets.GetVariantSets = addon.C_TransmogSets.GetVariantSets
-C_TransmogSets.GetSourcesForSlot =  addon.C_TransmogSets.GetSourcesForSlot
+C_TransmogSets.GetSourcesForSlot = addon.C_TransmogSets.GetSourcesForSlot
 C_TransmogSets.GetSetsContainingSourceID = addon.C_TransmogSets.GetSetsContainingSourceID
 C_TransmogSets.GetLatestSource = addon.C_TransmogSets.GetLatestSource
 C_TransmogSets.GetSetNewSources = addon.C_TransmogSets.GetSetNewSources
@@ -810,7 +811,8 @@ function WardrobeSetsCollectionMixin:OpenInDressingRoom(setID)
 	-----local setInfo = addon.getFullList(setID) --addon:GetSetInfo(setID)
 	local setInfo = C_TransmogSets.GetSetInfo(setID);
 
-	local setType = "Blizzard" --setInfo.setType;
+	local addonSetInfo = addon.GetSetInfo(setID)
+	local setType = (addonSetInfo and addonSetInfo.setType) or "Blizzard"
 
 	--local setType = addon.QueueList[1]
 	--local setID = addon.QueueList[2]

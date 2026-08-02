@@ -2,10 +2,12 @@ local addonName, addon = ...;
 ---addon = LibStub("AceAddon-3.0"):NewAddon(addon, addonName, "AceEvent-3.0", "AceConsole-3.0", "AceHook-3.0");
 addon = LibStub("AceAddon-3.0"):GetAddon(addonName);
 
-local Blizz_C_TransmogSets = {}
-Blizz_C_TransmogSets.GetSetPrimaryAppearances = C_TransmogSets.GetSetPrimaryAppearances
-Blizz_C_TransmogSets.GetBaseSetID = C_TransmogSets.GetBaseSetID
-local C_TransmogSets = {}
+local Blizz_C_TransmogSets = C_TransmogSets
+--Anything not explicitly overridden below falls through to the real Blizzard
+--C_TransmogSets via __index (this used to be a hand-built table missing
+--GetAvailableSets, which meant WardrobeSetsDataProviderMixin:GetAvailableSets
+--threw "attempt to call a nil value" whenever it ran).
+local C_TransmogSets = setmetatable({}, {__index = Blizz_C_TransmogSets})
 C_TransmogSets.GetSetPrimaryAppearances = addon.C_TransmogSets.GetSetPrimaryAppearances
 C_TransmogSets.GetBaseSetID = addon.C_TransmogSets.GetBaseSetID
 C_TransmogSets.SetHasNewSources = addon.C_TransmogSets.SetHasNewSources
