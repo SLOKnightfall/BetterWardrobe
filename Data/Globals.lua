@@ -46,6 +46,17 @@ local PlateMasks =  {1, 2, 32, 35, 0}
 local MailMasks =  {4, 64, 68, 0, 4096, 4164}
 local LeatherMasks = {8, 512, 1024, 2048, 3592, 0}
 local ClothMaks = {16, 128, 256, 400, 0}
+
+--Keyed by armor-type ID (matches ARMOR_TYPE_ID/ClassArmorType below: CLOTH=1, LEATHER=2,
+--MAIL=3, PLATE=4), not class ID. Lets the armor-type dropdown (addon.armorTypeFilter) look
+--up a mask list directly instead of needing to go through a specific class.
+Globals.ARMOR_TYPE_MASK = {
+		[1] = ClothMaks,
+		[2] = LeatherMasks,
+		[3] = MailMasks,
+		[4] = PlateMasks,
+}
+
 Globals.CLASS_MASK = {
 		[1] = PlateMasks, -- Warrior - Plate Wearer
 		[2] = PlateMasks, -- Paladin - Plate Wearer

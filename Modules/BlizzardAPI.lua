@@ -538,7 +538,7 @@ function addon:FilterSets(setList, setType)
 	end
 
 	for i, data in ipairs(filterList) do
-		local setData = BetterWardrobeSetsDataProviderMixin:GetSetSourceData(data.setID)
+		local setData = addon.SetsDataProvider:GetSetSourceData(data.setID)
 		local isPvP = data.isPvP;
 		local count , total = setData.numCollected, setData.numTotal
 		local expansion = data.expansionID

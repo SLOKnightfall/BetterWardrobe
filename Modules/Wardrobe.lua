@@ -345,6 +345,17 @@ local function RefreshLists()
 end
 
 addon.RefreshLists = RefreshLists;
+
+--Points the preview at the first set in whichever list (Sets or Extra Sets, whichever tab is
+--currently active) is showing after a class/armor-type filter change or an IgnoreClassRestrictions
+--toggle, since the previously selected set is often no longer in the newly filtered list at all.
+local function SelectFirstSet()
+	local sets = addon.SetsDataProvider:GetBaseSets();
+	if sets and sets[1] then
+		BetterWardrobeCollectionFrame.SetsCollectionFrame:SelectBaseSetID(sets[1].setID);
+	end
+end
+
 local locationDropDown = addon.Globals.locationDropDown;
 
 function WardrobeCollectionFrameMixin:InitItemsFilterButton()
@@ -482,6 +493,7 @@ function WardrobeCollectionFrameMixin:InitBaseSetsFilterButton()
 		BetterWardrobeCollectionFrame:SetTab(tab);
 
 		WardrobeCollectionFrame.ClassDropdown:Update()
+		SelectFirstSet();
 	end
 	local function ShowFactionOnly()
 		return addon.Profile.CurrentFactionSets;
@@ -516,7 +528,12 @@ function WardrobeCollectionFrameMixin:InitBaseSetsFilterButton()
 		xpackCheckAll(true)
 		sourceCheckAll(true)
 		missingCheckAll(true)
-		return C_TransmogSets.SetDefaultBaseSetsFilters();
+		local result = C_TransmogSets.SetDefaultBaseSetsFilters();
+		--xpackCheckAll refreshes internally, but that happens before sourceCheckAll/missingCheckAll
+		--apply their own changes below it, so the list only ever reflected the expansion-filter
+		--reset and silently missed the source/missing-location reset that follows.
+		RefreshLists();
+		return result;
 	end);
 
 
@@ -2251,7 +2268,7 @@ function WardrobeItemModelMixin:OnMouseUp(button)
 				for i = 1, #Recolors do
 					local visualList = Recolors[i];
 					for j = 1, #visualList do
-						if visualList[j] == visualID then
+						if visualList[j] == self.visualInfo.visualID then
 							BetterWardrobeCollectionFrame.ItemsCollectionFrame.recolors = visualList;
 							BetterWardrobeCollectionFrame.ItemsCollectionFrame:RefreshVisualsList();
 							BetterWardrobeCollectionFrame.ItemsCollectionFrame:FilterVisuals();
@@ -2483,6 +2500,7 @@ function WardrobeCollectionClassDropdownMixin:SetClassFilter(classID)
 	elseif searchType == Enum.TransmogSearchType.BaseSets then
 		C_TransmogSets.SetTransmogSetsClassFilter(classID);
 		addon.Init:InitDB()
+		SelectFirstSet();
 	end
 
 	self:Refresh();
@@ -2496,8 +2514,9 @@ function WardrobeCollectionClassDropdownMixin:SetArmorTypeFilter(armorType)
 		addon.armorTypeFilter = armorType;
 		addon.Init:InitDB();
 		RefreshLists();
+		SelectFirstSet();
 	end
-	
+
 	self:Refresh();
 end
 

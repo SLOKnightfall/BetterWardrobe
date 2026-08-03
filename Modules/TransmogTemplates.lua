@@ -1702,6 +1702,11 @@ function TransmogSetModelMixin:ToggleFavorite(setFavorite, isGroupFavorite)
 		end
 
 		C_TransmogSets.SetIsFavorite(setID, setFavorite);
+		--Unlike the extraset branch below, SetIsFavorite doesn't drive our custom BW_SetsFrame2
+		--list on its own -- the favorite icon/sort order come from a snapshot taken at the last
+		--RefreshCollectionEntries, so without this the toggle silently doesn't show until the
+		--tab is reopened.
+		TransmogFrame.WardrobeCollection.TabContent.BW_SetsFrame2:RefreshCollectionEntries()
 	else
 		addon.favoritesDB.profile.extraset[setID] = not addon.favoritesDB.profile.extraset[setID]
 		TransmogFrame.WardrobeCollection.TabContent.BW_ExtraSetsFrame:RefreshCollectionEntries()

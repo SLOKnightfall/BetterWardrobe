@@ -146,7 +146,11 @@ local function UseSet(data)
 	local _,_,playerRace = UnitRace('player');
 	local playerFaction, _ = UnitFactionGroup('player')
 	local correctFaction = false
-	local ClassArmorTypeMask = addon.Globals.CLASS_MASK[tonumber(selectedArmorType)]
+	--Ignore Class Restrictions should filter by the addon's own armor-type dropdown
+	--(addon.armorTypeFilter), not by Blizzard's class filter dropdown -- these are two
+	--separate, unsynced pieces of state, and using the latter here meant the sets shown
+	--reflected whatever the class filter last happened to be, not the armor type picked.
+	local ClassArmorTypeMask = addon.Globals.ARMOR_TYPE_MASK[addon.armorTypeFilter] or addon.Globals.CLASS_MASK[tonumber(selectedArmorType)]
 	local correctHeratiage = false
 	local heritageSets = addon.MiscSets.HeritageSets
 
@@ -185,12 +189,25 @@ local function UseSet(data)
 				end
 			end
 		else
-			if not addon.Profile.IgnoreClassRestrictions then 
+			if not addon.Profile.IgnoreClassRestrictions then
 				local classInfo = CLASS_INFO[playerClass]
 				local className = (classMask and GetClassInfo(classMask)) or nil
 				correctClass = data.classMask == classInfo[1] or not data.classMask
 			else
-				correctClass = true
+				--Was unconditionally true, so extra sets ignored the armor-type dropdown
+				--entirely while Blizzard sets (branch above) respected it. Extra sets are
+				--usually unrestricted (nil classMask) -- same fallback as the branch above,
+				--or every unrestricted extra set gets filtered out instead of always shown.
+				if not data.classMask then
+					correctClass = true;
+				else
+					for i = 1, #ClassArmorTypeMask do
+						if data.classMask == ClassArmorTypeMask[i] then
+							correctClass = true;
+							break;
+						end
+					end
+				end
 			end
 		end
 	end
@@ -488,6 +505,10 @@ do
 					local newID = 10000 + id
 
 					data.setID = newID
+
+					--Never populated before, so DetermineFavorites (which reads this field) was always
+					--blind to extra-set favorites regardless of what the favorite button did.
+					data.favorite = addon.favoritesDB.profile.extraset[newID] or false
 
 					data.newStatus = false
 
