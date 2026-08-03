@@ -869,7 +869,7 @@ function addon:SearchSets(data)
 		local tab = TransmogFrame and TransmogFrame.WardrobeCollection:GetTab()
 		if not tab then return  false end
 
-		local query = TransmogFrame and TransmogFrame.WardrobeCollection.TabContent.BW_ExtraSetsFrame.SearchBox:GetText()  or ""
+		query = TransmogFrame and TransmogFrame.WardrobeCollection.TabContent.BW_ExtraSetsFrame.SearchBox:GetText()  or ""
 		
 		if tab == 5 then
 			query = TransmogFrame and TransmogFrame.WardrobeCollection.TabContent.BW_SetsFrame2.SearchBox:GetText()  or ""

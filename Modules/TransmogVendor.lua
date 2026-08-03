@@ -20,9 +20,12 @@ function addon.Init:BuildTransmogVendorUI()
 	local secondaryShoulderButton = self.SecondaryShoulderButton;
 	local secondaryShoulderTransmogged = TransmogUtil.IsSecondaryTransmoggedForItemLocation(secondaryShoulderButton.itemLocation);
 
-	local pendingInfo = C_Transmog.GetPending(secondaryShoulderButton.transmogLocation);
+	--NOTE: C_Transmog.GetPending no longer exists in the current API. The modern
+	--equivalent is the pendingSourceID field on C_Transmog.GetSlotVisualInfo's result.
+	local slotVisualInfo = C_Transmog.GetSlotVisualInfo(secondaryShoulderButton.transmogLocation);
+	local hasPending = slotVisualInfo and slotVisualInfo.pendingSourceID and slotVisualInfo.pendingSourceID ~= 0;
 	local showSecondaryShoulder = false;
-	if not pendingInfo then
+	if not hasPending then
 		showSecondaryShoulder = secondaryShoulderTransmogged;
 	elseif pendingInfo.type == Enum.TransmogPendingType.ToggleOff then
 		showSecondaryShoulder = false;
@@ -354,9 +357,14 @@ local function UpdateSlotButtons()
 					local forceGo = slotButton.transmogLocation:IsIllusion();
 					local forTransmog = true;
 					local effectiveCategory;
-					if slotButton.transmogLocation:IsEitherHand() then
-						effectiveCategory = C_Transmog.GetSlotEffectiveCategory(slotButton.transmogLocation);
-					end
+					--NOTE: C_Transmog.GetSlotEffectiveCategory no longer exists in the
+					--current API and has no direct 1:1 replacement I could confirm.
+					--Left as nil (GoToSourceID's default category detection) rather than
+					--guessing at a replacement -- this only affected either-hand weapon
+					--slots specifically, worth testing that case in-game.
+					--if slotButton.transmogLocation:IsEitherHand() then
+					--	effectiveCategory = C_Transmog.GetSlotEffectiveCategory(slotButton.transmogLocation);
+					--end
 					BetterWardrobeCollectionFrame.ItemsCollectionFrame:GoToSourceID(selectedSourceID, slotButton.transmogLocation, forceGo, forTransmog, effectiveCategory);
 					BetterWardrobeCollectionFrame.ItemsCollectionFrame:SetTransmogrifierAppearancesShown(true);
 				end

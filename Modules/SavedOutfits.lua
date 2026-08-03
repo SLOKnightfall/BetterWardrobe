@@ -11,7 +11,7 @@ local SET_OFFSET = addon.Globals.SET_OFFSET
 
 
 local function GetTableIndex(index)
-	local numOutfits = #C_TransmogCollection.GetOutfits()
+	local numOutfits = #C_TransmogCollection.GetCustomSets()
 	return index - numOutfits + 1
 end
 
@@ -207,7 +207,7 @@ function BetterWardrobeOutfitDropdownMixin:SelectOutfit(outfitID)
 
 	self.selectedOutfitID = outfitID;
 	if BetterWardrobeCollectionFrame then 
-		BetterWardrobeCollectionFrame.SetsTransmogFrame.selectedSetID = outfitID;
+		BetterWardrobeCollectionFrame.SetsCollectionFrame.selectedSetID = outfitID;
 	end
 end
 
@@ -377,7 +377,7 @@ function BetterWardrobeOutfitDropdownMixin:IsOutfitDressed()
 
 	if self.selectedOutfitID >= SET_OFFSET and self.selectedOutfitID <= SET_OFFSET+25 then 
 		local selectedOutfitID = addon:GetBlizzID(self.selectedOutfitID);
-		local outfitItemTransmogInfoList = C_TransmogCollection.GetOutfitItemTransmogInfoList(selectedOutfitID);
+		local outfitItemTransmogInfoList = C_TransmogCollection.GetCustomSetItemTransmogInfoList(selectedOutfitID);
 		if not outfitItemTransmogInfoList then
 			return true
 		end
@@ -402,7 +402,7 @@ function BetterWardrobeOutfitDropdownMixin:IsOutfitDressed()
 			return true;
 		end
 
-		local outfitItemTransmogInfoList = addon.C_TransmogCollection.GetOutfitItemTransmogInfoList(self.selectedOutfitID);
+		local outfitItemTransmogInfoList = C_TransmogCollection.GetCustomSetItemTransmogInfoList(self.selectedOutfitID);
 		local currentItemTransmogInfoList = self:GetItemTransmogInfoList();
 		if not currentItemTransmogInfoList then
 			return true;
@@ -474,8 +474,8 @@ function BetterWardrobeOutfitManager:NewOutfit(name)
 				sources[i] = data.appearanceID
 			end]]
 
-	if (outfitID and IsDefaultSet(outfitID)) or (#C_TransmogCollection.GetOutfits() < MAX_DEFAULT_OUTFITS)  then 
-		outfitID = C_TransmogCollection.NewOutfit(name, icon, self.itemTransmogInfoList);
+	if (outfitID and IsDefaultSet(outfitID)) or (#C_TransmogCollection.GetCustomSets() < MAX_DEFAULT_OUTFITS)  then 
+		outfitID = C_TransmogCollection.NewCustomSet(name, icon, self.itemTransmogInfoList);
 	else
 		if outfitID then 
 			addon.OutfitDB.char.outfits[LookupIndexFromID(outfitID)]  = addon.OutfitDB.char.outfits[LookupIndexFromID(outfitID)] or {};
@@ -548,7 +548,7 @@ function BetterWardrobeOutfitManager:NameOutfit(newName, outfitID)
 	if outfitID and IsDefaultSet(outfitID) then
 		local blizzardID = addon:GetBlizzID(outfitID);
 	-- this is a rename
-		C_TransmogCollection.RenameOutfit(blizzardID, newName);
+		C_TransmogCollection.RenameCustomSet(blizzardID, newName);
 	elseif outfitID then 
 		local index = LookupIndexFromID(outfitID);
 		addon.OutfitDB.char.outfits[index].name = newName;
@@ -707,7 +707,7 @@ end
 function BetterWardrobeOutfitManager:ContinueWithSave()
 	if self.outfitID and IsDefaultSet(self.outfitID) then
 	-- this is a rename
-		C_TransmogCollection.ModifyOutfit(addon:GetBlizzID(self.outfitID), self.itemTransmogInfoList)
+		C_TransmogCollection.ModifyCustomSet(addon:GetBlizzID(self.outfitID), self.itemTransmogInfoList)
 		self:SaveLastOutfit(self.outfitID);
 		if ( self.dropdown ) then
 			self.dropdown:OnOutfitModified(self.outfitID);
@@ -767,7 +767,7 @@ end
 
 function BetterWardrobeOutfitEditFrameMixin:OnDelete()
 	BetterWardrobeOutfitFrame:Hide()
-	local name = C_TransmogCollection.GetOutfitInfo(addon:GetBlizzID(self.outfitID)) or self.name or ""
+	local name = C_TransmogCollection.GetCustomSetInfo(addon:GetBlizzID(self.outfitID)) or self.name or ""
 	BetterWardrobeOutfitFrame:ShowPopup("BW_CONFIRM_DELETE_TRANSMOG_OUTFIT", name, nil,  self.outfitID)
 end
 

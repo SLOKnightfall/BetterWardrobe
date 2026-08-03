@@ -1,4 +1,4 @@
-﻿## Interface: 120007,120100
+﻿## Interface: 120001
 ## Title: BetterWardrobe_SourceData (@project-version@)
 ## Version: @project-version@
 ## Author: SLOKnightfall

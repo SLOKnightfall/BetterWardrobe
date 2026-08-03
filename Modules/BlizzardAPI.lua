@@ -280,7 +280,7 @@ function addon.C_TransmogSets.GetSetSources(setID)
 
 	--Custom outfit saved through Blizzard's own UI
 	if SetType == "SavedBlizzard" then
-		local setTransmogInfo = C_TransmogCollection.GetOutfitItemTransmogInfoList(addon:GetBlizzID(setID))
+		local setTransmogInfo = C_TransmogCollection.GetCustomSetItemTransmogInfoList(addon:GetBlizzID(setID))
 		for slotID, data in ipairs(setTransmogInfo) do
 			if data.appearanceID and data.appearanceID ~= 0 then
 				local sourceInfo = C_TransmogCollection.GetSourceInfo(data.appearanceID)
@@ -505,15 +505,13 @@ local function OpposingFaction(faction)
 	end
 end
 
-local PvPSets = {
-	["Honor"] = true,
-	["Combatant"] = true,
-	["Combatant I"] = true,
-	["Warfront"] = true,
-	["Aspirant"] = true,
-	["Gladiator"] = true,
-	["Elite"] = true,
-}
+--NOTE: PvP detection used to re-check status client-side by matching
+--data.description against a hardcoded 7-entry list of tier names (Honor,
+--Combatant, Gladiator, etc.) -- which goes stale every PvP season as new tier
+--names are introduced, silently filtering out current-season PvP sets whose
+--description didn't happen to match. Now uses data.isPvP, stamped onto each
+--set in BuildBlizzSets() (Data/DataBase.lua) via the isPVP() ID-lookup against
+--the curated PVP_SETID list -- an ID check, not a description-string guess.
 
 addon.RefreshFilter = true
 function addon:FilterSets(setList, setType)
@@ -541,7 +539,7 @@ function addon:FilterSets(setList, setType)
 
 	for i, data in ipairs(filterList) do
 		local setData = BetterWardrobeSetsDataProviderMixin:GetSetSourceData(data.setID)
-		local isPvP = data.description and PvPSets[data.description];
+		local isPvP = data.isPvP;
 		local count , total = setData.numCollected, setData.numTotal
 		local expansion = data.expansionID
 		local sourcefilter = (BetterWardrobeCollectionFrame:CheckTab(3) and filterSelection[data.filter])
@@ -586,49 +584,8 @@ function addon:FilterSets(setList, setType)
 	return FilterSets
 end
 
-
-local function SearchValueFound(set, searchValue)
-	local start, _ = string.find(string.lower(set.name), searchValue);
-	if start ~= nil then return true; end
-	
-	if set.label then
-		start, _ = string.find(string.lower(set.label), searchValue);
-		if start ~= nil then return true; end
-	end
-	
-	local varSets = addon.SetsDataProvider:GetVariantSets(set.baseSet);
-	
-	for id,varSet in pairs(varSets) do
-		start, _ = string.find(string.lower(varSet.name), searchValue);
-		if start ~= nil then return true; end
-	end
-	
-	return false;
-end
-
-
-function addon:SearchSets(setList)
-	local searchedSets = {}
-	local searchString = string.lower(BetterWardrobeCollectionFrameSearchBox:GetText())
- 	local atTransmogrifier = C_Transmog.IsAtTransmogNPC()
-
-	if searchString == "" then return setList end
-
-	if atTransmogrifier then
-		setList = Sets:ClearHidden(setList)
-		for i, data in ipairs(setList) do
-			if (searchString and string.find(string.lower(data.name), searchString)) or (data.label and string.find(string.lower(data.label), searchString)) or (data.description and string.find(string.lower(data.description), searchString)) or (data.className and string.find(string.lower(data.className), searchString)) then
-				tinsert(searchedSets, data)
-			end
-		end
-		return searchedSets
-
-	else
-		for _, baseSet in ipairs(setList) do
-			if SearchValueFound(baseSet, searchString) then
-				table.insert(searchedSets, baseSet);
-			end
-		end
-		return searchedSets
-	end
-end
+--NOTE: addon:SearchSets used to be defined here too, but it was dead code --
+--every real call site uses addon:SearchSets(data), a boolean search predicate
+--defined in Modules/TransmogTemplates.lua (which loads after this file and was
+--therefore always the version actually in effect). Removed to avoid two
+--same-named functions with different signatures/behavior living in the codebase.

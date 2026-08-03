@@ -795,7 +795,7 @@ function BetterDressUpOutfitMixin:LoadOutfit(outfitID)
 
 	if setType == "SavedBlizzard"  or (outfitID >= SET_OFFSET and outfitID <= SET_OFFSET+25) then
 		local outfitID = addon:GetBlizzID(outfitID)
-		DressUpItemTransmogInfoList(C_TransmogCollection.GetOutfitItemTransmogInfoList(outfitID))
+		DressUpItemTransmogInfoList(C_TransmogCollection.GetCustomSetItemTransmogInfoList(outfitID))
 	else
 		local outfit = addon.GetSetInfo(outfitID)
 		local itemTransmogInfoList = {}

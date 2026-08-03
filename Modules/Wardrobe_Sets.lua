@@ -895,45 +895,55 @@ function WardrobeSetsScrollFrameButtonMixin:Init(elementData)
 	local variantSets = SetsDataProvider:GetVariantSets(elementData.setID) or {} --C_TransmogSets.GetVariantSets(elementData.setID) or {};
 	local topSourcesCollected, topSourcesTotal
 	local baseSet = SetsDataProvider:GetBaseSetByID(elementData.setID);
+
+	--NOTE: setID/name/label/icon/color used to only be set inside the
+	--`selectedCollectionTab ~= 4` branch below, which meant Saved Sets (tab 4) rows
+	--never got self.setID assigned at all -- causing "attempt to compare nil with
+	--number" at self.setID < 50000 further down, and rendering with no name/icon/label.
+	--Moved out so it runs for every tab; only the variant-set grouping logic
+	--(which doesn't apply to saved sets -- they don't have variants) stays conditional.
+	self.setID = elementData.setID;
+
 	if BetterWardrobeCollectionFrame.selectedCollectionTab ~= 4 then
 		if #variantSets > 0 then
 			-- variant sets are already filtered for visibility (won't get a hiddenUntilCollected one unless it's collected)
 			-- any set will do so just picking first one
 			--displayData = variantSets[1];
 		end
+	end
 
-		local subName = gsub(displayData.name, " %(Recolor%)", "")
-		if addon.Profile.IgnoreClassRestrictions then 
-			self.Name:SetText(subName..((displayData.className) and " ("..displayData.className..")" or "") );
-		else
-			self.Name:SetText(subName );
-		end
+	local subName = gsub(displayData.name or "", " %(Recolor%)", "")
+	if addon.Profile.IgnoreClassRestrictions then 
+		self.Name:SetText(subName..((displayData.className) and " ("..displayData.className..")" or "") );
+	else
+		self.Name:SetText(subName );
+	end
 
-		topSourcesCollected, topSourcesTotal = SetsDataProvider:GetSetSourceTopCounts(displayData.setID);
-		-- progress visuals use the top collected progress, so collected visuals should reflect the top completion status as well
-		topSourcesCollected = topSourcesCollected or 0
-		topSourcesTotal = topSourcesTotal or 0
+	topSourcesCollected, topSourcesTotal = SetsDataProvider:GetSetSourceTopCounts(displayData.setID);
+	-- progress visuals use the top collected progress, so collected visuals should reflect the top completion status as well
+	topSourcesCollected = topSourcesCollected or 0
+	topSourcesTotal = topSourcesTotal or 0
 
-		local setCollected = displayData.collected or topSourcesCollected == topSourcesTotal;
-		local color = IN_PROGRESS_FONT_COLOR;
-		if ( setCollected ) then
-			color = NORMAL_FONT_COLOR;
-		elseif ( topSourcesCollected == 0 ) then
-			color = GRAY_FONT_COLOR;
-		end
+	local setCollected = displayData.collected or topSourcesCollected == topSourcesTotal;
+	local color = IN_PROGRESS_FONT_COLOR;
+	if ( setCollected ) then
+		color = NORMAL_FONT_COLOR;
+	elseif ( topSourcesCollected == 0 ) then
+		color = GRAY_FONT_COLOR;
+	end
 
-		displayData.icon = displayData.icon or SetsDataProvider:GetIconForSet(displayData.setID)
+	displayData.icon = displayData.icon or SetsDataProvider:GetIconForSet(displayData.setID)
 
-		self.Name:SetTextColor(color.r, color.g, color.b);
-		self.Label:SetText(displayData.label);
-		self.IconFrame:SetIconTexture(SetsDataProvider:GetIconForSet(displayData.setID));
-		self.IconFrame:SetIconDesaturation((topSourcesCollected == 0) and 1 or 0);
-		self.IconFrame:SetIconCoverShown(not setCollected);
-		self.IconFrame:SetIconColor(displayData.validForCharacter and HIGHLIGHT_FONT_COLOR or RED_FONT_COLOR);
-		self.IconFrame:SetFavoriteIconShown(elementData.favoriteSetID)
-		self.New:SetShown(SetsDataProvider:IsBaseSetNew(elementData.setID));
-		self.setID = elementData.setID;
+	self.Name:SetTextColor(color.r, color.g, color.b);
+	self.Label:SetText(displayData.label);
+	self.IconFrame:SetIconTexture(SetsDataProvider:GetIconForSet(displayData.setID));
+	self.IconFrame:SetIconDesaturation((topSourcesCollected == 0) and 1 or 0);
+	self.IconFrame:SetIconCoverShown(not setCollected);
+	self.IconFrame:SetIconColor(displayData.validForCharacter and HIGHLIGHT_FONT_COLOR or RED_FONT_COLOR);
+	self.IconFrame:SetFavoriteIconShown(elementData.favoriteSetID)
+	self.New:SetShown(SetsDataProvider:IsBaseSetNew(elementData.setID));
 
+	if BetterWardrobeCollectionFrame.selectedCollectionTab ~= 4 then
 		if #variantSets <= 1  or (C_AddOns.IsAddOnLoaded("CanIMogIt") and CanIMogItOptions["showSetInfo"]) then
 			self.Variants:Hide()
 			self.Variants.Count:SetText(0)

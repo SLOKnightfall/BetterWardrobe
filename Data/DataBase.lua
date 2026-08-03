@@ -17,10 +17,25 @@ local PVP_SETID = {13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 2
 local CHALLENGE_SETID = {1436,1437,1438,1439,1440,1441,1442,1443,1444,1445,1446}
 local TRADING_POST_SETID = {2320, 2323, 2327, 2337, 2338, 2340, 2346, 2654, 2655, 2656, 2657, 2658, 2659, 2660,2669, 2676, 2677, 2678, 2679,3354,3355,3357,3358,3360,3361,3362,3444,3445,3446,3447,3448,3449,3189, 3190, 3306}
 --Check to see if a set from PvP
-local function isPVP(index)
+--Combines the curated PVP_SETID list (an ID lookup, reliable but only as
+--complete as whatever content existed when it was last updated) with a
+--description substring fallback (broader than exact-string matching, so e.g.
+--"Season 3 Elite" or "Elite Gladiator" still match "Elite", not just a
+--description that is literally and only the word "Elite").
+local PVP_DESCRIPTION_KEYWORDS = {"Honor", "Combatant", "Warfront", "Aspirant", "Gladiator", "Elite"}
+local function isPVP(index, description)
 	for _,i in ipairs(PVP_SETID) do
 		if i == index then return true end
 	end
+
+	if description then
+		for _, keyword in ipairs(PVP_DESCRIPTION_KEYWORDS) do
+			if string.find(description, keyword, 1, true) then
+				return true
+			end
+		end
+	end
+
 	return false
 end
 
@@ -264,6 +279,8 @@ function BuildBlizzSets()
 					data.description = addon.MiscSets.CustomDesc[data.setID];
 				end
 
+				data.isPvP = isPVP(data.setID, data.description)
+
 			--Combine special cases
 			if addon.Profile.CombineSpecial and data.classMask == 0 and addon.MiscSets.SPECIAL_SETS[data.setID] then
 				data.note = data.label;
@@ -337,13 +354,30 @@ function BuildBlizzSets()
 				SET_INDEX[data.setID] = data
 				fullList[data.setID] = set
 
+				--NOTE: only allow the addon's own same-.label grouping to hide this set
+				--as a "variant" if Blizzard's own baseSetID resolution agrees it actually
+				--belongs to the same family as the addon's proposed grouping target.
+				--Earlier version of this guard checked "is this Blizzard's own base"
+				--(GetBaseSetID(id) == id), but that's the wrong question -- many
+				--legitimate variants likely also satisfy that on their own, which made
+				--the guard neuter almost all of the addon's label-based grouping and
+				--caused real variants to show up as duplicate standalone entries. This
+				--asks the more precise question: do these two sets resolve to the same
+				--Blizzard base? If yes, safe to group. If no (e.g. some achievement-gated
+				--PvP Elite tiers, which Blizzard doesn't always chain into the normal
+				--season-tier family), keep both visible rather than silently dropping one.
+				local function BlizzardAgreesSameFamily(setID, proposedBaseID)
+					if setID == proposedBaseID then return true end
+					local trueBaseOfSet = C_TransmogSets.GetBaseSetID(setID) or setID
+					local trueBaseOfTarget = C_TransmogSets.GetBaseSetID(proposedBaseID) or proposedBaseID
+					return trueBaseOfSet == trueBaseOfTarget
+				end
 
-
-				if data.customGroups and baseListLabels[data.customGroups] then
+				if data.customGroups and baseListLabels[data.customGroups] and BlizzardAgreesSameFamily(data.setID, baseListLabels[data.customGroups]) then
 					subSet = true;
 					subSetBaseID = baseListLabels[data.customGroups]
 				
-				elseif not data.customGroups and data.label and baseListLabels[data.label] then
+				elseif not data.customGroups and data.label and baseListLabels[data.label] and BlizzardAgreesSameFamily(data.setID, baseListLabels[data.label]) then
 					subSet = true;
 					subSetBaseID = baseListLabels[data.label]
 				end
@@ -578,7 +612,10 @@ end
 	end
 
 
-	function addon.HasSubItem(sourceID)
+	--NOTE: renamed from HasSubItem to avoid colliding with the unrelated, later-defined
+	--addon.HasSubItem(setID) further down this file (SetSwaps-based). That second one is
+	--what Wardrobe_Sets.lua actually calls. This function was previously dead/shadowed.
+	function addon.GetSubItemForSource(sourceID)
 		if subitemlist[sourceID] then
 			local sourceInfo = C_TransmogCollection.GetSourceInfo(subitemlist[sourceID])
 			--print("found")
@@ -929,10 +966,10 @@ end
 
 	function addon.StoreBlizzardSets()
 		local BlizzardSavedSets = {}
-		local outfits = C_TransmogCollection.GetOutfits();
+		local outfits = C_TransmogCollection.GetCustomSets();
 		for i, outfitID in ipairs(outfits) do
 			local data = {}
-			local name, icon = C_TransmogCollection.GetOutfitInfo(outfitID);
+			local name, icon = C_TransmogCollection.GetCustomSetInfo(outfitID);
 			data.index = i
 			data.outfitID = outfitID
 			data.name = name
@@ -992,8 +1029,17 @@ end
 					 outfitItemTransmogInfoList = C_TransmogCollection.GetCustomSetItemTransmogInfoList(data.outfitID - SET_OFFSET);
 
 					info.sources = {}
+					--NOTE: was keyed by loop index (info.sources[i] = infoList.appearanceID),
+					--which meant every downstream consumer (GetSetPrimaryAppearances,
+					--GetSortedSetSources) looked up GetSourceInfo(1), GetSourceInfo(2), etc.
+					--instead of real source IDs -- this is why the preview window showed
+					--wrong/missing items for saved sets. Now keyed by the real sourceID,
+					--matching the convention the "ExtraSet" branch below already uses correctly.
 					for i, infoList in pairs(outfitItemTransmogInfoList) do
-						info.sources[i] = infoList.appearanceID
+						if infoList.appearanceID and infoList.appearanceID ~= 0 then
+							local sourceInfo = C_TransmogCollection.GetSourceInfo(infoList.appearanceID)
+							info.sources[infoList.appearanceID] = sourceInfo and sourceInfo.isCollected
+						end
 					end
 
 				elseif data.setType == "SavedExtra" then
@@ -1001,7 +1047,8 @@ end
 					info.sources = info.sources or {}
 					for slotID = 1, 19 do
 						local sourceID = data[slotID]
-						info.sources[slotID] = 0
+						--NOTE: was info.sources[slotID] = sourceInfo.sourceID -- same
+						--slot-vs-sourceID key bug as the SavedBlizzard branch above.
 						if sourceID  and sourceID ~= NO_TRANSMOG_SOURCE_ID and sourceID ~= 0 then 
 							 sourceInfo = C_TransmogCollection.GetSourceInfo(sourceID)
 									
@@ -1012,7 +1059,7 @@ end
 								local itemMod = sourceInfo.itemModID
 								info.itemData = info.itemData or {}
 								info.itemData[slot] = {"'"..itemID..":"..itemMod.."'", sourceID, appearanceID}
-								info.sources[slotID] = sourceInfo.sourceID
+								info.sources[sourceID] = sourceInfo.isCollected
 							end
 						end
 						--end

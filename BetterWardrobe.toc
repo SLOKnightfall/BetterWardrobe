@@ -1,4 +1,4 @@
-## Interface: 120007,120100
+## Interface: 120001
 ## Title: BetterWardrobe (@project-version@)
 ## Version: @project-version@
 ## Author: SLOKnightfall
@@ -60,7 +60,7 @@ Modules\Tooltips.lua
 Modules\ArtifactAppearances.lua
 Modules\SavedOutfits.xml
 Modules\ImportExport.lua
-#Modules\SavedOutfitsViewer.xml
+Modules\SavedOutfitsViewer.xml
 Modules\TransmogShared.lua
 Modules\TransmogTemplates.xml
 

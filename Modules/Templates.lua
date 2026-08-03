@@ -88,7 +88,6 @@ function BetterWardrobeAlteredFormSwapButtonMixin:OnClick()
 			BetterWardrobeCollectionFrame.ItemsCollectionFrame:SetActiveSlot(transmogLocation, cat, ignorePreviousSlot)
 		else
 			BetterWardrobeCollectionFrame.SetsCollectionFrame:OnUnitModelChangedEvent()
-			BetterWardrobeCollectionFrame.SetsTransmogFrame:OnUnitModelChangedEvent()
 		end
 	end
 end
