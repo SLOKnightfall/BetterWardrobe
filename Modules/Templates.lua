@@ -83,7 +83,7 @@ function BetterWardrobeAlteredFormSwapButtonMixin:OnClick()
 		if tabID == 1 then
 			local cat = BetterWardrobeCollectionFrame.ItemsCollectionFrame:GetActiveCategory()
 			local slot = BetterWardrobeCollectionFrame.ItemsCollectionFrame:GetActiveSlot()
-			local transmogLocation = TransmogUtil.GetTransmogLocation(slot, Enum.TransmogType.Appearance, Enum.TransmogModification.Main)
+			local transmogLocation = TransmogUtil.GetTransmogLocation(slot, Enum.TransmogType.Appearance, false)
 			local ignorePreviousSlot = true;
 			BetterWardrobeCollectionFrame.ItemsCollectionFrame:SetActiveSlot(transmogLocation, cat, ignorePreviousSlot)
 		else

@@ -234,7 +234,7 @@ end
 addon.GetItemCategory = GetItemCategory
 
 local function GetTransmogLocation(itemLinkOrID)
-	return TransmogUtil.GetTransmogLocation(GetItemSlot(itemLinkOrID), Enum.TransmogType.Appearance, Enum.TransmogModification.Main)
+	return TransmogUtil.GetTransmogLocation(GetItemSlot(itemLinkOrID), Enum.TransmogType.Appearance, false)
 end
 addon.GetTransmogLocation = GetTransmogLocation
 

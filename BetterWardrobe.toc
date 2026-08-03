@@ -1,4 +1,4 @@
-## Interface: 120001
+## Interface: 120007
 ## Title: BetterWardrobe (@project-version@)
 ## Version: @project-version@
 ## Author: SLOKnightfall
@@ -65,6 +65,7 @@ Modules\TransmogShared.lua
 Modules\TransmogTemplates.xml
 
 Modules\Transmog.xml
+Modules\Randomizer.lua
 Modules\Wardrobe_Sets.xml
 Modules\Wardrobe.xml
 Modules\ColorFilter.lua

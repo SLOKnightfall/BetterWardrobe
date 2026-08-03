@@ -134,7 +134,7 @@ local function GetUseTransmogSkin(slot)
 
 	-- this exludes head slot
 	if modelSetupTable.useTransmogChoices then
-		local transmogLocation = TransmogUtil.GetTransmogLocation(slot, Enum.TransmogType.Appearance, Enum.TransmogModification.Main);
+		local transmogLocation = TransmogUtil.GetTransmogLocation(slot, Enum.TransmogType.Appearance, false);
 		if transmogLocation then
 			if not C_PlayerInfo.HasVisibleInvSlot(transmogLocation.slotID) then
 				return true;
@@ -1641,9 +1641,9 @@ function WardrobeItemsCollectionMixin:GetWeaponInfoForEnchant()
 end
 
 function WardrobeItemsCollectionMixin:CanEnchantSource(sourceID)
-	local _, visualID, canEnchant,_,_,_,_,_, appearanceSubclass  = C_TransmogCollection.GetAppearanceSourceInfo(sourceID);
-	if ( canEnchant ) then
-		self.HiddenModel:SetItemAppearance(visualID, 0, appearanceSubclass);
+	local sourceInfo = C_TransmogCollection.GetAppearanceSourceInfo(sourceID);
+	if ( sourceInfo and sourceInfo.canHaveIllusion ) then
+		self.HiddenModel:SetItemAppearance(sourceInfo.itemAppearanceID, 0, sourceInfo.itemSubclass);
 		return self.HiddenModel:HasAttachmentPoints();
 	end
 	return false;
@@ -2476,7 +2476,7 @@ function WardrobeCollectionClassDropdownMixin:SetClassFilter(classID)
 		-- Not all classes can use the same weapons so the current category might not be valid
 		local name, isWeapon = C_TransmogCollection.GetCategoryInfo(WardrobeCollectionFrame.ItemsCollectionFrame:GetActiveCategory());
 		if isWeapon then
-			WardrobeCollectionFrame.ItemsCollectionFrame:SetActiveSlot(TransmogUtil.GetTransmogLocation("HEADSLOT", Enum.TransmogType.Appearance, Enum.TransmogModification.Main));
+			WardrobeCollectionFrame.ItemsCollectionFrame:SetActiveSlot(TransmogUtil.GetTransmogLocation("HEADSLOT", Enum.TransmogType.Appearance, false));
 		end
 
 		C_TransmogCollection.SetClassFilter(classID);

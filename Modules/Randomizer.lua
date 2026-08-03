@@ -15,6 +15,11 @@ function BW_RandomizeButtonMixin:OnEnter()
 end
 
 
+function BW_RandomizeButtonMixin:OnLeave()
+	GameTooltip:Hide()
+end
+
+
 function BW_RandomizeButtonMixin:OnMouseDown()
 	if IsModifierKeyDown() then
 		self:Randomize("outfit")
@@ -26,12 +31,19 @@ end
 
 
 local finalselection = {}
+
+local function ApplyAppearance(slot, transmogType, weaponOption, sourceID)
+	local displayType = Enum.TransmogOutfitDisplayType.Assigned
+	if C_TransmogCollection.IsAppearanceHiddenVisual(sourceID) then
+		displayType = Enum.TransmogOutfitDisplayType.Hidden
+	end
+	C_TransmogOutfitInfo.SetPendingTransmog(slot, transmogType, weaponOption, sourceID, displayType)
+end
+
 --Updates the model after all items has been selected so model and pending looks match
 local function finalUpdate()
-	for slotID, mog in pairs(finalselection)do
-		local transmogLocation = TransmogUtil.GetTransmogLocation(slotID, Enum.TransmogType.Appearance, Enum.TransmogModification.Main);
-		pendingInfo = TransmogUtil.CreateTransmogPendingInfo(Enum.TransmogPendingType.Apply, mog);
-		C_Transmog.SetPending(transmogLocation, pendingInfo);
+	for slotID, selection in pairs(finalselection)do
+		ApplyAppearance(selection.slot, selection.transmogType, selection.weaponOption, selection.sourceID)
 		finalselection[slotID] = nil
 	end
 end
@@ -46,10 +58,40 @@ end
 
 local function AddSlotAppearances(slotID, categoryID, transmogLocation)
 
-	if not transmogLocation then return end
+	if not categoryID or not transmogLocation then return end
 	for _, appearance in ipairs(C_TransmogCollection.GetCategoryAppearances(categoryID, transmogLocation)) do
 		if appearance.isUsable and appearance.isCollected then
-			tinsert(AppearanceList[slotID], appearance.visualID)
+			tinsert(AppearanceList[slotID].visuals, appearance.visualID)
+		end
+	end
+end
+
+
+--Weapon slots don't have a single fixed category like armor slots do, and transmog only allows
+--appearances compatible with the handedness of whatever's actually equipped there -- "enabled" in
+--GetWeaponOptionsForSlot just means the class/spec CAN use that handedness at all, not that it
+--matches the equipped weapon, so picking the first enabled one can pick an incompatible option and
+--silently yield zero valid appearances. Use the option matching what's actually equipped instead.
+local function GetDefaultWeaponOption(slot)
+	local equippedOption = C_TransmogOutfitInfo.GetEquippedSlotOptionFromTransmogSlot(slot)
+	if equippedOption then return equippedOption end
+
+	local weaponOptions, artifactOptions = C_TransmogOutfitInfo.GetWeaponOptionsForSlot(slot)
+	for _, optionInfo in ipairs(weaponOptions or {}) do
+		if optionInfo.enabled then return optionInfo.weaponOption end
+	end
+	for _, optionInfo in ipairs(artifactOptions or {}) do
+		if optionInfo.enabled then return optionInfo.weaponOption end
+	end
+	return Enum.TransmogOutfitSlotOption.None
+end
+
+
+local function AddWeaponSlotAppearances(slotID, transmogLocation, slot, weaponOption)
+	for weaponCategoryID = FIRST_TRANSMOG_COLLECTION_WEAPON_TYPE, LAST_TRANSMOG_COLLECTION_WEAPON_TYPE do
+		local collectionInfo = C_TransmogOutfitInfo.GetCollectionInfoForSlotAndOption(slot, weaponOption, weaponCategoryID)
+		if collectionInfo and collectionInfo.isWeapon then
+			AddSlotAppearances(slotID, weaponCategoryID, transmogLocation)
 		end
 	end
 end
@@ -60,29 +102,32 @@ function BW_RandomizeButtonMixin:BuildAppearanceList()
 	if not update and AppearanceList then return end
 
 	AppearanceList = (AppearanceList and wipe(AppearanceList)) or {}
-	for i, slotInfo in pairs(TRANSMOG_SLOTS) do
-		local slot = slotInfo.slotID
-		local slotID = slotInfo.location:GetSlotID()
+	for _, slotInfo in pairs(TRANSMOG_SLOTS) do
+		local transmogLocation = slotInfo.location
 
-		local transmogLocation = TransmogUtil.GetTransmogLocation(slotID, Enum.TransmogType.Appearance, Enum.TransmogModification.Main);
+		--Illusions and secondary (offhand-shoulder) slots are toggled separately and aren't part of base randomization.
+		if transmogLocation:IsAppearance() and not transmogLocation:IsSecondary() then
+			local slot = transmogLocation:GetSlot()
+			local slotID = transmogLocation:GetSlotID()
+			local transmogType = transmogLocation:GetType()
+			local isWeaponSlot = C_TransmogOutfitInfo.IsSlotWeaponSlot(slot)
+			local weaponOption = isWeaponSlot and GetDefaultWeaponOption(slot) or Enum.TransmogOutfitSlotOption.None
 
-		AppearanceList[slotID] = AppearanceList[slotID] or {}
+			if isWeaponSlot then
+				--GetViewedOutfitSlotInfo/GetCollectionInfoForSlotAndOption key off the slot's currently
+				--viewed weapon option, not just whatever's passed in below -- the weapon-option dropdown
+				--in TransmogTemplates.lua sets this via the same call before querying either of those.
+				C_TransmogOutfitInfo.SetViewedWeaponOptionForSlot(slot, weaponOption)
+			end
 
-		local _, _, _, canTransmogrify, cannotTransmogrifyReason, _ = C_Transmog.GetSlotInfo(transmogLocation)
-		if canTransmogrify or cannotTransmogrifyReason == 0 then
-			local sourceID = C_Transmog.GetSlotVisualInfo(transmogLocation)
-			local categoryID = slotInfo.armorCategoryID or C_TransmogCollection.GetAppearanceSourceInfo(sourceID)
-			AddSlotAppearances(slotID, categoryID, transmogLocation)
+			local outfitSlotInfo = C_TransmogOutfitInfo.GetViewedOutfitSlotInfo(slot, transmogType, weaponOption)
+			if outfitSlotInfo and outfitSlotInfo.canTransmogrify then
+				AppearanceList[slotID] = { transmogLocation = transmogLocation, slot = slot, transmogType = transmogType, weaponOption = weaponOption, visuals = {} }
 
-			for weaponCategoryID = FIRST_TRANSMOG_COLLECTION_WEAPON_TYPE, LAST_TRANSMOG_COLLECTION_WEAPON_TYPE do
-				local name, isWeapon, _, canMainHand, canOffHand = C_TransmogCollection.GetCategoryInfo(weaponCategoryID)
-				if name and isWeapon and weaponCategoryID ~= categoryID then
-					if (slotInfo.location:IsMainHand() and canMainHand) or (slotInfo.location:IsOffHand() and canOffHand) then  --todo either hand
-						local equippedItemID = GetInventoryItemID('player', GetInventorySlotInfo(slotInfo.location:GetSlotName()))
-						if C_TransmogCollection.IsCategoryValidForItem(weaponCategoryID, equippedItemID) then
-							AddSlotAppearances(slotID, weaponCategoryID)
-						end
-					end
+				if isWeaponSlot then
+					AddWeaponSlotAppearances(slotID, transmogLocation, slot, weaponOption)
+				else
+					AddSlotAppearances(slotID, slotInfo.armorCategoryID, transmogLocation)
 				end
 			end
 		end
@@ -91,24 +136,19 @@ end
 
 
 local function RandomizeBySlot(slotID)
-	local slotVisualList = AppearanceList[slotID]
-	if not slotVisualList then return end
+	local slotData = AppearanceList[slotID]
+	if not slotData or #slotData.visuals == 0 then return end
 
-	if #slotVisualList > 0 then
-		local appearanceID = slotVisualList[random(#slotVisualList)]
-		local _, visualID, _, _, _, itemLink = C_TransmogCollection.GetAppearanceSourceInfo(appearanceID)	
-		local sourceList = appearanceID and itemLink and C_TransmogCollection.GetAppearanceSources(appearanceID, addon.GetItemCategory(appearanceID), addon.GetTransmogLocation(itemLink))
-		if sourceList then
-			for _, source in pairs(sourceList) do
-				if source.isCollected then
-					local transmogLocation = TransmogUtil.GetTransmogLocation(slotID, Enum.TransmogType.Appearance, Enum.TransmogModification.Main);
-					pendingInfo = TransmogUtil.CreateTransmogPendingInfo(Enum.TransmogPendingType.Apply, source.sourceID);
-					C_Transmog.SetPending(transmogLocation, pendingInfo);
+	local visualID = slotData.visuals[random(#slotData.visuals)]
+	local categoryID = addon.GetItemCategory(visualID)
+	local sourceList = C_TransmogCollection.GetAppearanceSources(visualID, categoryID, slotData.transmogLocation)
+	if not sourceList then return end
 
-					finalselection[slotID] = source.sourceID
-					break
-				end
-			end
+	for _, source in pairs(sourceList) do
+		if source.isCollected then
+			ApplyAppearance(slotData.slot, slotData.transmogType, slotData.weaponOption, source.sourceID)
+			finalselection[slotID] = { slot = slotData.slot, transmogType = slotData.transmogType, weaponOption = slotData.weaponOption, sourceID = source.sourceID }
+			break
 		end
 	end
 end
@@ -125,9 +165,14 @@ end
 
 local function RandomizeOutfit()
 	local outfits = addon.GetOutfits()
-	local randomOutfitID = outfits[random(#outfits)].outfitID
+	if not outfits or #outfits == 0 then return end
 
-	BetterWardrobeTMOutfitDropDown:SelectOutfit(randomOutfitID, true)
+	local outfit = outfits[random(#outfits)]
+	if outfit.setType == "SavedBlizzard" then
+		C_TransmogOutfitInfo.SetOutfitToCustomSet(addon:GetBlizzID(outfit.outfitID))
+	elseif outfit.setType == "SavedExtra" then
+		addon.SavedSetsFrame:ApplyOutfit(outfit.index)
+	end
 end
 
 

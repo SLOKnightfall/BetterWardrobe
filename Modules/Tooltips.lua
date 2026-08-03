@@ -6,6 +6,7 @@ local LAT = LibStub("LibArmorToken-1.0")
 local LAI = LibStub("LibAppropriateItems-1.0")
 
 local collectedAppearances = {}
+
 local weaponSlots = {"INVTYPE_2HWEAPON", "INVTYPE_WEAPON", "INVTYPE_WEAPONMAINHAND", "INVTYPE_RANGED", "INVTYPE_RANGEDRIGHT", "INVTYPE_THROWN",}
 local offhandSlots = {"INVTYPE_WEAPONOFFHAND", "INVTYPE_SHIELD", "INVTYPE_HOLDABLE",}
 
@@ -194,10 +195,25 @@ function preview:OnHide2()
 	end
 end
 
-function preview:SetAnchor(tooltip, parent)
-	local primaryTooltip = self.parent.shoppingTooltips[1] 
-	primaryTooltip =  primaryTooltip:IsShown() and primaryTooltip or parent
+--When multiple comparison (shopping) tooltips are shown at once, the one to anchor the preview
+--against is whichever shown tooltip sits furthest out in the direction the preview is opening --
+--not just whichever happens to be first in the list, which could be a nearer or hidden one.
+--Returns nil if none of them are shown.
+local function GetOutermostShownTooltip(tooltipWithShoppingList, towardLeft)
+	local outermost
+	for _, shoppingTooltip in ipairs(tooltipWithShoppingList.shoppingTooltips or {}) do
+		if shoppingTooltip:IsShown() then
+			local edge = towardLeft and shoppingTooltip:GetLeft() or shoppingTooltip:GetRight()
+			local outerEdge = outermost and (towardLeft and outermost:GetLeft() or outermost:GetRight())
+			if edge and (not outermost or (towardLeft and edge < outerEdge) or (not towardLeft and edge > outerEdge)) then
+				outermost = shoppingTooltip
+			end
+		end
+	end
+	return outermost
+end
 
+function preview:SetAnchor(tooltip, parent)
 	local leftPos = self.parent:GetLeft()  or 0;
 	local rightPos = self.parent:GetRight()  or 0;
 
@@ -217,6 +233,8 @@ function preview:SetAnchor(tooltip, parent)
 	else
 		xShift = false;
 	end
+
+	local primaryTooltip = GetOutermostShownTooltip(self.parent, xShift) or parent
 
 local anchorFrame =	TooltipComparisonManager.anchorFrame
 
@@ -390,15 +408,13 @@ function preview:ShowPreview(itemLink, parent)
 	end
 
 	if addon.Profile.ShowOwnedItemTooltips and not found_systemTooltip then
-		local apperanceKnownText, canTransmog
-		local GetItemInfoInstant = C_Item and C_Item.GetItemInfoInstant
-		local itemID = GetItemInfoInstant(itemLink)
-		if itemID then
-			canTransmog = select(3, C_Transmog.CanTransmogItem(itemID))
-		end
+		local apperanceKnownText
+		--C_Transmog.CanTransmogItem no longer exists. IsAppearanceCollected already tells us
+		--whether the item has an appearance at all: it returns nil (not false) for "no appearance",
+		--distinct from false meaning "has one, just not collected".
 		local collected, altCollected = IsAppearanceCollected(itemLink)
 
-		if not canTransmog then
+		if collected == nil then
 			apperanceKnownText = "|c00ffff00" .. TRANSMOGRIFY_INVALID_DESTINATION
 		else
 			local check = "Ready"

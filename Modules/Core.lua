@@ -1524,9 +1524,9 @@ function addon:EventHandler(event, ...)
 				TransmogFrame.WardrobeCollection.TabContent.ItemsFrame.PagedContent.PagingControls = f
 
 				 self:SecureHookScript(TransmogFrame, "OnShow", function() C_Timer.After(.1, function() addon:UpdateTabs(); end) end)
+				addon:CreateButtons()
 			end
 			addon:UpdateTabs();
-					--addon:CreateButtons()
 		 end)
 
 		----C_Timer.After(1, function() addon:ResetSetsCollectionFrame() end)

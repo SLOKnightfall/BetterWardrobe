@@ -344,13 +344,21 @@ local function SortItemByItemID(self)
 	end
 end
 
+--C_TransmogCollection.GetAppearanceSourceInfo now returns a single info table (with an .itemLink
+--field) instead of the old multiple positional returns, so the previous 6-value destructuring here
+--always left itemLink nil.
+local function GetTopSourceForVisual(visualID)
+	local sourceInfo = C_TransmogCollection.GetAppearanceSourceInfo(visualID)
+	local itemLink = sourceInfo and sourceInfo.itemLink
+	if not itemLink then return {} end
+
+	return CollectionWardrobeUtil.GetSortedAppearanceSources(visualID, addon.GetItemCategory(visualID), addon.GetTransmogLocation(itemLink))[1] or {}
+end
+
 local function SortItemByExpansion(sets)
 	local comparison = function(source1, source2)
-		local _, visualID, _, _, _, itemLink = C_TransmogCollection.GetAppearanceSourceInfo(source1.visualID)	
-		local item1 = (itemLink and CollectionWardrobeUtil.GetSortedAppearanceSources(source1.visualID,addon.GetItemCategory(source1.visualID), addon.GetTransmogLocation(itemLink))[1]) or {}
-
-		local _, visualID, _, _, _, itemLink = C_TransmogCollection.GetAppearanceSourceInfo(source2.visualID)	
-		local item2 = (itemLink and CollectionWardrobeUtil.GetSortedAppearanceSources(source2.visualID,addon.GetItemCategory(source2.visualID), addon.GetTransmogLocation(itemLink))[1]) or {}
+		local item1 = GetTopSourceForVisual(source1.visualID)
+		local item2 = GetTopSourceForVisual(source2.visualID)
 		item1.itemID = item1.itemID or 0
 		item2.itemID = item2.itemID or 0
 		C_Item.RequestLoadItemDataByID(item1.itemID)
@@ -395,11 +403,8 @@ end
 
 local function SortByItemSource(self)
 	local comparison = function(source1, source2)
-		local _, visualID, _, _, _, itemLink = C_TransmogCollection.GetAppearanceSourceInfo(source1.visualID)	
-		local item1 = (itemLink and CollectionWardrobeUtil.GetSortedAppearanceSources(source1.visualID,addon.GetItemCategory(source1.visualID), addon.GetTransmogLocation(itemLink))[1]) or {}
-
-		local _, visualID, _, _, _, itemLink = C_TransmogCollection.GetAppearanceSourceInfo(source2.visualID)	
-		local item2 = (itemLink and CollectionWardrobeUtil.GetSortedAppearanceSources(source2.visualID,addon.GetItemCategory(source2.visualID), addon.GetTransmogLocation(itemLink))[1]) or {}
+		local item1 = GetTopSourceForVisual(source1.visualID)
+		local item2 = GetTopSourceForVisual(source2.visualID)
 		item1.sourceType = item1.sourceType or 7
 		item2.sourceType = item2.sourceType or 7
 				

@@ -1034,7 +1034,8 @@ local function ToggleHidden(model, isHidden)
 	local tabID = addon.GetTab()
 	if tabID == 1 then
 		local visualID = model.visualInfo.visualID;
-		local _, _, _, _, _, itemLink = C_TransmogCollection.GetAppearanceSourceInfo(visualID);
+		local sourceInfo = C_TransmogCollection.GetAppearanceSourceInfo(visualID);
+		local itemLink = sourceInfo and sourceInfo.itemLink;
 		local name, link;
 		if itemLink then 
 			local source = CollectionWardrobeUtil.GetSortedAppearanceSources(visualID, addon.GetItemCategory(visualID), addon.GetTransmogLocation(itemLink))[1];
@@ -1151,12 +1152,19 @@ function WardrobeSetsScrollFrameButtonMixin:OnClick(buttonName, down)
 				end
 
 				rootDescription:CreateButton(text, function()
-					--addon.C_TransmogSets.SetIsFavorite(targetSetID, not favorite);
-					--addon.C_TransmogSets.SetIsFavorite(baseSetID, not favorite);
-
-
-					addon.Init:InitDB()
-					--RefreshLists()
+					--addon.C_TransmogSets.SetIsFavorite doesn't exist (that wrapper only defines
+					--GetSetInfo/GetBaseSetID/etc, never SetIsFavorite), so these always errored.
+					--The local C_TransmogSets above falls through to the real Blizzard API for
+					--anything not explicitly overridden, which is exactly this case.
+					C_TransmogSets.SetIsFavorite(targetSetID, not favorite);
+					C_TransmogSets.SetIsFavorite(baseSetID, not favorite);
+					--RefreshFavorites/GetBaseSets only re-filter and re-sort addon.BaseList -- they
+					--never re-fetch it from Blizzard. BaseList is a one-time snapshot of
+					--C_TransmogSets.GetAllSets() taken by BuildBlizzSets() (Data/DataBase.lua), so
+					--each set's .favorite field stays frozen at login until that snapshot is retaken.
+					BuildBlizzSets();
+					SetsDataProvider:RefreshFavorites();
+					BetterWardrobeCollectionFrame.SetsCollectionFrame:Refresh();
 				end);
 			end);
 		end

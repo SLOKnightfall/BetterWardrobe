@@ -650,7 +650,7 @@ end
 
 	function addon.Init:UpdateCollectedAppearances()
 		for i = FIRST_TRANSMOG_COLLECTION_WEAPON_TYPE, LAST_TRANSMOG_COLLECTION_WEAPON_TYPE - 1 do
-			local location = TransmogUtil.GetTransmogLocation(addon.Globals.CATEGORYID_TO_NAME[i], Enum.TransmogType.Appearance, Enum.TransmogModification.Main)
+			local location = TransmogUtil.GetTransmogLocation(addon.Globals.CATEGORYID_TO_NAME[i], Enum.TransmogType.Appearance, false)
 			local appearances = C_TransmogCollection.GetCategoryAppearances(i, location)
 			for _, appearance in pairs(appearances) do
 				local sources = C_TransmogCollection.GetAppearanceSources(appearance.visualID, i, location)
