@@ -304,15 +304,14 @@ function WardrobeSetsCollectionMixin:DisplaySet(setID)
 	local holidayName = nil
 	for sourceID,_ in pairs(sources) do
 		holidayName = C_TransmogCollection.GetSourceRequiredHoliday(sourceID);
-		if holidayName then  
-			break 
+		if holidayName then
+			break
 		end
 	end
 
-	--TODO: ENable when fixed
-	self.DetailsFrame.BW_SetsHideSlotButton:Hide();
-	self.DetailsFrame.BW_LinkSetButton:Hide()
-	self.DetailsFrame.BW_OpenDressingRoomButton:Hide()
+	self.DetailsFrame.BW_SetsHideSlotButton:Show();
+	self.DetailsFrame.BW_LinkSetButton:Show();
+	self.DetailsFrame.BW_OpenDressingRoomButton:Show();
 
 	self.DetailsFrame.Name:SetText(setInfo.name);
 	if ( self.DetailsFrame.Name:IsTruncated() ) then
@@ -854,6 +853,32 @@ function WardrobeSetsCollectionMixin:OpenInDressingRoom(setID)
 	import = false
 	--TODO: Enable with Dressingroom files
 	----addon:UpdateDressingRoom()
+end
+
+--Referenced directly from Wardrobe.xml's BW_SetsHideSlotButton OnClick; was never
+--defined after the migration (the button itself was also force-hidden in DisplaySet
+--until now), so this menu never existed to click on.
+function BW_JournalHideSlotMenu_OnClick(parent)
+	local function resetModel()
+		local setID = BetterWardrobeCollectionFrame.SetsCollectionFrame:GetSelectedSetID();
+		BetterWardrobeCollectionFrame.SetsCollectionFrame:DisplaySet(setID);
+	end
+
+	local armor = addon.Globals.EmptyArmor;
+	local profile = addon.setdb.profile.autoHideSlot;
+
+	local function GeneratorFunction(owner, rootDescription)
+		rootDescription:CreateCheckbox(L["Toggle Hidden View"], function() return profile.toggle end, function() profile.toggle = not profile.toggle; resetModel(); end);
+		rootDescription:CreateDivider();
+		rootDescription:CreateTitle(L["Select Slot to Hide"]);
+		for i = 1, 19 do
+			if armor[i] then
+				rootDescription:CreateCheckbox(_G[addon.Globals.INVENTORY_SLOT_NAMES[i]], function() return profile[i] end, function() profile[i] = not profile[i]; resetModel(); end);
+			end
+		end
+	end
+
+	MenuUtil.CreateContextMenu(parent, GeneratorFunction);
 end
 
 function BetterWardrobeSetsCollectionMixin:LinkSet(setID)

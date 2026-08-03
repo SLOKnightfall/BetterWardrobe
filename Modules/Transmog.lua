@@ -2420,7 +2420,9 @@ function TransmogWardrobeSetsMixin:GetFirstMatchingSetID()
 		hasPending = false;
 		for transmogLocation, info in pairs(transmogInfo) do
 			if transmogLocation:IsAppearance() then
-				local sourceIDs = C_TransmogOutfitInfo.GetSourceIDsForSlot(usableSet.setID, transmogLocation:GetSlot());
+				--GetSourceIDsForSlot can return nothing at all (not even an empty table) for a slot
+				--this set doesn't use, which #sourceIDs would then error on.
+				local sourceIDs = C_TransmogOutfitInfo.GetSourceIDsForSlot(usableSet.setID, transmogLocation:GetSlot()) or {};
 				-- If there are no sources for a slot, that slot is considered matched.
 				local slotMatched = #sourceIDs == 0;
 				for _indexSourceIDs, sourceID in ipairs(sourceIDs) do

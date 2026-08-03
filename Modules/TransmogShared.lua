@@ -240,8 +240,17 @@ function WardrobeSetsDataProviderMixin:GetVariantSets(baseSetID)
 		self.variantSets = {};
 	end
 
-	if BetterWardrobeCollectionFrame:CheckTab(2) then 
-		local variantSets --= {} --self.variantSets[baseSetID];
+	if BetterWardrobeCollectionFrame:CheckTab(2) then
+		--Blizzard's own GetVariantSets only returns the full family when called with
+		--the true base set ID (see Blizzard_Wardrobe_Sets.lua, which always normalizes
+		--via GetBaseSetID before calling this). Our list rows use whichever set our own
+		--label-grouping in DataBase.lua happened to pick as the displayed "base" (the
+		--first one encountered while building baseList), which is not guaranteed to be
+		--Blizzard's canonical base for that family -- passing it straight through made
+		--Blizzard's API return an empty/wrong list for those sets, so the Variants
+		--marker silently never showed for them even though they do have variants.
+		baseSetID = C_TransmogSets.GetBaseSetID(baseSetID) or baseSetID;
+		local variantSets = self.variantSets[baseSetID];
 		if not variantSets then
 			variantSets = C_TransmogSets.GetVariantSets(baseSetID) or {};
 
@@ -268,7 +277,13 @@ function WardrobeSetsDataProviderMixin:GetVariantSets(baseSetID)
 				variantSetsAll = {};
 			end
 
-			local variantSets = {};
+			--Was "local variantSets = {}" here, shadowing the outer variantSets above inside this
+			--if-block. This inner copy got built and cached correctly (self.variantSets[baseSetID]
+			--below), but the function always returned the outer one, which stayed nil on this first,
+			--cache-populating call -- so the first read of a set's variants after any cache reset
+			--came back empty (e.g. the Variants marker on the collection list showing inconsistently),
+			--and only the next read after that returned the real, now-cached list.
+			variantSets = {};
 			for i=1, #variantSetsAll do
 				tinsert(variantSets, variantSetsAll[i]);
 			end
