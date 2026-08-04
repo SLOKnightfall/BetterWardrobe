@@ -1,6 +1,6 @@
-﻿## Interface: 120001
-## Title: BetterWardrobe_SourceData (@project-version@)
-## Version: @project-version@
+## Interface: 120007
+## Title: BetterWardrobe_SourceData (6.1.7-dev)
+## Version: 6.1.7-dev
 ## Author: SLOKnightfall
 ## Notes: 
 ## Category: Transmog

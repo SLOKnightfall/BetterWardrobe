@@ -45,6 +45,7 @@ local function SkinTransmogFrames()
 	S:HandleTab(BetterWardrobeCollectionFrame.SetsTab)
 	S:HandleTab(BetterWardrobeCollectionFrame.ExtraSetsTab)
 	S:HandleTab(BetterWardrobeCollectionFrame.SavedSetsTab)
+	S:HandleTab(BetterWardrobeCollectionFrame.WeaponSetsTab)
 
 	BetterWardrobeCollectionFrame.progressBar:StripTextures()
 	BetterWardrobeCollectionFrame.progressBar:CreateBackdrop()

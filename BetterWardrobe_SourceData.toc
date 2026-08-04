@@ -1,0 +1,17 @@
+## Interface: 120007
+## Title: BetterWardrobe_SourceData (6.1.7-dev)
+## Version: 6.1.7-dev
+## Author: SLOKnightfall
+## Notes: 
+## Category: Transmog
+## Group: BetterWardrobe
+## LoadOnDemand: 1
+## DefaultState: enabled
+
+## IconTexture: Interface\AddOns\BetterWardrobe\Images\DerectoryIcon
+
+#Data files
+Data\ColorData.lua
+
+Data\AppearanceData.lua
+Data\SourceData.lua
