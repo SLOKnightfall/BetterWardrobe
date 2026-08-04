@@ -1432,7 +1432,10 @@ function TransmogWardrobeItemsMixin:InitFilterButton()
 	self.FilterButton:SetText(SOURCES);
 
 	self.FilterButton:SetupMenu(function(_dropdown, rootDescription)
-		rootDescription:SetTag("MENU_TRANSMOG_ITEMS_FILTER");
+		--BISECTION TEST (BW_TAINT_BISECT): Items tab is TransmogFrame's default tab, so
+		--this runs on every vendor visit -- testing whether this shared-tag menu
+		--registration is the taint bug's source.
+		--rootDescription:SetTag("MENU_TRANSMOG_ITEMS_FILTER");
 
 		rootDescription:CreateButton(CHECK_ALL, function()
 			C_TransmogCollection.SetAllSourceTypeFilters(true);
@@ -2718,6 +2721,8 @@ function TransmogWardrobeCustomSetsMixin:GetCurrentTransmogInfoCallback()
 end
 
 function TransmogWardrobeCustomSetsMixin:GetItemTransmogInfoListCallback()
+	--wardrobeCollection may not be set yet on first call, guard instead of erroring
+	if not self.wardrobeCollection then return nil end
 	return self.wardrobeCollection.GetItemTransmogInfoListCallback();
 end
 

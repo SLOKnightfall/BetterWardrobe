@@ -5,6 +5,58 @@ local L = LibStub("AceLocale-3.0"):GetLocale(addonName)
 local IgnoredSlots = {}
 local AppearanceList
 
+--Moved from SavedOutfitsViewer.lua (now disabled) -- still needed for RandomizeOutfit below.
+local function UpdateOutfit(slot, type, appearance)
+	if not appearance then return end
+	local info = C_TransmogCollection.GetSourceInfo(appearance)
+	local categoryID = (info and info.categoryID) or 0
+	local display = (info and  info.isHideVisual and 3) or (info and  not info.isHideVisual and 1) or (not info and 0)
+	local option = 0
+
+	if slot == Enum.TransmogOutfitSlot.WeaponMainHand or slot == Enum.TransmogOutfitSlot.WeaponOffHand then
+		local spec = GetSpecializationInfo(GetSpecialization())
+
+		if (categoryID >= 12 and categoryID <= 17 ) or  categoryID == 28 then
+			option = Enum.TransmogOutfitSlotOption.OneHandedWeapon
+		elseif categoryID == 18 then
+			option = Enum.TransmogOutfitSlotOption.Shield
+		elseif categoryID == 19 then
+			option = Enum.TransmogOutfitSlotOption.OffHand
+		elseif categoryID >= 20 and categoryID <= 24  then
+			if spec == 72 then
+				option = Enum.TransmogOutfitSlotOption.FuryTwoHandedWeapon
+			end
+			option = Enum.TransmogOutfitSlotOption.TwoHandedWeapon
+		elseif categoryID >= 25 and categoryID <= 27  then
+			option = Enum.TransmogOutfitSlotOption.RangedWeapon
+		end
+	end
+
+	C_TransmogOutfitInfo.SetPendingTransmog(slot, type, option, appearance, display)
+end
+
+local function ApplyOutfit(index)
+	local outfit = addon.OutfitDB.char.outfits[index]
+	if outfit ~= nil then
+		C_TransmogOutfitInfo.ClearAllPendingTransmogs()
+		UpdateOutfit(Enum.TransmogOutfitSlot.Head, Enum.TransmogType.Appearance, outfit[1])
+		UpdateOutfit(Enum.TransmogOutfitSlot.ShoulderRight, Enum.TransmogType.Appearance, outfit[3])
+		UpdateOutfit(Enum.TransmogOutfitSlot.Body, Enum.TransmogType.Appearance, outfit[4])
+		UpdateOutfit(Enum.TransmogOutfitSlot.Chest, Enum.TransmogType.Appearance, outfit[5])
+		UpdateOutfit(Enum.TransmogOutfitSlot.Waist, Enum.TransmogType.Appearance, outfit[6])
+		UpdateOutfit(Enum.TransmogOutfitSlot.Legs, Enum.TransmogType.Appearance, outfit[7])
+		UpdateOutfit(Enum.TransmogOutfitSlot.Feet, Enum.TransmogType.Appearance, outfit[8])
+		UpdateOutfit(Enum.TransmogOutfitSlot.Wrist, Enum.TransmogType.Appearance, outfit[9])
+		UpdateOutfit(Enum.TransmogOutfitSlot.Hand ,Enum.TransmogType.Appearance, outfit[10])
+		UpdateOutfit(Enum.TransmogOutfitSlot.Back, Enum.TransmogType.Appearance, outfit[15])
+		UpdateOutfit(Enum.TransmogOutfitSlot.WeaponMainHand, Enum.TransmogType.Appearance, outfit[16])
+		UpdateOutfit(Enum.TransmogOutfitSlot.WeaponOffHand, Enum.TransmogType.Appearance, outfit[17])
+		UpdateOutfit(Enum.TransmogOutfitSlot.Tabard, Enum.TransmogType.Appearance, outfit[19])
+		UpdateOutfit(Enum.TransmogOutfitSlot.WeaponMainHand, Enum.TransmogType.Illusion, outfit["mainHandEnchant"])
+		UpdateOutfit(Enum.TransmogOutfitSlot.WeaponOffHand, Enum.TransmogType.Illusion, outfit["offHandEnchant"])
+	end
+end
+
 BW_RandomizeButtonMixin = {}
 
 function BW_RandomizeButtonMixin:OnEnter()
@@ -171,7 +223,7 @@ local function RandomizeOutfit()
 	if outfit.setType == "SavedBlizzard" then
 		C_TransmogOutfitInfo.SetOutfitToCustomSet(addon:GetBlizzID(outfit.outfitID))
 	elseif outfit.setType == "SavedExtra" then
-		addon.SavedSetsFrame:ApplyOutfit(outfit.index)
+		ApplyOutfit(outfit.index)
 	end
 end
 

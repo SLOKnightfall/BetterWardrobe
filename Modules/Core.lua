@@ -340,7 +340,6 @@ local options = {
 					type = "group",
 					inline = true,
 					order = 3,
-					hidden = true,
 					args={
 						Tooltip_Header = {
 							order = 1,
@@ -441,8 +440,6 @@ local options = {
 						type = "group",
 						inline = true,
 						order = 4,
-						disabled = function() return not addon.Profile.TooltipPreview_Show end,
-						hidden = true,
 						args={
 							Options_Header_2 = {
 							order = 0,
@@ -696,8 +693,6 @@ local options = {
 					type = "group",
 					inline = true,
 					order = 5,
-					disabled = function() return not addon.Profile.DR_OptionsEnable end,
-					hidden = true,
 					args={
 						Options_Header_2 = {
 							order = 1,
@@ -1322,7 +1317,7 @@ function addon:OnEnable()
 	addon.Init:InitDB()
 
 	--addon.Init:BuildTooltips()
-	----addon.Init:DressingRoom()
+	addon.Init:DressingRoom()
 	--addon.Init.LoadCollectionListModule()
 	--BW_ColectionListFrameTemplate
 	--addon.Init:BuildTooltips()
@@ -1339,26 +1334,19 @@ function addon:OnEnable()
 	--Cache any default Blizz Saved Sets
 	---addon.StoreBlizzardSets()
 	initialize = true
-
-	if not C_AddOns.IsAddOnLoaded("Blizzard_Collections") then
-  		C_AddOns.LoadAddOn("Blizzard_Collections")
-	end
-
-		if not C_AddOns.IsAddOnLoaded("Blizzard_Transmog") then
-  		C_AddOns.LoadAddOn("Blizzard_Transmog")
-	end
+	--Blizzard_Collections/Transmog are .toc Dependencies now instead of forced here.
 
 	C_Timer.After(1, function() addon.Init:LoadModules() end)
-	self:HookCustomSetsOnHide()
+	--self:HookCustomSetsOnHide() -- BW Saved button removed, nothing to hook anymore
 end
 
 --Hides default collection window when at transmog vendor
 local function UpdateTransmogVendor()
-	WardrobeCollectionFrame:Hide()
+	--WardrobeCollectionFrame:Hide()
 
 
-	BetterWardrobeCollectionFrame:Show()
-	BetterWardrobeCollectionFrame:SetContainer(WardrobeFrame)
+	--BetterWardrobeCollectionFrame:Show()
+	--BetterWardrobeCollectionFrame:SetContainer(WardrobeFrame)
 
 end
 
@@ -1370,7 +1358,7 @@ function addon.Init:LoadModules()
 		return false
 	end
 
-	--Check to make sure that the Blizzard Frames have completed loading
+	--Guard in case TransmogFrame isn't up yet.
 	if not TransmogFrame then
 		--C_Timer.After(0.5, function() addon.Init:LoadModules() end)
 		--return false
@@ -1439,8 +1427,8 @@ function addon.Init:LoadModules()
 		--with e.g. `if addon.UpdatePetTracker then addon:UpdatePetTracker() end` is safer
 		--than relying on the .toc alone).
 		----addon:UpdatePetTracker()
-		addon.Init:initCollectionList()
-	 	addon.Init:BuildCollectionList()
+	addon.Init:initCollectionList()
+	addon.Init:BuildCollectionList()
 		--NOTE: BuildTransmogVendorUI is NOT re-enabled here. Its file (TransmogVendor.lua/.xml)
 		--isn't loaded by the .toc in this version OR in wow11 -- it was commented out even in
 		--the working wow11 Core.lua, so this isn't a regression to restore, it's an unfinished/
@@ -1453,7 +1441,7 @@ function addon.Init:LoadModules()
 		----addon:UpdateCanIMogIt()
 		----addon:InitExtendedSetsSwap()
 
-		addon:CreateCustomSetsButton()
+		--addon:CreateCustomSetsButton() -- SavedOutfitsViewer.xml disabled, dead code
 
 
 		local selected = CollectionsJournal_GetTab(CollectionsJournal)
@@ -1488,18 +1476,11 @@ function addon:EventHandler(event, ...)
 		addon:SendMessage("BW_OnPlayerEnterWorld")
 
 
-		if not C_AddOns.IsAddOnLoaded("Blizzard_TransmogShared") then
-  		C_AddOns.LoadAddOn("Blizzard_TransmogShared")
-
-		end
-
-		if not C_AddOns.IsAddOnLoaded("Blizzard_Transmog") then
-  		C_AddOns.LoadAddOn("Blizzard_Transmog")
-
-		end
+		--See OnEnable: these are now .toc Dependencies instead of runtime LoadAddOn() calls.
 
 
-		C_Timer.After(1, function() 
+		C_Timer.After(1, function()
+			if not TransmogFrame then return end
 			if not TransmogFrame.WardrobeCollection.TabContent.BW_SetsFrame2 then
 				local f = CreateFrame("Frame", nil, TransmogFrame.WardrobeCollection.TabContent,"ExtraSetsFrameTemplate")
 				TransmogFrame.WardrobeCollection.TabContent.BW_SetsFrame2 = f

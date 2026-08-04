@@ -710,7 +710,9 @@ function WardrobeCollectionFrameMixin:OnLoad()
 
 	self.ItemsCollectionFrame.GetTooltipSourceIndexCallback = GenerateClosure(self.GetTooltipSourceIndex, self);
 
-	CollectionsJournal:SetPortraitToAsset("Interface\\Icons\\inv_misc_enggizmos_19");
+	--Copied from Blizzard's code, but CollectionsJournal isn't ours to touch. Just sets the
+	--corner icon, safe to drop.
+	--CollectionsJournal:SetPortraitToAsset("Interface\\Icons\\inv_misc_enggizmos_19");
 
 	self.FilterButton:SetWidth(90);
 
@@ -762,7 +764,8 @@ function WardrobeCollectionFrameMixin:OnUpdate()
 end
 
 function WardrobeCollectionFrameMixin:OnShow()
-	CollectionsJournal:SetPortraitToAsset("Interface\\Icons\\inv_chest_cloth_17");
+	--Same issue as OnLoad above.
+	--CollectionsJournal:SetPortraitToAsset("Interface\\Icons\\inv_chest_cloth_17");
 
 	self:RegisterEvent("TRANSMOG_COLLECTION_ITEM_UPDATE");
 	self:RegisterUnitEvent("UNIT_FORM_CHANGED", "player");
@@ -939,7 +942,7 @@ end
 function WardrobeCollectionFrameMixin:UpdateUsableAppearances()
 	if not self.updateUsableAppearances then
 		self.updateUsableAppearances = true;
-		C_Timer.After(0, function() self.updateUsableAppearances = nil; C_TransmogCollection.UpdateUsableAppearances(); end);
+		--C_Timer.After(0, function() self.updateUsableAppearances = nil; C_TransmogCollection.UpdateUsableAppearances(); end);
 	end
 end
 
@@ -1215,7 +1218,9 @@ function WardrobeItemsCollectionMixin:OnShow()
 		self:SetActiveSlot(transmogLocation);
 	end
 
-	WardrobeCollectionFrame.progressBar:SetShown(not TransmogUtil.IsCategoryLegionArtifact(self:GetActiveCategory()));
+	--This fires before setFrames() reassigns WardrobeCollectionFrame to us, so use our own
+	--frame name directly instead of the (still-Blizzard's) global.
+	BetterWardrobeCollectionFrame.progressBar:SetShown(not TransmogUtil.IsCategoryLegionArtifact(self:GetActiveCategory()));
 
 	if ( needsUpdate ) then
 		WardrobeCollectionFrame:UpdateUsableAppearances();
@@ -1292,7 +1297,9 @@ end
 
 
 function WardrobeItemsCollectionMixin:ChangeModelsSlot(newTransmogLocation, oldTransmogLocation)
-	WardrobeCollectionFrame.updateOnModelChanged = nil;
+	--Uses our own frame name directly, not the WardrobeCollectionFrame global -- that global
+	--isn't reassigned to us yet the first time this runs.
+	BetterWardrobeCollectionFrame.updateOnModelChanged = nil;
 	local oldSlot = oldTransmogLocation and oldTransmogLocation:GetSlotName();
 	local newSlot = newTransmogLocation:GetSlotName();
 
@@ -1312,7 +1319,7 @@ function WardrobeItemsCollectionMixin:ChangeModelsSlot(newTransmogLocation, oldT
 	end
 
 	if ( reloadModel and not IsUnitModelReadyForUI("player") ) then
-		WardrobeCollectionFrame.updateOnModelChanged = true;
+		BetterWardrobeCollectionFrame.updateOnModelChanged = true;
 		for i = 1, #self.Models do
 			self.Models[i]:ClearModel();
 		end
@@ -1728,7 +1735,7 @@ function WardrobeItemsCollectionMixin:UpdateItems()
 	end
 
 	local tutorialAnchorFrame;
-	local checkTutorialFrame = self.transmogLocation:IsAppearance() and not GetCVarBitfield("closedInfoFrames", LE_FRAME_TUTORIAL_TRANSMOG_MODEL_CLICK) and WardrobeCollectionFrame.fromSuggestedContent;
+	local checkTutorialFrame = self.transmogLocation:IsAppearance() and not GetCVarBitfield("closedInfoFrames", LE_FRAME_TUTORIAL_TRANSMOG_MODEL_CLICK) and BetterWardrobeCollectionFrame.fromSuggestedContent;
 
 	local slotVisualInfo = C_Transmog.GetSlotVisualInfo(self.transmogLocation:GetData());
 	local cameraVariation = TransmogUtil.GetCameraVariation(self.transmogLocation);
@@ -1812,9 +1819,9 @@ function WardrobeItemsCollectionMixin:UpdateItems()
 
 			-- find potential tutorial anchor for trackable item
 			if ( checkTutorialFrame ) then
-				if ( not WardrobeCollectionFrame.tutorialVisualID and not visualInfo.isCollected and not visualInfo.isHideVisual and model:HasTrackableSource()) then
+				if ( not BetterWardrobeCollectionFrame.tutorialVisualID and not visualInfo.isCollected and not visualInfo.isHideVisual and model:HasTrackableSource()) then
 					tutorialAnchorFrame = model;
-				elseif ( WardrobeCollectionFrame.tutorialVisualID and WardrobeCollectionFrame.tutorialVisualID == visualInfo.visualID ) then
+				elseif ( BetterWardrobeCollectionFrame.tutorialVisualID and BetterWardrobeCollectionFrame.tutorialVisualID == visualInfo.visualID ) then
 					tutorialAnchorFrame = model;
 				end
 			end
@@ -2053,10 +2060,24 @@ BetterWardrobeItemModelMixin = WardrobeItemModelMixin
 
 -- Overridden.
 function WardrobeItemModelMixin:OnMouseDown(button)
-	ItemModelBaseMixin.OnMouseDown(self, button);
-
 	local appearanceInfo = self:GetAppearanceInfo();
 	local itemsCollectionFrame = self:GetCollectionFrame();
+
+	--Apply on click (Profile.AutoApply) -- was toggling the flag but nothing read it, wired up here.
+	if appearanceInfo and itemsCollectionFrame and button == "LeftButton" and addon.Profile.AutoApply
+		and not IsModifiedClick("CHATLINK") and not C_Transmog.IsAtTransmogNPC() then
+		addon:StoreItems();
+		itemsCollectionFrame:DressUpVisual(appearanceInfo);
+		return;
+	end
+
+	--Checkpoint history before a shift-click dress-up too, or Undo has nothing to revert to.
+	if appearanceInfo and itemsCollectionFrame and self:CanCheckDressUpClick() and IsModifiedClick("DRESSUP") then
+		addon:StoreItems();
+	end
+
+	ItemModelBaseMixin.OnMouseDown(self, button);
+
 	if not appearanceInfo or not itemsCollectionFrame then
 		return;
 	end

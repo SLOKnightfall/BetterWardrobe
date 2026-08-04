@@ -53,8 +53,6 @@ function BetterWardrobe:ToggleDressingRoom()
 end
 
 function addon.Init:DressingRoom()
-	DressUpFrameOutfitDropdown:Hide()
-
 	Buttons = BW_DressingRoomFrame.PreviewButtonFrame.Slots
 	Profile = addon.Profile
 
@@ -69,7 +67,11 @@ local reset = false
 local defaultWidth, defaultHeight = 450, 545
 function addon:DressingRoom_Enable()
 	BW_DressingRoomFrame:Show()
-	addon:HookScript(DressUpFrameResetButton,"OnClick", function()
+	--AceHook's HookScript (as opposed to SecureHookScript) replaces the script via
+	--:SetScript() internally rather than the native, non-taint-inducing :HookScript()
+	--API -- an insecure, direct modification of a Blizzard-owned button, running on
+	--every login regardless of any UI interaction.
+	addon:SecureHookScript(DressUpFrameResetButton,"OnClick", function()
 		reset = true
 		HideArmorOnShow = addon.Profile.DR_StartUndressed
 		HideWeaponOnShow = addon.Profile.DR_HideWeapons
@@ -80,8 +82,6 @@ function addon:DressingRoom_Enable()
 
 	if DressUpFrame.MaximizeMinimizeFrame then
 		DressUpFrame.MaximizeMinimizeFrame:SetOnMaximizedCallback(function(self)
-			DressUpFrameOutfitDropdown:Hide()
-
 			if Profile.DR_ResizeWindow then
 				DressUpFrame.MaximizeMinimizeFrame:GetParent():SetSize(Profile.DR_Width, Profile.DR_Height) 
 			else
@@ -97,10 +97,13 @@ function addon:DressingRoom_Enable()
 
 	end
 
-	DressUpFrame:SetMovable(true)
-	DressUpFrame:RegisterForDrag("LeftButton")
-	DressUpFrame:SetScript("OnDragStart", DressUpFrame.StartMoving)
-	DressUpFrame:SetScript("OnDragStop", DressUpFrame.StopMovingOrSizing)
+	--Directly calling :SetMovable/:SetScript(OnDragStart/OnDragStop) on DressUpFrame --
+	--a Blizzard frame we don't own -- insecurely marks it as touched by BetterWardrobe.
+	--That mark can persist and later get picked up by unrelated code that iterates
+	--shared/registered UI panels (e.g. showing PVEFrame), causing taint to leak into
+	--completely unrelated later actions (this caused an ADDON_ACTION_FORBIDDEN on
+	--JoinBattlefield() when queuing for PvP, confirmed via a real player's taint log).
+	--Drag-to-move for the Dressing Room window isn't worth that risk, so it's removed.
 	hooksecurefunc("DressUpVisual", DressingRoom.Update);
 	hooksecurefunc("DressUpCollectionAppearance", DressingRoom.Update);
 end
@@ -109,10 +112,6 @@ function addon:DressingRoom_Disable()
 	BW_DressingRoomFrame:Hide()
 	addon:Unhook("DressUpSources")
 	addon:Unhook(DressUpFrameResetButton,"OnClick")
-
-	DressUpFrame:SetMovable(false)
-	DressUpFrame:SetScript("OnDragStart", nil)
-	DressUpFrame:SetScript("OnDragStop", nil)
 
 	if DressUpFrame.MaximizeMinimizeFrame then
 		DressUpFrame.MaximizeMinimizeFrame:SetOnMaximizedCallback(function(self)
@@ -156,7 +155,8 @@ local function GetDressUpModelSlotSource(slotID, enchantID)
 	end
 
 	local slotname = TransmogUtil.GetSlotName(slotID)
-	local transmogLocation = TransmogUtil.GetTransmogLocation(slotname, Enum.TransmogType.Appearance, Enum.TransmogModification.Main)
+	--3rd arg used to be Enum.TransmogModification.Main/Secondary; it's a plain isSecondary boolean now.
+	local transmogLocation = TransmogUtil.GetTransmogLocation(slotname, Enum.TransmogType.Appearance, false)
 	local info = playerActor:GetItemTransmogInfoList()
 	appliedSourceID = info[slotID].appearanceID
 
@@ -170,9 +170,15 @@ local function GetDressUpModelSlotSource(slotID, enchantID)
 	local itemModID = sourceInfo.itemModID
 	local itemID = sourceInfo.itemID
 	local itemName = sourceInfo.name
-	local appearanceID, sourceID = C_TransmogCollection.GetItemInfo(itemID, itemModID)
 	local itemIcon = C_TransmogCollection.GetSourceIcon(appliedSourceID)
-	local itemLink = select(6, C_TransmogCollection.GetAppearanceSourceInfo(appliedSourceID))
+
+	--GetAppearanceSourceInfo now returns a single info table (itemAppearanceID, itemLink, ...)
+	--instead of positional values; also replaces the old 2-arg GetItemInfo(itemID, itemModID)
+	--call for appearanceID, which no longer matches C_TransmogCollection.GetItemInfo's signature
+	--(now takes a single itemInfo argument).
+	local sourceAppearanceInfo = C_TransmogCollection.GetAppearanceSourceInfo(appliedSourceID)
+	local appearanceID = sourceAppearanceInfo and sourceAppearanceInfo.itemAppearanceID
+	local itemLink = sourceAppearanceInfo and sourceAppearanceInfo.itemLink
 	local hasAppearance = C_TransmogCollection.PlayerHasTransmog(itemID, itemModID) or IsAppearanceKnown(itemLink)
 
 	if itemName and (slotID == 16 or slotID == 17) then 
@@ -464,10 +470,19 @@ function DressingRoom:UpdateModel(unit)
 	end
 end
 
+--Was previously driven by RegisterEvent("ADDON_LOADED"), which fires for every addon
+--that loads (including Blizzard's own lazy-loaded ones). Checking on OnShow instead
+--avoids running our code during unrelated addons' load sequences.
+local hookedInspectUI = false
+local function CheckInspectUIHook()
+	if not hookedInspectUI and C_AddOns.IsAddOnLoaded("Blizzard_InspectUI") then
+		addon:SecureHookScript(InspectPaperDollFrame.ViewButton, "OnClick", function() inspectView = true end)
+		hookedInspectUI = true
+	end
+end
+
 BW_DressingRoomFrameMixin = {}
 function BW_DressingRoomFrameMixin:OnLoad()
-	self:RegisterEvent("ADDON_LOADED");
-
 --[[
 	DressUpFrame.LinkButton:ClearAllPoints()
 	DressUpFrame.LinkButton:SetPoint("LEFT",BW_DressingRoomFrame.BW_DressingRoomUndressButton, "RIGHT",-6,0)
@@ -502,6 +517,10 @@ function BW_DressingRoomFrameMixin:OnShow()
 	itemhistory = {};
 	BW_DressingRoomFrame.BW_DressingRoomUndoButton:Hide();
 	addon:StoreItems();
+	CheckInspectUIHook();
+	if C_AddOns.IsAddOnLoaded("Narcissus") then
+		BW_DressingRoomFrame.BW_DressingRoomSwapFormButton:Hide();
+	end
 	if not Profile.DR_OptionsEnable then return end
 
 	BW_DressingRoomFrame.PreviewButtonFrame:SetShown(addon.Profile.DR_ShowItemButtons);
@@ -539,15 +558,9 @@ function BW_DressingRoomFrameMixin:OnEvent(event, ...)
 			DressUpItemTransmogInfoList(C_TransmogCollection.GetInspectItemTransmogInfoList())
 			ClearInspectPlayer()
 		end)
-
-	elseif event == "ADDON_LOADED" and arg1 == "Blizzard_InspectUI" then 
-		addon:HookScript(InspectPaperDollFrame.ViewButton, "OnClick", function() inspectView = true end)
-		self:UnregisterEvent("ADDON_LOADED")
-
-	elseif event == "ADDON_LOADED" and arg1 == "Narcissus" then
-		BW_DressingRoomFrame.BW_DressingRoomSwapFormButton:Hide()
 	end
 end
+
 
 
 local function DressupSettingsButton_OnClick(self)
@@ -588,8 +601,6 @@ local function BW_DressingRoomImportButton_OnClick(self)
 
 		rootDescription:CreateTitle(L["Import/Export Options"]);
 		rootDescription:CreateButton(L["Load Set: %s"]:format( name or L["None Selected"]), function()
-				local sources
-				local setType = addon.QueueList[1]
 				local setID = addon.QueueList[2]
 				local playerActor = DressUpFrame.ModelScene:GetPlayerActor()
 
@@ -597,10 +608,13 @@ local function BW_DressingRoomImportButton_OnClick(self)
 					return false
 				end
 
-				if setType == "set" then
-					sources = C_TransmogSets.GetSetSources(setID)
-				elseif setType == "extraset" then
-					sources = addon.SetsDataProvider:GetSetSources(setID) --addon.GetSetsources(setID)
+				--C_TransmogSets.GetSetSources no longer exists, and TransmogShared.lua rebinds
+				--the global C_TransmogSets.GetSetPrimaryAppearances to addon.C_TransmogSets'
+				--own version, which already handles both Blizzard and Extra sets uniformly --
+				--see OpenInDressingRoom in Wardrobe_Sets.lua for the same pattern.
+				local sources = {}
+				for i, data in ipairs(C_TransmogSets.GetSetPrimaryAppearances(setID)) do
+					sources[data.appearanceID] = false
 				end
 
 				if not sources then return end
@@ -741,8 +755,10 @@ end
 function addon:StoreItems()
 	local playerActor = DressUpFrame.ModelScene:GetPlayerActor();
 	local itemTransmogInfoList = playerActor and playerActor:GetItemTransmogInfoList();
-	local slashCommand = itemTransmogInfoList and TransmogUtil.CreateOutfitSlashCommand(itemTransmogInfoList) or "";
-	slashCommand = string.gsub(slashCommand, "/outfit ", "")
+	--The whole /outfit v1 slash-link system (CreateOutfitSlashCommand/ParseOutfitSlashCommand)
+	--was removed; /customset v1 is the modern equivalent (same "v1 <17 values>" payload format).
+	local slashCommand = itemTransmogInfoList and TransmogUtil.CreateCustomSetSlashCommand(itemTransmogInfoList) or "";
+	slashCommand = string.gsub(slashCommand, "/customset ", "")
 	tinsert(itemhistory, slashCommand)
 
 	if  #itemhistory > 1 then
@@ -754,10 +770,15 @@ end
 function DressingRoom:Undo()
 	local msg = itemhistory[#itemhistory]
 	tremove(itemhistory, #itemhistory)
-	local itemTransmogInfoList = TransmogUtil.ParseOutfitSlashCommand(msg);
+	local itemTransmogInfoList = TransmogUtil.ParseCustomSetSlashCommand(msg);
 	if itemTransmogInfoList then
 		local showOutfitDetails = true;
 		DressUpItemTransmogInfoList(itemTransmogInfoList, showOutfitDetails);
+		--DressUpItemTransmogInfoList isn't hooksecurefunc'd like DressUpVisual/
+		--DressUpCollectionAppearance are, so the model reflects the change but our
+		--own per-slot icon buttons (Buttons/PreviewButtonFrame) never refresh without
+		--an explicit Update call.
+		DressingRoom:Update();
 	end
 	if  #itemhistory == 1 then
 		BW_DressingRoomFrame.BW_DressingRoomUndoButton:Hide()
