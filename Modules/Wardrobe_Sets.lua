@@ -103,6 +103,13 @@ local tabType = {"item", "set", "extraset"}
 
 
 local SetsDataProvider = CreateFromMixins(BetterWardrobeSetsDataProviderMixin);
+--TransmogShared.lua sets addon.SetsDataProvider to the raw mixin table (the class, not an
+--instance), so every addon.SetsDataProvider:ClearSets()/:ClearBaseSets() call elsewhere
+--(BuildBlizzSets in DataBase.lua, RefreshLists in Wardrobe.lua) was invalidating cache fields
+--on that inert prototype instead of this real, visible-list-backing instance -- so a fresh
+--armor-type/class-filter selection never reliably cleared out the previous one before the
+--next build ran, leaving old and new entries mixed together.
+addon.SetsDataProvider = SetsDataProvider;
 
 local WardrobeSetsCollectionMixin = {};
 BetterWardrobeSetsCollectionMixin = WardrobeSetsCollectionMixin
@@ -326,10 +333,10 @@ function WardrobeSetsCollectionMixin:DisplaySet(setID)
 
 	self.DetailsFrame.Label:SetText((setInfo.label or "")..((not setInfo.isClass and setInfo.className) and " -"..setInfo.className.."-" or "") );
 
-	--@debug@
+	--[==[@debug@
 		self.DetailsFrame.HolidayLabel:Show() 
 		self.DetailsFrame.HolidayLabel:SetText(setID);
-	--@end-debug@
+	--@end-debug@]==]
 
 	if ((setInfo.description == ELITE) and setInfo.patchID < buildID) or (setID <= 1446 and setID >=1436) then
 		setInfo.noLongerObtainable = true;
@@ -420,7 +427,7 @@ function WardrobeSetsCollectionMixin:DisplaySet(setID)
 		itemFrame.collected = sortedSources[i].collected;
 		itemFrame.invType = sortedSources[i].invType;
 		itemFrame.setID = setID
-		local slot = C_Transmog.GetSlotForInventoryType(itemFrame.invType)
+		local slot = itemFrame.invType and C_Transmog.GetSlotForInventoryType(itemFrame.invType)
 		local altid = addon:CheckAltItem(itemFrame.sourceID)
 		if altid and type(altid) ~= "table" then
 			altid = {altid}
@@ -464,8 +471,8 @@ function WardrobeSetsCollectionMixin:DisplaySet(setID)
 			itemFrame.IconBorder:SetDesaturation(0);
 			itemFrame.IconBorder:SetAlpha(1);
 
-			local transmogSlot = C_Transmog.GetSlotForInventoryType(itemFrame.invType);
-			if ( C_TransmogSets.SetHasNewSourcesForSlot(setID, transmogSlot) ) then
+			local transmogSlot = itemFrame.invType and C_Transmog.GetSlotForInventoryType(itemFrame.invType);
+			if ( transmogSlot and C_TransmogSets.SetHasNewSourcesForSlot(setID, transmogSlot) ) then
 				itemFrame.New:Show();
 				itemFrame.New.Anim:Play();
 			else
@@ -737,7 +744,9 @@ end
 
 function WardrobeSetsCollectionMixin:SetAppearanceTooltip(frame)
 	GameTooltip:SetOwner(frame, "ANCHOR_RIGHT");
+	if not frame or not frame.invType then return end
 	self.tooltipTransmogSlot = C_Transmog.GetSlotForInventoryType(frame.invType);
+	if not self.tooltipTransmogSlot then return end
 	self.tooltipPrimarySourceID = frame.sourceID;
 	self.tooltipSlot = _G[TransmogUtil.GetSlotName(frame.transmogSlot)];
 	self:RefreshAppearanceTooltip();
@@ -799,54 +808,45 @@ function WardrobeSetsCollectionMixin:ScrollToSet(setID, alignment)
 end
 
 function WardrobeSetsCollectionMixin:OpenInDressingRoom(setID)
-	if DressUpFrame:IsShown() then 
-	else
+	if not setID then return false end
+	if not DressUpFrame:IsShown() then
 		DressUpFrame_Show(DressUpFrame)
-		C_Timer.After(0, function() self:OpenInDressingRoom(setID) 
-		return 
-	end)
+		C_Timer.After(0, function() self:OpenInDressingRoom(setID) end)
+		return true
 	end
-		
-	--local setType = tabType[addon.GetTab()]
-	-----local setInfo = addon.getFullList(setID) --addon:GetSetInfo(setID)
-	local setInfo = C_TransmogSets.GetSetInfo(setID);
 
 	local addonSetInfo = addon.GetSetInfo(setID)
 	local setType = (addonSetInfo and addonSetInfo.setType) or "Blizzard"
-
-	--local setType = addon.QueueList[1]
-	--local setID = addon.QueueList[2]
 	local playerActor = DressUpFrame.ModelScene:GetPlayerActor()
 
 	if not playerActor or not setID then
 		return false;
 	end
 
-	local sources = nil;
+	local sources = {};
 
 	if setType == "Blizzard" then
-		sources = {}
-		local sourceInfo = C_TransmogSets.GetSetPrimaryAppearances(setID)
-		for i, data in ipairs(sourceInfo) do
-			sources[data.appearanceID] = false
+		local sourceInfo = C_TransmogSets.GetSetPrimaryAppearances(setID) or {}
+		for _, data in ipairs(sourceInfo) do
+			if data.appearanceID then sources[data.appearanceID] = true end
 		end
-
-	else--if setType == "ExtraSet" then
-		sources = setInfo.sources
+	elseif addonSetInfo then
+		for sourceID in pairs(addonSetInfo.sources or addonSetInfo.extendedSources or {}) do
+			sources[sourceID] = true
+		end
 	end
 
-	if not sources then return end
+	if not next(sources) then return false end
 
 	playerActor:Undress()
-	for i, d in pairs(sources)do
-		playerActor:TryOn(i)
+	for sourceID in pairs(sources)do
+		playerActor:TryOn(sourceID)
 	end
 
 	import = true
 	--DressUpSources(sources)
 	import = false
-	--TODO: Enable with Dressingroom files
-	----addon:UpdateDressingRoom()
+	return true
 end
 
 function BetterWardrobeSetsCollectionMixin:LinkSet(setID)
@@ -1034,7 +1034,8 @@ local function ToggleHidden(model, isHidden)
 	local tabID = addon.GetTab()
 	if tabID == 1 then
 		local visualID = model.visualInfo.visualID;
-		local _, _, _, _, _, itemLink = C_TransmogCollection.GetAppearanceSourceInfo(visualID);
+		local sourceInfo = C_TransmogCollection.GetAppearanceSourceInfo(visualID);
+		local itemLink = sourceInfo and sourceInfo.itemLink;
 		local name, link;
 		if itemLink then 
 			local source = CollectionWardrobeUtil.GetSortedAppearanceSources(visualID, addon.GetItemCategory(visualID), addon.GetTransmogLocation(itemLink))[1];
@@ -1095,6 +1096,11 @@ end
 
 
 function WardrobeSetsScrollFrameButtonMixin:OnClick(buttonName, down)
+	if buttonName == "LeftButton" and (IsControlKeyDown() or IsModifiedClick("DRESSUP")) then
+		PlaySound(SOUNDKIT.IG_MAINMENU_OPTION_CHECKBOX_ON)
+		BetterWardrobeCollectionFrame.SetsCollectionFrame:OpenInDressingRoom(self.setID)
+		return
+	end
 
 	if BetterWardrobeCollectionFrame.selectedCollectionTab == 4 then
 		if ( buttonName == "LeftButton" ) then
@@ -1117,46 +1123,78 @@ function WardrobeSetsScrollFrameButtonMixin:OnClick(buttonName, down)
 
 				local isHidden = addon.HiddenAppearanceDB.profile[type][baseSetID]
 				rootDescription:CreateButton(TRANSMOG_OUTFIT_POST_IN_CHAT, function()
-					BetterWardrobeSetsCollectionMixin:LinkSet(self.baseSetID or self.setID);
+					--Was calling LinkSet on the raw mixin table instead of the real frame, so
+					--self.Model inside LinkSet was always nil and this silently did nothing.
+					BetterWardrobeCollectionFrame.SetsCollectionFrame:LinkSet(self.baseSetID or self.setID);
 				end);
 
 				rootDescription:CreateButton(isHidden and SHOW or HIDE, function()
-					--self.setID = self.baseSetID; 
+					--self.setID = self.baseSetID;
 					ToggleHidden(self, isHidden);
 					addon.Init:InitDB()
-					BetterWardrobeCollectionFrame:SetTab(P3);
+					--P3 was an undefined global (nil), which set selectedCollectionTab to nil --
+					--everything else in this file branches on that field. Matches the same
+					--cycle-tabs-to-force-a-redraw pattern used correctly elsewhere (setIgnoreClassRestrictions),
+					--but was missing that pattern's final restore step, so it always landed on tab 2
+					--(Sets) regardless of which tab (e.g. Extra Sets) was actually active.
+					local currentTab = addon.GetTab()
+					BetterWardrobeCollectionFrame:SetTab(3);
 					BetterWardrobeCollectionFrame:SetTab(2);
+					BetterWardrobeCollectionFrame:SetTab(currentTab);
 					--RefreshLists()
 				end);
 
 				local text;
 				local targetSetID;
+				--This whole button was written for Blizzard sets only: baseSetID/targetSetID for an
+				--extra set is an addon-generated 10000+ pseudo-ID, not a real Blizzard transmog set
+				--ID, so calling C_TransmogSets.SetIsFavorite on it was never valid to begin with.
+				local isExtraSet = (type == "extraset")
 				local favorite = baseSet.favoriteSetID ~= nil or addon.favoritesDB.profile.extraset[baseSetID];
 				if favorite then
 					targetSetID = baseSet.favoriteSetID or baseSetID;
 					if useDescription then
-						local setInfo = C_TransmogSets.GetSetInfo(baseSet.favoriteSetID);
-						text = format(TRANSMOG_SETS_UNFAVORITE_WITH_DESCRIPTION, setInfo.description or setInfo.name or baseSet.name );
+						local setInfo = isExtraSet and addon.GetSetInfo(targetSetID) or C_TransmogSets.GetSetInfo(targetSetID);
+						text = format(TRANSMOG_SETS_UNFAVORITE_WITH_DESCRIPTION, (setInfo and (setInfo.description or setInfo.name)) or baseSet.name );
 					else
 						text = TRANSMOG_ITEM_UNSET_FAVORITE;
 					end
 				else
-					targetSetID = BetterWardrobeCollectionFrame.SetsCollectionFrame:GetDefaultSetIDForBaseSet(baseSetID);
+					targetSetID = isExtraSet and baseSetID or BetterWardrobeCollectionFrame.SetsCollectionFrame:GetDefaultSetIDForBaseSet(baseSetID);
 					if useDescription then
-						local setInfo = C_TransmogSets.GetSetInfo(targetSetID);
-						text = format(TRANSMOG_SETS_FAVORITE_WITH_DESCRIPTION, setInfo.description or setInfo.name);
+						local setInfo = isExtraSet and addon.GetSetInfo(targetSetID) or C_TransmogSets.GetSetInfo(targetSetID);
+						text = format(TRANSMOG_SETS_FAVORITE_WITH_DESCRIPTION, (setInfo and (setInfo.description or setInfo.name)) or "");
 					else
 						text = TRANSMOG_ITEM_SET_FAVORITE;
 					end
 				end
 
 				rootDescription:CreateButton(text, function()
-					--addon.C_TransmogSets.SetIsFavorite(targetSetID, not favorite);
-					--addon.C_TransmogSets.SetIsFavorite(baseSetID, not favorite);
-
-
-					addon.Init:InitDB()
-					--RefreshLists()
+					if isExtraSet then
+						--When already favorited via a variant (not the base set itself),
+						--targetSetID is that variant's ID -- writing to baseSetID here instead
+						--cleared the wrong entry, leaving the actual favorited variant untouched.
+						addon.favoritesDB.profile.extraset[targetSetID] = not favorite;
+						--Extra sets are addon-local data with no Blizzard event to signal the
+						--change, unlike the real Blizzard sets branch below -- this one still
+						--needs a manual refresh.
+						SetsDataProvider:RefreshFavorites();
+						BetterWardrobeCollectionFrame.SetsCollectionFrame:Refresh();
+					else
+						--addon.C_TransmogSets.SetIsFavorite doesn't exist (that wrapper only defines
+						--GetSetInfo/GetBaseSetID/etc, never SetIsFavorite), so these always errored.
+						--The local C_TransmogSets above falls through to the real Blizzard API for
+						--anything not explicitly overridden, which is exactly this case.
+						--
+						--Confirmed by an earlier diagnostic print: calling SetIsFavorite on BOTH
+						--targetSetID and baseSetID is what actually makes GetIsFavorite immediately
+						--reflect the change here -- matching Blizzard's own single-call version (which
+						--this was tried against) broke it, so keep both calls.
+						C_TransmogSets.SetIsFavorite(targetSetID, not favorite);
+						C_TransmogSets.SetIsFavorite(baseSetID, not favorite);
+						addon.Init:InitDB();
+						BetterWardrobeCollectionFrame.SetsCollectionFrame:Refresh();
+					end
 				end);
 			end);
 		end
@@ -1265,11 +1303,16 @@ function WardrobeSetsCollectionContainerMixin:OnLoad()
 end
 
 function WardrobeSetsCollectionContainerMixin:OnShow()
-	self:RegisterEvent("TRANSMOG_SETS_UPDATE_FAVORITE");
+	--Was registered, but our own Set Favorite button (Wardrobe_Sets.lua) already runs its own
+	--explicit InitDB()/Refresh() sequence immediately on click. This event fires from the same
+	--SetIsFavorite call and triggered a second, independent UpdateDataProvider() around the same
+	--time as our own -- two rebuilds racing the row button's 50ms-deferred Init() call is what was
+	--producing duplicate-looking rows and mismatched selection. Only one rebuild path should run.
+	--self:RegisterEvent("TRANSMOG_SETS_UPDATE_FAVORITE");
 end
 
 function WardrobeSetsCollectionContainerMixin:OnHide()
-	self:UnregisterEvent("TRANSMOG_SETS_UPDATE_FAVORITE");
+	--self:UnregisterEvent("TRANSMOG_SETS_UPDATE_FAVORITE");
 end
 
 function WardrobeSetsCollectionContainerMixin:OnEvent(event, ...)
@@ -1420,6 +1463,7 @@ function WardrobeSetsDetailsItemMixin:OnShow()
 	end
 
 	local sourceInfo = C_TransmogCollection.GetSourceInfo(self.sourceID);
+	if not sourceInfo then return end
 	self.visualID = sourceInfo.visualID;
 
 	self.Favorite.Icon:SetShown(C_TransmogCollection.GetIsAppearanceFavorite(self.visualID));
@@ -1431,7 +1475,9 @@ end
 
 
 function WardrobeSetsDetailsItemMixin:OnEnter()
+	if not self.invType then return end
 	self.transmogSlot = C_Transmog.GetSlotForInventoryType(self.invType);
+	if not self.transmogSlot then return end
 
 	self:GetParent():GetParent():SetAppearanceTooltip(self)
 
@@ -1477,7 +1523,9 @@ end
 function WardrobeSetsDetailsItemMixin:OnMouseDown(button)
 	if ( IsModifiedClick("CHATLINK") ) then
 		local sourceInfo = C_TransmogCollection.GetSourceInfo(self.sourceID);
+		if not sourceInfo or not sourceInfo.invType then return end
 		local slot = C_Transmog.GetSlotForInventoryType(sourceInfo.invType);
+		if not slot then return end
 		local sources = C_TransmogSets.GetSourcesForSlot(self:GetParent():GetParent():GetSelectedSetID(), slot);
 		if ( #sources == 0 ) then
 			-- can happen if a slot only has HiddenUntilCollected sources

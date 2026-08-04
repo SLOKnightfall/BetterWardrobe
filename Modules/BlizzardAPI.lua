@@ -234,7 +234,7 @@ end
 addon.GetItemCategory = GetItemCategory
 
 local function GetTransmogLocation(itemLinkOrID)
-	return TransmogUtil.GetTransmogLocation(GetItemSlot(itemLinkOrID), Enum.TransmogType.Appearance, Enum.TransmogModification.Main)
+	return TransmogUtil.GetTransmogLocation(GetItemSlot(itemLinkOrID), Enum.TransmogType.Appearance, false)
 end
 addon.GetTransmogLocation = GetTransmogLocation
 
@@ -414,86 +414,8 @@ if addon.Profile.ShowHidden then return setList end
 	return newSet
 end
 
-local function CheckMissingLocation(setInfo)
-	local filtered = false
-	local missingSelection
-	if 	BetterWardrobeCollectionFrame:CheckTab(2) then
-	
-	local invType = {}
-	missingSelection = addon.Filters.Base.missingSelection
-	local sources = addon.GetSetSources(setInfo.setID)
-	if not sources then return end
-		for sourceID in pairs(sources) do
-			local sourceInfo = C_TransmogCollection.GetSourceInfo(sourceID)
-			--local sources = sourceInfo and C_TransmogCollection.GetAppearanceSources(sourceInfo.visualID)
-			local sources = sourceInfo and C_TransmogCollection.GetAppearanceSources(sourceInfo.visualID, GetItemCategory(sourceInfo.visualID), GetTransmogLocation(sourceInfo.itemID))
-
-			if sources then
-				if #sources > 1 then
-				CollectionWardrobeUtil.SortSources(sources, sources[1].visualID, sourceID)
-
-				end
-				if missingSelection[sourceInfo.invType] and not sources[1].isCollected then
-
-					return true
-				elseif missingSelection[sourceInfo.invType] then
-					filtered = true
-				end
-			end
-		end
-
-		for type, value in pairs(missingSelection) do
-			if value and invType[type] then
-				filtered = true
-			end
-		end
-	else
-		local missingSelection = addon.Filters.Extra.missingSelection
-
-		for type, value in pairs(missingSelection) do
-			if value then
-				filtered = true
-				break
-			end
-		end
-		--no need to filter if nothing is selected
-		if not filtered then return true end
-		
-		local invType = {}
-		if not setInfo.itemData then
-			local sources = addon.GetSetSources(setInfo.setID)
-			for sourceID in pairs(sources) do
-				local sourceInfo = C_TransmogCollection.GetSourceInfo(sourceID)
-
-				local isCollected = Sets.isMogKnown(sourceID)
-				if missingSelection[sourceInfo.invType] and not isCollected then		
-					return true
-				elseif missingSelection[sourceInfo.invType] then
-					filtered = true
-				end
-			end
-
-		else
-			local setSources = addon.GetSetsources(setInfo.setID)
-			for sourceID, isCollected in pairs(setSources) do
-				local sourceInfo = C_TransmogCollection.GetSourceInfo(sourceID)
-				if missingSelection[sourceInfo.invType] and not isCollected then
-					return true
-				elseif missingSelection[sourceInfo.invType] then
-					filtered = true
-				end
-			end
-		end
-
-		for type, value in pairs(missingSelection) do
-			if value and invType[type] then
-				filtered = true
-			end
-		end
-	end
-
-	return not filtered
-end
+-- Removed the unused missing-slot filter prototype. Its only call site had
+-- been commented out and the prototype referenced obsolete/undefined APIs.
 
 
 local function OpposingFaction(faction)
@@ -503,6 +425,74 @@ local function OpposingFaction(faction)
 	elseif faction == "Alliance" then
 		return "Horde", "Orgrimmar", 2 -- "Zandalar",
 	end
+end
+
+local SOURCE_TYPE_CATEGORY = {
+	[1] = "Boss Drop", [2] = "Quest", [3] = "Vendor",
+	[4] = "World Drop", [5] = "Achievement", [6] = "Profession",
+}
+
+local function ContainsAny(text, values)
+	text = string.lower(text or "")
+	for _, value in ipairs(values) do
+		if string.find(text, value, 1, true) then return true end
+	end
+	return false
+end
+
+-- Curated flags take precedence because these acquisition channels are not
+-- distinct values in Enum.TransmogSource. Ordinary categories come directly
+-- from each source's Transmog API record.
+function addon.GetSetSourceCategories(data)
+	local categories = {}
+	if not data then
+		categories["Other"] = true
+		return categories
+	end
+	if data._bwSourceCategories then return data._bwSourceCategories end
+	local text = table.concat({tostring(data.name or ""), tostring(data.label or ""), tostring(data.description or ""), tostring(data.note or "")}, " ")
+	local explicit = data.sourceCategory
+	if not explicit then
+		if data.tp then explicit = "Trading Post"
+		elseif data.shop then explicit = "Blizzard Shop"
+		elseif data.isPvP or data.pvp then explicit = "PvP"
+		elseif data.raceID or data.heritage or ContainsAny(text, {"heritage armor", "heritage set", "'s heritage"}) then explicit = "Racial Heritage"
+		elseif ContainsAny(text, {"promotion", "recruit-a-friend", "collector's edition", "anniversary reward"}) then explicit = "Promotion"
+		elseif ContainsAny(text, {"trading post", "traveler's log"}) then explicit = "Trading Post"
+		elseif ContainsAny(text, {"blizzard shop", "in-game shop", "battle.net shop"}) then explicit = "Blizzard Shop" end
+	end
+	if explicit then
+		categories[explicit] = true
+		data._bwSourceCategories = categories
+		return categories
+	end
+
+	local sources = data.sources
+	if not sources and data.setID then
+		if data.setType == "Blizzard" then sources = addon.GetSetSources(data.setID)
+		elseif addon.C_TransmogSets and addon.C_TransmogSets.GetSetSources then sources = addon.C_TransmogSets.GetSetSources(data.setID) end
+	end
+	local pending = false
+	for sourceID in pairs(sources or {}) do
+		local sourceInfo = C_TransmogCollection.GetSourceInfo(sourceID)
+		if not sourceInfo then pending = true end
+		local category = sourceInfo and SOURCE_TYPE_CATEGORY[sourceInfo.sourceType]
+		if category then categories[category] = true end
+	end
+	if not next(categories) then categories["Other"] = true end
+	if not pending then data._bwSourceCategories = categories end
+	return categories
+end
+
+local function SourceFilterPasses(data, selection)
+	local enabled = {}
+	for index, name in ipairs(addon.TransmogSourceFilters or {}) do
+		if selection[index] then enabled[name] = true end
+	end
+	for category in pairs(addon.GetSetSourceCategories(data)) do
+		if enabled[category] then return true end
+	end
+	return false
 end
 
 --NOTE: PvP detection used to re-check status client-side by matching
@@ -528,9 +518,10 @@ function addon:FilterSets(setList, setType)
 	local filterPVE = C_TransmogSets.GetBaseSetsFilter(LE_TRANSMOG_SET_FILTER_PVE)
 	local filterPVP = C_TransmogSets.GetBaseSetsFilter(LE_TRANSMOG_SET_FILTER_PVP)
 
-	local missingSelection = addon.Filters.Base.missingSelection
-	local filterSelection = addon.Filters.Base.filterSelection
-	local xpacSelection = addon.Filters.Base.xpacSelection
+	local filterBank = addon.Filters[BetterWardrobeCollectionFrame:CheckTab(3) and "Extra" or "Base"]
+	local missingSelection = filterBank.missingSelection
+	local filterSelection = filterBank.filterSelection
+	local xpacSelection = filterBank.xpacSelection
 	local isHidden = false
 
 	if not filterList then
@@ -538,18 +529,18 @@ function addon:FilterSets(setList, setType)
 	end
 
 	for i, data in ipairs(filterList) do
-		local setData = BetterWardrobeSetsDataProviderMixin:GetSetSourceData(data.setID)
-		local isPvP = data.isPvP;
-		local count , total = setData.numCollected, setData.numTotal
-		local expansion = data.expansionID
-		local sourcefilter = (BetterWardrobeCollectionFrame:CheckTab(3) and filterSelection[data.filter])
-		local unavailableFilter = (not unavailable or (addon.Profile.HideUnavalableSets and unavailable))
+		local setData = addon.SetsDataProvider:GetSetSourceData(data.setID)
+		local categories = addon.GetSetSourceCategories(data)
+		local isPvP = data.isPvP or data.pvp or categories["PvP"] or false
+		local count = setData and setData.numCollected or 0
+		local total = setData and setData.numTotal or 0
+		local expansion = tonumber(data.expansionID) or 1
+		local sourcefilter = SourceFilterPasses(data, filterSelection)
+		local unobtainable = data.neverObtainable or data.noLongerObtainable
+		local unavailableFilter = addon.Profile.ShowUnobtainable or not unobtainable
 		local tab = (BetterWardrobeCollectionFrame:CheckTab(2) and data.tab == 2) or (BetterWardrobeCollectionFrame:CheckTab(3) and data.tab == 3)
-		if BetterWardrobeCollectionFrame:CheckTab(2) then
-			--expansion = expansion + 1
-			sourcefilter = true
-			unavailableFilter = true
-		end
+		local expansionFilter = xpacSelection[expansion]
+		if expansionFilter == nil then expansionFilter = xpacSelection[expansion + 1] end
 
 		local searchSet = addon:SearchSets(data)
 
@@ -571,8 +562,9 @@ function addon:FilterSets(setList, setType)
 		if ((filterCollected and collected) or (filterUncollected and not collected)) and
 			((filterPVE and not isPvP) or (filterPVP and isPvP)) and
 			--CheckMissingLocation(data) and
-			xpacSelection[expansion] and
+			expansionFilter and
 			sourcefilter and
+			unavailableFilter and
 			searchSet and
 			not isHidden and
 			tab then

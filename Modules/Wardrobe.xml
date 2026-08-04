@@ -197,7 +197,7 @@
 					<KeyValue key="minWidth" value="57" type="number"/>
 				</KeyValues>
 				<Anchors>
-					<Anchor point="TOPLEFT" x="58" y="-28"/>
+					<Anchor point="TOPLEFT" x="8" y="-28"/>
 				</Anchors>
 				<Scripts>
 					<OnClick>
@@ -277,7 +277,7 @@
 			</Button>
 			<Button name="$parentTab4" parentKey="SavedSetsTab" inherits="BW_PanelTopTabButtonTemplate" text="Custom Sets" id="4" frameLevel="75" >
 				<KeyValues>
-					<KeyValue key="minWidth" value="57" type="number"/>
+					<KeyValue key="minWidth" value="75" type="number"/>
 				</KeyValues>
 				<Anchors>
 					<Anchor point="LEFT" relativeKey="$parent.ExtraSetsTab"  relativePoint="RIGHT" x="0" y="0"/>
@@ -285,8 +285,8 @@
 				<Frames>
 					<Frame parentKey="FlashFrame" hidden="true">
 						<Anchors>
-							<Anchor point="TOPLEFT" relativeKey="$parent.ExtraSetsTab" relativePoint="TOPLEFT" x="0" y="-10"/>
-							<Anchor point="BOTTOMRIGHT" relativeKey="$parent.ExtraSetsTab" relativePoint="BOTTOMRIGHT" x="0" y="-5"/>
+							<Anchor point="TOPLEFT" relativeKey="$parent.SavedSetsTab" relativePoint="TOPLEFT" x="0" y="-10"/>
+							<Anchor point="BOTTOMRIGHT" relativeKey="$parent.SavedSetsTab" relativePoint="BOTTOMRIGHT" x="0" y="-5"/>
 						</Anchors>
 						<Layers>
 							<Layer level="ARTWORK">
@@ -310,8 +310,43 @@
 					</OnClick>
 				</Scripts>
 			</Button>
+			<Button name="$parentTab5" parentKey="WeaponSetsTab" inherits="BW_PanelTopTabButtonTemplate" text="Weapon Sets" id="5" frameLevel="75" >
+				<KeyValues>
+					<KeyValue key="minWidth" value="100" type="number"/>
+				</KeyValues>
+				<Anchors>
+					<Anchor point="LEFT" relativeKey="$parent.SavedSetsTab" relativePoint="RIGHT" x="0" y="0"/>
+				</Anchors>
+				<Frames>
+					<Frame parentKey="FlashFrame" hidden="true">
+						<Anchors>
+							<Anchor point="TOPLEFT" relativeKey="$parent.WeaponSetsTab" relativePoint="TOPLEFT" x="0" y="-10"/>
+							<Anchor point="BOTTOMRIGHT" relativeKey="$parent.WeaponSetsTab" relativePoint="BOTTOMRIGHT" x="0" y="-5"/>
+						</Anchors>
+						<Layers>
+							<Layer level="ARTWORK">
+								<Texture file="Interface\PaperDollInfoFrame\UI-Character-Tab-Highlight-yellow" setAllPoints="true" alphaMode="ADD"/>
+							</Layer>
+						</Layers>
+						<Scripts>
+							<OnUpdate>
+								if self:IsMouseOver() then
+									self:SetAlpha(0);
+								else
+									self:SetAlpha(abs(mod(GetTime(), 2) - 1));
+								end
+							</OnUpdate>
+						</Scripts>
+					</Frame>
+				</Frames>
+				<Scripts>
+					<OnClick>
+						BetterWardrobeCollectionFrame:ClickTab(self);
+					</OnClick>
+				</Scripts>
+			</Button>
 			<EditBox name="$parentSearchBox" parentKey="SearchBox" mixin="BetterWardrobeCollectionFrameSearchBoxMixin" inherits="SearchBoxTemplate" letters="40">
-				<Size x="115" y="20"/>
+				<Size x="130" y="20"/>
 				<Anchors>
 					<Anchor point="TOPRIGHT" x="-107" y="-35"/>
 				</Anchors>
@@ -469,14 +504,18 @@
 				</Frames>
 			</EditBox>
 			<StatusBar parentKey="progressBar" inherits="BW_CollectionsProgressBarTemplate">
-				<Size x="110" y="13"/>
+				<Size y="13"/>
 				<Anchors>
-					<Anchor point="TOPLEFT" relativeKey="$parent.SavedSetsTab" relativePoint="TOPRIGHT" x="5" y="-11"/>
+					<Anchor point="TOPLEFT" relativeKey="$parent.WeaponSetsTab" relativePoint="TOPRIGHT" x="5" y="-11"/>
+					<Anchor point="TOPRIGHT" relativeKey="$parent" relativePoint="TOPRIGHT" x="-245" y="-39"/>
 				</Anchors>
 				<Scripts>
 					<OnLoad>
-						self.border:SetWidth(120)
+						self.border:SetWidth(math.max(self:GetWidth() + 10, 10))
 					</OnLoad>
+					<OnSizeChanged>
+						self.border:SetWidth(math.max(w + 10, 10))
+					</OnSizeChanged>
 				</Scripts>
 			</StatusBar>
 			<Button name="BetterWardrobeVisualToggle" parentKey="VisualToggle" mixin="BetterWardrobeVisualToggleMixin" >
@@ -1029,6 +1068,7 @@
 		</Frames>
 		<Scripts>
 			<OnLoad method="OnLoad"/>
+			<OnSizeChanged method="OnSizeChanged"/>
 			<OnEvent method="OnEvent"/>
 			<OnShow method="OnShow"/>
 			<OnHide method="OnHide"/>

@@ -4,7 +4,7 @@ addon = LibStub("AceAddon-3.0"):GetAddon(addonName)
 local L = LibStub("AceLocale-3.0"):GetLocale(addonName)
 
 
-local MAX_DEFAULT_OUTFITS = 25 --C_TransmogCollection.GetNumMaxOutfits()
+local MAX_DEFAULT_OUTFITS = C_TransmogCollection.GetNumMaxCustomSets()
 local SET_OFFSET = addon.Globals.SET_OFFSET
 --Coresponds to wardrobeOutfits
 
@@ -345,12 +345,10 @@ function BetterWardrobeOutfitDropdownMixin:GetLastOutfitID()
 end
 
 local function IsSourceArtifact(sourceID)
-	local link = select(6, C_TransmogCollection.GetAppearanceSourceInfo(sourceID));
-	if not link then
-		return false;
-	end
-	local _, _, quality = GetItemInfo(link);
-	return quality == Enum.ItemQuality.Artifact;
+	--GetAppearanceSourceInfo takes a visualID (not sourceID) and returns a single info table now, not
+	--positional values; GetSourceInfo already carries quality for a sourceID directly.
+	local sourceInfo = C_TransmogCollection.GetSourceInfo(sourceID);
+	return sourceInfo and sourceInfo.quality == Enum.ItemQuality.Artifact;
 end
 
 local function isHiddenAppearance(appearanceID, set_appearanceID, slotID)
@@ -462,7 +460,8 @@ function BetterWardrobeOutfitManager:NewOutfit(name)
 	for slotID, itemTransmogInfo in ipairs(self.itemTransmogInfoList) do
 		local appearanceID = itemTransmogInfo.appearanceID;
 		if appearanceID ~= Constants.Transmog.NoTransmogID then
-			icon = select(4, C_TransmogCollection.GetAppearanceSourceInfo(appearanceID));
+			local sourceInfo = C_TransmogCollection.GetAppearanceSourceInfo(appearanceID);
+			icon = sourceInfo and sourceInfo.icon;
 			if icon then
 				break;
 			end
@@ -645,7 +644,7 @@ function BetterWardrobeOutfitManager:EvaluateAppearances()
 				end
 			end
 			if isValidAppearance then
-				local transmogLocation = TransmogUtil.CreateTransmogLocation(slotID, Enum.TransmogType.Appearance, Enum.TransmogModification.Main);
+				local transmogLocation = TransmogUtil.CreateTransmogLocation(slotID, Enum.TransmogType.Appearance, false);
 				local category = C_TransmogCollection.GetCategoryForItem(appearanceID);
 				local preferredAppearanceID, isInvalidAppearance = self:EvaluateAppearance(appearanceID, category, transmogLocation);
 				if isInvalidAppearance then
@@ -655,7 +654,7 @@ function BetterWardrobeOutfitManager:EvaluateAppearances()
 				end
 				-- secondary check
 				if itemTransmogInfo.secondaryAppearanceID ~= Constants.Transmog.NoTransmogID and C_Transmog.CanHaveSecondaryAppearanceForSlotID(slotID) then
-					local secondaryTransmogLocation = TransmogUtil.CreateTransmogLocation(slotID, Enum.TransmogType.Appearance, Enum.TransmogModification.Secondary);
+					local secondaryTransmogLocation = TransmogUtil.CreateTransmogLocation(slotID, Enum.TransmogType.Appearance, true);
 					local secondaryCategory = C_TransmogCollection.GetCategoryForItem(itemTransmogInfo.secondaryAppearanceID);
 					local secondaryPreferredAppearanceID, secondaryIsInvalidAppearance = self:EvaluateAppearance(itemTransmogInfo.secondaryAppearanceID, secondaryCategory, secondaryTransmogLocation);
 					if secondaryIsInvalidAppearance then
@@ -928,7 +927,7 @@ StaticPopupDialogs["BW_TRANSMOG_CUSTOM_SET_NAME"] = {
 
 		if data then
 			WardrobeCustomSetManager:SetItemTransmogInfoList(data.itemTransmogInfoList);
-			dialog:GetEditBox():SetText(data.name.name);
+			dialog:GetEditBox():SetText(data.name);
 		end
 	end,
 	OnHide = function(dialog, data)

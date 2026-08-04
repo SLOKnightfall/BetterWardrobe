@@ -1400,9 +1400,10 @@ function addon:CheckForExtraItems(setID, data)
 		--print(C_TransmogCollection.GetItemInfo(setID))
 		for _, itemID in ipairs(SetAdditions[setID]) do
 			local itemAppearanceID, itemModifiedAppearanceID = C_TransmogCollection.GetItemInfo(itemID)
-			local categoryID, visualID, canEnchant, icon, isCollected, itemLink, transmogLink, unknown1, itemSubTypeIndex = C_TransmogCollection.GetAppearanceSourceInfo(itemModifiedAppearanceID)
-		   -- print(isCollected)
-			if itemAppearanceID then 
+			--GetAppearanceSourceInfo returns a single info table now, not positional values.
+			local sourceInfo = C_TransmogCollection.GetAppearanceSourceInfo(itemModifiedAppearanceID)
+			local isCollected = sourceInfo and sourceInfo.isCollected
+			if itemAppearanceID then
 				tinsert(data,{["collected"] = isCollected, ["appearanceID"] = itemModifiedAppearanceID})
 			end
 		end

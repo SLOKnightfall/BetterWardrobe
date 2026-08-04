@@ -883,14 +883,26 @@ function addon:SearchSets(data)
 	if query == "" then return true end
 	query = string.lower(query)
 
-	local name = data.name and string.find(string.lower(data.name), query, 1, true) 
-	local label = data.label and string.find(string.lower(data.label), query, 1, true)
-	if name then
-		return true
+	local function Matches(value)
+		return value ~= nil and string.find(string.lower(tostring(value)), query, 1, true) ~= nil
 	end
-
-	if label then
-		return true
+	local fields = {
+		data.name, data.label, data.description, data.note, data.oldnote,
+		data.difficulty, data.className, data.sourceCategory,
+	}
+	for _, value in ipairs(fields) do
+		if Matches(value) then return true end
+	end
+	local expansionID = tonumber(data.expansionID)
+	if expansionID then
+		if Matches(_G["EXPANSION_NAME" .. expansionID]) or Matches(_G["EXPANSION_NAME" .. math.max(0, expansionID - 1)]) then
+			return true
+		end
+	end
+	if addon.GetSetSourceCategories then
+		for category in pairs(addon.GetSetSourceCategories(data)) do
+			if Matches(category) then return true end
+		end
 	end
 
 	return false
@@ -1702,6 +1714,11 @@ function TransmogSetModelMixin:ToggleFavorite(setFavorite, isGroupFavorite)
 		end
 
 		C_TransmogSets.SetIsFavorite(setID, setFavorite);
+		--Unlike the extraset branch below, SetIsFavorite doesn't drive our custom BW_SetsFrame2
+		--list on its own -- the favorite icon/sort order come from a snapshot taken at the last
+		--RefreshCollectionEntries, so without this the toggle silently doesn't show until the
+		--tab is reopened.
+		TransmogFrame.WardrobeCollection.TabContent.BW_SetsFrame2:RefreshCollectionEntries()
 	else
 		addon.favoritesDB.profile.extraset[setID] = not addon.favoritesDB.profile.extraset[setID]
 		TransmogFrame.WardrobeCollection.TabContent.BW_ExtraSetsFrame:RefreshCollectionEntries()

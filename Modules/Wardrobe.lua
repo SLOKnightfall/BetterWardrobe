@@ -110,7 +110,23 @@ local WARDROBE_TAB_ITEMS = 1;
 local WARDROBE_TAB_SETS = 2;
 local WARDROBE_TAB_EXTRASETS = 3;
 local WARDROBE_TAB_SAVED_SETS = 4;
-local WARDROBE_TABS_MAX_WIDTH = 185;
+local WARDROBE_TAB_WEAPON_SETS = 5;
+local WARDROBE_HEADER_LEFT_PADDING = 8;
+local WARDROBE_HEADER_FILTER_RIGHT_RESERVE = 107;
+local WARDROBE_HEADER_SEARCH_MIN_WIDTH = 130;
+local WARDROBE_HEADER_SEARCH_MAX_WIDTH = 160;
+local WARDROBE_HEADER_SEARCH_WIDTH_SHARE = 0.18;
+local WARDROBE_HEADER_SEARCH_GAP = 8;
+local WARDROBE_PROGRESS_MIN_WIDTH = 55;
+local WARDROBE_HEADER_GAP = 10;
+local WARDROBE_TAB_WIDTH_SHARE = 0.79;
+local WARDROBE_TAB_TEXT_PADDING = 34;
+local WARDROBE_TAB_MIN_WIDTHS = {60, 60, 60, 90, 110};
+
+local function GetWardrobeHeaderSearchWidth(frameWidth)
+	local proportionalWidth = math.floor((frameWidth or 0) * WARDROBE_HEADER_SEARCH_WIDTH_SHARE + 0.5)
+	return math.max(WARDROBE_HEADER_SEARCH_MIN_WIDTH, math.min(proportionalWidth, WARDROBE_HEADER_SEARCH_MAX_WIDTH))
+end
 
 local WARDROBE_MODEL_SETUP = {
 	["HEADSLOT"] 		= { useTransmogSkin = false, useTransmogChoices = false, obeyHideInTransmogFlag = false, slots = { CHESTSLOT = true,  HANDSSLOT = false, LEGSSLOT = false, FEETSLOT = false, HEADSLOT = false } },
@@ -134,7 +150,7 @@ local function GetUseTransmogSkin(slot)
 
 	-- this exludes head slot
 	if modelSetupTable.useTransmogChoices then
-		local transmogLocation = TransmogUtil.GetTransmogLocation(slot, Enum.TransmogType.Appearance, Enum.TransmogModification.Main);
+		local transmogLocation = TransmogUtil.GetTransmogLocation(slot, Enum.TransmogType.Appearance, false);
 		if transmogLocation then
 			if not C_PlayerInfo.HasVisibleInvSlot(transmogLocation.slotID) then
 				return true;
@@ -163,13 +179,75 @@ function WardrobeCollectionFrameMixin:CheckTab(tab)
 	end
 end
 
+function WardrobeCollectionFrameMixin:UpdateHeaderLayout(frameWidth)
+	if self.updatingHeaderLayout or not self.ItemsTab or not self.SetsTab or not self.ExtraSetsTab or not self.SavedSetsTab or not self.WeaponSetsTab or not self.SearchBox or not self.progressBar then
+		return
+	end
+
+	frameWidth = frameWidth or self:GetWidth()
+	if not frameWidth or frameWidth <= 0 then return end
+
+	self.updatingHeaderLayout = true
+	local tabs = {self.ItemsTab, self.SetsTab, self.ExtraSetsTab, self.SavedSetsTab, self.WeaponSetsTab}
+	local searchWidth = GetWardrobeHeaderSearchWidth(frameWidth)
+	local rightReserve = WARDROBE_HEADER_FILTER_RIGHT_RESERVE + searchWidth + WARDROBE_HEADER_SEARCH_GAP
+	local availableWidth = math.max(0, frameWidth - WARDROBE_HEADER_LEFT_PADDING - rightReserve)
+	self.headerSearchWidth = searchWidth
+	if not self.selectedCollectionTab or self.selectedCollectionTab == WARDROBE_TAB_ITEMS then
+		self.SearchBox:SetWidth(searchWidth)
+	end
+	self.progressBar:ClearAllPoints()
+	self.progressBar:SetPoint("TOPLEFT", self.WeaponSetsTab, "TOPRIGHT", 5, -11)
+	self.progressBar:SetPoint("TOPRIGHT", self, "TOPRIGHT", -rightReserve, -39)
+	local minimumTabsWidth = 0
+	for _, minimumWidth in ipairs(WARDROBE_TAB_MIN_WIDTHS) do
+		minimumTabsWidth = minimumTabsWidth + minimumWidth
+	end
+
+	local maximumTabsWidth = math.max(minimumTabsWidth, availableWidth - WARDROBE_PROGRESS_MIN_WIDTH - WARDROBE_HEADER_GAP)
+	local targetTabsWidth = math.floor(availableWidth * WARDROBE_TAB_WIDTH_SHARE)
+	targetTabsWidth = math.max(minimumTabsWidth, math.min(targetTabsWidth, maximumTabsWidth))
+
+	local naturalWidths = {}
+	local naturalTotal = 0
+	for index, tab in ipairs(tabs) do
+		local fontString = tab.Text or tab:GetFontString()
+		local textWidth = fontString and fontString:GetStringWidth() or 0
+		local naturalWidth = math.max(WARDROBE_TAB_MIN_WIDTHS[index], math.ceil(textWidth + WARDROBE_TAB_TEXT_PADDING))
+		naturalWidths[index] = naturalWidth
+		naturalTotal = naturalTotal + naturalWidth
+	end
+
+	if naturalTotal <= targetTabsWidth then
+		local extraPerTab = (targetTabsWidth - naturalTotal) / #tabs
+		for index, tab in ipairs(tabs) do
+			tab:SetWidth(math.floor(naturalWidths[index] + extraPerTab + 0.5))
+		end
+	else
+		local reducibleWidth = naturalTotal - minimumTabsWidth
+		local permittedFlexibleWidth = math.max(0, targetTabsWidth - minimumTabsWidth)
+		local scale = reducibleWidth > 0 and math.min(1, permittedFlexibleWidth / reducibleWidth) or 0
+		for index, tab in ipairs(tabs) do
+			local flexibleWidth = naturalWidths[index] - WARDROBE_TAB_MIN_WIDTHS[index]
+			tab:SetWidth(math.floor(WARDROBE_TAB_MIN_WIDTHS[index] + flexibleWidth * scale + 0.5))
+		end
+	end
+
+	self.updatingHeaderLayout = nil
+end
+
+function WardrobeCollectionFrameMixin:OnSizeChanged(width)
+	self:UpdateHeaderLayout(width)
+end
+
 function WardrobeCollectionFrameMixin:ClickTab(tab)
 	self:SetTab(tab:GetID());
-	PanelTemplates_ResizeTabsToFit(WardrobeCollectionFrame, WARDROBE_TABS_MAX_WIDTH);
+	self:UpdateHeaderLayout()
 	PlaySound(SOUNDKIT.IG_MAINMENU_OPTION_CHECKBOX_ON);
 end
 
 function WardrobeCollectionFrameMixin:SetTab(tabID)
+	if addon.HideWeaponSetsFrame then addon.HideWeaponSetsFrame() end
 	PanelTemplates_SetTab(self, tabID);
 	self.selectedCollectionTab = tabID;
 
@@ -202,7 +280,7 @@ function WardrobeCollectionFrameMixin:SetTab(tabID)
 		self.SetsCollectionFrame:Hide();
 		self.SearchBox:ClearAllPoints();
 		self.SearchBox:SetPoint("TOPRIGHT", -107, -35);
-		self.SearchBox:SetWidth(115);
+		self.SearchBox:SetWidth(self.headerSearchWidth or GetWardrobeHeaderSearchWidth(self:GetWidth()));
 		local enableSearchAndFilter = self.ItemsCollectionFrame.transmogLocation and self.ItemsCollectionFrame.transmogLocation:IsAppearance()
 		self.SearchBox:SetEnabled(enableSearchAndFilter);
 		self.FilterButton:Show();
@@ -236,7 +314,18 @@ function WardrobeCollectionFrameMixin:SetTab(tabID)
 		end
 	
 
-	elseif tabID == WARDROBE_TAB_SETS or tabID == WARDROBE_TAB_EXTRASETS or tabID == WARDROBE_TAB_SAVED_SETS  then
+	elseif tabID == WARDROBE_TAB_WEAPON_SETS then
+		self.progressBar:Show()
+		BW_SortDropDown:Hide()
+		if BW_ColectionListFrame then BW_ColectionListFrame:Hide() end
+		self.ItemsCollectionFrame:Hide()
+		self.SetsCollectionFrame:Hide()
+		self.SearchBox:Hide()
+		self.FilterButton:Hide()
+		self.ClassDropdown:Hide()
+		self.SavedOutfitDropDown:Hide()
+		if addon.ShowWeaponSetsFrame then addon.ShowWeaponSetsFrame(self) end
+	elseif tabID == WARDROBE_TAB_SETS or tabID == WARDROBE_TAB_EXTRASETS or tabID == WARDROBE_TAB_SAVED_SETS then
 		--BetterWardrobeVisualToggle:Show()
 		BW_SortDropDown:Hide()
 		if BW_ColectionListFrame then 
@@ -263,34 +352,18 @@ function WardrobeCollectionFrameMixin:SetTab(tabID)
 
 		self.SetsCollectionFrame:SetShown(true);
 
-		local r
-
-		if tabID == WARDROBE_TAB_SAVED_SETS then 
+		if tabID == WARDROBE_TAB_SAVED_SETS then
+			self.progressBar:Hide()
 			BW_SortDropDown:Hide()
-			--BW_SortDropDown:SetPoint("TOPLEFT", BetterWardrobeVisualToggle, "TOPRIGHT", 5, 0)
 			BW_SortDropDown:ClearAllPoints()
 			BW_SortDropDown:SetPoint("TOPRIGHT", self.SearchBox, "TOPRIGHT", 21, 5)
-			--BW_SortDropDown:Show()
 			self.FilterButton:Hide()
 			self.SearchBox:Hide()
 			self.ClassDropdown:Hide()
-			self.SavedOutfitDropDown:Show()
-			----BW_SortSavedDropDown:Show()
-			local savedCount = #addon.GetSavedList()
-			WardrobeCollectionFrame:UpdateProgressBar(savedCount, savedCount)
-
-			--tempSorting = BW_SortDropDown.selectedValue
-			--addon.setdb.profile.sorting = BW_SortDropDown.selectedValue
-
+			self.SavedOutfitDropDown:Hide()
 			sortValue = addon.setdb.profile.sorting
-
-			----BW_SortSavedDropDown:ClearAllPoints()
-			----BW_SortSavedDropDown:SetPoint("TOPLEFT", 10, -67);
-
-
 		else
-			--db.sortDropdown = BW_SortDropDown.selectedValue;
-			--sortValue = db.sortDropdown
+			self.progressBar:Show()
 		end
 	end
 	BW_SortDropDown:Hide()
@@ -299,7 +372,11 @@ end
 
 local FILTER_SOURCES = {"Trash", L["MISC"], L["Classic Set"], L["Quest Set"], L["Dungeon Set"], L["Raid Set"], L["Recolor"],L["Garrison"], L["Island Expedition"], L["Warfronts"], L["Covenants"], L["Trading Post"], L["Holiday"], L["NOTE_119"],L["NOTE_120"]}
 local EXPANSIONS = {EXPANSION_NAME0, EXPANSION_NAME1, EXPANSION_NAME2, EXPANSION_NAME3, EXPANSION_NAME4, EXPANSION_NAME5, EXPANSION_NAME6, EXPANSION_NAME7, EXPANSION_NAME8, EXPANSION_NAME9,EXPANSION_NAME10,EXPANSION_NAME11}
-local FILTER_EXTRA_SOURCES = {"Trash", L["MISC"], L["Classic Set"], L["Quest Set"], L["Dungeon Set"], L["Garrison"], L["Island Expedition"], L["Warfronts"], L["Trading Post"], L["Holiday"]}
+local FILTER_EXTRA_SOURCES = {
+	"Boss Drop", "Quest", "Vendor", "World Drop", "Achievement", "Profession",
+	"Trading Post", "Blizzard Shop", "PvP", "Promotion", "Racial Heritage", "Other",
+}
+addon.TransmogSourceFilters = FILTER_EXTRA_SOURCES
 
 addon.Filters = {
 	["Base"] = {
@@ -345,6 +422,17 @@ local function RefreshLists()
 end
 
 addon.RefreshLists = RefreshLists;
+
+--Points the preview at the first set in whichever list (Sets or Extra Sets, whichever tab is
+--currently active) is showing after a class/armor-type filter change or an IgnoreClassRestrictions
+--toggle, since the previously selected set is often no longer in the newly filtered list at all.
+local function SelectFirstSet()
+	local sets = addon.SetsDataProvider:GetBaseSets();
+	if sets and sets[1] then
+		BetterWardrobeCollectionFrame.SetsCollectionFrame:SelectBaseSetID(sets[1].setID);
+	end
+end
+
 local locationDropDown = addon.Globals.locationDropDown;
 
 function WardrobeCollectionFrameMixin:InitItemsFilterButton()
@@ -408,9 +496,8 @@ function WardrobeCollectionFrameMixin:InitItemsFilterButton()
 			C_TransmogCollection.SetAllFactionsShown(not C_TransmogCollection.GetAllFactionsShown());
 		end);
 
-		rootDescription:CreateCheckbox(TRANSMOG_SHOW_ALL_RACES, C_TransmogCollection.GetAllRacesShown, function()
-			C_TransmogCollection.SetAllRacesShown(not C_TransmogCollection.GetAllRacesShown());
-		end);
+		-- Race is locked to the current character so the item browser cannot show
+		-- appearances the active character can never use.
 
 		local submenu = rootDescription:CreateButton(SOURCES);
 		CreateSourceFilters(submenu);
@@ -423,6 +510,10 @@ function WardrobeCollectionFrameMixin:InitItemsFilterButton()
 end
 
 function WardrobeCollectionFrameMixin:InitBaseSetsFilterButton()
+	local filterBank = addon.Filters[BetterWardrobeCollectionFrame.selectedCollectionTab == 3 and "Extra" or "Base"]
+	local missingSelection = filterBank.missingSelection
+	local filterSelection = filterBank.filterSelection
+	local xpacSelection = filterBank.xpacSelection
 
 	self.FilterButton:SetIsDefaultCallback(function()
 		local numSources = #EXPANSIONS --C_TransmogCollection.GetNumTransmogSources()
@@ -482,6 +573,7 @@ function WardrobeCollectionFrameMixin:InitBaseSetsFilterButton()
 		BetterWardrobeCollectionFrame:SetTab(tab);
 
 		WardrobeCollectionFrame.ClassDropdown:Update()
+		SelectFirstSet();
 	end
 	local function ShowFactionOnly()
 		return addon.Profile.CurrentFactionSets;
@@ -516,7 +608,12 @@ function WardrobeCollectionFrameMixin:InitBaseSetsFilterButton()
 		xpackCheckAll(true)
 		sourceCheckAll(true)
 		missingCheckAll(true)
-		return C_TransmogSets.SetDefaultBaseSetsFilters();
+		local result = C_TransmogSets.SetDefaultBaseSetsFilters();
+		--xpackCheckAll refreshes internally, but that happens before sourceCheckAll/missingCheckAll
+		--apply their own changes below it, so the list only ever reflected the expansion-filter
+		--reset and silently missed the source/missing-location reset that follows.
+		RefreshLists();
+		return result;
 	end);
 
 
@@ -547,8 +644,6 @@ function WardrobeCollectionFrameMixin:InitBaseSetsFilterButton()
 			rootDescription:CreateDivider();
 	end
 
-	if BetterWardrobeCollectionFrame.selectedCollectionTab == 3 then 
-
 		local submenu = rootDescription:CreateButton(SOURCES);
 		submenu:CreateButton(CHECK_ALL, function()
 			sourceCheckAll(true)
@@ -565,15 +660,14 @@ function WardrobeCollectionFrameMixin:InitBaseSetsFilterButton()
 
 		for index = 1,  #FILTER_EXTRA_SOURCES do
 			local filterIndex = index;
-			submenu:CreateCheckbox(FILTER_EXTRA_SOURCES[index], 
-				function() return filterSelection[index] end,
+			submenu:CreateCheckbox(FILTER_EXTRA_SOURCES[filterIndex], 
+				function() return filterSelection[filterIndex] end,
 				function() 
-					filterSelection[index] = not filterSelection[index];
+					filterSelection[filterIndex] = not filterSelection[filterIndex];
 					RefreshLists()
 				end,
-				index);
+				filterIndex);
 		end
-	end
 
 		local submenu = rootDescription:CreateButton(L["Expansion"]);
 		submenu:CreateButton(CHECK_ALL, function()
@@ -591,15 +685,15 @@ function WardrobeCollectionFrameMixin:InitBaseSetsFilterButton()
 		local numSources = #EXPANSIONS
 		for index = 1, numSources do
 			local filterIndex = index;
-			submenu:CreateCheckbox(EXPANSIONS[index],	
+			submenu:CreateCheckbox(EXPANSIONS[filterIndex],	
 				function()
-					return xpacSelection[index]
+					return xpacSelection[filterIndex]
 				end,
 				function()
-					xpacSelection[index] = not xpacSelection[index];
+					xpacSelection[filterIndex] = not xpacSelection[filterIndex];
 					RefreshLists()
 				end,
-			index);
+			filterIndex);
 		end
 
 		local locationDropDown = addon.Globals.locationDropDown;
@@ -633,11 +727,29 @@ function WardrobeCollectionFrameMixin:InitBaseSetsFilterButton()
 		end
 		submenu:CreateDivider();
 	]]--
-		--TODO: Enable Sorting menu
-	 	--submenu = rootDescription:CreateButton("Sorting");
+	 	submenu = rootDescription:CreateButton("Sort");
+		local sortOptions = {
+			{"Default", 1}, {"Appearance", 2}, {"Alphabetical", 3},
+			{"Color", 4}, {"Expansion", 5},
+		}
+		for _, option in ipairs(sortOptions) do
+			local label, sortID = option[1], option[2]
+			submenu:CreateRadio(label,
+				function() return addon.sortDB.sortDropdown == sortID end,
+				function()
+					addon.sortDB.sortDropdown = sortID
+					RefreshLists()
+				end)
+		end
 
 		--rootDescription:CreateDivider();
 	 	submenu = rootDescription:CreateButton("Options");
+		submenu:CreateCheckbox("Show Unobtainable",
+			function() return addon.Profile.ShowUnobtainable end,
+			function()
+				addon.Profile.ShowUnobtainable = not addon.Profile.ShowUnobtainable
+				RefreshLists()
+			end)
 
 		submenu:CreateCheckbox(L["Show Hidden Sets"], 
 			function() 
@@ -682,9 +794,9 @@ end
 
 function WardrobeCollectionFrameMixin:OnLoad()
 
-	PanelTemplates_SetNumTabs(self, 4);
+	PanelTemplates_SetNumTabs(self, 5);
 	PanelTemplates_SetTab(self, WARDROBE_TAB_ITEMS);
-	PanelTemplates_ResizeTabsToFit(self, WARDROBE_TABS_MAX_WIDTH);
+	self:UpdateHeaderLayout()
 	self.selectedCollectionTab = WARDROBE_TAB_ITEMS;
 	self:SetTab(self.selectedCollectionTab);
 
@@ -1276,8 +1388,10 @@ end
 
 function WardrobeItemsCollectionMixin:ChangeModelsSlot(newTransmogLocation, oldTransmogLocation)
 	WardrobeCollectionFrame.updateOnModelChanged = nil;
+	if not newTransmogLocation then return end
 	local oldSlot = oldTransmogLocation and oldTransmogLocation:GetSlotName();
 	local newSlot = newTransmogLocation:GetSlotName();
+	if not newSlot then return end
 
 	local undressSlot, reloadModel;
 	local oldSlotIsArmor = oldTransmogLocation and oldTransmogLocation:GetArmorCategoryID();
@@ -1337,6 +1451,10 @@ end
 
 -- For dracthyr/mechagnome
 function WardrobeItemsCollectionMixin:EvaluateSlotAllowed()
+	if not self.transmogLocation then
+		self.slotAllowed = false
+		return
+	end
 	local isArmor = self.transmogLocation:GetArmorCategoryID();
 		-- Any model will do, using the 1st
 	local model = self.Models[1];
@@ -1380,6 +1498,7 @@ function WardrobeItemsCollectionMixin:GetActiveCategory()
 end
 
 function WardrobeItemsCollectionMixin:IsValidWeaponCategoryForSlot(categoryID)
+	if not self.transmogLocation or not categoryID then return false end
 	local name, isWeapon, canEnchant, canMainHand, canOffHand = C_TransmogCollection.GetCategoryInfo(categoryID);
 	if ( name and isWeapon ) then
 		if ( (self.transmogLocation:IsMainHand() and canMainHand) or (self.transmogLocation:IsOffHand() and canOffHand) ) then
@@ -1390,6 +1509,7 @@ function WardrobeItemsCollectionMixin:IsValidWeaponCategoryForSlot(categoryID)
 end
 
 function WardrobeItemsCollectionMixin:SetActiveSlot(transmogLocation, category, ignorePreviousSlot)
+	if not transmogLocation then return end
 	local previousTransmogLocation;
 	if not ignorePreviousSlot then
 		previousTransmogLocation = self.transmogLocation;
@@ -1641,9 +1761,9 @@ function WardrobeItemsCollectionMixin:GetWeaponInfoForEnchant()
 end
 
 function WardrobeItemsCollectionMixin:CanEnchantSource(sourceID)
-	local _, visualID, canEnchant,_,_,_,_,_, appearanceSubclass  = C_TransmogCollection.GetAppearanceSourceInfo(sourceID);
-	if ( canEnchant ) then
-		self.HiddenModel:SetItemAppearance(visualID, 0, appearanceSubclass);
+	local sourceInfo = C_TransmogCollection.GetAppearanceSourceInfo(sourceID);
+	if ( sourceInfo and sourceInfo.canHaveIllusion ) then
+		self.HiddenModel:SetItemAppearance(sourceInfo.itemAppearanceID, 0, sourceInfo.itemSubclass);
 		return self.HiddenModel:HasAttachmentPoints();
 	end
 	return false;
@@ -2251,7 +2371,7 @@ function WardrobeItemModelMixin:OnMouseUp(button)
 				for i = 1, #Recolors do
 					local visualList = Recolors[i];
 					for j = 1, #visualList do
-						if visualList[j] == visualID then
+						if visualList[j] == self.visualInfo.visualID then
 							BetterWardrobeCollectionFrame.ItemsCollectionFrame.recolors = visualList;
 							BetterWardrobeCollectionFrame.ItemsCollectionFrame:RefreshVisualsList();
 							BetterWardrobeCollectionFrame.ItemsCollectionFrame:FilterVisuals();
@@ -2324,7 +2444,10 @@ function WardrobeItemModelMixin:Reload(reloadSlot)
 			self:SetUseTransmogSkin(useTransmogSkin);
 			self:SetUseTransmogChoices(WARDROBE_MODEL_SETUP[reloadSlot].useTransmogChoices);
 			self:SetObeyHideInTransmogFlag(WARDROBE_MODEL_SETUP[reloadSlot].obeyHideInTransmogFlag);
-			self:SetUnit("player", false, PlayerUtil.ShouldUseNativeFormInModelScene());
+			local _, raceFilename = UnitRace("player")
+			local useNativeForm = PlayerUtil.ShouldUseNativeFormInModelScene()
+			if raceFilename == "Dracthyr" or raceFilename == "Worgen" then useNativeForm = addon.useNativeForm end
+			self:SetUnit("player", false, useNativeForm);
 			self:SetDoBlend(false);
 			for slot, equip in pairs(WARDROBE_MODEL_SETUP[reloadSlot].slots) do
 				if ( equip ) then
@@ -2333,39 +2456,8 @@ function WardrobeItemModelMixin:Reload(reloadSlot)
 			end
 		end
 
-		local _, raceFilename = UnitRace("player");
-		local sex = UnitSex("player") 
-		if (raceFilename == "Dracthyr" or raceFilename == "Worgen") then
-			local inNativeForm = C_UnitAuras.WantsAlteredForm("player");
-			self:SetUseTransmogSkin(false)
-			local modelID, altModelID;
-			if raceFilename == "Worgen" then
-				if sex == 3 then
-					modelID = 307453;
-					altModelID = 1000764;
-				else
-					modelID = 307454;
-					altModelID = 1011653;
-				end
-			elseif raceFilename == "Dracthyr" then
-				if sex == 3 then
-					modelID = 4207724;
-					altModelID = 4220448;
-				else
-					modelID = 4207724;
-					altModelID = 4395382;
-				end
-			end
-
-			if inNativeForm and not addon.useNativeForm then
-				self:SetUnit("player", false, false);
-				self:SetModel(altModelID);
-
-			elseif not inNativeForm and addon.useNativeForm then
-				self:SetUnit("player", false, true);
-				self:SetModel(modelID);
-			end
-		end
+		-- SetUnit preserves Blizzard's correct per-slot camera and updates altered
+		-- forms live; direct SetModel calls broke both behaviors.
 		self:SetKeepModelOnHide(true);
 		self.cameraID = nil;
 		self.needsReload = nil;
@@ -2476,13 +2568,14 @@ function WardrobeCollectionClassDropdownMixin:SetClassFilter(classID)
 		-- Not all classes can use the same weapons so the current category might not be valid
 		local name, isWeapon = C_TransmogCollection.GetCategoryInfo(WardrobeCollectionFrame.ItemsCollectionFrame:GetActiveCategory());
 		if isWeapon then
-			WardrobeCollectionFrame.ItemsCollectionFrame:SetActiveSlot(TransmogUtil.GetTransmogLocation("HEADSLOT", Enum.TransmogType.Appearance, Enum.TransmogModification.Main));
+			WardrobeCollectionFrame.ItemsCollectionFrame:SetActiveSlot(TransmogUtil.GetTransmogLocation("HEADSLOT", Enum.TransmogType.Appearance, false));
 		end
 
 		C_TransmogCollection.SetClassFilter(classID);
 	elseif searchType == Enum.TransmogSearchType.BaseSets then
 		C_TransmogSets.SetTransmogSetsClassFilter(classID);
 		addon.Init:InitDB()
+		SelectFirstSet();
 	end
 
 	self:Refresh();
@@ -2496,8 +2589,9 @@ function WardrobeCollectionClassDropdownMixin:SetArmorTypeFilter(armorType)
 		addon.armorTypeFilter = armorType;
 		addon.Init:InitDB();
 		RefreshLists();
+		SelectFirstSet();
 	end
-	
+
 	self:Refresh();
 end
 

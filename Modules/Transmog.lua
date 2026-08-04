@@ -2208,13 +2208,13 @@ function TransmogWardrobeSetsMixin:InitFilterButton()
 		submenu:CreateButton(CHECK_ALL, function()
 			xpackCheckAll(true)
 			self:RefreshCollectionEntries()
-
+			return MenuResponse.Refresh;
 		end);
 
 		submenu:CreateButton(UNCHECK_ALL, function()
 			xpackCheckAll(false)
 			self:RefreshCollectionEntries()
-
+			return MenuResponse.Refresh;
 		end);
 
 		submenu:CreateDivider();
@@ -2299,8 +2299,12 @@ function TransmogWardrobeSetsMixin:RefreshCollectionEntries()
 	self.setsDataProvider:ClearSets();
 
 	local collectionElements = {};
-	local tab = TransmogFrame.WardrobeCollection:GetTab()
-	if tab == 6 then
+	--Which sets to build depends on which frame this refresh is actually for, not whichever
+	--tab happens to be visually active right now -- those can disagree if a refresh is
+	--triggered on a frame that isn't the currently shown one.
+	local isExtraSetsFrame = (self == TransmogFrame.WardrobeCollection.TabContent.BW_ExtraSetsFrame)
+	local isBaseSetsFrame = (self == TransmogFrame.WardrobeCollection.TabContent.BW_SetsFrame2)
+	if isExtraSetsFrame then
 		local availableSets = addon.fullList -- self.setsDataProvider:GetAvailableSets();
 		for _index, availableSet in pairs(availableSets) do
 			if availableSet.setType ~= "Blizzard" then 
@@ -2330,7 +2334,7 @@ function TransmogWardrobeSetsMixin:RefreshCollectionEntries()
 			end
 		end
 
-	elseif tab == 5 then
+	elseif isBaseSetsFrame then
 		local availableSets = addon.fullList --self.setsDataProvider:GetAvailableSets();
 
 		for _index, availableSet in pairs(availableSets) do
@@ -2365,8 +2369,12 @@ function TransmogWardrobeSetsMixin:RefreshCollectionEntries()
 
 	local compareEntries = function(element1, element2)
 
-		if element1.favorite ~= element2.favorite then
-			return element1.favorite;
+		--Extra sets store favorite as nil-when-unfavorited rather than false; coerce both sides
+		--to real booleans so this never returns nil as a sort comparator result.
+		local favorite1 = element1.favorite and true or false;
+		local favorite2 = element2.favorite and true or false;
+		if favorite1 ~= favorite2 then
+			return favorite1;
 		end
 
 		local collected1 = element1.collected == element1.pieces
@@ -2572,15 +2580,25 @@ function TransmogWardrobeCustomSetsMixin:RefreshNewCustomSetButton()
 end
 
 function TransmogWardrobeCustomSetsMixin:RefreshCollectionEntries()
+	--This list mixes Blizzard custom sets with our own saved "Extra" sets (built below). Extra sets
+	--store their index into addon.OutfitDB.char.outfits as customSetID, not a real Blizzard set ID,
+	--so GetCustomSetInfo would return nil for them (and previously errored comparing nil < string).
+	local function GetEntryName(element)
+		if element.setType == "Blizzard" then
+			local customSetName = C_TransmogCollection.GetCustomSetInfo(element.customSetID);
+			return customSetName;
+		end
+
+		local outfit = addon.OutfitDB.char.outfits[element.customSetID];
+		return outfit and outfit.name;
+	end
+
 	local compareEntries = function(element1, element2)
 		if element1.isCollected ~= element2.isCollected then
 			return element1.isCollected;
 		end
 
-
-		local customSetName1, _customSetIcon1 = C_TransmogCollection.GetCustomSetInfo(element1.customSetID);
-		local customSetName2, _customSetIcon2 = C_TransmogCollection.GetCustomSetInfo(element2.customSetID);
-		return customSetName1 < customSetName2;
+		return (GetEntryName(element1) or "") < (GetEntryName(element2) or "");
 	end
 
 	local collectionElements = {};
@@ -2818,29 +2836,55 @@ function addon:CreateButtons()
 	--Load Queue Button
 	local BW_LoadQueueButton = CreateFrame("Button", "BW_LoadQueueButton", TransmogFrame.CharacterPreview, "BetterWardrobeButtonTemplate")
 	BW_LoadQueueButton.Icon:SetTexture("Interface\\Buttons\\UI-OptionsButton")
-	BW_LoadQueueButton:SetPoint("TOPLEFT", TransmogFrame.CharacterPreview, "TOPLEFT", 20,-5)
+	BW_LoadQueueButton:SetPoint("TOPLEFT", TransmogFrame.CharacterPreview.ToggleOptions.SheatheWeaponToggle, "BOTTOMLEFT", 0, -5)
 	BW_LoadQueueButton.buttonID = "Import"
 	BW_LoadQueueButton:SetScript("OnClick", function(self) BW_TransmogVendorExportButton_OnClick(self) end)
 	--BW_LoadQueueButton:SetScript("OnEnter",  function(self) BW_DressingRoomButtonMixin:OnEnter(self) end)
-	BW_LoadQueueButton:SetSize(20, 20)
+	--OnEnter is inherited from the template's mixin (BW_DressingRoomButtonMixin, defined in Wardrobe.lua),
+	--which shows text via BW_GameTooltip (Tooltips.lua's own tooltip frame), not the standard GameTooltip.
+	BW_LoadQueueButton:SetScript("OnLeave", function() BW_GameTooltip:Hide() end)
+	--OnMouseDown is also inherited from that mixin; for buttonID == "Import" it calls
+	--BW_DressingRoomImportButton_OnClick, a local function that only exists in the unloaded
+	--DressingRoom.lua, so it errors before OnClick above ever runs. Override with a no-op.
+	BW_LoadQueueButton:SetScript("OnMouseDown", function() BW_GameTooltip:Hide() end)
+	--Sized to match the preview's rotate/zoom/reset buttons (ModelSceneControlButtonTemplate, 32x32 with a 16x16 icon).
+	BW_LoadQueueButton:SetSize(32, 32)
+	BW_LoadQueueButton.Icon:SetSize(16, 16)
+	--CharacterPreview's ModelScene is mouse-enabled and setAllPoints across this whole area, so it
+	--eats clicks meant for these buttons unless they sit above it. Blizzard's own ClearAllPendingButton
+	--in the same frame uses frameLevel 100 for the same reason.
+	BW_LoadQueueButton:SetFrameLevel(100)
+	BW_LoadQueueButton:Hide()
 
 	--Randomize Button, Mixin defined in Randomizer.lua
 	local BW_RandomizeButton = CreateFrame("Button", "BW_RandomizeButton", TransmogFrame.CharacterPreview, "BetterWardrobeButtonTemplate")
 	BW_RandomizeButton.Icon:SetTexture("Interface\\Buttons\\UI-GroupLoot-Dice-Up")
-	--Mixin(BW_RandomizeButton, BW_RandomizeButtonMixin)
-	BW_RandomizeButton:SetPoint("TOPLEFT", BW_LoadQueueButton, "TOPRIGHT" , 0, 0)
+	Mixin(BW_RandomizeButton, BW_RandomizeButtonMixin)
+	BW_RandomizeButton:SetPoint("TOP", TransmogFrame.CharacterPreview.ToggleOptions.SheatheWeaponToggle, "BOTTOM", 0, -5)
 	BW_RandomizeButton:SetScript("OnMouseUp", BW_RandomizeButton.OnMouseUp)
 	BW_RandomizeButton:SetScript("OnMouseDown", BW_RandomizeButton.OnMouseDown)
 	BW_RandomizeButton:SetScript("OnEnter", BW_RandomizeButton.OnEnter)
+	BW_RandomizeButton:SetScript("OnLeave", BW_RandomizeButton.OnLeave)
+	--Matches the Sheathe Weapon toggle's own frame size (30x29).
+	BW_RandomizeButton:SetSize(30, 29)
+	BW_RandomizeButton.Icon:SetSize(15, 15)
+	BW_RandomizeButton:SetFrameLevel(100)
 
 	local BW_SlotHideButton = CreateFrame("Button", "BW_SlotHideButton", TransmogFrame.CharacterPreview, "BetterWardrobeButtonTemplate")
 	BW_SlotHideButton.buttonID = "HideSlot"
-	BW_SlotHideButton:SetScript("OnEnter", function(self) BW_DressingRoomButtonMixin:OnEnter() end)
-	
+	--Was calling OnEnter with a colon (BW_DressingRoomButtonMixin:OnEnter()), which passes the mixin
+	--table itself as self instead of this button, so self.buttonID was always nil and no tooltip showed.
+	BW_SlotHideButton:SetScript("OnEnter", function(self) BW_DressingRoomButtonMixin.OnEnter(self) end)
+	BW_SlotHideButton:SetScript("OnLeave", function() BW_GameTooltip:Hide() end)
+
 	BW_SlotHideButton.Icon:SetTexture("Interface\\PvPRankBadges\\PvPRank12")
+	BW_SlotHideButton:SetSize(32, 32)
+	BW_SlotHideButton.Icon:SetSize(16, 16)
 	--Mixin(BW_SlotHideButton, BW_SlotHideButtonMixin)
 	BW_SlotHideButton:SetPoint("TOPLEFT", BW_RandomizeButton, "TOPRIGHT" , 0, 0)
 	BW_SlotHideButton:SetScript("OnClick", function(self) UI:HideSlotMenu_OnClick(self) end)
+	BW_SlotHideButton:SetFrameLevel(100)
+	BW_SlotHideButton:Hide()
 
 	--BW_SlotHideButton:SetScript("OnMouseUp", BW_SlotHideButton.OnMouseUp)
 	--BW_SlotHideButton:SetScript("OnMouseDown", BW_SlotHideButton.OnMouseDown)

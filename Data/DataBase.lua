@@ -146,7 +146,11 @@ local function UseSet(data)
 	local _,_,playerRace = UnitRace('player');
 	local playerFaction, _ = UnitFactionGroup('player')
 	local correctFaction = false
-	local ClassArmorTypeMask = addon.Globals.CLASS_MASK[tonumber(selectedArmorType)]
+	--Ignore Class Restrictions should filter by the addon's own armor-type dropdown
+	--(addon.armorTypeFilter), not by Blizzard's class filter dropdown -- these are two
+	--separate, unsynced pieces of state, and using the latter here meant the sets shown
+	--reflected whatever the class filter last happened to be, not the armor type picked.
+	local ClassArmorTypeMask = addon.Globals.ARMOR_TYPE_MASK[addon.armorTypeFilter] or addon.Globals.CLASS_MASK[tonumber(selectedArmorType)]
 	local correctHeratiage = false
 	local heritageSets = addon.MiscSets.HeritageSets
 
@@ -185,12 +189,25 @@ local function UseSet(data)
 				end
 			end
 		else
-			if not addon.Profile.IgnoreClassRestrictions then 
+			if not addon.Profile.IgnoreClassRestrictions then
 				local classInfo = CLASS_INFO[playerClass]
 				local className = (classMask and GetClassInfo(classMask)) or nil
 				correctClass = data.classMask == classInfo[1] or not data.classMask
 			else
-				correctClass = true
+				--Was unconditionally true, so extra sets ignored the armor-type dropdown
+				--entirely while Blizzard sets (branch above) respected it. Extra sets are
+				--usually unrestricted (nil classMask) -- same fallback as the branch above,
+				--or every unrestricted extra set gets filtered out instead of always shown.
+				if not data.classMask then
+					correctClass = true;
+				else
+					for i = 1, #ClassArmorTypeMask do
+						if data.classMask == ClassArmorTypeMask[i] then
+							correctClass = true;
+							break;
+						end
+					end
+				end
 			end
 		end
 	end
@@ -280,6 +297,15 @@ function BuildBlizzSets()
 				end
 
 				data.isPvP = isPVP(data.setID, data.description)
+				data.tp = addon.MiscSets.TRADINGPOST_SETS[data.setID]
+					or (data.label and string.find(data.label, tradingPostGlobalString, 1, true))
+					or (data.description and string.find(data.description, tradingPostGlobalString, 1, true))
+				data.shop = (data.label and string.find(data.label, inGameShopGlobalString, 1, true))
+					or (data.description and string.find(data.description, inGameShopGlobalString, 1, true))
+				if addon.MiscSets.HeritageSets[data.setID] then
+					data.heritage = true
+					data.raceID = addon.MiscSets.HeritageSets[data.setID]
+				end
 
 			--Combine special cases
 			if addon.Profile.CombineSpecial and data.classMask == 0 and addon.MiscSets.SPECIAL_SETS[data.setID] then
@@ -417,7 +443,32 @@ local function getClassMask(mask)
 	end
 end
 
-local UIID_Counter = {1,1150,2000,3390,4580,6200,8000,10110,11000,12000}
+local UIID_Counter = {1,1150,2000,3390,4580,6200,8000,10110,11000,12000,13000,14000}
+
+local function MaterializeExtendedSources(data)
+	if not data.extendedSources then return end
+	data.itemData = data.itemData or {}
+	local occupiedSlots = {}
+	for slotID in pairs(data.itemData) do occupiedSlots[slotID] = true end
+	local primaryIDs = {}
+	for sourceID in pairs(data.extendedSources) do primaryIDs[#primaryIDs + 1] = sourceID end
+	table.sort(primaryIDs)
+	for _, primaryID in ipairs(primaryIDs) do
+		local candidates = data.extendedAltSources and data.extendedAltSources[primaryID]
+		if not candidates or #candidates == 0 then candidates = {primaryID} end
+		for _, sourceID in ipairs(candidates) do
+			local sourceInfo = C_TransmogCollection.GetSourceInfo(sourceID)
+			local slotID = sourceInfo and sourceInfo.invType and C_Transmog.GetSlotForInventoryType(sourceInfo.invType)
+			if sourceInfo and slotID and not occupiedSlots[slotID] then
+				local itemID = sourceInfo.itemID
+				if not itemID and C_TransmogCollection.GetSourceItemID then itemID = C_TransmogCollection.GetSourceItemID(sourceID) end
+				data.itemData[slotID] = {tostring(itemID or sourceID) .. ":0", sourceID, sourceInfo.visualID}
+				occupiedSlots[slotID] = true
+				break
+			end
+		end
+	end
+end
 
 local function OpposingFaction(faction)
 	local faction = UnitFactionGroup("player")
@@ -436,9 +487,9 @@ do
 		local buildID = (select(4, GetBuildInfo()))
 		BuildBlizzSets()
 
-		--@debug@
+		--[==[@debug@
 			--addon:AddTestSets()
-		--@end-debug@
+		--@end-debug@]==]
 
 
 		local dropdownclass = C_TransmogSets.GetTransmogSetsClassFilter();
@@ -467,7 +518,7 @@ do
 					--local class = (data.classMask and data.classMask == 0) or (data.classMask and bit.band(data.classMask, classInfo[2])  == classInfo[2]) or not data.classMask
 					data.className = data.classMask and GetClassInfo(data.classMask)
 
-					data["name"] = L[data["name"]]
+					data["name"] = L[data["name"]] or data["name"]
 					data.oldnote = data.label
 
 					if not data.note then
@@ -489,10 +540,15 @@ do
 
 					data.setID = newID
 
+					--Never populated before, so DetermineFavorites (which reads this field) was always
+					--blind to extra-set favorites regardless of what the favorite button did.
+					data.favorite = addon.favoritesDB.profile.extraset[newID] or false
+
 					data.newStatus = false
 
 
 					data.itemData = data.itemData or {}
+					MaterializeExtendedSources(data)
 
 					data.validForCharacter = true;
 
@@ -509,7 +565,7 @@ do
 					local subSet = false;
 					local subSetBaseID;
 					local subName = gsub(data.name, " %(Recolor%)", "")
-					if data.note == data.note == "NOTE_119" or data.note == "NOTE_120" or data.note == "NOTE_121" or data.note == "NOTE_123"   then
+					if data.note == "NOTE_119" or data.note == "NOTE_120" or data.note == "NOTE_121" or data.note == "NOTE_123" then
 						data.customGroups = data.label
 					elseif data.note == "NOTE_44" or data.note == "NOTE_45" then
 						data.customGroups =  data.label.."-"..subName--data.armorType
@@ -564,19 +620,13 @@ do
 					data.newStatus = false
 					local isCollected = true
 					for i, itemData in pairs(data.itemData) do
-						if subitemlist[item] then 
-							local replacementID = subitemlist[item]
-							local appearanceID, sourceID = C_TransmogCollection.GetItemInfo(replacementID)
-							local sources = C_TransmogCollection.GetAppearanceSources(appearanceID)
-							WardrobeCollectionFrame_SortSources(sources)
-							setData["items"][index] = replacementID
-							setData.sources[item] = nil
-							setData.sources[replacementID] = appearanceID
-						else
-							local info = C_TransmogCollection.GetSourceInfo(itemData[2])
-							data.sources[itemData[2]] = info.isCollected
-							if isCollected then isCollected = info.isCollected end
-						end
+						-- Removed an unreachable legacy substitution branch that indexed undefined
+						-- globals (`item`, `setData`, and `index`). Substitutions are resolved by
+						-- the maintained saved-set/import paths instead.
+						local info = C_TransmogCollection.GetSourceInfo(itemData[2])
+						local collected = info and info.isCollected or false
+						data.sources[itemData[2]] = collected
+						if isCollected then isCollected = collected end
 					end
 					data.isCollected = isCollected
 					if isCollected then
@@ -650,7 +700,7 @@ end
 
 	function addon.Init:UpdateCollectedAppearances()
 		for i = FIRST_TRANSMOG_COLLECTION_WEAPON_TYPE, LAST_TRANSMOG_COLLECTION_WEAPON_TYPE - 1 do
-			local location = TransmogUtil.GetTransmogLocation(addon.Globals.CATEGORYID_TO_NAME[i], Enum.TransmogType.Appearance, Enum.TransmogModification.Main)
+			local location = TransmogUtil.GetTransmogLocation(addon.Globals.CATEGORYID_TO_NAME[i], Enum.TransmogType.Appearance, false)
 			local appearances = C_TransmogCollection.GetCategoryAppearances(i, location)
 			for _, appearance in pairs(appearances) do
 				local sources = C_TransmogCollection.GetAppearanceSources(appearance.visualID, i, location)
@@ -897,7 +947,7 @@ end
 								if sourceInfo and sourceInfo.invType then  
 									local slot = C_Transmog.GetSlotForInventoryType(sourceInfo.invType);
 									local sourceID = sourceInfo.sourceID
-									data[slot] = sourceID
+									if slot then data[slot] = sourceID end
 								end
 							end
 						end
@@ -1058,7 +1108,7 @@ end
 								local itemID = sourceInfo.itemID
 								local itemMod = sourceInfo.itemModID
 								info.itemData = info.itemData or {}
-								info.itemData[slot] = {"'"..itemID..":"..itemMod.."'", sourceID, appearanceID}
+								if slot then info.itemData[slot] = {"'"..itemID..":"..itemMod.."'", sourceID, appearanceID} end
 								info.sources[sourceID] = sourceInfo.isCollected
 							end
 						end

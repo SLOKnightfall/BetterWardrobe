@@ -267,7 +267,7 @@ function WardrobeSetsDataProviderMixin:GetVariantSets(baseSetID)
 			if not variantSetsAll then
 				variantSetsAll = {};
 			end
-			
+
 			local variantSets = {};
 			for i=1, #variantSetsAll do
 				tinsert(variantSets, variantSetsAll[i]);

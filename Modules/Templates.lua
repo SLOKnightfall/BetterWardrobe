@@ -76,18 +76,19 @@ function BetterWardrobeAlteredFormSwapButtonMixin:OnClick()
 	self.useNativeForm = not self.useNativeForm
 
 	self:Update()
-	if DressUpFrame:IsShown() then
+	if DressUpFrame and DressUpFrame:IsShown() and type(addon.DressinRoomFormSwap) == "function" then
 		addon:DressinRoomFormSwap()
 	else
 		local tabID = addon.GetTab()
 		if tabID == 1 then
-			local cat = BetterWardrobeCollectionFrame.ItemsCollectionFrame:GetActiveCategory()
-			local slot = BetterWardrobeCollectionFrame.ItemsCollectionFrame:GetActiveSlot()
-			local transmogLocation = TransmogUtil.GetTransmogLocation(slot, Enum.TransmogType.Appearance, Enum.TransmogModification.Main)
-			local ignorePreviousSlot = true;
-			BetterWardrobeCollectionFrame.ItemsCollectionFrame:SetActiveSlot(transmogLocation, cat, ignorePreviousSlot)
+			local frame = BetterWardrobeCollectionFrame and BetterWardrobeCollectionFrame.ItemsCollectionFrame
+			local cat = frame and frame:GetActiveCategory()
+			local slot = frame and frame:GetActiveSlot()
+			local transmogLocation = slot and TransmogUtil.GetTransmogLocation(slot, Enum.TransmogType.Appearance, Enum.TransmogModification.Main)
+			if frame and transmogLocation then frame:SetActiveSlot(transmogLocation, cat, true) end
 		else
-			BetterWardrobeCollectionFrame.SetsCollectionFrame:OnUnitModelChangedEvent()
+			local frame = BetterWardrobeCollectionFrame and BetterWardrobeCollectionFrame.SetsCollectionFrame
+			if frame and frame.OnUnitModelChangedEvent then frame:OnUnitModelChangedEvent() end
 		end
 	end
 end

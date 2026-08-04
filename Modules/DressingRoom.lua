@@ -389,7 +389,8 @@ end
 
 local DefaultActorID = 1620;
 local ActorIDList = {
-	[4207724] = 1653, --Dracthyr
+	[4207724] = 1654, --Dracthyr (same default framing as visage)
+	[4220448] = 1654, --Dracthyr Female Visage
 	[4395382] = 1654, --Dracthyr Male Visage
 	[4220488] = 1654, --Dracthyr Female Visage
 	[307454] = 1626, --Worgen Male
@@ -433,11 +434,11 @@ function DressingRoom:UpdateModel(unit)
 
 	else
 		model = "player";
-		if not isPlayer then
-			isPlayer = true;
-			actor:SetModelByUnit(model, sheatheWeapons, true, false, addon.useNativeForm);
-			refresh = true;
-		end
+		isPlayer = true;
+		-- Always apply the requested form. The previous isPlayer guard meant that
+		-- Worgen/Human and Dracthyr/Visage stopped updating after the first load.
+		actor:SetModelByUnit(model, sheatheWeapons, true, false, addon.useNativeForm);
+		refresh = true;
 	end
 
 	if refresh then

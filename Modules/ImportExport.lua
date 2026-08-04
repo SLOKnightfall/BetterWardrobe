@@ -42,24 +42,35 @@ end
 --local string2 = "/outfit v1 194960,0,0,194987,194953,0,0,0,194954,194955,194956,194957,93239,-1,0,0,0"
 
 local function ImportSet(importString)
+	--Current export format (see ExportSet/CreateChatLinkTransmogVendor): a runnable /run macro
+	--that calls DressUpItemLink per item. Replay those same calls instead of executing the macro.
+	if importString:find("DressUpItemLink", 1, true) then
+		for itemID, bonusID in importString:gmatch("f%((%d+),(%d+)%)") do
+			DressUpItemLink(("item:%s::::::::::::9:%s"):format(itemID, bonusID))
+		end
+		return
+	end
+
+	--Legacy format: /outfit v1 <sourceID>,<sourceID>,... . Blizzard removed the API that generated
+	--these (TransmogUtil.CreateOutfitSlashCommand), but parsing/applying an old one still works.
 	local itemData = {}
 	importString = string.gsub(importString,"/outfit v1", "")
 	for item in importString:gmatch("[(%-?%d+)]+") do
 		table.insert(itemData, item)
 	end
 
-	local itemTransmogInfoList ={} 
+	local itemTransmogInfoList ={}
 
 	for i = 1, 19 do
 		local secondary = 0
 		local sourceID = itemData[i]
 
-		if sourceID then 
+		if sourceID then
 			itemTransmogInfo = ItemUtil.CreateItemTransmogInfo(sourceID or 0, secondary, 0)
 		else
 			itemTransmogInfo = ItemUtil.CreateItemTransmogInfo( 0, 0, 0)
 		end
-		itemTransmogInfoList[i] = itemTransmogInfo	
+		itemTransmogInfoList[i] = itemTransmogInfo
 	end
 
 	DressUpItemTransmogInfoList(itemTransmogInfoList)
@@ -109,6 +120,8 @@ end
 
 
 local function ImportItem(importString)
+	if not importString or importString == "" then return end
+	DressUpItemLink(importString)
 end
 
 
@@ -142,15 +155,10 @@ StaticPopupDialogs["BETTER_WARDROBE_IMPORT_ITEM_POPUP"] = {
 	whileDead = true,
 };
 
+--Blizzard removed TransmogUtil.CreateOutfitSlashCommand (the /outfit v1 link generator this used),
+--so exporting now reuses the same DressUpItemLink macro format as the existing "post to chat" command.
 function addon:ExportSet()
-	local playerActor = DressUpFrame.ModelScene:GetPlayerActor();
-	local itemTransmogInfoList = playerActor and playerActor:GetItemTransmogInfoList();
-	if not itemTransmogInfoList then
-		return;
-	end
-
-	local slashCommand = TransmogUtil.CreateOutfitSlashCommand(itemTransmogInfoList);
-	Export(slashCommand)
+	self:CreateChatLinkTransmogVendor()
 end
 
 function addon:ExportTransmogVendorSet()
@@ -182,7 +190,7 @@ function IE.ImportTransmogVendorSet(importString)
 		if sourceInfo then
 			local slot = C_Transmog.GetSlotForInventoryType(sourceInfo.invType);
 			local pendingInfo = TransmogUtil.CreateTransmogPendingInfo(Enum.TransmogPendingType.Apply, sourceID);
-			local transmogLocation = TransmogUtil.CreateTransmogLocation(slot, Enum.TransmogType.Appearance, Enum.TransmogModification.Main);
+			local transmogLocation = TransmogUtil.CreateTransmogLocation(slot, Enum.TransmogType.Appearance, false);
 			C_Transmog.SetPending(transmogLocation, pendingInfo);
 		end
 	end
@@ -230,6 +238,21 @@ end
 
 
 function BW_TransmogVendorExportButton_OnClick(self)
+	MenuUtil.CreateContextMenu(self, function(_owner, rootDescription)
+		rootDescription:CreateTitle(L["Import/Export Options"]);
+
+		rootDescription:CreateButton(L["Import Item"], function()
+			BetterWardrobeOutfitManager:ShowPopup("BETTER_WARDROBE_IMPORT_ITEM_POPUP")
+		end);
+
+		rootDescription:CreateButton(L["Import Set"], function()
+			BetterWardrobeOutfitManager:ShowPopup("BETTER_WARDROBE_IMPORT_SET_POPUP")
+		end);
+
+		rootDescription:CreateButton(L["Export Set"], function()
+			addon:ExportSet()
+		end);
+	end);
 end
 
 --/run local function f(i,b)DressUpItemLink("item:"..i.."::::::::::::9:"..b);end;f(27457,0);f(27489,0);f(27539,0);f(27548,0);f(27748,0);f(27790,0);f(27897,0);f(28221,0);
