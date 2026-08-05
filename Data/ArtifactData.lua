@@ -1,5 +1,6 @@
 local addonName, addon = ...
-addon = LibStub("AceAddon-3.0"):GetAddon(addonName)
+addon = addon or {}
+addon.Globals = addon.Globals or {}
 
 addon.Globals.ARTIFACT_DATA = {	[128292] = {
 		["name"] = "Blades of the Fallen Prince", 

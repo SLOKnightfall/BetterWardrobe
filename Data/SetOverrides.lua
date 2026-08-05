@@ -1,24 +1,8 @@
 local addonName, addon = ...
-addon = LibStub("AceAddon-3.0"):GetAddon(addonName)
+addon = addon or {}
 local expansionID = 0;
 
---These are missing set items from the trial of style event
-local SetAdditions = {
---[blizzard set ID] = {Item ID}    
-	[298] = {190064}, --sanctified-ymirjar-lords-battlegear-25-Heroic-recolor
-	[700] = {190673}, --battleplate-of-immolation-Heroic-recolor
-	[835] = {190858}, --elementium-deathplate-battlearmor-Heroic-recolor
-	[634] = {190544},--volcanic-regalia-Heroic-recolor
-	[741] = {190167},--conquerors-scourgestalker-battlegear-25-recolor
-	[643] = {190697},--conquerors-worldbreaker-regalia-25-recolor
-	[1482] = {190429},--bearmantle-battlegear-Mythic-recolor
-	[1507] = {190202},--regalia-of-the-dashing-scoundrel-Mythic-recolor
-	[1506] = {190202},--regalia-of-the-dashing-scoundrel-Mythic-recolor
-	[693] = {190830},--conquerors-terrorblade-battlegear-25-recolor
-	[348] = {190803},--sanctified-crimson-acolyte-regalia-25-Heroic
-	[664] = {190888},--vestments-of-the-faceless-shroud-Heroic-recolor
-	[716] = {189870},--firehawk-robes-of-conflagration-Heroic-recolor
-}
+-- Retired SetAdditions: the helper that consumed it had no callers.
 
 local altitems = { 
 
@@ -611,15 +595,6 @@ local altitems = {
 	[183613] = 184306,--Gladiator
 	[183614] = 184307,--Elite
 
-
-	[182540] = 186192, --LFR - 
-	[182539] = 186193, --Normal
-	[186190] = 186194, --Heroic
-	[186191] = 186195,--Mythic
-	[183613] = 186196,--Gladiator
-	[183614] = 186197,--Elite
-
-
 	--S2 Sinister Savants Cursethreads - Warlock Head
 	[186204] = 186208, --LFR
 	[184507] = 186207,--Normal
@@ -632,8 +607,8 @@ local altitems = {
 	--S2 Sinister Savants Cursethreads - Warlock Shoulder
 	[186189] = 186192, --LFR - 
 	[184505] = 186193, --Normal
-	[182541] = 186194, --Heroic
-	[182542] = 186195,--Mythic
+	[186190] = 186194, --Heroic
+	[186191] = 186195,--Mythic
 	[186873] = 186196,--Gladiator
 	[186874] = 186197,--Elite
 
@@ -1394,24 +1369,7 @@ local altitems = {
 }
 
 
---This will check to see if a set has items to add and then adds them
-function addon:CheckForExtraItems(setID, data)
-	if SetAdditions[setID]  then
-		--print(C_TransmogCollection.GetItemInfo(setID))
-		for _, itemID in ipairs(SetAdditions[setID]) do
-			local itemAppearanceID, itemModifiedAppearanceID = C_TransmogCollection.GetItemInfo(itemID)
-			--GetAppearanceSourceInfo returns a single info table now, not positional values.
-			local sourceInfo = C_TransmogCollection.GetAppearanceSourceInfo(itemModifiedAppearanceID)
-			local isCollected = sourceInfo and sourceInfo.isCollected
-			if itemAppearanceID then
-				tinsert(data,{["collected"] = isCollected, ["appearanceID"] = itemModifiedAppearanceID})
-			end
-		end
-	end
-	return data
-	--C_TransmogCollection.GetItemInfo(202542)
-end
-
+addon.AlternateSourceMap = altitems
 
 function addon:CheckAltItem(sourceID)
 	if altitems[sourceID] then
