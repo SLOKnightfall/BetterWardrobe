@@ -449,11 +449,22 @@ function WardrobeSetsCollectionMixin:DisplaySet(setID)
 			itemFrame.AltItem.index = nil
 		end
 
-		if itemFrame.AltItem.useAlt then 
+		if itemFrame.AltItem.useAlt then
 			itemFrame.sourceID = altid[itemFrame.AltItem.index]
 		end
 
-		if slot == 3 and not mainShoulder then 
+		-- Disabled: isValidSourceForPlayer/playerCanCollect were still misflagging items; needs more investigation before re-enabling.
+		-- local sourceInfo = C_TransmogCollection.GetSourceInfo(itemFrame.sourceID);
+		-- if itemFrame.collected then
+		-- 	itemFrame.itemCollectionStatus = (sourceInfo and not sourceInfo.isValidSourceForPlayer) and "CollectedCharCantUse" or nil;
+		-- elseif sourceInfo and sourceInfo.isValidSourceForPlayer and not sourceInfo.playerCanCollect then
+		-- 	itemFrame.itemCollectionStatus = "NotCollectedUnavailable";
+		-- else
+		-- 	itemFrame.itemCollectionStatus = nil;
+		-- end
+		itemFrame.itemCollectionStatus = nil;
+
+		if slot == 3 and not mainShoulder then
 			mainShoulder = itemFrame.sourceID;
 			offShoulder = setInfo.offShoulder;
 		elseif slot ==16 then 

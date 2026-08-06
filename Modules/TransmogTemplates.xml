@@ -1122,20 +1122,21 @@
 			</Frame>
             <!-- Title bar container -->
             <Frame parentKey="TitleBar" inherits="BackdropTemplate">
-                <Size y="24"/>
+                <Size y="36"/>
                 <Anchors>
                     <Anchor point="BOTTOMLEFT" relativeKey="$parent" relativePoint="BOTTOMLEFT"/>
                     <Anchor point="BOTTOMRIGHT" relativeKey="$parent" relativePoint="BOTTOMRIGHT"/>
                 </Anchors>
                 <Layers>
                     <Layer level="OVERLAY">
-                        <FontString parentKey="Text" inherits="GameFontNormal" text="My Frame Title">
+                        <FontString parentKey="Text" inherits="GameFontNormal" text="My Frame Title" justifyH="CENTER" justifyV="MIDDLE" maxLines="2">
                             <Anchors>
-                                <Anchor point="CENTER"/>
+                                <Anchor point="LEFT" x="4" y="0"/>
+                                <Anchor point="RIGHT" x="-4" y="0"/>
                             </Anchors>
                         </FontString>
 						<Texture parentKey="Background" setAllPoints="true">
-							<Size y="24"/>
+							<Size y="36"/>
 							<Color r="0" g="0" b="0"/>
 						</Texture>
                     </Layer>

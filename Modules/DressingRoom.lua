@@ -73,7 +73,7 @@ function addon:DressingRoom_Enable()
 	--every login regardless of any UI interaction.
 	addon:SecureHookScript(DressUpFrameResetButton,"OnClick", function()
 		reset = true
-		HideArmorOnShow = addon.Profile.DR_StartUndressed
+		HideArmorOnShow = false
 		HideWeaponOnShow = addon.Profile.DR_HideWeapons
 		HideTabardOnShow = addon.Profile.DR_HideTabard
 		HideShirtOnShow = addon.Profile.DR_HideShirt
@@ -106,6 +106,7 @@ function addon:DressingRoom_Enable()
 	--Drag-to-move for the Dressing Room window isn't worth that risk, so it's removed.
 	hooksecurefunc("DressUpVisual", DressingRoom.Update);
 	hooksecurefunc("DressUpCollectionAppearance", DressingRoom.Update);
+	hooksecurefunc("DressUpItemLink", DressingRoom.Update);
 end
 
 function addon:DressingRoom_Disable()
@@ -525,7 +526,7 @@ function BW_DressingRoomFrameMixin:OnShow()
 
 	BW_DressingRoomFrame.PreviewButtonFrame:SetShown(addon.Profile.DR_ShowItemButtons);
 	DressingRoom:UpdateBackground();
-	HideArmorOnShow = addon.Profile.DR_StartUndressed;
+	HideArmorOnShow = false;
 	HideWeaponOnShow = addon.Profile.DR_HideWeapons;
 	HideTabardOnShow = addon.Profile.DR_HideTabard;
 	HideShirtOnShow = addon.Profile.DR_HideShirt;
@@ -541,7 +542,13 @@ function BW_DressingRoomFrameMixin:OnShow()
 		BW_DressingRoomFrame.PreviewButtonFrame.PreviewButtonBack:SetPoint("TOPLEFT", BW_DressingRoomFrame.PreviewButtonFrame.PreviewButtonRightShoulder,"BOTTOMLEFT")
 	end
 
-	C_Timer.After(0, function() DressingRoom:GetSource() end);
+	--Hiding weapons/tabard/shirt on show relies on DressingRoom:Update() (which reads the
+	--HideXOnShow flags set above), not GetSource() alone. Previously this only applied when
+	--whatever opened the frame happened to also be hooked into Update() (e.g. the Collections
+	--Journal's DressUpCollectionAppearance) -- other entry points (item links, etc.) opened the
+	--frame without ever consuming the flags. Calling Update() directly here (it calls GetSource()
+	--itself) makes hide-on-show work regardless of what caused the frame to open.
+	C_Timer.After(0, function() DressingRoom:Update() end);
 end
 
 
@@ -585,7 +592,6 @@ local function DressupSettingsButton_OnClick(self)
 				DressingRoom:UpdateBackground()
 			end);
 		rootDescription:CreateTitle(L["Character Options"]);
-		rootDescription:CreateCheckbox(L["Start Undressed"], function() return Profile.DR_StartUndressed end, function() Profile.DR_StartUndressed = not Profile.DR_StartUndressed end);
 		rootDescription:CreateCheckbox(L["Hide Tabard"], function() return Profile.DR_HideTabard end, function() Profile.DR_HideTabard = not Profile.DR_HideTabard end);
 		rootDescription:CreateCheckbox(L["Hide Weapons"], function() return Profile.DR_HideWeapons end, function() Profile.DR_HideWeapons = not Profile.DR_HideWeapons end);
 		rootDescription:CreateCheckbox(L["Hide Shirt"], function() return Profile.DR_HideShirt end, function() Profile.DR_HideShirt = not Profile.DR_HideShirt end);

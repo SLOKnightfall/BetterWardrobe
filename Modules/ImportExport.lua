@@ -77,8 +77,7 @@ local function ImportSet(importString)
 end
 
 
-local importFrom = nil
-addon.importFrom = importFrom
+addon.importFrom = nil
 StaticPopupDialogs["BETTER_WARDROBE_IMPORT_SET_POPUP"] = {
 	text = L["Copy and paste a WoW Outfit Link into the text box below to import"],
 	preferredIndex = 3,
@@ -97,12 +96,12 @@ StaticPopupDialogs["BETTER_WARDROBE_IMPORT_SET_POPUP"] = {
 		end
 	end,
 	OnAccept = function(dialog, data)
-		if importFrom == "tmog"  then 
+		if addon.importFrom == "tmog"  then
 			IE.ImportTransmogVendorSet(dialog:GetEditBox():GetText())
 		else
 			ImportSet(dialog:GetEditBox():GetText());
 		end
-		importFrom = nil
+		addon.importFrom = nil
 	end,
 	EditBoxOnEscapePressed = HideParentPanel,
 	exclusive = true,
@@ -138,12 +137,12 @@ StaticPopupDialogs["BETTER_WARDROBE_IMPORT_ITEM_POPUP"] = {
 	editBoxWidth = 260,
 	OnShow = function() if LISTWINDOW then LISTWINDOW:Hide() end end,
 	OnAccept = function(dialog, data)
-		if importFrom == "Transmog" then 
+		if addon.importFrom == "Transmog" then
 			ImportItemTransMogVendor(dialog:GetEditBox():GetText())
 		else
 			ImportItem(dialog:GetEditBox():GetText());
 		end
-		importFrom = nil
+		addon.importFrom = nil
 	end,
 	EditBoxOnEnterPressed = function(editBox, data)
 		if (editBox:GetParent():GetButton1():IsEnabled()) then

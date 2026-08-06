@@ -1457,8 +1457,12 @@ function TransmogSetModelMixin:OnMouseDown(button)
 	end
 
 	if button == "LeftButton" then
-		local sources = getSourceSlots(self.elementData.sourceData.primaryAppearances)
-		ApplyOutfit(sources)
+		if self.elementData.setType == "Blizzard" then
+			C_TransmogOutfitInfo.SetOutfitToSet(self.elementData.set.setID);
+		else
+			local sources = getSourceSlots(self.elementData.sourceData.primaryAppearances)
+			ApplyOutfit(sources)
+		end
 		PlaySound(SOUNDKIT.UI_TRANSMOG_ITEM_CLICK);
 	end
 end
@@ -1726,6 +1730,8 @@ function TransmogCustomSetModelMixin:OnMouseDown(button)
 		PlaySound(SOUNDKIT.UI_TRANSMOG_ITEM_CLICK);
 		if self.elementData.setType == "Blizzard" then
 			C_TransmogOutfitInfo.SetOutfitToCustomSet(self.elementData.customSetID);
+		elseif self.elementData.setType == "Alt" then
+			addon:ApplySavedSetToPending(self.elementData.altData.slots);
 		else
 			local outfit = addon.OutfitDB.char.outfits[self.elementData.customSetID]
 			ApplyOutfit(outfit)
@@ -1741,6 +1747,11 @@ function TransmogCustomSetModelMixin:OnMouseUp(button)
 	end
 
 	if button ~= "RightButton" then
+		return;
+	end
+
+	if self.elementData.setType == "Alt" then
+		--Browsing another character's set: no rename/replace/delete, it isn't ours to edit.
 		return;
 	end
 
@@ -1846,6 +1857,20 @@ function TransmogCustomSetModelMixin:UpdateSet()
 		self.TitleBar.Text:SetText(name)
 		self.Extra.Icon:Hide()
 
+	elseif self.elementData.setType == "Alt" then
+		self:Undress();
+		local altData = self.elementData.altData;
+		local slots = altData.slots or {};
+		for slotID = 1, 19 do
+			local appearanceID = slots[slotID];
+			if appearanceID then
+				local itemTransmogInfo2 = ItemUtil.CreateItemTransmogInfo(appearanceID);
+				self:SetItemTransmogInfo(itemTransmogInfo2, slotID);
+			end
+		end
+		self.TitleBar.Text:SetText(altData.name)
+		self.Extra.Icon:Hide()
+
 	else
 		local customSetTransmogInfo = addon.OutfitDB.char.outfits[self.elementData.customSetID]
 		for slotID, itemTransmogInfo in ipairs(customSetTransmogInfo) do
@@ -1866,7 +1891,9 @@ function TransmogCustomSetModelMixin:UpdateSet()
 
 	local transmogStateAtlas;
 	local appliedCustomSetID, hasPending = self.elementData.collectionFrame:GetFirstMatchingCustomSetID();
-	if self.elementData.customSetID == appliedCustomSetID then
+	--Alt cards have no real customSetID (nil), which would otherwise false-positive
+	--match against GetFirstMatchingCustomSetID() also returning nil for "no match".
+	if self.elementData.setType ~= "Alt" and self.elementData.customSetID == appliedCustomSetID then
 		if hasPending then
 			transmogStateAtlas = "transmog-setcard-transmogrified-pending";
 		else
@@ -1912,7 +1939,53 @@ function TransmogCustomSetModelMixin:RefreshTooltip()
 
 	GameTooltip:SetOwner(self, "ANCHOR_RIGHT");
 
-	local name, _icon = C_TransmogCollection.GetCustomSetInfo(self.elementData.customSetID);
+	if self.elementData.setType == "Alt" then
+		local altData = self.elementData.altData;
+		local collectedCount, totalCount = altData.collectedCount or 0, altData.totalCount or 0;
+		local isComplete = totalCount > 0 and collectedCount == totalCount;
+
+		if addon.Profile.ShowDetailedAltSetTooltip or IsShiftKeyDown() then
+			local collectedColor = NORMAL_FONT_COLOR;
+			if not isComplete then
+				collectedColor = collectedCount == 0 and DISABLED_FONT_COLOR or GREEN_FONT_COLOR;
+			end
+			local formattedCollected = string.format(WrapTextInColor(TRANSMOG_SET_COMPLETION_FORMAT, collectedColor), collectedCount, totalCount);
+			GameTooltip_AddHighlightLine(GameTooltip, string.format("%s %s", altData.name, formattedCollected));
+
+			for slotID = 1, 19 do
+				local appearanceID = altData.slots[slotID];
+				if slotID ~= INVSLOT_MAINHAND and slotID ~= INVSLOT_OFFHAND and appearanceID and appearanceID ~= 0 and not C_TransmogCollection.IsAppearanceHiddenVisual(appearanceID) then
+					local sourceInfo = C_TransmogCollection.GetSourceInfo(appearanceID);
+					if sourceInfo and sourceInfo.name then
+						local appearanceInfo = C_TransmogCollection.GetAppearanceInfoBySource(appearanceID);
+						if appearanceInfo and appearanceInfo.appearanceIsCollected then
+							GameTooltip_AddColoredLine(GameTooltip, sourceInfo.name, LIGHTYELLOW_FONT_COLOR, false, 8);
+						else
+							GameTooltip_AddDisabledLine(GameTooltip, sourceInfo.name, false, 8);
+						end
+					end
+				end
+			end
+		else
+			GameTooltip:SetText(altData.name);
+			if isComplete then
+				GameTooltip_AddHighlightLine(GameTooltip, TRANSMOG_CUSTOM_SET_COMPLETE);
+			else
+				GameTooltip_AddDisabledLine(GameTooltip, string.format("%s (%d/%d)", TRANSMOG_CUSTOM_SET_INCOMPLETE, collectedCount, totalCount));
+			end
+		end
+
+		GameTooltip:Show();
+		return;
+	end
+
+	local name;
+	if self.elementData.setType == "Blizzard" then
+		name = C_TransmogCollection.GetCustomSetInfo(self.elementData.customSetID);
+	else
+		local outfit = addon.OutfitDB.char.outfits[self.elementData.customSetID];
+		name = outfit and outfit.name;
+	end
 	GameTooltip:SetText(name);
 
 	if self.elementData.isCollected then

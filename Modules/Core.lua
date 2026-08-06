@@ -737,6 +737,8 @@ local options = {
 							name = L["Start Undressed"],
 							type = "toggle",
 							width = "full",
+							disabled = true,
+							hidden = true,
 						},
 						DR_HideWeapons = {
 							order = 7,

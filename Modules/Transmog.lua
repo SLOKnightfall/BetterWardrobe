@@ -2520,6 +2520,71 @@ function TransmogWardrobeCustomSetsMixin:OnLoad()
 	end);
 
 	self.NewCustomSetButton:SetScript("OnLeave", GameTooltip_Hide);
+
+	--Character dropdown: browse another character's saved custom sets (same
+	--addon.SelecteSavedList flag the Collection Journal's saved-outfit dropdown
+	--uses, see BetterWardrobeCollectionSavedOutfitDropdownMixin in Wardrobe.lua).
+	local CharacterDropdown = CreateFrame("DropdownButton", nil, self, "WowStyle1DropdownTemplate");
+	self.CharacterDropdown = CharacterDropdown;
+	CharacterDropdown:SetPoint("TOPRIGHT", self, "TOPRIGHT", -26, -24);
+	CharacterDropdown:SetWidth(186);
+	CharacterDropdown:SetDefaultText("Current Character");
+
+	local frame = self;
+	local selfKey = UnitName("player").." - "..GetRealmName();
+
+	local function UpdateDropdownText()
+		if not addon.SelecteSavedList then
+			CharacterDropdown:SetText("Current Character");
+		elseif addon.SelecteSavedList == addon.SHARED_SETS_KEY then
+			CharacterDropdown:SetText("Shared Sets");
+		else
+			CharacterDropdown:SetText(addon.SelecteSavedList);
+		end
+	end
+	CharacterDropdown:SetScript("OnShow", UpdateDropdownText);
+
+	local Popout = addon:CreateCharacterPickerPopout(CharacterDropdown, {
+		staticEntries = {
+			{ text = "Current Character", value = selfKey },
+			{ text = "Shared Sets", value = addon.SHARED_SETS_KEY },
+		},
+		isSelected = function(value)
+			if not addon.SelecteSavedList then
+				return value == selfKey;
+			end
+			return addon.SelecteSavedList == value;
+		end,
+		onSelect = function(value)
+			addon.SelecteSavedList = (value ~= selfKey) and value or false;
+			UpdateDropdownText();
+			frame:RefreshCollectionEntries();
+		end,
+	});
+	Popout.DetailedTooltipCheckbox = CreateFrame("CheckButton", nil, Popout, "UICheckButtonTemplate");
+	Popout.DetailedTooltipCheckbox:SetSize(20, 20);
+	Popout.DetailedTooltipCheckbox:SetPoint("TOPLEFT", Popout.SearchBox, "BOTTOMLEFT", 0, -6);
+	Popout.DetailedTooltipCheckbox.Text = Popout.DetailedTooltipCheckbox:CreateFontString(nil, "OVERLAY", "GameFontHighlightSmall");
+	Popout.DetailedTooltipCheckbox.Text:SetPoint("LEFT", Popout.DetailedTooltipCheckbox, "RIGHT", 2, 0);
+	Popout.DetailedTooltipCheckbox.Text:SetText("Detailed Tooltip");
+	Popout.DetailedTooltipCheckbox:SetScript("OnClick", function(self)
+		addon.Profile.ShowDetailedAltSetTooltip = self:GetChecked();
+	end);
+	Popout.DetailedTooltipCheckbox:SetScript("OnShow", function(self)
+		self:SetChecked(addon.Profile.ShowDetailedAltSetTooltip);
+	end);
+	Popout.TopDivider:ClearAllPoints();
+	Popout.TopDivider:SetPoint("TOPLEFT", Popout.DetailedTooltipCheckbox, "BOTTOMLEFT", 4, -6);
+
+	CharacterDropdown:SetScript("OnClick", function(self)
+		if Popout:IsShown() then
+			Popout:Hide();
+		else
+			Popout:ClearAllPoints();
+			Popout:SetPoint("TOPRIGHT", self, "BOTTOMRIGHT", 0, 0);
+			Popout:Show();
+		end
+	end);
 end
 
 function TransmogWardrobeCustomSetsMixin:OnShow()
@@ -2592,6 +2657,8 @@ function TransmogWardrobeCustomSetsMixin:RefreshCollectionEntries()
 		if element.setType == "Blizzard" then
 			local customSetName = C_TransmogCollection.GetCustomSetInfo(element.customSetID);
 			return customSetName;
+		elseif element.setType == "Alt" then
+			return element.altData.name;
 		end
 
 		local outfit = addon.OutfitDB.char.outfits[element.customSetID];
@@ -2608,42 +2675,55 @@ function TransmogWardrobeCustomSetsMixin:RefreshCollectionEntries()
 
 	local collectionElements = {};
 
-	local customSets = C_TransmogCollection.GetCustomSets();
-	for _indexCustomSet, customSetID in ipairs(customSets) do
-		local isCollected = TransmogUtil.IsCustomSetCollected(customSetID);
+	if addon.SelecteSavedList then
+		for _, data in ipairs(addon.GetOutfits()) do
+			local collectedCount, totalCount = addon:GetSlotsCollectedCount(data);
+			local element = {
+				templateKey = "COLLECTION_CUSTOM_SET2",
+				isCollected = totalCount > 0 and collectedCount == totalCount,
+				collectionFrame = self,
+				setType = "Alt",
+				altData = { name = data.name, slots = data, collectedCount = collectedCount, totalCount = totalCount },
+			};
+			table.insert(collectionElements, element);
+		end
+	else
+		local customSets = C_TransmogCollection.GetCustomSets();
+		for _indexCustomSet, customSetID in ipairs(customSets) do
+			local isCollected = TransmogUtil.IsCustomSetCollected(customSetID);
 
-		local element = {
-			templateKey = "COLLECTION_CUSTOM_SET2",
-			customSetID = customSetID,
-			isCollected = isCollected,
-			collectionFrame = self,
-			setType = "Blizzard",
-			hidden = false,
-			favorite = false,
+			local element = {
+				templateKey = "COLLECTION_CUSTOM_SET2",
+				customSetID = customSetID,
+				isCollected = isCollected,
+				collectionFrame = self,
+				setType = "Blizzard",
+				hidden = false,
+				favorite = false,
 
-		};
-		table.insert(collectionElements, element);
+			};
+			table.insert(collectionElements, element);
+		end
+
+		local customSets = addon.OutfitDB.char.outfits --[i + 9 * (self.Pag
+		local index = 1
+		--local customSets = C_TransmogCollection.GetCustomSets();
+		for _indexCustomSet, customSetID in ipairs(customSets) do
+			local isCollected = true --TransmogUtil.IsCustomSetCollected(customSetID);
+
+			local element = {
+				templateKey = "COLLECTION_CUSTOM_SET2",
+				customSetID = index,
+				isCollected = isCollected,
+				collectionFrame = self,
+				setType = "Extra",
+				hidden = false,
+				favorite = false,
+			};
+			table.insert(collectionElements, element);
+			index = index + 1
+		end
 	end
-
-	local customSets = addon.OutfitDB.char.outfits --[i + 9 * (self.Pag
-	local index = 1
-	--local customSets = C_TransmogCollection.GetCustomSets();
-	for _indexCustomSet, customSetID in ipairs(customSets) do
-		local isCollected = true --TransmogUtil.IsCustomSetCollected(customSetID);
-
-		local element = {
-			templateKey = "COLLECTION_CUSTOM_SET2",
-			customSetID = index,
-			isCollected = isCollected,
-			collectionFrame = self,
-			setType = "Extra",
-			hidden = false,
-			favorite = false,
-		};
-		table.insert(collectionElements, element);
-		index = index + 1
-	end
-
 
 	table.sort(collectionElements, compareEntries);
 

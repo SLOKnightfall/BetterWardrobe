@@ -2725,84 +2725,50 @@ end
 
 	function BetterWardrobeCollectionSavedOutfitDropdownMixin:OnLoad()
 		self:SetWidth(150);
-		self:SetSelectionTranslator(function(selection)
-			return selection.text;
+
+		local dropdown = self;
+		local selfKey = UnitName("player").." - "..GetRealmName();
+
+		self.Popout = addon:CreateCharacterPickerPopout(dropdown, {
+			staticEntries = {
+				{ text = "Current Character", value = selfKey },
+				{ text = "Shared Sets", value = addon.SHARED_SETS_KEY },
+			},
+			isSelected = function(value)
+				if not addon.SelecteSavedList then
+					return value == selfKey;
+				end
+				return addon.SelecteSavedList == value;
+			end,
+			onSelect = function(value)
+				addon.SelecteSavedList = (value ~= selfKey) and value or false;
+				dropdown:OnShow();
+				BetterWardrobeCollectionFrame.SetsCollectionFrame:OnSearchUpdate();
+			end,
+		});
+
+		self:SetScript("OnClick", function(self)
+			if self.Popout:IsShown() then
+				self.Popout:Hide();
+			else
+				self.Popout:ClearAllPoints();
+				self.Popout:SetPoint("TOPRIGHT", self, "BOTTOMRIGHT", 0, 0);
+				self.Popout:Show();
+			end
 		end);
 	end
 
 	function BetterWardrobeCollectionSavedOutfitDropdownMixin:OnShow()
-		self:Refresh();
+		if not addon.SelecteSavedList then
+			self:SetText("Current Character");
+		elseif addon.SelecteSavedList == addon.SHARED_SETS_KEY then
+			self:SetText("Shared Sets");
+		else
+			self:SetText(addon.SelecteSavedList);
+		end
 	end
 
 	function BetterWardrobeCollectionSavedOutfitDropdownMixin:OnHide()
-	end
-
-	function BetterWardrobeCollectionSavedOutfitDropdownMixin:Refresh()
-		self:SetupMenu(function(dropdown, rootDescription)
-			rootDescription:SetTag("BW_SAVED_SETS");
-
-			local function IsProfileSet(name)
-				if not addon.SelecteSavedList then
-					local unitName = UnitName("player");
-					local realm = GetRealmName();
-					return unitName .." - ".. realm  == name;
-				else
-					return addon.SelecteSavedList == name;
-				end
-			end
-
-			local function SetProfile(name)
-				if ( name ~= addon.setdb:GetCurrentProfile() ) then 
-					addon.SelecteSavedList = name;
-				else
-					addon.SelecteSavedList = false;
-				end
-
-				BetterWardrobeCollectionFrame.SetsCollectionFrame:OnSearchUpdate();
-			end
-
-			local extent = 20;
-			local maxCharacters = 8;
-			local maxScrollExtent = extent * maxCharacters;
-			rootDescription:SetScrollMode(maxScrollExtent);
-
-			--Only list characters that actually have at least one saved set, checking
-			--both storage tables: addon.setdb.global.sets (native Blizzard custom sets)
-			--and addon.OutfitDB.sv.char[name].outfits (addon-only "extended" saved sets).
-			--A character can have entries in only one of the two, so union the keys.
-			local function HasSavedSets(name)
-				local native = addon.setdb.global.sets[name]
-				if native and #native > 0 then return true end
-
-				local extended = addon.OutfitDB.sv.char and addon.OutfitDB.sv.char[name] and addon.OutfitDB.sv.char[name].outfits
-				if extended and #extended > 0 then return true end
-
-				return false
-			end
-
-			local temp = {}
-			local seen = {}
-			for name in pairs(addon.setdb.global.sets) do
-				if not seen[name] and HasSavedSets(name) then
-					seen[name] = true
-					table.insert(temp, name);
-				end
-			end
-			if addon.OutfitDB.sv.char then
-				for name in pairs(addon.OutfitDB.sv.char) do
-					if not seen[name] and HasSavedSets(name) then
-						seen[name] = true
-						table.insert(temp, name);
-					end
-				end
-			end
-
-			table.sort(temp, function(a,b) return (a) < (b) end);
-
-			for _, name in pairs(temp) do
-				rootDescription:CreateRadio(name, IsProfileSet, SetProfile, name);
-			end
-		end)
 	end
 
 	BetterWardrobeTransmogOptionsDropdownMixin = {};

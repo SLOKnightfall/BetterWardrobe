@@ -138,7 +138,28 @@ local function AddVariantToBaseSet(set, newBaseID)
 	variantSets[set.setID] = nil;
 end
 
+local KnownClassMasks
+local function IsKnownClassMask(mask)
+	if not KnownClassMasks then
+		KnownClassMasks = {[0] = true}
+		for _, masks in pairs(addon.Globals.CLASS_MASK) do
+			for _, m in ipairs(masks) do
+				KnownClassMasks[m] = true
+			end
+		end
+	end
+	return KnownClassMasks[mask]
+end
+
 local function UseSet(data)
+	if data.classMask and not IsKnownClassMask(data.classMask) then
+		local baseSetID = C_TransmogSets.GetBaseSetID(data.setID)
+		local baseInfo = baseSetID and C_TransmogSets.GetSetInfo(baseSetID)
+		if baseInfo and baseInfo.classMask then
+			data.classMask = baseInfo.classMask
+		end
+	end
+
 	local dropdownClass = C_TransmogSets.GetTransmogSetsClassFilter();
 	local selectedArmorType = dropdownClass or playerClass;
 	local ClassArmor = addon.Globals.ClassArmorMask[selectedArmorType];
@@ -168,8 +189,7 @@ local function UseSet(data)
 		correctHeratiage = true;
 	end
 
-	if data.classMask and (data.classMask == 0 or data.classMask == 16383) then
-		correctClass = true;
+	if data.classMask and (data.classMask == 0 or data.classMask == 16383) then		correctClass = true;
 	else
 		if data.setType == "Blizzard" then
 			if not addon.Profile.IgnoreClassRestrictions then 
@@ -231,6 +251,44 @@ local function UseSet(data)
 	end
 end
 
+function addon:DumpTransmogSet(setID)
+	for _, data in ipairs(C_TransmogSets.GetAllSets()) do
+		if data.setID == setID then
+			local keys = {}
+			for k in pairs(data) do
+				table.insert(keys, k)
+			end
+			table.sort(keys, function(a, b) return tostring(a) < tostring(b) end)
+
+			print(string.format("--- TransmogSet %s ---", tostring(setID)))
+			for _, k in ipairs(keys) do
+				print(string.format("  %s = %s", tostring(k), tostring(data[k])))
+			end
+			return
+		end
+	end
+	print(string.format("TransmogSet %s not found", tostring(setID)))
+end
+
+function addon:DumpTransmogSetVariants(setID)
+	local baseSetID = C_TransmogSets.GetBaseSetID(setID) or setID
+	print(string.format("--- Variants of base set %s (from %s) ---", tostring(baseSetID), tostring(setID)))
+
+	local baseInfo = C_TransmogSets.GetSetInfo(baseSetID)
+	print(string.format("  base: name=%s classMask=%s", tostring(baseInfo and baseInfo.name), tostring(baseInfo and baseInfo.classMask)))
+
+	local variants = C_TransmogSets.GetVariantSets(baseSetID)
+	if not variants or #variants == 0 then
+		print("  (no variants)")
+		return
+	end
+
+	for i, v in ipairs(variants) do
+		local info = C_TransmogSets.GetSetInfo(v.setID)
+		print(string.format("  [%d] setID=%s name=%s classMask=%s", i, tostring(v.setID), tostring(info and info.name), tostring(info and info.classMask)))
+	end
+end
+
 -- Gets all the Blizzard sets, filters out any sets shown in the base set tab and adds them to the apropriate ArmorDB
 function BuildBlizzSets()
 	addon.SetsDataProvider:ClearSets();
@@ -248,7 +306,7 @@ function BuildBlizzSets()
 			data.BuildBlizzSets = true
 			data.setType = "Blizzard"
 
-			if data.classMask == 16383 then
+			if data.classMask == 16383 or data.classMask == 32767 then
 				 data.classMask = 0
 			elseif data.classMask == 4164 then
 				data.classMask = 68
@@ -424,6 +482,7 @@ function BuildBlizzSets()
 			end
 		end
 	end
+
 end
 
 
@@ -1161,6 +1220,288 @@ end
 			addon.SavedSetCache = list
 	--	end
 		return addon.SavedSetCache
+	end
+
+	--Placeholder profile key for the "Shared Sets" option; functionality TBD.
+	addon.SHARED_SETS_KEY = "__BW_SHARED_SETS__"
+
+	--Characters (other than the current one) that have at least one saved set,
+	--checking both storage tables: addon.setdb.global.sets (native Blizzard custom
+	--sets) and addon.OutfitDB.sv.char[name].outfits (addon-only "extended" saved
+	--sets), since a character can have entries in only one of the two.
+	function addon:GetSavedSetCharacterRoster()
+		local function HasSavedSets(name)
+			local native = addon.setdb.global.sets[name]
+			if native and #native > 0 then return true end
+
+			local extended = addon.OutfitDB.sv.char and addon.OutfitDB.sv.char[name] and addon.OutfitDB.sv.char[name].outfits
+			if extended and #extended > 0 then return true end
+
+			return false
+		end
+
+		local temp = {}
+		local seen = {}
+		for name in pairs(addon.setdb.global.sets) do
+			if not seen[name] and HasSavedSets(name) then
+				seen[name] = true
+				table.insert(temp, name)
+			end
+		end
+		if addon.OutfitDB.sv.char then
+			for name in pairs(addon.OutfitDB.sv.char) do
+				if not seen[name] and HasSavedSets(name) then
+					seen[name] = true
+					table.insert(temp, name)
+				end
+			end
+		end
+
+		table.sort(temp, function(a, b) return a < b end)
+		return temp
+	end
+
+	--slots: {[1..19] = appearanceID}. Returns collected, total item counts.
+	function addon:GetSlotsCollectedCount(slots)
+		local total, collected = 0, 0
+		for slotID = 1, 19 do
+			local appearanceID = slots[slotID]
+			if slotID ~= INVSLOT_MAINHAND and slotID ~= INVSLOT_OFFHAND and appearanceID and appearanceID ~= 0 and not C_TransmogCollection.IsAppearanceHiddenVisual(appearanceID) then
+				local appearanceInfo = C_TransmogCollection.GetAppearanceInfoBySource(appearanceID)
+				if appearanceInfo then
+					total = total + 1
+					if appearanceInfo.appearanceIsCollected then
+						collected = collected + 1
+					end
+				end
+			end
+		end
+		return collected, total
+	end
+
+	--slots: {[1..19] = appearanceID}, e.g. from addon.GetOutfits() for another character.
+	function addon:ApplySavedSetToPending(slots)
+		if not slots then return end
+
+		C_TransmogOutfitInfo.ClearAllPendingTransmogs();
+
+		local GetTransmogOutfitSlotFromInventorySlot = C_TransmogOutfitInfo.GetTransmogOutfitSlotFromInventorySlot
+		local option = Enum.TransmogOutfitSlotOption.None
+
+		for invSlotID = 1, 19 do
+			local appearanceID = slots[invSlotID]
+			if appearanceID then
+				local displayType = (appearanceID == 0) and Enum.TransmogOutfitDisplayType.Hidden or Enum.TransmogOutfitDisplayType.Assigned
+
+				if invSlotID == INVSLOT_SHOULDER then
+					local secondary = (slots.offShoulder and slots.offShoulder ~= 0) and slots.offShoulder or appearanceID
+					C_TransmogOutfitInfo.SetPendingTransmog(Enum.TransmogOutfitSlot.ShoulderRight, Enum.TransmogType.Appearance, option, appearanceID, displayType);
+					C_TransmogOutfitInfo.SetPendingTransmog(Enum.TransmogOutfitSlot.ShoulderLeft, Enum.TransmogType.Appearance, option, secondary, displayType);
+				else
+					local slot = GetTransmogOutfitSlotFromInventorySlot(invSlotID - 1);
+					if slot then
+						C_TransmogOutfitInfo.SetPendingTransmog(slot, Enum.TransmogType.Appearance, option, appearanceID, displayType);
+					end
+				end
+			end
+		end
+	end
+
+	--Character-picker popout (search + roster). Plain persistent frame, not
+	--Menu/SetupMenu -- regenerating that in place for live search corrupted it.
+	do
+		local ROW_HEIGHT = 20
+		local ROW_SPACING = 2
+		local LIST_WIDTH = 200
+
+		local RowMixin = {}
+		function RowMixin:OnClick()
+			if self.onClick then
+				self.onClick(self.value)
+			end
+		end
+		function RowMixin:OnEnter()
+			self.Highlight:Show()
+		end
+		function RowMixin:OnLeave()
+			self.Highlight:Hide()
+		end
+
+		local function CreateRow(parent)
+			local f = CreateFrame("Button", nil, parent)
+			f:SetSize(LIST_WIDTH, ROW_HEIGHT)
+
+			f.Highlight = f:CreateTexture(nil, "BACKGROUND")
+			f.Highlight:SetAllPoints()
+			f.Highlight:SetColorTexture(1, 1, 1, 0.1)
+			f.Highlight:Hide()
+
+			f.Check = f:CreateTexture(nil, "OVERLAY")
+			f.Check:SetPoint("LEFT", 6, 0)
+			f.Check:SetSize(14, 14)
+			f.Check:SetTexture("Interface\\Buttons\\UI-CheckBox-Check")
+			f.Check:Hide()
+
+			f.Text = f:CreateFontString(nil, "OVERLAY", "GameFontHighlightSmall")
+			f.Text:SetPoint("LEFT", 22, 0)
+			f.Text:SetPoint("RIGHT", -6, 0)
+			f.Text:SetJustifyH("LEFT")
+
+			Mixin(f, RowMixin)
+			f:SetScript("OnClick", f.OnClick)
+			f:SetScript("OnEnter", f.OnEnter)
+			f:SetScript("OnLeave", f.OnLeave)
+			return f
+		end
+
+		local PopoutMixin = {}
+
+		function PopoutMixin:OnShow()
+			self:RegisterEvent("GLOBAL_MOUSE_DOWN")
+			self.SearchBox:SetText(self.searchText or "")
+			self:RefreshStaticButtons()
+			self:Refresh()
+		end
+
+		function PopoutMixin:OnHide()
+			self:UnregisterEvent("GLOBAL_MOUSE_DOWN")
+		end
+
+		function PopoutMixin:OnEvent(event)
+			if event == "GLOBAL_MOUSE_DOWN" then
+				if not (self:IsMouseOver() or (self.owner and self.owner:IsMouseOver())) then
+					self:Hide()
+				end
+			end
+		end
+
+		function PopoutMixin:RefreshStaticButtons()
+			for _, row in ipairs(self.StaticButtons) do
+				row.Check:SetShown(self.isSelected and self.isSelected(row.value))
+			end
+		end
+
+		function PopoutMixin:Refresh()
+			local searchLower = self.searchText and self.searchText ~= "" and self.searchText:lower()
+
+			local entries = {}
+			for _, name in ipairs(addon:GetSavedSetCharacterRoster()) do
+				if name ~= self.selfKey and (not searchLower or name:lower():find(searchLower, 1, true)) then
+					table.insert(entries, { text = name, value = name })
+				end
+			end
+
+			for i, data in ipairs(entries) do
+				local row = self.Rows[i]
+				if not row then
+					row = CreateRow(self.Content)
+					row:SetPoint("TOPLEFT", self.Content, "TOPLEFT", 0, -(i - 1) * (ROW_HEIGHT + ROW_SPACING))
+					self.Rows[i] = row
+				end
+				row.value = data.value
+				row.Text:SetText(data.text)
+				row.Check:SetShown(self.isSelected and self.isSelected(data.value))
+				row.onClick = function(value)
+					self.onSelect(value)
+					self:Hide()
+				end
+				row:Show()
+			end
+
+			for i = #entries + 1, #self.Rows do
+				self.Rows[i]:Hide()
+			end
+
+			self.Content:SetHeight(math.max(1, #entries * (ROW_HEIGHT + ROW_SPACING)))
+		end
+
+		--config: {
+		--  staticEntries = { {text=, value=}, ... },  -- e.g. Current Character, Shared Sets
+		--  isSelected = function(value) end,
+		--  onSelect = function(value) end,
+		--}
+		function addon:CreateCharacterPickerPopout(owner, config)
+			local f = CreateFrame("Frame", nil, UIParent, "BackdropTemplate")
+			Mixin(f, PopoutMixin)
+			f:SetFrameStrata("DIALOG")
+			f:SetSize(LIST_WIDTH + 44, 260)
+			f:Hide()
+			f:EnableMouse(true)
+
+			f:SetBackdrop({
+				bgFile = "Interface/Tooltips/UI-Tooltip-Background",
+				edgeFile = "Interface/Tooltips/UI-Tooltip-Border",
+				edgeSize = 16,
+				insets = { left = 4, right = 4, top = 4, bottom = 4 },
+			})
+			f:SetBackdropColor(0, 0, 0, 0.95)
+
+			f.owner = owner
+			f.selfKey = UnitName("player").." - "..GetRealmName()
+			f.onSelect = config.onSelect
+			f.isSelected = config.isSelected
+			f.Rows = {}
+			f.StaticButtons = {}
+
+			local SearchBox = CreateFrame("EditBox", nil, f, "SearchBoxTemplate")
+			f.SearchBox = SearchBox
+			SearchBox:SetPoint("TOPLEFT", f, "TOPLEFT", 10, -10)
+			SearchBox:SetPoint("TOPRIGHT", f, "TOPRIGHT", -10, -10)
+			SearchBox:SetHeight(20)
+			SearchBox:SetScript("OnTextChanged", function(self)
+				SearchBoxTemplate_OnTextChanged(self)
+				f.searchText = self:GetText()
+				f:Refresh()
+			end)
+			SearchBox.clearButton:SetScript("OnClick", function()
+				PlaySound(SOUNDKIT.IG_MAINMENU_OPTION_CHECKBOX_ON)
+				SearchBox:SetText("")
+				f.searchText = ""
+				f:Refresh()
+			end)
+
+			local function CreateDivider(anchorTo)
+				local d = f:CreateTexture(nil, "ARTWORK")
+				d:SetHeight(1)
+				d:SetWidth(LIST_WIDTH - 8)
+				d:SetColorTexture(1, 1, 1, 0.2)
+				d:SetPoint("TOPLEFT", anchorTo, "BOTTOMLEFT", 4, -6)
+				return d
+			end
+
+			--Fixed above the scrollable roster (Current Character, Shared Sets).
+			f.TopDivider = CreateDivider(SearchBox)
+			local prevAnchor = f.TopDivider
+			for _, entry in ipairs(config.staticEntries or {}) do
+				local row = CreateRow(f)
+				row:SetPoint("TOPLEFT", prevAnchor, "BOTTOMLEFT", -4, -6)
+				row.value = entry.value
+				row.Text:SetText(entry.text)
+				row.onClick = function(value)
+					f.onSelect(value)
+					f:Hide()
+				end
+				table.insert(f.StaticButtons, row)
+				prevAnchor = row
+			end
+			f.BottomDivider = CreateDivider(prevAnchor)
+
+			local ScrollFrame = CreateFrame("ScrollFrame", nil, f, "UIPanelScrollFrameTemplate")
+			f.ScrollFrame = ScrollFrame
+			ScrollFrame:SetPoint("TOPLEFT", f.BottomDivider, "BOTTOMLEFT", -4, -8)
+			ScrollFrame:SetPoint("BOTTOMRIGHT", f, "BOTTOMRIGHT", -28, 10)
+
+			local Content = CreateFrame("Frame", nil, ScrollFrame)
+			f.Content = Content
+			Content:SetSize(LIST_WIDTH, 1)
+			ScrollFrame:SetScrollChild(Content)
+
+			f:SetScript("OnShow", f.OnShow)
+			f:SetScript("OnHide", f.OnHide)
+			f:SetScript("OnEvent", f.OnEvent)
+
+			return f
+		end
 	end
 
 --[[
