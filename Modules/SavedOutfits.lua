@@ -917,29 +917,40 @@ local function GetOrCreateCustomSetNamePopup()
 		return CustomSetNamePopup
 	end
 
-	local f = CreateFrame("Frame", "BW_CustomSetNamePopup", UIParent, "BackdropTemplate")
-	f:SetSize(260, 168)
+	local f = CreateFrame("Frame", "BW_CustomSetNamePopup", UIParent)
+	f:SetSize(320, 150)
 	f:SetPoint("CENTER")
 	f:SetFrameStrata("DIALOG")
 	f:EnableMouse(true)
 	f:Hide()
-	f:SetBackdrop({
-		bgFile = "Interface/Tooltips/UI-Tooltip-Background",
-		edgeFile = "Interface/Tooltips/UI-Tooltip-Border",
-		edgeSize = 16,
-		insets = { left = 4, right = 4, top = 4, bottom = 4 },
-	})
-	f:SetBackdropColor(0, 0, 0, 0.95)
+	f.Border = CreateFrame("Frame", nil, f, "DialogBorderTemplate")
 
-	f.Title = f:CreateFontString(nil, "OVERLAY", "GameFontNormal")
-	f.Title:SetPoint("TOP", 0, -16)
+	f.Title = f:CreateFontString(nil, "ARTWORK", "GameFontHighlight")
+	f.Title:SetPoint("TOP", 0, -20)
 	f.Title:SetText(TRANSMOG_CUSTOM_SET_NAME.."!")
 
-	f.EditBox = CreateFrame("EditBox", nil, f, "InputBoxTemplate")
-	f.EditBox:SetSize(200, 20)
-	f.EditBox:SetPoint("TOP", f.Title, "BOTTOM", 0, -18)
+	f.EditBox = CreateFrame("EditBox", nil, f)
+	f.EditBox:SetSize(260, 32)
+	f.EditBox:SetPoint("TOP", 0, -40)
 	f.EditBox:SetAutoFocus(false)
+	f.EditBox:SetFontObject(ChatFontNormal)
 	f.EditBox:SetMaxLetters(31)
+	f.EditBox:SetHistoryLines(1)
+
+	local editBoxLeft = f.EditBox:CreateTexture(nil, "BACKGROUND")
+	editBoxLeft:SetSize(32, 32)
+	editBoxLeft:SetPoint("LEFT", -10, 0)
+	editBoxLeft:SetTexture([[Interface\ChatFrame\UI-ChatInputBorder-Left2]])
+	local editBoxRight = f.EditBox:CreateTexture(nil, "BACKGROUND")
+	editBoxRight:SetSize(32, 32)
+	editBoxRight:SetPoint("RIGHT", 10, 0)
+	editBoxRight:SetTexture([[Interface\ChatFrame\UI-ChatInputBorder-Right2]])
+	local editBoxMiddle = f.EditBox:CreateTexture(nil, "BACKGROUND")
+	editBoxMiddle:SetHeight(32)
+	editBoxMiddle:SetTexture([[Interface\ChatFrame\UI-ChatInputBorder-Mid2]])
+	editBoxMiddle:SetHorizTile(true)
+	editBoxMiddle:SetPoint("TOPLEFT", editBoxLeft, "TOPRIGHT")
+	editBoxMiddle:SetPoint("TOPRIGHT", editBoxRight, "TOPLEFT")
 
 	local function OnSourceRadioClick(self)
 		f.CharacterRadio:SetChecked(self == f.CharacterRadio);
@@ -950,7 +961,7 @@ local function GetOrCreateCustomSetNamePopup()
 	f.CharacterRadio = CreateFrame("CheckButton", nil, f, "UIRadioButtonTemplate")
 	f.CharacterRadio.source = "Character"
 	f.CharacterRadio.text:SetText("Character")
-	f.CharacterRadio:SetPoint("TOPLEFT", f.EditBox, "BOTTOMLEFT", 4, -18)
+	f.CharacterRadio:SetPoint("TOP", f.EditBox, "BOTTOM", -60, -14)
 	f.CharacterRadio:SetScript("OnClick", OnSourceRadioClick)
 
 	f.SharedRadio = CreateFrame("CheckButton", nil, f, "UIRadioButtonTemplate")
@@ -967,11 +978,12 @@ local function GetOrCreateCustomSetNamePopup()
 	end)
 	f.SharedRadio:SetScript("OnLeave", GameTooltip_Hide)
 
-	f.SaveButton = CreateFrame("Button", nil, f, "SharedButtonTemplate")
-	f.SaveButton:SetSize(90, 22)
-	f.SaveButton:SetPoint("BOTTOMLEFT", 16, 16)
+	f.SaveButton = CreateFrame("Button", nil, f, "UIPanelButtonTemplate")
+	f.SaveButton:SetSize(120, 22)
+	f.SaveButton:SetPoint("TOPLEFT", 33, -108)
 	f.SaveButton:SetText(SAVE)
 	f.SaveButton:SetScript("OnClick", function()
+		PlaySound(SOUNDKIT.IG_MAINMENU_OPTION_CHECKBOX_ON);
 		local name = f.EditBox:GetText();
 		if f.source == "Shared" then
 			SaveSharedCustomSet(name);
@@ -981,9 +993,9 @@ local function GetOrCreateCustomSetNamePopup()
 		f:Hide();
 	end)
 
-	f.CancelButton = CreateFrame("Button", nil, f, "SharedButtonTemplate")
-	f.CancelButton:SetSize(90, 22)
-	f.CancelButton:SetPoint("BOTTOMRIGHT", -16, 16)
+	f.CancelButton = CreateFrame("Button", nil, f, "UIPanelButtonTemplate")
+	f.CancelButton:SetSize(120, 22)
+	f.CancelButton:SetPoint("TOPRIGHT", -33, -108)
 	f.CancelButton:SetText(CANCEL)
 	f.CancelButton:SetScript("OnClick", function()
 		f:Hide();
@@ -1003,10 +1015,12 @@ local function GetOrCreateCustomSetNamePopup()
 	end)
 
 	f:SetScript("OnHide", function()
+		PlaySound(SOUNDKIT.IG_MAINMENU_CLOSE);
 		f.EditBox:SetText("");
 	end)
 
 	tinsert(UISpecialFrames, "BW_CustomSetNamePopup")
+	TransmogFrame:HookScript("OnHide", function() f:Hide() end)
 
 	CustomSetNamePopup = f
 	return f

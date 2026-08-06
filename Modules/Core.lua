@@ -1238,6 +1238,7 @@ function addon:OnInitialize()
 	listDB.collectionListDB = listDB.collectionListDB or {}
 	listDB.HiddenAppearanceDB = listDB.HiddenAppearanceDB or {}
 	listDB.OutfitDB = listDB.OutfitDB or {}
+	listDB.SituationPresetsDB = listDB.SituationPresetsDB or {}
 
 
 --Create all the profiled DB
@@ -1482,6 +1483,7 @@ function addon:EventHandler(event, ...)
 				TransmogFrame.WardrobeCollection.TabHeaders.extracustomsetsTabID = TransmogFrame.WardrobeCollection:AddNamedTab(TRANSMOG_TAB_CUSTOM_SETS,  TransmogFrame.WardrobeCollection.TabContent.BW_ExtraCustomSetsFrame);
 				TransmogFrame.WardrobeCollection.TabContent.BW_ExtraCustomSetsFrame:Init(TransmogFrame.WardrobeCollection)
 				TransmogFrame.WardrobeCollection.TabHeaders.situationsTabID2 = TransmogFrame.WardrobeCollection:AddNamedTab(TRANSMOG_TAB_SITUATIONS, TransmogFrame.WardrobeCollection.TabContent.SituationsFrame);
+				addon:CreateSituationPresetUI(TransmogFrame.WardrobeCollection.TabContent.SituationsFrame);
 
 				local f = CreateFrame("Frame", nil, TransmogFrame.WardrobeCollection.TabContent.ItemsFrame.PagedContent,"BW_PagingControlsHorizontalTemplate")
 				f:ClearAllPoints()

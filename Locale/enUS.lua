@@ -79,6 +79,18 @@ L["Collection List"] = true
 L["TSM Source to Use"] = true
 L["Profiles for sharing the various lists across characters"] = true
 
+L["Presets"] = true
+L["Create Preset"] = true
+L["No Presets Saved"] = true
+L["Situation Name"] = true
+L["Select Preset"] = true
+L["Delete"] = true
+L["Update"] = true
+L["Edit Preset"] = true
+L["Save Situations As"] = true
+L["A preset named '%s' already exists. Overwrite it?"] = true
+L["Delete preset '%s'?"] = true
+
 --~~~~~~~~~~~~~~~~~~~~~~~ TRANSMOG VENODR WINDOW ~~~~~~~~~~~~~~~~~~~~~~~--
 
 L["Transmog Vendor Window"] = true
