@@ -195,10 +195,7 @@ function preview:OnHide2()
 	end
 end
 
---When multiple comparison (shopping) tooltips are shown at once, the one to anchor the preview
---against is whichever shown tooltip sits furthest out in the direction the preview is opening --
---not just whichever happens to be first in the list, which could be a nearer or hidden one.
---Returns nil if none of them are shown.
+--Anchors against whichever shown shopping tooltip sits furthest out in the preview's opening direction. Returns nil if none shown.
 local function GetOutermostShownTooltip(tooltipWithShoppingList, towardLeft)
 	local outermost
 	for _, shoppingTooltip in ipairs(tooltipWithShoppingList.shoppingTooltips or {}) do
@@ -409,9 +406,7 @@ function preview:ShowPreview(itemLink, parent)
 
 	if addon.Profile.ShowOwnedItemTooltips and not found_systemTooltip then
 		local apperanceKnownText
-		--C_Transmog.CanTransmogItem no longer exists. IsAppearanceCollected already tells us
-		--whether the item has an appearance at all: it returns nil (not false) for "no appearance",
-		--distinct from false meaning "has one, just not collected".
+		--IsAppearanceCollected returns nil for "no appearance", false for "has one, not collected".
 		local collected, altCollected = IsAppearanceCollected(itemLink)
 
 		if collected == nil then

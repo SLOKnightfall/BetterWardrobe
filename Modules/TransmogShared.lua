@@ -3,10 +3,7 @@ local addonName, addon = ...;
 addon = LibStub("AceAddon-3.0"):GetAddon(addonName);
 
 local Blizz_C_TransmogSets = C_TransmogSets
---Anything not explicitly overridden below falls through to the real Blizzard
---C_TransmogSets via __index (this used to be a hand-built table missing
---GetAvailableSets, which meant WardrobeSetsDataProviderMixin:GetAvailableSets
---threw "attempt to call a nil value" whenever it ran).
+--Anything not overridden below falls through to real Blizzard C_TransmogSets via __index, instead of resolving to nil.
 local C_TransmogSets = setmetatable({}, {__index = Blizz_C_TransmogSets})
 C_TransmogSets.GetSetPrimaryAppearances = addon.C_TransmogSets.GetSetPrimaryAppearances
 C_TransmogSets.GetBaseSetID = addon.C_TransmogSets.GetBaseSetID
@@ -241,14 +238,7 @@ function WardrobeSetsDataProviderMixin:GetVariantSets(baseSetID)
 	end
 
 	if BetterWardrobeCollectionFrame:CheckTab(2) then
-		--Blizzard's own GetVariantSets only returns the full family when called with
-		--the true base set ID (see Blizzard_Wardrobe_Sets.lua, which always normalizes
-		--via GetBaseSetID before calling this). Our list rows use whichever set our own
-		--label-grouping in DataBase.lua happened to pick as the displayed "base" (the
-		--first one encountered while building baseList), which is not guaranteed to be
-		--Blizzard's canonical base for that family -- passing it straight through made
-		--Blizzard's API return an empty/wrong list for those sets, so the Variants
-		--marker silently never showed for them even though they do have variants.
+		--Normalize to Blizzard's canonical base ID first -- our own label-grouped "base" isn't always the same set, and GetVariantSets needs the real one.
 		baseSetID = C_TransmogSets.GetBaseSetID(baseSetID) or baseSetID;
 		local variantSets = self.variantSets[baseSetID];
 		if not variantSets then
@@ -277,12 +267,7 @@ function WardrobeSetsDataProviderMixin:GetVariantSets(baseSetID)
 				variantSetsAll = {};
 			end
 
-			--Was "local variantSets = {}" here, shadowing the outer variantSets above inside this
-			--if-block. This inner copy got built and cached correctly (self.variantSets[baseSetID]
-			--below), but the function always returned the outer one, which stayed nil on this first,
-			--cache-populating call -- so the first read of a set's variants after any cache reset
-			--came back empty (e.g. the Variants marker on the collection list showing inconsistently),
-			--and only the next read after that returned the real, now-cached list.
+			--Must assign the outer variantSets, not shadow it with a new local -- that left the first (cache-populating) call always returning nil.
 			variantSets = {};
 			for i=1, #variantSetsAll do
 				tinsert(variantSets, variantSetsAll[i]);

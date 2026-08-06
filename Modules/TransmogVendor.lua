@@ -357,11 +357,7 @@ local function UpdateSlotButtons()
 					local forceGo = slotButton.transmogLocation:IsIllusion();
 					local forTransmog = true;
 					local effectiveCategory;
-					--NOTE: C_Transmog.GetSlotEffectiveCategory no longer exists in the
-					--current API and has no direct 1:1 replacement I could confirm.
-					--Left as nil (GoToSourceID's default category detection) rather than
-					--guessing at a replacement -- this only affected either-hand weapon
-					--slots specifically, worth testing that case in-game.
+					--C_Transmog.GetSlotEffectiveCategory no longer exists; left nil (GoToSourceID's default).
 					--if slotButton.transmogLocation:IsEitherHand() then
 					--	effectiveCategory = C_Transmog.GetSlotEffectiveCategory(slotButton.transmogLocation);
 					--end

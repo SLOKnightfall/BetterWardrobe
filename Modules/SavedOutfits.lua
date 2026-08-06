@@ -900,6 +900,137 @@ local function NameExtraCustomSet(newName, customSetIDToRename, dialogData)
 
 end
 
+local function SaveSharedCustomSet(newName)
+	if not addon:SaveNarcissusSharedSet(newName, WardrobeCustomSetManager.itemTransmogInfoList) then
+		return
+	end
+
+	TransmogFrame.WardrobeCollection.TabContent.BW_ExtraSetsFrame:RefreshCollectionEntries()
+
+	BetterWardrobeOutfitManager:ClosePopups();
+end
+
+local CustomSetNamePopup
+
+local function GetOrCreateCustomSetNamePopup()
+	if CustomSetNamePopup then
+		return CustomSetNamePopup
+	end
+
+	local f = CreateFrame("Frame", "BW_CustomSetNamePopup", UIParent, "BackdropTemplate")
+	f:SetSize(260, 168)
+	f:SetPoint("CENTER")
+	f:SetFrameStrata("DIALOG")
+	f:EnableMouse(true)
+	f:Hide()
+	f:SetBackdrop({
+		bgFile = "Interface/Tooltips/UI-Tooltip-Background",
+		edgeFile = "Interface/Tooltips/UI-Tooltip-Border",
+		edgeSize = 16,
+		insets = { left = 4, right = 4, top = 4, bottom = 4 },
+	})
+	f:SetBackdropColor(0, 0, 0, 0.95)
+
+	f.Title = f:CreateFontString(nil, "OVERLAY", "GameFontNormal")
+	f.Title:SetPoint("TOP", 0, -16)
+	f.Title:SetText(TRANSMOG_CUSTOM_SET_NAME.."!")
+
+	f.EditBox = CreateFrame("EditBox", nil, f, "InputBoxTemplate")
+	f.EditBox:SetSize(200, 20)
+	f.EditBox:SetPoint("TOP", f.Title, "BOTTOM", 0, -18)
+	f.EditBox:SetAutoFocus(false)
+	f.EditBox:SetMaxLetters(31)
+
+	local function OnSourceRadioClick(self)
+		f.CharacterRadio:SetChecked(self == f.CharacterRadio);
+		f.SharedRadio:SetChecked(self == f.SharedRadio);
+		f.source = self.source;
+	end
+
+	f.CharacterRadio = CreateFrame("CheckButton", nil, f, "UIRadioButtonTemplate")
+	f.CharacterRadio.source = "Character"
+	f.CharacterRadio.text:SetText("Character")
+	f.CharacterRadio:SetPoint("TOPLEFT", f.EditBox, "BOTTOMLEFT", 4, -18)
+	f.CharacterRadio:SetScript("OnClick", OnSourceRadioClick)
+
+	f.SharedRadio = CreateFrame("CheckButton", nil, f, "UIRadioButtonTemplate")
+	f.SharedRadio.source = "Shared"
+	f.SharedRadio.text:SetText("Shared")
+	f.SharedRadio:SetPoint("LEFT", f.CharacterRadio.text, "RIGHT", 24, 0)
+	f.SharedRadio:SetScript("OnClick", OnSourceRadioClick)
+	f.SharedRadio:SetScript("OnEnter", function(self)
+		if not self:IsEnabled() then
+			GameTooltip:SetOwner(self, "ANCHOR_RIGHT");
+			GameTooltip_AddErrorLine(GameTooltip, "Requires Narcissus");
+			GameTooltip:Show();
+		end
+	end)
+	f.SharedRadio:SetScript("OnLeave", GameTooltip_Hide)
+
+	f.SaveButton = CreateFrame("Button", nil, f, "SharedButtonTemplate")
+	f.SaveButton:SetSize(90, 22)
+	f.SaveButton:SetPoint("BOTTOMLEFT", 16, 16)
+	f.SaveButton:SetText(SAVE)
+	f.SaveButton:SetScript("OnClick", function()
+		local name = f.EditBox:GetText();
+		if f.source == "Shared" then
+			SaveSharedCustomSet(name);
+		else
+			NameExtraCustomSet(name, nil, f.data);
+		end
+		f:Hide();
+	end)
+
+	f.CancelButton = CreateFrame("Button", nil, f, "SharedButtonTemplate")
+	f.CancelButton:SetSize(90, 22)
+	f.CancelButton:SetPoint("BOTTOMRIGHT", -16, 16)
+	f.CancelButton:SetText(CANCEL)
+	f.CancelButton:SetScript("OnClick", function()
+		f:Hide();
+	end)
+
+	f.EditBox:SetScript("OnTextChanged", function(editBox)
+		f.SaveButton:SetEnabled(UserEditBoxNonEmpty(editBox));
+	end)
+	f.EditBox:SetScript("OnEnterPressed", function()
+		if f.SaveButton:IsEnabled() then
+			f.SaveButton:Click();
+		end
+	end)
+	f.EditBox:SetScript("OnEscapePressed", function(editBox)
+		editBox:ClearFocus();
+		f:Hide();
+	end)
+
+	f:SetScript("OnHide", function()
+		f.EditBox:SetText("");
+	end)
+
+	tinsert(UISpecialFrames, "BW_CustomSetNamePopup")
+
+	CustomSetNamePopup = f
+	return f
+end
+
+-- data: { name, itemTransmogInfoList } -- always the new-set flow (Character/Shared choice).
+function addon:ShowCustomSetNamePopup(data)
+	local f = GetOrCreateCustomSetNamePopup()
+	f.data = data
+
+	WardrobeCustomSetManager:SetItemTransmogInfoList(data.itemTransmogInfoList);
+
+	f.EditBox:SetText(data.name or "");
+	f.SaveButton:SetEnabled(UserEditBoxNonEmpty(f.EditBox));
+
+	f.CharacterRadio:SetChecked(true);
+	f.SharedRadio:SetChecked(false);
+	f.source = "Character";
+	f.SharedRadio:SetEnabled(NarciTransmogUIDB and NarciTransmogUIDB.SharedSets and true or false);
+
+	f:Show();
+	f.EditBox:SetFocus();
+end
+
 -- data (can be nil):
 -- name - Starting text for the edit box.
 -- customSetID - Set if editing an existing custom set, nil if new custom set flow.

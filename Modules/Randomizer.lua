@@ -119,11 +119,7 @@ local function AddSlotAppearances(slotID, categoryID, transmogLocation)
 end
 
 
---Weapon slots don't have a single fixed category like armor slots do, and transmog only allows
---appearances compatible with the handedness of whatever's actually equipped there -- "enabled" in
---GetWeaponOptionsForSlot just means the class/spec CAN use that handedness at all, not that it
---matches the equipped weapon, so picking the first enabled one can pick an incompatible option and
---silently yield zero valid appearances. Use the option matching what's actually equipped instead.
+--"Enabled" in GetWeaponOptionsForSlot means the class/spec CAN use that handedness, not that it matches what's equipped -- use the equipped option instead.
 local function GetDefaultWeaponOption(slot)
 	local equippedOption = C_TransmogOutfitInfo.GetEquippedSlotOptionFromTransmogSlot(slot)
 	if equippedOption then return equippedOption end
@@ -166,9 +162,7 @@ function BW_RandomizeButtonMixin:BuildAppearanceList()
 			local weaponOption = isWeaponSlot and GetDefaultWeaponOption(slot) or Enum.TransmogOutfitSlotOption.None
 
 			if isWeaponSlot then
-				--GetViewedOutfitSlotInfo/GetCollectionInfoForSlotAndOption key off the slot's currently
-				--viewed weapon option, not just whatever's passed in below -- the weapon-option dropdown
-				--in TransmogTemplates.lua sets this via the same call before querying either of those.
+				--GetViewedOutfitSlotInfo/GetCollectionInfoForSlotAndOption key off the slot's viewed weapon option, set here.
 				C_TransmogOutfitInfo.SetViewedWeaponOptionForSlot(slot, weaponOption)
 			end
 

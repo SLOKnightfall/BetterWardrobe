@@ -155,9 +155,7 @@ function addon.C_TransmogSets.SetHasNewSources(setID)
 	if SetsData.setType == "Blizzard" then
 		return C_TransmogSets.SetHasNewSources(setID)
 	else
-		--TODO: extra/saved sets have no "new source" tracking table yet (this used to
-		--reference an undefined global `NewVisualIDs`, which would only error once
-		--the sources table below was ever populated -- left as a safe stub for now).
+		--TODO: extra/saved sets have no "new source" tracking table yet; safe stub.
 		return false
 	end
 end
@@ -239,8 +237,6 @@ end
 addon.GetTransmogLocation = GetTransmogLocation
 
 --Returns a {appearanceID = collected} lookup table for a default Blizzard base set.
---Restored: this was deleted during the v12 refactor but is still called from
---CollectionList.lua, Tooltips.lua, and CheckMissingLocation below.
 function addon.GetSetSources(setID)
 	local setAppearances = C_TransmogSets.GetSetPrimaryAppearances(setID)
 	if not setAppearances then
@@ -259,11 +255,7 @@ function addon.ClearSourceDB()
 	wipe(SourceDB)
 end
 
---Returns (setSources, unavailable) for extra/saved sets. setSources is a
---{sourceID = collected} lookup table. Restored and adapted to the current
---setType taxonomy ("Blizzard", "ExtraSet", "SavedExtra", "SavedBlizzard") and
---to the current single-struct return value of C_TransmogCollection.GetAppearanceSourceInfo
---(it used to be treated as multiple positional returns in older code).
+--Returns (setSources, unavailable) for extra/saved sets. setSources is a {sourceID = collected} lookup table.
 function addon.C_TransmogSets.GetSetSources(setID)
 	if SourceDB[setID] then return SourceDB[setID][1], SourceDB[setID][2] end
 
@@ -505,14 +497,7 @@ local function OpposingFaction(faction)
 	end
 end
 
---NOTE: PvP detection used to re-check status client-side by matching
---data.description against a hardcoded 7-entry list of tier names (Honor,
---Combatant, Gladiator, etc.) -- which goes stale every PvP season as new tier
---names are introduced, silently filtering out current-season PvP sets whose
---description didn't happen to match. Now uses data.isPvP, stamped onto each
---set in BuildBlizzSets() (Data/DataBase.lua) via the isPVP() ID-lookup against
---the curated PVP_SETID list -- an ID check, not a description-string guess.
-
+--PvP detection uses data.isPvP (stamped in BuildBlizzSets, Data/DataBase.lua), not a description-string guess.
 addon.RefreshFilter = true
 function addon:FilterSets(setList, setType)
 	local FilterSets = {}

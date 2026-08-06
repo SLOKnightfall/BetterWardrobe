@@ -344,9 +344,7 @@ local function SortItemByItemID(self)
 	end
 end
 
---C_TransmogCollection.GetAppearanceSourceInfo now returns a single info table (with an .itemLink
---field) instead of the old multiple positional returns, so the previous 6-value destructuring here
---always left itemLink nil.
+--GetAppearanceSourceInfo returns a single info table now, not multiple positional returns.
 local function GetTopSourceForVisual(visualID)
 	local sourceInfo = C_TransmogCollection.GetAppearanceSourceInfo(visualID)
 	local itemLink = sourceInfo and sourceInfo.itemLink

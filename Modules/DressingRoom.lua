@@ -67,10 +67,7 @@ local reset = false
 local defaultWidth, defaultHeight = 450, 545
 function addon:DressingRoom_Enable()
 	BW_DressingRoomFrame:Show()
-	--AceHook's HookScript (as opposed to SecureHookScript) replaces the script via
-	--:SetScript() internally rather than the native, non-taint-inducing :HookScript()
-	--API -- an insecure, direct modification of a Blizzard-owned button, running on
-	--every login regardless of any UI interaction.
+	--SecureHookScript avoids the taint SecureHook's :SetScript()-based HookScript would cause on this Blizzard button.
 	addon:SecureHookScript(DressUpFrameResetButton,"OnClick", function()
 		reset = true
 		HideArmorOnShow = false
@@ -97,13 +94,7 @@ function addon:DressingRoom_Enable()
 
 	end
 
-	--Directly calling :SetMovable/:SetScript(OnDragStart/OnDragStop) on DressUpFrame --
-	--a Blizzard frame we don't own -- insecurely marks it as touched by BetterWardrobe.
-	--That mark can persist and later get picked up by unrelated code that iterates
-	--shared/registered UI panels (e.g. showing PVEFrame), causing taint to leak into
-	--completely unrelated later actions (this caused an ADDON_ACTION_FORBIDDEN on
-	--JoinBattlefield() when queuing for PvP, confirmed via a real player's taint log).
-	--Drag-to-move for the Dressing Room window isn't worth that risk, so it's removed.
+	--Drag-to-move removed: SetMovable/SetScript on DressUpFrame taints it and leaked into JoinBattlefield().
 	hooksecurefunc("DressUpVisual", DressingRoom.Update);
 	hooksecurefunc("DressUpCollectionAppearance", DressingRoom.Update);
 	hooksecurefunc("DressUpItemLink", DressingRoom.Update);
@@ -173,10 +164,7 @@ local function GetDressUpModelSlotSource(slotID, enchantID)
 	local itemName = sourceInfo.name
 	local itemIcon = C_TransmogCollection.GetSourceIcon(appliedSourceID)
 
-	--GetAppearanceSourceInfo now returns a single info table (itemAppearanceID, itemLink, ...)
-	--instead of positional values; also replaces the old 2-arg GetItemInfo(itemID, itemModID)
-	--call for appearanceID, which no longer matches C_TransmogCollection.GetItemInfo's signature
-	--(now takes a single itemInfo argument).
+	--GetAppearanceSourceInfo now returns a single info table instead of positional values.
 	local sourceAppearanceInfo = C_TransmogCollection.GetAppearanceSourceInfo(appliedSourceID)
 	local appearanceID = sourceAppearanceInfo and sourceAppearanceInfo.itemAppearanceID
 	local itemLink = sourceAppearanceInfo and sourceAppearanceInfo.itemLink
@@ -542,12 +530,7 @@ function BW_DressingRoomFrameMixin:OnShow()
 		BW_DressingRoomFrame.PreviewButtonFrame.PreviewButtonBack:SetPoint("TOPLEFT", BW_DressingRoomFrame.PreviewButtonFrame.PreviewButtonRightShoulder,"BOTTOMLEFT")
 	end
 
-	--Hiding weapons/tabard/shirt on show relies on DressingRoom:Update() (which reads the
-	--HideXOnShow flags set above), not GetSource() alone. Previously this only applied when
-	--whatever opened the frame happened to also be hooked into Update() (e.g. the Collections
-	--Journal's DressUpCollectionAppearance) -- other entry points (item links, etc.) opened the
-	--frame without ever consuming the flags. Calling Update() directly here (it calls GetSource()
-	--itself) makes hide-on-show work regardless of what caused the frame to open.
+	--Call Update() directly (not just GetSource()) so hide-on-show works no matter what opened the frame.
 	C_Timer.After(0, function() DressingRoom:Update() end);
 end
 

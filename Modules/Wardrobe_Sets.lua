@@ -3,11 +3,7 @@ addon = LibStub("AceAddon-3.0"):GetAddon(addonName);
 
 local Bizz_C_TransmogSets = C_TransmogSets
 addon.C_TransmogSets = addon.C_TransmogSets or {}
---Anything not explicitly overridden below falls through to the real Blizzard
---C_TransmogSets via __index, instead of silently resolving to nil (this used to
---be a hand-built proxy table that was missing GetSetPrimaryAppearances, IsSetVisible,
---SetIsFavorite, GetIsFavorite, and ClearSetNewSourcesForSlot -- any call to those
---would throw "attempt to call a nil value").
+--Anything not overridden below falls through to real Blizzard C_TransmogSets via __index, instead of resolving to nil.
 local C_TransmogSets = setmetatable({}, {__index = Bizz_C_TransmogSets})
 local L = LibStub("AceLocale-3.0"):GetLocale(addonName);
 
@@ -103,12 +99,7 @@ local tabType = {"item", "set", "extraset"}
 
 
 local SetsDataProvider = CreateFromMixins(BetterWardrobeSetsDataProviderMixin);
---TransmogShared.lua sets addon.SetsDataProvider to the raw mixin table (the class, not an
---instance), so every addon.SetsDataProvider:ClearSets()/:ClearBaseSets() call elsewhere
---(BuildBlizzSets in DataBase.lua, RefreshLists in Wardrobe.lua) was invalidating cache fields
---on that inert prototype instead of this real, visible-list-backing instance -- so a fresh
---armor-type/class-filter selection never reliably cleared out the previous one before the
---next build ran, leaving old and new entries mixed together.
+--Must reassign addon.SetsDataProvider to this real instance -- TransmogShared.lua points it at the inert mixin class, not an instance.
 addon.SetsDataProvider = SetsDataProvider;
 
 local WardrobeSetsCollectionMixin = {};
@@ -939,12 +930,7 @@ function WardrobeSetsScrollFrameButtonMixin:Init(elementData)
 	local topSourcesCollected, topSourcesTotal
 	local baseSet = SetsDataProvider:GetBaseSetByID(elementData.setID);
 
-	--NOTE: setID/name/label/icon/color used to only be set inside the
-	--`selectedCollectionTab ~= 4` branch below, which meant Saved Sets (tab 4) rows
-	--never got self.setID assigned at all -- causing "attempt to compare nil with
-	--number" at self.setID < 50000 further down, and rendering with no name/icon/label.
-	--Moved out so it runs for every tab; only the variant-set grouping logic
-	--(which doesn't apply to saved sets -- they don't have variants) stays conditional.
+	--setID must be set for every tab, not just inside the tab~=4 branch below, or Saved Sets rows never get self.setID.
 	self.setID = elementData.setID;
 
 	if BetterWardrobeCollectionFrame.selectedCollectionTab ~= 4 then
@@ -1184,9 +1170,7 @@ function WardrobeSetsScrollFrameButtonMixin:OnClick(buttonName, down)
 
 				local text;
 				local targetSetID;
-				--This whole button was written for Blizzard sets only: baseSetID/targetSetID for an
-				--extra set is an addon-generated 10000+ pseudo-ID, not a real Blizzard transmog set
-				--ID, so calling C_TransmogSets.SetIsFavorite on it was never valid to begin with.
+				--Extra set IDs are addon-generated pseudo-IDs, not real Blizzard set IDs -- needs its own branch.
 				local isExtraSet = (type == "extraset")
 				local favorite = baseSet.favoriteSetID ~= nil or addon.favoritesDB.profile.extraset[baseSetID];
 				if favorite then
@@ -1209,25 +1193,13 @@ function WardrobeSetsScrollFrameButtonMixin:OnClick(buttonName, down)
 
 				rootDescription:CreateButton(text, function()
 					if isExtraSet then
-						--When already favorited via a variant (not the base set itself),
-						--targetSetID is that variant's ID -- writing to baseSetID here instead
-						--cleared the wrong entry, leaving the actual favorited variant untouched.
+						--Write to targetSetID, not baseSetID: when favorited via a variant, targetSetID is that variant's ID.
 						addon.favoritesDB.profile.extraset[targetSetID] = not favorite;
-						--Extra sets are addon-local data with no Blizzard event to signal the
-						--change, unlike the real Blizzard sets branch below -- this one still
-						--needs a manual refresh.
+						--Extra sets have no Blizzard event for this, so refresh manually.
 						SetsDataProvider:RefreshFavorites();
 						BetterWardrobeCollectionFrame.SetsCollectionFrame:Refresh();
 					else
-						--addon.C_TransmogSets.SetIsFavorite doesn't exist (that wrapper only defines
-						--GetSetInfo/GetBaseSetID/etc, never SetIsFavorite), so these always errored.
-						--The local C_TransmogSets above falls through to the real Blizzard API for
-						--anything not explicitly overridden, which is exactly this case.
-						--
-						--Confirmed by an earlier diagnostic print: calling SetIsFavorite on BOTH
-						--targetSetID and baseSetID is what actually makes GetIsFavorite immediately
-						--reflect the change here -- matching Blizzard's own single-call version (which
-						--this was tried against) broke it, so keep both calls.
+						--Calling SetIsFavorite on BOTH targetSetID and baseSetID is required for GetIsFavorite to update immediately.
 						C_TransmogSets.SetIsFavorite(targetSetID, not favorite);
 						C_TransmogSets.SetIsFavorite(baseSetID, not favorite);
 						addon.Init:InitDB();

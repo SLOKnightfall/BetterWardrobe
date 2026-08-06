@@ -346,9 +346,7 @@ end
 
 addon.RefreshLists = RefreshLists;
 
---Points the preview at the first set in whichever list (Sets or Extra Sets, whichever tab is
---currently active) is showing after a class/armor-type filter change or an IgnoreClassRestrictions
---toggle, since the previously selected set is often no longer in the newly filtered list at all.
+--Re-selects the first visible set after a filter change, since the previous selection is often no longer in the list.
 local function SelectFirstSet()
 	local sets = addon.SetsDataProvider:GetBaseSets();
 	if sets and sets[1] then
@@ -529,9 +527,7 @@ function WardrobeCollectionFrameMixin:InitBaseSetsFilterButton()
 		sourceCheckAll(true)
 		missingCheckAll(true)
 		local result = C_TransmogSets.SetDefaultBaseSetsFilters();
-		--xpackCheckAll refreshes internally, but that happens before sourceCheckAll/missingCheckAll
-		--apply their own changes below it, so the list only ever reflected the expansion-filter
-		--reset and silently missed the source/missing-location reset that follows.
+		--RefreshLists must run after all three resets -- xpackCheckAll refreshes internally too early on its own.
 		RefreshLists();
 		return result;
 	end);
@@ -710,8 +706,7 @@ function WardrobeCollectionFrameMixin:OnLoad()
 
 	self.ItemsCollectionFrame.GetTooltipSourceIndexCallback = GenerateClosure(self.GetTooltipSourceIndex, self);
 
-	--Copied from Blizzard's code, but CollectionsJournal isn't ours to touch. Just sets the
-	--corner icon, safe to drop.
+	--CollectionsJournal isn't ours to touch; just sets a corner icon, safe to drop.
 	--CollectionsJournal:SetPortraitToAsset("Interface\\Icons\\inv_misc_enggizmos_19");
 
 	self.FilterButton:SetWidth(90);
@@ -2769,6 +2764,7 @@ end
 	end
 
 	function BetterWardrobeCollectionSavedOutfitDropdownMixin:OnHide()
+		self.Popout:Hide();
 	end
 
 	BetterWardrobeTransmogOptionsDropdownMixin = {};

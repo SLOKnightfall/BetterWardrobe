@@ -77,3 +77,4 @@ Modules\SortingFunctions.lua
 
 #3rd party addon compatability
 Plugins\ElvUI.lua
+Plugins\CanIMogIt.lua

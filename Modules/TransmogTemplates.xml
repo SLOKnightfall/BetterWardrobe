@@ -1327,6 +1327,16 @@
 	</DressUpModel>
 
 	<DressUpModel name="BW_TransmogCustomSetModelTemplate" mixin="BW_TransmogCustomSetModelMixin" inherits="BW_TransmogSetBaseModelTemplate" virtual="true">
+		<Layers>
+			<Layer level="OVERLAY">
+				<Texture parentKey="NarcissusIcon" file="Interface\AddOns\Narcissus\Art\Logos\NarcissusLogo32" hidden="true">
+					<Size x="18" y="18"/>
+					<Anchors>
+						<Anchor point="TOPRIGHT" x="-4" y="-4"/>
+					</Anchors>
+				</Texture>
+			</Layer>
+		</Layers>
 		<Scripts>
 			<OnMouseDown method="OnMouseDown"/>
 			<OnMouseUp method="OnMouseUp"/>

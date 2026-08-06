@@ -1432,9 +1432,7 @@ function TransmogWardrobeItemsMixin:InitFilterButton()
 	self.FilterButton:SetText(SOURCES);
 
 	self.FilterButton:SetupMenu(function(_dropdown, rootDescription)
-		--BISECTION TEST (BW_TAINT_BISECT): Items tab is TransmogFrame's default tab, so
-		--this runs on every vendor visit -- testing whether this shared-tag menu
-		--registration is the taint bug's source.
+		--BISECTION TEST (BW_TAINT_BISECT): checking if this shared-tag menu registration is the taint bug's source.
 		--rootDescription:SetTag("MENU_TRANSMOG_ITEMS_FILTER");
 
 		rootDescription:CreateButton(CHECK_ALL, function()
@@ -2302,9 +2300,7 @@ function TransmogWardrobeSetsMixin:RefreshCollectionEntries()
 	self.setsDataProvider:ClearSets();
 
 	local collectionElements = {};
-	--Which sets to build depends on which frame this refresh is actually for, not whichever
-	--tab happens to be visually active right now -- those can disagree if a refresh is
-	--triggered on a frame that isn't the currently shown one.
+	--Which sets to build depends on which frame this refresh is for, not whichever tab is visually active right now.
 	local isExtraSetsFrame = (self == TransmogFrame.WardrobeCollection.TabContent.BW_ExtraSetsFrame)
 	local isBaseSetsFrame = (self == TransmogFrame.WardrobeCollection.TabContent.BW_SetsFrame2)
 	if isExtraSetsFrame then
@@ -2486,17 +2482,8 @@ function TransmogWardrobeCustomSetsMixin:OnLoad()
 	self.PagedContent:SetElementTemplateData(self.COLLECTION_TEMPLATES);
 
 	self.NewCustomSetButton:SetScript("OnClick", function()
-		local data = { name = "", customSetID = nil, itemTransmogInfoList = self:GetItemTransmogInfoListCallback() };
-
-		local customSets = C_TransmogCollection.GetCustomSets();
-		--Use Ingame Manager if below cap
-		if #customSets <= 24  then
-			StaticPopup_Show("TRANSMOG_CUSTOM_SET_NAME", nil, nil, data);
-		else
-			local data = { name = "", customSetID = nil, itemTransmogInfoList = self:GetItemTransmogInfoListCallback() };
-			StaticPopup_Show("BW_TRANSMOG_CUSTOM_SET_NAME", nil, nil, data);
-		end
-
+		local data = { name = "", itemTransmogInfoList = self:GetItemTransmogInfoListCallback() };
+		addon:ShowCustomSetNamePopup(data);
 	end);
 
 	self.NewCustomSetButton:SetScript("OnEnter", function(button)
@@ -2521,9 +2508,7 @@ function TransmogWardrobeCustomSetsMixin:OnLoad()
 
 	self.NewCustomSetButton:SetScript("OnLeave", GameTooltip_Hide);
 
-	--Character dropdown: browse another character's saved custom sets (same
-	--addon.SelecteSavedList flag the Collection Journal's saved-outfit dropdown
-	--uses, see BetterWardrobeCollectionSavedOutfitDropdownMixin in Wardrobe.lua).
+	--Character dropdown: browse another character's saved custom sets (addon.SelecteSavedList flag).
 	local CharacterDropdown = CreateFrame("DropdownButton", nil, self, "WowStyle1DropdownTemplate");
 	self.CharacterDropdown = CharacterDropdown;
 	CharacterDropdown:SetPoint("TOPRIGHT", self, "TOPRIGHT", -26, -24);
@@ -2561,6 +2546,7 @@ function TransmogWardrobeCustomSetsMixin:OnLoad()
 			frame:RefreshCollectionEntries();
 		end,
 	});
+	frame.CharacterPopout = Popout;
 	Popout.DetailedTooltipCheckbox = CreateFrame("CheckButton", nil, Popout, "UICheckButtonTemplate");
 	Popout.DetailedTooltipCheckbox:SetSize(20, 20);
 	Popout.DetailedTooltipCheckbox:SetPoint("TOPLEFT", Popout.SearchBox, "BOTTOMLEFT", 0, -6);
@@ -2602,6 +2588,7 @@ end
 function TransmogWardrobeCustomSetsMixin:OnHide()
 	self:UnregisterEvent("UNIT_FORM_CHANGED");
 	FrameUtil.UnregisterFrameForEvents(self, self.DYNAMIC_EVENTS);
+	self.CharacterPopout:Hide();
 end
 
 function TransmogWardrobeCustomSetsMixin:OnEvent(event, ...)
@@ -2650,9 +2637,7 @@ function TransmogWardrobeCustomSetsMixin:RefreshNewCustomSetButton()
 end
 
 function TransmogWardrobeCustomSetsMixin:RefreshCollectionEntries()
-	--This list mixes Blizzard custom sets with our own saved "Extra" sets (built below). Extra sets
-	--store their index into addon.OutfitDB.char.outfits as customSetID, not a real Blizzard set ID,
-	--so GetCustomSetInfo would return nil for them (and previously errored comparing nil < string).
+	--Extra sets store their OutfitDB index as customSetID, not a real Blizzard set ID -- GetCustomSetInfo returns nil for them.
 	local function GetEntryName(element)
 		if element.setType == "Blizzard" then
 			local customSetName = C_TransmogCollection.GetCustomSetInfo(element.customSetID);
@@ -2676,6 +2661,7 @@ function TransmogWardrobeCustomSetsMixin:RefreshCollectionEntries()
 	local collectionElements = {};
 
 	if addon.SelecteSavedList then
+		local isSharedSets = addon.SelecteSavedList == addon.SHARED_SETS_KEY;
 		for _, data in ipairs(addon.GetOutfits()) do
 			local collectedCount, totalCount = addon:GetSlotsCollectedCount(data);
 			local element = {
@@ -2683,7 +2669,7 @@ function TransmogWardrobeCustomSetsMixin:RefreshCollectionEntries()
 				isCollected = totalCount > 0 and collectedCount == totalCount,
 				collectionFrame = self,
 				setType = "Alt",
-				altData = { name = data.name, slots = data, collectedCount = collectedCount, totalCount = totalCount },
+				altData = { name = data.name, slots = data, collectedCount = collectedCount, totalCount = totalCount, isNarcissusShared = isSharedSets },
 			};
 			table.insert(collectionElements, element);
 		end
@@ -2930,16 +2916,12 @@ function addon:CreateButtons()
 	--OnEnter is inherited from the template's mixin (BW_DressingRoomButtonMixin, defined in Wardrobe.lua),
 	--which shows text via BW_GameTooltip (Tooltips.lua's own tooltip frame), not the standard GameTooltip.
 	BW_LoadQueueButton:SetScript("OnLeave", function() BW_GameTooltip:Hide() end)
-	--OnMouseDown is also inherited from that mixin; for buttonID == "Import" it calls
-	--BW_DressingRoomImportButton_OnClick, a local function that only exists in the unloaded
-	--DressingRoom.lua, so it errors before OnClick above ever runs. Override with a no-op.
+	--Overridden with a no-op: the inherited OnMouseDown calls a function that only exists in unloaded DressingRoom.lua.
 	BW_LoadQueueButton:SetScript("OnMouseDown", function() BW_GameTooltip:Hide() end)
 	--Sized to match the preview's rotate/zoom/reset buttons (ModelSceneControlButtonTemplate, 32x32 with a 16x16 icon).
 	BW_LoadQueueButton:SetSize(32, 32)
 	BW_LoadQueueButton.Icon:SetSize(16, 16)
-	--CharacterPreview's ModelScene is mouse-enabled and setAllPoints across this whole area, so it
-	--eats clicks meant for these buttons unless they sit above it. Blizzard's own ClearAllPendingButton
-	--in the same frame uses frameLevel 100 for the same reason.
+	--frameLevel 100 so CharacterPreview's ModelScene doesn't eat clicks meant for this button.
 	BW_LoadQueueButton:SetFrameLevel(100)
 	BW_LoadQueueButton:Hide()
 

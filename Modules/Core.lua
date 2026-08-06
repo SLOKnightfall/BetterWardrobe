@@ -1369,12 +1369,7 @@ function addon.Init:LoadModules()
 	-----C_Timer.After(0, function() addon.Init:UpdateWardrobeEnhanced() end)
 
 	local f = CreateFrame("Frame", "BetterWardrobeCollectionFrame", TransmogFrame.WardrobeCollection, "BetterWardrobeCollectionFrameTemplate" )
-	--Saved Sets tab (tab 4) re-enabled -- it was being hidden here to work around
-	--errors that turned out to be caused by C_TransmogCollection's Outfit* API family
-	--being renamed to CustomSet* (GetOutfits->GetCustomSets, NewOutfit->NewCustomSet,
-	--RenameOutfit->RenameCustomSet, ModifyOutfit->ModifyCustomSet, GetOutfitInfo->
-	--GetCustomSetInfo, GetOutfitItemTransmogInfoList->GetCustomSetItemTransmogInfoList),
-	--now fixed throughout SavedOutfits.lua, DataBase.lua, BlizzardAPI.lua, and DressingRoom.lua.
+	--Saved Sets tab (tab 4) re-enabled -- was hidden to work around renamed Outfit*->CustomSet* APIs, now fixed.
 	--BetterWardrobeCollectionFrameTab4:Hide()
 	addon:setFrames()
 	addon.Init:InitFilterButtons()
@@ -1422,25 +1417,13 @@ function addon.Init:LoadModules()
 ]]--
 
 	C_Timer.After(0, function()
-		--UpdatePetTracker/UpdateCanIMogIt/InitExtendedSetsSwap stay disabled: their
-		--defining files (Plugins/PetTrackerJournal.lua, CanIMogIt.lua, ExtendedTransmog.lua)
-		--aren't loaded by the .toc, so calling these would throw "attempt to call a nil value".
-		--If you want this integration back, load those files first (guarding each call
-		--with e.g. `if addon.UpdatePetTracker then addon:UpdatePetTracker() end` is safer
-		--than relying on the .toc alone).
+		--UpdatePetTracker/InitExtendedSetsSwap stay disabled: their files aren't loaded by the .toc.
 		----addon:UpdatePetTracker()
 	addon.Init:initCollectionList()
 	addon.Init:BuildCollectionList()
-		--NOTE: BuildTransmogVendorUI is NOT re-enabled here. Its file (TransmogVendor.lua/.xml)
-		--isn't loaded by the .toc in this version OR in wow11 -- it was commented out even in
-		--the working wow11 Core.lua, so this isn't a regression to restore, it's an unfinished/
-		--unwired feature. I fixed 2 stale Blizzard API calls inside TransmogVendor.lua while
-		--investigating (C_Transmog.GetPending and GetSlotEffectiveCategory no longer exist),
-		--so it's in better shape if you want to finish wiring it in later -- add
-		--Modules\TransmogVendor.xml to the .toc and uncomment the line below once you've
-		--tested it, since it's never actually been exercised in a working build.
+		--BuildTransmogVendorUI stays disabled: TransmogVendor.xml isn't loaded by the .toc, unfinished/unwired.
 		----addon.Init:BuildTransmogVendorUI()
-		----addon:UpdateCanIMogIt()
+		addon:UpdateCanIMogIt()
 		----addon:InitExtendedSetsSwap()
 
 		--addon:CreateCustomSetsButton() -- SavedOutfitsViewer.xml disabled, dead code

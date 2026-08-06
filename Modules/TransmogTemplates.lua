@@ -1706,10 +1706,7 @@ function TransmogSetModelMixin:ToggleFavorite(setFavorite, isGroupFavorite)
 		end
 
 		C_TransmogSets.SetIsFavorite(setID, setFavorite);
-		--Unlike the extraset branch below, SetIsFavorite doesn't drive our custom BW_SetsFrame2
-		--list on its own -- the favorite icon/sort order come from a snapshot taken at the last
-		--RefreshCollectionEntries, so without this the toggle silently doesn't show until the
-		--tab is reopened.
+		--SetIsFavorite alone doesn't update BW_SetsFrame2's list; without this the toggle doesn't show until the tab reopens.
 		TransmogFrame.WardrobeCollection.TabContent.BW_SetsFrame2:RefreshCollectionEntries()
 	else
 		addon.favoritesDB.profile.extraset[setID] = not addon.favoritesDB.profile.extraset[setID]
@@ -1856,6 +1853,7 @@ function TransmogCustomSetModelMixin:UpdateSet()
 		local name, _icon = C_TransmogCollection.GetCustomSetInfo(self.elementData.customSetID);
 		self.TitleBar.Text:SetText(name)
 		self.Extra.Icon:Hide()
+		self.NarcissusIcon:Hide()
 
 	elseif self.elementData.setType == "Alt" then
 		self:Undress();
@@ -1870,6 +1868,7 @@ function TransmogCustomSetModelMixin:UpdateSet()
 		end
 		self.TitleBar.Text:SetText(altData.name)
 		self.Extra.Icon:Hide()
+		self.NarcissusIcon:SetShown(altData.isNarcissusShared == true)
 
 	else
 		local customSetTransmogInfo = addon.OutfitDB.char.outfits[self.elementData.customSetID]
@@ -1881,6 +1880,7 @@ function TransmogCustomSetModelMixin:UpdateSet()
 		end
 		self.TitleBar.Text:SetText(customSetTransmogInfo.name)
 		self.Extra.Icon:Show()
+		self.NarcissusIcon:Hide()
 	end
 
 	-- Border State FX
