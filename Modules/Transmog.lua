@@ -2662,6 +2662,7 @@ function TransmogWardrobeCustomSetsMixin:RefreshCollectionEntries()
 
 	if addon.SelecteSavedList then
 		local isSharedSets = addon.SelecteSavedList == addon.SHARED_SETS_KEY;
+		local isNarcissusShared = isSharedSets and C_AddOns.IsAddOnLoaded("Narcissus");
 		for _, data in ipairs(addon.GetOutfits()) do
 			local collectedCount, totalCount = addon:GetSlotsCollectedCount(data);
 			local element = {
@@ -2669,7 +2670,7 @@ function TransmogWardrobeCustomSetsMixin:RefreshCollectionEntries()
 				isCollected = totalCount > 0 and collectedCount == totalCount,
 				collectionFrame = self,
 				setType = "Alt",
-				altData = { name = data.name, slots = data, collectedCount = collectedCount, totalCount = totalCount, isNarcissusShared = isSharedSets },
+				altData = { name = data.name, slots = data, collectedCount = collectedCount, totalCount = totalCount, isNarcissusShared = isNarcissusShared },
 			};
 			table.insert(collectionElements, element);
 		end

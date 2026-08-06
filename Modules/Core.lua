@@ -1239,6 +1239,7 @@ function addon:OnInitialize()
 	listDB.HiddenAppearanceDB = listDB.HiddenAppearanceDB or {}
 	listDB.OutfitDB = listDB.OutfitDB or {}
 	listDB.SituationPresetsDB = listDB.SituationPresetsDB or {}
+	listDB.SharedSetsDB = listDB.SharedSetsDB or {}
 
 
 --Create all the profiled DB

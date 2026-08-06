@@ -855,7 +855,9 @@ end
 	--isn't cached), so it's derived from array position rather than an ever-incrementing
 	--counter -- using the shared `savedSetID` counter here gave every entry a new ID on
 	--every GetOutfits() call, which desynced selection from the ID the UI was built with.
-	local NARCISSUS_SHARED_SET_ID_BASE = SAVED_SET_OFFSET * 4
+	--Shared by both the Narcissus-backed and BetterWardrobe's own fallback Shared Sets pool below --
+	--only one is ever active per session (gated on whether Narcissus is loaded), so they don't collide.
+	local SHARED_SET_ID_BASE = SAVED_SET_OFFSET * 4
 
 	local function loadNarcissusSharedSets()
 		if not (NarciTransmogUIDB and NarciTransmogUIDB.SharedSets) then return {} end
@@ -868,7 +870,7 @@ end
 				data.name = setInfo.name
 				data.setType = "SavedExtra"
 				data.label = "Narcissus Shared Set"
-				data.outfitID = NARCISSUS_SHARED_SET_ID_BASE + i
+				data.outfitID = SHARED_SET_ID_BASE + i
 				data.index = #FullList + 1
 				data.validForCharacter = true
 
@@ -916,6 +918,73 @@ end
 		return true
 	end
 
+	--BetterWardrobe's own account-wide Shared Sets pool, used when Narcissus isn't loaded. Stores the
+	--itemTransmogInfoList directly (no slash-command encode/decode needed, unlike Narcissus's SavedVariable).
+	local function loadOwnSharedSets()
+		local list = BetterWardrobe_ListData.SharedSetsDB
+		if not list then return {} end
+
+		local FullList = {}
+		for i, setInfo in ipairs(list) do
+			local data = {}
+			data.name = setInfo.name
+			data.setType = "SavedExtra"
+			data.label = "Shared Set"
+			data.outfitID = SHARED_SET_ID_BASE + i
+			data.index = #FullList + 1
+			data.validForCharacter = true
+
+			for slotID = 1, 19 do
+				local info = setInfo.itemTransmogInfoList[slotID]
+				data[slotID] = (info and info.appearanceID) or 0
+
+				if slotID == 3 then
+					data.offShoulder = (info and info.secondaryAppearanceID) or 0
+				elseif slotID == 16 then
+					data.mainHandEnchant = (info and info.illusionID) or 0
+				elseif slotID == 17 then
+					data.offHandEnchant = (info and info.illusionID) or 0
+				end
+			end
+
+			tinsert(FullList, data)
+		end
+
+		return FullList
+	end
+
+	function addon:SaveOwnSharedSet(name, itemTransmogInfoList)
+		if not (name and strtrim(name) ~= "") then return false end
+
+		BetterWardrobe_ListData.SharedSetsDB = BetterWardrobe_ListData.SharedSetsDB or {}
+		local list = BetterWardrobe_ListData.SharedSetsDB
+
+		local _, _, classID = UnitClass("player");
+		table.insert(list, {
+			name = name,
+			itemTransmogInfoList = CopyTable(itemTransmogInfoList),
+			timeCreated = time(),
+			timeModified = time(),
+			classID = classID,
+		});
+
+		return true
+	end
+
+	function addon:SaveSharedSet(name, itemTransmogInfoList)
+		if C_AddOns.IsAddOnLoaded("Narcissus") then
+			return self:SaveNarcissusSharedSet(name, itemTransmogInfoList)
+		end
+		return self:SaveOwnSharedSet(name, itemTransmogInfoList)
+	end
+
+	local function loadSharedSets()
+		if C_AddOns.IsAddOnLoaded("Narcissus") then
+			return loadNarcissusSharedSets()
+		end
+		return loadOwnSharedSets()
+	end
+
 	function addon.GetOutfits(character)
 		local name = UnitName("player")
 		local realm = GetRealmName()
@@ -923,7 +992,7 @@ end
 		local FullList = {}
 		local savedOutfits
 		if addon.SelecteSavedList == addon.SHARED_SETS_KEY and not character then
-			FullList = loadNarcissusSharedSets()
+			FullList = loadSharedSets()
 		elseif addon.SelecteSavedList and not character then
 			FullList = loadAltsSavedSets(profile)
 		else

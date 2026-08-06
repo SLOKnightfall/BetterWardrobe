@@ -853,7 +853,7 @@ function addon:ModifyCustomSet(customSetIDToRename, dialogData)
 end
 
 local function NameExtraCustomSet(newName, customSetIDToRename, dialogData)
-	print("Saved ExtendedSet")
+	--print("Saved ExtendedSet")
 
 	local icon;
 	for _slotID, itemTransmogInfo in ipairs(WardrobeCustomSetManager.itemTransmogInfoList) do
@@ -901,11 +901,15 @@ local function NameExtraCustomSet(newName, customSetIDToRename, dialogData)
 end
 
 local function SaveSharedCustomSet(newName)
-	if not addon:SaveNarcissusSharedSet(newName, WardrobeCustomSetManager.itemTransmogInfoList) then
+	if not addon:SaveSharedSet(newName, WardrobeCustomSetManager.itemTransmogInfoList) then
 		return
 	end
 
 	TransmogFrame.WardrobeCollection.TabContent.BW_ExtraSetsFrame:RefreshCollectionEntries()
+	local customSetsFrame = TransmogFrame.WardrobeCollection.TabContent.BW_ExtraCustomSetsFrame
+	if customSetsFrame and customSetsFrame:IsShown() then
+		customSetsFrame:RefreshCollectionEntries()
+	end
 
 	BetterWardrobeOutfitManager:ClosePopups();
 end
@@ -927,7 +931,7 @@ local function GetOrCreateCustomSetNamePopup()
 
 	f.Title = f:CreateFontString(nil, "ARTWORK", "GameFontHighlight")
 	f.Title:SetPoint("TOP", 0, -20)
-	f.Title:SetText(TRANSMOG_CUSTOM_SET_NAME.."!")
+	f.Title:SetText(TRANSMOG_CUSTOM_SET_NAME)
 
 	f.EditBox = CreateFrame("EditBox", nil, f)
 	f.EditBox:SetSize(260, 32)
@@ -969,14 +973,6 @@ local function GetOrCreateCustomSetNamePopup()
 	f.SharedRadio.text:SetText("Shared")
 	f.SharedRadio:SetPoint("LEFT", f.CharacterRadio.text, "RIGHT", 24, 0)
 	f.SharedRadio:SetScript("OnClick", OnSourceRadioClick)
-	f.SharedRadio:SetScript("OnEnter", function(self)
-		if not self:IsEnabled() then
-			GameTooltip:SetOwner(self, "ANCHOR_RIGHT");
-			GameTooltip_AddErrorLine(GameTooltip, "Requires Narcissus");
-			GameTooltip:Show();
-		end
-	end)
-	f.SharedRadio:SetScript("OnLeave", GameTooltip_Hide)
 
 	f.SaveButton = CreateFrame("Button", nil, f, "UIPanelButtonTemplate")
 	f.SaveButton:SetSize(120, 22)
@@ -1039,7 +1035,6 @@ function addon:ShowCustomSetNamePopup(data)
 	f.CharacterRadio:SetChecked(true);
 	f.SharedRadio:SetChecked(false);
 	f.source = "Character";
-	f.SharedRadio:SetEnabled(NarciTransmogUIDB and NarciTransmogUIDB.SharedSets and true or false);
 
 	f:Show();
 	f.EditBox:SetFocus();
@@ -1050,7 +1045,7 @@ end
 -- customSetID - Set if editing an existing custom set, nil if new custom set flow.
 -- itemTransmogInfoList - Transmog info list to populate any custom set with (overriding existing or adding a new custom set).
 StaticPopupDialogs["BW_TRANSMOG_CUSTOM_SET_NAME"] = {
-	text = TRANSMOG_CUSTOM_SET_NAME.."!",
+	text = TRANSMOG_CUSTOM_SET_NAME,
 	button1 = SAVE,
 	button2 = CANCEL,
 	OnAccept = function(dialog, data)
