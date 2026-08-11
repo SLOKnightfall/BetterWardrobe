@@ -1045,6 +1045,10 @@ local defaults = {
 		ExtraLargeTransmogArea = false,
 		ExtraLargeTransmogAreaMax = screenWidth,
 		AutoApply = false,
+		ItemSortMode = "Default",
+		SetSortMode = "Default",
+		ItemSortReverse = false,
+		SetSortReverse = false,
 	}
 }
 local DB_Defaults = {

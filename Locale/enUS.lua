@@ -211,6 +211,11 @@ L["Default"] = true
 L["Expansion"] = true
 L["Missing:"] = true
 L["Armor Type"] = true
+L["Sort By"] = true
+L["Alphabetic"] = true
+L["Appearance"] = true
+L["Item Source"] = true
+L["Reverse"] = true
 
 L["Class Sets Only"] = true
 L["Hide Unavailable Sets"] = true

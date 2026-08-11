@@ -932,6 +932,7 @@ end
 			data.label = "Shared Set"
 			data.outfitID = SHARED_SET_ID_BASE + i
 			data.index = #FullList + 1
+			data.savedIndex = i
 			data.validForCharacter = true
 
 			for slotID = 1, 19 do
@@ -968,6 +969,23 @@ end
 			classID = classID,
 		});
 
+		return true
+	end
+
+	function addon:RenameOwnSharedSet(savedIndex, newName)
+		local list = BetterWardrobe_ListData.SharedSetsDB
+		if not (list and list[savedIndex] and newName and strtrim(newName) ~= "") then return false end
+
+		list[savedIndex].name = newName
+		list[savedIndex].timeModified = time()
+		return true
+	end
+
+	function addon:DeleteOwnSharedSet(savedIndex)
+		local list = BetterWardrobe_ListData.SharedSetsDB
+		if not (list and list[savedIndex]) then return false end
+
+		table.remove(list, savedIndex)
 		return true
 	end
 

@@ -95,16 +95,25 @@ local WardrobeSetsDataProviderMixin = {};
 BetterWardrobeSetsDataProviderMixin = WardrobeSetsDataProviderMixin
 
 addon.SetsDataProvider = BetterWardrobeSetsDataProviderMixin
+local function ReverseComparator(comparator, reverse)
+	if not reverse then return comparator end
+	return function(a, b) return comparator(b, a) end
+end
+
+local SETS_SORT_COMPARATORS = {
+	Alphabetic = function(set1, set2)
+		return (set1.name or "") < (set2.name or "");
+	end,
+	Expansion = function(set1, set2)
+		if set1.expansionID ~= set2.expansionID then
+			return set1.expansionID > set2.expansionID;
+		end
+		return (set1.name or "") < (set2.name or "");
+	end,
+};
+
 function WardrobeSetsDataProviderMixin:SortSets(sets, reverseUIOrder, ignorePatchID)
-	local comparison = function(set1, set2)
-		local groupFavorite1 = set1.favoriteSetID and true;
-		local groupFavorite2 = set2.favoriteSetID and true;
-		if ( groupFavorite1 ~= groupFavorite2 ) then
-			return groupFavorite1;
-		end
-		if ( set1.favorite ~= set2.favorite ) then
-			return set1.favorite;
-		end
+	local reversibleCompare = ReverseComparator(SETS_SORT_COMPARATORS[addon.Profile.SetSortMode] or function(set1, set2)
 		if ( set1.expansionID ~= set2.expansionID ) then
 			return set1.expansionID > set2.expansionID;
 		end
@@ -125,6 +134,19 @@ function WardrobeSetsDataProviderMixin:SortSets(sets, reverseUIOrder, ignorePatc
 		else
 			return set1.setID > set2.setID;
 		end
+	end, addon.Profile.SetSortReverse);
+
+	--Favorite-first stays outside the reversible comparator so Reverse never buries favorites.
+	local function comparison(set1, set2)
+		local groupFavorite1 = set1.favoriteSetID and true;
+		local groupFavorite2 = set2.favoriteSetID and true;
+		if ( groupFavorite1 ~= groupFavorite2 ) then
+			return groupFavorite1;
+		end
+		if ( set1.favorite ~= set2.favorite ) then
+			return set1.favorite;
+		end
+		return reversibleCompare(set1, set2);
 	end
 
 	table.sort(sets, comparison);

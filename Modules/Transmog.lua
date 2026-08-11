@@ -1445,6 +1445,28 @@ function TransmogWardrobeItemsMixin:InitFilterButton()
 			return MenuResponse.Refresh;
 		end);
 
+		rootDescription:CreateDivider();
+
+		local sortSubmenu = rootDescription:CreateButton(L["Sort By"]);
+		local function IsSortModeSelected(mode)
+			return addon.Profile.ItemSortMode == mode;
+		end
+		local function SetSortMode(mode)
+			addon.Profile.ItemSortMode = mode;
+			self:RefreshCollectionEntries();
+		end
+		sortSubmenu:CreateRadio(L["Default"], IsSortModeSelected, SetSortMode, "Default");
+		sortSubmenu:CreateRadio(L["Alphabetic"], IsSortModeSelected, SetSortMode, "Alphabetic");
+		sortSubmenu:CreateRadio(L["Appearance"], IsSortModeSelected, SetSortMode, "Appearance");
+		sortSubmenu:CreateRadio(L["Item Source"], IsSortModeSelected, SetSortMode, "ItemSource");
+		sortSubmenu:CreateDivider();
+		sortSubmenu:CreateCheckbox(L["Reverse"], function() return addon.Profile.ItemSortReverse; end, function()
+			addon.Profile.ItemSortReverse = not addon.Profile.ItemSortReverse;
+			self:RefreshCollectionEntries();
+		end);
+
+		rootDescription:CreateDivider();
+
 		local function IsChecked(filter)
 			return C_TransmogCollection.IsSourceTypeFilterChecked(filter);
 		end
@@ -1873,8 +1895,39 @@ function TransmogWardrobeItemsMixin:ClearAppearanceTooltip()
 	GameTooltip:Hide();
 end
 
+local function GetItemSourceName(sourceID)
+	local sourceInfo = C_TransmogCollection.GetSourceInfo(sourceID);
+	return sourceInfo and sourceInfo.name or "";
+end
+
+local function ReverseComparator(comparator, reverse)
+	if not reverse then return comparator end
+	return function(a, b) return comparator(b, a) end
+end
+
+local ITEM_SORT_COMPARATORS = {
+	Alphabetic = function(element1, element2)
+		local name1 = GetItemSourceName(element1.appearanceInfo.sourceID);
+		local name2 = GetItemSourceName(element2.appearanceInfo.sourceID);
+		return name1 < name2;
+	end,
+	Appearance = function(element1, element2)
+		return element1.appearanceInfo.visualID < element2.appearanceInfo.visualID;
+	end,
+	ItemSource = function(element1, element2)
+		local info1 = C_TransmogCollection.GetSourceInfo(element1.appearanceInfo.sourceID);
+		local info2 = C_TransmogCollection.GetSourceInfo(element2.appearanceInfo.sourceID);
+		local type1 = (info1 and info1.sourceType) or 0;
+		local type2 = (info2 and info2.sourceType) or 0;
+		if type1 == type2 then
+			return GetItemSourceName(element1.appearanceInfo.sourceID) < GetItemSourceName(element2.appearanceInfo.sourceID);
+		end
+		return type1 < type2;
+	end,
+};
+
 function TransmogWardrobeItemsMixin:SetCollectionEntries(entries, retainCurrentPage)
-	local compareEntries = function(element1, element2)
+	local compareEntries = ReverseComparator(ITEM_SORT_COMPARATORS[addon.Profile.ItemSortMode] or function(element1, element2)
 		local source1 = element1.appearanceInfo;
 		local source2 = element2.appearanceInfo;
 
@@ -1907,7 +1960,7 @@ function TransmogWardrobeItemsMixin:SetCollectionEntries(entries, retainCurrentP
 		end
 
 		return source1.sourceID > source2.sourceID;
-	end
+	end, addon.Profile.ItemSortReverse);
 
 	local collectionElements = {};
 	for _index, itemEntry in ipairs(entries) do
@@ -2088,6 +2141,14 @@ function TransmogWardrobeItemsMixin:GetSlotFrameCallback(slot, type)
 end
 ]]--
 
+--The Items-tab copy of this (near ITEM_SORT_COMPARATORS, above) sits inside the giant reference-only
+--comment block this file keeps for Blizzard's native code -- it never actually compiles, so it can't
+--be reused here. This is a separate, real, active copy for the Sets/Extra Sets tab.
+local function ReverseComparator(comparator, reverse)
+	if not reverse then return comparator end
+	return function(a, b) return comparator(b, a) end
+end
+
 local TransmogWardrobeSetsMixin = {
 	DYNAMIC_EVENTS = {
 		"TRANSMOG_SEARCH_UPDATED",
@@ -2105,9 +2166,41 @@ local TransmogWardrobeSetsMixin = {
 BW_TransmogWardrobeSetsMixin = TransmogWardrobeSetsMixin
 function TransmogWardrobeSetsMixin:OnLoad()
 	self:InitFilterButton();
+	self:InitClassDropdown();
 	self.PagedContent:SetElementTemplateData(self.COLLECTION_TEMPLATES);
 	self.SearchBox:SetSearchType(self.searchType);
 	self.setsDataProvider = CreateFromMixins(BetterWardrobeSetsDataProviderMixin);
+end
+
+--Drives C_TransmogSets' own native class filter (same one the Collection Journal's class dropdown
+--uses), which addon.Init:InitDB() -> BuildArmorDB()/BuildBlizzSets() -> UseSet() already respect.
+function TransmogWardrobeSetsMixin:InitClassDropdown()
+	self.ClassDropdown:SetSelectionTranslator(function(selection)
+		local classInfo = selection.data;
+		local classColor = GetClassColorObj(classInfo.classFile) or HIGHLIGHT_FONT_COLOR;
+		return classColor:WrapTextInColorCode(classInfo.className);
+	end);
+
+	self.ClassDropdown:SetupMenu(function(_dropdown, rootDescription)
+		rootDescription:SetTag("MENU_TRANSMOG_VENDOR_SETS_CLASS");
+
+		local function IsClassSelected(classInfo)
+			return C_TransmogSets.GetTransmogSetsClassFilter() == classInfo.classID;
+		end
+
+		local function SetClassFilter(classInfo)
+			C_TransmogSets.SetTransmogSetsClassFilter(classInfo.classID);
+			addon.Init:InitDB();
+			self:RefreshCollectionEntries();
+		end
+
+		for classID = 1, GetNumClasses() do
+			local classInfo = C_CreatureInfo.GetClassInfo(classID);
+			if classInfo then
+				rootDescription:CreateRadio(classInfo.className, IsClassSelected, SetClassFilter, classInfo);
+			end
+		end
+	end);
 end
 
 function TransmogWardrobeSetsMixin:OnShow()
@@ -2179,7 +2272,26 @@ function TransmogWardrobeSetsMixin:InitFilterButton()
 		rootDescription:CreateCheckbox(NOT_COLLECTED, C_TransmogSets.GetSetsFilter, SetSetsFilter, LE_TRANSMOG_SET_FILTER_UNCOLLECTED);
 		rootDescription:CreateDivider();
 
-		rootDescription:CreateCheckbox(L["Show Hidden Items"], function() return addon.Profile.ShowHidden; end, 
+		local sortSubmenu = rootDescription:CreateButton(L["Sort By"]);
+		local function IsSortModeSelected(mode)
+			return addon.Profile.SetSortMode == mode;
+		end
+		local function SetSortMode(mode)
+			addon.Profile.SetSortMode = mode;
+			self:RefreshCollectionEntries();
+		end
+		sortSubmenu:CreateRadio(L["Default"], IsSortModeSelected, SetSortMode, "Default");
+		sortSubmenu:CreateRadio(L["Alphabetic"], IsSortModeSelected, SetSortMode, "Alphabetic");
+		sortSubmenu:CreateRadio(L["Expansion"], IsSortModeSelected, SetSortMode, "Expansion");
+		sortSubmenu:CreateDivider();
+		sortSubmenu:CreateCheckbox(L["Reverse"], function() return addon.Profile.SetSortReverse; end, function()
+			addon.Profile.SetSortReverse = not addon.Profile.SetSortReverse;
+			self:RefreshCollectionEntries();
+		end);
+
+		rootDescription:CreateDivider();
+
+		rootDescription:CreateCheckbox(L["Show Hidden Items"], function() return addon.Profile.ShowHidden; end,
 			function()
 				addon.Profile.ShowHidden = not addon.Profile.ShowHidden;
 				self:RefreshCollectionEntries()
@@ -2366,16 +2478,19 @@ function TransmogWardrobeSetsMixin:RefreshCollectionEntries()
 		end
 	end
 
-	local compareEntries = function(element1, element2)
+	local SET_SORT_COMPARATORS = {
+		Alphabetic = function(element1, element2)
+			return element1.name < element2.name;
+		end,
+		Expansion = function(element1, element2)
+			if element1.expansionID ~= element2.expansionID then
+				return element1.expansionID > element2.expansionID;
+			end
+			return element1.name < element2.name;
+		end,
+	};
 
-		--Extra sets store favorite as nil-when-unfavorited rather than false; coerce both sides
-		--to real booleans so this never returns nil as a sort comparator result.
-		local favorite1 = element1.favorite and true or false;
-		local favorite2 = element2.favorite and true or false;
-		if favorite1 ~= favorite2 then
-			return favorite1;
-		end
-
+	local reversibleCompare = ReverseComparator(SET_SORT_COMPARATORS[addon.Profile.SetSortMode] or function(element1, element2)
 		local collected1 = element1.collected == element1.pieces
 		local collected2 = element2.collected == element2.pieces
 		if collected1 ~= collected2 then
@@ -2393,6 +2508,18 @@ function TransmogWardrobeSetsMixin:RefreshCollectionEntries()
 		local customSetName1, _customSetIcon1 = element1.name;
 		local customSetName2, _customSetIcon2 = element2.name;
 		return customSetName1 < customSetName2;
+	end, addon.Profile.SetSortReverse);
+
+	--Favorite-first stays outside the reversible comparator so Reverse never buries favorites.
+	local function compareEntries(element1, element2)
+		--Extra sets store favorite as nil-when-unfavorited rather than false; coerce both sides
+		--to real booleans so this never returns nil as a sort comparator result.
+		local favorite1 = element1.favorite and true or false;
+		local favorite2 = element2.favorite and true or false;
+		if favorite1 ~= favorite2 then
+			return favorite1;
+		end
+		return reversibleCompare(element1, element2);
 	end
 	table.sort(collectionElements, compareEntries);
 
@@ -2663,6 +2790,7 @@ function TransmogWardrobeCustomSetsMixin:RefreshCollectionEntries()
 	if addon.SelecteSavedList then
 		local isSharedSets = addon.SelecteSavedList == addon.SHARED_SETS_KEY;
 		local isNarcissusShared = isSharedSets and C_AddOns.IsAddOnLoaded("Narcissus");
+		local isOwnSharedSet = isSharedSets and not isNarcissusShared;
 		for _, data in ipairs(addon.GetOutfits()) do
 			local collectedCount, totalCount = addon:GetSlotsCollectedCount(data);
 			local element = {
@@ -2670,7 +2798,7 @@ function TransmogWardrobeCustomSetsMixin:RefreshCollectionEntries()
 				isCollected = totalCount > 0 and collectedCount == totalCount,
 				collectionFrame = self,
 				setType = "Alt",
-				altData = { name = data.name, slots = data, collectedCount = collectedCount, totalCount = totalCount, isNarcissusShared = isNarcissusShared },
+				altData = { name = data.name, slots = data, collectedCount = collectedCount, totalCount = totalCount, isNarcissusShared = isNarcissusShared, isOwnSharedSet = isOwnSharedSet, savedIndex = data.savedIndex },
 			};
 			table.insert(collectionElements, element);
 		end

@@ -478,6 +478,12 @@
 					<Anchor point="TOPRIGHT" relativeKey="$parent.FilterButton" relativePoint="TOPLEFT" x="-10" y="1"/>
 				</Anchors>
 			</EditBox>
+			<DropdownButton parentKey="ClassDropdown" inherits="WowStyle1DropdownTemplate">
+				<Size x="130" y="22"/>
+				<Anchors>
+					<Anchor point="TOPRIGHT" relativeKey="$parent.SearchBox" relativePoint="TOPLEFT" x="-10" y="0"/>
+				</Anchors>
+			</DropdownButton>
 			<Frame parentKey="PagedContent" inherits="PagedNaturalSizeGridContentFrameTemplate">
 				<KeyValues>
 					<KeyValue key="viewsPerPage" value="1" type="number"/>

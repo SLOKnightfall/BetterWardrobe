@@ -646,10 +646,24 @@ function WardrobeCollectionFrameMixin:InitBaseSetsFilterButton()
 		end
 		submenu:CreateDivider();
 	]]--
-		--TODO: Enable Sorting menu
-	 	--submenu = rootDescription:CreateButton("Sorting");
+		submenu = rootDescription:CreateButton(L["Sort By"]);
+		local function IsSortModeSelected(mode)
+			return addon.Profile.SetSortMode == mode;
+		end
+		local function SetSortMode(mode)
+			addon.Profile.SetSortMode = mode;
+			RefreshLists();
+		end
+		submenu:CreateRadio(L["Default"], IsSortModeSelected, SetSortMode, "Default");
+		submenu:CreateRadio(L["Alphabetic"], IsSortModeSelected, SetSortMode, "Alphabetic");
+		submenu:CreateRadio(L["Expansion"], IsSortModeSelected, SetSortMode, "Expansion");
+		submenu:CreateDivider();
+		submenu:CreateCheckbox(L["Reverse"], function() return addon.Profile.SetSortReverse; end, function()
+			addon.Profile.SetSortReverse = not addon.Profile.SetSortReverse;
+			RefreshLists();
+		end);
 
-		--rootDescription:CreateDivider();
+		rootDescription:CreateDivider();
 	 	submenu = rootDescription:CreateButton("Options");
 
 		submenu:CreateCheckbox(L["Show Hidden Sets"], 

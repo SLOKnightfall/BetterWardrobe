@@ -1748,7 +1748,26 @@ function TransmogCustomSetModelMixin:OnMouseUp(button)
 	end
 
 	if self.elementData.setType == "Alt" then
-		--Browsing another character's set: no rename/replace/delete, it isn't ours to edit.
+		--Browsing another character's set (or a Narcissus-backed shared set): not ours to edit here.
+		--Our own Shared Sets pool is the one exception -- we own that data.
+		if not self.elementData.altData.isOwnSharedSet then
+			return;
+		end
+
+		MenuUtil.CreateContextMenu(self, function(_owner, rootDescription)
+			rootDescription:SetTag("MENU_TRANSMOG_CUSTOM_SETS_MODEL_FILTER");
+
+			local altData = self.elementData.altData;
+			rootDescription:CreateButton(TRANSMOG_CUSTOM_SET_RENAME, function()
+				StaticPopup_Show("BW_RENAME_SHARED_SET", nil, nil, { name = altData.name, savedIndex = altData.savedIndex });
+			end);
+
+			rootDescription:CreateDivider();
+
+			rootDescription:CreateButton(RED_FONT_COLOR:WrapTextInColorCode(TRANSMOG_CUSTOM_SET_DELETE), function()
+				StaticPopup_Show("BW_CONFIRM_DELETE_SHARED_SET", altData.name, nil, altData.savedIndex);
+			end);
+		end);
 		return;
 	end
 

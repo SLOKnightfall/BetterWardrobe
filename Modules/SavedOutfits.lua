@@ -900,19 +900,77 @@ local function NameExtraCustomSet(newName, customSetIDToRename, dialogData)
 
 end
 
-local function SaveSharedCustomSet(newName)
-	if not addon:SaveSharedSet(newName, WardrobeCustomSetManager.itemTransmogInfoList) then
-		return
-	end
-
+--The Character/Shared-filtered browser (where "+ New Custom Set" and the Shared Sets list live) is a
+--separate frame from BW_ExtraSetsFrame and needs its own refresh after any shared-set data change.
+local function RefreshSharedSetLists()
 	TransmogFrame.WardrobeCollection.TabContent.BW_ExtraSetsFrame:RefreshCollectionEntries()
 	local customSetsFrame = TransmogFrame.WardrobeCollection.TabContent.BW_ExtraCustomSetsFrame
 	if customSetsFrame and customSetsFrame:IsShown() then
 		customSetsFrame:RefreshCollectionEntries()
 	end
+end
+
+local function SaveSharedCustomSet(newName)
+	if not addon:SaveSharedSet(newName, WardrobeCustomSetManager.itemTransmogInfoList) then
+		return
+	end
+
+	RefreshSharedSetLists()
 
 	BetterWardrobeOutfitManager:ClosePopups();
 end
+
+StaticPopupDialogs["BW_RENAME_SHARED_SET"] = {
+	preferredIndex = 3,
+	text = TRANSMOG_CUSTOM_SET_NAME,
+	button1 = SAVE,
+	button2 = CANCEL,
+	OnAccept = function(dialog, data)
+		if addon:RenameOwnSharedSet(data.savedIndex, dialog:GetEditBox():GetText()) then
+			RefreshSharedSetLists()
+		end
+	end,
+	timeout = 0,
+	whileDead = 1,
+	hideOnEscape = 1,
+	hasEditBox = 1,
+	maxLetters = 31,
+	OnShow = function(dialog, data)
+		dialog:GetEditBox():SetText(data.name or "")
+		dialog:GetEditBox():HighlightText()
+		dialog:GetEditBox():SetFocus()
+	end,
+	OnHide = function(dialog)
+		dialog:GetEditBox():SetText("")
+	end,
+	EditBoxOnEnterPressed = function(editBox)
+		if editBox:GetParent():GetButton1():IsEnabled() then
+			StaticPopup_OnClick(editBox:GetParent(), 1)
+		end
+	end,
+	EditBoxOnTextChanged = function(editBox)
+		local parent = editBox:GetParent()
+		parent:GetButton1():SetEnabled(parent:GetEditBox():GetText() ~= "")
+	end,
+	EditBoxOnEscapePressed = function(editBox)
+		editBox:GetParent():Hide()
+	end,
+}
+
+StaticPopupDialogs["BW_CONFIRM_DELETE_SHARED_SET"] = {
+	preferredIndex = 3,
+	text = TRANSMOG_CUSTOM_SET_CONFIRM_DELETE,
+	button1 = YES,
+	button2 = NO,
+	OnAccept = function(dialog, savedIndex)
+		if addon:DeleteOwnSharedSet(savedIndex) then
+			RefreshSharedSetLists()
+		end
+	end,
+	hideOnEscape = 1,
+	timeout = 0,
+	whileDead = 1,
+}
 
 local CustomSetNamePopup
 
