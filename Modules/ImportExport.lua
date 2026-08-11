@@ -153,28 +153,78 @@ StaticPopupDialogs["BETTER_WARDROBE_IMPORT_ITEM_POPUP"] = {
 	exclusive = true,
 	whileDead = true,
 };
+local function GetSourceItemData(sourceID)
+	if not sourceID or sourceID <= 0 then
+		return nil
+	end
 
+	local sourceInfo = C_TransmogCollection.GetSourceInfo(sourceID)
+
+	if not sourceInfo then
+		return nil
+	end
+
+	local itemID = sourceInfo.itemID
+	local itemModID = sourceInfo.itemModID or 0
+
+	if not itemID or itemID <= 0 then
+		return nil
+	end
+
+	return itemID, itemModID
+end
+
+
+local function GetVendorSourceID(transmogLocation)
+	if not transmogLocation then
+		return nil
+	end
+
+	local visualInfo = C_Transmog.GetSlotVisualInfo(transmogLocation)
+
+	if not visualInfo then
+		return nil
+	end
+
+	-- Если пользователь только выбрал трансмог,
+	-- но ещё не нажал "Применить", берём pending.
+	local sourceID = visualInfo.pendingSourceID
+
+	-- Если pending нет, берём уже применённый трансмог.
+	if not sourceID or sourceID <= 0 then
+		sourceID = visualInfo.appliedSourceID
+	end
+
+	if not sourceID or sourceID <= 0 then
+		return nil
+	end
+
+	return sourceID
+end
 --Blizzard removed TransmogUtil.CreateOutfitSlashCommand (the /outfit v1 link generator this used),
 --so exporting now reuses the same DressUpItemLink macro format as the existing "post to chat" command.
 function addon:ExportSet()
-	self:CreateChatLinkTransmogVendor()
+	if C_Transmog.IsAtTransmogNPC() then
+		self:CreateChatLinkTransmogVendor()
+	else
+		self:CreateChatLink()
+	end
 end
 
 function addon:ExportTransmogVendorSet()
-	local str = "/outfit v1 ";
-	for key, transmogSlot in pairs(TRANSMOG_SLOTS) do
-		if ( transmogSlot.location:IsAppearance() ) then
-			
-			----local sourceID = WardrobeOutfitDropDown:GetSlotSourceID(transmogSlot.location)
-			local _, _, sourceID = TransmogUtil.GetInfoForEquippedSlot(transmogSlot.location);
-			if ( sourceID ) then
-				str = str..sourceID..","
-			else
-				str = str.."0,"
-			end
+	local sources = {}
+
+	for _, transmogSlot in pairs(TRANSMOG_SLOTS) do
+		local location = transmogSlot.location
+
+		if location and location:IsAppearance() then
+			local sourceID = GetVendorSourceID(location)
+			table.insert(sources, tostring(sourceID or 0))
 		end
 	end
-	Export(str,false)
+
+	local str = "/outfit v1 " .. table.concat(sources, ",")
+	Export(str, false)
 end
 
 function IE.ImportTransmogVendorSet(importString)
@@ -198,41 +248,47 @@ end
 local linkText = "f(%d,%d);"
 function addon:CreateChatLink()
 	local string = [[/run local function f(i,b)DressUpItemLink("item:"..i.."::::::::::::9:"..b);end;]]
+
 	local Buttons = BW_DressingRoomFrame.PreviewButtonFrame.Slots
-	for index, button in pairs(Buttons) do
-		local itemlink = nil
-		local slot = button:GetID()
-		
-		--if not DressingRoom:IsSlotHidden(slot) then
-			itemlink = button.itemLink --GetInventoryItemLink("player", slot)
-			if itemlink then
-				local id, dif, bonus = ConvertItemLink(itemlink)
-				string = string..linkText:format(id,bonus or 0)
+
+	for _, button in pairs(Buttons) do
+		local sourceID = button.sourceID
+
+		if sourceID then
+			local itemID, itemModID = GetSourceItemData(sourceID)
+
+			if itemID then
+				string = string .. linkText:format(itemID, itemModID)
 			end
-		--end
+		end
 	end
+
 	print(string)
-	Export(string,false)
+	Export(string, false)
 end
 
 
 function addon:CreateChatLinkTransmogVendor()
 	local string = [[/run local function f(i,b)DressUpItemLink("item:"..i.."::::::::::::9:"..b);end;]]
-	for key, transmogSlot in pairs(TRANSMOG_SLOTS) do
-		if ( transmogSlot.location:IsAppearance() ) then
-			local _, _, sourceID = TransmogUtil.GetInfoForEquippedSlot(transmogSlot.location)
-			----local sourceID = WardrobeOutfitDropDown:GetSlotSourceID(transmogSlot.location)
-			if ( sourceID ) then
-				local sourceInfo = C_TransmogCollection.GetSourceInfo(sourceID)
-				if sourceInfo then 
-					local id = sourceInfo.itemID
-					local bonus = sourceInfo.itemModID  or 0
-					string = string..linkText:format(id,bonus)
+
+	for _, transmogSlot in pairs(TRANSMOG_SLOTS) do
+		local location = transmogSlot.location
+
+		if location and location:IsAppearance() then
+			local sourceID = GetVendorSourceID(location)
+
+			if sourceID then
+				local itemID, itemModID = GetSourceItemData(sourceID)
+
+				if itemID then
+					string = string .. linkText:format(itemID, itemModID)
 				end
 			end
 		end
 	end
-	Export(string,false)
+
+	print(string)
+	Export(string, false)
 end
 
 
