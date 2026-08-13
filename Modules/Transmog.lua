@@ -2307,14 +2307,14 @@ function TransmogWardrobeSetsMixin:InitFilterButton()
 			end,
 		1);
 
-		rootDescription:CreateCheckbox("Alternate Appearances", function() return addon.Profile.ShowOnlyAltAppearanceSets; end,
+		rootDescription:CreateCheckbox(L["Alternate Appearances"], function() return addon.Profile.ShowOnlyAltAppearanceSets; end,
 			function()
 				addon.Profile.ShowOnlyAltAppearanceSets = not addon.Profile.ShowOnlyAltAppearanceSets;
 				self:RefreshCollectionEntries()
 			end,
 		1);
 
-		rootDescription:CreateCheckbox("Show Alternate Appearance Icon", function() return addon.Profile.ShowAltAppearanceIcon; end,
+		rootDescription:CreateCheckbox(L["Show Alternate Appearance Icon"], function() return addon.Profile.ShowAltAppearanceIcon; end,
 			function()
 				addon.Profile.ShowAltAppearanceIcon = not addon.Profile.ShowAltAppearanceIcon;
 				self:RefreshCollectionEntries()

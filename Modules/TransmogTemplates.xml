@@ -1320,7 +1320,7 @@
 				<Scripts>
 					<OnEnter>
 						GameTooltip:SetOwner(self, "ANCHOR_RIGHT");
-						GameTooltip:SetText("Has an alternate look available");
+						GameTooltip:SetText(BW_GetAltAppearanceTooltipText());
 						GameTooltip:Show();
 					</OnEnter>
 					<OnLeave>

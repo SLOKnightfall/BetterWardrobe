@@ -1,4 +1,5 @@
 local addonName, addon = ...
+local L = LibStub("AceLocale-3.0"):GetLocale(addonName)
 
 --[[
 TransmogOutfitEntryMixin = {
@@ -1520,7 +1521,7 @@ function TransmogSetModelMixin:OnMouseUp(button)
 		end);
 
 		if self.altAppearanceItems and #self.altAppearanceItems > 0 then
-			rootDescription:CreateButton("Alternate Appearances", function()
+			rootDescription:CreateButton(L["Alternate Appearances"], function()
 				addon:ShowAltAppearancePopup(self.altAppearanceItems);
 			end);
 		end
@@ -1754,6 +1755,11 @@ function TransmogSetModelMixin:ToggleFavorite(setFavorite, isGroupFavorite)
 
 end
 
+--Global (not addon:-scoped) so XML <OnEnter> script bodies, which can't resolve this file's local L, can call it.
+function BW_GetAltAppearanceTooltipText()
+	return L["Has an alternate look available"];
+end
+
 do
 	local SWATCH_SIZE = 32;
 	local SWATCH_SPACING = 6;
@@ -1852,7 +1858,7 @@ do
 
 		f.Title = f:CreateFontString(nil, "OVERLAY", "GameFontNormal");
 		f.Title:SetPoint("TOP", 0, -12);
-		f.Title:SetText("Alternate Appearances");
+		f.Title:SetText(L["Alternate Appearances"]);
 
 		f.CloseButton = CreateFrame("Button", nil, f, "UIPanelCloseButton");
 		f.CloseButton:SetPoint("TOPRIGHT", 0, 0);
@@ -2008,7 +2014,7 @@ do
 
 		badge:SetScript("OnEnter", function(self)
 			GameTooltip:SetOwner(self, "ANCHOR_RIGHT");
-			GameTooltip:SetText("Has an alternate look available");
+			GameTooltip:SetText(L["Has an alternate look available"]);
 			GameTooltip:Show();
 		end);
 		badge:SetScript("OnLeave", GameTooltip_Hide);
@@ -2070,7 +2076,7 @@ do
 
 			MenuUtil.CreateContextMenu(self, function(_owner, rootDescription)
 				rootDescription:SetTag("MENU_TRANSMOG_SLOT_ALT_APPEARANCE");
-				rootDescription:CreateButton("Alternate Appearances", function()
+				rootDescription:CreateButton(L["Alternate Appearances"], function()
 					addon:ShowAltAppearancePopup({ altData });
 				end);
 			end);
@@ -2175,7 +2181,7 @@ do
 
 		badge:SetScript("OnEnter", function(self)
 			GameTooltip:SetOwner(self, "ANCHOR_RIGHT");
-			GameTooltip:SetText("Has an alternate look available");
+			GameTooltip:SetText(L["Has an alternate look available"]);
 			GameTooltip:Show();
 		end);
 		badge:SetScript("OnLeave", GameTooltip_Hide);
@@ -2235,7 +2241,7 @@ do
 
 			MenuUtil.CreateContextMenu(self, function(_owner, rootDescription)
 				rootDescription:SetTag("MENU_TRANSMOG_ITEM_ALT_APPEARANCE");
-				rootDescription:CreateButton("Alternate Appearances", function()
+				rootDescription:CreateButton(L["Alternate Appearances"], function()
 					addon:ShowAltAppearancePopup({ altData });
 				end);
 			end);

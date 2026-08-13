@@ -421,7 +421,7 @@ function WardrobeCollectionFrameMixin:InitItemsFilterButton()
 			C_TransmogCollection.SetAllRacesShown(not C_TransmogCollection.GetAllRacesShown());
 		end);
 
-		rootDescription:CreateCheckbox("Alternate Appearances",
+		rootDescription:CreateCheckbox(L["Alternate Appearances"],
 			function() return addon.Profile.ShowOnlyAltAppearanceItems; end,
 			function()
 				addon.Profile.ShowOnlyAltAppearanceItems = not addon.Profile.ShowOnlyAltAppearanceItems;
@@ -583,7 +583,7 @@ function WardrobeCollectionFrameMixin:InitBaseSetsFilterButton()
 		end
 	end
 
-		rootDescription:CreateCheckbox("Alternate Appearances",
+		rootDescription:CreateCheckbox(L["Alternate Appearances"],
 			function()
 				return addon.Profile.ShowOnlyAltAppearanceSets;
 			end,
@@ -690,7 +690,7 @@ function WardrobeCollectionFrameMixin:InitBaseSetsFilterButton()
 				RefreshLists();
 			end);
 
-		submenu:CreateCheckbox("Show Alternate Appearance Icon",
+		submenu:CreateCheckbox(L["Show Alternate Appearance Icon"],
 			function()
 				return addon.Profile.ShowAltAppearanceIcon;
 			end,
@@ -2358,7 +2358,7 @@ function WardrobeItemModelMixin:OnMouseUp(button)
 
 			local altData = addon:BuildAltAppearanceData(self:GetDisplayedSourceID());
 			if altData then
-				rootDescription:CreateButton("Alternate Appearances", function()
+				rootDescription:CreateButton(L["Alternate Appearances"], function()
 					addon:ShowAltAppearancePopup({ altData }, function(sourceID)
 						BetterWardrobeCollectionFrame:GoToItem(sourceID);
 					end);

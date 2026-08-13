@@ -526,3 +526,7 @@ L["NOTE_130"] = "Hallowfall Gear"
 
 L["Swap to Better Wardrobe View"] = true
 L["Swap to Extended Transmog Sets View"] = true
+
+L["Alternate Appearances"] = true
+L["Show Alternate Appearance Icon"] = true
+L["Has an alternate look available"] = true
