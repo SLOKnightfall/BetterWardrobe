@@ -1206,6 +1206,12 @@ end
 		end
 
 		addon.setdb.global.sets[addon.setdb:GetCurrentProfile()] = BlizzardSavedSets
+
+		--Stamp this character's class alongside their saved sets so the character-picker popout
+		--(CreateCharacterPickerPopout) can class-color the roster instead of plain white.
+		addon.setdb.global.characterClass = addon.setdb.global.characterClass or {}
+		addon.setdb.global.characterClass[addon.setdb:GetCurrentProfile()] = select(2, UnitClass("player"))
+
 		return BlizzardSavedSets
 	end
 
@@ -1480,8 +1486,14 @@ end
 			f.Check:SetTexture("Interface\\Buttons\\UI-CheckBox-Check")
 			f.Check:Hide()
 
+			f.ClassIcon = f:CreateTexture(nil, "OVERLAY")
+			f.ClassIcon:SetPoint("LEFT", 22, 0)
+			f.ClassIcon:SetSize(14, 14)
+			f.ClassIcon:SetTexture("Interface\\Glues\\CHARACTERCREATE\\UI-CharacterCreate-Classes")
+			f.ClassIcon:Hide()
+
 			f.Text = f:CreateFontString(nil, "OVERLAY", "GameFontHighlightSmall")
-			f.Text:SetPoint("LEFT", 22, 0)
+			f.Text:SetPoint("LEFT", 40, 0)
 			f.Text:SetPoint("RIGHT", -6, 0)
 			f.Text:SetJustifyH("LEFT")
 
@@ -1538,6 +1550,24 @@ end
 				end
 				row.value = data.value
 				row.Text:SetText(data.text)
+
+				local classFilename = addon.setdb.global.characterClass and addon.setdb.global.characterClass[data.value]
+				local classColor = classFilename and RAID_CLASS_COLORS[classFilename]
+				local classIconCoords = classFilename and CLASS_ICON_TCOORDS[classFilename]
+				if classIconCoords then
+					row.ClassIcon:SetTexCoord(unpack(classIconCoords))
+					row.ClassIcon:Show()
+				else
+					row.ClassIcon:Hide()
+				end
+				if classColor then
+					row.Text:SetTextColor(classColor.r, classColor.g, classColor.b)
+				else
+					--No stamped class yet (saved before this addon version, or from another source
+					--never storing one) -- fall back to the font object's default color.
+					row.Text:SetTextColor(HIGHLIGHT_FONT_COLOR.r, HIGHLIGHT_FONT_COLOR.g, HIGHLIGHT_FONT_COLOR.b)
+				end
+
 				row.Check:SetShown(self.isSelected and self.isSelected(data.value))
 				row.onClick = function(value)
 					self.onSelect(value)

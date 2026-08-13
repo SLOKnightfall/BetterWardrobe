@@ -1324,6 +1324,13 @@ function addon:OnEnable()
 
 	addon.Init:InitDB()
 
+	--Stamp this character's class every login (not just when StoreBlizzardSets() runs on save) so the
+	--character-picker popout (CreateCharacterPickerPopout, Data/DataBase.lua) can class-color the
+	--roster for anyone who has logged in at least once since this was added, without needing them to
+	--re-save a set first.
+	addon.setdb.global.characterClass = addon.setdb.global.characterClass or {}
+	addon.setdb.global.characterClass[addon.setdb:GetCurrentProfile()] = playerClass
+
 	--addon.Init:BuildTooltips()
 	addon.Init:DressingRoom()
 	--addon.Init.LoadCollectionListModule()
