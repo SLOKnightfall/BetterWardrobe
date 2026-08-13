@@ -1050,6 +1050,8 @@ local defaults = {
 		ItemSortReverse = false,
 		SetSortReverse = false,
 		ShowAltAppearanceIcon = true,
+		ShowOnlyAltAppearanceSets = false,
+		ShowOnlyAltAppearanceItems = false,
 	}
 }
 local DB_Defaults = {
