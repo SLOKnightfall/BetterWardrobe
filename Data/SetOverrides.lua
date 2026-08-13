@@ -1413,8 +1413,40 @@ function addon:CheckForExtraItems(setID, data)
 end
 
 
-function addon:CheckAltItem(sourceID)
-	if altitems[sourceID] then
-		return altitems[sourceID]
+--altitems is mostly one-directional (e.g. [36576] = 36581, no reverse entry); build a
+--symmetric index so any member of a group finds every other member.
+local altItemGroups
+
+local function BuildAltItemGroups()
+	altItemGroups = {}
+	for baseID, alt in pairs(altitems) do
+		local members = { baseID }
+		if type(alt) == "table" then
+			for _, id in ipairs(alt) do
+				tinsert(members, id)
+			end
+		else
+			tinsert(members, alt)
+		end
+
+		for _, memberID in ipairs(members) do
+			local others = altItemGroups[memberID]
+			if not others then
+				others = {}
+				altItemGroups[memberID] = others
+			end
+			for _, otherID in ipairs(members) do
+				if otherID ~= memberID and not tContains(others, otherID) then
+					tinsert(others, otherID)
+				end
+			end
+		end
 	end
+end
+
+function addon:CheckAltItem(sourceID)
+	if not altItemGroups then
+		BuildAltItemGroups()
+	end
+	return altItemGroups[sourceID]
 end

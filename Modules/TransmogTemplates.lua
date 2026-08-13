@@ -1464,6 +1464,8 @@ function TransmogSetModelMixin:OnMouseDown(button)
 			ApplyOutfit(sources)
 		end
 		PlaySound(SOUNDKIT.UI_TRANSMOG_ITEM_CLICK);
+
+		addon:RefreshOrCloseAltAppearancePopup(self.altAppearanceItems);
 	end
 end
 
@@ -1516,6 +1518,12 @@ function TransmogSetModelMixin:OnMouseUp(button)
 		rootDescription:CreateButton(text, function()
 			self:ToggleFavorite(not isFavorite, isGroupFavorite);
 		end);
+
+		if self.altAppearanceItems and #self.altAppearanceItems > 0 then
+			rootDescription:CreateButton("Alternate Appearances", function()
+				addon:ShowAltAppearancePopup(self.altAppearanceItems);
+			end);
+		end
 
 		rootDescription:CreateButton(TRANSMOG_SET_OPEN_COLLECTION, function()
 			if self.elementData.setType == "Blizzard" then
@@ -1622,6 +1630,37 @@ function TransmogSetModelMixin:UpdateSet()
 	-- Icons
 	self.Favorite.Icon:SetShown(self.elementData.favorite);
 	self.HiddenVisual.Icon:SetShown(self.elementData.hidden);
+
+	local altAppearanceItems = {};
+	for _index, primaryAppearance in pairs(self.elementData.sourceData.primaryAppearances) do
+		local altid = addon:CheckAltItem(primaryAppearance.appearanceID);
+		if altid then
+			if type(altid) ~= "table" then
+				altid = {altid};
+			end
+
+			local sourceInfo = C_TransmogCollection.GetSourceInfo(primaryAppearance.appearanceID);
+			local slot, slotLabel;
+			if sourceInfo then
+				--C_Transmog.GetSlotForInventoryType returns a legacy invSlot-space value, not an
+				--Enum.TransmogOutfitSlot -- bridge through TransmogUtil like DressingRoom.lua/Wardrobe_Sets.lua do.
+				local invSlot = C_Transmog.GetSlotForInventoryType(sourceInfo.invType);
+				local slotName = invSlot and TransmogUtil.GetSlotName(invSlot);
+				local transmogLocation = slotName and TransmogUtil.GetTransmogLocation(slotName, Enum.TransmogType.Appearance, false);
+				slot = transmogLocation and transmogLocation:GetSlot();
+				slotLabel = slotName and _G[slotName];
+			end
+
+			tinsert(altAppearanceItems, {
+				sourceID = primaryAppearance.appearanceID,
+				alternates = altid,
+				slot = slot,
+				slotLabel = slotLabel,
+			});
+		end
+	end
+	self.altAppearanceItems = altAppearanceItems;
+	self.AltAppearance:SetShown(addon.Profile.ShowAltAppearanceIcon and #altAppearanceItems > 0);
 end
 
 -- Overridden. (modified)
@@ -1713,6 +1752,556 @@ function TransmogSetModelMixin:ToggleFavorite(setFavorite, isGroupFavorite)
 		TransmogFrame.WardrobeCollection.TabContent.BW_ExtraSetsFrame:RefreshCollectionEntries()
 	end
 
+end
+
+do
+	local SWATCH_SIZE = 32;
+	local SWATCH_SPACING = 6;
+	local ROW_HEIGHT = SWATCH_SIZE + SWATCH_SPACING;
+	local MAX_VISIBLE_ROWS = 5;
+
+	local function CreateSwatch(parent)
+		local b = CreateFrame("Button", nil, parent);
+		b:SetSize(SWATCH_SIZE, SWATCH_SIZE);
+
+		b.Icon = b:CreateTexture(nil, "ARTWORK");
+		b.Icon:SetAllPoints();
+
+		b.IconBorder = b:CreateTexture(nil, "OVERLAY");
+		b.IconBorder:SetAllPoints();
+		b.IconBorder:SetAtlas("loottab-set-itemborder-green", TextureKitConstants.IgnoreAtlasSize);
+
+		b.Selected = CreateFrame("Frame", nil, b, "BackdropTemplate");
+		b.Selected:SetPoint("TOPLEFT", -3, 3);
+		b.Selected:SetPoint("BOTTOMRIGHT", 3, -3);
+		b.Selected:SetBackdrop({
+			edgeFile = "Interface/Tooltips/UI-Tooltip-Border",
+			edgeSize = 8,
+		});
+		b.Selected:SetBackdropBorderColor(1, 0.82, 0, 1);
+		b.Selected:Hide();
+
+		b:SetScript("OnEnter", function(self)
+			local sourceInfo = self.sourceID and C_TransmogCollection.GetSourceInfo(self.sourceID);
+			if not sourceInfo then
+				return;
+			end
+
+			GameTooltip:SetOwner(self, "ANCHOR_RIGHT");
+			GameTooltip:SetText(sourceInfo.name or RETRIEVING_ITEM_INFO);
+			if self.slotLabel then
+				GameTooltip:AddLine(self.slotLabel, 1, 1, 1);
+			end
+			if sourceInfo.isCollected then
+				GameTooltip:AddLine(TRANSMOG_COLLECTED or "Collected", 0, 1, 0);
+			else
+				GameTooltip:AddLine(TRANSMOG_NOT_COLLECTED or "Not Collected", 1, 0, 0);
+			end
+			GameTooltip:Show();
+		end);
+		b:SetScript("OnLeave", GameTooltip_Hide);
+
+		return b;
+	end
+
+	local function CreateRow(parent)
+		local row = CreateFrame("Frame", nil, parent);
+		row:SetHeight(SWATCH_SIZE);
+		row.Swatches = {};
+		return row;
+	end
+
+	local AltAppearancePopout;
+
+	local function GetAltAppearancePopout()
+		if AltAppearancePopout then
+			return AltAppearancePopout;
+		end
+
+		local f = CreateFrame("Frame", "BW_AltAppearancePopout", UIParent, "BackdropTemplate");
+		tinsert(UISpecialFrames, "BW_AltAppearancePopout");
+		f:SetFrameStrata("DIALOG");
+		f:SetSize(260, 100);
+
+		if TransmogFrame.Character then
+			f:SetPoint("CENTER", TransmogFrame.Character, "CENTER", -125, 0);
+		else
+			f:SetPoint("CENTER", UIParent, "CENTER", -125, 0);
+		end
+
+		f:Hide();
+		f:EnableMouse(true);
+
+		TransmogFrame:HookScript("OnHide", function()
+			f:Hide();
+		end);
+
+		if BetterWardrobeCollectionFrame then
+			BetterWardrobeCollectionFrame:HookScript("OnHide", function()
+				f:Hide();
+			end);
+		end
+
+		f:SetBackdrop({
+			bgFile = "Interface/Tooltips/UI-Tooltip-Background",
+			edgeFile = "Interface/Tooltips/UI-Tooltip-Border",
+			edgeSize = 16,
+			insets = { left = 4, right = 4, top = 4, bottom = 4 },
+		});
+		f:SetBackdropColor(0, 0, 0, 0.95);
+
+		f.Title = f:CreateFontString(nil, "OVERLAY", "GameFontNormal");
+		f.Title:SetPoint("TOP", 0, -12);
+		f.Title:SetText("Alternate Appearances");
+
+		f.CloseButton = CreateFrame("Button", nil, f, "UIPanelCloseButton");
+		f.CloseButton:SetPoint("TOPRIGHT", 0, 0);
+		f.CloseButton:SetScript("OnClick", function()
+			f:Hide();
+		end);
+
+		f.ScrollFrame = CreateFrame("ScrollFrame", nil, f, "UIPanelScrollFrameTemplate");
+		f.ScrollFrame:SetPoint("TOPLEFT", 16, -34);
+		f.ScrollFrame:SetPoint("BOTTOMRIGHT", -28, 12);
+
+		f.Content = CreateFrame("Frame", nil, f.ScrollFrame);
+		f.Content:SetSize(1, 1);
+		f.ScrollFrame:SetScrollChild(f.Content);
+
+		f.Rows = {};
+
+		local function DefaultOnSelect(sourceID, slot)
+			if slot then
+				UpdateOutfit(slot, Enum.TransmogType.Appearance, sourceID);
+			end
+		end
+
+		function f:Refresh(altAppearanceItems, onSelect)
+			self.onSelect = onSelect or DefaultOnSelect;
+
+			local prevRowAnchor;
+			for i, itemData in ipairs(altAppearanceItems) do
+				local row = self.Rows[i];
+				if not row then
+					row = CreateRow(self.Content);
+					self.Rows[i] = row;
+				end
+
+				row:ClearAllPoints();
+				if prevRowAnchor then
+					row:SetPoint("TOPLEFT", prevRowAnchor, "BOTTOMLEFT", 0, -SWATCH_SPACING);
+				else
+					row:SetPoint("TOPLEFT", self.Content, "TOPLEFT", 0, 0);
+				end
+				row:SetPoint("RIGHT", self.Content, "RIGHT", 0, 0);
+
+				local options = { itemData.sourceID };
+				for _index, altSourceID in ipairs(itemData.alternates) do
+					tinsert(options, altSourceID);
+				end
+
+				local prevSwatchAnchor;
+				for j, sourceID in ipairs(options) do
+					local swatch = row.Swatches[j];
+					if not swatch then
+						swatch = CreateSwatch(row);
+						row.Swatches[j] = swatch;
+					end
+
+					swatch:ClearAllPoints();
+					if prevSwatchAnchor then
+						swatch:SetPoint("LEFT", prevSwatchAnchor, "RIGHT", SWATCH_SPACING, 0);
+					else
+						swatch:SetPoint("LEFT", row, "LEFT", 0, 0);
+					end
+
+					swatch.Icon:SetTexture(C_TransmogCollection.GetSourceIcon(sourceID));
+					swatch.itemID = C_TransmogCollection.GetSourceItemID(sourceID);
+					swatch.sourceID = sourceID;
+					swatch.slot = itemData.slot;
+					swatch.slotLabel = itemData.slotLabel;
+					swatch.Selected:SetShown(sourceID == itemData.sourceID);
+					swatch:SetScript("OnClick", function(self)
+						f.onSelect(self.sourceID, self.slot);
+
+						for _index, otherSwatch in ipairs(row.Swatches) do
+							otherSwatch.Selected:SetShown(otherSwatch == self);
+						end
+					end);
+					swatch:Show();
+					prevSwatchAnchor = swatch;
+				end
+
+				for j = #options + 1, #row.Swatches do
+					row.Swatches[j]:Hide();
+				end
+
+				row:Show();
+				prevRowAnchor = row;
+			end
+
+			for i = #altAppearanceItems + 1, #self.Rows do
+				self.Rows[i]:Hide();
+			end
+
+			self.Content:SetHeight(math.max(1, #altAppearanceItems * ROW_HEIGHT));
+			self:SetHeight(44 + (math.min(#altAppearanceItems, MAX_VISIBLE_ROWS) * ROW_HEIGHT));
+		end
+
+		AltAppearancePopout = f;
+		return f;
+	end
+
+	function addon:ShowAltAppearancePopup(altAppearanceItems, onSelect)
+		local popout = GetAltAppearancePopout();
+		popout:Refresh(altAppearanceItems, onSelect);
+
+		--Popout is shared between the vendor and the Collections Journal; reposition per-show.
+		popout:ClearAllPoints();
+		if TransmogFrame and TransmogFrame:IsShown() and TransmogFrame.Character then
+			popout:SetPoint("CENTER", TransmogFrame.Character, "CENTER", -125, 0);
+		elseif BetterWardrobeCollectionFrame and BetterWardrobeCollectionFrame:IsShown() then
+			popout:SetPoint("CENTER", BetterWardrobeCollectionFrame, "CENTER");
+		else
+			popout:SetPoint("CENTER");
+		end
+
+		popout:Show();
+	end
+
+	function addon:RefreshOrCloseAltAppearancePopup(altAppearanceItems)
+		if not AltAppearancePopout or not AltAppearancePopout:IsShown() then
+			return;
+		end
+
+		if altAppearanceItems and #altAppearanceItems > 0 then
+			AltAppearancePopout:Refresh(altAppearanceItems);
+		else
+			AltAppearancePopout:Hide();
+		end
+	end
+end
+
+--Alt-appearance badges on the character-preview slot icons. Attaches an overlay to
+--Blizzard's own pooled slot buttons at runtime; doesn't touch Blizzard's XML.
+do
+	local DYNAMIC_EVENTS = {
+		"VIEWED_TRANSMOG_OUTFIT_CHANGED",
+		"VIEWED_TRANSMOG_OUTFIT_SLOT_REFRESH",
+		"VIEWED_TRANSMOG_OUTFIT_SLOT_WEAPON_OPTION_CHANGED",
+	};
+
+	local function GetOrCreateBadge(slotFrame)
+		if slotFrame.BW_AltAppearanceBadge then
+			return slotFrame.BW_AltAppearanceBadge;
+		end
+
+		--Real frame, not a texture, so it stacks above the slot's selection border.
+		local badge = CreateFrame("Frame", nil, slotFrame);
+		badge:SetSize(20, 20);
+		badge:SetFrameLevel(slotFrame:GetFrameLevel() + 10);
+		badge:SetPoint("CENTER", slotFrame.Icon or slotFrame, "TOPLEFT", 5, -5);
+
+		local texture = badge:CreateTexture(nil, "OVERLAY");
+		texture:SetAllPoints();
+		texture:SetTexture("Interface\\FriendsFrame\\UI-Toast-ChatInviteIcon");
+
+		badge:SetScript("OnEnter", function(self)
+			GameTooltip:SetOwner(self, "ANCHOR_RIGHT");
+			GameTooltip:SetText("Has an alternate look available");
+			GameTooltip:Show();
+		end);
+		badge:SetScript("OnLeave", GameTooltip_Hide);
+
+		badge:Hide();
+
+		slotFrame.BW_AltAppearanceBadge = badge;
+		return badge;
+	end
+
+	local function GetSlotAltAppearanceData(slotFrame)
+		local slotData = slotFrame.slotData;
+		if not slotData or not slotData.transmogLocation or not slotData.currentWeaponOptionInfo then
+			return nil;
+		end
+
+		local outfitSlotInfo = C_TransmogOutfitInfo.GetViewedOutfitSlotInfo(slotData.transmogLocation:GetSlot(), slotData.transmogLocation:GetType(), slotData.currentWeaponOptionInfo.weaponOption);
+		local transmogID = outfitSlotInfo and outfitSlotInfo.transmogID;
+		if not transmogID or transmogID == Constants.Transmog.NoTransmogID then
+			return nil;
+		end
+
+		local altid = addon:CheckAltItem(transmogID);
+		if not altid then
+			return nil;
+		end
+		if type(altid) ~= "table" then
+			altid = {altid};
+		end
+
+		local slotName = slotData.transmogLocation:GetSlotName();
+		return {
+			sourceID = transmogID,
+			alternates = altid,
+			slot = slotData.transmogLocation:GetSlot(),
+			slotLabel = slotName and _G[slotName],
+		};
+	end
+
+	local function RefreshSlotBadge(slotFrame)
+		GetOrCreateBadge(slotFrame):SetShown(addon.Profile.ShowAltAppearanceIcon and GetSlotAltAppearanceData(slotFrame) ~= nil);
+	end
+
+	local function HookSlotContextMenu(slotFrame)
+		if slotFrame.BW_AltAppearanceHooked then
+			return;
+		end
+		slotFrame.BW_AltAppearanceHooked = true;
+
+		slotFrame:HookScript("OnClick", function(self, buttonName)
+			if buttonName ~= "RightButton" then
+				return;
+			end
+
+			local altData = GetSlotAltAppearanceData(self);
+			if not altData then
+				return;
+			end
+
+			MenuUtil.CreateContextMenu(self, function(_owner, rootDescription)
+				rootDescription:SetTag("MENU_TRANSMOG_SLOT_ALT_APPEARANCE");
+				rootDescription:CreateButton("Alternate Appearances", function()
+					addon:ShowAltAppearancePopup({ altData });
+				end);
+			end);
+		end);
+	end
+
+	local function RefreshAllSlotBadges()
+		local preview = TransmogFrame and TransmogFrame.CharacterPreview;
+		local pool = preview and preview.CharacterAppearanceSlotFramePool;
+		if not pool then
+			return;
+		end
+
+		for slotFrame in pool:EnumerateActive() do
+			HookSlotContextMenu(slotFrame);
+			RefreshSlotBadge(slotFrame);
+		end
+	end
+
+	local watcher = CreateFrame("Frame");
+	for _index, event in ipairs(DYNAMIC_EVENTS) do
+		watcher:RegisterEvent(event);
+	end
+	watcher:SetScript("OnEvent", RefreshAllSlotBadges);
+
+	if TransmogFrame then
+		TransmogFrame:HookScript("OnShow", RefreshAllSlotBadges);
+	end
+end
+
+function addon:SetHasAltAppearanceItem(primaryAppearances)
+	if not primaryAppearances then
+		return false;
+	end
+
+	for _index, primaryAppearance in pairs(primaryAppearances) do
+		if addon:CheckAltItem(primaryAppearance.appearanceID) then
+			return true;
+		end
+	end
+
+	return false;
+end
+
+function addon:BuildAltAppearanceData(sourceID)
+	if not sourceID then
+		return nil;
+	end
+
+	local altid = addon:CheckAltItem(sourceID);
+	if not altid then
+		return nil;
+	end
+	if type(altid) ~= "table" then
+		altid = {altid};
+	end
+
+	local slot, slotLabel;
+	local sourceInfo = C_TransmogCollection.GetSourceInfo(sourceID);
+	if sourceInfo then
+		--GetSlotForInventoryType is a legacy invSlot value, not an Enum.TransmogOutfitSlot; bridge it.
+		local invSlot = C_Transmog.GetSlotForInventoryType(sourceInfo.invType);
+		local slotName = invSlot and TransmogUtil.GetSlotName(invSlot);
+		local transmogLocation = slotName and TransmogUtil.GetTransmogLocation(slotName, Enum.TransmogType.Appearance, false);
+		slot = transmogLocation and transmogLocation:GetSlot();
+		slotLabel = slotName and _G[slotName];
+	end
+
+	return {
+		sourceID = sourceID,
+		alternates = altid,
+		slot = slot,
+		slotLabel = slotLabel,
+	};
+end
+
+--Vendor's Items tab: these are Blizzard's own stock cards, not this addon's (its own
+--Items-tab mixin never finishes loading), so walk them via GetChildren() instead of
+--PagedContent:ForEachFrame.
+do
+	local DYNAMIC_EVENTS = {
+		"TRANSMOG_SEARCH_UPDATED",
+		"TRANSMOG_COLLECTION_UPDATED",
+		"VIEWED_TRANSMOG_OUTFIT_CHANGED",
+		"VIEWED_TRANSMOG_OUTFIT_SLOT_REFRESH",
+		"PLAYER_EQUIPMENT_CHANGED",
+	};
+
+	local function GetOrCreateBadge(card)
+		if card.BW_AltAppearanceBadge then
+			return card.BW_AltAppearanceBadge;
+		end
+
+		local badge = CreateFrame("Frame", nil, card);
+		badge:SetSize(20, 20);
+		badge:SetFrameLevel(card:GetFrameLevel() + 10);
+		badge:SetPoint("TOPRIGHT", -2, -2);
+
+		local texture = badge:CreateTexture(nil, "OVERLAY");
+		texture:SetAllPoints();
+		texture:SetTexture("Interface\\FriendsFrame\\UI-Toast-ChatInviteIcon");
+
+		badge:SetScript("OnEnter", function(self)
+			GameTooltip:SetOwner(self, "ANCHOR_RIGHT");
+			GameTooltip:SetText("Has an alternate look available");
+			GameTooltip:Show();
+		end);
+		badge:SetScript("OnLeave", GameTooltip_Hide);
+
+		badge:Hide();
+
+		card.BW_AltAppearanceBadge = badge;
+		return badge;
+	end
+
+	local function GetCardSourceID(card)
+		local elementData = card.elementData;
+		local appearanceInfo = elementData and elementData.appearanceInfo;
+		local collectionFrame = elementData and elementData.collectionFrame;
+		if not appearanceInfo or not collectionFrame or not collectionFrame.GetAnAppearanceSourceFromVisual then
+			return nil;
+		end
+
+		local sourceID = collectionFrame:GetAnAppearanceSourceFromVisual(appearanceInfo.visualID, nil);
+		if not sourceID or sourceID == Constants.Transmog.NoTransmogID then
+			return nil;
+		end
+
+		return sourceID;
+	end
+
+	local function RefreshCardBadge(card)
+		local altData = card.elementData and addon:BuildAltAppearanceData(GetCardSourceID(card));
+		GetOrCreateBadge(card):SetShown(addon.Profile.ShowAltAppearanceIcon and altData ~= nil);
+	end
+
+	--Hooks the same UpdateItem() that keeps HideVisual/FavoriteVisual current.
+	local function HookCardUpdateItem(card)
+		if card.BW_UpdateItemHooked or type(card.UpdateItem) ~= "function" then
+			return;
+		end
+		card.BW_UpdateItemHooked = true;
+
+		hooksecurefunc(card, "UpdateItem", RefreshCardBadge);
+	end
+
+	local function HookCardContextMenu(card)
+		if card.BW_AltAppearanceHooked then
+			return;
+		end
+		card.BW_AltAppearanceHooked = true;
+
+		card:HookScript("OnMouseUp", function(self, button)
+			if button ~= "RightButton" then
+				return;
+			end
+
+			local altData = self.elementData and addon:BuildAltAppearanceData(GetCardSourceID(self));
+			if not altData then
+				return;
+			end
+
+			MenuUtil.CreateContextMenu(self, function(_owner, rootDescription)
+				rootDescription:SetTag("MENU_TRANSMOG_ITEM_ALT_APPEARANCE");
+				rootDescription:CreateButton("Alternate Appearances", function()
+					addon:ShowAltAppearancePopup({ altData });
+				end);
+			end);
+		end);
+
+		card:HookScript("OnMouseDown", function(self, button)
+			if button ~= "LeftButton" then
+				return;
+			end
+
+			local altData = self.elementData and addon:BuildAltAppearanceData(GetCardSourceID(self));
+			addon:RefreshOrCloseAltAppearancePopup(altData and { altData } or {});
+		end);
+	end
+
+	local function GetItemCardsView()
+		local tabContent = TransmogFrame and TransmogFrame.WardrobeCollection and TransmogFrame.WardrobeCollection.TabContent;
+		local itemsFrame = tabContent and tabContent.ItemsFrame;
+		local pagedContent = itemsFrame and itemsFrame.PagedContent;
+		return pagedContent and pagedContent.View;
+	end
+
+	local function RefreshAllCardBadges()
+		local view = GetItemCardsView();
+		if not view then
+			return;
+		end
+
+		for _index, card in ipairs({ view:GetChildren() }) do
+			if card.elementData ~= nil then
+				HookCardContextMenu(card);
+				HookCardUpdateItem(card);
+				RefreshCardBadge(card);
+			end
+		end
+	end
+
+	--Deferred a tick: these can fire before the card pool actually repopulates.
+	local function DeferredRefresh()
+		C_Timer.After(0, RefreshAllCardBadges);
+	end
+
+	local watcher = CreateFrame("Frame");
+	for _index, event in ipairs(DYNAMIC_EVENTS) do
+		watcher:RegisterEvent(event);
+	end
+	watcher:SetScript("OnEvent", DeferredRefresh);
+
+	if TransmogFrame then
+		TransmogFrame:HookScript("OnShow", DeferredRefresh);
+	end
+
+	local itemsFrame = TransmogFrame and TransmogFrame.WardrobeCollection and TransmogFrame.WardrobeCollection.TabContent and TransmogFrame.WardrobeCollection.TabContent.ItemsFrame;
+	if itemsFrame then
+		itemsFrame:HookScript("OnShow", DeferredRefresh);
+	end
+
+	--Deferred a tick: Wardrobe.lua may not have set this global yet at load time.
+	C_Timer.After(0, function()
+		if BetterWardrobeItemsCollectionMixin then
+			hooksecurefunc(BetterWardrobeItemsCollectionMixin, "UpdateItems", RefreshAllCardBadges);
+		end
+	end);
+
+	--Exposed for manual /run testing.
+	addon.RefreshItemAltAppearanceBadges = RefreshAllCardBadges;
 end
 
 local TransmogCustomSetModelMixin = {};

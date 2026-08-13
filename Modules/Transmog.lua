@@ -2298,11 +2298,25 @@ function TransmogWardrobeSetsMixin:InitFilterButton()
 			end,
 		1);
 
-		rootDescription:CreateCheckbox(L["Ignore Class Restriction Filter"], function() return addon.Profile.IgnoreClassRestrictions; end, 
+		rootDescription:CreateCheckbox(L["Ignore Class Restriction Filter"], function() return addon.Profile.IgnoreClassRestrictions; end,
 			function()
 				addon.Profile.IgnoreClassRestrictions = not addon.Profile.IgnoreClassRestrictions;
 				addon.Init:InitDB()
 
+				self:RefreshCollectionEntries()
+			end,
+		1);
+
+		rootDescription:CreateCheckbox("Alternate Appearances", function() return addon.Profile.ShowOnlyAltAppearanceSets; end,
+			function()
+				addon.Profile.ShowOnlyAltAppearanceSets = not addon.Profile.ShowOnlyAltAppearanceSets;
+				self:RefreshCollectionEntries()
+			end,
+		1);
+
+		rootDescription:CreateCheckbox("Show Alternate Appearance Icon", function() return addon.Profile.ShowAltAppearanceIcon; end,
+			function()
+				addon.Profile.ShowAltAppearanceIcon = not addon.Profile.ShowAltAppearanceIcon;
 				self:RefreshCollectionEntries()
 			end,
 		1);
@@ -2400,11 +2414,12 @@ local function isValidFilter(data)
 	local hasPieces = (data.pieces and data.pieces > 0)
 	local hidden = (addon.Profile.ShowHidden and false) or ( not addon.Profile.ShowHidden and addon.HiddenAppearanceDB.profile[setType][data.setID])
 	local searhText = addon:SearchSets(data)
+	local altAppearanceOnly = not addon.Profile.ShowOnlyAltAppearanceSets or addon:SetHasAltAppearanceItem(data.sourceData and data.sourceData.primaryAppearances)
 	--if tab == 5 then
 		--return expansion and not hidden
 	--end
 
-	return expansion and (collected or uncollected) and searhText and not hidden and hasPieces
+	return expansion and (collected or uncollected) and searhText and not hidden and hasPieces and altAppearanceOnly
 end
 
 

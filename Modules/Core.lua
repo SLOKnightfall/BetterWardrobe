@@ -1049,6 +1049,7 @@ local defaults = {
 		SetSortMode = "Default",
 		ItemSortReverse = false,
 		SetSortReverse = false,
+		ShowAltAppearanceIcon = true,
 	}
 }
 local DB_Defaults = {

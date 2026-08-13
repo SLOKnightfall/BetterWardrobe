@@ -969,6 +969,8 @@ function WardrobeSetsScrollFrameButtonMixin:Init(elementData)
 	self.IconFrame:SetIconCoverShown(not setCollected);
 	self.IconFrame:SetIconColor(displayData.validForCharacter and HIGHLIGHT_FONT_COLOR or RED_FONT_COLOR);
 	self.IconFrame:SetFavoriteIconShown(elementData.favoriteSetID)
+	local sourceData = SetsDataProvider:GetSetSourceData(displayData.setID);
+	self.IconFrame:SetAltAppearanceIconShown(addon.Profile.ShowAltAppearanceIcon and addon:SetHasAltAppearanceItem(sourceData and sourceData.primaryAppearances));
 	self.New:SetShown(SetsDataProvider:IsBaseSetNew(elementData.setID));
 
 	if BetterWardrobeCollectionFrame.selectedCollectionTab ~= 4 then
@@ -1235,6 +1237,10 @@ end
 
 function WardrobeSetsScrollFrameButtonIconFrameMixin:SetFavoriteIconShown(shown)
 	self.Favorite:SetShown(shown);
+end
+
+function WardrobeSetsScrollFrameButtonIconFrameMixin:SetAltAppearanceIconShown(shown)
+	self.AltAppearance:SetShown(shown);
 end
 
 function WardrobeSetsScrollFrameButtonIconFrameMixin:SetIconColor(color)

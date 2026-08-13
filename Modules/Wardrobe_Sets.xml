@@ -25,6 +25,12 @@
 								<Anchor point="TOPLEFT" x="-8" y="8"/>
 							</Anchors>
 						</Texture>
+						<Texture parentKey="AltAppearance" file="Interface\FriendsFrame\UI-Toast-ChatInviteIcon" hidden="true">
+							<Size x="16" y="16"/>
+							<Anchors>
+								<Anchor point="TOPRIGHT" x="8" y="8"/>
+							</Anchors>
+						</Texture>
 					</Layer>
 				</Layers>
 				<Scripts>

@@ -421,13 +421,21 @@ function WardrobeCollectionFrameMixin:InitItemsFilterButton()
 			C_TransmogCollection.SetAllRacesShown(not C_TransmogCollection.GetAllRacesShown());
 		end);
 
+		rootDescription:CreateCheckbox("Alternate Appearances",
+			function() return addon.Profile.ShowOnlyAltAppearanceItems; end,
+			function()
+				addon.Profile.ShowOnlyAltAppearanceItems = not addon.Profile.ShowOnlyAltAppearanceItems;
+				BetterWardrobeCollectionFrame.ItemsCollectionFrame:RefreshVisualsList();
+				BetterWardrobeCollectionFrame.ItemsCollectionFrame:UpdateItems();
+			end);
+
 		local submenu = rootDescription:CreateButton(SOURCES);
 		CreateSourceFilters(submenu);
 
 		rootDescription:CreateDivider();
 	 	submenu = rootDescription:CreateButton("Options");
 		submenu:CreateCheckbox(L["Show Hidden Items"], shouldShowHidden, setShowHidden);
-		
+
 	end);
 end
 
@@ -575,6 +583,15 @@ function WardrobeCollectionFrameMixin:InitBaseSetsFilterButton()
 		end
 	end
 
+		rootDescription:CreateCheckbox("Alternate Appearances",
+			function()
+				return addon.Profile.ShowOnlyAltAppearanceSets;
+			end,
+			function()
+				addon.Profile.ShowOnlyAltAppearanceSets = not addon.Profile.ShowOnlyAltAppearanceSets;
+				RefreshLists();
+			end);
+
 		local submenu = rootDescription:CreateButton(L["Expansion"]);
 		submenu:CreateButton(CHECK_ALL, function()
 			xpackCheckAll(true)
@@ -670,6 +687,15 @@ function WardrobeCollectionFrameMixin:InitBaseSetsFilterButton()
 			end,
 			function()
 				addon.Profile.HideUnavalableSets = not addon.Profile.HideUnavalableSets;
+				RefreshLists();
+			end);
+
+		submenu:CreateCheckbox("Show Alternate Appearance Icon",
+			function()
+				return addon.Profile.ShowAltAppearanceIcon;
+			end,
+			function()
+				addon.Profile.ShowAltAppearanceIcon = not addon.Profile.ShowAltAppearanceIcon;
 				RefreshLists();
 			end);
 
@@ -1597,8 +1623,12 @@ function WardrobeItemsCollectionMixin:FilterVisuals()
 	local visualsList = self.visualsList;
 	local filteredVisualsList = { };
 	for i, visualInfo in ipairs(visualsList) do
+		local altAppearanceOnly = not addon.Profile.ShowOnlyAltAppearanceItems
+			or addon:BuildAltAppearanceData(self:GetAnAppearanceSourceFromVisual(visualInfo.visualID, nil)) ~= nil;
 		--if not visualInfo.isHideVisual then
+		if altAppearanceOnly then
 			table.insert(filteredVisualsList, visualInfo);
+		end
 		--end
 	end
 	self.filteredVisualsList = filteredVisualsList;
@@ -1806,6 +1836,9 @@ function WardrobeItemsCollectionMixin:UpdateItems()
 			model.Favorite.Icon:SetShown(visualInfo.isFavorite);
 			-- hide visual option
 			model.HideVisual.Icon:Hide();
+			-- alternate appearance
+			local altSourceID = self:GetAnAppearanceSourceFromVisual(visualInfo.visualID, nil);
+			model.AltAppearance.Icon:SetShown(addon.Profile.ShowAltAppearanceIcon and addon:BuildAltAppearanceData(altSourceID) ~= nil);
 			-- slots not allowed
 			local showAsInvalid = not canDisplayVisuals or not self.slotAllowed;
 			model.SlotInvalidTexture:SetShown(showAsInvalid);		
@@ -2142,6 +2175,21 @@ function WardrobeItemModelMixin:GetCollectionFrame()
 	return self:GetParent();
 end
 
+function WardrobeItemModelMixin:GetDisplayedSourceID()
+	local appearanceInfo = self:GetAppearanceInfo();
+	local itemsCollectionFrame = self:GetCollectionFrame();
+	if not appearanceInfo or not itemsCollectionFrame then
+		return nil;
+	end
+
+	local sourceID = itemsCollectionFrame:GetAnAppearanceSourceFromVisual(appearanceInfo.visualID, nil);
+	if not sourceID or sourceID == Constants.Transmog.NoTransmogID then
+		return nil;
+	end
+
+	return sourceID;
+end
+
 -- Overridden.
 function WardrobeItemModelMixin:ToggleFavorite(visualID, isFavorite)
 	ItemModelBaseMixin.ToggleFavorite(self, visualID, isFavorite);
@@ -2307,6 +2355,15 @@ function WardrobeItemModelMixin:OnMouseUp(button)
 				end
 				print(L["No Recolors Found"]);
 			end);
+
+			local altData = addon:BuildAltAppearanceData(self:GetDisplayedSourceID());
+			if altData then
+				rootDescription:CreateButton("Alternate Appearances", function()
+					addon:ShowAltAppearancePopup({ altData }, function(sourceID)
+						BetterWardrobeCollectionFrame:GoToItem(sourceID);
+					end);
+				end);
+			end
 
 			rootDescription:QueueSpacer();
 			rootDescription:QueueTitle(WARDROBE_TRANSMOGRIFY_AS);

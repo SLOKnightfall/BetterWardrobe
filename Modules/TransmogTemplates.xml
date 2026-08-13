@@ -1307,6 +1307,27 @@
 					</Layer>
 				</Layers>
 			</Frame>
+			<Frame parentKey="AltAppearance" hidden="true">
+				<Size x="32" y="32"/>
+				<Anchors>
+					<Anchor point="TOPRIGHT" x="-4" y="-4"/>
+				</Anchors>
+				<Layers>
+					<Layer level="ARTWORK">
+						<Texture parentKey="Icon" file="Interface\FriendsFrame\UI-Toast-ChatInviteIcon" setAllPoints="true"/>
+					</Layer>
+				</Layers>
+				<Scripts>
+					<OnEnter>
+						GameTooltip:SetOwner(self, "ANCHOR_RIGHT");
+						GameTooltip:SetText("Has an alternate look available");
+						GameTooltip:Show();
+					</OnEnter>
+					<OnLeave>
+						GameTooltip_Hide();
+					</OnLeave>
+				</Scripts>
+			</Frame>
 		</Frames>
 		<Scripts>
 			<OnLoad method="OnLoad"/>

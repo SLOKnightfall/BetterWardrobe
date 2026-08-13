@@ -572,6 +572,7 @@ function addon:FilterSets(setList, setType)
 		end
 
 		local collected = count == total
+		local altAppearanceOnly = not addon.Profile.ShowOnlyAltAppearanceSets or addon:SetHasAltAppearanceItem(setData.primaryAppearances)
 		if ((filterCollected and collected) or (filterUncollected and not collected)) and
 			((filterPVE and not isPvP) or (filterPVP and isPvP)) and
 			--CheckMissingLocation(data) and
@@ -580,7 +581,8 @@ function addon:FilterSets(setList, setType)
 			searchSet and
 			not isHidden and
 			tab and
-			unavailableFilter then
+			unavailableFilter and
+			altAppearanceOnly then
 			tinsert(FilterSets, data)
 		end
 	end
