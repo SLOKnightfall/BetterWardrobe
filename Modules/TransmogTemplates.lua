@@ -1634,30 +1634,9 @@ function TransmogSetModelMixin:UpdateSet()
 
 	local altAppearanceItems = {};
 	for _index, primaryAppearance in pairs(self.elementData.sourceData.primaryAppearances) do
-		local altid = addon:CheckAltItem(primaryAppearance.appearanceID);
-		if altid then
-			if type(altid) ~= "table" then
-				altid = {altid};
-			end
-
-			local sourceInfo = C_TransmogCollection.GetSourceInfo(primaryAppearance.appearanceID);
-			local slot, slotLabel;
-			if sourceInfo then
-				--C_Transmog.GetSlotForInventoryType returns a legacy invSlot-space value, not an
-				--Enum.TransmogOutfitSlot -- bridge through TransmogUtil like DressingRoom.lua/Wardrobe_Sets.lua do.
-				local invSlot = C_Transmog.GetSlotForInventoryType(sourceInfo.invType);
-				local slotName = invSlot and TransmogUtil.GetSlotName(invSlot);
-				local transmogLocation = slotName and TransmogUtil.GetTransmogLocation(slotName, Enum.TransmogType.Appearance, false);
-				slot = transmogLocation and transmogLocation:GetSlot();
-				slotLabel = slotName and _G[slotName];
-			end
-
-			tinsert(altAppearanceItems, {
-				sourceID = primaryAppearance.appearanceID,
-				alternates = altid,
-				slot = slot,
-				slotLabel = slotLabel,
-			});
+		local altData = addon:BuildAltAppearanceData(primaryAppearance.appearanceID);
+		if altData then
+			tinsert(altAppearanceItems, altData);
 		end
 	end
 	self.altAppearanceItems = altAppearanceItems;
@@ -2041,9 +2020,6 @@ do
 		if not altid then
 			return nil;
 		end
-		if type(altid) ~= "table" then
-			altid = {altid};
-		end
 
 		local slotName = slotData.transmogLocation:GetSlotName();
 		return {
@@ -2129,9 +2105,6 @@ function addon:BuildAltAppearanceData(sourceID)
 	local altid = addon:CheckAltItem(sourceID);
 	if not altid then
 		return nil;
-	end
-	if type(altid) ~= "table" then
-		altid = {altid};
 	end
 
 	local slot, slotLabel;
