@@ -74,10 +74,10 @@ function addon:ApplySituationPreset(preset)
 	C_TransmogOutfitInfo.CommitPendingSituations()
 end
 
-function addon:DeleteSituationPreset(name)
+function addon:DeleteSituationPresetByRef(presetRef)
 	local presets = self:GetSituationPresets()
 	for i, preset in ipairs(presets) do
-		if preset.name == name then
+		if preset == presetRef then
 			table.remove(presets, i)
 			return
 		end
@@ -141,13 +141,27 @@ StaticPopupDialogs["BW_CONFIRM_OVERWRITE_SITUATION_PRESET"] = {
 	whileDead = 1,
 }
 
+StaticPopupDialogs["BW_CONFIRM_RENAME_OVERWRITE_SITUATION_PRESET"] = {
+	preferredIndex = 3,
+	text = L["A preset named '%s' already exists. Overwrite it?"],
+	button1 = YES,
+	button2 = NO,
+	OnAccept = function(dialog, data)
+		addon:DeleteSituationPresetByRef(data.existing)
+		data.preset.name = data.newName
+	end,
+	hideOnEscape = 1,
+	timeout = 0,
+	whileDead = 1,
+}
+
 StaticPopupDialogs["BW_CONFIRM_DELETE_SITUATION_PRESET"] = {
 	preferredIndex = 3,
 	text = L["Delete preset '%s'?"],
 	button1 = YES,
 	button2 = NO,
-	OnAccept = function(dialog, name)
-		addon:DeleteSituationPreset(name)
+	OnAccept = function(dialog, presetRef)
+		addon:DeleteSituationPresetByRef(presetRef)
 	end,
 	hideOnEscape = 1,
 	timeout = 0,
@@ -259,9 +273,18 @@ function SituationPresetEditFrame:OnAccept()
 	if not self.AcceptButton:IsEnabled() then return end
 	local newName = self.EditBox:GetText()
 	StaticPopupSpecial_Hide(self)
-	if self.preset and newName ~= "" then
-		self.preset.name = newName
+	if not self.preset or newName == "" or newName == self.preset.name then
+		return
 	end
+
+	local existing = addon:GetSituationPreset(newName)
+	if existing and existing ~= self.preset then
+		StaticPopup_Show("BW_CONFIRM_RENAME_OVERWRITE_SITUATION_PRESET", newName, nil,
+			{ preset = self.preset, existing = existing, newName = newName })
+		return
+	end
+
+	self.preset.name = newName
 end
 
 function SituationPresetEditFrame:OnUpdate()
@@ -273,7 +296,7 @@ end
 
 function SituationPresetEditFrame:OnDelete()
 	StaticPopupSpecial_Hide(self)
-	StaticPopup_Show("BW_CONFIRM_DELETE_SITUATION_PRESET", self.preset.name, nil, self.preset.name)
+	StaticPopup_Show("BW_CONFIRM_DELETE_SITUATION_PRESET", self.preset.name, nil, self.preset)
 end
 
 function addon:CreateSituationPresetUI(SituationsFrame)
