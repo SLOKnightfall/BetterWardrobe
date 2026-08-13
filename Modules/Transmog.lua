@@ -2480,13 +2480,13 @@ function TransmogWardrobeSetsMixin:RefreshCollectionEntries()
 
 	local SET_SORT_COMPARATORS = {
 		Alphabetic = function(element1, element2)
-			return element1.name < element2.name;
+			return (element1.name or "") < (element2.name or "");
 		end,
 		Expansion = function(element1, element2)
 			if element1.expansionID ~= element2.expansionID then
 				return element1.expansionID > element2.expansionID;
 			end
-			return element1.name < element2.name;
+			return (element1.name or "") < (element2.name or "");
 		end,
 	};
 
@@ -2505,8 +2505,8 @@ function TransmogWardrobeSetsMixin:RefreshCollectionEntries()
 			--return element1.uiOrder > element2.uiOrder;
 		end
 
-		local customSetName1, _customSetIcon1 = element1.name;
-		local customSetName2, _customSetIcon2 = element2.name;
+		local customSetName1 = element1.name or "";
+		local customSetName2 = element2.name or "";
 		return customSetName1 < customSetName2;
 	end, addon.Profile.SetSortReverse);
 

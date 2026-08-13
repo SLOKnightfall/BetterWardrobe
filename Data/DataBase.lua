@@ -380,8 +380,8 @@ function BuildBlizzSets()
 						data.baseSetID = initTradingPostSet;
 						AddVariant(data, initTradingPostSet);
 						if data.favorite then
-							local baseSet = BetterWardrobeSetsDataProviderMixin:GetSetByID(initTradingPostSet);
-							if not baseSet.favoriteSetID then
+							local baseSet = baseIDs[initTradingPostSet];
+							if baseSet and not baseSet.favoriteSetID then
 								baseSet.favoriteSetID = data.setID;
 							end
 						end
