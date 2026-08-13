@@ -536,19 +536,6 @@ function WardrobeCollectionFrameMixin:InitBaseSetsFilterButton()
 		--rootDescription:CreateCheckbox(L["Show Only Player's Faction"], ShowFactionOnly, setShowFactionOnly, 5);
 
 
-		----TODO: FIX
---[[
-		rootDescription:CreateCheckbox(L["Hide Unavailable Sets"], 
-			function() 
-				return not addon.Profile.HideUnavalableSets;
-			end, 
-			function() 							
-				addon.Profile.HideUnavalableSets = not addon.Profile.HideUnavalableSets;
-				--addon.Init:BuildDB()
-				BetterWardrobeCollectionFrame.SetsTransmogFrame:UpdateProgressBar()
-				RefreshLists()
-			end, 7);
-]]--
 		rootDescription:CreateCheckbox(COLLECTED, C_TransmogSets.GetBaseSetsFilter, GetBaseSetsFilter, LE_TRANSMOG_SET_FILTER_COLLECTED);
 		rootDescription:CreateCheckbox(NOT_COLLECTED, C_TransmogSets.GetBaseSetsFilter, GetBaseSetsFilter, LE_TRANSMOG_SET_FILTER_UNCOLLECTED);
 		rootDescription:CreateDivider();
@@ -666,16 +653,25 @@ function WardrobeCollectionFrameMixin:InitBaseSetsFilterButton()
 		rootDescription:CreateDivider();
 	 	submenu = rootDescription:CreateButton("Options");
 
-		submenu:CreateCheckbox(L["Show Hidden Sets"], 
-			function() 
-				return addon.Profile.ShowHidden 
-			end, 
-			function() 
+		submenu:CreateCheckbox(L["Show Hidden Sets"],
+			function()
+				return addon.Profile.ShowHidden
+			end,
+			function()
 				addon.Profile.ShowHidden = not addon.Profile.ShowHidden;
 				addon.Init:InitDB()
 				RefreshLists()
 
 			end, 6);
+
+		submenu:CreateCheckbox(L["Hide Unavailable Sets"],
+			function()
+				return addon.Profile.HideUnavalableSets;
+			end,
+			function()
+				addon.Profile.HideUnavalableSets = not addon.Profile.HideUnavalableSets;
+				RefreshLists();
+			end);
 
 --[[
 		submenu:CreateDivider();

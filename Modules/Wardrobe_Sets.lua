@@ -853,8 +853,7 @@ function WardrobeSetsCollectionMixin:OpenInDressingRoom(setID)
 	import = true
 	--DressUpSources(sources)
 	import = false
-	--TODO: Enable with Dressingroom files
-	----addon:UpdateDressingRoom()
+	addon:UpdateDressingRoom()
 end
 
 --Referenced directly from Wardrobe.xml's BW_SetsHideSlotButton OnClick; was never
@@ -1500,13 +1499,13 @@ function WardrobeSetsDetailsItemMixin:OnEnter()
 
 	if ( self.New:IsShown() ) then
 		self.New:Hide();
---todo fix 
-	--	local setID = BetterWardrobeCollectionFrame.SetsCollectionFrame:GetSelectedSetID();
-		--C_TransmogSets.ClearSetNewSourcesForSlot(setID, self.transmogSlot);
-		--local baseSetID = C_TransmogSets.GetBaseSetID(setID);
-		--SetsDataProvider:ResetBaseSetNewStatus(baseSetID);
 
-		--BetterWardrobeCollectionFrame.SetsCollectionFrame.ListContainer:ReinitializeButtonWithBaseSetID(baseSetID);
+		local setID = BetterWardrobeCollectionFrame.SetsCollectionFrame:GetSelectedSetID();
+		C_TransmogSets.ClearSetNewSourcesForSlot(setID, self.transmogSlot);
+		local baseSetID = C_TransmogSets.GetBaseSetID(setID);
+		SetsDataProvider:ResetBaseSetNewStatus(baseSetID);
+
+		BetterWardrobeCollectionFrame.SetsCollectionFrame.ListContainer:ReinitializeButtonWithBaseSetID(baseSetID);
 	end
 end
 

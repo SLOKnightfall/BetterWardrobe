@@ -187,7 +187,18 @@ end
 function addon.C_TransmogSets.GetFilteredBaseSetsCounts()
 	local tab = addon.GetTab()
 	if tab == 2 then
-		return C_TransmogSets.GetFilteredBaseSetsCounts()
+		--Derived from the same already-filtered list driving the visible UI (addon.SetsDataProvider:GetBaseSets()),
+		--not Blizzard's own native count, which has no concept of any of this addon's own filters
+		--(xpacSelection, hidden sets, search, Hide Unavailable Sets) and drifts from what's actually shown.
+		local baseSets = addon.SetsDataProvider:GetBaseSets()
+		local collected, total = 0, #baseSets
+		for _, data in ipairs(baseSets) do
+			local setData = addon.SetsDataProvider:GetSetSourceData(data.setID)
+			if setData.numCollected == setData.numTotal then
+				collected = collected + 1
+			end
+		end
+		return collected, total
 	else
 		return addon:GetCollectedExtraSetCount()
 	end
@@ -528,12 +539,20 @@ function addon:FilterSets(setList, setType)
 		local count , total = setData.numCollected, setData.numTotal
 		local expansion = data.expansionID
 		local sourcefilter = (BetterWardrobeCollectionFrame:CheckTab(3) and filterSelection[data.filter])
-		local unavailableFilter = (not unavailable or (addon.Profile.HideUnavalableSets and unavailable))
+		--"Unavailable" mirrors the noLongerObtainable check in Wardrobe_Sets.lua:DisplaySet (Elite sets from
+		--an older patch, plus one hardcoded legacy setID range); only meaningful for real Blizzard sets.
+		local unavailable = false
+		if data.setType == "Blizzard" then
+			local nativeInfo = C_TransmogSets.GetSetInfo(data.setID)
+			local buildID = (select(4, GetBuildInfo()))
+			unavailable = (nativeInfo and nativeInfo.description == ELITE and nativeInfo.patchID and nativeInfo.patchID < buildID)
+				or (data.setID <= 1446 and data.setID >= 1436)
+		end
+		local unavailableFilter = (not unavailable) or (not addon.Profile.HideUnavalableSets)
 		local tab = (BetterWardrobeCollectionFrame:CheckTab(2) and data.tab == 2) or (BetterWardrobeCollectionFrame:CheckTab(3) and data.tab == 3)
 		if BetterWardrobeCollectionFrame:CheckTab(2) then
 			--expansion = expansion + 1
 			sourcefilter = true
-			unavailableFilter = true
 		end
 
 		local searchSet = addon:SearchSets(data)
@@ -560,8 +579,8 @@ function addon:FilterSets(setList, setType)
 			sourcefilter and
 			searchSet and
 			not isHidden and
-			tab then
-			--(not unavailable or (addon.Profile.HideUnavalableSets and unavailable)) then ----and
+			tab and
+			unavailableFilter then
 			tinsert(FilterSets, data)
 		end
 	end

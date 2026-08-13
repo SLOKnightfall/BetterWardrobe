@@ -419,6 +419,9 @@ function BuildBlizzSets()
 				fullList[data.setID] = set
 
 				--Only hide as a variant if Blizzard's own GetBaseSetID agrees it's the same family as our label grouping.
+				--(Blizzard's native GetVariantSets can't be relied on to expose it as a swatch afterwards --
+				--see WardrobeSetsDataProviderMixin:GetVariantSets in TransmogShared.lua, which falls back to
+				--our own addon.VariantSets grouping when the native list is empty, so it stays reachable.)
 				local function BlizzardAgreesSameFamily(setID, proposedBaseID)
 					if setID == proposedBaseID then return true end
 					local trueBaseOfSet = C_TransmogSets.GetBaseSetID(setID) or setID
@@ -1754,10 +1757,7 @@ end
 
 			addon.Init:BuildDB()
 
-			if BetterWardrobeCollectionFrame.SetsCollectionFrame:IsShown() then  --0--TODO FIX
-				BetterWardrobeCollectionFrame.SetsCollectionFrame:Refresh()
-				BetterWardrobeCollectionFrame.SetsCollectionFrame:OnSearchUpdate()
-			end
+			addon.RefreshLists()
 			addon.RefreshSubItemData()
 		end
 	end
@@ -1782,10 +1782,7 @@ end
 
 			addon.Init:BuildDB()
 			addon.GetBaseList()
-			if BetterWardrobeCollectionFrame.SetsCollectionFrame:IsShown() then  --0--TODO FIX
-				BetterWardrobeCollectionFrame.SetsCollectionFrame:Refresh()
-				BetterWardrobeCollectionFrame.SetsCollectionFrame:OnSearchUpdate()
-			end
+			addon.RefreshLists()
 			addon.RefreshSubItemData()
 
 

@@ -266,18 +266,32 @@ function WardrobeSetsDataProviderMixin:GetVariantSets(baseSetID)
 		if not variantSets then
 			variantSets = C_TransmogSets.GetVariantSets(baseSetID) or {};
 
-			self.variantSets[baseSetID] = variantSets;
 			if #variantSets > 0 then
 				-- Add base to variants and sort.
 				local baseSet = C_TransmogSets.GetSetInfo(baseSetID);
 				if baseSet then
 					tinsert(variantSets, baseSet);
 				end
+			else
+				--Blizzard's native GetVariantSets is empty/incomplete for some sets (e.g. past-season
+				--PvP Elite recolors), even when our own label-based grouping (Data/DataBase.lua) folded
+				--a set in as a variant of this base. Fall back to that grouping so it stays reachable.
+				local ownVariants = addon.VariantSets[baseSetID];
+				if ownVariants and #ownVariants > 1 then
+					for i = 1, #ownVariants do
+						tinsert(variantSets, ownVariants[i]);
+					end
+				end
+			end
+
+			if #variantSets > 0 then
 				local reverseUIOrder = true;
 				local ignorePatchID = true;
 				local ignoreCollected = true;
 				self:SortSets(variantSets, reverseUIOrder, ignorePatchID, ignoreCollected);
 			end
+
+			self.variantSets[baseSetID] = variantSets;
 		end
 		return variantSets or {};
 	else
