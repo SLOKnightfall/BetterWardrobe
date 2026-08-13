@@ -499,6 +499,47 @@ function BW_DressingRoomFrameMixin:OnLoad()
 	if C_AddOns.IsAddOnLoaded("Narcissus") then
 		BW_DressingRoomFrame.BW_DressingRoomSwapFormButton:Hide();
 	end
+
+	--Blizzard's own DressUpFrame.LinkButton menu (DressUpModelFrameLinkButtonMixin.OnShow,
+	--Blizzard_SharedXMLGame/DressUpModelFrameMixin.lua) rebuilds its menu every time it's set up, and
+	--its "Copy to Clipboard" option calls the protected CopyToClipboard() API directly -- only legal
+	--from Blizzard's own secure execution path, so it throws ADDON_ACTION_FORBIDDEN when reached
+	--through this addon (issue #585). Re-registering our own SetupMenu proved unreliable (Blizzard's
+	--own registration kept winning), so instead cover the real button with our own click-catching
+	--overlay button, parented to and sized to LinkButton so it shows/hides and resizes with it and
+	--sits above it in frame level -- the click never reaches Blizzard's button or its protected call.
+	if not BW_DressUpLinkButtonOverlay then
+		local overlay = CreateFrame("Button", "BW_DressUpLinkButtonOverlay", DressUpFrame.LinkButton)
+		overlay:SetAllPoints(true)
+		overlay:SetFrameLevel(DressUpFrame.LinkButton:GetFrameLevel() + 10)
+		overlay:RegisterForClicks("AnyUp")
+		--Always shown, independent of the custom dressing room's own Enable toggle (Profile.DR_OptionsEnable):
+		--Blizzard's LinkButton and its broken protected CopyToClipboard call are reachable either way.
+		overlay:Show()
+		overlay:SetScript("OnClick", function(self)
+			MenuUtil.CreateContextMenu(self, function(dropdown, rootDescription)
+				rootDescription:SetTag("MENU_DRESS_UP_MODEL");
+
+				local playerActor = DressUpFrame.ModelScene:GetPlayerActor();
+				local itemTransmogInfoList = playerActor and playerActor:GetItemTransmogInfoList();
+				if not itemTransmogInfoList then
+					return;
+				end
+
+				rootDescription:CreateButton(TRANSMOG_CUSTOM_SET_POST_IN_CHAT, function()
+					local hyperlink = C_TransmogCollection.GetCustomSetHyperlinkFromItemTransmogInfoList(itemTransmogInfoList);
+					if not ChatFrameUtil.InsertLink(hyperlink) then
+						ChatFrameUtil.OpenChat(hyperlink);
+					end
+				end);
+
+				rootDescription:CreateButton(TRANSMOG_CUSTOM_SET_COPY_TO_CLIPBOARD, function()
+					local slashCommand = TransmogUtil.CreateCustomSetSlashCommand(itemTransmogInfoList);
+					addon.ShowExportPopup(slashCommand)
+				end);
+			end);
+		end)
+	end
 end
 
 

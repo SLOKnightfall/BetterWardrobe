@@ -31,6 +31,7 @@ local function Export(itemString)
 
 	MultiLineEditBox:SetText(itemString or "")
 end
+addon.ShowExportPopup = Export
 
 
 
