@@ -1967,6 +1967,27 @@ do
 	end
 end
 
+local function CreateAltAppearanceBadge(parent, point, relativeTo, relativePoint, x, y)
+	local badge = CreateFrame("Frame", nil, parent);
+	badge:SetSize(20, 20);
+	badge:SetFrameLevel(parent:GetFrameLevel() + 10);
+	badge:SetPoint(point, relativeTo, relativePoint, x, y);
+
+	local texture = badge:CreateTexture(nil, "OVERLAY");
+	texture:SetAllPoints();
+	texture:SetTexture("Interface\\FriendsFrame\\UI-Toast-ChatInviteIcon");
+
+	badge:SetScript("OnEnter", function(self)
+		GameTooltip:SetOwner(self, "ANCHOR_RIGHT");
+		GameTooltip:SetText(L["Has an alternate look available"]);
+		GameTooltip:Show();
+	end);
+	badge:SetScript("OnLeave", GameTooltip_Hide);
+
+	badge:Hide();
+	return badge;
+end
+
 --Alt-appearance badges on the character-preview slot icons. Attaches an overlay to
 --Blizzard's own pooled slot buttons at runtime; doesn't touch Blizzard's XML.
 do
@@ -1982,23 +2003,7 @@ do
 		end
 
 		--Real frame, not a texture, so it stacks above the slot's selection border.
-		local badge = CreateFrame("Frame", nil, slotFrame);
-		badge:SetSize(20, 20);
-		badge:SetFrameLevel(slotFrame:GetFrameLevel() + 10);
-		badge:SetPoint("CENTER", slotFrame.Icon or slotFrame, "TOPLEFT", 5, -5);
-
-		local texture = badge:CreateTexture(nil, "OVERLAY");
-		texture:SetAllPoints();
-		texture:SetTexture("Interface\\FriendsFrame\\UI-Toast-ChatInviteIcon");
-
-		badge:SetScript("OnEnter", function(self)
-			GameTooltip:SetOwner(self, "ANCHOR_RIGHT");
-			GameTooltip:SetText(L["Has an alternate look available"]);
-			GameTooltip:Show();
-		end);
-		badge:SetScript("OnLeave", GameTooltip_Hide);
-
-		badge:Hide();
+		local badge = CreateAltAppearanceBadge(slotFrame, "CENTER", slotFrame.Icon or slotFrame, "TOPLEFT", 5, -5);
 
 		slotFrame.BW_AltAppearanceBadge = badge;
 		return badge;
@@ -2143,23 +2148,7 @@ do
 			return card.BW_AltAppearanceBadge;
 		end
 
-		local badge = CreateFrame("Frame", nil, card);
-		badge:SetSize(20, 20);
-		badge:SetFrameLevel(card:GetFrameLevel() + 10);
-		badge:SetPoint("TOPRIGHT", -2, -2);
-
-		local texture = badge:CreateTexture(nil, "OVERLAY");
-		texture:SetAllPoints();
-		texture:SetTexture("Interface\\FriendsFrame\\UI-Toast-ChatInviteIcon");
-
-		badge:SetScript("OnEnter", function(self)
-			GameTooltip:SetOwner(self, "ANCHOR_RIGHT");
-			GameTooltip:SetText(L["Has an alternate look available"]);
-			GameTooltip:Show();
-		end);
-		badge:SetScript("OnLeave", GameTooltip_Hide);
-
-		badge:Hide();
+		local badge = CreateAltAppearanceBadge(card, "TOPRIGHT", card, "TOPRIGHT", -2, -2);
 
 		card.BW_AltAppearanceBadge = badge;
 		return badge;
