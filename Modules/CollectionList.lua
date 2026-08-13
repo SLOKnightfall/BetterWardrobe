@@ -552,7 +552,7 @@ function CollectionList:GenerateListView()
 	for i, data in ipairs(list) do
 		if data then
 			local GetItemInfo = C_Item and C_Item.GetItemInfo
-			local _, itemLink, _, _, _, _, _, _, _, itemIcon, _, _, _, _, expacID = GetItemInfo(data.itemID)
+			local _, itemLink, _, _, _, _, _, _, _, itemIcon, _, _, _, _, expacID = C_Item.GetItemInfo(data.itemID)
 			local nameColor = ITEM_QUALITY_COLORS[data.quality] or ""
 			local transmogSource = data.sourceType and _G["TRANSMOG_SOURCE_"..(data.sourceType)] or L.OM_GOLD..L["Collected"]..L.ENDCOLOR
 			local bossInfo = ""

@@ -172,7 +172,7 @@ local function GetDressUpModelSlotSource(slotID, enchantID)
 
 	if itemName and (slotID == 16 or slotID == 17) then 
 		local GetItemInfo = C_Item and C_Item.GetItemInfo
-		local _, _, _, _, _, _, _, _, _, _, _, classID, subclassID = GetItemInfo(itemName)
+		local _, _, _, _, _, _, _, _, _, _, _, classID, subclassID = C_Item.GetItemInfo(itemName)
 		if classID == LE_ITEM_CLASS_WEAPON then
 			if subclassID == LE_ITEM_WEAPON_BOWS or subclassID == LE_ITEM_WEAPON_GUNS or subclassID == LE_ITEM_WEAPON_CROSSBOW then 
 				rangedWeapon = true

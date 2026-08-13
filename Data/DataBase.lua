@@ -1764,8 +1764,8 @@ end
 			return false 
 		else
 			local GetItemInfo = C_Item and C_Item.GetItemInfo
-			local itemName1, link1 = GetItemInfo(tonumber(itemID))
-			local itemName2, link2 = GetItemInfo(tonumber(subID))
+			local itemName1, link1 = C_Item.GetItemInfo(tonumber(itemID))
+			local itemName2, link2 = C_Item.GetItemInfo(tonumber(subID))
 
 			--local appearanceID, sourceID = C_TransmogCollection.GetItemInfo(itemID|itemString [, itemModID])
 			addon.itemsubdb.profile.items[itemID] = {["subID"] = subID, ["itemLink"] = link1, ["subLink"] = link2}

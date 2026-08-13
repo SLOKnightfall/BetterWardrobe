@@ -468,7 +468,7 @@ function CollectionList:GenerateSourceListView(visualID)
 				collectedStatus = RED_FONT_COLOR_CODE.."["..L["Not Collected"].."]"..L.ENDCOLOR
 			end
 			local GetItemInfo = C_Item and C_Item.GetItemInfo
-			local itemName, _, itemQuality = GetItemInfo(itemLink)
+			local itemName, _, itemQuality = C_Item.GetItemInfo(itemLink)
 			--local itemID =GetItemInfoFromHyperlink(itemLink)
 			local nameColor = ITEM_QUALITY_COLORS[itemQuality] or ""
 			local transmogSource = data.sourceType and _G["TRANSMOG_SOURCE_"..(data.sourceType)] or ""

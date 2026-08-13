@@ -365,7 +365,7 @@ local function UpdateDressingRoom()
 
 				if itemFrame.itemLink then
 					--local quality = C_TransmogCollection.GetSourceInfo(itemFrame.sourceID).quality
-					local _, _, quality, _, _, _, _, _, _, texture = GetItemInfo(itemFrame.itemLink)
+					local _, _, quality, _, _, _, _, _, _, texture = C_Item.GetItemInfo(itemFrame.itemLink)
 					local color = BAG_ITEM_QUALITY_COLORS[quality or 1]
 					icon.backdrop:SetBackdropBorderColor(color.r, color.g, color.b)
 				else

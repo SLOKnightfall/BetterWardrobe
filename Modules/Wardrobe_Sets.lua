@@ -1069,7 +1069,7 @@ local function ToggleHidden(model, isHidden)
 		local name, link;
 		if itemLink then 
 			local source = CollectionWardrobeUtil.GetSortedAppearanceSources(visualID, addon.GetItemCategory(visualID), addon.GetTransmogLocation(itemLink))[1];
-			name, link = GetItemInfo(source.itemID);
+			name, link = C_Item.GetItemInfo(source.itemID);
 		end
 
 		if not link then

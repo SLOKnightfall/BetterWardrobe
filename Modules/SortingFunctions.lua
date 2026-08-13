@@ -362,8 +362,8 @@ local function SortItemByExpansion(sets)
 		C_Item.RequestLoadItemDataByID(item1.itemID)
 		C_Item.RequestLoadItemDataByID(item2.itemID)
 		local GetItemInfo = C_Item and C_Item.GetItemInfo
-		item1.expansionID = select(15,  GetItemInfo(item1.itemID)) 
-		item2.expansionID = select(15,  GetItemInfo(item2.itemID))
+		item1.expansionID = select(15,  C_Item.GetItemInfo(item1.itemID)) 
+		item2.expansionID = select(15,  C_Item.GetItemInfo(item2.itemID))
 
 		if item1.expansionID and item1.expansionID then
 			if ( item1.expansionID ~= item2.expansionID ) then
