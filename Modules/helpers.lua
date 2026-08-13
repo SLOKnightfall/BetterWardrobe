@@ -48,7 +48,7 @@ BetterWardrobe_Temp = Recolors
 
 
 
-function xxxx()
+function ExportColorTableToBTT()
 
 
 
