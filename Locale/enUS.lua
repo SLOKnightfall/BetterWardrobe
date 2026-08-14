@@ -215,6 +215,9 @@ L["Sort By"] = true
 L["Alphabetic"] = true
 L["Appearance"] = true
 L["Item Source"] = true
+L["Color"] = true
+L["Item Level"] = true
+L["Collected Count"] = true
 L["Reverse"] = true
 
 L["Class Sets Only"] = true

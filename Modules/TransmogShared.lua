@@ -112,8 +112,62 @@ local SETS_SORT_COMPARATORS = {
 	end,
 };
 
-function WardrobeSetsDataProviderMixin:SortSets(sets, reverseUIOrder, ignorePatchID)
-	local reversibleCompare = ReverseComparator(SETS_SORT_COMPARATORS[addon.Profile.SetSortMode] or function(set1, set2)
+function WardrobeSetsDataProviderMixin:SortSets(sets, reverseUIOrder, ignorePatchID, ignoreCollected, ignoreSortMode)
+	--Variant lists (GetVariantSets, e.g. raid difficulty dropdowns) need a fixed LFR/Normal/Heroic/
+	--Mythic-style order via uiOrder regardless of the user's chosen sort mode for the main list.
+	local comparator = not ignoreSortMode and SETS_SORT_COMPARATORS[addon.Profile.SetSortMode];
+
+	if not ignoreSortMode and addon.Profile.SetSortMode == "CollectedCount" then
+		--GetSetSourceCounts recomputes from the API every call (its own cache is disabled in
+		--GetSetSourceData), so snapshot it once instead of re-querying it inside table.sort's
+		--comparator, which table.sort calls many times and needs a stable answer from.
+		local percentCollected, totalCounts = {}, {};
+		for _, set in ipairs(sets) do
+			--Query the row's own setID directly first -- GetBaseSets() already normalized it to the
+			--right representative (base or complete variant); resolving via GetBaseSetID here too
+			--is redundant and, for some sets (e.g. Heritage Armor), resolves to the wrong entity.
+			local bestCollected, bestTotal = self:GetSetSourceCounts(set.setID);
+			local bestPercent = (bestTotal > 0) and (bestCollected / bestTotal) or 0;
+
+			--Use whichever sibling variant has the best completion, not just a fully-complete one --
+			--a 4/6 variant shouldn't sort with 0-collected sets just because it isn't 6/6 yet. Uses
+			--the raw Blizzard API directly (not self:GetVariantSets, which calls back into SortSets
+			--for its own sorting and would recurse forever from in here).
+			local baseSetID = C_TransmogSets.GetBaseSetID(set.setID) or set.setID;
+			local variants = Blizz_C_TransmogSets.GetVariantSets(baseSetID);
+			if not variants or #variants == 0 then
+				variants = addon.VariantSets[baseSetID] or {};
+			end
+			for _, variant in ipairs(variants) do
+				if variant.setID ~= set.setID then
+					local numCollected, numTotal = self:GetSetSourceCounts(variant.setID);
+					local percent = (numTotal > 0) and (numCollected / numTotal) or 0;
+					if percent > bestPercent then
+						bestCollected, bestTotal, bestPercent = numCollected, numTotal, percent;
+					end
+				end
+			end
+
+			totalCounts[set.setID] = bestTotal;
+			percentCollected[set.setID] = bestPercent;
+		end
+		comparator = function(set1, set2)
+			--Percentage first so complete sets (100%) never land among incomplete ones; set size breaks ties.
+			local percent1 = percentCollected[set1.setID];
+			local percent2 = percentCollected[set2.setID];
+			if percent1 ~= percent2 then
+				return percent1 > percent2;
+			end
+			local total1 = totalCounts[set1.setID];
+			local total2 = totalCounts[set2.setID];
+			if total1 ~= total2 then
+				return total1 > total2;
+			end
+			return (set1.name or "") < (set2.name or "");
+		end
+	end
+
+	local reversibleCompare = ReverseComparator(comparator or function(set1, set2)
 		if ( set1.expansionID ~= set2.expansionID ) then
 			return set1.expansionID > set2.expansionID;
 		end
@@ -134,7 +188,7 @@ function WardrobeSetsDataProviderMixin:SortSets(sets, reverseUIOrder, ignorePatc
 		else
 			return set1.setID > set2.setID;
 		end
-	end, addon.Profile.SetSortReverse);
+	end, not ignoreSortMode and addon.Profile.SetSortReverse);
 
 	--Favorite-first stays outside the reversible comparator so Reverse never buries favorites.
 	local function comparison(set1, set2)
@@ -167,6 +221,27 @@ function WardrobeSetsDataProviderMixin:GetBaseSets()
 		self.baseSets = C_TransmogSets.GetBaseSets();
 		self.baseSets = addon:FilterSets(baseSets)
 		self:DetermineFavorites();
+
+		--Blizzard's own (unmodified) C_TransmogSets.GetBaseSets() already picks the right
+		--representative set per group -- e.g. a complete variant over an incomplete base --
+		--so borrow that choice instead of reimplementing "which variant wins" ourselves.
+		local representativeByBase = {};
+		for _, nativeSet in ipairs(Blizz_C_TransmogSets.GetBaseSets()) do
+			representativeByBase[Blizz_C_TransmogSets.GetBaseSetID(nativeSet.setID) or nativeSet.setID] = nativeSet.setID;
+		end
+		for _, data in ipairs(self.baseSets) do
+			local trueBaseID = Blizz_C_TransmogSets.GetBaseSetID(data.setID) or data.setID;
+			local representativeID = representativeByBase[trueBaseID];
+			if representativeID and representativeID ~= data.setID then
+				local representativeInfo = Blizz_C_TransmogSets.GetSetInfo(representativeID);
+				if representativeInfo then
+					for k, v in pairs(representativeInfo) do
+						data[k] = v;
+					end
+					data.baseSetID = trueBaseID;
+				end
+			end
+		end
 
 		local tabFilter = {}
 		local tab = addon.GetTab()
@@ -288,7 +363,8 @@ function WardrobeSetsDataProviderMixin:GetVariantSets(baseSetID)
 				local reverseUIOrder = true;
 				local ignorePatchID = true;
 				local ignoreCollected = true;
-				self:SortSets(variantSets, reverseUIOrder, ignorePatchID, ignoreCollected);
+				local ignoreSortMode = true;
+				self:SortSets(variantSets, reverseUIOrder, ignorePatchID, ignoreCollected, ignoreSortMode);
 			end
 
 			self.variantSets[baseSetID] = variantSets;

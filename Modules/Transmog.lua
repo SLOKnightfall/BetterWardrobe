@@ -1429,23 +1429,11 @@ function TransmogWardrobeItemsMixin:Init(wardrobeCollection)
 end
 
 function TransmogWardrobeItemsMixin:InitFilterButton()
-	self.FilterButton:SetText(SOURCES);
+	self.FilterButton:SetText(FILTER);
 
 	self.FilterButton:SetupMenu(function(_dropdown, rootDescription)
 		--BISECTION TEST (BW_TAINT_BISECT): checking if this shared-tag menu registration is the taint bug's source.
 		--rootDescription:SetTag("MENU_TRANSMOG_ITEMS_FILTER");
-
-		rootDescription:CreateButton(CHECK_ALL, function()
-			C_TransmogCollection.SetAllSourceTypeFilters(true);
-			return MenuResponse.Refresh;
-		end);
-
-		rootDescription:CreateButton(UNCHECK_ALL, function()
-			C_TransmogCollection.SetAllSourceTypeFilters(false);
-			return MenuResponse.Refresh;
-		end);
-
-		rootDescription:CreateDivider();
 
 		local sortSubmenu = rootDescription:CreateButton(L["Sort By"]);
 		local function IsSortModeSelected(mode)
@@ -1459,6 +1447,10 @@ function TransmogWardrobeItemsMixin:InitFilterButton()
 		sortSubmenu:CreateRadio(L["Alphabetic"], IsSortModeSelected, SetSortMode, "Alphabetic");
 		sortSubmenu:CreateRadio(L["Appearance"], IsSortModeSelected, SetSortMode, "Appearance");
 		sortSubmenu:CreateRadio(L["Item Source"], IsSortModeSelected, SetSortMode, "ItemSource");
+		sortSubmenu:CreateRadio(L["Color"], IsSortModeSelected, SetSortMode, "Color");
+		sortSubmenu:CreateRadio(L["Expansion"], IsSortModeSelected, SetSortMode, "Expansion");
+		sortSubmenu:CreateRadio(L["Item Level"], IsSortModeSelected, SetSortMode, "ItemLevel");
+		sortSubmenu:CreateRadio(L["Item ID"], IsSortModeSelected, SetSortMode, "ItemID");
 		sortSubmenu:CreateDivider();
 		sortSubmenu:CreateCheckbox(L["Reverse"], function() return addon.Profile.ItemSortReverse; end, function()
 			addon.Profile.ItemSortReverse = not addon.Profile.ItemSortReverse;
@@ -1466,6 +1458,18 @@ function TransmogWardrobeItemsMixin:InitFilterButton()
 		end);
 
 		rootDescription:CreateDivider();
+
+		local sourcesSubmenu = rootDescription:CreateButton(SOURCES);
+
+		sourcesSubmenu:CreateButton(CHECK_ALL, function()
+			C_TransmogCollection.SetAllSourceTypeFilters(true);
+			return MenuResponse.Refresh;
+		end);
+
+		sourcesSubmenu:CreateButton(UNCHECK_ALL, function()
+			C_TransmogCollection.SetAllSourceTypeFilters(false);
+			return MenuResponse.Refresh;
+		end);
 
 		local function IsChecked(filter)
 			return C_TransmogCollection.IsSourceTypeFilterChecked(filter);
@@ -1477,7 +1481,7 @@ function TransmogWardrobeItemsMixin:InitFilterButton()
 
 		for filterIndex = 1, C_TransmogCollection.GetNumTransmogSources() do
 			if (C_TransmogCollection.IsValidTransmogSource(filterIndex)) then
-				rootDescription:CreateCheckbox(_G["TRANSMOG_SOURCE_"..filterIndex], IsChecked, SetChecked, filterIndex);
+				sourcesSubmenu:CreateCheckbox(_G["TRANSMOG_SOURCE_"..filterIndex], IsChecked, SetChecked, filterIndex);
 			end
 		end
 	end);
@@ -1923,6 +1927,44 @@ local ITEM_SORT_COMPARATORS = {
 			return GetItemSourceName(element1.appearanceInfo.sourceID) < GetItemSourceName(element2.appearanceInfo.sourceID);
 		end
 		return type1 < type2;
+	end,
+	Color = function(element1, element2)
+		local result = addon:CompareItemColor(element1.appearanceInfo.visualID, element2.appearanceInfo.visualID);
+		if result ~= nil then
+			return result;
+		end
+		return GetItemSourceName(element1.appearanceInfo.sourceID) < GetItemSourceName(element2.appearanceInfo.sourceID);
+	end,
+	Expansion = function(element1, element2)
+		local sourceInfo1 = C_TransmogCollection.GetSourceInfo(element1.appearanceInfo.sourceID);
+		local sourceInfo2 = C_TransmogCollection.GetSourceInfo(element2.appearanceInfo.sourceID);
+		local expansion1 = addon.GetItemExpansionID(sourceInfo1 and sourceInfo1.itemID);
+		local expansion2 = addon.GetItemExpansionID(sourceInfo2 and sourceInfo2.itemID);
+		if expansion1 and expansion2 and expansion1 ~= expansion2 then
+			return expansion1 > expansion2;
+		end
+		return GetItemSourceName(element1.appearanceInfo.sourceID) < GetItemSourceName(element2.appearanceInfo.sourceID);
+	end,
+	ItemLevel = function(element1, element2)
+		local sourceInfo1 = C_TransmogCollection.GetSourceInfo(element1.appearanceInfo.sourceID);
+		local sourceInfo2 = C_TransmogCollection.GetSourceInfo(element2.appearanceInfo.sourceID);
+		local itemID1 = sourceInfo1 and sourceInfo1.itemID;
+		local itemID2 = sourceInfo2 and sourceInfo2.itemID;
+		if itemID1 then C_Item.RequestLoadItemDataByID(itemID1); end
+		if itemID2 then C_Item.RequestLoadItemDataByID(itemID2); end
+		local ilvl1 = itemID1 and select(4, C_Item.GetItemInfo(itemID1));
+		local ilvl2 = itemID2 and select(4, C_Item.GetItemInfo(itemID2));
+		if ilvl1 and ilvl2 and ilvl1 ~= ilvl2 then
+			return ilvl1 > ilvl2;
+		end
+		return GetItemSourceName(element1.appearanceInfo.sourceID) < GetItemSourceName(element2.appearanceInfo.sourceID);
+	end,
+	ItemID = function(element1, element2)
+		local sourceInfo1 = C_TransmogCollection.GetSourceInfo(element1.appearanceInfo.sourceID);
+		local sourceInfo2 = C_TransmogCollection.GetSourceInfo(element2.appearanceInfo.sourceID);
+		local itemID1 = (sourceInfo1 and sourceInfo1.itemID) or 0;
+		local itemID2 = (sourceInfo2 and sourceInfo2.itemID) or 0;
+		return itemID1 < itemID2;
 	end,
 };
 

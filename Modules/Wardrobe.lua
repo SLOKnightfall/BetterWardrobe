@@ -429,6 +429,33 @@ function WardrobeCollectionFrameMixin:InitItemsFilterButton()
 				BetterWardrobeCollectionFrame.ItemsCollectionFrame:UpdateItems();
 			end);
 
+		rootDescription:CreateDivider();
+
+		local sortSubmenu = rootDescription:CreateButton(L["Sort By"]);
+		local function IsItemSortModeSelected(mode)
+			return (addon.Profile.JournalItemSortMode or addon.ItemSortMode.Default) == mode;
+		end
+		local function SetItemSortMode(mode)
+			addon.Profile.JournalItemSortMode = mode;
+			BetterWardrobeCollectionFrame.ItemsCollectionFrame:RefreshVisualsList();
+			BetterWardrobeCollectionFrame.ItemsCollectionFrame:UpdateItems();
+		end
+		sortSubmenu:CreateRadio(L["Default"], IsItemSortModeSelected, SetItemSortMode, addon.ItemSortMode.Default);
+		sortSubmenu:CreateRadio(L["Alphabetic"], IsItemSortModeSelected, SetItemSortMode, addon.ItemSortMode.Alphabetic);
+		sortSubmenu:CreateRadio(L["Appearance"], IsItemSortModeSelected, SetItemSortMode, addon.ItemSortMode.Appearance);
+		sortSubmenu:CreateRadio(L["Item Source"], IsItemSortModeSelected, SetItemSortMode, addon.ItemSortMode.ItemSource);
+		sortSubmenu:CreateRadio(L["Color"], IsItemSortModeSelected, SetItemSortMode, addon.ItemSortMode.Color);
+		sortSubmenu:CreateRadio(L["Expansion"], IsItemSortModeSelected, SetItemSortMode, addon.ItemSortMode.Expansion);
+		sortSubmenu:CreateRadio(L["Item Level"], IsItemSortModeSelected, SetItemSortMode, addon.ItemSortMode.ILevel);
+		sortSubmenu:CreateRadio(L["Item ID"], IsItemSortModeSelected, SetItemSortMode, addon.ItemSortMode.ItemID);
+
+		sortSubmenu:CreateDivider();
+		sortSubmenu:CreateCheckbox(L["Reverse"], function() return addon.Profile.JournalItemSortReverse; end, function()
+			addon.Profile.JournalItemSortReverse = not addon.Profile.JournalItemSortReverse;
+			BetterWardrobeCollectionFrame.ItemsCollectionFrame:RefreshVisualsList();
+			BetterWardrobeCollectionFrame.ItemsCollectionFrame:UpdateItems();
+		end);
+
 		local submenu = rootDescription:CreateButton(SOURCES);
 		CreateSourceFilters(submenu);
 
@@ -661,6 +688,7 @@ function WardrobeCollectionFrameMixin:InitBaseSetsFilterButton()
 		submenu:CreateRadio(L["Default"], IsSortModeSelected, SetSortMode, "Default");
 		submenu:CreateRadio(L["Alphabetic"], IsSortModeSelected, SetSortMode, "Alphabetic");
 		submenu:CreateRadio(L["Expansion"], IsSortModeSelected, SetSortMode, "Expansion");
+		submenu:CreateRadio(L["Collected Count"], IsSortModeSelected, SetSortMode, "CollectedCount");
 		submenu:CreateDivider();
 		submenu:CreateCheckbox(L["Reverse"], function() return addon.Profile.SetSortReverse; end, function()
 			addon.Profile.SetSortReverse = not addon.Profile.SetSortReverse;
@@ -1635,6 +1663,12 @@ function WardrobeItemsCollectionMixin:FilterVisuals()
 end
 
 function WardrobeItemsCollectionMixin:SortVisuals()
+	local sortMode = addon.Profile.JournalItemSortMode or addon.ItemSortMode.Default;
+	if sortMode ~= addon.ItemSortMode.Default then
+		addon.SortItems(sortMode, self);
+		return;
+	end
+
 	local comparison = function(source1, source2)
 		if ( source1.isCollected ~= source2.isCollected ) then
 			return source1.isCollected;
@@ -1658,6 +1692,11 @@ function WardrobeItemsCollectionMixin:SortVisuals()
 			return source1.uiOrder > source2.uiOrder;
 		end
 		return source1.sourceID > source2.sourceID;
+	end
+
+	if addon.Profile.JournalItemSortReverse then
+		local defaultComparison = comparison;
+		comparison = function(source1, source2) return defaultComparison(source2, source1); end;
 	end
 
 	table.sort(self.filteredVisualsList, comparison);

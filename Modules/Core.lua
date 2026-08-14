@@ -1047,6 +1047,8 @@ local defaults = {
 		AutoApply = false,
 		ItemSortMode = "Default",
 		SetSortMode = "Default",
+		JournalItemSortMode = 1, --addon.ItemSortMode.Default (SortingFunctions.lua loads after Core.lua, so a literal is used here)
+		JournalItemSortReverse = false,
 		ItemSortReverse = false,
 		SetSortReverse = false,
 		ShowAltAppearanceIcon = true,
@@ -1466,6 +1468,205 @@ end
 	--TransmogFrame.WardrobeCollection.TabHeaders:SetTabShown(TransmogFrame.WardrobeCollection.extracustomsetsTabID, true);
 end
 
+--Self-contained: Transmog.lua's own TransmogWardrobeItemsMixin overrides are dead (inside a
+--reference-only comment block), so this doesn't call into them.
+local function BW_GetVendorSourceInfo(sourceID)
+	return sourceID and C_TransmogCollection.GetSourceInfo(sourceID)
+end
+
+local function BW_GetVendorItemSourceName(sourceID)
+	local sourceInfo = BW_GetVendorSourceInfo(sourceID)
+	return sourceInfo and sourceInfo.name or ""
+end
+
+local function BW_ReverseComparator(comparator, reverse)
+	if not reverse then return comparator end
+	return function(a, b) return comparator(b, a) end
+end
+
+local BW_VENDOR_ITEM_SORT_COMPARATORS = {
+	Alphabetic = function(element1, element2)
+		return BW_GetVendorItemSourceName(element1.appearanceInfo.sourceID) < BW_GetVendorItemSourceName(element2.appearanceInfo.sourceID)
+	end,
+	Appearance = function(element1, element2)
+		return element1.appearanceInfo.visualID < element2.appearanceInfo.visualID
+	end,
+	ItemSource = function(element1, element2)
+		local info1 = BW_GetVendorSourceInfo(element1.appearanceInfo.sourceID)
+		local info2 = BW_GetVendorSourceInfo(element2.appearanceInfo.sourceID)
+		local type1 = (info1 and info1.sourceType) or 0
+		local type2 = (info2 and info2.sourceType) or 0
+		if type1 == type2 then
+			return BW_GetVendorItemSourceName(element1.appearanceInfo.sourceID) < BW_GetVendorItemSourceName(element2.appearanceInfo.sourceID)
+		end
+		return type1 < type2
+	end,
+	Color = function(element1, element2)
+		local result = addon:CompareItemColor(element1.appearanceInfo.visualID, element2.appearanceInfo.visualID)
+		if result ~= nil then return result end
+		return BW_GetVendorItemSourceName(element1.appearanceInfo.sourceID) < BW_GetVendorItemSourceName(element2.appearanceInfo.sourceID)
+	end,
+	Expansion = function(element1, element2)
+		local sourceInfo1 = BW_GetVendorSourceInfo(element1.appearanceInfo.sourceID)
+		local sourceInfo2 = BW_GetVendorSourceInfo(element2.appearanceInfo.sourceID)
+		local expansion1 = addon.GetItemExpansionID(sourceInfo1 and sourceInfo1.itemID)
+		local expansion2 = addon.GetItemExpansionID(sourceInfo2 and sourceInfo2.itemID)
+		if expansion1 and expansion2 and expansion1 ~= expansion2 then
+			return expansion1 > expansion2
+		end
+		return BW_GetVendorItemSourceName(element1.appearanceInfo.sourceID) < BW_GetVendorItemSourceName(element2.appearanceInfo.sourceID)
+	end,
+	ItemLevel = function(element1, element2)
+		local sourceInfo1 = BW_GetVendorSourceInfo(element1.appearanceInfo.sourceID)
+		local sourceInfo2 = BW_GetVendorSourceInfo(element2.appearanceInfo.sourceID)
+		local itemID1 = sourceInfo1 and sourceInfo1.itemID
+		local itemID2 = sourceInfo2 and sourceInfo2.itemID
+		if itemID1 then C_Item.RequestLoadItemDataByID(itemID1) end
+		if itemID2 then C_Item.RequestLoadItemDataByID(itemID2) end
+		local ilvl1 = itemID1 and select(4, C_Item.GetItemInfo(itemID1))
+		local ilvl2 = itemID2 and select(4, C_Item.GetItemInfo(itemID2))
+		if ilvl1 and ilvl2 and ilvl1 ~= ilvl2 then
+			return ilvl1 > ilvl2
+		end
+		return BW_GetVendorItemSourceName(element1.appearanceInfo.sourceID) < BW_GetVendorItemSourceName(element2.appearanceInfo.sourceID)
+	end,
+	ItemID = function(element1, element2)
+		local sourceInfo1 = BW_GetVendorSourceInfo(element1.appearanceInfo.sourceID)
+		local sourceInfo2 = BW_GetVendorSourceInfo(element2.appearanceInfo.sourceID)
+		local itemID1 = (sourceInfo1 and sourceInfo1.itemID) or 0
+		local itemID2 = (sourceInfo2 and sourceInfo2.itemID) or 0
+		return itemID1 < itemID2
+	end,
+}
+
+local function BW_RefreshVendorItemsList(itemsFrame)
+	if not itemsFrame.transmogLocation or not itemsFrame.activeCategoryID then return end
+
+	local entries
+	if itemsFrame.transmogLocation:IsIllusion() then
+		entries = C_TransmogCollection.GetIllusions()
+	else
+		entries = C_TransmogCollection.GetCategoryAppearances(itemsFrame.activeCategoryID, itemsFrame.transmogLocation:GetData())
+	end
+
+	local compareEntries = BW_ReverseComparator(BW_VENDOR_ITEM_SORT_COMPARATORS[addon.Profile.ItemSortMode] or function(element1, element2)
+		local source1 = element1.appearanceInfo
+		local source2 = element2.appearanceInfo
+		if source1.isCollected ~= source2.isCollected then return source1.isCollected end
+		if source1.isUsable ~= source2.isUsable then return source1.isUsable end
+		if source1.isFavorite ~= source2.isFavorite then return source1.isFavorite end
+		if source1.canDisplayOnPlayer ~= source2.canDisplayOnPlayer then return source1.canDisplayOnPlayer end
+		if source1.isHideVisual ~= source2.isHideVisual then return source1.isHideVisual end
+		if source1.hasActiveRequiredHoliday ~= source2.hasActiveRequiredHoliday then return source1.hasActiveRequiredHoliday end
+		if source1.uiOrder and source2.uiOrder then return source1.uiOrder > source2.uiOrder end
+		return source1.sourceID > source2.sourceID
+	end, addon.Profile.ItemSortReverse)
+
+	local collectionElements = {}
+	for _, itemEntry in ipairs(entries) do
+		if (itemEntry.isUsable and itemEntry.isCollected) or itemEntry.alwaysShowItem then
+			table.insert(collectionElements, {
+				templateKey = "COLLECTION_ITEM",
+				appearanceInfo = itemEntry,
+				collectionFrame = itemsFrame,
+			})
+		end
+	end
+
+	table.sort(collectionElements, compareEntries)
+
+	local dataProvider = CreateDataProvider({{elements = collectionElements}})
+	itemsFrame.PagedContent:SetDataProvider(dataProvider, true)
+end
+
+function addon:CreateVendorItemsFilterButton(itemsFrame)
+	if itemsFrame.BW_FilterButton then
+		return itemsFrame.BW_FilterButton
+	end
+
+	local original = itemsFrame.FilterButton
+
+	local filterButton = CreateFrame("DropdownButton", nil, itemsFrame, "WowStyle1FilterDropdownTemplate")
+	filterButton.resizeToText = false
+	filterButton:SetPoint("TOPRIGHT", original, "TOPRIGHT")
+	filterButton:SetSize(original:GetSize())
+	filterButton:SetText(FILTER)
+
+	--Blizzard re-Shows original on later events (changing slots, etc.), so keep re-hiding it.
+	original:HookScript("OnShow", function(self)
+		filterButton:SetSize(self:GetSize())
+		self:Hide()
+	end)
+	original:Hide()
+
+	filterButton:SetupMenu(function(_dropdown, rootDescription)
+		local sortSubmenu = rootDescription:CreateButton(L["Sort By"])
+		local function IsSortModeSelected(mode)
+			return addon.Profile.ItemSortMode == mode
+		end
+		local function SetSortMode(mode)
+			addon.Profile.ItemSortMode = mode
+			BW_RefreshVendorItemsList(itemsFrame)
+		end
+		sortSubmenu:CreateRadio(L["Default"], IsSortModeSelected, SetSortMode, "Default")
+		sortSubmenu:CreateRadio(L["Alphabetic"], IsSortModeSelected, SetSortMode, "Alphabetic")
+		sortSubmenu:CreateRadio(L["Appearance"], IsSortModeSelected, SetSortMode, "Appearance")
+		sortSubmenu:CreateRadio(L["Item Source"], IsSortModeSelected, SetSortMode, "ItemSource")
+		sortSubmenu:CreateRadio(L["Color"], IsSortModeSelected, SetSortMode, "Color")
+		sortSubmenu:CreateRadio(L["Expansion"], IsSortModeSelected, SetSortMode, "Expansion")
+		sortSubmenu:CreateRadio(L["Item Level"], IsSortModeSelected, SetSortMode, "ItemLevel")
+		sortSubmenu:CreateRadio(L["Item ID"], IsSortModeSelected, SetSortMode, "ItemID")
+		sortSubmenu:CreateDivider()
+		sortSubmenu:CreateCheckbox(L["Reverse"], function() return addon.Profile.ItemSortReverse end, function()
+			addon.Profile.ItemSortReverse = not addon.Profile.ItemSortReverse
+			BW_RefreshVendorItemsList(itemsFrame)
+		end)
+
+		rootDescription:CreateDivider()
+
+		local sourcesSubmenu = rootDescription:CreateButton(SOURCES)
+
+		sourcesSubmenu:CreateButton(CHECK_ALL, function()
+			C_TransmogCollection.SetAllSourceTypeFilters(true)
+			BW_RefreshVendorItemsList(itemsFrame)
+			return MenuResponse.Refresh
+		end)
+
+		sourcesSubmenu:CreateButton(UNCHECK_ALL, function()
+			C_TransmogCollection.SetAllSourceTypeFilters(false)
+			BW_RefreshVendorItemsList(itemsFrame)
+			return MenuResponse.Refresh
+		end)
+
+		local function IsChecked(filter)
+			return C_TransmogCollection.IsSourceTypeFilterChecked(filter)
+		end
+
+		local function SetChecked(filter)
+			C_TransmogCollection.SetSourceTypeFilter(filter, not IsChecked(filter))
+			BW_RefreshVendorItemsList(itemsFrame)
+		end
+
+		for filterIndex = 1, C_TransmogCollection.GetNumTransmogSources() do
+			if (C_TransmogCollection.IsValidTransmogSource(filterIndex)) then
+				sourcesSubmenu:CreateCheckbox(_G["TRANSMOG_SOURCE_"..filterIndex], IsChecked, SetChecked, filterIndex)
+			end
+		end
+	end)
+
+	filterButton:SetIsDefaultCallback(function()
+		return C_TransmogCollection.IsUsingDefaultFilters()
+	end)
+
+	filterButton:SetDefaultCallback(function()
+		C_TransmogCollection.SetDefaultFilters()
+		BW_RefreshVendorItemsList(itemsFrame)
+	end)
+
+	itemsFrame.BW_FilterButton = filterButton
+	return filterButton
+end
+
 function addon:EventHandler(event, ...)
 	if event == "ADDON_LOADED" and ... == "Blizzard_Collections" then
 		addon:SendMessage("BW_ADDON_LOADED")
@@ -1505,6 +1706,8 @@ function addon:EventHandler(event, ...)
 				f:SetPoint("TOPLEFT", TransmogFrame.WardrobeCollection.TabContent.ItemsFrame.PagedContent, "BOTTOM", -120, 40)
 				TransmogFrame.WardrobeCollection.TabContent.ItemsFrame.PagedContent.PagingControls:Hide()
 				TransmogFrame.WardrobeCollection.TabContent.ItemsFrame.PagedContent.PagingControls = f
+
+				xpcall(addon.CreateVendorItemsFilterButton, geterrorhandler(), addon, TransmogFrame.WardrobeCollection.TabContent.ItemsFrame)
 
 				 self:SecureHookScript(TransmogFrame, "OnShow", function() C_Timer.After(.1, function() addon:UpdateTabs(); end) end)
 				addon:CreateButtons()

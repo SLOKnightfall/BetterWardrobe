@@ -464,6 +464,24 @@ function BuildBlizzSets()
 		end
 	end
 
+	--GetAllSets() doesn't guarantee base-before-variant order, so a variant processed before its
+	--base (no baseListLabels match existed yet) got wrongly promoted to its own base entry above.
+	--Fold those into their real base now that the full list exists.
+	for i = #baseList, 1, -1 do
+		local data = baseList[i]
+		local trueBaseID = C_TransmogSets.GetBaseSetID(data.setID)
+		local trueBase = trueBaseID and trueBaseID ~= data.setID and baseIDs[trueBaseID]
+		if trueBase and trueBase ~= data then
+			table.remove(baseList, i)
+			baseIDs[data.setID] = nil
+			if data.favorite and not trueBase.favoriteSetID then
+				trueBase.favoriteSetID = data.setID;
+			end
+			AddVariant(data, trueBaseID);
+			data.baseSetID = trueBaseID;
+		end
+	end
+
 end
 
 

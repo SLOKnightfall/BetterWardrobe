@@ -20,6 +20,18 @@ local ILEVEL = 8
 local ITEMID = 9
 local ARTIFACT = 7
 
+--Journal items filter dropdown reads these; kept separate from addon.Profile.SetSortMode (sets tab) and addon.Profile.ItemSortMode (vendor items tab).
+addon.ItemSortMode = {
+	Default = DEFAULT,
+	Appearance = APPEARANCE,
+	Alphabetic = ALPHABETIC,
+	Color = COLOR,
+	Expansion = EXPANSION,
+	ItemSource = ITEM_SOURCE,
+	ILevel = ILEVEL,
+	ItemID = ITEMID,
+}
+
 local TAB_ITEMS = 1
 local TAB_SETS = 2
 local TAB_EXTRASETS = 3
@@ -135,11 +147,17 @@ addon.CheckTab = CheckTab
 
 local function SortOrder(a, b)
 	if not a or not b then return end
-	if IsModifierKeyDown() then 
+	if IsModifierKeyDown() then
 		return a < b
 	else
 		return a > b
 	end
+end
+
+--Wraps a table.sort comparator so the Journal items "Reverse" checkbox can flip any sort mode without touching its comparison logic.
+local function ReverseComparator(comparator, reverse)
+	if not reverse then return comparator end
+	return function(a, b) return comparator(b, a) end
 end
 
 local labA, labB, labC = addon:ConvertRGB_to_LAB(0, 0, 0)
@@ -168,42 +186,50 @@ local function FindColorInFile(file)
 	end	
 end
 
+--Shared by the Journal's Color sort and the vendor's "Sort By > Color"; returns true/false once the visuals are distinguishable, nil if the caller should fall back to its own tie-break (e.g. uiOrder).
+function addon:CompareItemColor(visualID1, visualID2)
+	if not C_AddOns.IsAddOnLoaded("BetterWardrobe_SourceData") then
+		C_AddOns.EnableAddOn("BetterWardrobe_SourceData")
+		C_AddOns.LoadAddOn("BetterWardrobe_SourceData")
+	end
+
+	local ColorTable = (_G.BetterWardrobeData and _G.BetterWardrobeData.ColorTable) or {}
+	local ItemAppearance = (_G.BetterWardrobeData and _G.BetterWardrobeData.ItemAppearance) or {}
+	local color1 = ColorTable[visualID1]
+	local color2 = ColorTable[visualID2]
+	local file1 = ItemAppearance[visualID1]
+	local file2 = ItemAppearance[visualID2]
+
+	if file1 and file2 then
+		local index1 = FindColorInFile(file1)
+		local index2 = FindColorInFile(file2)
+
+		if index1 ~= index2 then
+			return SortOrder(index2, index1)
+		end
+	end
+
+	if color1 and color2 then
+		local color1diff = GetColor2Diff(color1)
+		local color2diff = GetColor2Diff(color2)
+
+		if color1diff ~= color2diff then
+			return SortOrder(color2, color1)
+		end
+	end
+
+	return nil
+end
+
 local function SortColor(sets)
 	local comparison = function(source1, source2)
-		if not C_AddOns.IsAddOnLoaded("BetterWardrobe_SourceData") then
-			C_AddOns.EnableAddOn("BetterWardrobe_SourceData")
-			C_AddOns.LoadAddOn("BetterWardrobe_SourceData")
-		end
-
 		if not source1 or not source2 then
 			return
 		end
 
-		local colors = addon.Globals.colors
-		local ColorTable = (_G.BetterWardrobeData and _G.BetterWardrobeData.ColorTable) or {}
-		local color1 = ColorTable[source1.visualID]
-		local color2 = ColorTable[source2.visualID]
-		local file1 = addon.ItemAppearance[source1.visualID]
-		local file2 = addon.ItemAppearance[source2.visualID]
-		local index1, index2
-
-		if file1 and file2 then
-			index1 = FindColorInFile(file1)
-			index2 = FindColorInFile(file2)
-
-			if index1 ~= index2 then
-				return SortOrder(index2, index1)
-			end
-		end
-
-		if color1 and color2 then
-			local index1 = #colors + 1
-			local color1diff = GetColor2Diff(color1)
-			local color2diff = GetColor2Diff(color2)
-
-			if color1diff ~= color2diff then
-				return SortOrder(color2, color1)
-			end
+		local result = addon:CompareItemColor(source1.visualID, source2.visualID)
+		if result ~= nil then
+			return result
 		end
 
 		if (source1.uiOrder and source2.uiOrder) then
@@ -211,7 +237,7 @@ local function SortColor(sets)
 		end
 	end
 
-	table.sort(sets, comparison)
+	table.sort(sets, ReverseComparator(comparison, addon.Profile.JournalItemSortReverse))
 end
 
 local function SortItemDefault(self)
@@ -257,16 +283,18 @@ end
 	local Wardrobe = BetterWardrobeCollectionFrame.ItemsCollectionFrame
 	for _, data in pairs(self.filteredVisualsList) do
 		local id = data.visualID
-		local sources =  CollectionWardrobeUtil.GetSortedAppearanceSources(id) --C_TransmogCollection.GetAppearanceSources(id)
-		local itemID = sources[1].itemID
-		local item = Item:CreateFromItemID(itemID)
+		local sources = CollectionWardrobeUtil.GetSortedAppearanceSources(id, self:GetActiveCategory(), self:GetTransmogLocation())
+		if sources[1] then
+			local itemID = sources[1].itemID
+			local item = Item:CreateFromItemID(itemID)
 
-		item:ContinueOnItemLoad(function()
-			local name = item:GetItemName() 
-			local ilevel = item:GetCurrentItemLevel() 
-			local itemID = item:GetItemID()
-			itemCache[id] = {["name"] = name, ["ilevel"] = ilevel, ["itemID"] = itemID}
-		end)
+			item:ContinueOnItemLoad(function()
+				local name = item:GetItemName()
+				local ilevel = item:GetCurrentItemLevel()
+				local itemID = item:GetItemID()
+				itemCache[id] = {["name"] = name, ["ilevel"] = ilevel, ["itemID"] = itemID}
+			end)
+		end
 	end
 	categoryCached[Wardrobe:GetActiveCategory()] = true
 end
@@ -282,15 +310,17 @@ local function SortItemAlphabetic(self)
 	if BetterWardrobeCollectionFrame.ItemsCollectionFrame:IsVisible() then
 		C_Timer.After(.1, function()
 				local comparison = function(source1, source2)
-					local item1 = itemCache[source1.visualID].name
-					local item2 = itemCache[source2.visualID].name
+					local entry1 = itemCache[source1.visualID]
+					local entry2 = itemCache[source2.visualID]
+					local item1 = entry1 and entry1.name
+					local item2 = entry2 and entry2.name
 					if item1 and item2 then
 						return SortOrder(item2, item1)
 					else
 						return SortOrder(source2.uiOrder, source1.uiOrder)
 					end
 				end
-			table.sort(BetterWardrobeCollectionFrame.ItemsCollectionFrame:GetFilteredVisualsList(), comparison)
+			table.sort(BetterWardrobeCollectionFrame.ItemsCollectionFrame:GetFilteredVisualsList(), ReverseComparator(comparison, addon.Profile.JournalItemSortReverse))
 
 			BetterWardrobeCollectionFrame.ItemsCollectionFrame:UpdateItems()
 		end)
@@ -300,22 +330,24 @@ end
 
 local function SortItemByILevel(self)
 	if not categoryCached[self:GetActiveCategory()] then
-		CacheCategory(self)
+		addon:CacheCategory(self)
 	end
 
 	if BetterWardrobeCollectionFrame.ItemsCollectionFrame:IsVisible() then
 		C_Timer.After(.0, function()
 			local comparison = function(source1, source2)
-				local itemLevel1 = itemCache[source1.visualID].ilevel
-				local itemLevel2 = itemCache[source2.visualID].ilevel
+				local entry1 = itemCache[source1.visualID]
+				local entry2 = itemCache[source2.visualID]
+				local itemLevel1 = entry1 and entry1.ilevel
+				local itemLevel2 = entry2 and entry2.ilevel
 
-				if itemLevel1 ~= itemLevel2 then
+				if itemLevel1 and itemLevel2 and itemLevel1 ~= itemLevel2 then
 					return SortOrder(itemLevel1, itemLevel2)
 				else
 					return SortOrder(source1.uiOrder, source2.uiOrder)
 				end
 			end
-			table.sort(BetterWardrobeCollectionFrame.ItemsCollectionFrame:GetFilteredVisualsList(), comparison)
+			table.sort(BetterWardrobeCollectionFrame.ItemsCollectionFrame:GetFilteredVisualsList(), ReverseComparator(comparison, addon.Profile.JournalItemSortReverse))
 
 			BetterWardrobeCollectionFrame.ItemsCollectionFrame:UpdateItems()
 		end)
@@ -324,20 +356,23 @@ end
 
 local function SortItemByItemID(self)
 	if not categoryCached[self:GetActiveCategory()] then
-		CacheCategory(self)
+		addon:CacheCategory(self)
 	end
 
 	if BetterWardrobeCollectionFrame.ItemsCollectionFrame:IsVisible() then
 		C_Timer.After(.1, function()
 			local comparison = function(source1, source2)
-				local item1 = itemCache[source1.visualID].itemID
-				local item2 = itemCache[source2.visualID].itemID
+				local entry1 = itemCache[source1.visualID]
+				local entry2 = itemCache[source2.visualID]
+				local item1 = entry1 and entry1.itemID
+				local item2 = entry2 and entry2.itemID
 
-				if item1 ~= item2 then
+				if item1 and item2 and item1 ~= item2 then
 					return SortOrder(item1, item2)
 				end
+				return SortOrder(source1.uiOrder, source2.uiOrder)
 			end
-			table.sort(BetterWardrobeCollectionFrame.ItemsCollectionFrame:GetFilteredVisualsList(), comparison)
+			table.sort(BetterWardrobeCollectionFrame.ItemsCollectionFrame:GetFilteredVisualsList(), ReverseComparator(comparison, addon.Profile.JournalItemSortReverse))
 
 			BetterWardrobeCollectionFrame.ItemsCollectionFrame:UpdateItems()
 		end)
@@ -352,6 +387,14 @@ local function GetTopSourceForVisual(visualID)
 
 	return CollectionWardrobeUtil.GetSortedAppearanceSources(visualID, addon.GetItemCategory(visualID), addon.GetTransmogLocation(itemLink))[1] or {}
 end
+
+--Shared by the Journal and vendor Expansion sorts; nil until the item's data has loaded.
+local function GetItemExpansionID(itemID)
+	if not itemID or itemID == 0 then return nil end
+	C_Item.RequestLoadItemDataByID(itemID)
+	return select(15, C_Item.GetItemInfo(itemID))
+end
+addon.GetItemExpansionID = GetItemExpansionID
 
 local function SortItemByExpansion(sets)
 	local comparison = function(source1, source2)
@@ -378,7 +421,7 @@ local function SortItemByExpansion(sets)
 		end
 	end
 
-	table.sort(sets, comparison)
+	table.sort(sets, ReverseComparator(comparison, addon.Profile.JournalItemSortReverse))
 end
 
 local function SortItemByAppearance(self)
@@ -396,7 +439,7 @@ local function SortItemByAppearance(self)
 		end
 	end
 
-	table.sort(self.filteredVisualsList, comparison)
+	table.sort(self.filteredVisualsList, ReverseComparator(comparison, addon.Profile.JournalItemSortReverse))
 end
 
 local function SortByItemSource(self)
@@ -440,7 +483,7 @@ local function SortByItemSource(self)
 		return SortOrder(source1.uiOrder, source2.uiOrder)
 	end
 
-	table.sort(self.filteredVisualsList, comparison)
+	table.sort(self.filteredVisualsList, ReverseComparator(comparison, addon.Profile.JournalItemSortReverse))
 end
 
 
