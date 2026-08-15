@@ -477,7 +477,7 @@ local function CheckMissingLocation(setInfo)
 			end
 
 		else
-			local setSources = addon.GetSetSources(setInfo.setID)
+			local setSources = addon.C_TransmogSets.GetSetSources(setInfo.setID)
 			for sourceID, isCollected in pairs(setSources) do
 				local sourceInfo = C_TransmogCollection.GetSourceInfo(sourceID)
 				if missingSelection[sourceInfo.invType] and not isCollected then

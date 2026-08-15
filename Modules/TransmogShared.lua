@@ -118,9 +118,8 @@ function WardrobeSetsDataProviderMixin:SortSets(sets, reverseUIOrder, ignorePatc
 	local comparator = not ignoreSortMode and SETS_SORT_COMPARATORS[addon.Profile.SetSortMode];
 
 	if not ignoreSortMode and addon.Profile.SetSortMode == "CollectedCount" then
-		--GetSetSourceCounts recomputes from the API every call (its own cache is disabled in
-		--GetSetSourceData), so snapshot it once instead of re-querying it inside table.sort's
-		--comparator, which table.sort calls many times and needs a stable answer from.
+		--Snapshot counts once instead of querying them inside table.sort's comparator, which
+		--calls it many times per sort and needs a stable answer.
 		local percentCollected, totalCounts = {}, {};
 		for _, set in ipairs(sets) do
 			--Query the row's own setID directly first -- GetBaseSets() already normalized it to the
@@ -405,7 +404,7 @@ function WardrobeSetsDataProviderMixin:GetSetSourceData(setID)
 	end
 
 	local sourceData = self.sourceData[setID];
-	--if not sourceData then
+	if not sourceData then
 		local primaryAppearances = C_TransmogSets.GetSetPrimaryAppearances(setID) or {};
 		local numCollected = 0;
 		local numTotal = 0;
@@ -417,7 +416,7 @@ function WardrobeSetsDataProviderMixin:GetSetSourceData(setID)
 		end
 		sourceData = { numCollected = numCollected, numTotal = numTotal, primaryAppearances = primaryAppearances };
 		self.sourceData[setID] = sourceData;
-	--end
+	end
 	return sourceData;
 end
 

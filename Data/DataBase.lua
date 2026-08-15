@@ -1706,10 +1706,6 @@ end
 		return visualID ,sourceID
 	end
 
-	function addon.GetSetSources(setID)
-		return addon.C_TransmogSets.GetSetSources(setID)
-	end
-
 	--Always nil right now -- backing cache is only populated by the unused UpdateCollectedAppearances.
 	function addon:IsCollected(visualID)
 		return collectedAppearances[visualID]
