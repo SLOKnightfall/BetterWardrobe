@@ -936,6 +936,7 @@ function WardrobeCollectionFrameMixin:GoToItem(sourceID)
 	if slot then
 		local isSecondary = false;
 		local transmogLocation = TransmogUtil.GetTransmogLocation(slot, Enum.TransmogType.Appearance, isSecondary);
+		self.ItemsCollectionFrame.highlightVisualID = appearanceSourceInfo.itemAppearanceID;
 		self.ItemsCollectionFrame:GoToSourceID(sourceID, transmogLocation);
 	end
 end
@@ -996,7 +997,12 @@ function WardrobeCollectionFrameMixin:SetAppearanceTooltip(contentFrame, sources
 	local displayedSourceID = displayedSource and displayedSource.sourceID;
 	if displayedSourceID then
 		local itemID = C_TransmogCollection.GetSourceItemID(displayedSourceID);
-		GameTooltip:AddLine(string.format("itemID: %s  sourceID: %s", tostring(itemID), tostring(displayedSourceID)), 0.6, 0.6, 0.6);
+		if addon.Profile.ShowItemIDTooltips then
+			GameTooltip:AddLine("itemID: "..tostring(itemID), 0.6, 0.6, 0.6);
+		end
+		if addon.Profile.ShowVisualIDTooltips then
+			GameTooltip:AddLine("sourceID: "..tostring(displayedSourceID), 0.6, 0.6, 0.6);
+		end
 		GameTooltip:Show();
 	end
 end
@@ -1136,7 +1142,7 @@ local defaultSectionSpacing = 24;
 local shorterSectionSpacing = 19;
 
 function WardrobeItemsCollectionMixin:CreateSlotButtons()
-	local slots = { "head", "shoulder", "back", "chest", "shirt", "tabard", "wrist", defaultSectionSpacing, "hands", "waist", "legs", "feet", defaultSectionSpacing, "mainhand", spacingWithSmallButton, "secondaryhand" };
+	local slots = { "head", "shoulder", "back", "chest", "shirt", "tabard", "wrist", "hands", "waist", "legs", "feet", "mainhand", spacingWithSmallButton, "secondaryhand" };
 	local parentFrame = self.SlotsFrame;
 	local lastButton;
 	local xOffset = spacingNoSmallButton;
@@ -1863,7 +1869,7 @@ function WardrobeItemsCollectionMixin:UpdateItems()
 			model:UpdateContentTracking();
 			model:UpdateTrackingDisabledOverlay();
 
-			model.TransmogStateTexture:Hide();
+			model.TransmogStateTexture:SetShown(self.highlightVisualID ~= nil and self.highlightVisualID == visualInfo.visualID);
 
 			-- border
 			if ( not visualInfo.isCollected ) then
@@ -1885,9 +1891,9 @@ function WardrobeItemsCollectionMixin:UpdateItems()
 			model.Favorite.Icon:SetShown(visualInfo.isFavorite);
 			-- hide visual option
 			model.HideVisual.Icon:Hide();
-			-- alternate appearance
-			local altSourceID = self:GetAnAppearanceSourceFromVisual(visualInfo.visualID, nil);
-			model.AltAppearance.Icon:SetShown(addon.Profile.ShowAltAppearanceIcon and addon:BuildAltAppearanceData(altSourceID) ~= nil);
+			-- alternate appearance (illusions aren't item appearances, so skip the lookup there)
+			local altSourceID = not self.transmogLocation:IsIllusion() and self:GetAnAppearanceSourceFromVisual(visualInfo.visualID, nil);
+			model.AltAppearance.Icon:SetShown(addon.Profile.ShowAltAppearanceIcon and altSourceID and addon:BuildAltAppearanceData(altSourceID) ~= nil);
 			-- slots not allowed
 			local showAsInvalid = not canDisplayVisuals or not self.slotAllowed;
 			model.SlotInvalidTexture:SetShown(showAsInvalid);		
@@ -2055,8 +2061,7 @@ function WardrobeItemsCollectionMixin:UpdateSlotButtons()
 				local xOffset = showSecondaryShoulder and spacingWithSmallButton or spacingNoSmallButton;
 				button:SetPoint("LEFT", lastButton, "RIGHT", xOffset, 0);
 			elseif slotName == "HANDSSLOT" or slotName == "MAINHANDSLOT" then
-				local xOffset = showSecondaryShoulder and shorterSectionSpacing or defaultSectionSpacing;
-				button:SetPoint("LEFT", lastButton, "RIGHT", xOffset, 0);
+				button:SetPoint("LEFT", lastButton, "RIGHT", spacingNoSmallButton, 0);
 			end
 			lastButton = button;
 		elseif button.transmogLocation:IsEqual(secondaryShoulderTransmogLocation) then

@@ -78,7 +78,9 @@ function BW_CollectionsPagingMixin:SetCurrentPage(page, userAction)
 		if ( self:GetParent().OnPageChanged ) then
 			self:GetParent():OnPageChanged(userAction);
 		end
+		return true;
 	end
+	return false;
 end
 
 function BW_CollectionsPagingMixin:GetCurrentPage()
@@ -91,6 +93,14 @@ end
 
 function BW_CollectionsPagingMixin:PreviousPage()
 	self:SetCurrentPage(self.currentPage - self:GetPageDelta(), true);
+end
+
+function BW_CollectionsPagingMixin:GoToFirstPage()
+	self:SetCurrentPage(1, true);
+end
+
+function BW_CollectionsPagingMixin:GoToLastPage()
+	self:SetCurrentPage(self.maxPages, true);
 end
 
 function BW_CollectionsPagingMixin:GetPageDelta()
@@ -116,13 +126,21 @@ function BW_CollectionsPagingMixin:Update()
 	self.PageText:SetFormattedText(COLLECTION_PAGE_NUMBER, self.currentPage, self.maxPages);
 	if ( self.currentPage <= 1 ) then
 		self.PrevPageButton:Disable();
+		self.FirstPageButton:Disable();
+		self.FirstPageButton:GetNormalTexture():SetDesaturated(true);
 	else
 		self.PrevPageButton:Enable();
+		self.FirstPageButton:Enable();
+		self.FirstPageButton:GetNormalTexture():SetDesaturated(false);
 	end
 	if ( self.currentPage >= self.maxPages ) then
 		self.NextPageButton:Disable();
+		self.LastPageButton:Disable();
+		self.LastPageButton:GetNormalTexture():SetDesaturated(true);
 	else
 		self.NextPageButton:Enable();
+		self.LastPageButton:Enable();
+		self.LastPageButton:GetNormalTexture():SetDesaturated(false);
 	end
 end
 

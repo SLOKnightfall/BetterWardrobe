@@ -1341,7 +1341,7 @@ function addon:OnEnable()
 	--addon.Init.LoadCollectionListModule()
 	--BW_ColectionListFrameTemplate
 	--addon.Init:BuildTooltips()
-	----addon:InitTooltips()
+	addon:InitTooltips()
 	C_Timer.After(0.5, function()
 		----addon.RefreshSubItemData()
 		----addon.RefreshOutfitData()
@@ -1706,6 +1706,17 @@ function addon:EventHandler(event, ...)
 				f:SetPoint("TOPLEFT", TransmogFrame.WardrobeCollection.TabContent.ItemsFrame.PagedContent, "BOTTOM", -120, 40)
 				TransmogFrame.WardrobeCollection.TabContent.ItemsFrame.PagedContent.PagingControls:Hide()
 				TransmogFrame.WardrobeCollection.TabContent.ItemsFrame.PagedContent.PagingControls = f
+
+				--FirstPageButton/LastPageButton are our own addition; Blizzard's PagingControlsMixin
+				--only greys out Prev/Next, so sync the desaturation for these two ourselves.
+				hooksecurefunc(f, "UpdateControls", function(self)
+					local atFirst = self:GetCurrentPage() <= 1;
+					local atLast = self:GetCurrentPage() >= self:GetMaxPages();
+					self.FirstPageButton:SetEnabled(not atFirst);
+					self.FirstPageButton:GetNormalTexture():SetDesaturated(atFirst);
+					self.LastPageButton:SetEnabled(not atLast);
+					self.LastPageButton:GetNormalTexture():SetDesaturated(atLast);
+				end);
 
 				xpcall(addon.CreateVendorItemsFilterButton, geterrorhandler(), addon, TransmogFrame.WardrobeCollection.TabContent.ItemsFrame)
 

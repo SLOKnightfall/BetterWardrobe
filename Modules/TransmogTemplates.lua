@@ -1795,6 +1795,11 @@ do
 				GameTooltip:AddLine(TRANSMOG_NOT_COLLECTED or "Not Collected", 1, 0, 0);
 			end
 			GameTooltip:Show();
+			--GetSourceInfo (by sourceID) has no itemLink field, unlike GetAppearanceSourceInfo; build one from the itemID instead.
+			local itemLink = self.itemID and select(2, C_Item.GetItemInfo(self.itemID));
+			if itemLink then
+				addon.preview:ShowPreview(itemLink);
+			end
 		end);
 		b:SetScript("OnLeave", GameTooltip_Hide);
 
@@ -1820,14 +1825,24 @@ do
 		f:SetFrameStrata("DIALOG");
 		f:SetSize(260, 100);
 
-		if TransmogFrame.Character then
-			f:SetPoint("CENTER", TransmogFrame.Character, "CENTER", -125, 0);
+		if TransmogFrame.CharacterPreview then
+			f:SetPoint("CENTER", TransmogFrame.CharacterPreview, "CENTER", -125, 0);
 		else
 			f:SetPoint("CENTER", UIParent, "CENTER", -125, 0);
 		end
 
 		f:Hide();
 		f:EnableMouse(true);
+
+		f:SetScript("OnHide", function()
+			local itemsFrame = BetterWardrobeCollectionFrame and BetterWardrobeCollectionFrame.ItemsCollectionFrame;
+			if itemsFrame and itemsFrame.highlightVisualID then
+				itemsFrame.highlightVisualID = nil;
+				if itemsFrame:IsShown() then
+					itemsFrame:UpdateItems();
+				end
+			end
+		end);
 
 		TransmogFrame:HookScript("OnHide", function()
 			f:Hide();
@@ -1870,6 +1885,15 @@ do
 		local function DefaultOnSelect(sourceID, slot)
 			if slot then
 				UpdateOutfit(slot, Enum.TransmogType.Appearance, sourceID);
+			end
+			--At the vendor, TransmogFrame owns its own native item list (Blizzard's cards,
+			--not ours) - page it there directly instead of touching the Journal's frame.
+			local itemsFrame = TransmogFrame and TransmogFrame:IsShown() and TransmogFrame.WardrobeCollection
+				and TransmogFrame.WardrobeCollection.TabContent and TransmogFrame.WardrobeCollection.TabContent.ItemsFrame;
+			if itemsFrame and itemsFrame.PageToTransmogID then
+				itemsFrame:PageToTransmogID(sourceID);
+			elseif BetterWardrobeCollectionFrame and BetterWardrobeCollectionFrame:IsVisible() then
+				BetterWardrobeCollectionFrame:GoToItem(sourceID);
 			end
 		end
 
@@ -1955,10 +1979,11 @@ do
 
 		--Popout is shared between the vendor and the Collections Journal; reposition per-show.
 		popout:ClearAllPoints();
-		if TransmogFrame and TransmogFrame:IsShown() and TransmogFrame.Character then
-			popout:SetPoint("CENTER", TransmogFrame.Character, "CENTER", -125, 0);
+		if TransmogFrame and TransmogFrame:IsShown() and TransmogFrame.CharacterPreview then
+			popout:SetPoint("CENTER", TransmogFrame.CharacterPreview, "CENTER", -125, 0);
 		elseif BetterWardrobeCollectionFrame and BetterWardrobeCollectionFrame:IsShown() then
-			popout:SetPoint("CENTER", BetterWardrobeCollectionFrame, "CENTER");
+			local slotsFrame = BetterWardrobeCollectionFrame.ItemsCollectionFrame.SlotsFrame;
+			popout:SetPoint("TOP", BetterWardrobeCollectionFrame, "TOP", 0, slotsFrame:GetTop() - BetterWardrobeCollectionFrame:GetTop());
 		else
 			popout:SetPoint("CENTER");
 		end

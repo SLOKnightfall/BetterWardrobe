@@ -187,6 +187,8 @@ local function SelectColor()
 	ColorPickerFrame.swatchFunc = ColorPickerCallback
 	ColorPickerFrame.cancelFunc = function() resetFilters() end
 	--ColorPickerFrame:SetColorRGB(.64,.64,.64,1)
+	ColorPickerFrame:ClearAllPoints()
+	ColorPickerFrame:SetPoint("TOPLEFT", BetterWardrobeCollectionFrame, "TOPRIGHT", 6, -8)
 	ColorPickerFrame:Show()
 	ColorPickerFrame.Content.ColorSwatchOriginal:Hide()
 
@@ -198,8 +200,14 @@ function addon.Init:InitFilterButtons()
 	local frame = CreateFrame("Button", nil, BetterWardrobeCollectionFrame.ItemsCollectionFrame)
 	local atTransmogrifier = C_Transmog.IsAtTransmogNPC();
 	frame:ClearAllPoints()
-	--frame:SetPoint("TOPRIGHT", BW_SortDropDown, 30, 0)
-	frame:SetPoint("TOPRIGHT", BetterWardrobeCollectionFrame.ItemsCollectionFrame.SlotsFrame,"BOTTOMLEFT", 30, -30)
+	local slotButtons = BetterWardrobeCollectionFrame.ItemsCollectionFrame.SlotsFrame.Buttons
+	local lastSlotButton
+	for i = 1, #slotButtons do
+		if not slotButtons[i].isSmallButton then
+			lastSlotButton = slotButtons[i]
+		end
+	end
+	frame:SetPoint("LEFT", lastSlotButton, "RIGHT", 12, 0)
 	frame:SetSize(25, 25)
 
 	frame:SetScript("OnHide",function()

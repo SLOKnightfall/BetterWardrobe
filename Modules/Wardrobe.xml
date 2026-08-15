@@ -621,7 +621,7 @@
 					</CheckButton>
 					<Frame parentKey="PagingFrame" inherits="BW_CollectionsPagingFrameTemplate">
 						<Anchors>
-							<Anchor point="BOTTOM" x="22" y="29"/>
+							<Anchor point="BOTTOM" x="22" y="47"/>
 						</Anchors>
 					</Frame>
 					<DropdownButton parentKey="WeaponDropdown" inherits="WowStyle1DropdownTemplate" hidden="true">

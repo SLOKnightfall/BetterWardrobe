@@ -385,13 +385,35 @@
 		<HighlightTexture file="Interface\Buttons\UI-Common-MouseHilight" alphaMode="ADD"/>
 	</Button>
 
+	<Button name="BW_CollectionsFirstPageButton" virtual="true">
+		<Size x="32" y="32" />
+		<NormalTexture file="Interface\TIMEMANAGER\RWButton"/>
+		<HighlightTexture file="Interface\Buttons\UI-Common-MouseHilight" alphaMode="ADD"/>
+	</Button>
+
+	<Button name="BW_CollectionsLastPageButton" virtual="true">
+		<Size x="32" y="32" />
+		<NormalTexture file="Interface\TIMEMANAGER\FFButton"/>
+		<HighlightTexture file="Interface\Buttons\UI-Common-MouseHilight" alphaMode="ADD"/>
+	</Button>
+
 	<Frame name="BW_CollectionsPagingFrameTemplate" mixin="BW_CollectionsPagingMixin" virtual="true">
 		<!-- why 33? it makes it so the button textures display without rounding fuzziness on my screen -->
-		<Size x="33" y="32"/>
+		<Size x="177" y="32"/>
 		<Frames>
-			<Button parentKey="PrevPageButton" inherits="BW_CollectionsPrevPageButton">
+			<Button parentKey="FirstPageButton" inherits="BW_CollectionsFirstPageButton">
 				<Anchors>
 					<Anchor point="LEFT" x="0" y="0" />
+				</Anchors>
+				<Scripts>
+					<OnClick>
+						self:GetParent():GoToFirstPage();
+					</OnClick>
+				</Scripts>
+			</Button>
+			<Button parentKey="PrevPageButton" inherits="BW_CollectionsPrevPageButton">
+				<Anchors>
+					<Anchor point="LEFT" relativeKey="$parent.FirstPageButton" relativePoint="RIGHT" x="3" y="0" />
 				</Anchors>
 				<Scripts>
 					<OnClick>
@@ -399,13 +421,42 @@
 					</OnClick>
 				</Scripts>
 			</Button>
+			<EditBox parentKey="PageInput" inherits="InputBoxTemplate">
+				<Size x="30" y="24"/>
+				<Anchors>
+					<Anchor point="LEFT" relativeKey="$parent.PrevPageButton" relativePoint="RIGHT" x="6" y="0" />
+				</Anchors>
+				<Scripts>
+					<OnLoad>
+						self:SetAutoFocus(false)
+					</OnLoad>
+					<OnEnterPressed>
+						local page = tonumber(self:GetText())
+						if page then
+							self:GetParent():SetCurrentPage(page, true);
+						end
+						self:ClearFocus()
+						self:SetText("")
+					</OnEnterPressed>
+				</Scripts>
+			</EditBox>
 			<Button parentKey="NextPageButton" inherits="BW_CollectionsNextPageButton">
 				<Anchors>
-					<Anchor point="LEFT" relativePoint="RIGHT" x="3" y="0" />
+					<Anchor point="LEFT" relativeKey="$parent.PageInput" relativePoint="RIGHT" x="6" y="0" />
 				</Anchors>
 				<Scripts>
 					<OnClick>
 						self:GetParent():NextPage();
+					</OnClick>
+				</Scripts>
+			</Button>
+			<Button parentKey="LastPageButton" inherits="BW_CollectionsLastPageButton">
+				<Anchors>
+					<Anchor point="LEFT" relativeKey="$parent.NextPageButton" relativePoint="RIGHT" x="3" y="0" />
+				</Anchors>
+				<Scripts>
+					<OnClick>
+						self:GetParent():GoToLastPage();
 					</OnClick>
 				</Scripts>
 			</Button>
@@ -414,7 +465,7 @@
 			<Layer level="ARTWORK">
 				<FontString parentKey="PageText" inherits="BW_CollectionsPageTextTemplate">
 					<Anchors>
-						<Anchor point="RIGHT" relativePoint="LEFT" x="-11" y="0"/>
+						<Anchor point="RIGHT" relativeKey="$parent.FirstPageButton" relativePoint="LEFT" x="-11" y="0"/>
 					</Anchors>
 				</FontString>
 			</Layer>
