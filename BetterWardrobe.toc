@@ -44,6 +44,7 @@ Data\ArtifactData.lua
 Modules\BlizzardAPI.lua
 Modules\CollectionTemplates.xml
 Modules\Templates.xml
+Patrons.lua
 Modules\Core.lua
 Data\DataBase.lua
 Data\Cloth.lua

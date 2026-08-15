@@ -9,7 +9,6 @@ addon.Globals.SAVED_SET_OFFSET = SAVED_SET_OFFSET
 
 local L = LibStub("AceLocale-3.0"):GetLocale(addonName)
 local _, playerClass, classID = UnitClass("player")
---local role = GetFilteredRole()
 local CLASS_INFO = Globals.CLASS_INFO
 local SET_OFFSET = addon.Globals.SET_OFFSET
 
@@ -18,6 +17,7 @@ local CHALLENGE_SETID = {1436,1437,1438,1439,1440,1441,1442,1443,1444,1445,1446}
 local TRADING_POST_SETID = {2320, 2323, 2327, 2337, 2338, 2340, 2346, 2654, 2655, 2656, 2657, 2658, 2659, 2660,2669, 2676, 2677, 2678, 2679,3354,3355,3357,3358,3360,3361,3362,3444,3445,3446,3447,3448,3449,3189, 3190, 3306}
 --PVP_SETID is an exact ID lookup; these keywords catch newer PvP sets it hasn't been updated for.
 local PVP_DESCRIPTION_KEYWORDS = {"Honor", "Combatant", "Warfront", "Aspirant", "Gladiator", "Elite"}
+--True if a Blizzard set is a PvP set, by ID or by description keyword.
 local function isPVP(index, description)
 	for _,i in ipairs(PVP_SETID) do
 		if i == index then return true end
@@ -44,7 +44,7 @@ local hiddenSet ={
 	["setID"] =  0 ,
 	["name"] =  "Hidden",
 	["items"] = { 134110, 134112, 168659, 168665, 158329, 143539, 168664, 198608 },
-	
+
 	["expansionID"] =  1,
 	["filter"] =  1,
 	["recolor"] =  false,
@@ -54,17 +54,17 @@ local hiddenSet ={
 	--["itemTransmogInfo"] = {}  --TODO Populate
 }
 local ALT_SET_DATA = {}
- SET_INDEX = {}
+SET_INDEX = {}
 local ArmorDB = {}
 local collectedAppearances = {}
 
 local extraSetCount = 0
 local extraSetCollectedCount = 0
 
-
+--Normalizes a faction name/ID to Blizzard's numeric faction ID.
 local function GetFactionID(faction)
 	if type(faction) == "number" then
-		return faction		
+		return faction
 	end
 
 	if faction == "Horde" then
@@ -73,7 +73,6 @@ local function GetFactionID(faction)
 		return 1--4
 	end
 end
-
 
 local armorMask = {400, 3592, 68, 35}
 local WowSets = {{}, {}, {}, {}, {}}
@@ -96,7 +95,7 @@ addon.VariantIDs = variantIDs
 local fullList = {}
 addon.fullList = fullList
 
-
+--Hides a set as a variant of baseSetID (reachable via addon.VariantSets instead of as its own entry).
 local function AddVariant(set, baseSetID)
 	variantSets[baseSetID] = variantSets[baseSetID] or {};
 	set.baseSetID = baseSetID;
@@ -106,12 +105,13 @@ local function AddVariant(set, baseSetID)
 	variantIDs[set.setID] = baseSetID;
 end
 
+--Re-parents an existing variant group (and set itself) onto a different base set.
 local function AddVariantToBaseSet(set, newBaseID)
 	variantSets[baseSetID] = variantSets[baseSetID] or {};
-	
+
 	local baseID = set.baseSetID;
 	--if not baseID then baseID = set.setID; end
-	
+
 	if variantSets[baseID] then
 		for i=1,#variantSets[baseID] do
 			tinsert(variantSets[newBaseID], variantSets[baseID][i]);
@@ -127,13 +127,14 @@ local function AddVariantToBaseSet(set, newBaseID)
 			variantSets[set.setID][i].baseSetID = newBaseID;
 		end
 	end
-	
+
 	set.baseSetID = newBaseID;
 	variantSets[baseID] = nil;
 	variantSets[set.setID] = nil;
 end
 
 local KnownClassMasks
+--True if mask is a real class/class-combo mask (cached from addon.Globals.CLASS_MASK).
 local function IsKnownClassMask(mask)
 	if not KnownClassMasks then
 		KnownClassMasks = {[0] = true}
@@ -146,6 +147,7 @@ local function IsKnownClassMask(mask)
 	return KnownClassMasks[mask]
 end
 
+--Whether a set should be shown for the current character: class, faction, and heritage-race checks.
 local function UseSet(data)
 	if data.classMask and not IsKnownClassMask(data.classMask) then
 		local baseSetID = C_TransmogSets.GetBaseSetID(data.setID)
@@ -167,7 +169,6 @@ local function UseSet(data)
 	local correctHeratiage = false
 	local heritageSets = addon.MiscSets.HeritageSets
 
-
 	--wierd artifact sets that were added
 	if data.setID >= 4575 and data.setID <= 5094  then
 		return false
@@ -181,10 +182,11 @@ local function UseSet(data)
 		correctHeratiage = true;
 	end
 
-	if data.classMask and (data.classMask == 0 or data.classMask == 16383) then		correctClass = true;
+	if data.classMask and (data.classMask == 0 or data.classMask == 16383) then
+		correctClass = true;
 	else
 		if data.setType == "Blizzard" then
-			if not addon.Profile.IgnoreClassRestrictions then 
+			if not addon.Profile.IgnoreClassRestrictions then
 
 				for i = 1, #ClassArmor do
 					if data.classMask == ClassArmor[i] then
@@ -221,18 +223,14 @@ local function UseSet(data)
 		end
 	end
 
-	if addon.Profile.CurrentFactionSets and (data.requiredFaction and GetFactionID(data.requiredFaction) == GetFactionID(playerFaction) or data.requiredFaction == nil) 
+	if addon.Profile.CurrentFactionSets and (data.requiredFaction and GetFactionID(data.requiredFaction) == GetFactionID(playerFaction) or data.requiredFaction == nil)
 		or not addon.Profile.CurrentFactionSets then
 			correctFaction =  true
 	end
 
---if true then return true end
-
-	--local search = addon:SearchSets(data)
 	if correctFaction
-	and correctClass 
+	and correctClass
 	and correctHeratiage
-	--and search
 	then
 		return true
 	else
@@ -240,6 +238,7 @@ local function UseSet(data)
 	end
 end
 
+--Debug: prints every field on a native TransmogSet to chat.
 function addon:DumpTransmogSet(setID)
 	for _, data in ipairs(C_TransmogSets.GetAllSets()) do
 		if data.setID == setID then
@@ -259,6 +258,7 @@ function addon:DumpTransmogSet(setID)
 	print(string.format("TransmogSet %s not found", tostring(setID)))
 end
 
+--Debug: prints a native set's base info and all its variants to chat.
 function addon:DumpTransmogSetVariants(setID)
 	local baseSetID = C_TransmogSets.GetBaseSetID(setID) or setID
 	print(string.format("--- Variants of base set %s (from %s) ---", tostring(baseSetID), tostring(setID)))
@@ -278,7 +278,7 @@ function addon:DumpTransmogSetVariants(setID)
 	end
 end
 
--- Gets all the Blizzard sets, filters out any sets shown in the base set tab and adds them to the apropriate ArmorDB
+--Gets all Blizzard sets, filters out ones already shown in the base set tab, and adds the rest to ArmorDB.
 function BuildBlizzSets()
 	addon.SetsDataProvider:ClearSets();
 	addon:ClearCache()
@@ -307,30 +307,29 @@ function BuildBlizzSets()
 				data.classMask = 35
 			end
 
-
-			if data.classMask and Globals.CLASS_MASK_TO_ID[data.classMask] then 
+			if data.classMask and Globals.CLASS_MASK_TO_ID[data.classMask] then
 				data.classID = Globals.CLASS_MASK_TO_ID[data.classMask]
 				data.className, data.classTag = GetClassInfo(data.classID);
 			end
-		
+
 			data.tab = 2
 			--PvP Sets
-			if data.PvP then 
+			if data.PvP then
 				--data.filter = 7
 
 			--Covenant Sets
-			elseif data.setID <= 2221 and data.setID >= 2015 then 
+			elseif data.setID <= 2221 and data.setID >= 2015 then
 				--data.filter = 11
 				--data.tab = 2
 
 			--Shop & Trading Post
-			elseif addon.MiscSets.TRADINGPOST_SETS[data.setID]  or (data.label and string.find(data.label, inGameShopGlobalString))  or (data.label and string.find(data.label, tradingPostGlobalString))  
+			elseif addon.MiscSets.TRADINGPOST_SETS[data.setID]  or (data.label and string.find(data.label, inGameShopGlobalString))  or (data.label and string.find(data.label, tradingPostGlobalString))
 				or (data.description and string.find(data.description, inGameShopGlobalString))  or (data.description and string.find(data.description, tradingPostGlobalString)) then
 				--data.tab = 3
 				data.filter = 12
 
 			--Raid Sets
-			elseif data.description then 
+			elseif data.description then
 				--data.filter = 5
 
 			else
@@ -353,7 +352,7 @@ function BuildBlizzSets()
 				if not initSpecialSet then
 					initSpecialSet = data.setID;
 					baseIDs[data.setID] = data;
-					baseListLabels[data.label] = data.setID; 
+					baseListLabels[data.label] = data.setID;
 					table.insert(baseList, data);
 					AddVariant(data, data.setID);
 
@@ -387,7 +386,7 @@ function BuildBlizzSets()
 						end
 					end
 			else
-				
+
 				if (not data.description) then
 					if addon.Globals.CLASS_NAMES[data.classMask] then
 						data.description = addon.Globals.CLASS_NAMES[data.classMask][1];
@@ -395,7 +394,7 @@ function BuildBlizzSets()
 						data.description = data.name;
 					end
 				end
-				
+
 				if addon.Globals.CLASS_NAMES[data.classMask] then
 					--=data.description = addon:GetClassColor(data.classMask, data.description);
 				end
@@ -407,21 +406,19 @@ function BuildBlizzSets()
 
 				if addon.MiscSets.customGroups[tonumber(data.setID)] then
 					data.customGroups = addon.MiscSets.customGroups[tonumber(data.setID)]
-				end				
+				end
 
 				if data.label == tradingPostGlobalString then
 					data.customGroups = data.name
-				end				
-			
+				end
+
 				local subSet = false;
 				local subSetBaseID;
 				SET_INDEX[data.setID] = data
 				fullList[data.setID] = set
 
-				--Only hide as a variant if Blizzard's own GetBaseSetID agrees it's the same family as our label grouping.
-				--(Blizzard's native GetVariantSets can't be relied on to expose it as a swatch afterwards --
-				--see WardrobeSetsDataProviderMixin:GetVariantSets in TransmogShared.lua, which falls back to
-				--our own addon.VariantSets grouping when the native list is empty, so it stays reachable.)
+				--Only hide as a variant if GetBaseSetID agrees it's the same family as our label grouping --
+				--otherwise it stays reachable via addon.VariantSets (see TransmogShared.lua:GetVariantSets).
 				local function BlizzardAgreesSameFamily(setID, proposedBaseID)
 					if setID == proposedBaseID then return true end
 					local trueBaseOfSet = C_TransmogSets.GetBaseSetID(setID) or setID
@@ -432,16 +429,16 @@ function BuildBlizzSets()
 				if data.customGroups and baseListLabels[data.customGroups] and BlizzardAgreesSameFamily(data.setID, baseListLabels[data.customGroups]) then
 					subSet = true;
 					subSetBaseID = baseListLabels[data.customGroups]
-				
+
 				elseif not data.customGroups and data.label and baseListLabels[data.label] and BlizzardAgreesSameFamily(data.setID, baseListLabels[data.label]) then
 					subSet = true;
 					subSetBaseID = baseListLabels[data.label]
 				end
-			
+
 				if subSet then
 					if data.favorite then
 						----if not baseIDs[subSetBaseID].favoriteSetID then
-						----	baseIDs[subSetBaseID].favoriteSetID = data.setID;
+						---- baseIDs[subSetBaseID].favoriteSetID = data.setID;
 						----end
 					end
 
@@ -465,8 +462,7 @@ function BuildBlizzSets()
 	end
 
 	--GetAllSets() doesn't guarantee base-before-variant order, so a variant processed before its
-	--base (no baseListLabels match existed yet) got wrongly promoted to its own base entry above.
-	--Fold those into their real base now that the full list exists.
+	--base gets wrongly promoted above -- fold those into their real base now that we have the full list.
 	for i = #baseList, 1, -1 do
 		local data = baseList[i]
 		local trueBaseID = C_TransmogSets.GetBaseSetID(data.setID)
@@ -484,9 +480,9 @@ function BuildBlizzSets()
 
 end
 
-
+--Converts a class bitmask (CLASS_INFO[i][2]) back to its class ID (CLASS_INFO[i][1]).
 local function getClassMask(mask)
-	for i, d in pairs(addon.Globals.CLASS_INFO) do 
+	for i, d in pairs(addon.Globals.CLASS_INFO) do
 
 		if mask == d[2] then return d[1] end
 	end
@@ -494,6 +490,7 @@ end
 
 local UIID_Counter = {1,1150,2000,3390,4580,6200,8000,10110,11000,12000,13000,14000}
 
+--Returns the player's opposing faction name, capital city name, and faction ID.
 local function OpposingFaction(faction)
 	local faction = UnitFactionGroup("player")
 	if faction == "Horde" then
@@ -505,6 +502,8 @@ end
 
 addon.ArmorSetModCache = {}
 do
+	--Rebuilds every runtime set table from scratch: native Blizzard sets plus this class/armor
+	--type's Extra Sets, folding same-label/customGroups sets together as variants.
 	local function BuildArmorDB()
 			wipe(baseList);
 			wipe(baseListLabels);
@@ -525,7 +524,6 @@ do
 			--addon:AddTestSets()
 		--@end-debug@
 
-
 		local dropdownclass = C_TransmogSets.GetTransmogSetsClassFilter();
 		local at = Globals.ClassArmorType[dropdownclass]
 		local ty = Globals.ARMOR_TYPE[at]
@@ -538,18 +536,14 @@ do
 			ArmorDB[currentArmorType] = ArmorDB[currentArmorType] or {}
 
 			for id, data in pairs(data) do
-				--print(UseSet(data))
-				if (data.requiredFaction and data.requiredFaction == GetFactionID(playerFaction) or data.requiredFaction == nil) and 
-					--(not data.BuildBlizzSets and (data.filter ~= 5 and data.filter ~= 7 and data.filter ~= 11)) and  UseSet(data) then 
-					(not data.BuildBlizzSets ) and  UseSet(data) then 
-
-					--data.isHeritageArmor = string.find(data.name, "Heritage")
+				if (data.requiredFaction and data.requiredFaction == GetFactionID(playerFaction) or data.requiredFaction == nil) and
+					(not data.BuildBlizzSets ) and  UseSet(data) then
 
 					local classInfo = CLASS_INFO[playerClass]
 					local classMask = getClassMask(data.classMask)
 					local class =  (data.classMask)
 					local className = (classMask and GetClassInfo(classMask)) or nil
-					
+
 					data.isClass = data.classMask == classInfo[1] or not data.classMask
 					--local class = (data.classMask and data.classMask == 0) or (data.classMask and bit.band(data.classMask, classInfo[2])  == classInfo[2]) or not data.classMask
 					data.className = data.classMask and GetClassInfo(data.classMask)
@@ -581,19 +575,17 @@ do
 
 					data.newStatus = false
 
-
 					data.itemData = data.itemData or {}
 
 					data.validForCharacter = true;
 
-
 					--for slotID, itemData in pairs(data.itemData) do
-					--	local appearanceID = itemData[3]
-						--if appearanceID  then --and data.sources[item] and data.sources[item] ~= 0 then 
+					-- local appearanceID = itemData[3]
+						--if appearanceID  then --and data.sources[item] and data.sources[item] ~= 0 then
 							--local appearanceID = data.sources[item]
-						--	ItemDB[appearanceID] = ItemDB[appearanceID] or {}
-						--	ItemDB[appearanceID][newID] = data
-					--	end
+						-- ItemDB[appearanceID] = ItemDB[appearanceID] or {}
+						-- ItemDB[appearanceID][newID] = data
+					-- end
 					--end
 
 					local subSet = false;
@@ -626,7 +618,7 @@ do
 					end
 
 				--print(data.name)
-					
+
 					if subSet then
 						AddVariant(data, subSetBaseID);
 						data.baseSetID = subSetBaseID;
@@ -635,7 +627,6 @@ do
 						baseIDs[data.setID] = data;
 
 						data.baseSetID = data.setID;
-
 
 						if data.customGroups then
 							baseListLabels[data.customGroups] = data.setID;
@@ -654,7 +645,7 @@ do
 					data.newStatus = false
 					local isCollected = true
 					for i, itemData in pairs(data.itemData) do
-						if subitemlist[item] then 
+						if subitemlist[item] then
 							local replacementID = subitemlist[item]
 							local appearanceID, sourceID = C_TransmogCollection.GetItemInfo(replacementID)
 							local sources = C_TransmogCollection.GetAppearanceSources(appearanceID)
@@ -681,38 +672,33 @@ do
 				end
 			end
 		end
-		--print(extraSetCount)
-		--addon.ArmorSets = nil
 	end
-
 
 function addon:GetCollectedExtraSetCount()
 	return extraSetCollectedCount, extraSetCount
 end
 
+	--Returns the Extra Set(s) an item belongs to, if any (keyed by appearance ID in ItemDB).
 	function addon.IsSetItem(itemLink)
 		if not itemLink then return end
 
 		local appearanceID, sourceID = C_TransmogCollection.GetItemInfo(itemLink)
-		if not ItemDB[appearanceID] then 
-			return nil 
+		if not ItemDB[appearanceID] then
+			return nil
 		else
 			return ItemDB[appearanceID]
 		end
 	end
 
-
-	--NOTE: renamed from HasSubItem to avoid colliding with the unrelated, later-defined
-	--addon.HasSubItem(setID) further down this file (SetSwaps-based). That second one is
-	--what Wardrobe_Sets.lua actually calls. This function was previously dead/shadowed.
+	--Renamed from HasSubItem -- collided with the unrelated addon.HasSubItem(setID) later in this file.
 	function addon.GetSubItemForSource(sourceID)
 		if subitemlist[sourceID] then
 			local sourceInfo = C_TransmogCollection.GetSourceInfo(subitemlist[sourceID])
-			--print("found")
 			return subitemlist[sourceID]
 		end
 	end
 
+	--Rebuilds subitemlist from the saved item-substitute DB (addon.itemsubdb).
 	local function buildSetSubstitutions()
 		wipe(subitemlist)
 		subitemlist = subitemlist or {}
@@ -720,24 +706,13 @@ end
 
 		for itemID, sub_data in pairs(addon.itemsubdb.profile.items) do
 			local appearanceID, sourceID = C_TransmogCollection.GetItemInfo(itemID)
-			--print(sourceID)
 			local appearanceID2, sourceID2 = C_TransmogCollection.GetItemInfo(sub_data.subID)
-			--print(sourceID)
 
 			subitemlist[sourceID] = sourceID2
-			--[[local _, visualID, _, _, _, itemLink = C_TransmogCollection.GetAppearanceSourceInfo(appearanceID)	
-			local sources = (itemLink and C_TransmogCollection.GetAppearanceSources(appearanceID, addon.GetItemCategory(appearanceID), addon.GetTransmogLocation(itemLink)) )
-			if sources then 
-				for i, data in ipairs(sources) do
-					subitemlist[data.itemID] = sub_data.subID
-				end
-			end
-			subitemlist[itemID] = sub_data.subID
-			]]--
 		end
-	end 
+	end
 
-
+	--Populates collectedAppearances (weapon appearances only). Currently unused -- no live caller.
 	function addon.Init:UpdateCollectedAppearances()
 		for i = FIRST_TRANSMOG_COLLECTION_WEAPON_TYPE, LAST_TRANSMOG_COLLECTION_WEAPON_TYPE - 1 do
 			local location = TransmogUtil.GetTransmogLocation(addon.Globals.CATEGORYID_TO_NAME[i], Enum.TransmogType.Appearance, false)
@@ -754,46 +729,37 @@ end
 		end
 	end
 
+	--Login-time DB build: clears caches and builds the armor DB + artifact appearance list.
 	function addon.Init:InitDB()
 		addon:ClearCache()
-		--buildSetSubstitutions()
 
 		BuildArmorDB()
-		--addon.Init:BuildDB()
 		addon.BuildClassArtifactAppearanceList()
-		--addon.GetSavedList()
 	end
-	
+
+	--Full rebuild after a filter/class/armor-type change: DB, artifact list, and saved sets.
 	function addon.Init:BuildDB()
 		addon.SetsDataProvider:ClearSets();
-		--buildSetSubstitutions()
 		local armorSet = ArmorDB[addon.selectedArmorType] or ArmorDB[CLASS_INFO[playerClass][3]]
-		--wipe(SET_INDEX)
-		--Add Hidden Set
-		------SET_INDEX[0] = hiddenSet
 		BuildArmorDB()
 		addon.BuildClassArtifactAppearanceList()
 		addon.GetSavedList()
 	end
 
+	--Builds the "alt appearance" source DB (SET_DATA) used for alt-item lookups.
 	function addon.Init:BuildAltDB()
 		addon.ClearSourceDB()
 		buildSetSubstitutions()
 		local armorSet = ArmorDB[addon.selectedArmorType]
-		--wipe(SET_INDEX)
 		addArmor(armorSet, SET_DATA)
 		addArmor(ArmorDB["COSMETIC"], SET_DATA)
-		--Add Hidden Set
-		--ALT_SET_INDEX[0] = hiddenSet
-		--tinsert(SET_DATA, hiddenSet)
-		--addon.BuildClassArtifactAppearanceList()
 	end
 
+	--Wipes every runtime set/index table before a rebuild.
 	function addon:ClearCache()
 		wipe(addon.ArmorSetModCache)
 		wipe(SET_INDEX)
 		wipe(fullList)
-		-----addon.ClearArtifactData()
 		addon.SavedSetCache =  nil
 
 		wipe(baseListLabels)
@@ -803,8 +769,9 @@ end
 		wipe(variantIDs)
 	end
 
+	--Returns baseIDs, rebuilding the DB first if a refresh was flagged since the last call.
 	function addon.GetBaseList()
-		if addon.refreshData then 
+		if addon.refreshData then
 			addon.Init:BuildDB()
 			addon.refreshData = false
 		end
@@ -813,19 +780,19 @@ end
 
 	local MAX_DEFAULT_OUTFITS = C_TransmogCollection.GetNumMaxCustomSets() --(25
 
+	--Converts our internal saved-outfit ID back to Blizzard's real outfitID.
 	function addon:GetBlizzID(outfitID)
-
 		return outfitID - SET_OFFSET
-
 	end
 
 	local profileCache = {}
 	local savedSetID = SET_OFFSET+1000
 
+	--Loads a profile's saved sets (Blizzard custom sets + our own extended outfits), cached per profile.
 	local function loadAltsSavedSets(profile)
 		if not addon.setdb.global.sets[profile] then return {} end
 
-		if not profileCache[profile] then 
+		if not profileCache[profile] then
 			local FullList = CopyTable(addon.setdb.global.sets[profile])
 			--FullList = addon.setdb.global.sets[addon.SelecteSavedList]
 			for i, data in ipairs(FullList) do
@@ -835,36 +802,18 @@ end
 				data.label = L["Saved Set"]
 
 				if data.sources  then
-					for index, sourceID in pairs(data.sources) do 
-						--local sourceInfo = C_TransmogCollection.GetSourceInfo(sourceID)
+					for index, sourceID in pairs(data.sources) do
 						data[index] =  sourceID
-					--	if sourceInfo and sourceInfo.invType then  
-						--	local appearanceID = sourceInfo.visualID
-							--local itemID = sourceInfo.itemID
-							--local itemMod = sourceInfo.itemModID
-						--	local sourceID = sourceInfo.sourceID
-							--data.itemData = data.itemData or {} 
-							--data.itemData[index] = {"'"..itemID..":"..itemMod.."'", sourceID, appearanceID}
-						--end
 					end
 					data.sources = nil
-				else
-					--data.sources = {}
-						for i=1, 19 do
-							--data.sources[i] = data[i] or 0
-						end
 				end
 			end
 
-			if addon.OutfitDB.sv.char[profile] and addon.OutfitDB.sv.char[profile].outfits  then 
+			if addon.OutfitDB.sv.char[profile] and addon.OutfitDB.sv.char[profile].outfits  then
 				local extendeSets = CopyTable(addon.OutfitDB.sv.char[profile].outfits)
 
-				if extendeSets then 
+				if extendeSets then
 					for i, data in ipairs(extendeSets) do
-				----data.setType = "SavedExtra"
-				--savedSetID = savedSetID + 1
-				--data.outfitID = savedSetID
-				----data.label = L["Saved Set"]
 						tinsert(FullList, data)
 					end
 				end
@@ -876,19 +825,10 @@ end
 		return profileCache[profile]
 	end
 
-	--Narcissus stores its "Shared Sets" (an account-wide, not per-character, custom
-	--set pool) in its own SavedVariable, NarciTransmogUIDB.SharedSets, as an array of
-	--{name, cmd, timeCreated, timeModified, classID, dataIndex}. cmd is a Blizzard
-	--/customset slash-command payload (prefix already stripped by Narcissus), decoded
-	--with the same TransmogUtil.ParseCustomSetSlashCommand BetterWardrobe already uses
-	--for its own dressing-room undo history (see DressingRoom.lua).
-	--Fixed range, well clear of SET_OFFSET/SAVED_SET_OFFSET/savedSetID's ranges above.
-	--Narcissus entries need a stable outfitID across calls (unlike alt sets, this list
-	--isn't cached), so it's derived from array position rather than an ever-incrementing
-	--counter -- using the shared `savedSetID` counter here gave every entry a new ID on
-	--every GetOutfits() call, which desynced selection from the ID the UI was built with.
-	--Shared by both the Narcissus-backed and BetterWardrobe's own fallback Shared Sets pool below --
-	--only one is ever active per session (gated on whether Narcissus is loaded), so they don't collide.
+	--Narcissus's account-wide Shared Sets (NarciTransmogUIDB.SharedSets) decode with the same
+	--slash-command parser as our own undo history. outfitID comes from array position, not a
+	--counter -- a counter desynced selection since this list isn't cached between calls.
+	--Also used by our own fallback Shared Sets pool below; only one is active per session.
 	local SHARED_SET_ID_BASE = SAVED_SET_OFFSET * 4
 
 	local function loadNarcissusSharedSets()
@@ -929,6 +869,7 @@ end
 	--Must match Narcissus's own MAX_SHARED_SETS (Modules/TransmogUI/Preload.lua), a local there we can't reach.
 	local MAX_NARCISSUS_SHARED_SETS = 90
 
+	--Saves a new entry to Narcissus's SharedSets SavedVariable directly.
 	function addon:SaveNarcissusSharedSet(name, itemTransmogInfoList)
 		if not (NarciTransmogUIDB and NarciTransmogUIDB.SharedSets) then return false end
 		if not (name and strtrim(name) ~= "") then return false end
@@ -986,6 +927,7 @@ end
 		return FullList
 	end
 
+	--Saves a new entry to our own fallback Shared Sets pool (BetterWardrobe_ListData.SharedSetsDB).
 	function addon:SaveOwnSharedSet(name, itemTransmogInfoList)
 		if not (name and strtrim(name) ~= "") then return false end
 
@@ -1004,6 +946,7 @@ end
 		return true
 	end
 
+	--Renames an entry in our own fallback Shared Sets pool by its array index.
 	function addon:RenameOwnSharedSet(savedIndex, newName)
 		local list = BetterWardrobe_ListData.SharedSetsDB
 		if not (list and list[savedIndex] and newName and strtrim(newName) ~= "") then return false end
@@ -1013,6 +956,7 @@ end
 		return true
 	end
 
+	--Removes an entry from our own fallback Shared Sets pool by its array index.
 	function addon:DeleteOwnSharedSet(savedIndex)
 		local list = BetterWardrobe_ListData.SharedSetsDB
 		if not (list and list[savedIndex]) then return false end
@@ -1021,6 +965,7 @@ end
 		return true
 	end
 
+	--Saves to Narcissus's Shared Sets if it's loaded, otherwise our own fallback pool.
 	function addon:SaveSharedSet(name, itemTransmogInfoList)
 		if C_AddOns.IsAddOnLoaded("Narcissus") then
 			return self:SaveNarcissusSharedSet(name, itemTransmogInfoList)
@@ -1028,6 +973,7 @@ end
 		return self:SaveOwnSharedSet(name, itemTransmogInfoList)
 	end
 
+	--Loads from Narcissus's Shared Sets if it's loaded, otherwise our own fallback pool.
 	local function loadSharedSets()
 		if C_AddOns.IsAddOnLoaded("Narcissus") then
 			return loadNarcissusSharedSets()
@@ -1035,6 +981,8 @@ end
 		return loadOwnSharedSets()
 	end
 
+	--Builds the full saved-outfit list for the current view: Shared Sets, another character's
+	--saved sets, or (default) this character's Blizzard + Extra saved sets combined.
 	function addon.GetOutfits(character)
 		local name = UnitName("player")
 		local realm = GetRealmName()
@@ -1065,7 +1013,7 @@ end
 			end
 
 			--Extended Sets
-			if addon.OutfitDB.char.outfits then 
+			if addon.OutfitDB.char.outfits then
 				for i, data in ipairs(addon.OutfitDB.char.outfits) do
 					data.outfitID = MAX_DEFAULT_OUTFITS + i + SAVED_SET_OFFSET
 
@@ -1083,7 +1031,7 @@ end
 							local setInfo = data.itemData[i]
 							if setInfo then
 								data[i] = setInfo[2]
-							else 
+							else
 								data[i] = 0
 							end
 						end
@@ -1111,21 +1059,20 @@ end
 							data.icon = icon
 
 						elseif data.sources and  #data.sources ~= 0 then
-							for item_data, source_data in pairs(data.sources) do 
-								--print(source_data)
+							for item_data, source_data in pairs(data.sources) do
 								--itemlink, appearance pairs
-								if string.find(item_data, "item:") then 
+								if string.find(item_data, "item:") then
 									local _, sourceID = C_TransmogCollection.GetItemInfo(item_data)
 									sourceInfo = C_TransmogCollection.GetSourceInfo(sourceID)
 
 								--itemID, appearance/source pairs.  Checking for both to catch all possible saved types
 								else
 									local appearanceID, sourceID = C_TransmogCollection.GetItemInfo(item_data)
-									if appearanceID and appearanceID == source_data then 
-									elseif appearanceID then 
+									if appearanceID and appearanceID == source_data then
+									elseif appearanceID then
 										for itemMod = 1, 10 do
 											appearanceID, sourceID = C_TransmogCollection.GetItemInfo(item_data, itemMod)
-											if appearanceID == source_data then 
+											if appearanceID == source_data then
 												break
 											end
 										end
@@ -1133,19 +1080,19 @@ end
 
 									sourceInfo = sourceID and C_TransmogCollection.GetSourceInfo(sourceID)
 									--value returned info and the itemID matches, so its was an appearanceID
-									if sourceInfo and sourceInfo.itemID == item_data then 
+									if sourceInfo and sourceInfo.itemID == item_data then
 
 									else
 									--value returned info and the itemID matches, so its was an sourceID
 										sourceInfo = C_TransmogCollection.GetSourceInfo(source_data)
-										if sourceInfo and sourceInfo.itemID == item_data then 
+										if sourceInfo and sourceInfo.itemID == item_data then
 										else
 											sourceInfo = nil
 										end
 									end
 								end
 
-								if sourceInfo and sourceInfo.invType then  
+								if sourceInfo and sourceInfo.invType then
 									local slot = C_Transmog.GetSlotForInventoryType(sourceInfo.invType);
 									local sourceID = sourceInfo.sourceID
 									data[slot] = sourceID
@@ -1159,15 +1106,15 @@ end
 					data.itemTransmogInfoList = nil
 					data.items = nil
 					data.itemData = nil
-			
+
 					tinsert(FullList, data)
 				end
 			end
-		
+
 		--[[
 			--MogIt Sets
 			local mogit_Outfits = addon.MogIt.GetMogitOutfits()
-			if mogit_Outfits then 
+			if mogit_Outfits then
 				for i, data in ipairs(mogit_Outfits) do
 					data.validForCharacter = true
 
@@ -1177,7 +1124,7 @@ end
 
 			--TransmogOutfits Sets
 			local transmogOutfits_Sets = addon.TransmogOutfits.GetOutfits()
-			if transmogOutfits_Sets then 
+			if transmogOutfits_Sets then
 				for i, data in ipairs(transmogOutfits_Sets) do
 								data.validForCharacter = true
 
@@ -1187,34 +1134,30 @@ end
 	]]--
 		end
 
-
 		return FullList
 	end
 
-
-
+	--True if outfitID is one of Blizzard's own native saved sets.
 	function addon.IsDefaultSet(outfitID)
 		local savedSets = addon.GetSavedList()
 		for i, data in ipairs(savedSets) do
-			if data.setID == outfitID and data.setType == "SavedBlizzard" then 
+			if data.setID == outfitID and data.setType == "SavedBlizzard" then
 				return true
 			end
 		end
 		return false
-		--local MAX_DEFAULT_OUTFITS = C_TransmogCollection.GetNumMaxOutfits()
-		----return outfitID < MAX_DEFAULT_OUTFITS  -- #C_TransmogCollection.GetOutfits()--MAX_DEFAULT_OUTFITS 
 	end
 
+	--Returns "SavedBlizzard" for native saved sets, otherwise whatever setType the set info has.
 	function addon.GetSetType(outfitID)
 
 			if outfitID >= SET_OFFSET and outfitID < (SET_OFFSET + MAX_DEFAULT_OUTFITS) then return "SavedBlizzard" end
-
 
 			local setData = addon.GetSetInfo(outfitID)
 		return setData and setData.setType or nil
 	end
 
-
+	--Rebuilds this profile's saved-sets cache from Blizzard's native custom sets (overwrites, doesn't merge).
 	function addon.StoreBlizzardSets()
 		local BlizzardSavedSets = {}
 		local outfits = C_TransmogCollection.GetCustomSets();
@@ -1244,9 +1187,9 @@ end
 		return BlizzardSavedSets
 	end
 
-
+	--Converts GetOutfits()'s raw saved-outfit data into the normalized set-info shape the UI expects.
 	function addon.GetSavedList()
-		--if not addon.savedSetCache then 
+		--if not addon.savedSetCache then
 			local savedOutfits = addon.GetOutfits()
 			local list = {}
 			SET_INDEX = SET_INDEX or {}
@@ -1281,17 +1224,12 @@ end
 				info.baseSetID = info.setID;
 				info.savedSet = true
 
-				if data.setType == "SavedBlizzard" then 
+				if data.setType == "SavedBlizzard" then
 
 					 outfitItemTransmogInfoList = C_TransmogCollection.GetCustomSetItemTransmogInfoList(data.outfitID - SET_OFFSET);
 
 					info.sources = {}
-					--NOTE: was keyed by loop index (info.sources[i] = infoList.appearanceID),
-					--which meant every downstream consumer (GetSetPrimaryAppearances,
-					--GetSortedSetSources) looked up GetSourceInfo(1), GetSourceInfo(2), etc.
-					--instead of real source IDs -- this is why the preview window showed
-					--wrong/missing items for saved sets. Now keyed by the real sourceID,
-					--matching the convention the "ExtraSet" branch below already uses correctly.
+					--Must key by real sourceID, not loop index -- keying by index broke preview lookups.
 					for i, infoList in pairs(outfitItemTransmogInfoList) do
 						if infoList.appearanceID and infoList.appearanceID ~= 0 then
 							local sourceInfo = C_TransmogCollection.GetSourceInfo(infoList.appearanceID)
@@ -1307,8 +1245,8 @@ end
 						--Was info.sources[slotID] = ... -- same slot-vs-sourceID key bug as the SavedBlizzard branch above.
 						if sourceID  and sourceID ~= NO_TRANSMOG_SOURCE_ID and sourceID ~= 0 then
 							 sourceInfo = C_TransmogCollection.GetSourceInfo(sourceID)
-									
-							if sourceInfo and sourceInfo.invType then 
+
+							if sourceInfo and sourceInfo.invType then
 								local slot = C_Transmog.GetSlotForInventoryType(sourceInfo.invType);
 								local appearanceID = sourceInfo.visualID
 								local itemID = sourceInfo.itemID
@@ -1318,71 +1256,7 @@ end
 								info.sources[sourceID] = sourceInfo.isCollected
 							end
 						end
-						--end
-
-							--[[local illusionID
-																					if slotID == 16 then 
-																						illusionID = data["mainHandEnchant"] or 0
-																					elseif slotID == 17 then 
-																						illusionID = data["offHandEnchant"] or 0
-																					else
-																						illusionID = 0
-																					end
-																					ItemTransmogInfoList[slotID] = ItemUtil.CreateItemTransmogInfo(data[slotID] or 0, 0, illusionID);]]
 					end
-
-
-
-
-
-
-
-					----info.sources = C_TransmogCollection.GetOutfitSources(data.outfitID)
-				--elseif  #info.sources == 0 then 
-					--for i = 1, 19 do  ----was 16?
-						--info.sources[i] = data[i] or 0
-					--end
-				--end
-
-
-
---[[
-
-									--converts setdata to new info lists
-					if not data.itemTransmogInfoList then 
-						local outfitData = {}
-						outfitData["outfitID"] = data.outfitID
-						outfitData["name"] = data.name
-						outfitData["set"] = data.set
-						outfitData["icon"] = data.icon
-						outfitData["index"] = data.index
-
-						local ItemTransmogInfoList = {}
-						--for dataIndex, sourceID in ipairs(data) do
-						for i = 1, 19  do
-							local illusionID
-							if i == 16 then 
-								illusionID = data["mainHandEnchant"]
-							elseif i == 17 then 
-								illusionID = data["offHandEnchant"]
-							else
-								illusionID = 0
-							end
-							ItemTransmogInfoList[i] = ItemUtil.CreateItemTransmogInfo(data[i] or 0, 0, illusionID);
-							----outfit = outfitData
-
-						end
-						--ItemTransmogInfoList["Clear"] = nil 
-						--ItemTransmogInfoList["IsEqual"] = nil 
-						--ItemTransmogInfoList["Init"] = nil 
-						outfitData["ItemTransmogInfoList"] = ItemTransmogInfoList
-
-						--addon.OutfitDB.char.outfits[data.index] = outfitData
-						--data = outfitData
-						--outfitData["ItemTransmogInfoList"] = ItemTransmogInfoList
-					end]]
-
-					--info.itemTransmogInfoList = data.itemTransmogInfoList
 				end
 
 				baseIDs[info.setID] =  info;
@@ -1392,9 +1266,9 @@ end
 				fullList[info.setID] = info
 				tinsert(list, info)
 			end
-			
+
 			addon.SavedSetCache = list
-	--	end
+	-- end
 		return addon.SavedSetCache
 	end
 
@@ -1403,6 +1277,7 @@ end
 
 	--Checks both storage tables (native Blizzard sets and addon-only "extended" saved sets) since a character can be in only one.
 	function addon:GetSavedSetCharacterRoster()
+		--True if the named character has any saved sets in either storage table.
 		local function HasSavedSets(name)
 			local native = addon.setdb.global.sets[name]
 			if native and #native > 0 then return true end
@@ -1500,6 +1375,7 @@ end
 			self.Highlight:Hide()
 		end
 
+		--Creates one selectable roster row (check mark, class icon, name text).
 		local function CreateRow(parent)
 			local f = CreateFrame("Button", nil, parent)
 			f:SetSize(LIST_WIDTH, ROW_HEIGHT)
@@ -1560,6 +1436,7 @@ end
 			end
 		end
 
+		--Rebuilds the row pool from the filtered character roster, class-coloring each row.
 		function PopoutMixin:Refresh()
 			local searchLower = self.searchText and self.searchText ~= "" and self.searchText:lower()
 
@@ -1701,96 +1578,33 @@ end
 		end
 	end
 
---[[
-				{
-					77497, -- [1]
-					nil, -- [2]
-					94136, -- [3]
-					84536, -- [4]
-					54411, -- [5]
-					4307, -- [6]
-					45096, -- [7]
-					10642, -- [8]
-					25667, -- [9]
-					53708, -- [10]
-					nil, -- [11]
-					nil, -- [12]
-					nil, -- [13]
-					nil, -- [14]
-					22804, -- [15]
-					0, -- [16]
-					["outfitID"] = 21,
-					["index"] = 1,
-					["name"] = "5-554",
-					["set"] = "extra",
-					[19] = 35448,
-					["mainHandEnchant"] = 0,
-					["icon"] = 1130280,
-					["offHandEnchant"] = 0,]]
-
-
-	--[[function addon.AddSet(setData)
-				local id = setData[1]
-		
-				local info = {}
-				info.classMask = setData[4] --class
-				info.collected = false 	
-				info.description = ""
-				info.expansionID	= ""
-				info.favorite = ""
-				info.hiddenUntilCollected = false
-				info.label = ""
-				info.limitedTimeSet = false
-				info.name = setData[2]--name
-				info.patchID = ""
-				info.requiredFaction = setData[5]--faction
-				info.setID = id
-				info.uiOrder = ""
-				info.items = setData[3]--items
-		
-				setInfo[id] = info
-				tinsert(baseList, setInfo[id])
-			end]]
-
-
 	function addon.GetSetInfo(setID)
-			local atTransmogrifier = C_Transmog.IsAtTransmogNPC()
-		--if atTransmogrifier then 
-			return fullList[setID]
-		--else
-			--return SET_INDEX[setID]
-		--end
-
+		return fullList[setID]
 	end
 
 	function addon.GetSets()
-		local atTransmogrifier = C_Transmog.IsAtTransmogNPC()
-		--if atTransmogrifier then 
-			return fullList
-		--else
-			--return SET_INDEX
-		--end
-	end 
+		return fullList
+	end
 
 	function addon.GetFullSets()
-
-	return 	fullList
-end
+		return fullList
+	end
+	--Registers itemID as substitutable by subID (same equip slot required), then rebuilds the DB.
 	function addon.SetItemSubstitute(itemID, subID)
 		itemID = tonumber(itemID)
 		subID = tonumber(subID)
 
-		if type(itemID) ~= "number" or type(subID) ~= "number" then 
+		if type(itemID) ~= "number" or type(subID) ~= "number" then
 			BetterWardrobeOutfitManager:ShowPopup("BETTER_WARDROBE_SUBITEM_INVALID_POPUP")
-			return false 
+			return false
 		end
 		local GetItemInfoInstant = C_Item and C_Item.GetItemInfoInstant
-		local _, _, _, itemEquipLoc1 = GetItemInfoInstant(itemID) 
-		local _, _, _, itemEquipLoc2 = GetItemInfoInstant(subID) 
+		local _, _, _, itemEquipLoc1 = GetItemInfoInstant(itemID)
+		local _, _, _, itemEquipLoc2 = GetItemInfoInstant(subID)
 
-		if itemEquipLoc1 ~= itemEquipLoc2 then 
+		if itemEquipLoc1 ~= itemEquipLoc2 then
 			BetterWardrobeOutfitManager:ShowPopup("BETTER_WARDROBE_SUBITEM_WRONG_LOCATION_POPUP")
-			return false 
+			return false
 		else
 			local GetItemInfo = C_Item and C_Item.GetItemInfo
 			local itemName1, link1 = C_Item.GetItemInfo(tonumber(itemID))
@@ -1821,6 +1635,7 @@ end
 		end
 	end
 
+	--Clears every substitute registered for itemID's appearance, then rebuilds the DB.
 	function addon:RemoveItemSubstitute(itemID)
 		if not itemID  then
 			return false
@@ -1828,13 +1643,11 @@ end
 		--local appearanceID, sourceID = C_TransmogCollection.GetItemInfo(itemID|itemString [, itemModID])
 		local appearanceID, sourceID = C_TransmogCollection.GetItemInfo(tonumber(itemID))
 		local sources = C_TransmogCollection.GetAllAppearanceSources(appearanceID)
-		--local sources = C_TransmogCollection.GetAppearanceSources(appearanceID)
 
 		for i, source_ID in ipairs(sources) do
 			local info = C_TransmogCollection.GetSourceInfo(source_ID)
 			addon.itemsubdb.profile.items[info.itemID] = nil
 		end
-
 
 			addon:ClearCache()
 			addon.SetsDataProvider:ClearSets()
@@ -1844,8 +1657,6 @@ end
 			addon.RefreshLists()
 			addon.RefreshSubItemData()
 
-
-
 		addon:ClearCache()
 
 		addon.Init:BuildDB()
@@ -1854,6 +1665,7 @@ end
 		addon.RefreshLists()
 	end
 
+	--Resolves an itemID(+mod) to its visual/source ID, cached in addon.ArmorSetModCache.
 	function addon.GetItemSource(itemID, itemMod)
 
 		if addon.ArmorSetModCache[itemID] and addon.ArmorSetModCache[itemID][itemMod] then return addon.ArmorSetModCache[itemID][itemMod][1], addon.ArmorSetModCache[itemID][itemMod][2] end
@@ -1875,22 +1687,17 @@ end
 				for i = 1, 19 do
 					local source = 10000---- f.model:GetSlotTransmogSources(i)
 					if source ~= 0 then
-						--addon.itemSourceID[itemID] = source
 						sourceID = source
 						break
 					end
 				end
 			end
 
-			if not sourceID then 
+			if not sourceID then
 				visualID, sourceID = C_TransmogCollection.GetItemInfo(itemID, 0)
 			end
 
-		--[[		if sourceID and itemMod then
-							addon.modArmor[itemID] = addon.modArmor[itemID] or {}
-							addon.modArmor[itemID][itemMod] = sourceID
-						end]]
-			if sourceID and itemMod then 
+			if sourceID and itemMod then
 				addon.ArmorSetModCache[itemID] = addon.ArmorSetModCache[itemID]  or {}
 				addon.ArmorSetModCache[itemID][itemMod] = {visualID, sourceID}
 			end
@@ -1900,10 +1707,10 @@ end
 	end
 
 	function addon.GetSetSources(setID)
-		--return C_TransmogSets.GetSetPrimaryAppearances(setID)
 		return addon.C_TransmogSets.GetSetSources(setID)
 	end
 
+	--Always nil right now -- backing cache is only populated by the unused UpdateCollectedAppearances.
 	function addon:IsCollected(visualID)
 		return collectedAppearances[visualID]
 	end
@@ -1940,10 +1747,12 @@ StaticPopupDialogs["BETTER_WARDROBE_SUBITEM_INVALID_POPUP"] = {
 }
 
 	local SetSwaps = {}
+	--True if setID has any source swapped via GetSubItem below. What Wardrobe_Sets.lua actually calls.
 	function addon.HasSubItem(setID)
-				return SetSwaps[setID]
-	end --SetSwaps[setID][itemFrame.sourceID] then
+		return SetSwaps[setID]
+	end
 
+	--Looks up sourceID's substitute and marks setID as having a swap, for HasSubItem above.
 	function addon.GetSubItem(sourceID, setID)
 		local newSource = subitemlist[sourceID]
 		if newSource then
