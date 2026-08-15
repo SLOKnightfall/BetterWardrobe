@@ -884,17 +884,28 @@ function addon:SearchSets(data)
 	if query == "" then return true end
 	query = string.lower(query)
 
-	local name = data.name and string.find(string.lower(data.name), query, 1, true) 
+	if addon:DoesSetMatchSearch(data, query) then
+		return true;
+	end
+
+	local variants = addon.VariantSets[data.baseSetID or data.setID];
+	if variants then
+		for i = 1, #variants do
+			if variants[i] ~= data and addon:DoesSetMatchSearch(variants[i], query) then
+				return true;
+			end
+		end
+	end
+
+	return false;
+end
+
+--query must already be lowercased.
+function addon:DoesSetMatchSearch(data, query)
+	local name = data.name and string.find(string.lower(data.name), query, 1, true)
 	local label = data.label and string.find(string.lower(data.label), query, 1, true)
-	if name then
-		return true
-	end
-
-	if label then
-		return true
-	end
-
-	return false
+	local description = data.description and string.find(string.lower(data.description), query, 1, true)
+	return (name or label or description) and true or false;
 end
 
 function TransmogSearchBoxMixin:UpdateSearch()
@@ -1777,6 +1788,7 @@ do
 			if self.slotLabel then
 				GameTooltip:AddLine(self.slotLabel, 1, 1, 1);
 			end
+			GameTooltip:AddLine(string.format("itemID: %s  sourceID: %s", tostring(self.itemID), tostring(self.sourceID)), 0.6, 0.6, 0.6);
 			if sourceInfo.isCollected then
 				GameTooltip:AddLine(TRANSMOG_COLLECTED or "Collected", 0, 1, 0);
 			else
@@ -1980,6 +1992,12 @@ local function CreateAltAppearanceBadge(parent, point, relativeTo, relativePoint
 	badge:SetScript("OnEnter", function(self)
 		GameTooltip:SetOwner(self, "ANCHOR_RIGHT");
 		GameTooltip:SetText(L["Has an alternate look available"]);
+		if self.altData and self.altData.alternates then
+			for _, altSourceID in ipairs(self.altData.alternates) do
+				local itemID = C_TransmogCollection.GetSourceItemID(altSourceID);
+				GameTooltip:AddLine(string.format("itemID: %s  sourceID: %s", tostring(itemID), tostring(altSourceID)), 0.6, 0.6, 0.6);
+			end
+		end
 		GameTooltip:Show();
 	end);
 	badge:SetScript("OnLeave", GameTooltip_Hide);
@@ -2036,7 +2054,10 @@ do
 	end
 
 	local function RefreshSlotBadge(slotFrame)
-		GetOrCreateBadge(slotFrame):SetShown(addon.Profile.ShowAltAppearanceIcon and GetSlotAltAppearanceData(slotFrame) ~= nil);
+		local altData = GetSlotAltAppearanceData(slotFrame);
+		local badge = GetOrCreateBadge(slotFrame);
+		badge.altData = altData;
+		badge:SetShown(addon.Profile.ShowAltAppearanceIcon and altData ~= nil);
 	end
 
 	local function HookSlotContextMenu(slotFrame)
@@ -2172,7 +2193,9 @@ do
 
 	local function RefreshCardBadge(card)
 		local altData = card.elementData and addon:BuildAltAppearanceData(GetCardSourceID(card));
-		GetOrCreateBadge(card):SetShown(addon.Profile.ShowAltAppearanceIcon and altData ~= nil);
+		local badge = GetOrCreateBadge(card);
+		badge.altData = altData;
+		badge:SetShown(addon.Profile.ShowAltAppearanceIcon and altData ~= nil);
 	end
 
 	--Hooks the same UpdateItem() that keeps HideVisual/FavoriteVisual current.

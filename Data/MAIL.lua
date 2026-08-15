@@ -14,6 +14,7 @@ local HOLIDAY = addon.Filter["HOLIDAY"]
 local TPOST = addon.Filter["TPOST"]
 local COVENANT = addon.Filter["COVENANT"]
 local WARFRONT = addon.Filter["WARFRONT"]
+local CRAFTED = addon.Filter["CRAFTED"]
 
 
 addon.ArmorSets["MAIL"] ={
@@ -2875,7 +2876,7 @@ addon.ArmorSets["MAIL"] ={
 
 	[50322]={
 		["armorType"] =  3 ,
-		["label"] =  "Class Ensemble - Evoker" ,
+		["label"] =  139 ,
 		["setID"] =  50322,
 		["expansionID"] =  10 ,
 		["filter"] =  TPOST,
@@ -2886,7 +2887,7 @@ addon.ArmorSets["MAIL"] ={
 	},
 	[50323]={
 		["armorType"] =  3 ,
-		["label"] =  "Class Ensemble - Hunter" ,
+		["label"] =  140 ,
 		["setID"] =  50323,
 		["expansionID"] =  10 ,
 		["filter"] =  TPOST,
@@ -2899,7 +2900,7 @@ addon.ArmorSets["MAIL"] ={
 	},
 	[50325]={
 		["armorType"] =  3 ,
-		["label"] =  "Class Ensemble - Shaman" ,
+		["label"] =  141 ,
 		["setID"] =  50325,
 		["expansionID"] =  10 ,
 		["filter"] =  TPOST,
@@ -3038,7 +3039,7 @@ addon.ArmorSets["MAIL"] ={
 
 	[50360]={
 		["armorType"] =  3 ,
-		["label"] =  "Class Ensemble - Evoker" ,
+		["label"] =  139 ,
 		["setID"] =  50360,
 		["expansionID"] =  10 ,
 		["filter"] =  TPOST,
@@ -3049,7 +3050,7 @@ addon.ArmorSets["MAIL"] ={
 	},
 	[50361]={
 		["armorType"] =  3 ,
-		["label"] =  "Class Ensemble - Hunter" ,
+		["label"] =  140 ,
 		["setID"] =  50361,
 		["expansionID"] =  10 ,
 		["filter"] =  TPOST,
@@ -3061,7 +3062,7 @@ addon.ArmorSets["MAIL"] ={
 	},
 	[50362]={
 		["armorType"] =  3 ,
-		["label"] =  "Class Ensemble - Shaman" ,
+		["label"] =  141 ,
 		["setID"] =  50362,
 		["expansionID"] =  10 ,
 		["filter"] =  TPOST,
@@ -3110,7 +3111,7 @@ addon.ArmorSets["MAIL"] ={
 	},	
 	[50391]={
 		["armorType"] =  3,
-		["label"] =  129,
+		["label"] =  132,
 		["setID"] =  50391,
 		["expansionID"] =  11,
 		["filter"] =  MISC,
@@ -3119,10 +3120,12 @@ addon.ArmorSets["MAIL"] ={
 		["itemData"] =  { { "219481:0", 218379, 91209, }, { "219482:0", 218380, 91207, }, { "219475:0", 218373, 91213, }, { "219474:0", 218372, 91205, }, { "219483:0", 218381, 91210, }, { "219485:0", 218383, 91206, }, { "219484:0", 218382, 91208, }, { "219473:0", 218371, 91211, }, },
 		["sourceType"] =  0,
 		["description"] = "Profession",
+				["customGroups"] = "Hallofall",
+
 	},	
 	[50392]={
 		["armorType"] =  3,
-		["label"] =  129,
+		["label"] =  132,
 		["setID"] =  50392,
 		["expansionID"] =  11,
 		["filter"] =  MISC,
@@ -3131,19 +3134,46 @@ addon.ArmorSets["MAIL"] ={
 		["itemData"] =  { { "223350:0", 219820, 91191, }, { "223940:0", 220225, 91189, }, { "223926:0", 220211, 91195, }, { "223403:0", 219869, 91187, }, { "223348:0", 219818, 91192, }, { "223362:0", 219832, 91188, }, { "223354:0", 219824, 91190, }, { "223949:0", 220234, 91193, }, },
 		["sourceType"] =  0,
 		["description"] = "World Drop",
+		["customGroups"] = "Hallofall",
+
 	},	
 	[50393]={
 		["armorType"] =  3,
-		["label"] =  130,
+		["label"] =  132,
 		["setID"] =  50393,
 		["expansionID"] =  11,
 		["filter"] =  MISC,
 		["name"] = "Glyph-Etched Chain",
 		["mod"] =  0,
-		["itemData"] =  { { "219337:0", 218276, 85010, }, { "219338:0", 218277, 85011, }, { "219507:0", 218388, 85012, }, { "219501:0", 218386, 85016, }, { "219341:0", 218280, 85017, }, { "219509:0", 218390, 85013, }, { "219340:0", 218279, 85014, }, { "219508:0", 218389, 85015, }, },
-		["sourceType"] =  0,
+		["itemData"] =  { { "219337:0", 218276, 85010, }, { "219338:0", 218277, 85011, }, { "219336:0", 218275, 85012, }, { "219339:0", 218278, 85013, }, { "219340:0", 218279, 85014, }, { "219335:0", 218274, 85015, }, { "219342:0", 218281, 85016, }, { "219341:0", 218280, 85017, }, },
+		["sourceType"] =  10,
 		["description"] = "Profession",
+
 	},
-	
+	[50408]={
+		["armorType"] =  3,
+		["label"] =  137,
+		["setID"] =  50408,
+		["expansionID"] =  12,
+		["filter"] =  CRAFTED,
+		["name"] = "Scout's Polished",
+		["mod"] =  0,
+		["itemData"] ={{"244588:0",292318,120770,},{"244589:0",292319,120771,},{"244590:0",292320,120767,},{"244596:0",292326,120765,},{"244597:0",292327,120766,},{"244598:0",292328,120772,},{"244599:0",292329,120769,},{"244600:0",292330,120768,},},
+		["sourceType"] =  10,
+		["description"] = "Profession - Blue",
+	},
+	[50409]={
+		["armorType"] =  3,
+		["label"] =  137,
+		["setID"] =  50409,
+		["expansionID"] =  12,
+		["filter"] =  CRAFTED,
+		["name"] = "Farstrider's",
+		["mod"] =  0,
+		["itemData"] ={{"244577:0",292307,120787,},{"244578:0",292308,120784,},{"244579:0",292309,120845,},{"244580:0",292310,120783,},{"244581:0",292311,120785,},{"244582:0",292312,120786,},{"244583:0",292313,120789,},{"244584:0",292314,120788,},},
+		["sourceType"] =  10,
+		["description"] = "Profession - Red",
+	},
+
 }
 

@@ -14,6 +14,7 @@ local HOLIDAY = addon.Filter["HOLIDAY"]
 local TPOST = addon.Filter["TPOST"]
 local COVENANT = addon.Filter["COVENANT"]
 local WARFRONT = addon.Filter["WARFRONT"]
+local CRAFTED = addon.Filter["CRAFTED"]
 
 
 addon.ArmorSets["LEATHER"] ={
@@ -3214,7 +3215,7 @@ addon.ArmorSets["LEATHER"] ={
 		["label"] =  129,
 		["setID"] =  50396,
 		["expansionID"] =  11,
-		["filter"] =  MISC,
+		["filter"] =  CRAFTED,
 		["name"] = "Spelunker's Leather",
 		["mod"] =  0,
 		["itemData"] = { { "219476:0", 218374, 91164, }, { "219477:0", 218375, 91162, }, { "219472:0", 218370, 91168, }, { "219471:0", 218369, 91160, }, { "219478:0", 218376, 91165, }, { "219502:0", 218387, 91161, }, { "219479:0", 218377, 91163, }, { "219470:0", 218368, 91166, }, },
@@ -3227,12 +3228,38 @@ addon.ArmorSets["LEATHER"] ={
 		["label"] =  130,
 		["setID"] =  50397,
 		["expansionID"] =  11,
-		["filter"] =  MISC,
+		["filter"] =  CRAFTED,
 		["name"] = "Rune-Branded Leather",
 		["mod"] =  0,
 		["itemData"] =  { { "219329:0", 218268, 85144, }, { "219330:0", 218269, 85145, }, { "219512:0", 218392, 85146, }, { "219511:0", 218391, 85150, }, { "219513:0", 218393, 85151, }, { "219331:0", 218270, 85147, }, { "219332:0", 218271, 85148, }, { "219489:0", 218384, 85149, }, },
 		["sourceType"] =  0,
 		["description"] = "Profession",
+
+	},
+	[50406]={
+		["armorType"] =  2,
+		["label"] =  135,
+		["setID"] =  50406,
+		["expansionID"] =  12,
+		["filter"] =  CRAFTED,
+		["name"] = "Silvermoon Agent's Leather Armor",
+		["mod"] =  0,
+		["itemData"] = { { "244571:0", 292301, 121405, }, { "244572:0", 292302, 121406, }, { "244570:0", 292300, 121407, }, { "244573:0", 292303, 121408, }, { "244574:0", 292304, 121409, }, { "244569:0", 292299, 121410, }, { "244576:0", 292306, 121411, }, { "244575:0", 292305, 121412, }, },
+		["sourceType"] =  10,
+		["description"] = "Profession - Red",
+
+	},
+	[50407]={
+		["armorType"] =  2,
+		["label"] =  136,
+		["setID"] =  50407,
+		["expansionID"] =  12,
+		["filter"] =  CRAFTED,
+		["name"] = "Smuggler's",
+		["mod"] =  0,
+		["itemData"] ={{"244585:0",292315,121392,},{"244586:0",292316,121393,},{"244587:0",292317,121389,},{"244591:0",292321,121387,},{"244592:0",292322,121388,},{"244593:0",292323,121394,},{"244594:0",292324,121391,},{"244595:0",292325,121390,},},
+		["sourceType"] =  10,
+		["description"] = "Profession - Blue",
 
 	},
 

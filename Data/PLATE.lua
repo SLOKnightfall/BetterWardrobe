@@ -15,6 +15,7 @@ local HOLIDAY = addon.Filter["HOLIDAY"]
 local TPOST = addon.Filter["TPOST"]
 local COVENANT = addon.Filter["COVENANT"]
 local WARFRONT = addon.Filter["WARFRONT"]
+local CRAFTED = addon.Filter["CRAFTED"]
 
 addon.ArmorSets["PLATE"] ={
 	[208]={
@@ -3074,6 +3075,30 @@ addon.ArmorSets["PLATE"] ={
 		["mod"] =  0,
 		["itemData"] ={ { "222433:0", 219526, 85199, }, { "222436:0", 219529, 85200, }, { "222430:0", 219523, 85201, }, { "222435:0", 219528, 85205, }, { "222437:0", 219530, 85206, }, { "222431:0", 219524, 85202, }, { "222434:0", 219527, 85203, }, { "222458:0", 219641, 85204, }, },
 		["sourceType"] =  0,
+		["description"] = "Profession",
+	},
+	[50410]={
+		["armorType"] =  4,
+		["label"] =  145,
+		["setID"] =  50410,
+		["expansionID"] =  12,
+		["filter"] =  CRAFTED,
+		["name"] = "Blood-Tempered",
+		["mod"] =  0,
+		["itemData"] ={{"237917:0",301560,121346,},{"237918:0",301561,121343,},{"237919:0",301562,121344,},{"237921:0",301563,121341,},{"237922:0",301564,121345,},{"237923:0",301565,121347,},{"237924:0",301566,121342,},{"237925:0",301567,121348,},},
+		["sourceType"] =  10,
+		["description"] = "Profession",
+	},
+	[50411]={
+		["armorType"] =  4,
+		["label"] =  146,
+		["setID"] =  50411,
+		["expansionID"] =  12,
+		["filter"] =  CRAFTED,
+		["name"] = "Spellbreaker's",
+		["mod"] =  0,
+		["itemData"] ={{"237828:0",301568,121363,},{"237829:0",301569,121360,},{"237830:0",301570,121361,},{"237832:0",301571,121377,},{"237833:0",301572,121362,},{"237834:0",301573,121364,},{"237835:0",301574,121359,},{"237836:0",301575,121365,},},
+		["sourceType"] =  10,
 		["description"] = "Profession",
 	},
 }

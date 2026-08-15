@@ -347,13 +347,16 @@ function WardrobeSetsDataProviderMixin:GetVariantSets(baseSetID)
 				if baseSet then
 					tinsert(variantSets, baseSet);
 				end
-			else
-				--Blizzard's native GetVariantSets is empty/incomplete for some sets (e.g. past-season
-				--PvP Elite recolors), even when our own label-based grouping (Data/DataBase.lua) folded
-				--a set in as a variant of this base. Fall back to that grouping so it stays reachable.
-				local ownVariants = addon.VariantSets[baseSetID];
-				if ownVariants and #ownVariants > 1 then
-					for i = 1, #ownVariants do
+			end
+
+			local ownVariants = addon.VariantSets[baseSetID];
+			if ownVariants and #ownVariants > 0 then
+				local present = {};
+				for i = 1, #variantSets do
+					present[variantSets[i].setID] = true;
+				end
+				for i = 1, #ownVariants do
+					if not present[ownVariants[i].setID] then
 						tinsert(variantSets, ownVariants[i]);
 					end
 				end

@@ -1478,6 +1478,9 @@ function WardrobeSetsDetailsItemMixin:OnShow()
 	end
 
 	local sourceInfo = C_TransmogCollection.GetSourceInfo(self.sourceID);
+	if not sourceInfo then
+		return;
+	end
 	self.visualID = sourceInfo.visualID;
 
 	self.Favorite.Icon:SetShown(C_TransmogCollection.GetIsAppearanceFavorite(self.visualID));

@@ -36,6 +36,12 @@ addon.MiscSets.TRADINGPOST_SETS = {
 	[3189] = "true",
 	[3190] = "true",
 	[3306] = "true",
+	[2322] = "true",
+	[2339] = "true",
+	[3303] = "true",
+	[3359] = "true",
+	[3653] = "true",
+	[3654] = "true",
 
 	[2340] = "Slops",--Swashbuckling
 	[2346] = "Slops", -- Dashing

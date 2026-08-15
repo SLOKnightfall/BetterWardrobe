@@ -492,7 +492,7 @@ local function getClassMask(mask)
 	end
 end
 
-local UIID_Counter = {1,1150,2000,3390,4580,6200,8000,10110,11000,12000}
+local UIID_Counter = {1,1150,2000,3390,4580,6200,8000,10110,11000,12000,13000,14000}
 
 local function OpposingFaction(faction)
 	local faction = UnitFactionGroup("player")
@@ -506,6 +506,16 @@ end
 addon.ArmorSetModCache = {}
 do
 	local function BuildArmorDB()
+			wipe(baseList);
+			wipe(baseListLabels);
+			wipe(baseIDs);
+			wipe(variantSets);
+			wipe(variantIDs);
+			wipe(fullList);
+			wipe(SET_INDEX);
+			wipe(ArmorDB);
+			extraSetCount = 0;
+			extraSetCollectedCount = 0;
 		addon.SetsDataProvider:ClearSets();
 		local playerFaction, _ = UnitFactionGroup('player')
 		local buildID = (select(4, GetBuildInfo()))
@@ -522,8 +532,10 @@ do
 			armorType = ty or addon.Globals.CLASS_INFO[playerClass][3]
 			ArmorDB[armorType] = {}
 			local armorSetdata = {addon.ArmorSets[armorType], addon.ArmorSets["COSMETIC"]}
-		for armorType, data in ipairs(armorSetdata) do
-			ArmorDB[armorType] = {}
+			local armorSetKeys = {armorType, "COSMETIC"}
+		for armorSetIndex, data in ipairs(armorSetdata) do
+			local currentArmorType = armorSetKeys[armorSetIndex]
+			ArmorDB[currentArmorType] = ArmorDB[currentArmorType] or {}
 
 			for id, data in pairs(data) do
 				--print(UseSet(data))
@@ -555,7 +567,6 @@ do
 					--local baseItem = data.items[1]
 					----local visualID, sourceID = addon.GetItemSource(baseItem)
 					----data.itemAppearance = addon.ItemAppearance[visualID]
-					data.armorType = armorType
 					data.setType = "ExtraSet"
 					data.oldID = data.setID
 					data.tab = 3
@@ -593,8 +604,8 @@ do
 					elseif data.note == "NOTE_44" or data.note == "NOTE_45" then
 						data.customGroups =  data.label.."-"..subName--data.armorType
 
-					elseif addon.MiscSets.customGroups[tonumber(data.setID)] then
-						data.customGroups = addon.MiscSets.customGroups[tonumber(data.setID)]
+					elseif addon.MiscSets.customGroups[tonumber(data.oldID)] then
+						data.customGroups = addon.MiscSets.customGroups[tonumber(data.oldID)]
 					elseif data.custom then
 						data.customGroups = data.custom --or data.label.."-"..subName--data.armorType
 					end
@@ -663,7 +674,7 @@ do
 					end
 					data.uiOrder = UIID_Counter[data.expansionID] -- id * 100
 					SET_INDEX[newID] = data
-					ArmorDB[armorType][newID] = data
+					ArmorDB[currentArmorType][newID] = data
 
 					extraSetCount = extraSetCount + 1
 

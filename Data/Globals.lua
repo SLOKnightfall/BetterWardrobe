@@ -399,5 +399,6 @@ addon.Filter = {
 ["HOLIDAY"] = 10,
 ["TPOST"] = 9,
 ["COVENANT"] = 0,
-["WARFRONT"] = 8,	
+["WARFRONT"] = 8,
+["CRAFTED"] = 11,
 }

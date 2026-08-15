@@ -14,6 +14,7 @@ local HOLIDAY = addon.Filter["HOLIDAY"]
 local TPOST = addon.Filter["TPOST"]
 local COVENANT = addon.Filter["COVENANT"]
 local WARFRONT = addon.Filter["WARFRONT"]
+local CRAFTED = addon.Filter["CRAFTED"]
 
 addon.ArmorSets["COSMETIC"] ={
 
@@ -236,7 +237,7 @@ addon.ArmorSets["COSMETIC"] ={
 	]]--
 	[50214]={
 		["armorType"] =  13 ,
-		["label"] =  "Brewfest" ,
+		["label"] =  142 ,
 		["setID"] =  50214,
 		["expansionID"] =  1 ,
 		["filter"] =  HOLIDAY,
@@ -248,7 +249,7 @@ addon.ArmorSets["COSMETIC"] ={
 	},
 	[50215]={
 		["armorType"] =  13 ,
-		["label"] =  "Brewfest" ,
+		["label"] =  142 ,
 		["setID"] =  50215,
 		["expansionID"] =  1 ,
 		["filter"] =  HOLIDAY,
@@ -260,7 +261,7 @@ addon.ArmorSets["COSMETIC"] ={
 	},
 	[50216]={
 		["armorType"] =  13 ,
-		["label"] =  "Brewfest" ,
+		["label"] =  142 ,
 		["setID"] =  50216,
 		["expansionID"] =  1 ,
 		["filter"] =  HOLIDAY,
@@ -272,7 +273,7 @@ addon.ArmorSets["COSMETIC"] ={
 	},
 	[50217]={
 		["armorType"] =  13 ,
-		["label"] =  "Brewfest" ,
+		["label"] =  142 ,
 		["setID"] =  50217,
 		["expansionID"] =  1 ,
 		["filter"] =  HOLIDAY,
@@ -284,7 +285,7 @@ addon.ArmorSets["COSMETIC"] ={
 	},
 	[50218]={
 		["armorType"] =  13 ,
-		["label"] =  "Brewfest" ,
+		["label"] =  142 ,
 		["setID"] =  50218,
 		["expansionID"] =  1 ,
 		["filter"] =  HOLIDAY,
@@ -344,7 +345,7 @@ addon.ArmorSets["COSMETIC"] ={
 	},
 	[50223]={
 		["armorType"] =  13 ,
-		["label"] =  "Winter Veil" ,
+		["label"] =  143 ,
 		["setID"] =  50223,
 		["expansionID"] =  1 ,
 		["filter"] =  HOLIDAY,
@@ -356,7 +357,7 @@ addon.ArmorSets["COSMETIC"] ={
 	},
 	[50224]={
 		["armorType"] =  13 ,
-		["label"] =  "Winter Veil" ,
+		["label"] =  143 ,
 		["setID"] =  50224,
 		["expansionID"] =  1 ,
 		["filter"] =  HOLIDAY,
@@ -368,7 +369,7 @@ addon.ArmorSets["COSMETIC"] ={
 	},
 	[50225]={
 		["armorType"] =  13 ,
-		["label"] =  "Winter Veil" ,
+		["label"] =  143 ,
 		["setID"] =  50225,
 		["expansionID"] =  1 ,
 		["filter"] =  HOLIDAY,
@@ -380,7 +381,7 @@ addon.ArmorSets["COSMETIC"] ={
 	},
 	[50226]={
 		["armorType"] =  13 ,
-		["label"] =  "Winter Veil" ,
+		["label"] =  143 ,
 		["setID"] =  50226,
 		["expansionID"] =  1 ,
 		["filter"] =  HOLIDAY,
@@ -392,7 +393,7 @@ addon.ArmorSets["COSMETIC"] ={
 	},
 	[50227]={
 		["armorType"] =  13 ,
-		["label"] =  "Winter Veil" ,
+		["label"] =  143 ,
 		["setID"] =  50227,
 		["expansionID"] =  1 ,
 		["filter"] =  HOLIDAY,
@@ -404,7 +405,7 @@ addon.ArmorSets["COSMETIC"] ={
 	},
 	[50228]={
 		["armorType"] =  13 ,
-		["label"] =  "Winter Veil" ,
+		["label"] =  143 ,
 		["setID"] =  50228,
 		["expansionID"] =  1 ,
 		["filter"] =  HOLIDAY,
@@ -417,7 +418,7 @@ addon.ArmorSets["COSMETIC"] ={
 
 	[50229]={
 		["armorType"] =  13 ,
-		["label"] =  "Haliscan" ,
+		["label"] =  144 ,
 		["setID"] =  50229,
 		["expansionID"] =  1 ,
 		["filter"] =  MISC,
@@ -501,13 +502,13 @@ addon.ArmorSets["COSMETIC"] ={
 		["mod"] =  0 ,
 		["itemData"] = {{"241346:0",289585,116056,},{"241342:0",289581,116052,},{"249859:0",296327,120351,},{"241351:0",289589,116060,},},
 		["sourceType"] =  0 ,
-		["sourceType"] =  0 ,
 		["customGroups"] = "Brewers",
 		["description"] = "Green",
+		["filter"] =  MISC,
 	},
 		[50399]={
 		["armorType"] =  13 ,
-		["label"] =  "Brewfest" ,
+		["label"] =  142 ,
 		["setID"] =  50399,
 		["expansionID"] =  10 ,
 		["name"] =  "Brewers Outfit" ,
@@ -522,7 +523,7 @@ addon.ArmorSets["COSMETIC"] ={
 	},
 		[50400]={
 		["armorType"] =  13 ,
-		["label"] =  "Brewfest" ,
+		["label"] =  142 ,
 		["setID"] =  50400,
 		["expansionID"] =  10 ,
 		["name"] =  "Brewer's Outfit" ,
@@ -537,7 +538,7 @@ addon.ArmorSets["COSMETIC"] ={
 	},
 		[50401]={
 		["armorType"] =  13 ,
-		["label"] =  "Brewfest" ,
+		["label"] =  142 ,
 		["setID"] =  50401,
 		["expansionID"] =  10 ,
 		["name"] =  "Brewer's Outfit" ,
