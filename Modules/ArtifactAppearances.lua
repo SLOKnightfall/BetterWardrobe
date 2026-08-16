@@ -174,12 +174,17 @@ end
 
 local visualIDIndex = {}
 local sourcelist = {}
-function addon.BuildClassArtifactAppearanceList() 
+local builtForClassFile
+--classFile (e.g. "DEATHKNIGHT") lets the Journal's class dropdown build another class's
+--artifacts; defaults to the player's own class when omitted (login/DB rebuild calls).
+function addon.BuildClassArtifactAppearanceList(classFile)
 	wipe(visualIDIndex)
 	wipe(sourcelist)
 
-	local _, playerClass, classID = UnitClass("player")
-	local artifactList = CLASS_ARTIFACT_DATA[playerClass]
+	local _, playerClass = UnitClass("player")
+	classFile = classFile or playerClass
+	builtForClassFile = classFile
+	local artifactList = CLASS_ARTIFACT_DATA[classFile] or {}
 	local uiOrderBase = 0
 
 	for itemID in pairs(artifactList) do 
@@ -263,7 +268,14 @@ function addon.BuildClassArtifactAppearanceList()
 	return sourcelist
 end
 
-function addon.GetClassArtifactAppearanceList() 
+--Rebuilds for whatever class the Journal's class dropdown is currently showing, if it
+--isn't the class the list was last built for (mirrors GetArtifactSourceInfo below).
+function addon.GetClassArtifactAppearanceList()
+	local classID = C_TransmogCollection.GetClassFilter()
+	local classFile = classID and select(2, GetClassInfo(classID))
+	if classFile and classFile ~= builtForClassFile then
+		addon.BuildClassArtifactAppearanceList(classFile)
+	end
 	return sourcelist
 end
 
@@ -272,18 +284,32 @@ function addon.ClearArtifactData()
 	wipe(sourcelist)
 end
 
+--Rebuilds for whatever class the Journal's class dropdown is currently showing, if it
+--isn't the class the index was last built for (e.g. browsing another class's artifacts).
 function addon.GetArtifactSourceInfo(visualID)
-	return visualIDIndex[visualID] 
+	local info = visualIDIndex[visualID]
+	if not info then
+		local classID = C_TransmogCollection.GetClassFilter()
+		local classFile = classID and select(2, GetClassInfo(classID))
+		if classFile and classFile ~= builtForClassFile then
+			addon.BuildClassArtifactAppearanceList(classFile)
+			info = visualIDIndex[visualID]
+		end
+	end
+	return info
 end
 
 function addon.SetArtifactAppearanceTooltip(contentFrame, sourceInfo, sourceID)
 	BetterWardrobeCollectionFrame.tooltipContentFrame = contentFrame
 	BetterWardrobeCollectionFrame.tooltipSourceIndex = 1
 
-	if sourceInfo then 
+	--frame.visualInfo (what gets passed in here) is Blizzard's raw appearance info -- name/specName/
+	--mod/unlock only exist on our own enriched copy from BuildClassArtifactAppearanceList.
+	sourceInfo = (sourceInfo and addon.GetArtifactSourceInfo(sourceInfo.visualID)) or sourceInfo
+
+	if sourceInfo then
 		local name, nameColor = sourceInfo.name, ARTIFACT_GOLD_COLOR
-		local sourceText, sourceColor = BetterWardrobeCollectionFrame:GetAppearanceSourceTextAndColor(sourceInfo)
-		GameTooltip:SetText(name or "X")--, nameColor:GetRGBA())
+		GameTooltip:SetText(name or RETRIEVING_ITEM_INFO, nameColor:GetRGBA())
 
 
 		----local name, nameColor, sourceText, sourceColor = WardrobeCollectionFrameModel_GetSourceTooltipInfo(sourceInfo)
@@ -308,10 +334,37 @@ function addon.SetArtifactAppearanceTooltip(contentFrame, sourceInfo, sourceID)
 		
 			GameTooltip:AddLine(sourceInfo.specName)
 			if not sourceInfo.isCollected then
-				if sourceInfo.mod >= 25 and sourceInfo.mod <= 28 and not sourceInfo.unlock then 
+				if sourceInfo.mod and sourceInfo.mod >= 25 and sourceInfo.mod <= 28 and not sourceInfo.unlock then
 					GameTooltip:AddLine(L["Learned from Item"])
-				else
-					GameTooltip:AddLine(sourceInfo.unlock)
+				elseif sourceInfo.unlock then
+					local unlockColor = HIGHLIGHT_FONT_COLOR
+					local progress = ""
+					if sourceInfo.unlockAch then
+						for _, achID in ipairs(sourceInfo.unlockAch) do
+							if achID and achID ~= 0 then
+								local _, _, _, achCompleted = GetAchievementInfo(achID)
+								if achCompleted then
+									unlockColor = GREEN_FONT_COLOR
+								else
+									for c = 1, (GetAchievementNumCriteria(achID) or 0) do
+										local _, _, criteriaCompleted, quantity, reqQuantity = GetAchievementCriteriaInfo(achID, c)
+										if reqQuantity and reqQuantity > 1 and not criteriaCompleted then
+											progress = string.format(" (%d/%d)", quantity or 0, reqQuantity)
+											break
+										end
+									end
+								end
+								break
+							end
+						end
+					end
+					for line in (sourceInfo.unlock.."\n"):gmatch("(.-)\n") do
+						if line:find("Complete the quest") then
+							GameTooltip:AddLine(line..progress, unlockColor.r, unlockColor.g, unlockColor.b)
+						elseif line ~= "" then
+							GameTooltip:AddLine(line)
+						end
+					end
 				end
 			end
 		

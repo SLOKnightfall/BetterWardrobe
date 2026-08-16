@@ -432,6 +432,8 @@ function WardrobeCollectionFrameMixin:InitItemsFilterButton()
 		rootDescription:CreateDivider();
 
 		local sortSubmenu = rootDescription:CreateButton(L["Sort By"]);
+		--Sort is locked to Appearance while browsing Legion Artifacts (see EnterArtifactBrowsing).
+		sortSubmenu:SetEnabled(self.ItemsCollectionFrame:GetActiveCategory() ~= Enum.TransmogCollectionType.Paired);
 		local function IsItemSortModeSelected(mode)
 			return (addon.Profile.JournalItemSortMode or addon.ItemSortMode.Default) == mode;
 		end
@@ -1233,6 +1235,15 @@ function WardrobeItemsCollectionMixin:CheckLatestAppearance(changeTab)
 	end
 end
 
+local function IsValidItemSortMode(mode)
+	for _, value in pairs(addon.ItemSortMode) do
+		if value == mode then
+			return true;
+		end
+	end
+	return false;
+end
+
 function WardrobeItemsCollectionMixin:OnLoad()
 	self:CreateSlotButtons();
 	self.BGCornerTopLeft:Hide();
@@ -1248,6 +1259,17 @@ function WardrobeItemsCollectionMixin:OnLoad()
 	self.WeaponDropdown:SetWidth(157);
 
 	self:RegisterEvent("TRANSMOG_COLLECTION_UPDATED");
+
+	if addon.Profile.PreArtifactSortMode ~= nil then
+		if IsValidItemSortMode(addon.Profile.PreArtifactSortMode) then
+			addon.Profile.JournalItemSortMode = addon.Profile.PreArtifactSortMode;
+		end
+		addon.Profile.PreArtifactSortMode = nil;
+	end
+
+	if not IsValidItemSortMode(addon.Profile.JournalItemSortMode) then
+		addon.Profile.JournalItemSortMode = addon.ItemSortMode.Default;
+	end
 
 	self:CheckLatestAppearance();
 end
@@ -1317,6 +1339,8 @@ function WardrobeItemsCollectionMixin:OnHide()
 	self:UnregisterEvent("TRANSMOG_COLLECTION_ITEM_UPDATE");
 
 	StaticPopup_Hide("TRANSMOG_FAVORITE_WARNING");
+
+	self:LeaveArtifactBrowsing();
 
 	self:GetParent():ClearSearch(Enum.TransmogSearchType.Items);
 
@@ -1596,9 +1620,36 @@ function WardrobeItemsCollectionMixin:UpdateWeaponDropdown()
 	end);
 end
 
+function WardrobeItemsCollectionMixin:EnterArtifactBrowsing()
+	if addon.Profile.PreArtifactSortMode ~= nil then
+		return;
+	end
+	addon.Profile.PreArtifactSortMode = addon.Profile.JournalItemSortMode or addon.ItemSortMode.Default;
+	addon.Profile.JournalItemSortMode = addon.ItemSortMode.Appearance;
+	self:GetParent().SearchBox:Hide();
+end
+
+function WardrobeItemsCollectionMixin:LeaveArtifactBrowsing()
+	if addon.Profile.PreArtifactSortMode == nil then
+		return;
+	end
+	if IsValidItemSortMode(addon.Profile.PreArtifactSortMode) then
+		addon.Profile.JournalItemSortMode = addon.Profile.PreArtifactSortMode;
+	end
+	addon.Profile.PreArtifactSortMode = nil;
+	self:GetParent().SearchBox:Show();
+end
+
 function WardrobeItemsCollectionMixin:SetActiveCategory(category)
 	local previousCategory = self.activeCategory;
 	self.activeCategory = category;
+
+	if category == Enum.TransmogCollectionType.Paired then
+		self:EnterArtifactBrowsing();
+	elseif previousCategory == Enum.TransmogCollectionType.Paired then
+		self:LeaveArtifactBrowsing();
+	end
+
 	if previousCategory ~= category and self.transmogLocation:IsAppearance() then
 		C_TransmogCollection.SetSearchAndFilterCategory(category);
 		local name, isWeapon = C_TransmogCollection.GetCategoryInfo(category);
@@ -1840,7 +1891,13 @@ function WardrobeItemsCollectionMixin:UpdateItems()
 
 			-- camera
 			if ( self.transmogLocation:IsAppearance() ) then
-				cameraID = C_TransmogCollection.GetAppearanceCameraID(visualInfo.visualID, cameraVariation);
+				if visualInfo.artifact then
+					--Blizzard's GetAppearanceCameraID doesn't recognize artifact trait visualIDs;
+					--use the camera we already resolved (with fallbacks) when building this list.
+					cameraID = visualInfo.camera;
+				else
+					cameraID = C_TransmogCollection.GetAppearanceCameraID(visualInfo.visualID, cameraVariation);
+				end
 			end
 			if ( model.cameraID ~= cameraID ) then
 				Model_ApplyUICamera(model, cameraID);
@@ -1858,6 +1915,13 @@ function WardrobeItemsCollectionMixin:UpdateItems()
 				elseif ( isArmor ) then
 					local sourceID = self:GetAnAppearanceSourceFromVisual(visualInfo.visualID, nil);
 					model:TryOn(sourceID);
+				elseif ( visualInfo.shapeshiftID ) then
+					--Druid artifact forms (Fangs of Ashamane / Claws of Ursoc) display as the
+					--shapeshift form itself rather than a weapon appearance.
+					model.cameraID = visualInfo.camera;
+					Model_ApplyUICamera(model, visualInfo.camera);
+					model:SetDisplayInfo(visualInfo.shapeshiftID);
+					model:MakeCurrentCameraCustom();
 				elseif ( appearanceVisualID ) then
 					-- appearanceVisualID is only set when looking at enchants
 					model:SetItemAppearance(appearanceVisualID, visualInfo.visualID, appearanceVisualSubclass);
@@ -1946,11 +2010,22 @@ function WardrobeItemsCollectionMixin:UpdateProgressBar()
 end
 
 function WardrobeItemsCollectionMixin:RefreshVisualsList()
+	--Keep the sort-mode/search-box swap correct even when something refreshes the list
+	--without going through SetActiveCategory (collection updates, color filter, etc.).
+	if self.activeCategory == Enum.TransmogCollectionType.Paired then
+		self:EnterArtifactBrowsing();
+	elseif self.preArtifactSortMode ~= nil then
+		self:LeaveArtifactBrowsing();
+	end
+
 	if self.transmogLocation:IsIllusion() then
 		self.visualsList = C_TransmogCollection.GetIllusions();
+	elseif self.activeCategory == Enum.TransmogCollectionType.Paired and not C_Transmog.IsAtTransmogNPC() then
+		--Blizzard's native GetCategoryAppearances only surfaces collected artifact traits;
+		--our own list (built from Data/ArtifactData.lua) also includes the uncollected ones.
+		self.visualsList = addon.GetClassArtifactAppearanceList();
 	else
 		self.visualsList = C_TransmogCollection.GetCategoryAppearances(self.activeCategory, self.transmogLocation:GetData());
-
 	end
 	self:FilterVisuals();
 	self:SortVisuals();
@@ -1962,6 +2037,13 @@ function WardrobeItemsCollectionMixin:GetFilteredVisualsList()
 end
 
 function WardrobeItemsCollectionMixin:GetAnAppearanceSourceFromVisual(visualID, mustBeUsable)
+	--Artifact trait visualIDs aren't registered with Blizzard's normal appearance-source system;
+	--our own enriched data already has the sourceID directly.
+	if self.activeCategory == Enum.TransmogCollectionType.Paired then
+		local artifactInfo = addon.GetArtifactSourceInfo(visualID);
+		return artifactInfo and artifactInfo.sourceID;
+	end
+
 	local sourceID = self:GetChosenVisualSource(visualID);
 	if ( sourceID == Constants.Transmog.NoTransmogID ) then
 		local sources = CollectionWardrobeUtil.GetSortedAppearanceSources(visualID, self.activeCategory, self.transmogLocation);
@@ -2276,6 +2358,14 @@ function WardrobeItemModelMixin:GetAppearanceLink()
 		return link;
 	end
 
+	if itemsCollectionFrame:GetActiveCategory() == Enum.TransmogCollectionType.Paired then
+		local artifactInfo = addon.GetArtifactSourceInfo(appearanceInfo.visualID);
+		if artifactInfo then
+			link = CollectionWardrobeUtil.GetAppearanceItemHyperlink(artifactInfo, true);
+		end
+		return link;
+	end
+
 	local tooltipSourceIndex = itemsCollectionFrame:GetTooltipSourceIndex();
 	local sources = CollectionWardrobeUtil.GetSortedAppearanceSourcesForClass(appearanceInfo.visualID, C_TransmogCollection.GetClassFilter(), itemsCollectionFrame:GetActiveCategory(), itemsCollectionFrame:GetTransmogLocation());
 	if tooltipSourceIndex then
@@ -2296,7 +2386,8 @@ function WardrobeItemModelMixin:UpdateContentTracking()
 
 	self:ClearTrackables();
 
-	if not itemsCollectionFrame:GetTransmogLocation():IsIllusion() then
+	--Illusions and artifact traits aren't tracked via Blizzard's normal appearance-source system.
+	if not itemsCollectionFrame:GetTransmogLocation():IsIllusion() and itemsCollectionFrame:GetActiveCategory() ~= Enum.TransmogCollectionType.Paired then
 		local sources = CollectionWardrobeUtil.GetSortedAppearanceSourcesForClass(appearanceInfo.visualID, C_TransmogCollection.GetClassFilter(), itemsCollectionFrame:GetActiveCategory(), itemsCollectionFrame:GetTransmogLocation());
 		for _index, sourceInfo in ipairs(sources) do
 			if sourceInfo.playerCanCollect then
@@ -2331,7 +2422,7 @@ function WardrobeItemModelMixin:GetSourceInfoForTracking()
 		return;
 	end
 
-	if itemsCollectionFrame:GetTransmogLocation():IsIllusion() then
+	if itemsCollectionFrame:GetTransmogLocation():IsIllusion() or itemsCollectionFrame:GetActiveCategory() == Enum.TransmogCollectionType.Paired then
 		return nil;
 	else
 		local sourceIndex = itemsCollectionFrame.tooltipSourceIndex or 1;
@@ -2419,31 +2510,35 @@ function WardrobeItemModelMixin:OnMouseUp(button)
 				end);
 			end
 
-			rootDescription:QueueSpacer();
-			rootDescription:QueueTitle(WARDROBE_TRANSMOGRIFY_AS);
-
 			local activeCategory = itemsCollectionFrame:GetActiveCategory();
-			local transmogLocation = itemsCollectionFrame.transmogLocation;
-			local chosenSourceID = itemsCollectionFrame:GetChosenVisualSource(appearanceID);
-			for index, source in ipairs(CollectionWardrobeUtil.GetSortedAppearanceSources(appearanceID, activeCategory, transmogLocation)) do
-				if source.isCollected and itemsCollectionFrame:IsAppearanceUsableForActiveCategory(source) then
-					if chosenSourceID == Constants.Transmog.NoTransmogID then
-						chosenSourceID = source.sourceID;
-					end
+			--Artifact traits have a single fixed appearance -- no "transmogrify as a different
+			--source" concept, and Blizzard's API doesn't recognize their visualIDs anyway.
+			if activeCategory ~= Enum.TransmogCollectionType.Paired then
+				rootDescription:QueueSpacer();
+				rootDescription:QueueTitle(WARDROBE_TRANSMOGRIFY_AS);
 
-					local function IsChecked(data)
-						return chosenSourceID == data.sourceID;
-					end
+				local transmogLocation = itemsCollectionFrame.transmogLocation;
+				local chosenSourceID = itemsCollectionFrame:GetChosenVisualSource(appearanceID);
+				for index, source in ipairs(CollectionWardrobeUtil.GetSortedAppearanceSources(appearanceID, activeCategory, transmogLocation)) do
+					if source.isCollected and itemsCollectionFrame:IsAppearanceUsableForActiveCategory(source) then
+						if chosenSourceID == Constants.Transmog.NoTransmogID then
+							chosenSourceID = source.sourceID;
+						end
 
-					local function SetChecked(data)
-						itemsCollectionFrame:SetChosenVisualSource(data.appearanceID, data.sourceID);
-						itemsCollectionFrame:SelectVisual(data.appearanceID);
-					end
+						local function IsChecked(data)
+							return chosenSourceID == data.sourceID;
+						end
 
-					local name, color = WardrobeCollectionFrame:GetAppearanceNameTextAndColor(source);
-					local coloredText = color:WrapTextInColorCode(name);
-					local data = {appearanceID = appearanceID, sourceID = source.sourceID};
-					rootDescription:CreateRadio(coloredText, IsChecked, SetChecked, data);
+						local function SetChecked(data)
+							itemsCollectionFrame:SetChosenVisualSource(data.appearanceID, data.sourceID);
+							itemsCollectionFrame:SelectVisual(data.appearanceID);
+						end
+
+						local name, color = WardrobeCollectionFrame:GetAppearanceNameTextAndColor(source);
+						local coloredText = color:WrapTextInColorCode(name);
+						local data = {appearanceID = appearanceID, sourceID = source.sourceID};
+						rootDescription:CreateRadio(coloredText, IsChecked, SetChecked, data);
+					end
 				end
 			end
 		end);
