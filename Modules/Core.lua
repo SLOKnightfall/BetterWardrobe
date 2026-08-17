@@ -1388,9 +1388,7 @@ function addon.Init:LoadModules()
 		local selected = CollectionsJournal_GetTab(CollectionsJournal)
 		BetterWardrobeCollectionFrame:SetShown(selected == 5)
 
-		if C_AddOns.IsAddOnLoaded("ElvUI") then
-			addon.ApplyElvUISkin()
-		end
+		----addon.ApplyElvUISkin()
 
 	end)
 end
