@@ -1340,6 +1340,27 @@ function addon:OnEnable()
 	C_Timer.After(1, function() addon.Init:LoadModules() end)
 end
 
+--Per-visit toggle, not a saved preference -- resets to true on load and on Journal close.
+addon.UseBetterWardrobeUI = true
+function addon:ApplyJournalUIMode()
+	if CollectionsJournal_GetTab(CollectionsJournal) ~= 5 then return end
+	if addon.UseBetterWardrobeUI then
+		WardrobeCollectionFrame:Hide()
+		BetterWardrobeCollectionFrame:Show()
+	else
+		BetterWardrobeCollectionFrame:Hide()
+		WardrobeCollectionFrame:Show()
+	end
+end
+
+function addon:ApplyVendorUIMode()
+	local w = TransmogFrame.WardrobeCollection
+	local useBetter = addon.UseBetterWardrobeUI
+	w.TabHeaders:SetTabShown(w.setsTabID, not useBetter)
+	w.TabHeaders:SetTabShown(w.TabHeaders.setsFrame2TabID, useBetter)
+	w.TabHeaders:SetTabShown(w.TabHeaders.extrasetsTabID, useBetter)
+end
+
 --Loads various modules and builds frames once the Blizzard_Collection addon is loaded
 function addon.Init:LoadModules()
 	--Check to make sure that the addon has completed loading
@@ -1353,6 +1374,40 @@ function addon.Init:LoadModules()
 	--BetterWardrobeCollectionFrameTab4:Hide()
 	addon:setFrames()
 	addon.Init:InitFilterButtons()
+
+	local uiToggleButton = CreateFrame("Button", "BW_JournalUIToggleButton", CollectionsJournalCloseButton)
+	uiToggleButton:SetFrameLevel(CollectionsJournalCloseButton:GetFrameLevel() + 1)
+	uiToggleButton:SetPoint("RIGHT", CollectionsJournalCloseButton, "LEFT", -4, 0)
+	uiToggleButton:SetSize(14, 14)
+
+	uiToggleButton:SetNormalTexture("Interface\\GossipFrame\\transmogrifyGossipIcon")
+	uiToggleButton:SetHighlightTexture("Interface\\GossipFrame\\transmogrifyGossipIcon", "ADD")
+	for _, tex in ipairs({uiToggleButton:GetNormalTexture(), uiToggleButton:GetHighlightTexture()}) do
+		tex:ClearAllPoints()
+		tex:SetPoint("CENTER")
+		tex:SetSize(22, 22)
+	end
+
+	uiToggleButton:SetScript("OnClick", function()
+		addon.UseBetterWardrobeUI = not addon.UseBetterWardrobeUI
+		addon:ApplyJournalUIMode()
+		if addon.UseBetterWardrobeUI then
+			local tab = BetterWardrobeCollectionFrame.selectedCollectionTab
+			BetterWardrobeCollectionFrame:SetTab(3)
+			BetterWardrobeCollectionFrame:SetTab(2)
+			BetterWardrobeCollectionFrame:SetTab(tab)
+		end
+	end)
+	uiToggleButton:SetScript("OnEnter", function(self)
+		GameTooltip:SetOwner(self, "ANCHOR_RIGHT")
+		GameTooltip:SetText(addon.UseBetterWardrobeUI and L["Switch to Default Wardrobe UI"] or L["Switch to BetterWardrobe UI"]);
+		GameTooltip:Show()
+	end)
+	uiToggleButton:SetScript("OnLeave", GameTooltip_Hide)
+	addon.JournalUIToggleButton = uiToggleButton
+
+	CollectionsJournal:HookScript("OnHide", function() addon.UseBetterWardrobeUI = true end)
+
 	--Hooks into the colection tabs and sets Better Wardobe when viewing the wardrobe collection
 	addon:SecureHook(nil, "CollectionsJournal_UpdateSelectedTab", function(self)
 		local selected = CollectionsJournal_GetTab(self)
@@ -1361,8 +1416,7 @@ function addon.Init:LoadModules()
 		if (WardrobeCollectionFrame:GetParent() == self or not WardrobeCollectionFrame:GetParent():IsShown()) then
 			if selected == 5 then
 				--HideUIPanel(WardrobeFrame)
-				WardrobeCollectionFrame:Hide()
-				BetterWardrobeCollectionFrame:Show()
+				addon:ApplyJournalUIMode()
 
 				if addon.ExtendedTransmogSwap then
 					addon.ExtendedTransmogSwap:Show()
@@ -1385,8 +1439,7 @@ function addon.Init:LoadModules()
 		addon:UpdateCanIMogIt()
 		----addon:InitExtendedSetsSwap()
 
-		local selected = CollectionsJournal_GetTab(CollectionsJournal)
-		BetterWardrobeCollectionFrame:SetShown(selected == 5)
+		addon:ApplyJournalUIMode()
 
 		if C_AddOns.IsAddOnLoaded("ElvUI") then addon.ApplyElvUISkin() end
 
@@ -1395,12 +1448,9 @@ end
 
 function addon:UpdateTabs()
 	TransmogFrame.WardrobeCollection.TabHeaders:SetTabShown(TransmogFrame.WardrobeCollection.itemsTabID, true);
-	TransmogFrame.WardrobeCollection.TabHeaders:SetTabShown(TransmogFrame.WardrobeCollection.setsTabID, false);
 	TransmogFrame.WardrobeCollection.TabHeaders:SetTabShown(TransmogFrame.WardrobeCollection.custmSetsTabID, false);
 	TransmogFrame.WardrobeCollection.TabHeaders:SetTabShown(TransmogFrame.WardrobeCollection.situationsTabID, false);
-
-	--TransmogFrame.WardrobeCollection.TabHeaders:SetTabShown(TransmogFrame.WardrobeCollection.BW_SetsFrame2TabID, true);
-	--TransmogFrame.WardrobeCollection.TabHeaders:SetTabShown(TransmogFrame.WardrobeCollection.extracustomsetsTabID, true);
+	addon:ApplyVendorUIMode();
 end
 
 --Self-contained: Transmog.lua's own TransmogWardrobeItemsMixin overrides are dead (inside a
@@ -1655,6 +1705,31 @@ function addon:EventHandler(event, ...)
 
 				 self:SecureHookScript(TransmogFrame, "OnShow", function() C_Timer.After(.1, function() addon:UpdateTabs(); end) end)
 				addon:CreateButtons()
+
+				local vendorUIToggleButton = CreateFrame("Button", "BW_VendorUIToggleButton", TransmogFrameCloseButton)
+				vendorUIToggleButton:SetFrameLevel(TransmogFrameCloseButton:GetFrameLevel() + 1)
+				vendorUIToggleButton:SetPoint("RIGHT", TransmogFrameCloseButton, "LEFT", -4, 0)
+				vendorUIToggleButton:SetSize(14, 14)
+				vendorUIToggleButton:SetNormalTexture("Interface\\GossipFrame\\transmogrifyGossipIcon")
+				vendorUIToggleButton:SetHighlightTexture("Interface\\GossipFrame\\transmogrifyGossipIcon", "ADD")
+				for _, tex in ipairs({vendorUIToggleButton:GetNormalTexture(), vendorUIToggleButton:GetHighlightTexture()}) do
+					tex:ClearAllPoints()
+					tex:SetPoint("CENTER")
+					tex:SetSize(22, 22)
+				end
+				vendorUIToggleButton:SetScript("OnClick", function()
+					addon.UseBetterWardrobeUI = not addon.UseBetterWardrobeUI
+					addon:ApplyVendorUIMode()
+				end)
+				vendorUIToggleButton:SetScript("OnEnter", function(self)
+					GameTooltip:SetOwner(self, "ANCHOR_RIGHT")
+					GameTooltip:SetText(addon.UseBetterWardrobeUI and L["Switch to Default Wardrobe UI"] or L["Switch to BetterWardrobe UI"]);
+					GameTooltip:Show()
+				end)
+				vendorUIToggleButton:SetScript("OnLeave", GameTooltip_Hide)
+				addon.VendorUIToggleButton = vendorUIToggleButton
+
+				TransmogFrame:HookScript("OnHide", function() addon.UseBetterWardrobeUI = true end)
 			end
 			addon:UpdateTabs();
 		 end)
