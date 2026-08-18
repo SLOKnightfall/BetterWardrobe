@@ -9,31 +9,18 @@ local E, L, V, P, G = unpack(ElvUI); --Import: Engine, Locales, PrivateDB, Profi
 local S = E:GetModule('Skins')
 
 local _G = _G
-local select = select
 local ipairs, pairs, unpack = ipairs, pairs, unpack
 
 local CreateFrame = CreateFrame
-local GetItemInfo = GetItemInfo
 local hooksecurefunc = hooksecurefunc
-local BAG_ITEM_QUALITY_COLORS = BAG_ITEM_QUALITY_COLORS
-local GetItemQualityColor = GetItemQualityColor
-local C_TransmogCollection_GetSourceInfo = C_TransmogCollection.GetSourceInfo
 
 local MyPlugin = E:NewModule('addonName', 'AceHook-3.0', 'AceEvent-3.0', 'AceTimer-3.0') --Create a plugin within ElvUI and adopt AceHook-3.0, AceEvent-3.0 and AceTimer-3.0. We can make use of these later.
 local EP = LibStub("LibElvUIPlugin-1.0") --We can use this to automatically insert our GUI tables when ElvUI_Config is loaded.
 
 
-local function LoadSkin_ElvUI()
---DropDownMenu
-	
-
-end
-
-
 function MyPlugin:Initialize()
 	--Register plugin so options are properly inserted when config is loaded
 	EP:RegisterPlugin(addonName, MyPlugin.InsertOptions)
-	LoadSkin_ElvUI()
 end
 
 
@@ -57,9 +44,6 @@ local function SkinTransmogFrames()
 	S:HandleDropDownBox(_G.BW_SortDropDown, 145)
 	----S:HandleDropDownBox(_G.BW_CollectionList_Dropdown, 145)
 	----S:HandleDropDownBox(_G.BW_SavedOutfitDropDown, 145)
-	--S:HandleDropDownBox(_G.BW_TransmogOptionsButton, 145)
-	--S:HandleDropDownBox(_G.BetterWardrobeTMOutfitDropDown, 145)
-	--S:HandleButton(_G.BetterWardrobeTMOutfitDropDown.SaveButton, nil, nil, nil, nil, nil, nil, nil, nil, nil, nil, true, 'right')
 
 	--S:HandleButton(_G.BW_CollectionListButton, nil, nil, nil, nil, nil, nil, nil, nil, nil, nil, true, 'right')
 
@@ -141,6 +125,9 @@ local function SkinTransmogFrames()
 		if paging then
 			S:HandleNextPrevButton(paging.PrevPageButton, nil, nil, true)
 			S:HandleNextPrevButton(paging.NextPageButton, nil, nil, true)
+			S:HandleNextPrevButton(paging.FirstPageButton, nil, nil, true)
+			S:HandleNextPrevButton(paging.LastPageButton, "up", nil, true)
+			S:HandleEditBox(paging.PageInput)
 		end
 	end
 
@@ -150,19 +137,12 @@ local function SkinTransmogFrames()
 	SetsCollectionFrame.LeftInset:StripTextures()
 	S:HandleTrimScrollBar(SetsCollectionFrame.ListContainer.ScrollBar)
 
-	----hooksecurefunc(SetsCollectionFrame.ListContainer.ScrollBox, 'Update', SetsFrame_ScrollBoxUpdate)
-
 	local DetailsFrame = SetsCollectionFrame.DetailsFrame
 	DetailsFrame.ModelFadeTexture:Hide()
 	DetailsFrame.IconRowBackground:Hide()
 	DetailsFrame.Name:FontTemplate(nil, 16)
 	DetailsFrame.LongName:FontTemplate(nil, 16)
 	S:HandleDropDownBox(DetailsFrame.VariantSetsDropdown)
-	----hooksecurefunc(SetsCollectionFrame, 'SetItemFrameQuality', SetsFrame_SetItemFrameQuality)
-
-	--local WardrobeFrame = _G.BetterWardrobeFrame
-	--S:HandlePortraitFrame(WardrobeFrame)
-
 
 	S:HandleButton(DetailsFrame.BW_LinkSetButton)
 	S:HandleButton(DetailsFrame.BW_OpenDressingRoomButton)
@@ -175,11 +155,6 @@ local function SkinTransmogFrames()
 	BetterWardrobeCollectionFrame.ItemsCollectionFrame:StripTextures()
 	BetterWardrobeCollectionFrame.ItemsCollectionFrame:SetTemplate('Transparent')
 
-	----BetterWardrobeCollectionFrame.SetsTransmogFrame:StripTextures()
-	----BetterWardrobeCollectionFrame.SetsTransmogFrame:SetTemplate('Transparent')
-	----:HandleNextPrevButton(BetterWardrobeCollectionFrame.SetsTransmogFrame.PagingFrame.NextPageButton)
-	----S:HandleNextPrevButton(BetterWardrobeCollectionFrame.SetsTransmogFrame.PagingFrame.PrevPageButton)
-
 	local WardrobeOutfitEditFrame = _G.BetterWardrobeOutfitEditFrame
 	WardrobeOutfitEditFrame:StripTextures()
 	WardrobeOutfitEditFrame:SetTemplate('Transparent')
@@ -189,191 +164,56 @@ local function SkinTransmogFrames()
 	S:HandleButton(WardrobeOutfitEditFrame.CancelButton)
 	S:HandleButton(WardrobeOutfitEditFrame.DeleteButton)
 
-	--Items
-
-
-	----S:HandleButton(_G.BW_CollectionListOptionsButton)
-	----BW_CollectionListOptionsButton:SetSize(25,25)
-----
-	----S:HandleButton(_G.BW_LoadQueueButton)
-	----BW_LoadQueueButton:ClearAllPoints()
-	----BW_LoadQueueButton:Point("TOPLEFT",BetterWardrobeTMOutfitDropDown, "TOPRIGHT", 95, -2)
-
-	----S:HandleButton(_G.BW_RandomizeButton)
-	----BW_RandomizeButton:ClearAllPoints()
-	----BW_RandomizeButton:Point("TOPLEFT",BW_LoadQueueButton, "TOPRIGHT", 5, 0)
-
-	----S:HandleButton(_G.BW_SlotHideButton)
-	----BW_SlotHideButton:ClearAllPoints()
-	----BW_SlotHideButton:Point("TOPLEFT",BW_RandomizeButton, "TOPRIGHT", 5, 0)
-
 	--Transmog frames
 
+	for _, tab in next, { TransmogFrame.WardrobeCollection.TabHeaders:GetChildren() } do
+		S:HandleTab(tab)
+	end
+	local frame = TransmogFrame.WardrobeCollection.TabContent.ItemsFrame
+	if frame then
+		S:HandleNextPrevButton(frame.PagedContent.PagingControls.PrevPageButton)
+		S:HandleNextPrevButton(frame.PagedContent.PagingControls.NextPageButton)
+		S:HandleNextPrevButton(frame.PagedContent.PagingControls.FirstPageButton)
+		S:HandleNextPrevButton(frame.PagedContent.PagingControls.LastPageButton, "up")
+		S:HandleEditBox(frame.PagedContent.PagingControls.PageInput)
+	end
+	local frame = TransmogFrame.WardrobeCollection.TabContent.BW_SetsFrame2
+	if frame then
+		S:HandleButton(frame.SearchBox)
+		S:HandleButton(frame.FilterButton, nil, nil, nil, nil, nil, nil, nil, nil, nil, nil, true, 'right')
 
-		for _, tab in next, { TransmogFrame.WardrobeCollection.TabHeaders:GetChildren() } do
-			S:HandleTab(tab)
-		end
-		local frame = TransmogFrame.WardrobeCollection.TabContent.ItemsFrame
-		if frame then
+		S:HandleNextPrevButton(frame.PagedContent.PagingControls.PrevPageButton)
+		S:HandleNextPrevButton(frame.PagedContent.PagingControls.NextPageButton)
+		S:HandleNextPrevButton(frame.PagedContent.PagingControls.FirstPageButton)
+		S:HandleNextPrevButton(frame.PagedContent.PagingControls.LastPageButton, "up")
+		S:HandleEditBox(frame.PagedContent.PagingControls.PageInput)
+	end
 
-			S:HandleNextPrevButton(frame.PagedContent.PagingControls.PrevPageButton)
-			S:HandleNextPrevButton(frame.PagedContent.PagingControls.NextPageButton)
-			S:HandleNextPrevButton(frame.PagedContent.PagingControls.FirstPageButton)
-			S:HandleNextPrevButton(frame.PagedContent.PagingControls.LastPageButton, "up")
+	local frame = TransmogFrame.WardrobeCollection.TabContent.BW_ExtraSetsFrame
+	if frame then
+		S:HandleButton(frame.SearchBox)
+		S:HandleButton(frame.FilterButton, nil, nil, nil, nil, nil, nil, nil, nil, nil, nil, true, 'right')
 
-			--hooksecurefunc(frame.PagedContent.PagingControls, 'ShouldClearOnUpdateAfterClean', PageControlsPositionUpdate)
-			--hooksecurefunc(frame.PagedContent.PagingControls, 'ShouldClearOnUpdateAfterClean', PageControlsPositionUpdate)
-		end
-		local frame = TransmogFrame.WardrobeCollection.TabContent.BW_SetsFrame2
-		if frame then
-			S:HandleButton(frame.SearchBox)
-			S:HandleButton(frame.FilterButton, nil, nil, nil, nil, nil, nil, nil, nil, nil, nil, true, 'right')
+		S:HandleNextPrevButton(frame.PagedContent.PagingControls.PrevPageButton)
+		S:HandleNextPrevButton(frame.PagedContent.PagingControls.NextPageButton)
+		S:HandleNextPrevButton(frame.PagedContent.PagingControls.FirstPageButton)
+		S:HandleNextPrevButton(frame.PagedContent.PagingControls.LastPageButton, "up")
+		S:HandleEditBox(frame.PagedContent.PagingControls.PageInput)
+	end
 
-			S:HandleNextPrevButton(frame.PagedContent.PagingControls.PrevPageButton)
-			S:HandleNextPrevButton(frame.PagedContent.PagingControls.NextPageButton)
-			S:HandleNextPrevButton(frame.PagedContent.PagingControls.FirstPageButton)
-			S:HandleNextPrevButton(frame.PagedContent.PagingControls.LastPageButton, "up")
-			S:HandleEditBox(frame.PagedContent.PagingControls.PageInput)
+	local CustomSetsFrame = TransmogFrame.WardrobeCollection.TabContent.BW_ExtraCustomSetsFrame
+	if CustomSetsFrame then
+		S:HandleButton(CustomSetsFrame.NewCustomSetButton, nil, nil, nil, true, nil, nil, nil, true)
 
-
-			--hooksecurefunc(frame.PagedContent.PagingControls, 'ShouldClearOnUpdateAfterClean', PageControlsPositionUpdate)
-			--hooksecurefunc(frame.PagedContent.PagingControls, 'ShouldClearOnUpdateAfterClean', PageControlsPositionUpdate)
-		end
-
-		local frame = TransmogFrame.WardrobeCollection.TabContent.BW_ExtraSetsFrame
-		if frame then
-			S:HandleButton(frame.SearchBox)
-			S:HandleButton(frame.FilterButton, nil, nil, nil, nil, nil, nil, nil, nil, nil, nil, true, 'right')
-
-			S:HandleNextPrevButton(frame.PagedContent.PagingControls.PrevPageButton)
-			S:HandleNextPrevButton(frame.PagedContent.PagingControls.NextPageButton)
-			S:HandleNextPrevButton(frame.PagedContent.PagingControls.FirstPageButton)
-			S:HandleNextPrevButton(frame.PagedContent.PagingControls.LastPageButton, "up")
-			S:HandleEditBox(frame.PagedContent.PagingControls.PageInput)
-
-			--hooksecurefunc(frame.PagedContent.PagingControls, 'ShouldClearOnUpdateAfterClean', PageControlsPositionUpdate)
-			--hooksecurefunc(frame.PagedContent.PagingControls, 'ShouldClearOnUpdateAfterClean', PageControlsPositionUpdate)
-		end
-
-		local CustomSetsFrame = TransmogFrame.WardrobeCollection.TabContent.BW_ExtraCustomSetsFrame
-		if CustomSetsFrame then
-			S:HandleButton(CustomSetsFrame.NewCustomSetButton, nil, nil, nil, true, nil, nil, nil, true)
-
-			S:HandleNextPrevButton(CustomSetsFrame.PagedContent.PagingControls.PrevPageButton)
-			S:HandleNextPrevButton(CustomSetsFrame.PagedContent.PagingControls.NextPageButton)
-			S:HandleNextPrevButton(CustomSetsFrame.PagedContent.PagingControls.FirstPageButton)
-			S:HandleNextPrevButton(CustomSetsFrame.PagedContent.PagingControls.LastPageButton, "up")
-			S:HandleEditBox(CustomSetsFrame.PagedContent.PagingControls.PageInput)
-		--	hooksecurefunc(CustomSetsFrame.PagedContent.PagingControls, 'ShouldClearOnUpdateAfterClean', PageControlsPositionUpdate)
-			--hooksecurefunc(CustomSetsFrame.PagedContent.PagingControls, 'ShouldClearOnUpdateAfterClean', PageControlsPositionUpdate)
-
-		end
+		S:HandleNextPrevButton(CustomSetsFrame.PagedContent.PagingControls.PrevPageButton)
+		S:HandleNextPrevButton(CustomSetsFrame.PagedContent.PagingControls.NextPageButton)
+		S:HandleNextPrevButton(CustomSetsFrame.PagedContent.PagingControls.FirstPageButton)
+		S:HandleNextPrevButton(CustomSetsFrame.PagedContent.PagingControls.LastPageButton, "up")
+		S:HandleEditBox(CustomSetsFrame.PagedContent.PagingControls.PageInput)
+	end
 end
 
 local function UpdateDressingRoom()
-	--Dropdown Menu
-	--BetterWardrobeOutfitFrame:StripTextures()
-	--BetterWardrobeOutfitFrame:CreateBackdrop('Transparent')
-
-	--DressingRoom
-	--BW_DressingRoomFrame:StripTextures()
-	--BW_DressingRoomFrame:CreateBackdrop('Transparent')
---	--S:HandleScrollBar(BetterWardrobeOutfitFrameScrollFrameScrollBar)
-
-
---	BetterWardrobeDressUpFrameDropDown:StripTextures()
-	--BetterWardrobeDressUpFrameDropDown:CreateBackdrop()
-	--BetterWardrobeOutfitDropDown:Set
---	S:HandleNextPrevButton(BetterWardrobeDressUpFrameDropDownButton)
-	--BetterWardrobeDressUpFrameDropDownButton:ClearAllPoints()
-	--BetterWardrobeDressUpFrameDropDownButton:SetPoint("RIGHT")
-	--BetterWardrobeOutfitDropDown.SaveButton:ClearAllPoints()
-	--BetterWardrobeOutfitDropDown.SaveButton:SetPoint("LEFT",BetterWardrobeOutfitDropDown, "RIGHT", 3, 0)
-
-
-	--S:HandleDropDownBox(BetterWardrobeDressUpFrameDropDown, 221)
-	--BetterWardrobeDressUpFrameDropDown:SetHeight(34)
-
-	--S:HandleButton(BetterWardrobeDressUpFrameDropDown.SaveButton)
-	--BetterWardrobeDressUpFrameDropDown.SaveButton:ClearAllPoints()
-	--BetterWardrobeDressUpFrameDropDown.SaveButton:SetPoint("LEFT", BetterWardrobeDressUpFrameDropDown, "RIGHT", 3, 0)
---[[
-	S:HandleButton(BW_DressingRoomFrame.BW_DressingRoomSettingsButton)
-	BW_DressingRoomFrame.BW_DressingRoomSettingsButton:SetSize(25,25)
-	BW_DressingRoomFrame.BW_DressingRoomSettingsButton:SetPoint("BOTTOMLEFT", 8, 31)
-
-	S:HandleButton(BW_DressingRoomFrame.BW_DressingRoomExportButton)
-	BW_DressingRoomFrame.BW_DressingRoomExportButton:SetSize(25,25)
-	BW_DressingRoomFrame.BW_DressingRoomExportButton:SetPoint("LEFT", BW_DressingRoomFrame.BW_DressingRoomSettingsButton, "RIGHT" )
-
-	S:HandleButton(BW_DressingRoomFrame.BW_DressingRoomTargetButton)
-	BW_DressingRoomFrame.BW_DressingRoomTargetButton:SetSize(25,25)
-
-	BW_DressingRoomFrame.BW_DressingRoomTargetButton:SetPoint("LEFT", BW_DressingRoomFrame.BW_DressingRoomExportButton, "RIGHT" )
-
-	S:HandleButton(BW_DressingRoomFrame.BW_DressingRoomPlayerButton)
-	BW_DressingRoomFrame.BW_DressingRoomPlayerButton:SetSize(25,25)
-	BW_DressingRoomFrame.BW_DressingRoomPlayerButton:SetPoint("LEFT", BW_DressingRoomFrame.BW_DressingRoomTargetButton, "RIGHT" )
-
-	S:HandleButton(BW_DressingRoomFrame.BW_DressingRoomGearButton)
-	BW_DressingRoomFrame.BW_DressingRoomGearButton:SetSize(25,25)
-	BW_DressingRoomFrame.BW_DressingRoomGearButton:SetPoint("LEFT", BW_DressingRoomFrame.BW_DressingRoomPlayerButton, "RIGHT" )
-
-	S:HandleButton(BW_DressingRoomFrame.BW_DressingRoomUndressButton)
-	BW_DressingRoomFrame.BW_DressingRoomUndressButton:SetSize(25,25)
-	BW_DressingRoomFrame.BW_DressingRoomUndressButton:SetPoint("LEFT", BW_DressingRoomFrame.BW_DressingRoomGearButton, "RIGHT" )
-
-	S:HandleButton(BW_DressingRoomFrame.BW_DressingRoomUndoButton)
-	BW_DressingRoomFrame.BW_DressingRoomUndoButton:SetSize(25,25)
-	BW_DressingRoomFrame.BW_DressingRoomUndoButton:SetPoint("LEFT", BW_DressingRoomFrame.BW_DressingRoomUndressButton, "RIGHT" )
-
-	--DressUpFrame.LinkButton:ClearAllPoints()
-	--DressUpFrame.LinkButton:SetSize(25,25)
-	--DressUpFrame.LinkButton:SetPoint("LEFT", BW_DressingRoomFrame.BW_DressingRoomUndressButton, "RIGHT" , 00)
-
-	--DressUpFrameOutfitDropDown:ClearAllPoints()
-	--DressUpFrameOutfitDropDown:SetSize(1,1)
-	--DressUpFrameOutfitDropDown:SetPoint("LEFT", UIParent, "LEFT", -1000,-1000)
-	--DressUpFrameOutfitDropDown:Hide()
-	--DressUpFrameOutfitDropDownButton:Hide()
-	--DressUpFrameOutfitDropDown.SaveButton:Hide()
-	--for index, button in pairs(BW_DressingRoomFrame.PreviewButtonFrame.Slots) do
-		--S:HandleItemButton(button)
-		--button.IconBorder:SetColorTexture(1, 1, 1, 0.1)
-	--end
-
-	S:HandleDropDownBox(_G.BW_DressingRoomFrameOutfitDropdown, 145)
-	S:HandleButton(_G.BW_DressingRoomFrameOutfitDropdown.SaveButton, nil, nil, nil, nil, nil, nil, nil, nil, nil, nil, true, 'right')
-
-	S:HandleButton(BW_DressingRoomFrame.BW_DressingRoomSwapFormButton)
-	BW_DressingRoomFrame.BW_DressingRoomSwapFormButton:SetSize(20,20)
-	BW_DressingRoomFrame.BW_DressingRoomSwapFormButton.Portrait:SetSize(20,20)
-]]--
---Need to redo
-	--[[hooksecurefunc(addon, 'DressingRoom_SetItemFrameQuality', function(_, itemFrame)
-				local icon = itemFrame.Icon
-				if not icon.backdrop then
-					icon:CreateBackdrop()
-					icon:SetTexCoord(unpack(E.TexCoords))
-					itemFrame.IconBorder:Hide()
-					local level = itemFrame:GetFrameLevel()
-					if icon then
-						itemFrame:SetFrameLevel(level +1)
-					end
-					icon.backdrop:SetFrameLevel(level + .5)
-				end
-
-				if itemFrame.itemLink then
-					--local quality = C_TransmogCollection.GetSourceInfo(itemFrame.sourceID).quality
-					local _, _, quality, _, _, _, _, _, _, texture = C_Item.GetItemInfo(itemFrame.itemLink)
-					local color = BAG_ITEM_QUALITY_COLORS[quality or 1]
-					icon.backdrop:SetBackdropBorderColor(color.r, color.g, color.b)
-				else
-					icon.backdrop:SetBackdropBorderColor(unpack(E.media.bordercolor))
-				end
-			end)]]--
-
-	-- Outfit Edit Frame
 	local BetterWardrobeOutfitEditFrame = _G.BetterWardrobeOutfitEditFrame
 	BetterWardrobeOutfitEditFrame:StripTextures()
 	BetterWardrobeOutfitEditFrame:CreateBackdrop('Transparent')
@@ -384,11 +224,46 @@ local function UpdateDressingRoom()
 	S:HandleButton(BetterWardrobeOutfitEditFrame.DeleteButton)
 end
 
+local function SkinAltAppearancePopout()
+	local f = _G.BW_AltAppearancePopout
+	if not f or f.ElvUISkinned then return end
+	f.ElvUISkinned = true
+
+	f:StripTextures()
+	f:SetTemplate('Transparent')
+	S:HandleCloseButton(f.CloseButton)
+	S:HandleScrollBar(f.ScrollFrame.ScrollBar)
+end
+hooksecurefunc(addon, 'ShowAltAppearancePopup', SkinAltAppearancePopout)
+
+local function SkinCharacterPickerPopout(f)
+	if not f or f.ElvUISkinned then return f end
+	f.ElvUISkinned = true
+
+	f:StripTextures()
+	f:SetTemplate('Transparent')
+	S:HandleEditBox(f.SearchBox)
+	S:HandleScrollBar(f.ScrollFrame.ScrollBar)
+	return f
+end
+local orig_CreateCharacterPickerPopout = addon.CreateCharacterPickerPopout
+addon.CreateCharacterPickerPopout = function(self, owner, config)
+	return SkinCharacterPickerPopout(orig_CreateCharacterPickerPopout(self, owner, config))
+end
+
+local function SkinColorFilterButtons()
+	if addon.ColorFilterButton then
+		S:HandleButton(addon.ColorFilterButton)
+		if addon.ColorFilterButton.revert then
+			S:HandleButton(addon.ColorFilterButton.revert)
+		end
+	end
+end
+hooksecurefunc(addon.Init, 'InitFilterButtons', SkinColorFilterButtons)
+
 addon.ElvUI_init = false
-local eventFrame
 local function applySkins()
 	if not (E.private.skins.blizzard.enable) then return end
-	if not E.private.skins.blizzard.enable then return end
 	if E.private.skins.blizzard.transmogrify then SkinTransmogFrames() end
 	if E.private.skins.blizzard.dressingroom then UpdateDressingRoom() end
 end
@@ -408,4 +283,3 @@ end
 
 S:AddCallbackForAddon('BetterWardrobe')
 E:RegisterModule(MyPlugin:GetName())  --Register the module with ElvUI. ElvUI will now call MyPlugin:Initialize() when ElvUI is ready to load our plugin.
---saddon:RegisterMessage("BW_ADDON_LOADED", function() C_Timer.After(5, applySkins) end)
