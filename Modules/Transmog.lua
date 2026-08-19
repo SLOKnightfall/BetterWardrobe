@@ -2224,7 +2224,7 @@ function TransmogWardrobeSetsMixin:InitClassDropdown()
 	end);
 
 	self.ClassDropdown:SetupMenu(function(_dropdown, rootDescription)
-		rootDescription:SetTag("MENU_TRANSMOG_VENDOR_SETS_CLASS");
+		rootDescription:SetTag("BW_MENU_TRANSMOG_VENDOR_SETS_CLASS");
 
 		local function IsClassSelected(classInfo)
 			return C_TransmogSets.GetTransmogSetsClassFilter() == classInfo.classID;
@@ -2304,7 +2304,7 @@ xpackCheckAll(true)
 
 function TransmogWardrobeSetsMixin:InitFilterButton()
 	self.FilterButton:SetupMenu(function(_dropdown, rootDescription)
-		rootDescription:SetTag("MENU_TRANSMOG_SETS_FILTER");
+		rootDescription:SetTag("BW_TRANSMOG_SETS_FILTER");
 
 		local function SetSetsFilter(filter)
 			C_TransmogSets.SetSetsFilter(filter, not C_TransmogSets.GetSetsFilter(filter));
@@ -2312,6 +2312,53 @@ function TransmogWardrobeSetsMixin:InitFilterButton()
 
 		rootDescription:CreateCheckbox(COLLECTED, C_TransmogSets.GetSetsFilter, SetSetsFilter, LE_TRANSMOG_SET_FILTER_COLLECTED);
 		rootDescription:CreateCheckbox(NOT_COLLECTED, C_TransmogSets.GetSetsFilter, SetSetsFilter, LE_TRANSMOG_SET_FILTER_UNCOLLECTED);
+		rootDescription:CreateDivider();
+
+		local cutoffSubmenu = rootDescription:CreateButton(L["Minimum Collected"]);
+		cutoffSubmenu:CreateRadio(L["Any"], function() return (addon.Profile.PartialLimit or 0) == 0 end,
+			function()
+				addon.Profile.PartialLimit = 0
+				self:RefreshCollectionEntries()
+			end,
+		0);
+		for index = 1, 9 do
+			cutoffSubmenu:CreateRadio(index, function() return index == addon.Profile.PartialLimit end,
+				function()
+					addon.Profile.PartialLimit = index
+					self:RefreshCollectionEntries()
+				end,
+			index);
+		end
+
+		rootDescription:CreateDivider();
+
+		local expansionSubmenu = rootDescription:CreateButton(L["Expansion"]);
+		expansionSubmenu:CreateButton(CHECK_ALL, function()
+			xpackCheckAll(true)
+			self:RefreshCollectionEntries()
+			return MenuResponse.Refresh;
+		end);
+
+		expansionSubmenu:CreateButton(UNCHECK_ALL, function()
+			xpackCheckAll(false)
+			self:RefreshCollectionEntries()
+			return MenuResponse.Refresh;
+		end);
+
+		expansionSubmenu:CreateDivider();
+
+		for index = 1, #EXPANSIONS do
+			expansionSubmenu:CreateCheckbox(EXPANSIONS[index],
+				function()
+					return xpacSelection[index]
+				end,
+				function()
+					xpacSelection[index] = not xpacSelection[index];
+					self:RefreshCollectionEntries()
+				end,
+			index);
+		end
+
 		rootDescription:CreateDivider();
 
 		local sortSubmenu = rootDescription:CreateButton(L["Sort By"]);
@@ -2325,6 +2372,7 @@ function TransmogWardrobeSetsMixin:InitFilterButton()
 		sortSubmenu:CreateRadio(L["Default"], IsSortModeSelected, SetSortMode, "Default");
 		sortSubmenu:CreateRadio(L["Alphabetic"], IsSortModeSelected, SetSortMode, "Alphabetic");
 		sortSubmenu:CreateRadio(L["Expansion"], IsSortModeSelected, SetSortMode, "Expansion");
+		sortSubmenu:CreateRadio(L["Collected Count"], IsSortModeSelected, SetSortMode, "CollectedCount");
 		sortSubmenu:CreateDivider();
 		sortSubmenu:CreateCheckbox(L["Reverse"], function() return addon.Profile.SetSortReverse; end, function()
 			addon.Profile.SetSortReverse = not addon.Profile.SetSortReverse;
@@ -2333,14 +2381,16 @@ function TransmogWardrobeSetsMixin:InitFilterButton()
 
 		rootDescription:CreateDivider();
 
-		rootDescription:CreateCheckbox(L["Show Hidden Items"], function() return addon.Profile.ShowHidden; end,
+		local optionsSubmenu = rootDescription:CreateButton(L["Options"]);
+
+		optionsSubmenu:CreateCheckbox(L["Show Hidden Items"], function() return addon.Profile.ShowHidden; end,
 			function()
 				addon.Profile.ShowHidden = not addon.Profile.ShowHidden;
 				self:RefreshCollectionEntries()
 			end,
 		1);
 
-		rootDescription:CreateCheckbox(L["Ignore Class Restriction Filter"], function() return addon.Profile.IgnoreClassRestrictions; end,
+		optionsSubmenu:CreateCheckbox(L["Ignore Class Restriction Filter"], function() return addon.Profile.IgnoreClassRestrictions; end,
 			function()
 				addon.Profile.IgnoreClassRestrictions = not addon.Profile.IgnoreClassRestrictions;
 				addon.Init:InitDB()
@@ -2349,59 +2399,20 @@ function TransmogWardrobeSetsMixin:InitFilterButton()
 			end,
 		1);
 
-		rootDescription:CreateCheckbox(L["Alternate Appearances"], function() return addon.Profile.ShowOnlyAltAppearanceSets; end,
+		optionsSubmenu:CreateCheckbox(L["Alternate Appearances"], function() return addon.Profile.ShowOnlyAltAppearanceSets; end,
 			function()
 				addon.Profile.ShowOnlyAltAppearanceSets = not addon.Profile.ShowOnlyAltAppearanceSets;
 				self:RefreshCollectionEntries()
 			end,
 		1);
 
-		rootDescription:CreateCheckbox(L["Show Alternate Appearance Icon"], function() return addon.Profile.ShowAltAppearanceIcon; end,
+		optionsSubmenu:CreateCheckbox(L["Show Alternate Appearance Icon"], function() return addon.Profile.ShowAltAppearanceIcon; end,
 			function()
 				addon.Profile.ShowAltAppearanceIcon = not addon.Profile.ShowAltAppearanceIcon;
 				self:RefreshCollectionEntries()
 			end,
 		1);
 
-		rootDescription:CreateDivider();
-
-		local tab = TransmogFrame.WardrobeCollection:GetTab()
-		--if tab == 5 then
-		if TransmogFrame.WardrobeCollection.TabContent.BW_ExtraSetsFrame and TransmogFrame.WardrobeCollection.TabContent.BW_ExtraSetsFrame:IsShown() then
-			--rootDescription:CreateCheckbox(TRANSMOG_SET_PVE, C_TransmogSets.GetSetsFilter, SetSetsFilter, LE_TRANSMOG_SET_FILTER_PVE);
-			--rootDescription:CreateCheckbox(TRANSMOG_SET_PVP, C_TransmogSets.GetSetsFilter, SetSetsFilter, LE_TRANSMOG_SET_FILTER_PVP);
-			--rootDescription:CreateDivider();
-		end
-
-		local submenu = rootDescription:CreateButton(L["Expansion"]);
-		submenu:CreateButton(CHECK_ALL, function()
-			xpackCheckAll(true)
-			self:RefreshCollectionEntries()
-			return MenuResponse.Refresh;
-		end);
-
-		submenu:CreateButton(UNCHECK_ALL, function()
-			xpackCheckAll(false)
-			self:RefreshCollectionEntries()
-			return MenuResponse.Refresh;
-		end);
-
-		submenu:CreateDivider();
-		
-		local numSources = #EXPANSIONS
-		for index = 1, numSources do
-			local filterIndex = index;
-			submenu:CreateCheckbox(EXPANSIONS[index],	
-				function()
-					return xpacSelection[index]
-				end,
-				function()
-					xpacSelection[index] = not xpacSelection[index];
-					self:RefreshCollectionEntries()
-
-				end,
-			index);
-		end
 	end);
 
 	self.FilterButton:SetIsDefaultCallback(function()
@@ -2457,11 +2468,12 @@ local function isValidFilter(data)
 	local hidden = (addon.Profile.ShowHidden and false) or ( not addon.Profile.ShowHidden and addon.HiddenAppearanceDB.profile[setType][data.setID])
 	local searhText = addon:SearchSets(data)
 	local altAppearanceOnly = not addon.Profile.ShowOnlyAltAppearanceSets or addon:SetHasAltAppearanceItem(data.sourceData and data.sourceData.primaryAppearances)
+	local meetsPartialLimit = (addon.Profile.PartialLimit or 0) == 0 or data.collected >= math.min(data.pieces or 0, addon.Profile.PartialLimit)
 	--if tab == 5 then
 		--return expansion and not hidden
 	--end
 
-	return expansion and (collected or uncollected) and searhText and not hidden and hasPieces and altAppearanceOnly
+	return expansion and (collected or uncollected) and searhText and not hidden and hasPieces and altAppearanceOnly and meetsPartialLimit
 end
 
 
@@ -3090,12 +3102,42 @@ end
 
 BW_DressingRoomButtonMixin = {}
 
+local function BW_ApplyAutoHiddenSlots()
+	if not addon.UseBetterWardrobeUI then return end
+
+	local profile = addon.setdb.profile.autoHideSlot
+
+	for i = 1, 19 do
+		if addon.Globals.EmptyArmor[i] and profile[i] then
+			local slotName = addon.Globals.INVENTORY_SLOT_NAMES[i]
+			local transmogLocation = slotName and TransmogUtil.GetTransmogLocation(slotName, Enum.TransmogType.Appearance, false)
+			if transmogLocation then
+				local slot, slotType = transmogLocation:GetSlot(), transmogLocation:GetType()
+				local outfitSlotInfo = C_TransmogOutfitInfo.GetViewedOutfitSlotInfo(slot, slotType, Enum.TransmogOutfitSlotOption.None)
+				if outfitSlotInfo and outfitSlotInfo.displayType ~= Enum.TransmogOutfitDisplayType.Hidden then
+					C_TransmogOutfitInfo.SetPendingTransmog(slot, slotType, Enum.TransmogOutfitSlotOption.None, Constants.Transmog.NoTransmogID, Enum.TransmogOutfitDisplayType.Hidden);
+				end
+			end
+		end
+	end
+end
+
+local BW_AutoHideSlotListener = CreateFrame("Frame")
+BW_AutoHideSlotListener:RegisterEvent("VIEWED_TRANSMOG_OUTFIT_CHANGED")
+BW_AutoHideSlotListener:RegisterEvent("VIEWED_TRANSMOG_OUTFIT_SLOT_REFRESH")
+BW_AutoHideSlotListener:SetScript("OnEvent", function()
+	C_Timer.After(0, BW_ApplyAutoHiddenSlots)
+end)
+
+hooksecurefunc(TransmogWardrobeItemsMixin, "SelectVisual", function()
+	C_Timer.After(0, BW_ApplyAutoHiddenSlots)
+end)
+
 --Creates the various buttons used on the Collection Journal
 function addon:CreateButtons()
 	--Load Queue Button
 	local BW_LoadQueueButton = CreateFrame("Button", "BW_LoadQueueButton", TransmogFrame.CharacterPreview, "BetterWardrobeButtonTemplate")
 	BW_LoadQueueButton.Icon:SetTexture("Interface\\Buttons\\UI-OptionsButton")
-	BW_LoadQueueButton:SetPoint("TOPLEFT", TransmogFrame.CharacterPreview.ToggleOptions.SheatheWeaponToggle, "BOTTOMLEFT", 0, -5)
 	BW_LoadQueueButton.buttonID = "Import"
 	BW_LoadQueueButton:SetScript("OnClick", function(self) BW_TransmogVendorExportButton_OnClick(self) end)
 	--BW_LoadQueueButton:SetScript("OnEnter",  function(self) BW_DressingRoomButtonMixin:OnEnter(self) end)
@@ -3109,7 +3151,6 @@ function addon:CreateButtons()
 	BW_LoadQueueButton.Icon:SetSize(16, 16)
 	--frameLevel 100 so CharacterPreview's ModelScene doesn't eat clicks meant for this button.
 	BW_LoadQueueButton:SetFrameLevel(100)
-	BW_LoadQueueButton:Hide()
 
 	--Randomize Button, Mixin defined in Randomizer.lua
 	local BW_RandomizeButton = CreateFrame("Button", "BW_RandomizeButton", TransmogFrame.CharacterPreview, "BetterWardrobeButtonTemplate")
@@ -3137,9 +3178,10 @@ function addon:CreateButtons()
 	BW_SlotHideButton.Icon:SetSize(16, 16)
 	--Mixin(BW_SlotHideButton, BW_SlotHideButtonMixin)
 	BW_SlotHideButton:SetPoint("TOPLEFT", BW_RandomizeButton, "TOPRIGHT" , 0, 0)
-	BW_SlotHideButton:SetScript("OnClick", function(self) UI:HideSlotMenu_OnClick(self) end)
+	BW_SlotHideButton:SetScript("OnClick", function(self) BW_JournalHideSlotMenu_OnClick(self) end)
 	BW_SlotHideButton:SetFrameLevel(100)
-	BW_SlotHideButton:Hide()
+
+	BW_LoadQueueButton:SetPoint("TOPLEFT", BW_SlotHideButton, "TOPRIGHT", 0, 0)
 
 	--BW_SlotHideButton:SetScript("OnMouseUp", BW_SlotHideButton.OnMouseUp)
 	--BW_SlotHideButton:SetScript("OnMouseDown", BW_SlotHideButton.OnMouseDown)

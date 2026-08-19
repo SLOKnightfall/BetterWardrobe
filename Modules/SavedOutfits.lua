@@ -258,7 +258,7 @@ function BetterWardrobeOutfitDropdownMixin:InitOutfitDropdown()
 	end
 
 	self:SetupMenu(function(dropdown, rootDescription)
-		rootDescription:SetTag("MENU_WARDROBE_OUTFITS");
+		rootDescription:SetTag("BW_MENU_WARDROBE_OUTFITS");
 
 		local extent = 20;
 		local maxCharacters = 8;

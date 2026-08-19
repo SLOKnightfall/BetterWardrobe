@@ -30,6 +30,8 @@ local playerNme
 local realmName
 local playerClass, classID,_
 local L = LibStub("AceLocale-3.0"):GetLocale(addonName)
+local BW_VENDOR_UI_ICON = "Interface\\GossipFrame\\transmogrifyGossipIcon"
+local BW_DEFAULT_UI_ICON = "Interface\\Buttons\\UI-RefreshButton"
 local GetItemInfoInstant = C_Item and C_Item.GetItemInfoInstant
 
 --ACE3 Option Handlers
@@ -1011,7 +1013,7 @@ end
 local defaults = {
 	profile = {
 		['*'] = true,
-		PartialLimit = 4,
+		PartialLimit = 0,
 		ShowHidden = false,
 		TSM_Market = "DBMarket",
 		DR_HideBackground = false,
@@ -1353,14 +1355,6 @@ function addon:ApplyJournalUIMode()
 	end
 end
 
-function addon:ApplyVendorUIMode()
-	local w = TransmogFrame.WardrobeCollection
-	local useBetter = addon.UseBetterWardrobeUI
-	w.TabHeaders:SetTabShown(w.setsTabID, not useBetter)
-	w.TabHeaders:SetTabShown(w.TabHeaders.setsFrame2TabID, useBetter)
-	w.TabHeaders:SetTabShown(w.TabHeaders.extrasetsTabID, useBetter)
-end
-
 --Loads various modules and builds frames once the Blizzard_Collection addon is loaded
 function addon.Init:LoadModules()
 	--Check to make sure that the addon has completed loading
@@ -1392,10 +1386,11 @@ function addon.Init:LoadModules()
 		addon.UseBetterWardrobeUI = not addon.UseBetterWardrobeUI
 		addon:ApplyJournalUIMode()
 		if addon.UseBetterWardrobeUI then
-			local tab = BetterWardrobeCollectionFrame.selectedCollectionTab
 			BetterWardrobeCollectionFrame:SetTab(3)
 			BetterWardrobeCollectionFrame:SetTab(2)
-			BetterWardrobeCollectionFrame:SetTab(tab)
+			BetterWardrobeCollectionFrame:SetTab(1)
+		else
+			WardrobeCollectionFrame:SetTab(1)
 		end
 	end)
 	uiToggleButton:SetScript("OnEnter", function(self)
@@ -1440,6 +1435,8 @@ function addon.Init:LoadModules()
 		----addon:InitExtendedSetsSwap()
 
 		addon:ApplyJournalUIMode()
+
+		if addon.SuppressLuckysWardrobeConflictWarning then addon:SuppressLuckysWardrobeConflictWarning() end
 
 		if C_AddOns.IsAddOnLoaded("ElvUI") then addon.ApplyElvUISkin() end
 
@@ -1547,9 +1544,14 @@ local function BW_RefreshVendorItemsList(itemsFrame)
 		return source1.sourceID > source2.sourceID
 	end, addon.Profile.ItemSortReverse)
 
+	local colorTarget = addon.VendorColorTarget
+	local colorTable = colorTarget and addon:GetColorTable()
+
 	local collectionElements = {}
 	for _, itemEntry in ipairs(entries) do
-		if (itemEntry.isUsable and itemEntry.isCollected) or itemEntry.alwaysShowItem then
+		local passesColor = not colorTarget or itemEntry.isHideVisual
+			or addon:VisualMatchesColorLab(itemEntry.visualID, colorTable, colorTarget[1], colorTarget[2], colorTarget[3])
+		if ((itemEntry.isUsable and itemEntry.isCollected) or itemEntry.alwaysShowItem) and passesColor then
 			table.insert(collectionElements, {
 				templateKey = "COLLECTION_ITEM",
 				appearanceInfo = itemEntry,
@@ -1562,6 +1564,151 @@ local function BW_RefreshVendorItemsList(itemsFrame)
 
 	local dataProvider = CreateDataProvider({{elements = collectionElements}})
 	itemsFrame.PagedContent:SetDataProvider(dataProvider, true)
+end
+
+local function ResetVendorColorFilter()
+	ColorPickerFrame:Hide()
+	addon.VendorColorTarget = nil
+	if addon.VendorColorFilterButton then
+		addon.VendorColorFilterButton.colorSwatch:Hide()
+		addon.VendorColorFilterButton.revert:Hide()
+	end
+
+	local itemsFrame = TransmogFrame.WardrobeCollection.TabContent.ItemsFrame
+	if itemsFrame:IsShown() then
+		BW_RefreshVendorItemsList(itemsFrame)
+	end
+end
+
+local function SelectVendorColor(itemsFrame)
+	ColorPickerFrame.hasOpacity = false
+	if not ColorPickerFrame then return end
+
+	local function ColorPickerCallback()
+		if not ColorPickerFrame then return end
+
+		local R2, G2, B2 = ColorPickerFrame:GetColorRGB()
+		ColorPickerFrame.previousValues = {R2, G2, B2, 1}
+
+		addon.VendorColorFilterButton.colorSwatch:Show()
+		addon.VendorColorFilterButton.colorSwatch:SetVertexColor(R2, G2, B2, 1)
+		addon.VendorColorFilterButton.revert:Show()
+
+		local labA, labB, labC = addon:ConvertRGB_to_LAB(R2 * 255, G2 * 255, B2 * 255)
+		addon.VendorColorTarget = {labA, labB, labC}
+		BW_RefreshVendorItemsList(itemsFrame)
+	end
+
+	ColorPickerFrame.swatchFunc = ColorPickerCallback
+	ColorPickerFrame.cancelFunc = ResetVendorColorFilter
+	ColorPickerFrame:ClearAllPoints()
+	ColorPickerFrame:SetPoint("TOPLEFT", TransmogFrame, "TOPRIGHT", 6, -8)
+	ColorPickerFrame:Show()
+	ColorPickerFrame.Content.ColorSwatchOriginal:Hide()
+end
+
+function addon:CreateVendorColorFilterButton(itemsFrame)
+	if addon.VendorColorFilterFrame then
+		return addon.VendorColorFilterFrame
+	end
+
+	local equippedButton = itemsFrame.DisplayTypes and itemsFrame.DisplayTypes.DisplayTypeEquippedButton
+
+	local frame = CreateFrame("Button", nil, itemsFrame)
+	if equippedButton then
+		frame:SetPoint("LEFT", equippedButton, "RIGHT", 16, 0)
+	else
+		frame:SetPoint("RIGHT", itemsFrame.BW_FilterButton or itemsFrame.FilterButton, "LEFT", -8, 0)
+	end
+	frame:SetSize(25, 25)
+	frame:SetScript("OnHide", ResetVendorColorFilter)
+	addon.VendorColorFilterFrame = frame
+
+	local btn = CreateFrame("Button", nil, frame)
+	btn:SetWidth(13)
+	btn:SetHeight(13)
+	btn:SetPoint("CENTER")
+	btn:SetScript("OnClick", function() SelectVendorColor(itemsFrame) end)
+	btn:SetScript("OnEnter", function(self)
+		GameTooltip:SetOwner(self, "ANCHOR_RIGHT")
+		GameTooltip:AddLine(L["Select color"])
+		GameTooltip:Show()
+	end)
+	btn:SetScript("OnLeave", GameTooltip_Hide)
+	addon.VendorColorFilterButton = btn
+
+	local colorSwatch = btn:CreateTexture(nil, "OVERLAY")
+	colorSwatch:SetWidth(13)
+	colorSwatch:SetHeight(13)
+	colorSwatch:SetTexture(130939) -- Interface\\ChatFrame\\ChatFrameColorSwatch
+	colorSwatch:SetPoint("CENTER")
+	colorSwatch:Hide()
+	btn.colorSwatch = colorSwatch
+
+	local checkers = btn:CreateTexture(nil, "BACKGROUND")
+	checkers:SetWidth(13)
+	checkers:SetHeight(13)
+	checkers:SetTexture(188523) -- Tileset\\Generic\\Checkers
+	checkers:SetTexCoord(.25, 0, 0.5, .25)
+	checkers:SetDesaturated(true)
+	checkers:SetVertexColor(1, 1, 1, 0.75)
+	checkers:SetPoint("CENTER", colorSwatch)
+
+	local border = frame:CreateTexture(nil, "OVERLAY")
+	border:SetTexture([[Interface\CastingBar\UI-CastingBar-Arena-Shield]])
+	border:SetSize(43, 43)
+	border:SetPoint("LEFT", -1, -1)
+
+	local revert = CreateFrame("Button", nil, frame)
+	revert:SetPoint("CENTER", 16, 15)
+	revert:SetWidth(20)
+	revert:SetHeight(20)
+	revert:Hide()
+	revert:SetScript("OnClick", ResetVendorColorFilter)
+	revert:SetScript("OnEnter", function(self)
+		GameTooltip:SetOwner(self, "ANCHOR_RIGHT")
+		GameTooltip:AddLine(L["Reset"])
+		GameTooltip:Show()
+	end)
+	revert:SetScript("OnLeave", GameTooltip_Hide)
+	btn.revert = revert
+
+	local revertTexture = revert:CreateTexture(nil, "OVERLAY")
+	revertTexture:SetAtlas("transmog-icon-revert-small")
+	revertTexture:SetAllPoints()
+
+	return frame
+end
+
+function addon:ApplyVendorUIMode()
+	local w = TransmogFrame.WardrobeCollection
+	local useBetter = addon.UseBetterWardrobeUI
+	w.TabHeaders:SetTabShown(w.setsTabID, not useBetter)
+	w.TabHeaders:SetTabShown(w.TabHeaders.setsFrame2TabID, useBetter)
+	w.TabHeaders:SetTabShown(w.TabHeaders.extrasetsTabID, useBetter)
+
+	if addon.VendorUIToggleButton then
+		local icon = useBetter and BW_VENDOR_UI_ICON or BW_DEFAULT_UI_ICON
+		addon.VendorUIToggleButton:SetNormalTexture(icon)
+		addon.VendorUIToggleButton:SetHighlightTexture(icon, "ADD")
+		for _, tex in ipairs({addon.VendorUIToggleButton:GetNormalTexture(), addon.VendorUIToggleButton:GetHighlightTexture()}) do
+			tex:ClearAllPoints()
+			tex:SetPoint("CENTER")
+			tex:SetSize(22, 22)
+		end
+	end
+
+	if addon.VendorColorFilterFrame then
+		addon.VendorColorFilterFrame:SetShown(useBetter)
+		if not useBetter and addon.VendorColorTarget then
+			ResetVendorColorFilter()
+		end
+	end
+
+	if addon.ApplyLuckysWardrobeVendorUI then
+		addon:ApplyLuckysWardrobeVendorUI(useBetter)
+		C_Timer.After(0.3, function() addon:ApplyLuckysWardrobeVendorUI(addon.UseBetterWardrobeUI) end)
+	end
 end
 
 function addon:CreateVendorItemsFilterButton(itemsFrame)
@@ -1702,6 +1849,7 @@ function addon:EventHandler(event, ...)
 				end);
 
 				xpcall(addon.CreateVendorItemsFilterButton, geterrorhandler(), addon, TransmogFrame.WardrobeCollection.TabContent.ItemsFrame)
+				xpcall(addon.CreateVendorColorFilterButton, geterrorhandler(), addon, TransmogFrame.WardrobeCollection.TabContent.ItemsFrame)
 
 				 self:SecureHookScript(TransmogFrame, "OnShow", function() C_Timer.After(.1, function() addon:UpdateTabs(); end) end)
 				addon:CreateButtons()
@@ -1710,8 +1858,8 @@ function addon:EventHandler(event, ...)
 				vendorUIToggleButton:SetFrameLevel(TransmogFrameCloseButton:GetFrameLevel() + 1)
 				vendorUIToggleButton:SetPoint("RIGHT", TransmogFrameCloseButton, "LEFT", -4, 0)
 				vendorUIToggleButton:SetSize(14, 14)
-				vendorUIToggleButton:SetNormalTexture("Interface\\GossipFrame\\transmogrifyGossipIcon")
-				vendorUIToggleButton:SetHighlightTexture("Interface\\GossipFrame\\transmogrifyGossipIcon", "ADD")
+				vendorUIToggleButton:SetNormalTexture(BW_VENDOR_UI_ICON)
+				vendorUIToggleButton:SetHighlightTexture(BW_VENDOR_UI_ICON, "ADD")
 				for _, tex in ipairs({vendorUIToggleButton:GetNormalTexture(), vendorUIToggleButton:GetHighlightTexture()}) do
 					tex:ClearAllPoints()
 					tex:SetPoint("CENTER")
@@ -1720,6 +1868,7 @@ function addon:EventHandler(event, ...)
 				vendorUIToggleButton:SetScript("OnClick", function()
 					addon.UseBetterWardrobeUI = not addon.UseBetterWardrobeUI
 					addon:ApplyVendorUIMode()
+					TransmogFrame.WardrobeCollection:SetTab(TransmogFrame.WardrobeCollection.itemsTabID)
 				end)
 				vendorUIToggleButton:SetScript("OnEnter", function(self)
 					GameTooltip:SetOwner(self, "ANCHOR_RIGHT")

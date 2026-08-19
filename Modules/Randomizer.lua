@@ -133,6 +133,7 @@ local function GetDefaultWeaponOption(slot)
 	end
 	return Enum.TransmogOutfitSlotOption.None
 end
+addon.GetDefaultWeaponOption = GetDefaultWeaponOption
 
 
 local function AddWeaponSlotAppearances(slotID, transmogLocation, slot, weaponOption)

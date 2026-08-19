@@ -403,7 +403,7 @@ function WardrobeCollectionFrameMixin:InitItemsFilterButton()
 	end
 
 	self.FilterButton:SetupMenu(function(dropdown, rootDescription)
-		rootDescription:SetTag("MENU_WARDROBE_FILTER");
+		rootDescription:SetTag("BW_MENU_WARDROBE_FILTER");
 
 		rootDescription:CreateCheckbox(COLLECTED, C_TransmogCollection.GetCollectedShown, function()
 			C_TransmogCollection.SetCollectedShown(not C_TransmogCollection.GetCollectedShown());
@@ -488,7 +488,7 @@ function WardrobeCollectionFrameMixin:InitBaseSetsFilterButton()
 	end);
 
 	self.FilterButton:SetupMenu(function(dropdown, rootDescription)
-		rootDescription:SetTag("MENU_WARDROBE_BASE_SETS_FILTER");
+		rootDescription:SetTag("BW_MENU_WARDROBE_BASE_SETS_FILTER");
 
 	local function GetBaseSetsFilter(filter)
 		C_TransmogSets.SetBaseSetsFilter(filter, not C_TransmogSets.GetBaseSetsFilter(filter));
@@ -575,6 +575,21 @@ function WardrobeCollectionFrameMixin:InitBaseSetsFilterButton()
 
 		rootDescription:CreateCheckbox(COLLECTED, C_TransmogSets.GetBaseSetsFilter, GetBaseSetsFilter, LE_TRANSMOG_SET_FILTER_COLLECTED);
 		rootDescription:CreateCheckbox(NOT_COLLECTED, C_TransmogSets.GetBaseSetsFilter, GetBaseSetsFilter, LE_TRANSMOG_SET_FILTER_UNCOLLECTED);
+
+		rootDescription:CreateCheckbox(L["Hide Missing Set Pieces at Transmog Vendor"],
+			function() return addon.Profile.HideMissing; end,
+			function()
+				addon.Profile.HideMissing = not addon.Profile.HideMissing;
+				RefreshLists();
+			end);
+
+		rootDescription:CreateCheckbox(L["Show Collected Count"],
+			function() return addon.Profile.ShowSetCount; end,
+			function()
+				addon.Profile.ShowSetCount = not addon.Profile.ShowSetCount;
+				RefreshLists();
+			end);
+
 		rootDescription:CreateDivider();
 
 
@@ -1594,7 +1609,7 @@ function WardrobeItemsCollectionMixin:UpdateWeaponDropdown()
 
 	local transmogLocation = self.transmogLocation;
 	self.WeaponDropdown:SetupMenu(function(_dropdown, rootDescription)
-		rootDescription:SetTag("MENU_WARDROBE_WEAPONS_FILTER");
+		rootDescription:SetTag("BW_MENU_WARDROBE_WEAPONS_FILTER");
 
 		local isForMainHand = transmogLocation:IsMainHand();
 		local isForOffHand = transmogLocation:IsOffHand();
@@ -2443,7 +2458,7 @@ function WardrobeItemModelMixin:OnMouseUp(button)
 		end
 
 		MenuUtil.CreateContextMenu(self, function(owner, rootDescription)
-			rootDescription:SetTag("MENU_WARDROBE_ITEMS_MODEL_FILTER");
+			rootDescription:SetTag("BW_MENU_WARDROBE_ITEMS_MODEL_FILTER");
 
 			local appearanceID = self.visualInfo.visualID;
 			local favorite = C_TransmogCollection.GetIsAppearanceFavorite(appearanceID);
@@ -2771,7 +2786,7 @@ function WardrobeCollectionClassDropdownMixin:Refresh()
 	end
 
 	self:SetupMenu(function(dropdown, rootDescription)
-		rootDescription:SetTag("MENU_WARDROBE_CLASS");
+		rootDescription:SetTag("BW_MENU_WARDROBE_CLASS");
 
 		local function IsClassFilterSet(classInfo)
 			if addon.Profile.IgnoreClassRestrictions and addon.GetTab() ~= 1 then

@@ -57,6 +57,11 @@
 					</Anchors>
 					<Color r="0.329" g="0.329" b="0.329"/>
 				</FontString>
+				<FontString parentKey="CollectedCount" inherits="GameFontDisableSmallLeft" justifyH="RIGHT" maxLines="1" hidden="true">
+					<Anchors>
+						<Anchor point="BOTTOMRIGHT" x="-6" y="4"/>
+					</Anchors>
+				</FontString>
 				<Texture parentKey="ProgressBar">
 					<Size x="204" y="2"/>
 					<Anchors>

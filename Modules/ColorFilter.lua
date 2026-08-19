@@ -119,12 +119,36 @@ function addon:CompareLAB(R1, G1, B1, R2, G2, B2)
 	end
 end
 
-local function SelectColor()
+function addon:GetColorTable()
 	if not C_AddOns.IsAddOnLoaded("BetterWardrobe_SourceData") then
 		C_AddOns.EnableAddOn("BetterWardrobe_SourceData")
 		C_AddOns.LoadAddOn("BetterWardrobe_SourceData")
 	end
-	local ColorTable = (_G.BetterWardrobeData and _G.BetterWardrobeData.ColorTable) or {}
+	return (_G.BetterWardrobeData and _G.BetterWardrobeData.ColorTable) or {}
+end
+
+function addon:VisualMatchesColorLab(visualID, colorTable, labA, labB, labC)
+	local item_colors = colorTable[visualID]
+	if not item_colors then return false end
+
+	local _, colors = addon:Deserialize(item_colors)
+	for i = 1, #colors, 3 do
+		local R = colors[2][i + 0]
+		local G = colors[2][i + 1]
+		local B = colors[2][i + 2]
+
+		if R and G and B then
+			local colorDifferece = addon:CompareLAB(labA, labB, labC, addon:ConvertRGB_to_LAB(R, G, B))
+			if colorDifferece <= 17 then
+				return true
+			end
+		end
+	end
+	return false
+end
+
+local function SelectColor()
+	local ColorTable = addon:GetColorTable()
 	ColorPickerFrame.hasOpacity = false
 	if not ColorPickerFrame then return end
 
@@ -150,26 +174,7 @@ local function SelectColor()
 
 		local labA, labB, labC = addon:ConvertRGB_to_LAB(R2, G2, B2)
 		for i = #transmogAppearances, 1, -1 do
-			local item_colors = ColorTable[transmogAppearances[i].visualID]
-			local colorMatch
-			if item_colors then
-				local _, colors = addon:Deserialize(item_colors)
-				for i = 1, #colors, 3 do
-					local R = colors[2][i + 0]
-					local G = colors[2][i + 1]
-					local B = colors[2][i + 2]
-
-					if R and G and B then
-						local colorDifferece = addon:CompareLAB(labA, labB, labC, addon:ConvertRGB_to_LAB(R, G, B))
-						
-						if colorDifferece <= 17 then
-							colorMatch = true
-						end
-					end
-				end
-			end
-
-			if not colorMatch then
+			if not addon:VisualMatchesColorLab(transmogAppearances[i].visualID, ColorTable, labA, labB, labC) then
 				tremove(transmogAppearances, i)
 			end
 		end

@@ -170,7 +170,7 @@ function WardrobeSetsCollectionMixin:OnShow()
 		end
 	end
 	self.DetailsFrame.VariantSetsDropdown:SetupMenu(function(dropdown, rootDescription)
-		rootDescription:SetTag("MENU_WARDROBE_VARIANT_SETS");
+		rootDescription:SetTag("BW_MENU_WARDROBE_VARIANT_SETS");
 
 		local selectedSetID = self:GetSelectedSetID();
 		-- If the player has all sets filtered out, there is a chance for this to be nil
@@ -511,8 +511,9 @@ function WardrobeSetsCollectionMixin:DisplaySet(setID)
 		local invType = sortedSources[i].invType - 1;
 
 		if invType  == 20 then invType = 5 end
-		if not addon.setdb.profile.autoHideSlot.toggle or ( addon.setdb.profile.autoHideSlot.toggle and not addon.setdb.profile.autoHideSlot[invType]) then
-			if itemFrame.AltItem.useAlt then 
+		if (not addon.setdb.profile.autoHideSlot.toggle or ( addon.setdb.profile.autoHideSlot.toggle and not addon.setdb.profile.autoHideSlot[invType]))
+			and (not addon.Profile.HideMissing or sortedSources[i].collected) then
+			if itemFrame.AltItem.useAlt then
 				self.Model:TryOn(itemFrame.AltItem.altid[itemFrame.AltItem.index]);
 			else
 				self.Model:TryOn(sortedSources[i].sourceID);
@@ -952,6 +953,11 @@ function WardrobeSetsScrollFrameButtonMixin:Init(elementData)
 	topSourcesCollected = topSourcesCollected or 0
 	topSourcesTotal = topSourcesTotal or 0
 
+	self.CollectedCount:SetShown(addon.Profile.ShowSetCount);
+	if addon.Profile.ShowSetCount then
+		self.CollectedCount:SetText(topSourcesCollected.."/"..topSourcesTotal);
+	end
+
 	local setCollected = displayData.collected or topSourcesCollected == topSourcesTotal;
 	local color = IN_PROGRESS_FONT_COLOR;
 	if ( setCollected ) then
@@ -1139,7 +1145,7 @@ function WardrobeSetsScrollFrameButtonMixin:OnClick(buttonName, down)
 			--addon:DebugData(self.setID)
 		elseif ( buttonName == "RightButton" ) then
 			MenuUtil.CreateContextMenu(self, function(owner, rootDescription)
-				rootDescription:SetTag("MENU_WARDROBE_SETS_SET");
+				rootDescription:SetTag("BW_MENU_WARDROBE_SETS_SET");
 
 				local baseSetID = self.setID;
 				local baseSet = SetsDataProvider:GetBaseSetByID(baseSetID);
@@ -1565,7 +1571,7 @@ function WardrobeSetsDetailsItemMixin:OnMouseUp(button)
 		end
 
 		MenuUtil.CreateContextMenu(self, function(owner, rootDescription)
-			rootDescription:SetTag("MENU_WARDROBE_SETS_SET_DETAIL");
+			rootDescription:SetTag("BW_MENU_WARDROBE_SETS_SET_DETAIL");
 
 			local appearanceID = self.visualID;
 			local favorite = C_TransmogCollection.GetIsAppearanceFavorite(appearanceID);

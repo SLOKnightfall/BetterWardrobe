@@ -305,7 +305,7 @@ local MogItKey
 
 local function GeneratorFunction(owner, rootDescription)
 	rootDescription:CreateTitle("Collection Lists");
-			rootDescription:SetTag("MENU_COLLECTION_LIST");
+			rootDescription:SetTag("BW_MENU_COLLECTION_LIST");
 
 		local list = addon.collectionListDB.profile.lists
 		for index, data in pairs(list) do

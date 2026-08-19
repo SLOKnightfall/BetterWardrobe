@@ -125,7 +125,46 @@ local function ImportItem(importString)
 end
 
 
+local function ParseImportItemString(importString)
+	if not importString or importString == "" then return nil end
+
+	local itemID = importString:match("item:(%d+)")
+		or importString:match("[Ii]tem=(%d+)")
+		or importString:match("^%s*(%d+)%s*$")
+	if not itemID then return nil end
+
+	local bonusString = importString:match("item:%d+:%d*:%d*:%d*:%d*:%d*:%d*:%d*:%d*:%d*:%d*:%d+:([%d:]+)")
+		or importString:match("bonus=([%d:]+)")
+
+	local bonusIDs = {}
+	if bonusString then
+		for id in bonusString:gmatch("%d+") do
+			table.insert(bonusIDs, id)
+		end
+	end
+
+	if #bonusIDs > 0 then
+		return ("item:%s:%s%d:%s"):format(itemID, string.rep(":", 10), #bonusIDs, table.concat(bonusIDs, ":"))
+	end
+	return ("item:%s"):format(itemID)
+end
+
 local function ImportItemTransMogVendor(importString)
+	local itemString = ParseImportItemString(importString)
+	if not itemString then return end
+
+	local _appearanceID, sourceID = C_TransmogCollection.GetItemInfo(itemString)
+	local transmogLocation = addon.GetTransmogLocation(itemString)
+	if not sourceID or not transmogLocation then return end
+
+	local displayType = Enum.TransmogOutfitDisplayType.Assigned
+	if C_TransmogCollection.IsAppearanceHiddenVisual(sourceID) then
+		displayType = Enum.TransmogOutfitDisplayType.Hidden
+	end
+
+	local slot = transmogLocation:GetSlot()
+	local weaponOption = C_TransmogOutfitInfo.IsSlotWeaponSlot(slot) and addon.GetDefaultWeaponOption(slot) or Enum.TransmogOutfitSlotOption.None
+	C_TransmogOutfitInfo.SetPendingTransmog(slot, transmogLocation:GetType(), weaponOption, sourceID, displayType);
 end
 
 StaticPopupDialogs["BETTER_WARDROBE_IMPORT_ITEM_POPUP"] = {
@@ -139,7 +178,7 @@ StaticPopupDialogs["BETTER_WARDROBE_IMPORT_ITEM_POPUP"] = {
 	OnShow = function() if LISTWINDOW then LISTWINDOW:Hide() end end,
 	OnAccept = function(dialog, data)
 		if addon.importFrom == "Transmog" then
-			ImportItemTransMogVendor(dialog:GetEditBox():GetText())
+			xpcall(ImportItemTransMogVendor, geterrorhandler(), dialog:GetEditBox():GetText())
 		else
 			ImportItem(dialog:GetEditBox():GetText());
 		end
@@ -228,20 +267,34 @@ function addon:ExportTransmogVendorSet()
 	Export(str, false)
 end
 
-function IE.ImportTransmogVendorSet(importString)
-	local transmogSources = {}
-	importString = string.gsub(importString,"/outfit v1", "")
-	for item in importString:gmatch("[(%-?%d+)]+") do
-		table.insert(transmogSources, item)
+local function ApplyImportedSlot(slotID, sourceID)
+	local slotName = addon.Globals.INVENTORY_SLOT_NAMES[slotID]
+	local transmogLocation = slotName and TransmogUtil.GetTransmogLocation(slotName, Enum.TransmogType.Appearance, false)
+	if not transmogLocation then
+		return
 	end
 
-	for _,sourceID in ipairs(transmogSources) do
-		local sourceInfo = C_TransmogCollection.GetSourceInfo(sourceID)
-		if sourceInfo then
-			local slot = C_Transmog.GetSlotForInventoryType(sourceInfo.invType);
-			local pendingInfo = TransmogUtil.CreateTransmogPendingInfo(Enum.TransmogPendingType.Apply, sourceID);
-			local transmogLocation = TransmogUtil.CreateTransmogLocation(slot, Enum.TransmogType.Appearance, false);
-			C_Transmog.SetPending(transmogLocation, pendingInfo);
+	local displayType = Enum.TransmogOutfitDisplayType.Assigned
+	if C_TransmogCollection.IsAppearanceHiddenVisual(sourceID) then
+		displayType = Enum.TransmogOutfitDisplayType.Hidden
+	end
+
+	local slot = transmogLocation:GetSlot()
+	local weaponOption = C_TransmogOutfitInfo.IsSlotWeaponSlot(slot) and addon.GetDefaultWeaponOption(slot) or Enum.TransmogOutfitSlotOption.None
+	C_TransmogOutfitInfo.SetPendingTransmog(slot, transmogLocation:GetType(), weaponOption, sourceID, displayType);
+end
+
+function IE.ImportTransmogVendorSet(importString)
+	local msg = importString:gsub("^/customset%s+", "")
+	local itemTransmogInfoList = TransmogUtil.ParseCustomSetSlashCommand(msg)
+	if not itemTransmogInfoList then
+		return
+	end
+
+	for _, slotID in ipairs(TransmogSlotOrder) do
+		local info = itemTransmogInfoList[slotID]
+		if info and info.appearanceID and info.appearanceID ~= Constants.Transmog.NoTransmogID then
+			xpcall(ApplyImportedSlot, geterrorhandler(), slotID, info.appearanceID)
 		end
 	end
 end
@@ -270,26 +323,13 @@ end
 
 
 function addon:CreateChatLinkTransmogVendor()
-	local string = [[/run local function f(i,b)DressUpItemLink("item:"..i.."::::::::::::9:"..b);end;]]
-
-	for _, transmogSlot in pairs(TRANSMOG_SLOTS) do
-		local location = transmogSlot.location
-
-		if location and location:IsAppearance() then
-			local sourceID = GetVendorSourceID(location)
-
-			if sourceID then
-				local itemID, itemModID = GetSourceItemData(sourceID)
-
-				if itemID then
-					string = string .. linkText:format(itemID, itemModID)
-				end
-			end
-		end
+	local itemTransmogInfoList = TransmogFrame.CharacterPreview:GetItemTransmogInfoList()
+	if not itemTransmogInfoList then
+		return
 	end
 
-	print(string)
-	Export(string, false)
+	local slashCommand = TransmogUtil.CreateCustomSetSlashCommand(itemTransmogInfoList)
+	Export(slashCommand, false)
 end
 
 
@@ -298,10 +338,12 @@ function BW_TransmogVendorExportButton_OnClick(self)
 		rootDescription:CreateTitle(L["Import/Export Options"]);
 
 		rootDescription:CreateButton(L["Import Item"], function()
+			addon.importFrom = "Transmog"
 			BetterWardrobeOutfitManager:ShowPopup("BETTER_WARDROBE_IMPORT_ITEM_POPUP")
 		end);
 
 		rootDescription:CreateButton(L["Import Set"], function()
+			addon.importFrom = "tmog"
 			BetterWardrobeOutfitManager:ShowPopup("BETTER_WARDROBE_IMPORT_SET_POPUP")
 		end);
 

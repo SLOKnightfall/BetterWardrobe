@@ -518,7 +518,7 @@ function BW_DressingRoomFrameMixin:OnLoad()
 		overlay:Show()
 		overlay:SetScript("OnClick", function(self)
 			MenuUtil.CreateContextMenu(self, function(dropdown, rootDescription)
-				rootDescription:SetTag("MENU_DRESS_UP_MODEL");
+				rootDescription:SetTag("BW_MENU_DRESS_UP_MODEL");
 
 				local playerActor = DressUpFrame.ModelScene:GetPlayerActor();
 				local itemTransmogInfoList = playerActor and playerActor:GetItemTransmogInfoList();
@@ -663,7 +663,7 @@ local function BW_DressingRoomImportButton_OnClick(self)
 	
 		if  C_Transmog.IsAtTransmogNPC() then
 			rootDescription:CreateButton(L["Import Set"], function() addon.importFrom = "tmog"; BetterWardrobeOutfitManager:ShowPopup("BETTER_WARDROBE_IMPORT_SET_POPUP") end);
-			rootDescription:CreateButton(L["Export Set"], function() addon:ExportTransmogVendorSet() end);
+			rootDescription:CreateButton(L["Export Set"], function() addon:ExportSet() end);
 
 
 		else

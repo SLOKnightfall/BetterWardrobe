@@ -867,13 +867,14 @@ function addon:SearchSets(data)
 	local query = ""
 
 	if TransmogFrame:IsShown() then
-		local tab = TransmogFrame and TransmogFrame.WardrobeCollection:GetTab()
+		local wardrobe = TransmogFrame.WardrobeCollection
+		local tab = wardrobe:GetTab()
 		if not tab then return  false end
 
-		query = TransmogFrame and TransmogFrame.WardrobeCollection.TabContent.BW_ExtraSetsFrame.SearchBox:GetText()  or ""
-		
-		if tab == 5 then
-			query = TransmogFrame and TransmogFrame.WardrobeCollection.TabContent.BW_SetsFrame2.SearchBox:GetText()  or ""
+		if tab == wardrobe.TabHeaders.setsFrame2TabID then
+			query = wardrobe.TabContent.BW_SetsFrame2.SearchBox:GetText() or ""
+		else
+			query = wardrobe.TabContent.BW_ExtraSetsFrame.SearchBox:GetText() or ""
 		end
 	else
 		query = BetterWardrobeCollectionFrameSearchBox and BetterWardrobeCollectionFrameSearchBox:GetText()  or ""
@@ -913,17 +914,10 @@ function TransmogSearchBoxMixin:UpdateSearch()
 		return;
 	end
 
-	local tab = TransmogFrame.WardrobeCollection:GetTab()
-
 	if self:GetText() == "" then
 		C_TransmogCollection.ClearSearch(self.searchType);
-		TransmogFrame.WardrobeCollection.TabContent.BW_ExtraSetsFrame:RefreshCollectionEntries()
 	else
-		if tab == 5 then
-			C_TransmogCollection.SetSearch(self.searchType, self:GetText());
-		else
-			TransmogFrame.WardrobeCollection.TabContent.BW_ExtraSetsFrame:RefreshCollectionEntries()
-		end
+		C_TransmogCollection.SetSearch(self.searchType, self:GetText());
 	end
 
 	-- Restart search tracking.
@@ -1500,7 +1494,7 @@ function TransmogSetModelMixin:OnMouseUp(button)
 	end
 
 	MenuUtil.CreateContextMenu(self, function(_owner, rootDescription)
-		rootDescription:SetTag("MENU_TRANSMOG_SETS_MODEL_FILTER");
+		rootDescription:SetTag("BW_MENU_TRANSMOG_SETS_MODEL_FILTER");
 
 		local isFavorite, isGroupFavorite = false, false
 		local setType = self.elementData.setType
@@ -1826,9 +1820,9 @@ do
 		f:SetSize(260, 100);
 
 		if TransmogFrame.CharacterPreview then
-			f:SetPoint("CENTER", TransmogFrame.CharacterPreview, "CENTER", -125, 0);
+			f:SetPoint("CENTER", TransmogFrame.CharacterPreview, "CENTER");
 		else
-			f:SetPoint("CENTER", UIParent, "CENTER", -125, 0);
+			f:SetPoint("CENTER", UIParent, "CENTER");
 		end
 
 		f:Hide();
@@ -1980,7 +1974,7 @@ do
 		--Popout is shared between the vendor and the Collections Journal; reposition per-show.
 		popout:ClearAllPoints();
 		if TransmogFrame and TransmogFrame:IsShown() and TransmogFrame.CharacterPreview then
-			popout:SetPoint("CENTER", TransmogFrame.CharacterPreview, "CENTER", -125, 0);
+			popout:SetPoint("CENTER", TransmogFrame.CharacterPreview, "CENTER");
 		elseif BetterWardrobeCollectionFrame and BetterWardrobeCollectionFrame:IsShown() then
 			local slotsFrame = BetterWardrobeCollectionFrame.ItemsCollectionFrame.SlotsFrame;
 			popout:SetPoint("TOP", BetterWardrobeCollectionFrame, "TOP", 0, slotsFrame:GetTop() - BetterWardrobeCollectionFrame:GetTop());
@@ -2017,12 +2011,6 @@ local function CreateAltAppearanceBadge(parent, point, relativeTo, relativePoint
 	badge:SetScript("OnEnter", function(self)
 		GameTooltip:SetOwner(self, "ANCHOR_RIGHT");
 		GameTooltip:SetText(L["Has an alternate look available"]);
-		if self.altData and self.altData.alternates then
-			for _, altSourceID in ipairs(self.altData.alternates) do
-				local itemID = C_TransmogCollection.GetSourceItemID(altSourceID);
-				GameTooltip:AddLine(string.format("itemID: %s  sourceID: %s", tostring(itemID), tostring(altSourceID)), 0.6, 0.6, 0.6);
-			end
-		end
 		GameTooltip:Show();
 	end);
 	badge:SetScript("OnLeave", GameTooltip_Hide);
@@ -2102,7 +2090,7 @@ do
 			end
 
 			MenuUtil.CreateContextMenu(self, function(_owner, rootDescription)
-				rootDescription:SetTag("MENU_TRANSMOG_SLOT_ALT_APPEARANCE");
+				rootDescription:SetTag("BW_MENU_TRANSMOG_SLOT_ALT_APPEARANCE");
 				rootDescription:CreateButton(L["Alternate Appearances"], function()
 					addon:ShowAltAppearancePopup({ altData });
 				end);
@@ -2204,11 +2192,20 @@ do
 		local elementData = card.elementData;
 		local appearanceInfo = elementData and elementData.appearanceInfo;
 		local collectionFrame = elementData and elementData.collectionFrame;
-		if not appearanceInfo or not collectionFrame or not collectionFrame.GetAnAppearanceSourceFromVisual then
+		if not appearanceInfo or not collectionFrame then
 			return nil;
 		end
 
-		local sourceID = collectionFrame:GetAnAppearanceSourceFromVisual(appearanceInfo.visualID, nil);
+		local sourceID;
+		if collectionFrame.transmogLocation and collectionFrame.transmogLocation:IsAppearance() then
+			if not collectionFrame.GetAnAppearanceSourceFromVisual then
+				return nil;
+			end
+			sourceID = collectionFrame:GetAnAppearanceSourceFromVisual(appearanceInfo.visualID, nil);
+		else
+			sourceID = appearanceInfo.sourceID;
+		end
+
 		if not sourceID or sourceID == Constants.Transmog.NoTransmogID then
 			return nil;
 		end
@@ -2220,7 +2217,7 @@ do
 		local altData = card.elementData and addon:BuildAltAppearanceData(GetCardSourceID(card));
 		local badge = GetOrCreateBadge(card);
 		badge.altData = altData;
-		badge:SetShown(addon.Profile.ShowAltAppearanceIcon and altData ~= nil);
+		badge:SetShown(addon.UseBetterWardrobeUI and addon.Profile.ShowAltAppearanceIcon and altData ~= nil);
 	end
 
 	--Hooks the same UpdateItem() that keeps HideVisual/FavoriteVisual current.
@@ -2240,7 +2237,7 @@ do
 		card.BW_AltAppearanceHooked = true;
 
 		card:HookScript("OnMouseUp", function(self, button)
-			if button ~= "RightButton" then
+			if button ~= "RightButton" or not addon.UseBetterWardrobeUI then
 				return;
 			end
 
@@ -2250,7 +2247,7 @@ do
 			end
 
 			MenuUtil.CreateContextMenu(self, function(_owner, rootDescription)
-				rootDescription:SetTag("MENU_TRANSMOG_ITEM_ALT_APPEARANCE");
+				rootDescription:SetTag("BW_MENU_TRANSMOG_ITEM_ALT_APPEARANCE");
 				rootDescription:CreateButton(L["Alternate Appearances"], function()
 					addon:ShowAltAppearancePopup({ altData });
 				end);
@@ -2360,7 +2357,7 @@ function TransmogCustomSetModelMixin:OnMouseUp(button)
 		end
 
 		MenuUtil.CreateContextMenu(self, function(_owner, rootDescription)
-			rootDescription:SetTag("MENU_TRANSMOG_CUSTOM_SETS_MODEL_FILTER");
+			rootDescription:SetTag("BW_MENU_TRANSMOG_CUSTOM_SETS_MODEL_FILTER");
 
 			local altData = self.elementData.altData;
 			rootDescription:CreateButton(TRANSMOG_CUSTOM_SET_RENAME, function()
@@ -2377,7 +2374,7 @@ function TransmogCustomSetModelMixin:OnMouseUp(button)
 	end
 
 	MenuUtil.CreateContextMenu(self, function(_owner, rootDescription)
-		rootDescription:SetTag("MENU_TRANSMOG_CUSTOM_SETS_MODEL_FILTER");
+		rootDescription:SetTag("BW_MENU_TRANSMOG_CUSTOM_SETS_MODEL_FILTER");
 
 		local itemTransmogInfoList = self.elementData.collectionFrame:GetItemTransmogInfoListCallback();
 		if DressUpFrameLinkingSupported() then
