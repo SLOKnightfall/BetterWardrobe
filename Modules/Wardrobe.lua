@@ -576,20 +576,6 @@ function WardrobeCollectionFrameMixin:InitBaseSetsFilterButton()
 		rootDescription:CreateCheckbox(COLLECTED, C_TransmogSets.GetBaseSetsFilter, GetBaseSetsFilter, LE_TRANSMOG_SET_FILTER_COLLECTED);
 		rootDescription:CreateCheckbox(NOT_COLLECTED, C_TransmogSets.GetBaseSetsFilter, GetBaseSetsFilter, LE_TRANSMOG_SET_FILTER_UNCOLLECTED);
 
-		rootDescription:CreateCheckbox(L["Hide Missing Set Pieces at Transmog Vendor"],
-			function() return addon.Profile.HideMissing; end,
-			function()
-				addon.Profile.HideMissing = not addon.Profile.HideMissing;
-				RefreshLists();
-			end);
-
-		rootDescription:CreateCheckbox(L["Show Collected Count"],
-			function() return addon.Profile.ShowSetCount; end,
-			function()
-				addon.Profile.ShowSetCount = not addon.Profile.ShowSetCount;
-				RefreshLists();
-			end);
-
 		rootDescription:CreateDivider();
 
 

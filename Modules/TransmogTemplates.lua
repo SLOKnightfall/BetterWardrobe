@@ -1696,6 +1696,17 @@ function TransmogSetModelMixin:RefreshTooltip()
 		GameTooltip_AddDisabledLine(GameTooltip, text);
 	end
 
+	if addon.Profile.ShowDetailedListTooltips then
+		for _index, primaryAppearance in pairs(primaryAppearances) do
+			local sourceInfo = C_TransmogCollection.GetSourceInfo(primaryAppearance.appearanceID);
+			if primaryAppearance.collected and not addon.Profile.ShowMissingDetailedListTooltips then
+				GameTooltip_AddColoredLine(GameTooltip, ("|TInterface\\RaidFrame\\ReadyCheck-Ready:0|t %s"):format(sourceInfo and sourceInfo.name or ""), GREEN_FONT_COLOR);
+			elseif not primaryAppearance.collected then
+				GameTooltip_AddColoredLine(GameTooltip, ("|TInterface\\RaidFrame\\ReadyCheck-NotReady:0|t %s"):format(sourceInfo and sourceInfo.name or ""), RED_FONT_COLOR);
+			end
+		end
+	end
+
 	GameTooltip:Show();
 end
 

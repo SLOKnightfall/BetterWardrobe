@@ -2310,8 +2310,42 @@ function TransmogWardrobeSetsMixin:InitFilterButton()
 			C_TransmogSets.SetSetsFilter(filter, not C_TransmogSets.GetSetsFilter(filter));
 		end
 
-		rootDescription:CreateCheckbox(COLLECTED, C_TransmogSets.GetSetsFilter, SetSetsFilter, LE_TRANSMOG_SET_FILTER_COLLECTED);
-		rootDescription:CreateCheckbox(NOT_COLLECTED, C_TransmogSets.GetSetsFilter, SetSetsFilter, LE_TRANSMOG_SET_FILTER_UNCOLLECTED);
+		local filtersSubmenu = rootDescription:CreateButton(L["Filters"]);
+
+		filtersSubmenu:CreateCheckbox(COLLECTED, C_TransmogSets.GetSetsFilter, SetSetsFilter, LE_TRANSMOG_SET_FILTER_COLLECTED);
+		filtersSubmenu:CreateCheckbox(NOT_COLLECTED, C_TransmogSets.GetSetsFilter, SetSetsFilter, LE_TRANSMOG_SET_FILTER_UNCOLLECTED);
+
+		if self == TransmogFrame.WardrobeCollection.TabContent.BW_SetsFrame2 then
+			filtersSubmenu:CreateDivider();
+
+			filtersSubmenu:CreateCheckbox(TRANSMOG_SET_PVE, C_TransmogSets.GetSetsFilter, SetSetsFilter, LE_TRANSMOG_SET_FILTER_PVE);
+			filtersSubmenu:CreateCheckbox(TRANSMOG_SET_PVP, C_TransmogSets.GetSetsFilter, SetSetsFilter, LE_TRANSMOG_SET_FILTER_PVP);
+
+			filtersSubmenu:CreateDivider();
+
+			filtersSubmenu:CreateCheckbox(L["Armor"], function() return addon.Profile.ShowArmorSets; end,
+				function()
+					addon.Profile.ShowArmorSets = not addon.Profile.ShowArmorSets;
+					self:RefreshCollectionEntries()
+				end,
+			1);
+			filtersSubmenu:CreateCheckbox(L["Cosmetic"], function() return addon.Profile.ShowCosmeticSets; end,
+				function()
+					addon.Profile.ShowCosmeticSets = not addon.Profile.ShowCosmeticSets;
+					self:RefreshCollectionEntries()
+				end,
+			1);
+		end
+
+		filtersSubmenu:CreateDivider();
+
+		filtersSubmenu:CreateCheckbox(L["Alternate Appearances"], function() return addon.Profile.ShowOnlyAltAppearanceSets; end,
+			function()
+				addon.Profile.ShowOnlyAltAppearanceSets = not addon.Profile.ShowOnlyAltAppearanceSets;
+				self:RefreshCollectionEntries()
+			end,
+		1);
+
 		rootDescription:CreateDivider();
 
 		local cutoffSubmenu = rootDescription:CreateButton(L["Minimum Collected"]);
@@ -2383,7 +2417,13 @@ function TransmogWardrobeSetsMixin:InitFilterButton()
 
 		local optionsSubmenu = rootDescription:CreateButton(L["Options"]);
 
-		optionsSubmenu:CreateCheckbox(L["Show Hidden Items"], function() return addon.Profile.ShowHidden; end,
+		optionsSubmenu:CreateCheckbox(L["Replace missing items with \"Hidden\" items"], function() return addon.Profile.HideMissing; end,
+			function()
+				addon.Profile.HideMissing = not addon.Profile.HideMissing;
+			end,
+		1);
+
+		optionsSubmenu:CreateCheckbox(L["Show sets flagged to be hidden"], function() return addon.Profile.ShowHidden; end,
 			function()
 				addon.Profile.ShowHidden = not addon.Profile.ShowHidden;
 				self:RefreshCollectionEntries()
@@ -2399,13 +2439,6 @@ function TransmogWardrobeSetsMixin:InitFilterButton()
 			end,
 		1);
 
-		optionsSubmenu:CreateCheckbox(L["Alternate Appearances"], function() return addon.Profile.ShowOnlyAltAppearanceSets; end,
-			function()
-				addon.Profile.ShowOnlyAltAppearanceSets = not addon.Profile.ShowOnlyAltAppearanceSets;
-				self:RefreshCollectionEntries()
-			end,
-		1);
-
 		optionsSubmenu:CreateCheckbox(L["Show Alternate Appearance Icon"], function() return addon.Profile.ShowAltAppearanceIcon; end,
 			function()
 				addon.Profile.ShowAltAppearanceIcon = not addon.Profile.ShowAltAppearanceIcon;
@@ -2413,13 +2446,40 @@ function TransmogWardrobeSetsMixin:InitFilterButton()
 			end,
 		1);
 
+		optionsSubmenu:CreateCheckbox(L["Verbose Tooltips"], function() return addon.Profile.ShowDetailedListTooltips; end,
+			function()
+				addon.Profile.ShowDetailedListTooltips = not addon.Profile.ShowDetailedListTooltips;
+			end,
+		1);
+
 	end);
 
 	self.FilterButton:SetIsDefaultCallback(function()
-		return C_TransmogSets.IsUsingDefaultSetsFilters();
+		local xpacIsDefault = true
+		for index = 1, #EXPANSIONS do
+			if not xpacSelection[index] then
+				xpacIsDefault = false
+				break
+			end
+		end
+
+		return C_TransmogSets.IsUsingDefaultSetsFilters()
+			and addon.Profile.ShowArmorSets ~= false
+			and addon.Profile.ShowCosmeticSets ~= false
+			and not addon.Profile.ShowOnlyAltAppearanceSets
+			and not addon.Profile.ShowHidden
+			and (addon.Profile.PartialLimit or 0) == 0
+			and xpacIsDefault;
 	end);
 
 	self.FilterButton:SetDefaultCallback(function()
+		addon.Profile.ShowArmorSets = true;
+		addon.Profile.ShowCosmeticSets = true;
+		addon.Profile.ShowOnlyAltAppearanceSets = false;
+		addon.Profile.ShowHidden = false;
+		addon.Profile.PartialLimit = 0;
+		xpackCheckAll(true);
+		self:RefreshCollectionEntries();
 		return C_TransmogSets.SetDefaultSetsFilters();
 	end);
 end
@@ -2440,7 +2500,9 @@ local function getSources(data)
 	local dataSources = data.sources
 	local count = 0
 	local index = 1
-	for source, collected in pairs(dataSources) do 
+	for source in pairs(dataSources) do
+		local sourceInfo = C_TransmogCollection.GetSourceInfo(source)
+		local collected = sourceInfo and sourceInfo.isCollected or false
 		sources.primaryAppearances[index] = {
 	      collected = collected,
 	      appearanceID = source
@@ -2451,6 +2513,26 @@ local function getSources(data)
 	    index = index + 1
 	end
 	return sources, count, index-1
+end
+
+local BW_SetCosmeticCache = {}
+local function BW_IsCosmeticSet(setID, primaryAppearances)
+	local cached = BW_SetCosmeticCache[setID]
+	if cached ~= nil then return cached end
+
+	local isCosmetic = false
+	if primaryAppearances then
+		for _, appearance in pairs(primaryAppearances) do
+			local sourceInfo = C_TransmogCollection.GetSourceInfo(appearance.appearanceID)
+			if sourceInfo and sourceInfo.itemID and C_Item.IsCosmeticItem(sourceInfo.itemID) then
+				isCosmetic = true
+				break
+			end
+		end
+	end
+
+	BW_SetCosmeticCache[setID] = isCosmetic
+	return isCosmetic
 end
 
 local function isValidFilter(data)
@@ -2469,11 +2551,12 @@ local function isValidFilter(data)
 	local searhText = addon:SearchSets(data)
 	local altAppearanceOnly = not addon.Profile.ShowOnlyAltAppearanceSets or addon:SetHasAltAppearanceItem(data.sourceData and data.sourceData.primaryAppearances)
 	local meetsPartialLimit = (addon.Profile.PartialLimit or 0) == 0 or data.collected >= math.min(data.pieces or 0, addon.Profile.PartialLimit)
+	local armorOrCosmetic = setType ~= "set" or (data.isCosmetic and addon.Profile.ShowCosmeticSets) or (not data.isCosmetic and addon.Profile.ShowArmorSets)
 	--if tab == 5 then
 		--return expansion and not hidden
 	--end
 
-	return expansion and (collected or uncollected) and searhText and not hidden and hasPieces and altAppearanceOnly and meetsPartialLimit
+	return expansion and (collected or uncollected) and searhText and not hidden and hasPieces and altAppearanceOnly and meetsPartialLimit and armorOrCosmetic
 end
 
 
@@ -2536,6 +2619,7 @@ function TransmogWardrobeSetsMixin:RefreshCollectionEntries()
 					expansionID = availableSet.expansionID,
 					label = availableSet.label,
 					uiOrder = availableSet.uiOrder,
+					isCosmetic = BW_IsCosmeticSet(availableSet.setID, data.primaryAppearances),
 
 				};
 				availableSet.expansionID = availableSet.expansionID
@@ -3105,10 +3189,10 @@ BW_DressingRoomButtonMixin = {}
 local function BW_ApplyAutoHiddenSlots()
 	if not addon.UseBetterWardrobeUI then return end
 
-	local profile = addon.setdb.profile.autoHideSlot
+	local hideSlotProfile = addon.setdb.profile.autoHideSlot
 
 	for i = 1, 19 do
-		if addon.Globals.EmptyArmor[i] and profile[i] then
+		if addon.Globals.EmptyArmor[i] and hideSlotProfile[i] then
 			local slotName = addon.Globals.INVENTORY_SLOT_NAMES[i]
 			local transmogLocation = slotName and TransmogUtil.GetTransmogLocation(slotName, Enum.TransmogType.Appearance, false)
 			if transmogLocation then
@@ -3121,6 +3205,7 @@ local function BW_ApplyAutoHiddenSlots()
 		end
 	end
 end
+addon.ApplyAutoHiddenSlots = BW_ApplyAutoHiddenSlots
 
 local BW_AutoHideSlotListener = CreateFrame("Frame")
 BW_AutoHideSlotListener:RegisterEvent("VIEWED_TRANSMOG_OUTFIT_CHANGED")
@@ -3128,6 +3213,65 @@ BW_AutoHideSlotListener:RegisterEvent("VIEWED_TRANSMOG_OUTFIT_SLOT_REFRESH")
 BW_AutoHideSlotListener:SetScript("OnEvent", function()
 	C_Timer.After(0, BW_ApplyAutoHiddenSlots)
 end)
+
+local BW_CATEGORY_TO_INVSLOT = {
+	[1] = 1,   --Head
+	[2] = 3,   --Shoulder
+	[3] = 15,  --Back
+	[4] = 5,   --Chest
+	[5] = 4,   --Shirt
+	[6] = 19,  --Tabard
+	[7] = 9,   --Wrist
+	[8] = 10,  --Hands
+	[9] = 6,   --Waist
+	[10] = 7,  --Legs
+	[11] = 8,  --Feet
+}
+
+local function BW_HideMissingSlot(invSlot)
+	local slotName = addon.Globals.INVENTORY_SLOT_NAMES[invSlot]
+	local transmogLocation = slotName and TransmogUtil.GetTransmogLocation(slotName, Enum.TransmogType.Appearance, false)
+	if transmogLocation then
+		C_TransmogOutfitInfo.SetPendingTransmog(transmogLocation:GetSlot(), transmogLocation:GetType(), Enum.TransmogOutfitSlotOption.None, Constants.Transmog.NoTransmogID, Enum.TransmogOutfitDisplayType.Hidden);
+	end
+end
+
+local function BW_HideMissingSetPieces(setID)
+	if not addon.UseBetterWardrobeUI or not addon.Profile.HideMissing or not setID then return end
+
+	local covered = {}
+
+	local appearances = C_TransmogSets.GetSetPrimaryAppearances(setID)
+	if appearances then
+		for _, data in ipairs(appearances) do
+			if data.collected then
+				local invSlot = BW_CATEGORY_TO_INVSLOT[addon.GetItemCategory(data.appearanceID)]
+				if invSlot then covered[invSlot] = true end
+			end
+		end
+	else
+		local extraSetData = SET_INDEX and SET_INDEX[setID]
+		if extraSetData and extraSetData.sources then
+			for sourceID in pairs(extraSetData.sources) do
+				local sourceInfo = C_TransmogCollection.GetSourceInfo(sourceID)
+				if sourceInfo and sourceInfo.isCollected then
+					local slotName = sourceInfo.itemID and addon.GetItemSlot(sourceInfo.itemID)
+					local invSlot = slotName and addon.Globals.INVENTORY_SLOT_NAMES[slotName]
+					if invSlot then covered[invSlot] = true end
+				end
+			end
+		end
+	end
+
+	for invSlot in pairs(addon.Globals.EmptyArmor) do
+		if not covered[invSlot] then
+			BW_HideMissingSlot(invSlot)
+		end
+	end
+end
+addon.HideMissingSetPieces = BW_HideMissingSetPieces
+
+hooksecurefunc(C_TransmogOutfitInfo, "SetOutfitToSet", function(setID) C_Timer.After(0, function() BW_HideMissingSetPieces(setID) end) end)
 
 hooksecurefunc(TransmogWardrobeItemsMixin, "SelectVisual", function()
 	C_Timer.After(0, BW_ApplyAutoHiddenSlots)

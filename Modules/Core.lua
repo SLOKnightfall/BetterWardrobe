@@ -326,11 +326,6 @@ local options = {
 							name = L["Show Set Names"],
 							type = "toggle",
 						},
-						ShowSetCount = {
-							order = 8,
-							name = L["Show Collected Count"],
-							type = "toggle",
-						},
 					},
 				},
 				tooltip_settings={
