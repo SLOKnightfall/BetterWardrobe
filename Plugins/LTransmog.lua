@@ -4,6 +4,10 @@ addon = LibStub("AceAddon-3.0"):GetAddon(addonName)
 
 function addon:SuppressLuckysWardrobeConflictWarning()
 	LuckysWardrobe.AddonConflicts = {}
+	local frame = LuckysWardrobeAddonConflict
+    frame:SetPoint("TOPRIGHT", 120, 120)
+    frame:SetSize(0,0)
+    frame:Hide()
 end
 
 local DICE_ICON = "Interface\\AddOns\\Luckys_Wardrobe\\Images\\icons\\dice"
