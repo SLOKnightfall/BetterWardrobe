@@ -309,6 +309,8 @@ L["Hide Armor Slots"] = true
 --------------------------------------------------------------------------
 
 L["Copy and paste a Wowhead Compare URL into the text box below to import"] = true
+L["Copy Wowhead Link"] = true
+L["Wowhead link for this set:"] = true
 L["Import"] = true
 L["Type the item ID or url in the text box below"] = true
 L["Export"] = true

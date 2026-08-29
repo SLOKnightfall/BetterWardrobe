@@ -7,6 +7,11 @@ addon.C_TransmogSets = addon.C_TransmogSets or {}
 local C_TransmogSets = setmetatable({}, {__index = Bizz_C_TransmogSets})
 local L = LibStub("AceLocale-3.0"):GetLocale(addonName);
 
+--Display-only: strips the literal "(Recolor)" tag some set names carry, never the underlying data.
+local function StripRecolorSuffix(name)
+	return (gsub(name or "", " %(Recolor%)", ""))
+end
+
 --Overrides: these need to be extra/saved-set aware, so they route through addon.C_TransmogSets
 C_TransmogSets.GetSetInfo = addon.C_TransmogSets.GetSetInfo
 C_TransmogSets.GetBaseSetID = addon.C_TransmogSets.GetBaseSetID
@@ -113,7 +118,7 @@ function WardrobeSetsCollectionMixin:OnLoad()
 
 	self.DetailsFrame.VariantSetsDropdown:SetSelectionTranslator(function(selection)
 		local variantSet = selection.data;
-		return variantSet.description or variantSet.name;
+		return StripRecolorSuffix(variantSet.description or variantSet.name);
 	end);
 
 	self.DetailsFrame.VariantSetsDropdown.PrecedingVariantIcon:SetScript("OnEnter", function(self)
@@ -128,7 +133,6 @@ function WardrobeSetsCollectionMixin:OnLoad()
 end
 
 function WardrobeSetsCollectionMixin:OnShow()
-
 	self:RegisterEvent("GET_ITEM_INFO_RECEIVED");
 	self:RegisterEvent("TRANSMOG_COLLECTION_ITEM_UPDATE");
 	self:RegisterEvent("TRANSMOG_COLLECTION_UPDATED");
@@ -153,7 +157,14 @@ function WardrobeSetsCollectionMixin:OnShow()
 				self:SelectSet(defaultSetID);
 			end
 		end
+		if ( self.Model.lastUseNativeForm ~= addon.useNativeForm ) then
+			self.Model:ApplyForm();
+		end
+		self.Model.cameraID = nil;
+		self.Model:UpdatePanAndZoomModelType();
+		self:RefreshCameras();
 		self:Refresh();
+		self.Model:ApplyZoomTuning();
 	end
 
 	if defaultSetID then
@@ -195,7 +206,7 @@ function WardrobeSetsCollectionMixin:OnShow()
 		
 		local function SetSelected(variantSet)
 			self:SelectSet(variantSet.setID);
-			local desc = variantSet.description or variantSet.name
+			local desc = StripRecolorSuffix(variantSet.description or variantSet.name)
 
 			self.DetailsFrame.VariantSetsDropdown:SetText(desc);
 		end
@@ -218,7 +229,7 @@ function WardrobeSetsCollectionMixin:OnShow()
 
 				assertsafe(variantSet.description ~= nil, "TransmogSet %s (%d) missing description / difficulty variant", variantSet.name, variantSet.setID);
 
-				local text = format(ITEM_SET_NAME, (variantSet.description or variantSet.name)..colorCode, numSourcesCollected, numSourcesTotal);
+				local text = format(ITEM_SET_NAME, StripRecolorSuffix(variantSet.description or variantSet.name)..colorCode, numSourcesCollected, numSourcesTotal);
 				rootDescription:CreateRadio(text, IsSelected, SetSelected, variantSet);
 			--end
 		end
@@ -303,6 +314,15 @@ function WardrobeSetsCollectionMixin:DisplaySet(setID)
 	self.DetailsFrame.BW_SetsHideSlotButton:Show();
 	self.DetailsFrame.BW_LinkSetButton:Show();
 	self.DetailsFrame.BW_OpenDressingRoomButton:Show();
+
+	--SavedExtra sets are the player's own arbitrary saved dressing-room combinations,
+	--not a catalogued set, so there's no real Wowhead page to link to.
+	local addonSetInfo = addon.GetSetInfo(setID)
+	if addonSetInfo and addonSetInfo.setType == "SavedExtra" then
+		self.DetailsFrame.BW_WowheadLinkButton:Hide();
+	else
+		self.DetailsFrame.BW_WowheadLinkButton:Show();
+	end
 
 	self.DetailsFrame.Name:SetText(setInfo.name);
 	if ( self.DetailsFrame.Name:IsTruncated() ) then
@@ -637,11 +657,15 @@ end
 function WardrobeSetsCollectionMixin:OnUnitModelChangedEvent()
 	if ( IsUnitModelReadyForUI("player") ) then
 		self.Model:RefreshUnit();
+		if ( self.Model.lastUseNativeForm ~= addon.useNativeForm ) then
+			self.Model:ApplyForm();
+		end
 		-- clearing cameraID so it resets zoom/pan
 		self.Model.cameraID = nil;
 		self.Model:UpdatePanAndZoomModelType();
 		self:RefreshCameras();
 		self:Refresh();
+		self.Model:ApplyZoomTuning();
 		return true;
 	else
 		return false;
@@ -658,6 +682,7 @@ function WardrobeSetsCollectionMixin:RefreshCameras()
 			model.cameraID = detailsCameraID;
 			model.defaultPosX, model.defaultPosY, model.defaultPosZ, model.yaw = GetUICameraInfo(detailsCameraID);
 		end
+		model:ApplyZoomTuning();
 	end
 end
 
@@ -806,6 +831,45 @@ function WardrobeSetsCollectionMixin:ScrollToSet(setID, alignment)
 	scrollBox:ScrollToElementDataByPredicate(FindSet, alignment);
 end
 
+StaticPopupDialogs["BETTER_WARDROBE_WOWHEAD_LINK_POPUP"] = {
+	text = L["Wowhead link for this set:"],
+	button1 = OKAY,
+	hasEditBox = true,
+	maxLetters = 256,
+	editBoxWidth = 260,
+	OnShow = function(dialog, data)
+		local editBox = dialog:GetEditBox()
+		editBox:SetText(data or "")
+		editBox:HighlightText()
+	end,
+	EditBoxOnEnterPressed = function(editBox)
+		StaticPopup_OnClick(editBox:GetParent(), 1)
+	end,
+	EditBoxOnEscapePressed = function(editBox)
+		editBox:GetParent():Hide()
+	end,
+	exclusive = true,
+	whileDead = true,
+}
+
+function WardrobeSetsCollectionMixin:ShowWowheadLink(setID)
+	if not setID then return end
+
+	--Extra Sets are keyed at runtime as 10000+configuredID (see DataBase.lua); Wowhead only knows
+	--about the real, pre-remap ID, which is preserved on the entry as oldID.
+	local addonSetInfo = addon.GetSetInfo(setID)
+
+	--SavedExtra sets are the player's own arbitrary saved dressing-room combinations,
+	--not a catalogued set, so there's no real Wowhead page to link to.
+	if addonSetInfo and addonSetInfo.setType == "SavedExtra" then
+		return
+	end
+
+	local wowheadID = (addonSetInfo and addonSetInfo.setType == "ExtraSet" and addonSetInfo.oldID) or setID
+
+	StaticPopup_Show("BETTER_WARDROBE_WOWHEAD_LINK_POPUP", nil, nil, "https://www.wowhead.com/transmog-set=" .. wowheadID)
+end
+
 function WardrobeSetsCollectionMixin:OpenInDressingRoom(setID)
 	if DressUpFrame:IsShown() then 
 	else
@@ -911,7 +975,7 @@ local function variantsTooltip(elementData, variantSets)
 
 	for i, setdata in ipairs(variantSets) do
 		local have, total = addon.SetsDataProvider:GetSetSourceCounts(setdata.setID)
-		text = setdata.description or setdata.name
+		text = StripRecolorSuffix(setdata.description or setdata.name)
 		 ratioText =  ratioText..text..": ".. have .. "/" .. total.."\n"
 	end
 
@@ -1381,12 +1445,70 @@ function WardrobeSetsDetailsModelMixin:OnLoad()
 	self:SetLight(enabled, lightValues);
 end
 
+function WardrobeSetsDetailsModelMixin:ApplyForm()
+	self.lastUseNativeForm = addon.useNativeForm;
+	self:SetUnit("player", false, addon.useNativeForm);
+
+	local _, raceFilename = UnitRace("player");
+	if ( raceFilename == "Worgen" or raceFilename == "Dracthyr" ) then
+		local sex = UnitSex("player");
+		local modelID, altModelID;
+		if raceFilename == "Worgen" then
+			if sex == 3 then
+				modelID, altModelID = 307453, 1000764;
+			else
+				modelID, altModelID = 307454, 1011653;
+			end
+		else
+			if sex == 3 then
+				modelID, altModelID = 4207724, 4220448;
+			else
+				modelID, altModelID = 4207724, 4395382;
+			end
+		end
+		local chosenModel = addon.useNativeForm and modelID or altModelID;
+		self:SetModel(chosenModel);
+	end
+end
+
+function WardrobeSetsDetailsModelMixin:ApplyZoomTuning()
+	local _, raceFilename = UnitRace("player");
+	local _, inAlternateForm = C_PlayerInfo.GetAlternateFormInfo();
+	local realBodyIsNative = not inAlternateForm;
+	--TUNING: the generic camera is already correct when the displayed form matches the player's real body;
+	--only the mismatched case (previewing alt while really native) needs this compensation.
+	if not ( raceFilename == "Worgen" or raceFilename == "Dracthyr" ) then
+		return;
+	end
+	if ( not addon.useNativeForm ) and realBodyIsNative then
+		local limits = self:GetPanAndZoomLimits();
+		if limits and self.defaultPosX then
+			local posX = limits.maxZoom - 0.6 * (limits.maxZoom - self.defaultPosX);
+			local posZ = self.defaultPosZ + 0.3 * (limits.panMaxTop - self.defaultPosZ);
+			self:SetPosition(posX, self.defaultPosY, posZ);
+		end
+	elseif ( addon.useNativeForm ) and ( not realBodyIsNative ) then
+		local limits = self:GetPanAndZoomLimits();
+		local altLimits = limits and SET_MODEL_PAN_AND_ZOOM_LIMITS[self.panAndZoomModelType.."Alt"];
+		if limits and altLimits and self.defaultPosX then
+			local ratio = limits.maxZoom / altLimits.maxZoom;
+			local posX = self.defaultPosX - 1.0 * (altLimits.maxZoom - self.defaultPosX) * ratio;
+			local posZ = self.defaultPosZ - 1.1 * (self.defaultPosZ - limits.panMaxBottom) * ratio;
+			self:SetPosition(posX, self.defaultPosY, posZ);
+		end
+	end
+end
+
 function WardrobeSetsDetailsModelMixin:OnShow()
-	self:SetUnit("player", false, PlayerUtil.ShouldUseNativeFormInModelScene());
+	self:ApplyForm();
+	self.cameraID = nil;
+	self:UpdatePanAndZoomModelType();
+	self:GetParent():RefreshCameras();
+	self:ApplyZoomTuning();
 end
 
 function WardrobeSetsDetailsModelMixin:UpdatePanAndZoomModelType()
-	local hasAlternateForm, inAlternateForm = C_PlayerInfo.GetAlternateFormInfo();
+	local inAlternateForm = not addon.useNativeForm;
 	if ( not self.panAndZoomModelType or self.inAlternateForm ~= inAlternateForm ) then
 		local _, race = UnitRace("player");
 		local sex = UnitSex("player");

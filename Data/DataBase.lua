@@ -591,15 +591,16 @@ do
 					local subSet = false;
 					local subSetBaseID;
 					local subName = gsub(data.name, " %(Recolor%)", "")
+					data.name = subName
 					if data.note == data.note == "NOTE_119" or data.note == "NOTE_120" or data.note == "NOTE_121" or data.note == "NOTE_123"   then
 						data.customGroups = data.label
 					elseif data.note == "NOTE_44" or data.note == "NOTE_45" then
 						data.customGroups =  data.label.."-"..subName--data.armorType
 
-					elseif addon.MiscSets.customGroups[tonumber(data.oldID)] then
-						data.customGroups = addon.MiscSets.customGroups[tonumber(data.oldID)]
 					elseif data.custom then
 						data.customGroups = data.custom --or data.label.."-"..subName--data.armorType
+					elseif addon.MiscSets.customGroups[tonumber(data.oldID)] then
+						data.customGroups = addon.MiscSets.customGroups[tonumber(data.oldID)]
 					end
 
 					if data.customGroups and baseListLabels[data.customGroups]  then

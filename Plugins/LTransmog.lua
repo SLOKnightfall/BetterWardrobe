@@ -2,12 +2,16 @@ if not C_AddOns.IsAddOnLoaded("Luckys_Wardrobe") then return end
 local addonName, addon = ...
 addon = LibStub("AceAddon-3.0"):GetAddon(addonName)
 
+--Neutered before it's ever called, so the dialog never shows at all (no reactive-hide flash).
+if LuckysWardrobe.AddonConflicts then
+	LuckysWardrobe.AddonConflicts.Warn = function() return false end
+end
+
 function addon:SuppressLuckysWardrobeConflictWarning()
-	LuckysWardrobe.AddonConflicts = {}
 	local frame = LuckysWardrobeAddonConflict
-    frame:SetPoint("TOPRIGHT", 120, 120)
-    frame:SetSize(0,0)
-    frame:Hide()
+	if frame then
+		frame:Hide()
+	end
 end
 
 local DICE_ICON = "Interface\\AddOns\\Luckys_Wardrobe\\Images\\icons\\dice"

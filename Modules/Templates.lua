@@ -37,7 +37,8 @@ function BetterWardrobeAlteredFormSwapButtonMixin:OnLoad()
 		self:Hide();
 	end
 
-	addon.useNativeForm = C_UnitAuras.WantsAlteredForm("player");
+	local hasAlternateForm, inAlternateForm = C_PlayerInfo.GetAlternateFormInfo();
+	addon.useNativeForm = not inAlternateForm;
 	self.useNativeForm = addon.useNativeForm
 end
 
@@ -59,10 +60,11 @@ function BetterWardrobeAlteredFormSwapButtonMixin:OnEnter()
 end
 
 function BetterWardrobeAlteredFormSwapButtonMixin:OnShow()
-	addon.useNativeForm = C_UnitAuras.WantsAlteredForm("player");
+	local hasAlternateForm, inAlternateForm = C_PlayerInfo.GetAlternateFormInfo();
+	addon.useNativeForm = not inAlternateForm;
 	self.useNativeForm = addon.useNativeForm
 	self:Update()
-	
+
 end
 
 function BetterWardrobeAlteredFormSwapButtonMixin:OnLeave()
@@ -72,7 +74,7 @@ end
 
 
 function BetterWardrobeAlteredFormSwapButtonMixin:OnClick()
-	addon.useNativeForm = not addon.useNativeForm 
+	addon.useNativeForm = not addon.useNativeForm
 	self.useNativeForm = not self.useNativeForm
 
 	self:Update()

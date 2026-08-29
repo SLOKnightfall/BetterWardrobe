@@ -392,6 +392,7 @@ local ActorIDList = {
 };
 
 local isPlayer = false
+local lastUseNativeForm = nil
 function DressingRoom:UpdateModel(unit)
 	local unit = unit or "player";
 	if not UnitExists(unit) or not UnitIsPlayer(unit) or not CanInspect(unit, false) then
@@ -428,8 +429,9 @@ function DressingRoom:UpdateModel(unit)
 
 	else
 		model = "player";
-		if not isPlayer then
+		if not isPlayer or lastUseNativeForm ~= addon.useNativeForm then
 			isPlayer = true;
+			lastUseNativeForm = addon.useNativeForm;
 			actor:SetModelByUnit(model, sheatheWeapons, true, false, addon.useNativeForm);
 			refresh = true;
 		end

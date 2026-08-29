@@ -231,7 +231,7 @@ function WardrobeCollectionFrameMixin:SetTab(tabID)
 		else 
 			--BW_SortDropDown:SetPoint("TOPLEFT", BetterWardrobeCollectionFrame, "TOPLEFT", 0, -110)
 			BetterWardrobeCollectionFrame.AlteredFormSwapButton:ClearAllPoints()
-			BetterWardrobeCollectionFrame.AlteredFormSwapButton:SetPoint("TOPRIGHT",BetterWardrobeCollectionFrame.ItemsCollectionFrame.WeaponDropdown, "TOPRIGHT", 35, 13)
+			BetterWardrobeCollectionFrame.AlteredFormSwapButton:SetPoint("LEFT", addon.ColorFilterFrame, "RIGHT", 2, 9)
 			-----BetterWardrobeCollectionFrame.AlteredFormSwapButton:SetPoint("TOPRIGHT",self:GetParent(), "TOPRIGHT", -19,-65)
 		end
 	
@@ -260,6 +260,10 @@ function WardrobeCollectionFrameMixin:SetTab(tabID)
 		self.SearchBox:SetEnabled(true);
 		self.ClassDropdown:ClearAllPoints();
 		self.ClassDropdown:SetPoint("BOTTOMRIGHT", self.SetsCollectionFrame, "TOPRIGHT", -9, 4);
+
+		BetterWardrobeCollectionFrame.AlteredFormSwapButton:Show()
+		BetterWardrobeCollectionFrame.AlteredFormSwapButton:ClearAllPoints()
+		BetterWardrobeCollectionFrame.AlteredFormSwapButton:SetPoint("RIGHT", self.ClassDropdown, "LEFT", -2, 9)
 
 		self.SetsCollectionFrame:SetShown(true);
 
@@ -299,7 +303,7 @@ end
 
 local FILTER_SOURCES = {"Trash", L["MISC"], L["Classic Set"], L["Quest Set"], L["Dungeon Set"], L["Raid Set"], L["Recolor"],L["Garrison"], L["Island Expedition"], L["Warfronts"], L["Covenants"], L["Trading Post"], L["Holiday"], L["NOTE_119"],L["NOTE_120"]}
 local EXPANSIONS = {EXPANSION_NAME0, EXPANSION_NAME1, EXPANSION_NAME2, EXPANSION_NAME3, EXPANSION_NAME4, EXPANSION_NAME5, EXPANSION_NAME6, EXPANSION_NAME7, EXPANSION_NAME8, EXPANSION_NAME9,EXPANSION_NAME10,EXPANSION_NAME11}
-local FILTER_EXTRA_SOURCES = {L["Trash"], L["MISC"], L["Classic Set"], L["Quest Set"], L["Dungeon Set"], L["Garrison"], L["Island Expedition"], L["Warfronts"], L["Trading Post"], L["Holiday"], L["Crafted"]}
+local FILTER_EXTRA_SOURCES = {L["Trash"], L["MISC"], L["Classic Set"], L["Quest Set"], L["Dungeon Set"], L["Raid Set"], L["Garrison"], L["Island Expedition"], L["Warfronts"], L["Trading Post"], L["Holiday"], L["Crafted"]}
 
 addon.Filters = {
 	["Base"] = {
@@ -1426,8 +1430,14 @@ function WardrobeItemsCollectionMixin:ChangeModelsSlot(newTransmogLocation, oldT
 		return;
 	end
 
+	local formChanged = self.lastUseNativeForm ~= addon.useNativeForm;
+	self.lastUseNativeForm = addon.useNativeForm;
+
 	for i = 1, #self.Models do
 		local model = self.Models[i];
+		if formChanged then
+			model:SetUnit("player", false, addon.useNativeForm);
+		end
 		if ( undressSlot ) then
 			local changedOldSlot = false;
 			-- dress/undress setup gear
@@ -1871,7 +1881,7 @@ function WardrobeItemsCollectionMixin:UpdateItems()
 			self.illusionWeaponAppearanceID = appearanceSourceID;
 			changeModel = true;
 		end
-	else
+	elseif self.activeCategory then
 		local _, isWeapon = C_TransmogCollection.GetCategoryInfo(self.activeCategory);
 		isArmor = not isWeapon;
 	end
@@ -1898,6 +1908,16 @@ function WardrobeItemsCollectionMixin:UpdateItems()
 					cameraID = visualInfo.camera;
 				else
 					cameraID = C_TransmogCollection.GetAppearanceCameraID(visualInfo.visualID, cameraVariation);
+				end
+
+				--Worgen/Dracthyr armor slots: override with the race/form-specific camera, if still valid.
+				local _, raceFile = UnitRace("player");
+				local slotName = addon.Globals.CATEGORYID_TO_NAME[self.activeCategory];
+				if (raceFile == "Worgen" or raceFile == "Dracthyr") and slotName and addon.Camera.lookupItems[slotName] then
+					local formCameraID = addon.Camera:GetCameraIDBySlot(self.activeCategory);
+					if formCameraID and GetUICameraInfo(formCameraID) then
+						cameraID = formCameraID;
+					end
 				end
 			end
 			if ( model.cameraID ~= cameraID ) then
@@ -2003,9 +2023,11 @@ function WardrobeItemsCollectionMixin:UpdateProgressBar()
 				collected = collected + 1;
 			end
 		end
-	else
+	elseif self.activeCategory then
 		collected = C_TransmogCollection.GetFilteredCategoryCollectedCount(self.activeCategory);
 		total = C_TransmogCollection.GetFilteredCategoryTotal(self.activeCategory);
+	else
+		collected, total = 0, 0;
 	end
 	self:GetParent():UpdateProgressBar(collected, total);
 end
@@ -2025,6 +2047,8 @@ function WardrobeItemsCollectionMixin:RefreshVisualsList()
 		--Blizzard's native GetCategoryAppearances only surfaces collected artifact traits;
 		--our own list (built from Data/ArtifactData.lua) also includes the uncollected ones.
 		self.visualsList = addon.GetClassArtifactAppearanceList();
+	elseif not self.activeCategory then
+		self.visualsList = {};
 	else
 		self.visualsList = C_TransmogCollection.GetCategoryAppearances(self.activeCategory, self.transmogLocation:GetData());
 	end

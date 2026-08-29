@@ -895,8 +895,8 @@
 							<Button parentKey="BW_LinkSetButton" inherits="SquareIconButtonTemplate" >
 								<Size x="32" y="32"/>
 								<Anchors>
-									<Anchor point="TOPRIGHT" x="-23" y="0"/>
-								</Anchors>					
+									<Anchor point="TOPRIGHT" x="-49.5" y="0"/>
+								</Anchors>
 								<Layers>
 									<Layer level="ARTWORK" textureSubLevel="5">
 										<Texture parentKey="Icon" atlas="poi-transmogrifier" useAtlasSize="false">
@@ -924,8 +924,8 @@
 							<Button parentKey="BW_SetsHideSlotButton" inherits="SquareIconButtonTemplate" >
 								<Size x="32" y="32"/>
 								<Anchors>
-									<Anchor point="TOPRIGHT" x="-49.5" y="0"/>
-								</Anchors>					
+									<Anchor point="TOPRIGHT" x="-76" y="0"/>
+								</Anchors>
 								<Layers>
 									<Layer level="ARTWORK" textureSubLevel="5">
 										<Texture parentKey="Icon" file="Interface\PvPRankBadges\PvPRank12">
@@ -957,8 +957,8 @@
 							<Button parentKey="BW_OpenDressingRoomButton" inherits="SquareIconButtonTemplate" >
 								<Size x="32" y="32"/>
 								<Anchors>
-									<Anchor point="TOPRIGHT" x="3" y="0"/>
-								</Anchors>					
+									<Anchor point="TOPRIGHT" x="-23" y="0"/>
+								</Anchors>
 								<Layers>
 									<Layer level="ARTWORK" textureSubLevel="5">
 										<Texture parentKey="Icon" file="Interface\ICONS\Trade_Archaeology_HighborneSoulMirror">
@@ -970,7 +970,7 @@
 									</Layer>
 								</Layers>
 								<Scripts>
-									<OnShow> 
+									<OnShow>
 									</OnShow>
 									<OnEnter>
 										GameTooltip:SetOwner(self, "ANCHOR_RIGHT");
@@ -983,10 +983,39 @@
 									</OnClick>
 								</Scripts>
 							</Button>
+							<Button parentKey="BW_WowheadLinkButton" inherits="SquareIconButtonTemplate" >
+								<Size x="32" y="32"/>
+								<Anchors>
+									<Anchor point="TOPRIGHT" x="3" y="0"/>
+								</Anchors>
+								<Layers>
+									<Layer level="ARTWORK" textureSubLevel="5">
+										<Texture parentKey="Icon" file="Interface\Addons\BetterWardrobe\Images\Wowhead">
+											<Size x="24" y="24"/>
+											<Anchors>
+												<Anchor point="CENTER" />
+											</Anchors>
+										</Texture>
+									</Layer>
+								</Layers>
+								<Scripts>
+									<OnShow>
+									</OnShow>
+									<OnEnter>
+										GameTooltip:SetOwner(self, "ANCHOR_RIGHT");
+										GameTooltip_SetTitle(GameTooltip, LibStub("AceLocale-3.0"):GetLocale("BetterWardrobe")["Copy Wowhead Link"], NORMAL_FONT_COLOR, true);
+										GameTooltip:Show();
+									</OnEnter>
+									<OnLeave function="GameTooltip_Hide"/>
+									<OnClick>
+										self:GetParent():GetParent():ShowWowheadLink(self:GetParent().BW_LinkSetButton.setID)
+									</OnClick>
+								</Scripts>
+							</Button>
 
 							<DropdownButton parentKey="VariantSetsDropdown" inherits="WowStyle1DropdownTemplate" frameLevel="80">
 								<Anchors>
-									<Anchor point="TOPRIGHT" x="-80" y="-3"/>
+									<Anchor point="TOPRIGHT" x="-106.5" y="-3"/>
 								</Anchors>
 								<Layers>
 									<Layer level="ARTWORK">
