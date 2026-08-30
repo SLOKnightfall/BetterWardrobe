@@ -2556,9 +2556,123 @@ local function isValidFilter(data)
 		--return expansion and not hidden
 	--end
 
-	return expansion and (collected or uncollected) and searhText and not hidden and hasPieces and altAppearanceOnly and meetsPartialLimit and armorOrCosmetic
+	local colorFilter = true
+	local target = addon.ExtraSetColorTarget
+	if target then
+		colorFilter = false
+		if setType == "extraset" then
+			local extraSetColors = _G.BetterWardrobeData and _G.BetterWardrobeData.ExtraSetColorData
+			local rawColors = extraSetColors and extraSetColors[data.set.oldID or data.set.setID]
+			local ok, itemColors
+			if rawColors then
+				ok, itemColors = addon:Deserialize(rawColors)
+			end
+			if ok and itemColors then
+				for _, itemColor in ipairs(itemColors) do
+					local L, A, B = addon:ConvertRGB_to_LAB(itemColor[1], itemColor[2], itemColor[3])
+					if addon:CompareLAB(target[1], target[2], target[3], L, A, B) <= 20 then
+						colorFilter = true
+						break
+					end
+				end
+			end
+		else
+			local colorTable = addon:GetColorTable()
+			for _, primaryAppearance in ipairs(data.sourceData and data.sourceData.primaryAppearances or {}) do
+				if addon:VisualMatchesColorLab(primaryAppearance.appearanceID, colorTable, target[1], target[2], target[3], 20) then
+					colorFilter = true
+					break
+				end
+			end
+		end
+	end
+
+	return expansion and (collected or uncollected) and searhText and not hidden and hasPieces and altAppearanceOnly and meetsPartialLimit and armorOrCosmetic and colorFilter
 end
 
+--Also called when the Journal/Vendor closes or the vendor switches back to the default UI.
+function addon:ResetVendorSetsColorFilter()
+	addon.ExtraSetColorTarget = nil;
+	local tabContent = TransmogFrame and TransmogFrame.WardrobeCollection and TransmogFrame.WardrobeCollection.TabContent;
+	if not tabContent then return end;
+	for _, frame in pairs({BW_SetsFrame2 = tabContent.BW_SetsFrame2, BW_ExtraSetsFrame = tabContent.BW_ExtraSetsFrame}) do
+		if frame.ColorFilterButton then
+			frame.ColorFilterButton.colorSwatch:Hide();
+			frame.ColorFilterButton.revert:Hide();
+			frame:RefreshCollectionEntries();
+		end
+	end
+end
+
+local function OpenVendorSetsColorPicker(self)
+	local btn = self.ColorFilterButton;
+	ColorPickerFrame.swatchFunc = function()
+		local R2, G2, B2 = ColorPickerFrame:GetColorRGB();
+		btn.colorSwatch:Show();
+		btn.colorSwatch:SetVertexColor(R2, G2, B2, 1);
+		btn.revert:Show();
+		addon.ExtraSetColorTarget = {addon:ConvertRGB_to_LAB(R2 * 255, G2 * 255, B2 * 255)};
+		self:RefreshCollectionEntries();
+	end
+	ColorPickerFrame.cancelFunc = function()
+		addon:ResetVendorSetsColorFilter();
+	end
+	ColorPickerFrame:ClearAllPoints();
+	ColorPickerFrame:SetPoint("TOPLEFT", self, "TOPRIGHT", 6, -8);
+	addon.colorPickerIsOurs = true;
+	ColorPickerFrame:Show();
+	ColorPickerFrame.Content.ColorSwatchOriginal:Hide();
+end
+
+--Builds the same checkered-swatch/shield-border look as the Journal's color-filter button.
+hooksecurefunc(TransmogWardrobeSetsMixin, "OnLoad", function(self)
+	local btn = self.ColorFilterButton;
+
+	local colorSwatch = btn:CreateTexture(nil, "OVERLAY");
+	colorSwatch:SetSize(13, 13);
+	colorSwatch:SetTexture(130939); -- Interface\ChatFrame\ChatFrameColorSwatch
+	colorSwatch:SetPoint("CENTER");
+	colorSwatch:Hide();
+	btn.colorSwatch = colorSwatch;
+
+	local checkers = btn:CreateTexture(nil, "BACKGROUND");
+	checkers:SetSize(13, 13);
+	checkers:SetTexture(188523); -- Tileset\Generic\Checkers
+	checkers:SetTexCoord(.25, 0, 0.5, .25);
+	checkers:SetDesaturated(true);
+	checkers:SetVertexColor(1, 1, 1, 0.75);
+	checkers:SetPoint("CENTER", colorSwatch);
+
+	local border = btn:CreateTexture(nil, "OVERLAY");
+	border:SetTexture([[Interface\CastingBar\UI-CastingBar-Arena-Shield]]);
+	border:SetSize(43, 43);
+	border:SetPoint("LEFT", -1, -1);
+
+	local revert = CreateFrame("Button", nil, btn);
+	revert:SetPoint("CENTER", 16, 15);
+	revert:SetSize(20, 20);
+	revert:Hide();
+	revert:SetScript("OnClick", function() addon:ResetVendorSetsColorFilter(); end);
+	revert:SetScript("OnEnter", function()
+		GameTooltip:SetOwner(revert, "ANCHOR_RIGHT");
+		GameTooltip:SetText(L["Reset"]);
+		GameTooltip:Show();
+	end);
+	revert:SetScript("OnLeave", GameTooltip_Hide);
+	btn.revert = revert;
+
+	local revertTexture = revert:CreateTexture(nil, "OVERLAY");
+	revertTexture:SetAtlas("transmog-icon-revert-small");
+	revertTexture:SetAllPoints();
+
+	btn:SetScript("OnEnter", function()
+		GameTooltip:SetOwner(btn, "ANCHOR_RIGHT");
+		GameTooltip:SetText(L["Color"]);
+		GameTooltip:Show();
+	end);
+	btn:SetScript("OnLeave", GameTooltip_Hide);
+	btn:SetScript("OnClick", function() OpenVendorSetsColorPicker(self); end);
+end);
 
 function TransmogWardrobeSetsMixin:RefreshCollectionEntries()
 	self.setsDataProvider:ClearSets();

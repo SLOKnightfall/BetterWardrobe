@@ -475,15 +475,21 @@
 			</DropdownButton>
 			<EditBox parentKey="SearchBox" inherits="BW_TransmogSearchBoxTemplate">
 				<Anchors>
-					<Anchor point="TOPRIGHT" relativeKey="$parent.FilterButton" relativePoint="TOPLEFT" x="-10" y="1"/>
+					<Anchor point="TOPRIGHT" relativeKey="$parent.FilterButton" relativePoint="TOPLEFT" x="-44" y="1"/>
 				</Anchors>
 			</EditBox>
 			<DropdownButton parentKey="ClassDropdown" inherits="WowStyle1DropdownTemplate">
 				<Size x="130" y="22"/>
 				<Anchors>
-					<Anchor point="TOPRIGHT" relativeKey="$parent.SearchBox" relativePoint="TOPLEFT" x="-10" y="0"/>
+					<Anchor point="TOPLEFT" x="26" y="-24"/>
 				</Anchors>
 			</DropdownButton>
+			<Button parentKey="ColorFilterButton">
+				<Size x="25" y="25"/>
+				<Anchors>
+					<Anchor point="RIGHT" relativeKey="$parent.FilterButton" relativePoint="LEFT" x="-12" y="0"/>
+				</Anchors>
+			</Button>
 			<Frame parentKey="PagedContent" inherits="PagedNaturalSizeGridContentFrameTemplate">
 				<KeyValues>
 					<KeyValue key="viewsPerPage" value="1" type="number"/>

@@ -315,14 +315,8 @@ function WardrobeSetsCollectionMixin:DisplaySet(setID)
 	self.DetailsFrame.BW_LinkSetButton:Show();
 	self.DetailsFrame.BW_OpenDressingRoomButton:Show();
 
-	--SavedExtra sets are the player's own arbitrary saved dressing-room combinations,
-	--not a catalogued set, so there's no real Wowhead page to link to.
-	local addonSetInfo = addon.GetSetInfo(setID)
-	if addonSetInfo and addonSetInfo.setType == "SavedExtra" then
-		self.DetailsFrame.BW_WowheadLinkButton:Hide();
-	else
-		self.DetailsFrame.BW_WowheadLinkButton:Show();
-	end
+	--Disabled until all Extra Sets get rechecked for a valid Wowhead page (NO_WOWHEAD_PAGE only covers a partial scope).
+	self.DetailsFrame.BW_WowheadLinkButton:Hide();
 
 	self.DetailsFrame.Name:SetText(setInfo.name);
 	if ( self.DetailsFrame.Name:IsTruncated() ) then
@@ -853,21 +847,7 @@ StaticPopupDialogs["BETTER_WARDROBE_WOWHEAD_LINK_POPUP"] = {
 }
 
 function WardrobeSetsCollectionMixin:ShowWowheadLink(setID)
-	if not setID then return end
-
-	--Extra Sets are keyed at runtime as 10000+configuredID (see DataBase.lua); Wowhead only knows
-	--about the real, pre-remap ID, which is preserved on the entry as oldID.
-	local addonSetInfo = addon.GetSetInfo(setID)
-
-	--SavedExtra sets are the player's own arbitrary saved dressing-room combinations,
-	--not a catalogued set, so there's no real Wowhead page to link to.
-	if addonSetInfo and addonSetInfo.setType == "SavedExtra" then
-		return
-	end
-
-	local wowheadID = (addonSetInfo and addonSetInfo.setType == "ExtraSet" and addonSetInfo.oldID) or setID
-
-	StaticPopup_Show("BETTER_WARDROBE_WOWHEAD_LINK_POPUP", nil, nil, "https://www.wowhead.com/transmog-set=" .. wowheadID)
+	--Disabled to match DisplaySet's button hide, until all Extra Sets get rechecked.
 end
 
 function WardrobeSetsCollectionMixin:OpenInDressingRoom(setID)

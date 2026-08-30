@@ -562,7 +562,8 @@ do
 					----local visualID, sourceID = addon.GetItemSource(baseItem)
 					----data.itemAppearance = addon.ItemAppearance[visualID]
 					data.setType = "ExtraSet"
-					data.oldID = data.setID
+					--Only capture oldID once; a rebuild would otherwise re-derive it from the already-remapped setID.
+					data.oldID = data.oldID or data.setID
 					data.tab = 3
 
 					local newID = 10000 + id

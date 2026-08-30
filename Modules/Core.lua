@@ -1723,6 +1723,10 @@ function addon:ApplyVendorUIMode()
 		end
 	end
 
+	if not useBetter and addon.ExtraSetColorTarget then
+		addon:ResetVendorSetsColorFilter()
+	end
+
 	if addon.ApplyLuckysWardrobeVendorUI then
 		addon:ApplyLuckysWardrobeVendorUI(useBetter)
 		C_Timer.After(0.3, function() addon:ApplyLuckysWardrobeVendorUI(addon.UseBetterWardrobeUI) end)
@@ -1896,7 +1900,10 @@ function addon:EventHandler(event, ...)
 				vendorUIToggleButton:SetScript("OnLeave", GameTooltip_Hide)
 				addon.VendorUIToggleButton = vendorUIToggleButton
 
-				TransmogFrame:HookScript("OnHide", function() addon.UseBetterWardrobeUI = true end)
+				TransmogFrame:HookScript("OnHide", function()
+					addon.UseBetterWardrobeUI = true
+					if addon.ExtraSetColorTarget then addon:ResetVendorSetsColorFilter() end
+				end)
 			end
 			addon:UpdateTabs();
 		 end)

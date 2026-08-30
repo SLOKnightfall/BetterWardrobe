@@ -532,6 +532,13 @@
 				</Anchors>
 			</DropdownButton>
 
+			<Button parentKey="ColorFilterButton" hidden="true">
+				<Size x="25" y="25"/>
+				<Anchors>
+					<Anchor point="RIGHT" relativeKey="$parent.FilterButton" relativePoint="LEFT" x="-5" y="0"/>
+				</Anchors>
+			</Button>
+
 			<DropdownButton parentKey="ClassDropdown" inherits="WowStyle1DropdownTemplate" mixin="BetterWardrobeCollectionClassDropdownMixin">
 				<Anchors>
 					<Anchor point="TOPLEFT" y="-20"/>

@@ -218,9 +218,10 @@ function addon.C_TransmogSets.GetSourcesForSlot(setID, transmogSlot, data)
 		local sourceInfo = data and data.tooltipPrimarySourceID and C_TransmogCollection.GetAppearanceSourceInfo(data.tooltipPrimarySourceID)
 		if not sourceInfo then return {} end
 
-		local sources = CollectionWardrobeUtil.GetSortedAppearanceSources(sourceInfo.itemAppearanceID, sourceInfo.category, transmogLocation)
+		--Blizzard's own function throws (rather than returning empty) when a visualID has no known sources.
+		local ok, sources = pcall(CollectionWardrobeUtil.GetSortedAppearanceSources, sourceInfo.itemAppearanceID, sourceInfo.category, transmogLocation)
 
-		return sources or {}
+		return (ok and sources) or {}
 	end
 end
 
@@ -539,6 +540,37 @@ function addon:FilterSets(setList, setType)
 		local count , total = setData.numCollected, setData.numTotal
 		local expansion = data.expansionID
 		local sourcefilter = (BetterWardrobeCollectionFrame:CheckTab(3) and filterSelection[data.filter])
+		--Passes everywhere when no color is picked; otherwise requires a matching item in the set.
+		local colorFilter = true
+		if addon.ExtraSetColorTarget then
+			local target = addon.ExtraSetColorTarget
+			local colorTable = addon:GetColorTable()
+			colorFilter = false
+			if data.setType == "ExtraSet" then
+				local extraSetColors = _G.BetterWardrobeData and _G.BetterWardrobeData.ExtraSetColorData
+				local raw = extraSetColors and extraSetColors[data.oldID or data.setID]
+				local ok, itemColors
+				if raw then
+					ok, itemColors = addon:Deserialize(raw)
+				end
+				if ok and itemColors then
+					for _, itemColor in ipairs(itemColors) do
+						local L, A, B = addon:ConvertRGB_to_LAB(itemColor[1], itemColor[2], itemColor[3])
+						if addon:CompareLAB(target[1], target[2], target[3], L, A, B) <= 20 then
+							colorFilter = true
+							break
+						end
+					end
+				end
+			elseif data.setType == "Blizzard" then
+				for _, primaryAppearance in ipairs(setData.primaryAppearances) do
+					if addon:VisualMatchesColorLab(primaryAppearance.appearanceID, colorTable, target[1], target[2], target[3], 20) then
+						colorFilter = true
+						break
+					end
+				end
+			end
+		end
 		--"Unavailable" mirrors the noLongerObtainable check in Wardrobe_Sets.lua:DisplaySet (Elite sets from
 		--an older patch, plus one hardcoded legacy setID range); only meaningful for real Blizzard sets.
 		local unavailable = false
@@ -582,6 +614,7 @@ function addon:FilterSets(setList, setType)
 			not isHidden and
 			tab and
 			unavailableFilter and
+			colorFilter and
 			altAppearanceOnly then
 			tinsert(FilterSets, data)
 		end

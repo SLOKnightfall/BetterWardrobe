@@ -182,6 +182,8 @@ function WardrobeCollectionFrameMixin:SetTab(tabID)
 
 	BetterWardrobeVisualToggle.VisualMode = false;
 	self.TransmogOptionsButton:Hide();
+	self.ColorFilterButton:Hide();
+	if addon.colorPickerIsOurs then ColorPickerFrame:Hide(); end
 	----self.ItemsCollectionFrame:Hide();
 	self.SetsCollectionFrame:Hide();
 	--self.SetsTransmogFrame:Hide();
@@ -207,6 +209,9 @@ function WardrobeCollectionFrameMixin:SetTab(tabID)
 		self.SearchBox:SetEnabled(enableSearchAndFilter);
 		self.FilterButton:Show();
 		self.FilterButton:SetEnabled(enableSearchAndFilter);
+		self.FilterButton:ClearAllPoints();
+		self.FilterButton:SetPoint("LEFT", self.SearchBox, "RIGHT", 7, 0);
+		self.FilterButton:SetWidth(90);
 		self.ClassDropdown:ClearAllPoints();
 		self.ClassDropdown:SetPoint("TOPRIGHT", self.ItemsCollectionFrame.SlotsFrame, "TOPLEFT", -12, -2);
 
@@ -249,9 +254,19 @@ function WardrobeCollectionFrameMixin:SetTab(tabID)
 
 		self.activeFrame = self.SetsCollectionFrame;
 		self.SearchBox:SetPoint("TOPLEFT", 19, -69);
-		self.SearchBox:SetWidth(145);
 		self.FilterButton:Show();
 		self.FilterButton:SetEnabled(true);
+		self.FilterButton:ClearAllPoints();
+		self.FilterButton:SetWidth(90);
+		if tabID == WARDROBE_TAB_EXTRASETS or tabID == WARDROBE_TAB_SETS then
+			self.SearchBox:SetWidth(105);
+			self.FilterButton:SetPoint("LEFT", self.SearchBox, "RIGHT", 34, 0);
+			self.FilterButton:SetWidth(104);
+			self.ColorFilterButton:Show();
+		else
+			self.SearchBox:SetWidth(145);
+			self.FilterButton:SetPoint("LEFT", self.SearchBox, "RIGHT", 7, 0);
+		end
 		self:InitBaseSetsFilterButton();
 		--self.BW_SetsHideSlotButton:Show();
 		self.ClassDropdown:Show();
@@ -764,6 +779,91 @@ function WardrobeCollectionFrameMixin:InitBaseSetsFilterButton()
 	end);
 end
 
+local function ResetExtraSetColorFilter()
+	local btn = BetterWardrobeCollectionFrame.ColorFilterButton;
+	btn.colorSwatch:Hide();
+	btn.revert:Hide();
+	addon.ExtraSetColorTarget = nil;
+	RefreshLists();
+end
+
+local function ExtraSetColorPickerCallback()
+	if not ColorPickerFrame then return end
+
+	local R2, G2, B2 = ColorPickerFrame:GetColorRGB();
+	local btn = BetterWardrobeCollectionFrame.ColorFilterButton;
+	btn.colorSwatch:Show();
+	btn.colorSwatch:SetVertexColor(R2, G2, B2, 1);
+	btn.revert:Show();
+	R2, G2, B2 = R2 * 255, G2 * 255, B2 * 255;
+
+	addon.colorPickerFromSwatch = false;
+	addon.colorPickerSwatchNames = nil;
+	addon.ExtraSetColorTarget = {addon:ConvertRGB_to_LAB(R2, G2, B2)};
+	RefreshLists();
+end
+
+local function OpenExtraSetColorPicker()
+	ColorPickerFrame.swatchFunc = ExtraSetColorPickerCallback;
+	ColorPickerFrame.cancelFunc = ResetExtraSetColorFilter;
+	ColorPickerFrame:ClearAllPoints();
+	ColorPickerFrame:SetPoint("TOPLEFT", BetterWardrobeCollectionFrame, "TOPRIGHT", 6, -8);
+	addon.colorPickerIsOurs = true;
+	ColorPickerFrame:Show();
+	ColorPickerFrame.Content.ColorSwatchOriginal:Hide();
+end
+
+function WardrobeCollectionFrameMixin:InitColorFilterButton()
+	local btn = self.ColorFilterButton;
+
+	local colorSwatch = btn:CreateTexture(nil, "OVERLAY");
+	colorSwatch:SetSize(13, 13);
+	colorSwatch:SetTexture(130939); -- Interface\ChatFrame\ChatFrameColorSwatch
+	colorSwatch:SetPoint("CENTER");
+	colorSwatch:Hide();
+	btn.colorSwatch = colorSwatch;
+
+	local checkers = btn:CreateTexture(nil, "BACKGROUND");
+	checkers:SetSize(13, 13);
+	checkers:SetTexture(188523); -- Tileset\Generic\Checkers
+	checkers:SetTexCoord(.25, 0, 0.5, .25);
+	checkers:SetDesaturated(true);
+	checkers:SetVertexColor(1, 1, 1, 0.75);
+	checkers:SetPoint("CENTER", colorSwatch);
+
+	local border = btn:CreateTexture(nil, "OVERLAY");
+	border:SetTexture([[Interface\CastingBar\UI-CastingBar-Arena-Shield]]);
+	border:SetSize(43, 43);
+	border:SetPoint("LEFT", -1, -1);
+
+	local revert = CreateFrame("Button", nil, btn);
+	revert:SetPoint("CENTER", 16, 15);
+	revert:SetSize(20, 20);
+	revert:Hide();
+	revert:SetScript("OnClick", ResetExtraSetColorFilter);
+	revert:SetScript("OnEnter", function()
+		GameTooltip:SetOwner(revert, "ANCHOR_RIGHT");
+		GameTooltip:SetText(L["Reset"]);
+		GameTooltip:Show();
+	end);
+	revert:SetScript("OnLeave", GameTooltip_Hide);
+	btn.revert = revert;
+
+	local revertTexture = revert:CreateTexture(nil, "OVERLAY");
+	revertTexture:SetAtlas("transmog-icon-revert-small");
+	revertTexture:SetAllPoints();
+
+	btn:SetScript("OnEnter", function()
+		GameTooltip:SetOwner(btn, "ANCHOR_RIGHT");
+		GameTooltip:SetText(L["Color"]);
+		GameTooltip:Show();
+	end);
+	btn:SetScript("OnLeave", GameTooltip_Hide);
+	btn:SetScript("OnClick", function()
+		OpenExtraSetColorPicker();
+	end);
+end
+
 function WardrobeCollectionFrameMixin:OnLoad()
 
 	PanelTemplates_SetNumTabs(self, 4);
@@ -781,6 +881,7 @@ function WardrobeCollectionFrameMixin:OnLoad()
 	--CollectionsJournal:SetPortraitToAsset("Interface\\Icons\\inv_misc_enggizmos_19");
 
 	self.FilterButton:SetWidth(90);
+	self:InitColorFilterButton();
 
 	-- TODO: Remove this at the next deprecation reset
 	self.searchBox = self.SearchBox;
@@ -856,6 +957,7 @@ function WardrobeCollectionFrameMixin:OnShow()
 end
 
 function WardrobeCollectionFrameMixin:OnHide()
+	if addon.ExtraSetColorTarget then ResetExtraSetColorFilter(); end
 	self:UnregisterEvent("TRANSMOG_COLLECTION_ITEM_UPDATE");
 	self:UnregisterEvent("UNIT_FORM_CHANGED");
 	self:UnregisterEvent("TRANSMOG_SEARCH_UPDATED");
