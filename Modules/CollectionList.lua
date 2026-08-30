@@ -98,6 +98,30 @@ function CollectionList:BuildCollectionList(complete)
 	return list
 end
 
+--Cross-category visuals list for the "View All" slot button: pulls every category that
+--has at least one member of the current list, then relies on FilterVisuals' IsInList
+--check to drop the non-member appearances each category call also returns.
+function CollectionList:BuildAllCategoriesVisualsList()
+	local collectionList = self:CurrentList()
+	local transmogLocation = BetterWardrobeCollectionFrame.ItemsCollectionFrame.transmogLocation
+	local categorySeen = {}
+	local visualsList = {}
+	for visualID in pairs(collectionList["item"]) do
+		local sources = C_TransmogCollection.GetAllAppearanceSources(visualID)
+		local sourceInfo = sources and sources[1] and C_TransmogCollection.GetSourceInfo(sources[1])
+		local categoryID = sourceInfo and sourceInfo.categoryID
+		if categoryID and not categorySeen[categoryID] then
+			categorySeen[categoryID] = true
+			local appearances = C_TransmogCollection.GetCategoryAppearances(categoryID, transmogLocation:GetData())
+			for _, visualInfo in ipairs(appearances) do
+				visualInfo.bwCategoryID = categoryID
+				tinsert(visualsList, visualInfo)
+			end
+		end
+	end
+	return visualsList
+end
+
 function CollectionList:BuildShoppingList()
 	local collectionList = self:BuildCollectionList(true)
 	local shoppingList = {}
@@ -203,7 +227,7 @@ function addon.Init:BuildCollectionList()
 	CollectionList:CreateDropdown()
 end
 
-local spacingNoSmallButton = 2
+local spacingNoSmallButton = 0
 local spacingWithSmallButton = 12
 local defaultSectionSpacing = 24
 local shorterSectionSpacing = 19
@@ -232,16 +256,15 @@ local function slotOnClick(self, transmogLocation)
 	if self.transmogLocation:IsAppearance() then
 		CollectionList.Category = transmogLocation and self.transmogLocation:GetArmorCategoryID() or self.transmogLocation:GetSlotID() + 100
 		CollectionList.showAll = false
-		BetterWardrobeCollectionFrame.ItemsCollectionFrame:ChangeModelsSlot(transmogLocation)
+		BetterWardrobeCollectionFrame.ItemsCollectionFrame:SetActiveSlot(self.transmogLocation)
 	else
 
 		CollectionList.Category = catchAll and catchAll:GetArmorCategoryID()
-		BetterWardrobeCollectionFrame.ItemsCollectionFrame:ChangeModelsSlot(catchAll)
+		BetterWardrobeCollectionFrame.ItemsCollectionFrame:SetActiveSlot(catchAll)
 		CollectionList.showAll = true
 	end
 
 	CloseDropDownMenus()
-	BW_CloseDropDownMenus()
 	PlaySound(SOUNDKIT.UI_TRANSMOG_GEAR_SLOT_CLICK)
 	BetterWardrobeCollectionFrame.ItemsCollectionFrame:RefreshVisualsList()
 	BetterWardrobeCollectionFrame.ItemsCollectionFrame:UpdateItems()
@@ -253,8 +276,7 @@ function BetterWardrobeSetsCollectionListMixin:CreateSlotButtons()
 	local lastButton
 	local xOffset = spacingNoSmallButton
 
-	local button = CreateFrame("BUTTON", nil, parentFrame, "WardrobeSlotButtonTemplate")
-	button:SetSize(40,40)
+	local button = CreateFrame("BUTTON", nil, parentFrame, "BetterWardrobeSlotButtonTemplate")
 	button.NormalTexture:ClearAllPoints()
 	button.NormalTexture:SetAllPoints()
 	button.NormalTexture:SetAtlas("transmog-nav-slot-enchant", false)
@@ -274,7 +296,7 @@ function BetterWardrobeSetsCollectionListMixin:CreateSlotButtons()
 			xOffset = value
 		else
 			local slotString = slots[i]
-			local button = CreateFrame("BUTTON", nil, parentFrame, "WardrobeSlotButtonTemplate")
+			local button = CreateFrame("BUTTON", nil, parentFrame, "BetterWardrobeSlotButtonTemplate")
 			button.NormalTexture:SetAtlas("transmog-nav-slot-"..slotString, true)
 			if (lastButton) then
 				button:SetPoint("LEFT", lastButton, "RIGHT", xOffset, 0)

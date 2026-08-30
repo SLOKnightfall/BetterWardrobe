@@ -1852,11 +1852,13 @@ end
 function WardrobeItemsCollectionMixin:FilterVisuals()
 	local visualsList = self.visualsList;
 	local filteredVisualsList = { };
+	local collectionListMode = BW_CollectionListButton and BW_CollectionListButton.ToggleState;
 	for i, visualInfo in ipairs(visualsList) do
 		local altAppearanceOnly = not addon.Profile.ShowOnlyAltAppearanceItems
 			or addon:BuildAltAppearanceData(self:GetAnAppearanceSourceFromVisual(visualInfo.visualID, nil)) ~= nil;
+		local inCollectionList = not collectionListMode or addon.CollectionList:IsInList(visualInfo.visualID, "item");
 		--if not visualInfo.isHideVisual then
-		if altAppearanceOnly then
+		if altAppearanceOnly and inCollectionList then
 			table.insert(filteredVisualsList, visualInfo);
 		end
 		--end
@@ -2026,19 +2028,32 @@ function WardrobeItemsCollectionMixin:UpdateItems()
 
 			-- camera
 			if ( self.transmogLocation:IsAppearance() ) then
+				--In the cross-category "View All" list each visual keeps the category it was
+				--actually pulled from (see BuildAllCategoriesVisualsList), which can differ from
+				--the frame's own activeCategory (fixed to the catch-all slot) -- use that real
+				--category for camera lookups so e.g. boots don't render with the head's camera.
+				local itemCategory = visualInfo.bwCategoryID or self.activeCategory;
+				local itemCameraVariation = cameraVariation;
+				if visualInfo.bwCategoryID and visualInfo.bwCategoryID ~= self.activeCategory then
+					local itemSlotName = addon.Globals.CATEGORYID_TO_NAME[itemCategory];
+					if itemSlotName then
+						itemCameraVariation = TransmogUtil.GetCameraVariation(TransmogUtil.GetTransmogLocation(itemSlotName, Enum.TransmogType.Appearance, false));
+					end
+				end
+
 				if visualInfo.artifact then
 					--Blizzard's GetAppearanceCameraID doesn't recognize artifact trait visualIDs;
 					--use the camera we already resolved (with fallbacks) when building this list.
 					cameraID = visualInfo.camera;
 				else
-					cameraID = C_TransmogCollection.GetAppearanceCameraID(visualInfo.visualID, cameraVariation);
+					cameraID = C_TransmogCollection.GetAppearanceCameraID(visualInfo.visualID, itemCameraVariation);
 				end
 
 				--Worgen/Dracthyr armor slots: override with the race/form-specific camera, if still valid.
 				local _, raceFile = UnitRace("player");
-				local slotName = addon.Globals.CATEGORYID_TO_NAME[self.activeCategory];
+				local slotName = addon.Globals.CATEGORYID_TO_NAME[itemCategory];
 				if (raceFile == "Worgen" or raceFile == "Dracthyr") and slotName and addon.Camera.lookupItems[slotName] then
-					local formCameraID = addon.Camera:GetCameraIDBySlot(self.activeCategory);
+					local formCameraID = addon.Camera:GetCameraIDBySlot(itemCategory);
 					if formCameraID and GetUICameraInfo(formCameraID) then
 						cameraID = formCameraID;
 					end
@@ -2110,10 +2125,10 @@ function WardrobeItemsCollectionMixin:UpdateItems()
 
 			local setID = (model.visualInfo and model.visualInfo.visualID) or model.setID;
 			local isHidden = addon.HiddenAppearanceDB.profile.item[setID];
-			----model.CollectionListVisual.Hidden.Icon:SetShown(isHidden);
-			----local isInList = addon.CollectionList:IsInList(setID, "item")
-			----model.CollectionListVisual.Collection.Collection_Icon:SetShown(isInList);
-			----model.CollectionListVisual.Collection.Collected_Icon:SetShown(isInList and model.visualInfo and model.visualInfo.isCollected);
+			model.CollectionListVisual.Hidden.Icon:SetShown(isHidden);
+			local isInList = addon.CollectionList:IsInList(setID, "item");
+			model.CollectionListVisual.Collection.Collection_Icon:SetShown(isInList);
+			model.CollectionListVisual.Collection.Collected_Icon:SetShown(isInList and model.visualInfo and model.visualInfo.isCollected);
 
 			if ( GameTooltip:GetOwner() == model ) then
 				model:OnEnter();
@@ -2165,7 +2180,10 @@ function WardrobeItemsCollectionMixin:RefreshVisualsList()
 		self:LeaveArtifactBrowsing();
 	end
 
-	if self.transmogLocation:IsIllusion() then
+	local collectionListMode = BW_CollectionListButton and BW_CollectionListButton.ToggleState;
+	if collectionListMode and addon.CollectionList.showAll then
+		self.visualsList = addon.CollectionList:BuildAllCategoriesVisualsList();
+	elseif self.transmogLocation:IsIllusion() then
 		self.visualsList = C_TransmogCollection.GetIllusions();
 	elseif self.activeCategory == Enum.TransmogCollectionType.Paired and not C_Transmog.IsAtTransmogNPC() then
 		--Blizzard's native GetCategoryAppearances only surfaces collected artifact traits;
@@ -2587,7 +2605,7 @@ end
 function WardrobeItemModelMixin:OnMouseUp(button)
 	if button == "RightButton" then
 		local itemsCollectionFrame = self:GetParent();
-		if ( not self.visualInfo.isCollected or self.visualInfo.isHideVisual or itemsCollectionFrame.transmogLocation:IsIllusion() ) then
+		if ( self.visualInfo.isHideVisual or itemsCollectionFrame.transmogLocation:IsIllusion() ) then
 			return;
 		end
 
@@ -2609,11 +2627,9 @@ function WardrobeItemModelMixin:OnMouseUp(button)
 			end);
 			
 			local collected = self.visualInfo.isCollected;
-			-----local collectionList = addon.CollectionList:CurrentList();
-			----local isInList = match or addon.CollectionList:IsInList(self.visualInfo.visualID, "item");
 			local targetSet = match or variantTarget or self.visualInfo.visualID;
 			local targetText = match and " - "..matchType or variantTarget and " - "..variantType or "";
-			local isInList = false -----collectionList["item"][targetSet];
+			local isInList = addon.CollectionList:IsInList(targetSet, "item");
 
 			text = isInList and L["Remove from Collection List"]..targetText or L["Add to Collection List"]..targetText;
 
@@ -3163,65 +3179,56 @@ function BetterWardrobeTransmogOptionsDropdownMixin:OnLoad()
 					-----BetterWardrobeCollectionFrame.SetsTransmogFrame:OnSearchUpdate();
 				end,
 			7);
-			rootDescription:CreateRadio(L["Show Incomplete Sets"], function() return addon.Profile.ShowIncomplete end, 
+			rootDescription:CreateRadio(L["Hide Missing Set Pieces at Transmog Vendor"], function() return addon.Profile.HideMissing; end,
 				function()
-					addon.Profile.ShowIncomplete = not addon.Profile.ShowIncomplete;
+					addon.Profile.HideMissing = not addon.Profile.HideMissing;
 					-----BetterWardrobeCollectionFrame.SetsTransmogFrame:OnSearchUpdate();
-				end, 
-			1);
+					-----BetterWardrobeCollectionFrame.SetsTransmogFrame:UpdateSets();
+				end,
+			4);
 
-			if addon.Profile.ShowIncomplete then
-				rootDescription:CreateRadio(L["Hide Missing Set Pieces at Transmog Vendor"], function() return addon.Profile.HideMissing; end, 
-					function()
-						addon.Profile.HideMissing = not addon.Profile.HideMissing;
-						-----BetterWardrobeCollectionFrame.SetsTransmogFrame:OnSearchUpdate();
-						-----BetterWardrobeCollectionFrame.SetsTransmogFrame:UpdateSets();
-					end,
-				4);
-
-				local submenu = rootDescription:CreateButton("Include:");
-				submenu:CreateButton(CHECK_ALL, 
-					function()
-						for index in pairs(locationDropDown) do
-							addon.includeLocation[index] = true;
-						end
-						-----BetterWardrobeCollectionFrame.SetsTransmogFrame:OnSearchUpdate();
+			local submenu = rootDescription:CreateButton("Include:");
+			submenu:CreateButton(CHECK_ALL,
+				function()
+					for index in pairs(locationDropDown) do
+						addon.includeLocation[index] = true;
 					end
-				);
-
-				submenu:CreateButton(UNCHECK_ALL, 
-					function()
-						for index in pairs(locationDropDown) do
-							addon.includeLocation[index] = false;
-						end
-						-----BetterWardrobeCollectionFrame.SetsTransmogFrame:OnSearchUpdate();
-					end
-				);
-
-				for index, id in pairs(locationDropDown) do
-					if index ~= 21 then --Skip "robe" type
-						submenu:CreateCheckbox(id, function() return addon.includeLocation[index]; end, 
-							function()
-								addon.includeLocation[index] = value;
-								if index == 6 then
-									addon.includeLocation[21] = value;
-								end
-
-								-----BetterWardrobeCollectionFrame.SetsTransmogFrame:OnSearchUpdate();
-							end, 
-						index);
-					end
+					-----BetterWardrobeCollectionFrame.SetsTransmogFrame:OnSearchUpdate();
 				end
+			);
 
-				submenu = rootDescription:CreateButton("Cutoff:");
-				for index = 1, 9 do
-					submenu:CreateCheckbox(index, function() return index == addon.Profile.PartialLimit end, 
-						function() 
-							addon.Profile.PartialLimit = index
-							-----BetterWardrobeCollectionFrame.SetsTransmogFrame:OnSearchUpdate()
-						end, 
+			submenu:CreateButton(UNCHECK_ALL,
+				function()
+					for index in pairs(locationDropDown) do
+						addon.includeLocation[index] = false;
+					end
+					-----BetterWardrobeCollectionFrame.SetsTransmogFrame:OnSearchUpdate();
+				end
+			);
+
+			for index, id in pairs(locationDropDown) do
+				if index ~= 21 then --Skip "robe" type
+					submenu:CreateCheckbox(id, function() return addon.includeLocation[index]; end,
+						function()
+							addon.includeLocation[index] = value;
+							if index == 6 then
+								addon.includeLocation[21] = value;
+							end
+
+							-----BetterWardrobeCollectionFrame.SetsTransmogFrame:OnSearchUpdate();
+						end,
 					index);
 				end
+			end
+
+			submenu = rootDescription:CreateButton("Cutoff:");
+			for index = 1, 9 do
+				submenu:CreateCheckbox(index, function() return index == addon.Profile.PartialLimit end,
+					function()
+						addon.Profile.PartialLimit = index
+						-----BetterWardrobeCollectionFrame.SetsTransmogFrame:OnSearchUpdate()
+					end,
+				index);
 			end
 		end
 	end);

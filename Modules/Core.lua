@@ -230,6 +230,13 @@ local options = {
 							width = .7,
 							disabled = function() return not addon.Profile.ShowCollectionUpdates end,
 						},
+						ShowCollectionToast = {
+							order = 5.5,
+							name = L["Show Toast"],
+							type = "toggle",
+							width = 1,
+							disabled = function() return not addon.Profile.ShowCollectionUpdates end,
+						},
 						TSM_Market = {
 							order = 6,
 							name = L["TSM Source to Use"],
@@ -288,11 +295,6 @@ local options = {
 							desc = L["ExtraLargeTransmogAreaMax_Tooltip"],
 							hidden = true,
 
-						},
-						ShowIncomplete = {
-							order = 2,
-							name = L["Show Incomplete Sets"],
-							type = "toggle",
 						},
 						ShowHidden = {
 							order = 3,
@@ -1329,6 +1331,54 @@ function addon:OnEnable()
 	addon:RegisterEvent("TRANSMOG_COLLECTION_SOURCE_ADDED", "EventHandler")
 	addon:RegisterEvent("PLAYER_ENTERING_WORLD", "EventHandler")
 
+	--Both base Sets and Extra Sets use our own link scheme: Blizzard's native "transmogset"
+	--handler crashes here since this addon's Sets tab replaces Blizzard's own, leaving
+	--Blizzard's stock Sets scrollbox with no data to select into.
+	local BW_SET_TABS = {BW_transmogset = 2, ["BW_transmogset-extra"] = 3}
+	addon:SecureHook(nil, "SetItemRef", function(link, ...)
+		if InCombatLockdown() then return end
+
+		local linkType, id = strsplit(":", link)
+		local tabID = BW_SET_TABS[linkType]
+		if not tabID then return end
+
+		local setID = tonumber((strsplit("-", id)))
+		if not setID then return end
+
+		local function goToSet()
+			BetterWardrobeCollectionFrame:SetTab(tabID)
+			BetterWardrobeCollectionFrame.SetsCollectionFrame:SelectSet(setID)
+		end
+
+		if not CollectionsJournal:IsVisible() then
+			ToggleCollectionsJournal(5)
+			C_Timer.After(0, goToSet)
+		else
+			goToSet()
+		end
+	end)
+
+	--Reuses Blizzard's own generic collectible toast (same template as new-toy/pet/mount alerts).
+	addon.CollectionAlertSystem = AlertFrame:AddQueuedAlertFrameSubSystem("BW_CollectionAlertFrameTemplate", function(alert, icon, quality, name, label, setLine)
+		if not alert.BWBackground then
+			local bg = alert:CreateTexture(nil, "BACKGROUND", nil, 1)
+			bg:SetAtlas("LootToast-MoreAwesome", true)
+			bg:SetPoint("CENTER")
+			alert.BWBackground = bg
+
+			local setInfo = alert:CreateFontString(nil, "ARTWORK", "GameFontHighlightSmall")
+			setInfo:SetPoint("RIGHT", alert.Name)
+			setInfo:SetJustifyH("LEFT")
+			alert.BWSetInfo = setInfo
+		end
+		alert:SetUpDisplay(icon, quality, name, label)
+		alert.BWSetInfo:ClearAllPoints()
+		alert.BWSetInfo:SetPoint("TOPLEFT", alert.Name, "TOPLEFT", 0, -(alert.Name:GetStringHeight() + 2))
+		alert.BWSetInfo:SetPoint("RIGHT", alert.Name)
+		alert.BWSetInfo:SetShown(setLine ~= nil)
+		alert.BWSetInfo:SetText(setLine)
+	end, 1, 1)
+
 	--Cache any default Blizz Saved Sets
 	---addon.StoreBlizzardSets()
 	initialize = true
@@ -1821,6 +1871,116 @@ function addon:CreateVendorItemsFilterButton(itemsFrame)
 	return filterButton
 end
 
+--Shared by the real event handler below and the /bwannounce test command.
+function addon:AnnounceCollectionUpdate(sourceID)
+	if not addon.Profile.ShowCollectionUpdates then return end
+
+	local sourceInfo = C_TransmogCollection.GetSourceInfo(sourceID)
+	if not sourceInfo then return end
+
+	local announced = false
+	local toastSetName, toastCollected, toastTotal
+
+	if addon.Profile.ShowSetCollectionUpdates then
+		local setIDs = C_TransmogSets.GetSetsContainingSourceID(sourceID)
+		for i, setID in pairs(setIDs or {}) do
+			local setInfo = C_TransmogSets.GetSetInfo(setID)
+			print((YELLOW_FONT_COLOR_CODE..L["Added missing appearances of: \124cffff7fff\124H%s:%s\124h[%s]\124h\124r"]):format("BW_transmogset", setID, setInfo.name))
+			announced = true
+			if not toastSetName then
+				toastSetName = setInfo.name
+				toastCollected, toastTotal = addon.SetsDataProvider:GetSetSourceCounts(setID)
+			end
+		end
+	end
+
+	if addon.Profile.ShowExtraSetsCollectionUpdates then
+		local setData = addon.IsSetItem(sourceInfo.itemID)
+		for _, data in pairs(setData or {}) do
+			local linkID = ("%d-%d"):format(data.setID, sourceID)
+			print((YELLOW_FONT_COLOR_CODE..L["Added missing appearances of: \124cffff7fff\124H%s:%s\124h[%s]\124h\124r"]):format("BW_transmogset-extra", linkID, data.name))
+			announced = true
+			if not toastSetName then
+				toastSetName = data.name
+				toastCollected, toastTotal = addon.SetsDataProvider:GetSetSourceCounts(data.setID)
+			end
+		end
+	end
+
+	if addon.Profile.ShowCollectionListCollectionUpdates and addon.CollectionList:IsInList(sourceInfo.visualID, "item") then
+		print(YELLOW_FONT_COLOR_CODE..L["Added appearance in Collection List"])
+		announced = true
+	end
+
+	if announced and addon.Profile.ShowCollectionToast and addon.CollectionAlertSystem then
+		local icon = C_TransmogCollection.GetSourceIcon(sourceID)
+		local setLine = toastSetName and ("%s (%d/%d)"):format(toastSetName, toastCollected or 0, toastTotal or 0)
+		addon.CollectionAlertSystem:AddAlert(icon, sourceInfo.quality, sourceInfo.name, YOU_COLLECTED_LABEL, setLine)
+	end
+end
+
+--No argument: falls back to the first equipped item that belongs to a set/extra set/list.
+SLASH_BWANNOUNCETEST1 = "/bwannounce"
+SlashCmdList["BWANNOUNCETEST"] = function(msg)
+	local sourceID = tonumber(msg)
+
+	if not sourceID then
+		for slotID = 1, 19 do
+			local itemID = GetInventoryItemID("player", slotID)
+			if itemID then
+				local appearanceID, equippedSourceID = C_TransmogCollection.GetItemInfo(itemID)
+				if equippedSourceID then
+					local setIDs = C_TransmogSets.GetSetsContainingSourceID(equippedSourceID)
+					local inExtraSet = addon.IsSetItem(itemID)
+					local inList = appearanceID and addon.CollectionList:IsInList(appearanceID, "item")
+					if (setIDs and next(setIDs)) or inExtraSet or inList then
+						sourceID = equippedSourceID
+						break
+					end
+				end
+			end
+		end
+	end
+
+	if not sourceID then
+		print("BetterWardrobe: no announceable item found equipped. Usage: /bwannounce <sourceID>")
+		return
+	end
+
+	addon:AnnounceCollectionUpdate(sourceID)
+end
+
+--Tests only the Extra Set link/click path; setID defaults to the first Extra Set found on a currently equipped item.
+SLASH_BWANNOUNCEEXTRATEST1 = "/bwannounceextra"
+SlashCmdList["BWANNOUNCEEXTRATEST"] = function(msg)
+	local setID = tonumber(msg)
+
+	if not setID then
+		for slotID = 1, 19 do
+			local itemID = GetInventoryItemID("player", slotID)
+			local setData = itemID and addon.IsSetItem(itemID)
+			if setData and next(setData) then
+				setID = select(2, next(setData)).setID
+				break
+			end
+		end
+	end
+
+	if not setID then
+		print("BetterWardrobe: no equipped item belongs to an Extra Set. Usage: /bwannounceextra <setID>")
+		return
+	end
+
+	local setInfo = addon.GetSetInfo(setID)
+	if not setInfo or setInfo.setType == "Blizzard" then
+		print("BetterWardrobe: "..setID.." is not an Extra Set.")
+		return
+	end
+
+	local linkID = ("%d-%d"):format(setID, 0)
+	print((YELLOW_FONT_COLOR_CODE..L["Added missing appearances of: \124cffff7fff\124H%s:%s\124h[%s]\124h\124r"]):format("BW_transmogset-extra", linkID, setInfo.name))
+end
+
 function addon:EventHandler(event, ...)
 	if event == "ADDON_LOADED" and ... == "Blizzard_Collections" then
 		addon:SendMessage("BW_ADDON_LOADED")
@@ -1911,8 +2071,8 @@ function addon:EventHandler(event, ...)
 		----C_Timer.After(1, function() addon:ResetSetsCollectionFrame() end)
 
 	elseif (event == "TRANSMOG_COLLECTION_SOURCE_ADDED") then
-		local x = ...
-		BetterWardrobeCollectionFrameMixin:OnEvent(event, x)
+		local sourceID = ...
+		addon:AnnounceCollectionUpdate(sourceID)
 
 	elseif (event == "TRANSMOG_COLLECTION_SOURCE_REMOVED") then
 		local x = ...

@@ -3,6 +3,8 @@
 
 	<Script file="Templates.lua"/>
 
+	<ContainedAlertFrame name="BW_CollectionAlertFrameTemplate" parent="UIParent" hidden="true" virtual="true" mixin="BetterWardrobeCollectionAlertMixin" inherits="ItemAlertFrameTemplate"/>
+
 	<Frame name="BetterWardrobeSetInfoTemplate" parentKey="SetInfo" virtual="true" setAllPoints="true" hidden="false">
 		<Anchors>
 			<Anchor point="TOPLEFT" x="2" y="-2" relativePoint="TOPLEFT"/>

@@ -137,14 +137,6 @@ function UI:HideSlotMenu_OnClick(parent)
 	MenuUtil.CreateContextMenu(parent, GeneratorFunction);
 end
 
-function BW_TransmogOptionsButton_OnEnter(self)
-	if not addon.Profile.ShowIncomplete then 
-		GameTooltip:SetOwner(self, "ANCHOR_RIGHT")
-		GameTooltip:SetText(L["Requires 'Show Incomplete Sets' Enabled"])
-		GameTooltip:Show()
-	end
-end
-
 function BetterWardrobeTransmogVendorOptionsDropDown_OnLoad(self)
 end
 
