@@ -605,6 +605,8 @@ function addon:FilterSets(setList, setType)
 
 		local collected = count == total
 		local altAppearanceOnly = not addon.Profile.ShowOnlyAltAppearanceSets or addon:SetHasAltAppearanceItem(setData.primaryAppearances)
+		local isCosmetic = setType == "set" and addon:IsCosmeticSet(data.setID)
+		local armorOrCosmetic = setType ~= "set" or (isCosmetic and addon.Profile.ShowCosmeticSets ~= false) or (not isCosmetic and addon.Profile.ShowArmorSets ~= false)
 		if ((filterCollected and collected) or (filterUncollected and not collected)) and
 			((filterPVE and not isPvP) or (filterPVP and isPvP)) and
 			--CheckMissingLocation(data) and
@@ -615,6 +617,7 @@ function addon:FilterSets(setList, setType)
 			tab and
 			unavailableFilter and
 			colorFilter and
+			armorOrCosmetic and
 			altAppearanceOnly then
 			tinsert(FilterSets, data)
 		end

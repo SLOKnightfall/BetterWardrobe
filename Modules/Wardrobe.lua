@@ -504,6 +504,8 @@ function WardrobeCollectionFrameMixin:InitBaseSetsFilterButton()
 		end
 
 		return C_TransmogSets.IsUsingDefaultBaseSetsFilters()
+			and addon.Profile.ShowArmorSets ~= false
+			and addon.Profile.ShowCosmeticSets ~= false
 	end);
 
 	self.FilterButton:SetupMenu(function(dropdown, rootDescription)
@@ -582,6 +584,8 @@ function WardrobeCollectionFrameMixin:InitBaseSetsFilterButton()
 		xpackCheckAll(true)
 		sourceCheckAll(true)
 		missingCheckAll(true)
+		addon.Profile.ShowArmorSets = true;
+		addon.Profile.ShowCosmeticSets = true;
 		local result = C_TransmogSets.SetDefaultBaseSetsFilters();
 		--RefreshLists must run after all three resets -- xpackCheckAll refreshes internally too early on its own.
 		RefreshLists();
@@ -598,9 +602,21 @@ function WardrobeCollectionFrameMixin:InitBaseSetsFilterButton()
 		rootDescription:CreateDivider();
 
 
-	if BetterWardrobeCollectionFrame.selectedCollectionTab == 2 then 
+	if BetterWardrobeCollectionFrame.selectedCollectionTab == 2 then
 			rootDescription:CreateCheckbox(TRANSMOG_SET_PVE, C_TransmogSets.GetBaseSetsFilter, GetBaseSetsFilter, LE_TRANSMOG_SET_FILTER_PVE);
 			rootDescription:CreateCheckbox(TRANSMOG_SET_PVP, C_TransmogSets.GetBaseSetsFilter, GetBaseSetsFilter, LE_TRANSMOG_SET_FILTER_PVP);
+			rootDescription:CreateDivider();
+
+			rootDescription:CreateCheckbox(L["Armor"], function() return addon.Profile.ShowArmorSets ~= false; end,
+				function()
+					addon.Profile.ShowArmorSets = not (addon.Profile.ShowArmorSets ~= false);
+					RefreshLists();
+				end);
+			rootDescription:CreateCheckbox(L["Cosmetic"], function() return addon.Profile.ShowCosmeticSets ~= false; end,
+				function()
+					addon.Profile.ShowCosmeticSets = not (addon.Profile.ShowCosmeticSets ~= false);
+					RefreshLists();
+				end);
 			rootDescription:CreateDivider();
 	end
 

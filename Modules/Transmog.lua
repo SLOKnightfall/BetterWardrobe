@@ -2516,24 +2516,17 @@ local function getSources(data)
 end
 
 local BW_SetCosmeticCache = {}
-local function BW_IsCosmeticSet(setID, primaryAppearances)
+--Cosmetic sets have no single-class restriction: classMask 0 (unset) or 16383 (all classes).
+function addon:IsCosmeticSet(setID)
 	local cached = BW_SetCosmeticCache[setID]
 	if cached ~= nil then return cached end
 
-	local isCosmetic = false
-	if primaryAppearances then
-		for _, appearance in pairs(primaryAppearances) do
-			local sourceInfo = C_TransmogCollection.GetSourceInfo(appearance.appearanceID)
-			if sourceInfo and sourceInfo.itemID and C_Item.IsCosmeticItem(sourceInfo.itemID) then
-				isCosmetic = true
-				break
-			end
-		end
-	end
-
+	local info = C_TransmogSets.GetSetInfo(setID)
+	local isCosmetic = info and (info.classMask == 0 or info.classMask == 16383) or false
 	BW_SetCosmeticCache[setID] = isCosmetic
 	return isCosmetic
 end
+local function BW_IsCosmeticSet(setID) return addon:IsCosmeticSet(setID) end
 
 local function isValidFilter(data)
 	local expansion = xpacSelection[data.expansionID]
@@ -2733,7 +2726,7 @@ function TransmogWardrobeSetsMixin:RefreshCollectionEntries()
 					expansionID = availableSet.expansionID,
 					label = availableSet.label,
 					uiOrder = availableSet.uiOrder,
-					isCosmetic = BW_IsCosmeticSet(availableSet.setID, data.primaryAppearances),
+					isCosmetic = BW_IsCosmeticSet(availableSet.setID),
 
 				};
 				availableSet.expansionID = availableSet.expansionID
