@@ -195,7 +195,8 @@ local function BuildSourceList(visualID)
 	if sources then
 		for i=1,#sources do
 			local sourceInfo = C_TransmogCollection.GetSourceInfo(sources[i])
-			local _,_,_,_,_,itemLink = C_TransmogCollection.GetAppearanceSourceInfo(sources[i])
+			local appearanceSourceInfo = C_TransmogCollection.GetAppearanceSourceInfo(sources[i])
+			local itemLink = appearanceSourceInfo and appearanceSourceInfo.itemLink
 			if itemLink then
 				local itemID = itemLink:match("item:(%d+)")
 				itemID = tonumber(itemID)
@@ -459,7 +460,10 @@ function CollectionList:GenerateSourceListView(visualID)
 	local list = BuildSourceList(visualID)
 	for i, data in ipairs(list) do
 		if data then
-			local categoryID, visualID, canEnchant, itemIcon, isCollected, itemLink, transmogLink = C_TransmogCollection.GetAppearanceSourceInfo(data.sourceID)
+			local appearanceSourceInfo = C_TransmogCollection.GetAppearanceSourceInfo(data.sourceID)
+			local itemIcon = appearanceSourceInfo and appearanceSourceInfo.icon
+			local isCollected = appearanceSourceInfo and appearanceSourceInfo.isCollected
+			local itemLink = appearanceSourceInfo and appearanceSourceInfo.itemLink
 			local collectedStatus = ""
 
 			if isCollected then 

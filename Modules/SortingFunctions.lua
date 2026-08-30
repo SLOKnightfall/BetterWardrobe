@@ -194,7 +194,7 @@ function addon:CompareItemColor(visualID1, visualID2)
 	end
 
 	local ColorTable = (_G.BetterWardrobeData and _G.BetterWardrobeData.ColorTable) or {}
-	local ItemAppearance = (_G.BetterWardrobeData and _G.BetterWardrobeData.ItemAppearance) or {}
+	local ItemAppearance = (_G.BetterWardrobeData and _G.BetterWardrobeData.ItemAppearanceByID) or {}
 	local color1 = ColorTable[visualID1]
 	local color2 = ColorTable[visualID2]
 	local file1 = ItemAppearance[visualID1]
@@ -430,7 +430,7 @@ local function SortItemByAppearance(self)
 			C_AddOns.LoadAddOn("BetterWardrobe_SourceData")
 			C_AddOns.EnableAddOn("BetterWardrobe_SourceData")
 		end
-		local ItemAppearance = (_G.BetterWardrobeData and _G.BetterWardrobeData.ItemAppearance) or {}
+		local ItemAppearance = (_G.BetterWardrobeData and _G.BetterWardrobeData.ItemAppearanceByID) or {}
 
 		if ItemAppearance[source1.visualID] and ItemAppearance[source2.visualID] then
 			return SortOrder(ItemAppearance[source1.visualID], ItemAppearance[source2.visualID])
@@ -469,7 +469,7 @@ local function SortByItemSource(self)
 					C_AddOns.EnableAddOn("BetterWardrobe_SourceData")
 					C_AddOns.LoadAddOn("BetterWardrobe_SourceData")
 				end
-				local ItemAppearance = (_G.BetterWardrobeData and _G.BetterWardrobeData.ItemAppearance) or {}
+				local ItemAppearance = (_G.BetterWardrobeData and _G.BetterWardrobeData.ItemAppearanceByID) or {}
 				--local ItemAppearance = addon.ItemAppearance or {}
 
 				if ItemAppearance[source1.visualID] and ItemAppearance[source2.visualID] then
@@ -619,7 +619,7 @@ local function SortSetByAppearance(sets)
 			C_AddOns.EnableAddOn("BetterWardrobe_SourceData")
 			C_AddOns.LoadAddOn("BetterWardrobe_SourceData")
 		end
-		local ItemAppearance = (_G.BetterWardrobeData and _G.BetterWardrobeData.ItemAppearance) or {}
+		local ItemAppearance = (_G.BetterWardrobeData and _G.BetterWardrobeData.ItemAppearanceByID) or {}
 		--local ItemAppearance = addon.ItemAppearance or {}
 
 		if ItemAppearance[source1.visualID] and ItemAppearance[source2.visualID] then

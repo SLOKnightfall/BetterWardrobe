@@ -949,9 +949,15 @@ function WardrobeCollectionFrameMixin:GoToItem(sourceID)
 end
 
 function WardrobeCollectionFrameMixin:GoToSet(setID)
-	--self:SetTab(WARDROBE_TAB_SETS);
+	local setInfo = addon.GetSetInfo(setID);
+	local tabID = WARDROBE_TAB_SETS;
+	if setInfo and setInfo.setType == "ExtraSet" then
+		tabID = WARDROBE_TAB_EXTRASETS;
+	elseif setInfo and setInfo.setType == "SavedExtra" then
+		tabID = WARDROBE_TAB_SAVED_SETS;
+	end
+	self:SetTab(tabID);
 
-	--TODO: Handle extra set
 	local classID = C_TransmogSets.GetValidClassForSet(setID);
 	if classID then
 		C_TransmogSets.SetTransmogSetsClassFilter(classID);

@@ -92,6 +92,7 @@ Modules\Wardrobe.xml
 Modules\DressingRoom.xml
 Modules\ColorFilter.lua
 Modules\CollectionList.xml
+Modules\Sources.lua
 
 Modules\SortingFunctions.lua
 

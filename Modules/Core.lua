@@ -1541,11 +1541,25 @@ local function BW_RefreshVendorItemsList(itemsFrame)
 
 	local colorTarget = addon.VendorColorTarget
 	local colorTable = colorTarget and addon:GetColorTable()
+	local colorTolerance = addon.VendorColorTolerance
+	local colorSwatchNames = addon.VendorColorSwatchNames
+	local ItemAppearance = colorSwatchNames and (_G.BetterWardrobeData and _G.BetterWardrobeData.ItemAppearanceByID) or nil
 
 	local collectionElements = {}
 	for _, itemEntry in ipairs(entries) do
 		local passesColor = not colorTarget or itemEntry.isHideVisual
-			or addon:VisualMatchesColorLab(itemEntry.visualID, colorTable, colorTarget[1], colorTarget[2], colorTarget[3])
+		if colorTarget and not itemEntry.isHideVisual then
+			local nameMatch = false
+			if colorSwatchNames and ItemAppearance and ItemAppearance[itemEntry.visualID] then
+				for _, colorName in ipairs(colorSwatchNames) do
+					if strfind(ItemAppearance[itemEntry.visualID], colorName, 1, true) then
+						nameMatch = true
+						break
+					end
+				end
+			end
+			passesColor = nameMatch or addon:VisualMatchesColorLab(itemEntry.visualID, colorTable, colorTarget[1], colorTarget[2], colorTarget[3], colorTolerance)
+		end
 		if ((itemEntry.isUsable and itemEntry.isCollected) or itemEntry.alwaysShowItem) and passesColor then
 			table.insert(collectionElements, {
 				templateKey = "COLLECTION_ITEM",
@@ -1564,6 +1578,8 @@ end
 local function ResetVendorColorFilter()
 	ColorPickerFrame:Hide()
 	addon.VendorColorTarget = nil
+	addon.VendorColorTolerance = nil
+	addon.VendorColorSwatchNames = nil
 	if addon.VendorColorFilterButton then
 		addon.VendorColorFilterButton.colorSwatch:Hide()
 		addon.VendorColorFilterButton.revert:Hide()
@@ -1591,11 +1607,18 @@ local function SelectVendorColor(itemsFrame)
 
 		local labA, labB, labC = addon:ConvertRGB_to_LAB(R2 * 255, G2 * 255, B2 * 255)
 		addon.VendorColorTarget = {labA, labB, labC}
+		--Swatches use idealized/pure RGB, which real sampled item colors rarely match closely,
+		--so widen the tolerance for a swatch-triggered pick; manual wheel picks keep the default.
+		addon.VendorColorTolerance = addon.colorPickerFromSwatch and 22 or nil
+		addon.VendorColorSwatchNames = addon.colorPickerFromSwatch and addon.colorPickerSwatchNames or nil
+		addon.colorPickerFromSwatch = false
+		addon.colorPickerSwatchNames = nil
 		BW_RefreshVendorItemsList(itemsFrame)
 	end
 
 	ColorPickerFrame.swatchFunc = ColorPickerCallback
 	ColorPickerFrame.cancelFunc = ResetVendorColorFilter
+	addon.colorPickerIsOurs = true
 	ColorPickerFrame:ClearAllPoints()
 	ColorPickerFrame:SetPoint("TOPLEFT", TransmogFrame, "TOPRIGHT", 6, -8)
 	ColorPickerFrame:Show()
