@@ -72,7 +72,6 @@ L["Larger Transmog Area"] = "Großes Fenster"
 L["LargeTransmogArea_Tooltip"] = "Vergrößert das Fenster des Transmogrifizierers"
 L["Extra Large Transmog Area"] = "Extra großes Fenster"
 L["ExtraLargeTransmogArea_Tooltip"] = "Vergrößert das Fenster des Transmogrifizierers enorm, sodass das Fenster auf Bildschirmgröße ist."
-L["Show Incomplete Sets"] = "Unvollständige Sets anzeigen"
 L["Show Items set to Hidden"] = "Ausgeblendete Vorlagen anzeigen"
 L["Hide Missing Set Pieces at Transmog Vendor"] = "Verstecke fehlende Setteile beim Transmogrifizierer"
 L["Use Hidden Transmog for Missing Set Pieces"] = "Verwende \"versteckte\" Transmogvorlagen, für fehlende Setteile."
@@ -81,7 +80,6 @@ L["Show Set Names"] = "Setnamen anzeigen"
 L["Show Collected Count"] = "Gesammelte Anzahl anzeigen"
 
 L["Select Slot to Hide"] = "Slot zum verstecken auswählen"
-L["Requires 'Show Incomplete Sets' Enabled"] = "'Unvollständige Sets anzeigen' muss aktiviert sein"
 
 --~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ TOOLTIP ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~--
 
@@ -318,3 +316,40 @@ L["Item No Longer Available"] = "Gegenstand nicht länger verfügbar"
 --------------------------------------------------------------------------
 
 L["Saved Set"] = "Set gespeichert"
+
+--------------------------------------------------------------------------
+-------------- F-007 FIX: PREVIOUSLY MISSING FROM THIS FILE --------------
+--MACHINE-TRANSLATED by Claude -- review before shipping to native speakers.
+--------------------------------------------------------------------------
+
+L["Combine Special Sets"] = "Spezialsets kombinieren"
+L["Combine Trading Post Sets"] = "Handelsposten-Sets kombinieren"
+L["Contains Unavailable Items"] = "Enthält nicht verfügbare Gegenstände"
+L["Default to Human Form"] = "Standardmäßig menschliche Form"
+L["Item Visual ID"] = "Gegenstand-Visual-ID"
+L["MogIt Set"] = "MogIt-Set"
+L["No Longer Obtainable"] = "Nicht mehr erhältlich"
+L["Only swap if modifier is pressed"] = "Nur tauschen, wenn Zusatztaste gedrückt wird"
+L["Saved Outfits"] = "Gespeicherte Outfits"
+L["Show Hidden Sets"] = "Versteckte Sets anzeigen"
+L["Show ILevel"] = "Gegenstandsstufe anzeigen"
+L["Show Item Visual ID"] = "Gegenstand-Visual-ID anzeigen"
+L["Show Toast"] = "Toast-Benachrichtigung anzeigen"
+L["Sources"] = "Quellen"
+L["Switch Form To Dracthyr"] = "Zu Dracthyr-Form wechseln"
+L["Switch Form To Human"] = "Zu menschlicher Form wechseln"
+L["Switch Form To Visage"] = "Zur Erscheinungsform wechseln"
+L["Switch Form To Worgen"] = "Zur Worgen-Form wechseln"
+L["Trading Post"] = "Handelsposten"
+L["Undo"] = "Rückgängig"
+L["Zone"] = "Zone"
+
+--The review's cited NOTE_ examples only -- the broader NOTE_ grouping-label system (~140 keys,
+--fully translated in zhTW.lua) is entirely untranslated in this file; that is a much larger,
+--separate gap not addressed here. See the F-007 chat report.
+L["NOTE_16"] = "Stufe 70 PvP Seltenes Set"
+L["NOTE_32"] = "Stufe 85 PvP Seltenes Set"
+L["NOTE_36"] = "Stufe 85 PvP Episches Set"
+L["NOTE_41"] = "Stufe 90 PvP Seltenes Set"
+L["NOTE_1001"] = "Schattenland-Invasion Event-Set"
+L["NOTE_-2323"] = "Beliebig"

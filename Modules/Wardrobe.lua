@@ -2663,7 +2663,7 @@ function WardrobeItemModelMixin:OnMouseUp(button)
 						end
 					end
 				end
-				print(L["No Recolors Found"]);
+				addon:Print(L["No Recolors Found"]);
 			end);
 
 			local altData = addon:BuildAltAppearanceData(self:GetDisplayedSourceID());
@@ -3269,7 +3269,7 @@ function BetterWardrobeSetsDetailsItemUseabiltiyMixin:OnEnter()
 	local status = self:GetParent().itemCollectionStatus;
 	local text;
 	if status == "CollectedCharCantUse" then
-		text = L["Class cant use appearance. Useable appearance available."];
+		text = L["Class can't use appearance. Useable appearance available."];
 	elseif status == "CollectedCharCantGet" or status == "NotCollectedCharCantGet" then 
 		text = L["Class can't collect or use appearance."];
 	elseif status == "NotCollectedUnavailable" then

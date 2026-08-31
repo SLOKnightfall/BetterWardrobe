@@ -73,7 +73,6 @@ L["Larger Transmog Area"] = "大型塑形區域"
 L["Extra Large Transmog Area"] = "額外加大塑形區域"
 L["LargeTransmogArea_Tooltip"] = "加大塑形商店視窗"
 L["ExtraLargeTransmogArea_Tooltip"] = "加大塑形商店視窗以填充螢幕寬度"
-L["Show Incomplete Sets"] = "顯示未完成套裝"
 L["Show Items set to Hidden"] = "顯示物品套裝為隱藏"
 L["Hide Missing Set Pieces at Transmog Vendor"] = "在塑形商店隱藏缺少套裝的部位"
 L["Use Hidden Transmog for Missing Set Pieces"] = "在缺少套裝部位使用隱藏塑形"
@@ -82,7 +81,6 @@ L["Show Set Names"] = "顯示套裝名稱"
 L["Show Collected Count"] = "顯示已收藏件數"
 
 L["Select Slot to Hide"] = "選擇隱藏的部位"
-L["Requires 'Show Incomplete Sets' Enabled"] = "需要啟用'顯示未完成套裝'"
 
 --~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ TOOLTIP ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~--
 
@@ -448,3 +446,30 @@ L["NOTE_91"] = "海嶼遠征事件套裝"
 L["NOTE_60"] = "天譴入侵事件套裝"
 L["NOTE_69"] = "要塞套裝"
 L["NOTE_1001"] = "暗影之境入侵事件套裝"
+
+--------------------------------------------------------------------------
+-------------- F-007 FIX: PREVIOUSLY MISSING FROM THIS FILE --------------
+--MACHINE-TRANSLATED by Claude -- review before shipping to native speakers.
+--------------------------------------------------------------------------
+
+L["Combine Special Sets"] = "合併特殊套裝"
+L["Combine Trading Post Sets"] = "合併商隊驛站套裝"
+L["Contains Unavailable Items"] = "包含不可用物品"
+L["Default to Human Form"] = "預設為人類形態"
+L["Item Visual ID"] = "物品外觀ID"
+L["MogIt Set"] = "MogIt套裝"
+L["No Longer Obtainable"] = "已無法取得"
+L["Only swap if modifier is pressed"] = "僅在按下修飾鍵時交換"
+L["Saved Outfits"] = "已儲存的裝扮"
+L["Show Hidden Sets"] = "顯示隱藏套裝"
+L["Show ILevel"] = "顯示裝備等級"
+L["Show Item Visual ID"] = "顯示物品外觀ID"
+L["Show Toast"] = "顯示提示訊息"
+L["Sources"] = "來源"
+L["Switch Form To Dracthyr"] = "切換為龍裔形態"
+L["Switch Form To Human"] = "切換為人類形態"
+L["Switch Form To Visage"] = "切換為幻形"
+L["Switch Form To Worgen"] = "切換為狼人形態"
+L["Trading Post"] = "商隊驛站"
+L["Undo"] = "復原"
+L["Zone"] = "區域"

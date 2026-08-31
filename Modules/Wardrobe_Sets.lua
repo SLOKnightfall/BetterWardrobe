@@ -1123,7 +1123,7 @@ local function ToggleHidden(model, isHidden)
 		end
 		addon.HiddenAppearanceDB.profile.item[visualID] = not isHidden and link;
 		--self:UpdateWardrobe()
-		print(string.format("%s "..link.." %s", isHidden and L["unhiding_item"] or L["hiding_item"], isHidden and L["inhiding_item_end"] or L["hiding_item_end"] ));
+		addon:Print(string.format("%s "..link.." %s", isHidden and L["unhiding_item"] or L["hiding_item"], isHidden and L["unhiding_item_end"] or L["hiding_item_end"] ));
 		BetterWardrobeCollectionFrame.ItemsCollectionFrame:RefreshVisualsList();
 		BetterWardrobeCollectionFrame.ItemsCollectionFrame:UpdateItems();
 
@@ -1158,12 +1158,12 @@ local function ToggleHidden(model, isHidden)
 				--end
 		end	
 		--BetterWardrobeCollectionFrame.SetsCollectionFrame:OnSearchUpdate();
-		print(format("%s "..name.." %s", isHidden and L["unhiding_set"] or L["hiding_set"], isHidden and L["unhiding_set_end"] or L["hiding_set_end"]))
+		addon:Print(format("%s "..name.." %s", isHidden and L["unhiding_set"] or L["hiding_set"], isHidden and L["unhiding_set_end"] or L["hiding_set_end"]))
 	else
 		local setInfo = addon.GetSetInfo(model.setID);
 		local name = setInfo["name"];
 		addon.HiddenAppearanceDB.profile.extraset[model.setID] = not isHidden and name or nil;
-		print(format("%s "..name.." %s", isHidden and L["unhiding_set"] or L["hiding_set"], isHidden and L["unhiding_set_end"] or L["hiding_set_end"]));
+		addon:Print(format("%s "..name.." %s", isHidden and L["unhiding_set"] or L["hiding_set"], isHidden and L["unhiding_set_end"] or L["hiding_set_end"]));
 		BetterWardrobeCollectionFrame.SetsCollectionFrame:OnSearchUpdate();
 
 	end

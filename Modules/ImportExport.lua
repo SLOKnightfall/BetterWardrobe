@@ -317,7 +317,7 @@ function addon:CreateChatLink()
 		end
 	end
 
-	print(string)
+	addon:Print(string)
 	Export(string, false)
 end
 

@@ -123,7 +123,7 @@ local Patrons = {
 	args = {
 			Patronss_Label = {
 				order = 1,
-				name = function() return addonName .. ' is distributed for free and supported trough donations. A massive thank you to all the supporters on Patreon and Paypal who keep development alive. You can become a patron too at |cFFF96854patreon.com/SLOKnightfall|r.\n\n\n', 'https://www.patreon.com/SLOKnightfall' end,
+				name = function() return addonName .. ' is distributed for free and supported trough donations. A massive thank you to all the supporters on Patreon and Paypal who keep development alive. You can become a patron too at |cFFF96854patreon.com/SLOKnightfall|r.\n\n\n' end,
 				type = "description",
 				width = "full",
 
@@ -1009,7 +1009,6 @@ end
 --ACE Profile Saved Variables Defaults
 local defaults = {
 	profile = {
-		['*'] = true,
 		PartialLimit = 0,
 		ShowHidden = false,
 		TSM_Market = "DBMarket",
@@ -1027,7 +1026,6 @@ local defaults = {
 		TooltipPreview_Anchor = "horizontal",
 		TooltipPreviewRotate = false,
 		TooltipPreview_Modifier = L["None"],
-		TooltipPreview_ZoomItemModifier = L["None"],
 		TooltipPreview_SwapModifier = L["None"],
 		TooltipPreview_CustomRace = 1,
 		TooltipPreview_CustomGender = 0,
@@ -1046,6 +1044,46 @@ local defaults = {
 		ShowAltAppearanceIcon = true,
 		ShowOnlyAltAppearanceSets = false,
 		ShowOnlyAltAppearanceItems = false,
+
+		--Added by the F-001 fix (removal of the ['*'] = true wildcard): every key below was
+		--previously getting an accidental `true` default from the wildcard with no deliberate choice.
+		IgnoreClassLookalikeRestrictions = false,
+		ShowCollectionUpdates = true,
+		ShowSetCollectionUpdates = true,
+		ShowExtraSetsCollectionUpdates = true,
+		ShowCollectionListCollectionUpdates = true,
+		ShowCollectionToast = true,
+		HideMissing = false,
+		HiddenMog = false,
+		ShowNames = true,
+		ShowTooltips = true,
+		ShowSetTooltips = true,
+		ShowExtraSetsTooltips = true,
+		ShowCollectionListTooltips = true,
+		ShowVisualIDTooltips = false,
+		ShowOwnedItemTooltips = true,
+		ShowAdditionalSourceTooltips = true,
+		ShowTokenTooltips = true,
+		ShowWarningTooltips = true,
+		LargeTransmogArea = false,
+		TooltipPreview_Tokens = true,
+		TooltipPreview_Overlap = false,
+		TooltipPreview_Dress = true,
+		TooltipPreview_ZoomModifier = L["None"], --was mistakenly named TooltipPreview_ZoomItemModifier here, which no option ever read
+		TooltipPreview_MouseRotate = true,
+		TooltipPreview_CustomModel = false,
+		DR_ShowItemButtons = true,
+		DR_ShowControls = true,
+		DR_ResizeWindow = false,
+		ShowDetailedListTooltips = false,
+		ShowMissingDetailedListTooltips = false,
+		ShowILevelTooltips = true,
+		DR_OptionsEnable = false,
+		TooltipPreview_MogOnly = false,
+		TooltipPreview_ZoomWeapon = true,
+		TooltipPreview_ZoomItem = true,
+		TooltipPreview_SwapDefault = false,
+		DR_DimBackground = false,
 	}
 }
 local DB_Defaults = {
@@ -1471,11 +1509,9 @@ function addon.Init:LoadModules()
 	end)
 
 	C_Timer.After(0, function()
-		----addon:UpdatePetTracker()
+		addon:UpdatePetTracker()
 	addon.Init:initCollectionList()
 	addon.Init:BuildCollectionList()
-		--BuildTransmogVendorUI stays disabled: TransmogVendor.xml isn't loaded by the .toc, unfinished/unwired.
-		----addon.Init:BuildTransmogVendorUI()
 		addon:UpdateCanIMogIt()
 		----addon:InitExtendedSetsSwap()
 
@@ -1885,7 +1921,7 @@ function addon:AnnounceCollectionUpdate(sourceID)
 		local setIDs = C_TransmogSets.GetSetsContainingSourceID(sourceID)
 		for i, setID in pairs(setIDs or {}) do
 			local setInfo = C_TransmogSets.GetSetInfo(setID)
-			print((YELLOW_FONT_COLOR_CODE..L["Added missing appearances of: \124cffff7fff\124H%s:%s\124h[%s]\124h\124r"]):format("BW_transmogset", setID, setInfo.name))
+			addon:Print((YELLOW_FONT_COLOR_CODE..L["Added missing appearances of: \124cffff7fff\124H%s:%s\124h[%s]\124h\124r"]):format("BW_transmogset", setID, setInfo.name))
 			announced = true
 			if not toastSetName then
 				toastSetName = setInfo.name
@@ -1898,7 +1934,7 @@ function addon:AnnounceCollectionUpdate(sourceID)
 		local setData = addon.IsSetItem(sourceInfo.itemID)
 		for _, data in pairs(setData or {}) do
 			local linkID = ("%d-%d"):format(data.setID, sourceID)
-			print((YELLOW_FONT_COLOR_CODE..L["Added missing appearances of: \124cffff7fff\124H%s:%s\124h[%s]\124h\124r"]):format("BW_transmogset-extra", linkID, data.name))
+			addon:Print((YELLOW_FONT_COLOR_CODE..L["Added missing appearances of: \124cffff7fff\124H%s:%s\124h[%s]\124h\124r"]):format("BW_transmogset-extra", linkID, data.name))
 			announced = true
 			if not toastSetName then
 				toastSetName = data.name
@@ -1908,7 +1944,7 @@ function addon:AnnounceCollectionUpdate(sourceID)
 	end
 
 	if addon.Profile.ShowCollectionListCollectionUpdates and addon.CollectionList:IsInList(sourceInfo.visualID, "item") then
-		print(YELLOW_FONT_COLOR_CODE..L["Added appearance in Collection List"])
+		addon:Print(YELLOW_FONT_COLOR_CODE..L["Added appearance in Collection List"])
 		announced = true
 	end
 
@@ -1917,68 +1953,6 @@ function addon:AnnounceCollectionUpdate(sourceID)
 		local setLine = toastSetName and ("%s (%d/%d)"):format(toastSetName, toastCollected or 0, toastTotal or 0)
 		addon.CollectionAlertSystem:AddAlert(icon, sourceInfo.quality, sourceInfo.name, YOU_COLLECTED_LABEL, setLine)
 	end
-end
-
---No argument: falls back to the first equipped item that belongs to a set/extra set/list.
-SLASH_BWANNOUNCETEST1 = "/bwannounce"
-SlashCmdList["BWANNOUNCETEST"] = function(msg)
-	local sourceID = tonumber(msg)
-
-	if not sourceID then
-		for slotID = 1, 19 do
-			local itemID = GetInventoryItemID("player", slotID)
-			if itemID then
-				local appearanceID, equippedSourceID = C_TransmogCollection.GetItemInfo(itemID)
-				if equippedSourceID then
-					local setIDs = C_TransmogSets.GetSetsContainingSourceID(equippedSourceID)
-					local inExtraSet = addon.IsSetItem(itemID)
-					local inList = appearanceID and addon.CollectionList:IsInList(appearanceID, "item")
-					if (setIDs and next(setIDs)) or inExtraSet or inList then
-						sourceID = equippedSourceID
-						break
-					end
-				end
-			end
-		end
-	end
-
-	if not sourceID then
-		print("BetterWardrobe: no announceable item found equipped. Usage: /bwannounce <sourceID>")
-		return
-	end
-
-	addon:AnnounceCollectionUpdate(sourceID)
-end
-
---Tests only the Extra Set link/click path; setID defaults to the first Extra Set found on a currently equipped item.
-SLASH_BWANNOUNCEEXTRATEST1 = "/bwannounceextra"
-SlashCmdList["BWANNOUNCEEXTRATEST"] = function(msg)
-	local setID = tonumber(msg)
-
-	if not setID then
-		for slotID = 1, 19 do
-			local itemID = GetInventoryItemID("player", slotID)
-			local setData = itemID and addon.IsSetItem(itemID)
-			if setData and next(setData) then
-				setID = select(2, next(setData)).setID
-				break
-			end
-		end
-	end
-
-	if not setID then
-		print("BetterWardrobe: no equipped item belongs to an Extra Set. Usage: /bwannounceextra <setID>")
-		return
-	end
-
-	local setInfo = addon.GetSetInfo(setID)
-	if not setInfo or setInfo.setType == "Blizzard" then
-		print("BetterWardrobe: "..setID.." is not an Extra Set.")
-		return
-	end
-
-	local linkID = ("%d-%d"):format(setID, 0)
-	print((YELLOW_FONT_COLOR_CODE..L["Added missing appearances of: \124cffff7fff\124H%s:%s\124h[%s]\124h\124r"]):format("BW_transmogset-extra", linkID, setInfo.name))
 end
 
 function addon:EventHandler(event, ...)

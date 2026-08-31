@@ -161,9 +161,8 @@ preview:SetScript("OnUpdate", function(self, elapsed)
 	self.elapsed = (self.elapsed or 0) + elapsed
 	if self.elapsed >= TOOLTIP_UPDATE_TIME then
 		self.elapsed = 0
+		preview:SetAnchor(preview, preview.parent)
 	end
-
-	preview:SetAnchor(preview, preview.parent)
 end)
 
 preview:SetScript("OnShow", function(self)

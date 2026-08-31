@@ -203,7 +203,7 @@ function MogIt.UpdateWishlistItem(type, typeID, add)
 				Wishlist:DeleteItem(mogitItem)
 				mog:BuildList(nil, "Wishlist")
 			end
-			print(add and L["Appearance added."] or L["Appearance removed."] )
+			addon:Print(add and L["Appearance added."] or L["Appearance removed."] )
 			BetterWardrobeCollectionFrame.ItemsCollectionFrame:RefreshVisualsList()
 			BetterWardrobeCollectionFrame.ItemsCollectionFrame:UpdateItems()
 		end

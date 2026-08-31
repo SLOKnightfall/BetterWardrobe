@@ -248,33 +248,33 @@ function addon:DumpTransmogSet(setID)
 			end
 			table.sort(keys, function(a, b) return tostring(a) < tostring(b) end)
 
-			print(string.format("--- TransmogSet %s ---", tostring(setID)))
+			addon:Print(string.format("--- TransmogSet %s ---", tostring(setID)))
 			for _, k in ipairs(keys) do
-				print(string.format("  %s = %s", tostring(k), tostring(data[k])))
+				addon:Print(string.format("  %s = %s", tostring(k), tostring(data[k])))
 			end
 			return
 		end
 	end
-	print(string.format("TransmogSet %s not found", tostring(setID)))
+	addon:Print(string.format("TransmogSet %s not found", tostring(setID)))
 end
 
 --Debug: prints a native set's base info and all its variants to chat.
 function addon:DumpTransmogSetVariants(setID)
 	local baseSetID = C_TransmogSets.GetBaseSetID(setID) or setID
-	print(string.format("--- Variants of base set %s (from %s) ---", tostring(baseSetID), tostring(setID)))
+	addon:Print(string.format("--- Variants of base set %s (from %s) ---", tostring(baseSetID), tostring(setID)))
 
 	local baseInfo = C_TransmogSets.GetSetInfo(baseSetID)
-	print(string.format("  base: name=%s classMask=%s", tostring(baseInfo and baseInfo.name), tostring(baseInfo and baseInfo.classMask)))
+	addon:Print(string.format("  base: name=%s classMask=%s", tostring(baseInfo and baseInfo.name), tostring(baseInfo and baseInfo.classMask)))
 
 	local variants = C_TransmogSets.GetVariantSets(baseSetID)
 	if not variants or #variants == 0 then
-		print("  (no variants)")
+		addon:Print("  (no variants)")
 		return
 	end
 
 	for i, v in ipairs(variants) do
 		local info = C_TransmogSets.GetSetInfo(v.setID)
-		print(string.format("  [%d] setID=%s name=%s classMask=%s", i, tostring(v.setID), tostring(info and info.name), tostring(info and info.classMask)))
+		addon:Print(string.format("  [%d] setID=%s name=%s classMask=%s", i, tostring(v.setID), tostring(info and info.name), tostring(info and info.classMask)))
 	end
 end
 
@@ -1113,8 +1113,7 @@ end
 				end
 			end
 
-		--[[
-			--MogIt Sets
+		--MogIt Sets
 			local mogit_Outfits = addon.MogIt.GetMogitOutfits()
 			if mogit_Outfits then
 				for i, data in ipairs(mogit_Outfits) do
@@ -1128,12 +1127,11 @@ end
 			local transmogOutfits_Sets = addon.TransmogOutfits.GetOutfits()
 			if transmogOutfits_Sets then
 				for i, data in ipairs(transmogOutfits_Sets) do
-								data.validForCharacter = true
+					data.validForCharacter = true
 
 					tinsert(FullList, data)
 				end
 			end
-	]]--
 		end
 
 		return FullList

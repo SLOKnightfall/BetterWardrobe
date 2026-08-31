@@ -4,7 +4,7 @@
 ## Author: SLOKnightfall
 ## Notes:
 ## Dependencies: Blizzard_Collections, Blizzard_Transmog
-## OptionalDeps: MogMount,MogIt, CanIMogIt, LegionWardrobe, WardrobeEnhanced, Rarity, TransmogOutfits, ExtendedSets, ElvUI, PetTracker, PetTrackerJournal, Luckys_Wardrobe
+## OptionalDeps: MogMount,MogIt, CanIMogIt, Rarity, TransmogOutfits, ExtendedSets, ElvUI, PetTracker, PetTrackerJournal, Luckys_Wardrobe
 ## SavedVariables: BetterWardrobe_Options, BetterWardrobe_CharacterData, BetterWardrobe_SavedSetData, BetterWardrobe_SubstituteItemData, BetterWardrobe_ListData, BetterWardrobe_Mogitdata, BetterWardrobe_Updates, BTT
 ## X-Curse-Project-ID: 401253
 ## X-Wago-ID: 0mKOzk6x
@@ -100,3 +100,6 @@ Modules\SortingFunctions.lua
 Plugins\ElvUI.lua
 Plugins\CanIMogIt.lua
 Plugins\LTransmog.lua
+Plugins\PetTrackerJournal.lua
+Plugins\TransmogOutfits.lua
+Plugins\MogIt.lua

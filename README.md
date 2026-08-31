@@ -8,7 +8,8 @@ Tired of not being able to Transmog incomplete sets or the many dungeon/leveling
 
 ### General Improvements
 
-- Collection Alerts: Alerts are printed in the chat window if a set, extra set, or collection list appearance was learned.
+- Collection Alerts: Alerts are printed in the chat window if a set, extra set, or collection list appearance was learned. Each category of alert can be toggled independently, and an on-screen toast popup can be shown alongside the chat message.
+- Ignore Class Restrictions: An option to ignore class-based item restrictions when browsing appearances and sets, with a further option to limit that bypass to raid lookalike/recolor sets only.
 - Improved Artifact section of the Collection Journal: When viewing the Legion Artifact section of the Item Collection Journal, it now shows collected & the uncollected weapon appearances for all the weapon types. The uncollected appearances have info on how to unlock them in the tooltips. Also for Druids, the shape shift forms are shown for the Fangs of Ashamane and Claws of Ursoc instead of the base weapons. Very nice now that the transmog restrictions on artifacts have been removed, so you can see what still needs to be unlocked without having to find the artifact and go back to the class hall.
 
 ### Alt-Appearance Detection
@@ -34,6 +35,9 @@ Tired of not being able to Transmog incomplete sets or the many dungeon/leveling
 - Item Substitution: Substitute the item shown in a set for another. Just right click on the item in the set preview window or via the options page. Great for when an item is no longer in game, or if you think another item will look better.
 - View other armor weight sets: See other types of armor by selecting it via the Filters Drop Down menu. *This is currently only available on the Extra Tab, the functionality for the default sets is currently in development.*
 - View other class sets in the Extra Sets: Turn off the class filter in the options menu to see all armor for your class's armor type. Armor sets flagged for other classes will show up with a visual indicator and the class added to its name.
+- View Sources: Right click an appearance to pull up a full list of every way to obtain it.
+- View Recolors: Right click an appearance to filter the item list down to its known color-variant/recolor versions.
+- List Profiles: Collection Lists have their own profile system, separate from the character-based hide/show profiles, so shared lists can be managed and copied independently.
 
 ### Improved Transmog Vendor
 
@@ -54,6 +58,8 @@ Tired of not being able to Transmog incomplete sets or the many dungeon/leveling
 - View set pieces that tokens convert into.
 - Appearance Preview: Hover an item to see a live 3D model preview of the appearance, with options for zoom (separately for items and weapons), rotating with the mouse, showing it on the dressing-room dummy vs. your current gear, and a resizable/movable preview window. *Off by default - enable it in the options.*
 - Alt-appearance items also show a note in their tooltip when another source is available (see Alt-Appearance Detection above).
+- Additional Tooltip Info: Optionally show an item's Item ID, Visual/Appearance ID, and item level directly in its tooltip.
+- Unusable-as-Transmog Warning: Optionally flag items in tooltips that can't actually be used as a transmog appearance.
 
 ### Enhanced Dressing Room
 
@@ -61,6 +67,8 @@ Tired of not being able to Transmog incomplete sets or the many dungeon/leveling
 - Auto hide Tabards, Shirts, Weapons and the Dressing Room Background on show.
 - Item buttons showing the currently applied appearance. Left Click will toggle the appearance while a Right Click will clear the spot.
 - Button to quickly undress the model.
+- View as Player/Target: Preview outfits on your own model or your current target's model, and pull a target's currently worn gear directly into the Dressing Room.
+- Undo: Step back through recent Dressing Room changes.
 - Import sets from WoWHead or MogIt.
 - Export the current appearances using the same format as MogIt.
 - Quick load previously queued sets from the Collection Journal.
@@ -71,3 +79,4 @@ Tired of not being able to Transmog incomplete sets or the many dungeon/leveling
 - TransmogOutfits Integration: Any TransmogOutfits sets will be automatically added to the outfits dropdown and the saved sets tab.
 - CanIMogIt Integration: If CanIMogIt is installed, its collected-ratio indicators are shown directly on BetterWardrobe's own set frames.
 - ElvUI Integration: If ElvUI is installed, BetterWardrobe's tabs, dropdowns, buttons, scrollbars, and paging controls are automatically reskinned to match.
+- PetTracker Integration: If PetTracker is installed, BetterWardrobe's collection window automatically steps aside while PetTracker's Rivals Journal tab is open, then reappears once you switch away.

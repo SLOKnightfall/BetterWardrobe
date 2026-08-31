@@ -10,9 +10,8 @@ local SET_OFFSET = addon.Globals.SET_OFFSET
 function TransmogOutfits.GetOutfits() return {} end
 
 if not C_AddOns.IsAddOnLoaded("TransmogOutfits") then return end
-if true then return end -- TODO remove when updated
 
-function TransmogOutfits.GetOutfits() 
+function TransmogOutfits.GetOutfits()
 	local sets = transmogOutfitOutfits
 
 	if #sets == 0 then return end
@@ -92,6 +91,7 @@ function TransmogOutfits.GetOutfits()
 	return mogSets
 end
 
+if true then return end -- Rest of file targets TransmogOutfits UI globals removed in its Midnight rewrite; GetOutfits() above only reads the SavedVariable and still works.
 
 --Catches the TransmogOutfit frame and clears its OnEven script.  This keeps the addons's buttons from being shown.
 addon:SecureHook("transmogOutfitFrameCreate", function (frame) 

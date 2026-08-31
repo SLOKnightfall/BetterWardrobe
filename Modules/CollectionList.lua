@@ -154,7 +154,7 @@ function CollectionList:UpdateList(type, typeID, add, sourceID)
 		if BetterWardrobeCollectionFrame.ItemsCollectionFrame:IsShown() then
 			BetterWardrobeCollectionFrame.ItemsCollectionFrame:RefreshVisualsList()
 			BetterWardrobeCollectionFrame.ItemsCollectionFrame:UpdateItems()
-			print(add and L["Appearance added."] or L["Appearance removed."])
+			addon:Print(add and L["Appearance added."] or L["Appearance removed."])
 		end
 		
 		return collectionList[type][typeID]
