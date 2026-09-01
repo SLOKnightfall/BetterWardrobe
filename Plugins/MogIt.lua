@@ -232,7 +232,7 @@ function MogIt.UpdateWishlistItem(type, typeID, add)
 	end
 end
 
-local MAX_DEFAULT_OUTFITS = C_TransmogCollection.GetNumMaxOutfits()
+local MAX_DEFAULT_OUTFITS = C_TransmogCollection.GetNumMaxCustomSets()
 local function IsDefaultSet(outfitID)
 	
 	return outfitID < MAX_DEFAULT_OUTFITS  -- #C_TransmogCollection.GetOutfits()--MAX_DEFAULT_OUTFITS 
@@ -255,8 +255,8 @@ function MogIt:CopySet(outfitID)
 		itemTransmogInfoList[slotID] = itemTransmogInfo
 	end
 
-	if (outfitID and IsDefaultSet(outfitID)) or (#C_TransmogCollection.GetOutfits() < MAX_DEFAULT_OUTFITS)  then 
-		outfitID = C_TransmogCollection.NewOutfit(name, icon, itemTransmogInfoList);
+	if (outfitID and IsDefaultSet(outfitID)) or (#C_TransmogCollection.GetCustomSets() < MAX_DEFAULT_OUTFITS)  then
+		outfitID = C_TransmogCollection.NewCustomSet(name, icon, itemTransmogInfoList);
 	else
 		tinsert(addon.OutfitDB.char.outfits, setdata)
 		outfit = addon.OutfitDB.char.outfits[#addon.OutfitDB.char.outfits]
