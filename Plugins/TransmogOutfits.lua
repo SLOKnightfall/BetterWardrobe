@@ -173,7 +173,7 @@ function TransmogOutfits:DeleteSet(setID)
 	TransmogOutfitRemoveOutfit()
 end
 
-local MAX_DEFAULT_OUTFITS = C_TransmogCollection.GetNumMaxOutfits()
+local MAX_DEFAULT_OUTFITS = C_TransmogCollection.GetNumMaxCustomSets()
 local function IsDefaultSet(outfitID)
 	
 	return outfitID - SET_OFFSET < MAX_DEFAULT_OUTFITS  -- #C_TransmogCollection.GetOutfits()--MAX_DEFAULT_OUTFITS 
@@ -198,8 +198,8 @@ function TransmogOutfits:CopySet(setID)
 		itemTransmogInfoList[slotID] = itemTransmogInfo
 	end
 
-	if (setID and IsDefaultSet(setID)) or (#C_TransmogCollection.GetOutfits() < MAX_DEFAULT_OUTFITS)  then 
-		setID = C_TransmogCollection.NewOutfit(name, icon, itemTransmogInfoList);
+	if (setID and IsDefaultSet(setID)) or (#C_TransmogCollection.GetCustomSets() < MAX_DEFAULT_OUTFITS)  then
+		setID = C_TransmogCollection.NewCustomSet(name, icon, itemTransmogInfoList);
 	else
 		tinsert(addon.OutfitDB.char.outfits, setdata)
 		outfit = addon.OutfitDB.char.outfits[#addon.OutfitDB.char.outfits]
