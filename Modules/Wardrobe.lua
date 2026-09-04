@@ -661,11 +661,13 @@ function WardrobeCollectionFrameMixin:InitBaseSetsFilterButton()
 		submenu:CreateButton(CHECK_ALL, function()
 			xpackCheckAll(true)
 			RefreshLists()
+			return MenuResponse.Refresh;
 		end);
 
 		submenu:CreateButton(UNCHECK_ALL, function()
 			xpackCheckAll(false)
 			RefreshLists()
+			return MenuResponse.Refresh;
 		end);
 
 		submenu:CreateDivider();

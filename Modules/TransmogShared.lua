@@ -234,9 +234,12 @@ function WardrobeSetsDataProviderMixin:GetBaseSets()
 			if representativeID and representativeID ~= data.setID then
 				local representativeInfo = Blizz_C_TransmogSets.GetSetInfo(representativeID);
 				if representativeInfo then
+					--Keep our own normalized expansionID -- the raw copy below would undo BuildBlizzSets' +1.
+					local expansionID = data.expansionID;
 					for k, v in pairs(representativeInfo) do
 						data[k] = v;
 					end
+					data.expansionID = expansionID;
 					data.baseSetID = trueBaseID;
 				end
 			end

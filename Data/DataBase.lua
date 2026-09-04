@@ -737,6 +737,9 @@ end
 
 		BuildArmorDB()
 		addon.BuildClassArtifactAppearanceList()
+
+		--Re-clear post-build: a mid-build TRANSMOG_COLLECTION_UPDATED refresh can re-cache a half-built list.
+		addon.SetsDataProvider:ClearSets()
 	end
 
 	--Full rebuild after a filter/class/armor-type change: DB, artifact list, and saved sets.
@@ -746,6 +749,9 @@ end
 		BuildArmorDB()
 		addon.BuildClassArtifactAppearanceList()
 		addon.GetSavedList()
+
+		--Same re-clear as InitDB(): guards against a mid-build UI refresh re-caching a half-built list.
+		addon.SetsDataProvider:ClearSets()
 	end
 
 	--Builds the "alt appearance" source DB (SET_DATA) used for alt-item lookups.
