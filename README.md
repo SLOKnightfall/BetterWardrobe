@@ -38,6 +38,7 @@ Tired of not being able to Transmog incomplete sets or the many dungeon/leveling
 - View Sources: Right click an appearance to pull up a full list of every way to obtain it.
 - View Recolors: Right click an appearance to filter the item list down to its known color-variant/recolor versions.
 - List Profiles: Collection Lists have their own profile system, separate from the character-based hide/show profiles, so shared lists can be managed and copied independently.
+- Remembered Scroll Position: The Sets, Extra Sets and Saved Sets tabs each remember where you were in the list when you switch between them.
 
 ### Improved Transmog Vendor
 
@@ -48,6 +49,7 @@ Tired of not being able to Transmog incomplete sets or the many dungeon/leveling
 - Names & collected set piece count added to the transmog vendor view.
 - Auto Hide Missing Transmog Slots: When transmoging an incomplete set you have the option to have any missing set pieces set to be hidden. (The exception is the pants slot, which does not have a hide option.)
 - AutoHide Transmog Slots: A menu button has been added to the Transmog Vendor from which you can select slots which will always be set to the hidden appearance when selecting a set or extra set.
+- Right-Click to Hide a Slot: Right-clicking a character slot with a pending change reverts it, as before. Right-click again with nothing pending and the slot is set to its hidden appearance; one more right-click reverts that. Weapon slots are not affected.
 - Load Sets: Ability to quickly load a set queued from the Collection Journal without needing to find it again at the Transmog Vendor.
 - Situations Presets: Save and re-apply named presets for Blizzard's own transmog "Situations" options (e.g. mounted, in combat) from the vendor's Situations tab, so you can switch between different conditional-transmog setups in one click instead of reconfiguring them each time.
 
