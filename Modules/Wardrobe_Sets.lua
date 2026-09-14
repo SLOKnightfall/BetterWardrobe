@@ -130,12 +130,13 @@ function WardrobeSetsCollectionMixin:OnLoad()
 
 
 	self.selectedVariantSets = { };
+	--Permanent: OnHide no longer wipes the per-set collection counts, so this must clear them even while hidden.
+	self:RegisterEvent("TRANSMOG_COLLECTION_UPDATED");
 end
 
 function WardrobeSetsCollectionMixin:OnShow()
 	self:RegisterEvent("GET_ITEM_INFO_RECEIVED");
 	self:RegisterEvent("TRANSMOG_COLLECTION_ITEM_UPDATE");
-	self:RegisterEvent("TRANSMOG_COLLECTION_UPDATED");
 	-- select the first set if not init
 	local baseSets = SetsDataProvider:GetBaseSets();
 	local defaultSetID = baseSets and baseSets[1] and self:GetDefaultSetIDForBaseSet(baseSets[1].setID) or nil;
@@ -243,8 +244,11 @@ end
 function WardrobeSetsCollectionMixin:OnHide()
 	self:UnregisterEvent("GET_ITEM_INFO_RECEIVED");
 	self:UnregisterEvent("TRANSMOG_COLLECTION_ITEM_UPDATE");
-	self:UnregisterEvent("TRANSMOG_COLLECTION_UPDATED");
-	SetsDataProvider:ClearSets();
+	--Keep sourceData (collection counts): tab switches hide/show this frame, and refetching
+	--GetSetPrimaryAppearances for every set each time is the bulk of the switch cost.
+	SetsDataProvider:ClearBaseSets();
+	SetsDataProvider:ClearVariantSets();
+	SetsDataProvider:ClearUsableSets();
 	self:GetParent():ClearSearch(Enum.TransmogSearchType.BaseSets);
 end
 
@@ -263,6 +267,7 @@ function WardrobeSetsCollectionMixin:OnEvent(event, ...)
 		end
 	elseif ( event == "TRANSMOG_COLLECTION_UPDATED" ) then
 		SetsDataProvider:ClearSets();
+		if not self:IsShown() then return end
 		self:Refresh();
 		self:UpdateProgressBar();
 		self:ClearLatestSource();
@@ -337,10 +342,10 @@ function WardrobeSetsCollectionMixin:DisplaySet(setID)
 
 	self.DetailsFrame.Label:SetText((setInfo.label or "")..((not setInfo.isClass and setInfo.className) and " -"..setInfo.className.."-" or "") );
 
-	--@debug@
+	--[==[@debug@
 		self.DetailsFrame.HolidayLabel:Show() 
 		self.DetailsFrame.HolidayLabel:SetText(setID);
-	--@end-debug@
+	--@end-debug@]==]
 
 	if ((setInfo.description == ELITE) and setInfo.patchID < buildID) or (setID <= 1446 and setID >=1436) then
 		setInfo.noLongerObtainable = true;
@@ -386,8 +391,6 @@ function WardrobeSetsCollectionMixin:DisplaySet(setID)
 		self.DetailsFrame.Faction.Alliance:Hide()
 	end
 
-	self.DetailsFrame.Label:SetText(setInfo.label);
-	self.DetailsFrame.LimitedSet:SetShown(setInfo.limitedTimeSet);
 
 	local newSourceIDs = C_TransmogSets.GetSetNewSources(setID);
 	--	local newSourceIDs = C_TransmogSets.GetSetNewSources(setID) or addon.GetSetNewSources(setID);
@@ -475,7 +478,7 @@ function WardrobeSetsCollectionMixin:DisplaySet(setID)
 		elseif slot ==16 then 
 			mainHand = itemFrame.sourceID;
 		elseif slot == 17 then
-			offhand = itemFrame.sourceID;
+			offHand = itemFrame.sourceID;
 		end
 
 		local texture = C_TransmogCollection.GetSourceIcon(sortedSources[i].sourceID);
@@ -955,7 +958,7 @@ local function variantsTooltip(elementData, variantSets)
 
 	for i, setdata in ipairs(variantSets) do
 		local have, total = addon.SetsDataProvider:GetSetSourceCounts(setdata.setID)
-		text = StripRecolorSuffix(setdata.description or setdata.name)
+		local text = StripRecolorSuffix(setdata.description or setdata.name)
 		 ratioText =  ratioText..text..": ".. have .. "/" .. total.."\n"
 	end
 
@@ -1046,26 +1049,19 @@ function WardrobeSetsScrollFrameButtonMixin:Init(elementData)
 
 	end
 
-	self.Remix:SetShown(addon.MiscSets.REMIX_SETS[self.setID] );
-	self.Remix:SetShown(false );
+	self.Remix:SetShown(false);
 
 	self.EditButton:Hide();
 
 	self.variantInfo = variantsTooltip(elementData, variantSets);
 
-	local setInfo = addon.GetSetInfo(displayData.setID);
-	--local isFavorite = 	C_TransmogSets.GetIsFavorite(displayData.setID);
+	--Must be local: as a global it leaked the last Extra Sets row's value into every Sets row.
+	local isFavorite;
 	local isHidden = addon.HiddenAppearanceDB.profile.set[displayData.setID];
-	local isInList = addon.CollectionList:IsInList(displayData.setID, "set");
 
 	if BetterWardrobeCollectionFrame.selectedCollectionTab == 3 then
-		isInList = addon.CollectionList:IsInList(displayData.setID, "extraset");
 		isFavorite = addon.favoritesDB.profile.extraset[displayData.setID];
 		isHidden = addon.HiddenAppearanceDB.profile.extraset[displayData.setID];
-	end
-
-	if BetterWardrobeCollectionFrame.selectedCollectionTab == 2 or BetterWardrobeCollectionFrame.selectedCollectionTab == 3  then
-		self.New:SetShown(SetsDataProvider:IsBaseSetNew(elementData.setID));
 	end
 
 	if BetterWardrobeCollectionFrame.selectedCollectionTab == 4 then
@@ -1202,17 +1198,8 @@ function WardrobeSetsScrollFrameButtonMixin:OnClick(buttonName, down)
 				rootDescription:CreateButton(isHidden and SHOW or HIDE, function()
 					--self.setID = self.baseSetID;
 					ToggleHidden(self, isHidden);
-					addon.Init:InitDB()
-					--P3 was an undefined global (nil), which set selectedCollectionTab to nil --
-					--everything else in this file branches on that field. Matches the same
-					--cycle-tabs-to-force-a-redraw pattern used correctly elsewhere (setIgnoreClassRestrictions),
-					--but was missing that pattern's final restore step, so it always landed on tab 2
-					--(Sets) regardless of which tab (e.g. Extra Sets) was actually active.
-					local currentTab = addon.GetTab()
-					BetterWardrobeCollectionFrame:SetTab(3);
-					BetterWardrobeCollectionFrame:SetTab(2);
-					BetterWardrobeCollectionFrame:SetTab(currentTab);
-					--RefreshLists()
+					--Hidden is a FilterSets criterion: a list refresh is enough, no DB rebuild or tab cycling.
+					addon.RefreshLists();
 				end);
 
 				local text;
@@ -1249,7 +1236,13 @@ function WardrobeSetsScrollFrameButtonMixin:OnClick(buttonName, down)
 						--Calling SetIsFavorite on BOTH targetSetID and baseSetID is required for GetIsFavorite to update immediately.
 						C_TransmogSets.SetIsFavorite(targetSetID, not favorite);
 						C_TransmogSets.SetIsFavorite(baseSetID, not favorite);
-						addon.Init:InitDB();
+						--Re-read the flag on this group's records instead of rebuilding the whole DB.
+						local record = addon.GetSetInfo(baseSetID);
+						local group = record and addon.VariantSets[record.baseSetID or baseSetID] or {};
+						for _, member in ipairs(group) do
+							member.favorite = C_TransmogSets.GetIsFavorite(member.setID) and true or false;
+						end
+						SetsDataProvider:RefreshFavorites();
 						BetterWardrobeCollectionFrame.SetsCollectionFrame:Refresh();
 					end
 				end);
@@ -1343,7 +1336,9 @@ BetterWardrobeSetsCollectionContainerMixin = WardrobeSetsCollectionContainerMixi
 function WardrobeSetsCollectionContainerMixin:OnLoad()
 	local view = CreateScrollBoxListLinearView();
 	view:SetElementInitializer("BetterWardrobeSetsScrollFrameButtonTemplate", function(button, elementData)
-		C_Timer.After(.05, function() button:Init(elementData); end)
+		--Synchronous: the old 50ms-deferred Init wrote stale data into rows the ScrollBox had already
+		--recycled for a different element during fast scrolling.
+		button:Init(elementData);
 	end);
 	view:SetPadding(0,0,44,0,0);
 

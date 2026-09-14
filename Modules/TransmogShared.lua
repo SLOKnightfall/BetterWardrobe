@@ -228,19 +228,24 @@ function WardrobeSetsDataProviderMixin:GetBaseSets()
 		for _, nativeSet in ipairs(Blizz_C_TransmogSets.GetBaseSets()) do
 			representativeByBase[Blizz_C_TransmogSets.GetBaseSetID(nativeSet.setID) or nativeSet.setID] = nativeSet.setID;
 		end
-		for _, data in ipairs(self.baseSets) do
+		--Swap onto a shallow copy. The records in addon.BaseList are shared with SET_INDEX/fullList and
+		--outlive ClearSets(), so mutating them made every later refresh filter, hide and select by the
+		--swapped setID. expansionID/classMask/label stay ours (BuildBlizzSets normalizes them).
+		local ADDON_OWNED = { expansionID = true, classMask = true, label = true };
+		for i, data in ipairs(self.baseSets) do
 			local trueBaseID = Blizz_C_TransmogSets.GetBaseSetID(data.setID) or data.setID;
 			local representativeID = representativeByBase[trueBaseID];
 			if representativeID and representativeID ~= data.setID then
 				local representativeInfo = Blizz_C_TransmogSets.GetSetInfo(representativeID);
 				if representativeInfo then
-					--Keep our own normalized expansionID -- the raw copy below would undo BuildBlizzSets' +1.
-					local expansionID = data.expansionID;
+					local row = CopyTable(data, true);
 					for k, v in pairs(representativeInfo) do
-						data[k] = v;
+						if not ADDON_OWNED[k] then
+							row[k] = v;
+						end
 					end
-					data.expansionID = expansionID;
-					data.baseSetID = trueBaseID;
+					row.baseSetID = trueBaseID;
+					self.baseSets[i] = row;
 				end
 			end
 		end
@@ -266,7 +271,7 @@ function WardrobeSetsDataProviderMixin:GetBaseSetByID(baseSetID)
 	local baseSets = self:GetBaseSets();
 
 	for index, baseSet in ipairs(baseSets) do
-		if baseSet.baseSetID == baseSetID then
+		if baseSet.baseSetID == baseSetID or baseSet.setID == baseSetID then
 
 			return baseSet, index;
 		end

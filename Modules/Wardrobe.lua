@@ -356,11 +356,16 @@ for i, types in ipairs(sets) do
 end
 
 local function RefreshLists()
-	addon.SetsDataProvider:ClearSets()
-	addon.Init:InitDB()
+	--View-only: filters run in FilterSets over the already-built lists. Callers that change what gets
+	--built (class, faction, ignore-restrictions) call addon.Init:InitDB() themselves first.
+	--Same partial clear as OnSearchUpdate: per-set collection counts (sourceData) only change on
+	--TRANSMOG_COLLECTION_UPDATED, which does the full ClearSets. No hide/show cycle: OnHide cleared
+	--the search box and every checkbox paid for a full list rebuild.
+	local provider = addon.SetsDataProvider
+	provider:ClearBaseSets()
+	provider:ClearVariantSets()
+	provider:ClearUsableSets()
 	BetterWardrobeCollectionFrame.SetsCollectionFrame:Refresh()
-	BetterWardrobeCollectionFrame.SetsCollectionFrame:SetShown(false);
-	BetterWardrobeCollectionFrame.SetsCollectionFrame:SetShown(true);
 end
 
 addon.RefreshLists = RefreshLists;
