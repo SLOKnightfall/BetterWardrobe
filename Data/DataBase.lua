@@ -18,10 +18,9 @@ local TRADING_POST_SETID = {2320, 2323, 2327, 2337, 2338, 2340, 2346, 2654, 2655
 --PVP_SETID is an exact ID lookup; these keywords catch newer PvP sets it hasn't been updated for.
 local PVP_DESCRIPTION_KEYWORDS = {"Honor", "Combatant", "Warfront", "Aspirant", "Gladiator", "Elite"}
 --True if a Blizzard set is a PvP set, by ID or by description keyword.
+local PVP_SET_LOOKUP = tInvert(PVP_SETID)
 local function isPVP(index, description)
-	for _,i in ipairs(PVP_SETID) do
-		if i == index then return true end
-	end
+	if PVP_SET_LOOKUP[index] then return true end
 
 	if description then
 		for _, keyword in ipairs(PVP_DESCRIPTION_KEYWORDS) do
@@ -94,6 +93,8 @@ local variantIDs = {};
 addon.VariantIDs = variantIDs
 local fullList = {}
 addon.fullList = fullList
+--sourceID -> {extraSetRecord = true}; keeps extra-set collected flags current between DB rebuilds.
+local SourceToExtraSets = {}
 
 --Hides a set as a variant of baseSetID (reachable via addon.VariantSets instead of as its own entry).
 local function AddVariant(set, baseSetID)
@@ -103,34 +104,6 @@ local function AddVariant(set, baseSetID)
 
 	fullList[set.setID] = set
 	variantIDs[set.setID] = baseSetID;
-end
-
---Re-parents an existing variant group (and set itself) onto a different base set.
-local function AddVariantToBaseSet(set, newBaseID)
-	variantSets[baseSetID] = variantSets[baseSetID] or {};
-
-	local baseID = set.baseSetID;
-	--if not baseID then baseID = set.setID; end
-
-	if variantSets[baseID] then
-		for i=1,#variantSets[baseID] do
-			tinsert(variantSets[newBaseID], variantSets[baseID][i]);
-			variantIDs[variantSets[baseID][i].setID] = newBaseID;
-			variantSets[baseID][i].baseSetID = newBaseID;
-		end
-	end
-
-	if variantSets[set.setID] then
-		for i=1,#variantSets[set.setID] do
-			tinsert(variantSets[newBaseID], variantSets[set.setID][i]);
-			variantIDs[variantSets[set.setID][i].setID] = newBaseID;
-			variantSets[set.setID][i].baseSetID = newBaseID;
-		end
-	end
-
-	set.baseSetID = newBaseID;
-	variantSets[baseID] = nil;
-	variantSets[set.setID] = nil;
 end
 
 local KnownClassMasks
@@ -288,12 +261,17 @@ function BuildBlizzSets()
 	local inGameShopGlobalString = "In-Game Shop"; --BATTLE_PET_SOURCE_10
 
 	local allSets = C_TransmogSets.GetAllSets()
+	local buildID = select(4, GetBuildInfo())
 	for i, data in ipairs(allSets) do
 		data.setType = "Blizzard"
 		if not (data.name == "PH") and UseSet(data) then
 			data.expansionID  = data.expansionID + 1
 			data.BuildBlizzSets = true
 			data.setType = "Blizzard"
+			--Elite PvP sets from an older patch plus one legacy Challenge Mode ID range (raw description,
+			--before CustomDesc below). Read by FilterSets for Hide Unavailable Sets.
+			data.unavailable = (data.description == ELITE and data.patchID and data.patchID < buildID)
+				or (data.setID <= 1446 and data.setID >= 1436)
 
 			if data.classMask == 16383 or data.classMask == 32767 then
 				 data.classMask = 0
@@ -415,7 +393,6 @@ function BuildBlizzSets()
 				local subSet = false;
 				local subSetBaseID;
 				SET_INDEX[data.setID] = data
-				fullList[data.setID] = set
 
 				--Only hide as a variant if GetBaseSetID agrees it's the same family as our label grouping --
 				--otherwise it stays reachable via addon.VariantSets (see TransmogShared.lua:GetVariantSets).
@@ -513,6 +490,7 @@ do
 			wipe(fullList);
 			wipe(SET_INDEX);
 			wipe(ArmorDB);
+			wipe(SourceToExtraSets);
 			extraSetCount = 0;
 			extraSetCollectedCount = 0;
 		addon.SetsDataProvider:ClearSets();
@@ -520,9 +498,9 @@ do
 		local buildID = (select(4, GetBuildInfo()))
 		BuildBlizzSets()
 
-		--@debug@
+		--[==[@debug@
 			--addon:AddTestSets()
-		--@end-debug@
+		--@end-debug@]==]
 
 		local dropdownclass = C_TransmogSets.GetTransmogSetsClassFilter();
 		local at = Globals.ClassArmorType[dropdownclass]
@@ -593,7 +571,7 @@ do
 					local subSetBaseID;
 					local subName = gsub(data.name, " %(Recolor%)", "")
 					data.name = subName
-					if data.note == data.note == "NOTE_119" or data.note == "NOTE_120" or data.note == "NOTE_121" or data.note == "NOTE_123"   then
+					if data.note == "NOTE_119" or data.note == "NOTE_120" or data.note == "NOTE_121" or data.note == "NOTE_123"   then
 						data.customGroups = data.label
 					elseif data.note == "NOTE_44" or data.note == "NOTE_45" then
 						data.customGroups =  data.label.."-"..subName--data.armorType
@@ -647,19 +625,15 @@ do
 					data.newStatus = false
 					local isCollected = true
 					for i, itemData in pairs(data.itemData) do
-						if subitemlist[item] then
-							local replacementID = subitemlist[item]
-							local appearanceID, sourceID = C_TransmogCollection.GetItemInfo(replacementID)
-							local sources = C_TransmogCollection.GetAppearanceSources(appearanceID)
-							WardrobeCollectionFrame_SortSources(sources)
-							setData["items"][index] = replacementID
-							setData.sources[item] = nil
-							setData.sources[replacementID] = appearanceID
-						else
-							local info = C_TransmogCollection.GetSourceInfo(itemData[2])
-							data.sources[itemData[2]] = info.isCollected
-							if isCollected then isCollected = info.isCollected end
-						end
+						--GetSourceInfo is nil for a source this client no longer knows; one such entry in the data
+						--files used to abort the whole DB build here and leave the set lists half-filled.
+						local sourceID = itemData[2]
+						local info = C_TransmogCollection.GetSourceInfo(sourceID)
+						local collected = info and info.isCollected or false
+						data.sources[sourceID] = collected
+						if isCollected then isCollected = collected end
+						SourceToExtraSets[sourceID] = SourceToExtraSets[sourceID] or {}
+						SourceToExtraSets[sourceID][data] = true
 					end
 					data.isCollected = isCollected
 					if isCollected then
@@ -678,6 +652,17 @@ do
 
 function addon:GetCollectedExtraSetCount()
 	return extraSetCollectedCount, extraSetCount
+end
+
+--TRANSMOG_COLLECTION_SOURCE_ADDED/REMOVED: flip the flag on every extra set holding that source,
+--then drop the count caches so the next redraw recomputes them.
+function addon.MarkExtraSetSource(sourceID, collected)
+	local sets = SourceToExtraSets[sourceID]
+	if not sets then return end
+	for data in pairs(sets) do
+		data.sources[sourceID] = collected
+	end
+	addon.SetsDataProvider:ClearSets()
 end
 
 	--Returns the Extra Set(s) an item belongs to, if any (keyed by appearance ID in ItemDB).

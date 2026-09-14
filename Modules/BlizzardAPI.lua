@@ -185,23 +185,17 @@ function addon.C_TransmogSets.GetVariantSets(setID)
 end
 
 function addon.C_TransmogSets.GetFilteredBaseSetsCounts()
-	local tab = addon.GetTab()
-	if tab == 2 then
-		--Derived from the same already-filtered list driving the visible UI (addon.SetsDataProvider:GetBaseSets()),
-		--not Blizzard's own native count, which has no concept of any of this addon's own filters
-		--(xpacSelection, hidden sets, search, Hide Unavailable Sets) and drifts from what's actually shown.
-		local baseSets = addon.SetsDataProvider:GetBaseSets()
-		local collected, total = 0, #baseSets
-		for _, data in ipairs(baseSets) do
-			local setData = addon.SetsDataProvider:GetSetSourceData(data.setID)
-			if setData.numCollected == setData.numTotal then
-				collected = collected + 1
-			end
+	--Every tab: derived from the already-filtered list driving the visible UI and from live counts,
+	--not from flags frozen at DB build time or Blizzard's unfiltered native count.
+	local baseSets = addon.SetsDataProvider:GetBaseSets()
+	local collected, total = 0, #baseSets
+	for _, data in ipairs(baseSets) do
+		local setData = addon.SetsDataProvider:GetSetSourceData(data.setID)
+		if setData.numCollected == setData.numTotal then
+			collected = collected + 1
 		end
-		return collected, total
-	else
-		return addon:GetCollectedExtraSetCount()
 	end
+	return collected, total
 end
 
 function addon.C_TransmogSets.GetSourcesForSlot(setID, transmogSlot, data)
@@ -227,7 +221,16 @@ end
 
 
 function addon.C_TransmogSets.GetUsableSets()
-	return addon.fullList
+	--Array, not the setID-keyed fullList: callers ipairs/sort it. Completed Blizzard sets only, like
+	--Blizzard's own -- GetFirstMatchingSetID feeds each setID to C_TransmogOutfitInfo, which knows
+	--nothing about extra-set IDs and would match them on every slot.
+	local sets = {}
+	for _, set in pairs(addon.fullList) do
+		if set.setType == "Blizzard" and set.collected then
+			tinsert(sets, set)
+		end
+	end
+	return sets
 end
 
 local function GetItemSlot(itemLinkOrID)
@@ -571,16 +574,8 @@ function addon:FilterSets(setList, setType)
 				end
 			end
 		end
-		--"Unavailable" mirrors the noLongerObtainable check in Wardrobe_Sets.lua:DisplaySet (Elite sets from
-		--an older patch, plus one hardcoded legacy setID range); only meaningful for real Blizzard sets.
-		local unavailable = false
-		if data.setType == "Blizzard" then
-			local nativeInfo = C_TransmogSets.GetSetInfo(data.setID)
-			local buildID = (select(4, GetBuildInfo()))
-			unavailable = (nativeInfo and nativeInfo.description == ELITE and nativeInfo.patchID and nativeInfo.patchID < buildID)
-				or (data.setID <= 1446 and data.setID >= 1436)
-		end
-		local unavailableFilter = (not unavailable) or (not addon.Profile.HideUnavalableSets)
+		--Stamped once per set in BuildBlizzSets (data.unavailable): no per-set C calls in the filter loop.
+		local unavailableFilter = (not data.unavailable) or (not addon.Profile.HideUnavalableSets)
 		local tab = (BetterWardrobeCollectionFrame:CheckTab(2) and data.tab == 2) or (BetterWardrobeCollectionFrame:CheckTab(3) and data.tab == 3)
 		if BetterWardrobeCollectionFrame:CheckTab(2) then
 			--expansion = expansion + 1

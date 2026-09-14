@@ -1010,6 +1010,8 @@ end
 local defaults = {
 	profile = {
 		PartialLimit = 0,
+		ShowArmorSets = true,
+		ShowCosmeticSets = true,
 		ShowHidden = false,
 		TSM_Market = "DBMarket",
 		DR_HideBackground = false,
@@ -2046,10 +2048,12 @@ function addon:EventHandler(event, ...)
 
 	elseif (event == "TRANSMOG_COLLECTION_SOURCE_ADDED") then
 		local sourceID = ...
+		addon.MarkExtraSetSource(sourceID, true)
 		addon:AnnounceCollectionUpdate(sourceID)
 
 	elseif (event == "TRANSMOG_COLLECTION_SOURCE_REMOVED") then
 		local x = ...
+		addon.MarkExtraSetSource(x, false)
 		BetterWardrobeCollectionFrameMixin:OnEvent(event, x)
 	end
 end

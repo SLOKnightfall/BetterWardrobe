@@ -1326,10 +1326,7 @@ local function UpdateOutfit(slot, type, appearance)
 		elseif categoryID == 19 then
 			option = Enum.TransmogOutfitSlotOption.OffHand
 		elseif categoryID >= 20 and categoryID <= 24  then
-			if spec == 72 then
-				option = Enum.TransmogOutfitSlotOption.FuryTwoHandedWeapon
-			end
-			option = Enum.TransmogOutfitSlotOption.TwoHandedWeapon
+			option = (spec == 72) and Enum.TransmogOutfitSlotOption.FuryTwoHandedWeapon or Enum.TransmogOutfitSlotOption.TwoHandedWeapon
 		elseif categoryID >= 25 and categoryID <= 27  then
 			option = Enum.TransmogOutfitSlotOption.RangedWeapon
 		end
@@ -1362,9 +1359,12 @@ local function getSourceSlots(data)
 	local sources = {}
 	for _index, primaryAppearance in pairs(data) do
 		local sourceInfo = C_TransmogCollection.GetSourceInfo(primaryAppearance.appearanceID);
-		local categoryID = sourceInfo.invType-1
-		sources[categoryID] =primaryAppearance.appearanceID
-
+		--ApplyOutfit reads inventory slot IDs (INVSLOT_*); same mapping BW_HideMissingSetPieces uses.
+		local slotName = sourceInfo and sourceInfo.itemID and addon.GetItemSlot(sourceInfo.itemID)
+		local invSlot = slotName and addon.Globals.INVENTORY_SLOT_NAMES[slotName]
+		if invSlot then
+			sources[invSlot] = primaryAppearance.appearanceID
+		end
 	end
 	return sources
 end
