@@ -2797,6 +2797,11 @@ function TransmogWardrobeSetsMixin:RefreshCameras()
 end
 
 function TransmogWardrobeSetsMixin:GetFirstMatchingSetID()
+	--Every visible card asks this on the same redraw and the scan is usable sets x slots of API
+	--calls; GetTime() is constant within a frame, so share one answer per frame.
+	if self.matchCacheTime == GetTime() then
+		return self.matchCacheSetID, self.matchCachePending;
+	end
 	local appliedSetID, hasPending;
 
 	local transmogInfo = self:GetCurrentTransmogInfoCallback();
@@ -2834,6 +2839,7 @@ function TransmogWardrobeSetsMixin:GetFirstMatchingSetID()
 		end
 	end
 
+	self.matchCacheTime, self.matchCacheSetID, self.matchCachePending = GetTime(), appliedSetID, hasPending;
 	return appliedSetID, hasPending;
 end
 
@@ -3293,6 +3299,23 @@ end
 
 BW_DressingRoomButtonMixin = {}
 
+--Blizzard hides an armor slot by assigning that slot's "hidden" appearance (the first entry of its
+--items list). A bare Hidden display type with no appearance ID does nothing for armor slots.
+local function BW_SetSlotHidden(location, weaponOption)
+	local categoryID = location:GetArmorCategoryID()
+	local appearances = categoryID and C_TransmogCollection.GetCategoryAppearances(categoryID, location:GetData()) or {}
+	for _, appearance in ipairs(appearances) do
+		if appearance.isHideVisual then
+			local ok, sources = pcall(CollectionWardrobeUtil.GetSortedAppearanceSources, appearance.visualID, categoryID, location)
+			local sourceID = ok and sources and sources[1] and sources[1].sourceID
+			if sourceID then
+				C_TransmogOutfitInfo.SetPendingTransmog(location:GetSlot(), location:GetType(), weaponOption or Enum.TransmogOutfitSlotOption.None, sourceID, Enum.TransmogOutfitDisplayType.Hidden)
+			end
+			return
+		end
+	end
+end
+
 local function BW_ApplyAutoHiddenSlots()
 	if not addon.UseBetterWardrobeUI then return end
 
@@ -3306,7 +3329,7 @@ local function BW_ApplyAutoHiddenSlots()
 				local slot, slotType = transmogLocation:GetSlot(), transmogLocation:GetType()
 				local outfitSlotInfo = C_TransmogOutfitInfo.GetViewedOutfitSlotInfo(slot, slotType, Enum.TransmogOutfitSlotOption.None)
 				if outfitSlotInfo and outfitSlotInfo.displayType ~= Enum.TransmogOutfitDisplayType.Hidden then
-					C_TransmogOutfitInfo.SetPendingTransmog(slot, slotType, Enum.TransmogOutfitSlotOption.None, Constants.Transmog.NoTransmogID, Enum.TransmogOutfitDisplayType.Hidden);
+					BW_SetSlotHidden(transmogLocation)
 				end
 			end
 		end
@@ -3339,7 +3362,7 @@ local function BW_HideMissingSlot(invSlot)
 	local slotName = addon.Globals.INVENTORY_SLOT_NAMES[invSlot]
 	local transmogLocation = slotName and TransmogUtil.GetTransmogLocation(slotName, Enum.TransmogType.Appearance, false)
 	if transmogLocation then
-		C_TransmogOutfitInfo.SetPendingTransmog(transmogLocation:GetSlot(), transmogLocation:GetType(), Enum.TransmogOutfitSlotOption.None, Constants.Transmog.NoTransmogID, Enum.TransmogOutfitDisplayType.Hidden);
+		BW_SetSlotHidden(transmogLocation)
 	end
 end
 
@@ -3379,10 +3402,6 @@ end
 addon.HideMissingSetPieces = BW_HideMissingSetPieces
 
 hooksecurefunc(C_TransmogOutfitInfo, "SetOutfitToSet", function(setID) C_Timer.After(0, function() BW_HideMissingSetPieces(setID) end) end)
-
-hooksecurefunc(TransmogWardrobeItemsMixin, "SelectVisual", function()
-	C_Timer.After(0, BW_ApplyAutoHiddenSlots)
-end)
 
 --Creates the various buttons used on the Collection Journal
 function addon:CreateButtons()

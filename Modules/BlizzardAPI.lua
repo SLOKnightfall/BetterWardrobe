@@ -221,7 +221,16 @@ end
 
 
 function addon.C_TransmogSets.GetUsableSets()
-	return addon.fullList
+	--Array, not the setID-keyed fullList: callers ipairs/sort it. Completed Blizzard sets only, like
+	--Blizzard's own -- GetFirstMatchingSetID feeds each setID to C_TransmogOutfitInfo, which knows
+	--nothing about extra-set IDs and would match them on every slot.
+	local sets = {}
+	for _, set in pairs(addon.fullList) do
+		if set.setType == "Blizzard" and set.collected then
+			tinsert(sets, set)
+		end
+	end
+	return sets
 end
 
 local function GetItemSlot(itemLinkOrID)

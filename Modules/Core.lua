@@ -1010,6 +1010,8 @@ end
 local defaults = {
 	profile = {
 		PartialLimit = 0,
+		ShowArmorSets = true,
+		ShowCosmeticSets = true,
 		ShowHidden = false,
 		TSM_Market = "DBMarket",
 		DR_HideBackground = false,
