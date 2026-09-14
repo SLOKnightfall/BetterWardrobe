@@ -170,6 +170,14 @@ function WardrobeCollectionFrameMixin:ClickTab(tab)
 end
 
 function WardrobeCollectionFrameMixin:SetTab(tabID)
+	--Sets/Extra Sets/Saved share one ScrollBox; RetainScrollPosition alone carries one tab's offset
+	--into the next tab's differently sized list. Remember and restore per tab instead.
+	local prevTab = self.selectedCollectionTab
+	local setsScrollBox = self.SetsCollectionFrame.ListContainer.ScrollBox
+	self.setsScrollMemory = self.setsScrollMemory or {}
+	if prevTab and prevTab ~= tabID and self.SetsCollectionFrame:IsShown() then
+		self.setsScrollMemory[prevTab] = setsScrollBox:GetScrollPercentage()
+	end
 	PanelTemplates_SetTab(self, tabID);
 	self.selectedCollectionTab = tabID;
 
@@ -280,7 +288,12 @@ function WardrobeCollectionFrameMixin:SetTab(tabID)
 		BetterWardrobeCollectionFrame.AlteredFormSwapButton:ClearAllPoints()
 		BetterWardrobeCollectionFrame.AlteredFormSwapButton:SetPoint("RIGHT", self.ClassDropdown, "LEFT", -2, 9)
 
+		local latestSource = C_TransmogSets.GetLatestSource()
 		self.SetsCollectionFrame:SetShown(true);
+		--OnShow scrolls to a newly collected set itself; only restore when it didn't.
+		if prevTab ~= tabID and latestSource == Constants.Transmog.NoTransmogID then
+			setsScrollBox:SetScrollPercentage(self.setsScrollMemory[tabID] or 0, true) --noInterpolation
+		end
 
 		local r
 
