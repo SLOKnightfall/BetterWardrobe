@@ -294,13 +294,23 @@ ColorPickerFrame:HookScript("OnShow", function()
 	end
 end)
 
+--ColorPickerFrame is one shared global frame. We anchor it beside the wardrobe while it's ours;
+--put it back at Blizzard's default (screen center) on close, or every later color picker in any
+--addon opens at that stale spot on top of whatever is there.
 ColorPickerFrame:HookScript("OnHide", function()
+	if addon.colorPickerIsOurs then
+		ColorPickerFrame:ClearAllPoints()
+		ColorPickerFrame:SetPoint("CENTER", UIParent, "CENTER", 0, 0)
+		ColorPickerFrame.Content.ColorSwatchOriginal:Show()
+	end
 	addon.colorPickerIsOurs = false
 	ColorPickerFrame:SetHeight(COLORPICKER_ORIGINAL_HEIGHT)
 	if swatchContainer then
 		swatchContainer:Hide()
 	end
 end)
+--Beside a screen-filling transmog frame there is often no room to the right; keep it on screen.
+ColorPickerFrame:SetClampedToScreen(true)
 
 function addon.Init:InitFilterButtons()
 	local frame = CreateFrame("Button", nil, BetterWardrobeCollectionFrame.ItemsCollectionFrame)
