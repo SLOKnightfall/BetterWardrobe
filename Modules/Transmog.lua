@@ -3403,6 +3403,45 @@ addon.HideMissingSetPieces = BW_HideMissingSetPieces
 
 hooksecurefunc(C_TransmogOutfitInfo, "SetOutfitToSet", function(setID) C_Timer.After(0, function() BW_HideMissingSetPieces(setID) end) end)
 
+--Right-click on a character slot: Blizzard's own handler reverts a pending change and does nothing
+--otherwise. Second right-click (nothing to revert) sets the slot to Hidden. Slot buttons come from a
+--frame pool filled on first show, so hooking the mixin here reaches every slot.
+local BW_RevertedSlots = {}
+hooksecurefunc(C_TransmogOutfitInfo, "RevertPendingTransmog", function(slot) BW_RevertedSlots[slot] = true end)
+hooksecurefunc(TransmogAppearanceSlotMixin, "OnClick", function(self, buttonName)
+	local slotData = self.slotData
+	local location = slotData and slotData.transmogLocation
+	local slot = location and location:GetSlot()
+	local reverted = slot and BW_RevertedSlots[slot]
+	wipe(BW_RevertedSlots)
+	if buttonName ~= "RightButton" then return end
+	local info = self:GetSlotInfo()
+	if not location or not location:IsAppearance() then return end
+	if reverted or C_TransmogOutfitInfo.IsSlotWeaponSlot(slot) then return end
+	if not info or info.displayType == Enum.TransmogOutfitDisplayType.Hidden then return end
+
+	BW_SetSlotHidden(location, slotData.currentWeaponOptionInfo.weaponOption)
+	self:OnSelect()
+end)
+
+--Linked shoulders: with "transmog each shoulder separately" off, the UI only ever addresses
+--ShoulderRight, which left the second shoulder untouched on a clear, revert or hide. Mirror every
+--change to ShoulderLeft while they are linked; split mode addresses each slot itself.
+local function BW_ShouldersLinked(slot)
+	return slot == Enum.TransmogOutfitSlot.ShoulderRight and not C_TransmogOutfitInfo.GetSecondarySlotState(slot)
+end
+hooksecurefunc(C_TransmogOutfitInfo, "SetPendingTransmog", function(slot, slotType, option, transmogID, displayType)
+	if BW_ShouldersLinked(slot) then
+		C_TransmogOutfitInfo.SetPendingTransmog(Enum.TransmogOutfitSlot.ShoulderLeft, slotType, option, transmogID, displayType)
+	end
+end)
+hooksecurefunc(C_TransmogOutfitInfo, "RevertPendingTransmog", function(slot, slotType, option)
+	if BW_ShouldersLinked(slot) then
+		C_TransmogOutfitInfo.RevertPendingTransmog(Enum.TransmogOutfitSlot.ShoulderLeft, slotType, option)
+	end
+end)
+
+
 --Creates the various buttons used on the Collection Journal
 function addon:CreateButtons()
 	--Load Queue Button
