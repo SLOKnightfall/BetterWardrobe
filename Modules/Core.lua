@@ -2046,10 +2046,12 @@ function addon:EventHandler(event, ...)
 
 	elseif (event == "TRANSMOG_COLLECTION_SOURCE_ADDED") then
 		local sourceID = ...
+		addon.MarkExtraSetSource(sourceID, true)
 		addon:AnnounceCollectionUpdate(sourceID)
 
 	elseif (event == "TRANSMOG_COLLECTION_SOURCE_REMOVED") then
 		local x = ...
+		addon.MarkExtraSetSource(x, false)
 		BetterWardrobeCollectionFrameMixin:OnEvent(event, x)
 	end
 end
