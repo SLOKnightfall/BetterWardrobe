@@ -97,7 +97,34 @@ function addon.C_TransmogSets.GetSetPrimaryAppearances(setID)
 	end
 end
 
+--Extra/saved sets have no Blizzard-side "latest source" tracking, so we keep our own, set
+--whenever TRANSMOG_COLLECTION_SOURCE_ADDED fires (Core.lua's EventHandler) and cleared the same
+--way Blizzard clears its own (viewing the Sets tab, or the collection updating).
+addon.extraSetsLatestSource = nil
+
+--Reverse lookup, extra-sets side of IsSetItem: which extra set(s) a sourceID's appearance
+--belongs to, in the same {setID=..., name=...} shape AnnounceCollectionUpdate already consumes.
+local function GetExtraSetsContainingSourceID(sourceID)
+	local sourceInfo = sourceID and C_TransmogCollection.GetSourceInfo(sourceID)
+	local setData = sourceInfo and addon.IsSetItem(sourceInfo.itemID)
+	if not setData then return {} end
+
+	local setIDs = {}
+	for _, data in pairs(setData) do
+		tinsert(setIDs, data.setID)
+	end
+	return setIDs
+end
+
+local function ExtraSetContainsSource(setID, sourceID)
+	for _, containingSetID in ipairs(GetExtraSetsContainingSourceID(sourceID)) do
+		if containingSetID == setID then return true end
+	end
+	return false
+end
+
 function addon.C_TransmogSets.ClearLatestSource()
+	addon.extraSetsLatestSource = nil
 	C_TransmogSets.ClearLatestSource()
 end
 
@@ -106,9 +133,7 @@ function addon.C_TransmogSets.GetSetsContainingSourceID(latestSource)
 	if tab == 2 then
 		return C_TransmogSets.GetSetsContainingSourceID(latestSource)
 	else
-
-	--todo:  extrasets	
-	return 
+		return GetExtraSetsContainingSourceID(latestSource)
 	end
 end
 function addon.C_TransmogSets.SetHasNewSourcesForSlot(setID, transmogSlot)
@@ -116,9 +141,11 @@ function addon.C_TransmogSets.SetHasNewSourcesForSlot(setID, transmogSlot)
 	if tab == 2 then
 		return C_TransmogSets.SetHasNewSourcesForSlot(setID, transmogSlot)
 	else
+		local newSource = addon.extraSetsLatestSource
+		if not newSource or not ExtraSetContainsSource(setID, newSource) then return false end
 
-	--todo:  extrasets	
-	return false
+		local sourceInfo = C_TransmogCollection.GetSourceInfo(newSource)
+		return sourceInfo ~= nil and C_Transmog.GetSlotForInventoryType(sourceInfo.invType) == transmogSlot
 	end
 end
 
@@ -127,7 +154,7 @@ function addon.C_TransmogSets.GetLatestSource()
 	if tab == 2 then
 		return C_TransmogSets.GetLatestSource()
 	else
-	--todo:  extrasets		
+		return addon.extraSetsLatestSource or Constants.Transmog.NoTransmogID
 	end
 end
 
@@ -142,8 +169,11 @@ function addon.C_TransmogSets.GetSetNewSources(setID)
 		return C_TransmogSets.GetSetNewSources(setID)
 
 	else
-	--todo:  extrasets	
-	return {}	
+		local newSource = addon.extraSetsLatestSource
+		if newSource and ExtraSetContainsSource(setID, newSource) then
+			return { newSource }
+		end
+		return {}
 	end
 end
 
@@ -155,8 +185,8 @@ function addon.C_TransmogSets.SetHasNewSources(setID)
 	if SetsData.setType == "Blizzard" then
 		return C_TransmogSets.SetHasNewSources(setID)
 	else
-		--TODO: extra/saved sets have no "new source" tracking table yet; safe stub.
-		return false
+		local newSource = addon.extraSetsLatestSource
+		return newSource ~= nil and ExtraSetContainsSource(setID, newSource)
 	end
 end
 

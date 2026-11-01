@@ -2046,7 +2046,22 @@ function addon:EventHandler(event, ...)
 
 	elseif (event == "TRANSMOG_COLLECTION_SOURCE_ADDED") then
 		local sourceID = ...
+		-- Mirrors Blizzard's own single-slot "latest source" tracking (C_TransmogSets.GetLatestSource)
+		-- for extra/saved sets, which have no such tracking of their own.
+		addon.extraSetsLatestSource = sourceID
 		addon:AnnounceCollectionUpdate(sourceID)
+
+		-- Extra/recolor sets' isCollected/sources snapshot (BuildArmorDB, Data/DataBase.lua) is only
+		-- ever rebuilt at login or on a filter/class/armor-type change -- never on a collection
+		-- change -- so a set can sit "missing" a piece the player already owns until they happen to
+		-- touch a filter. Debounced so looting/learning several pieces in a burst rebuilds once.
+		if not addon.pendingArmorDBRebuild then
+			addon.pendingArmorDBRebuild = true
+			C_Timer.After(1, function()
+				addon.pendingArmorDBRebuild = false
+				addon.Init:BuildDB()
+			end)
+		end
 
 	elseif (event == "TRANSMOG_COLLECTION_SOURCE_REMOVED") then
 		local x = ...

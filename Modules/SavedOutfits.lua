@@ -526,6 +526,11 @@ function BetterWardrobeOutfitManager:DeleteOutfit(outfitID)
 	--addon.setdb.global.sets[addon.setdb:GetCurrentProfile()] = addon.GetSavedList()
 	-----addon.setdb.global.sets[addon.setdb:GetCurrentProfile()] = addon.StoreBlizzardSets();
 	TransmogFrame.WardrobeCollection.TabContent.BW_ExtraSetsFrame:RefreshCollectionEntries()
+	-- The custom-sets collection (vendor's own outfit cards) caches each card's customSetID as a
+	-- raw index into addon.OutfitDB.char.outfits. The tremove above shifts every later outfit's
+	-- position down by one, so without this refresh a still-displayed card can hold a now-stale
+	-- index and crash (ipairs on nil) the next time something re-renders it, e.g. a tab switch.
+	TransmogFrame.WardrobeCollection.TabContent.CustomSetsFrame2:RefreshCollectionEntries()
 
 	addon:SendMessage("BW_TRANSMOG_COLLECTION_UPDATED");
 end

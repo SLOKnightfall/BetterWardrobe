@@ -593,7 +593,7 @@ do
 					local subSetBaseID;
 					local subName = gsub(data.name, " %(Recolor%)", "")
 					data.name = subName
-					if data.note == data.note == "NOTE_119" or data.note == "NOTE_120" or data.note == "NOTE_121" or data.note == "NOTE_123"   then
+					if data.note == "NOTE_119" or data.note == "NOTE_120" or data.note == "NOTE_121" or data.note == "NOTE_123"   then
 						data.customGroups = data.label
 					elseif data.note == "NOTE_44" or data.note == "NOTE_45" then
 						data.customGroups =  data.label.."-"..subName--data.armorType

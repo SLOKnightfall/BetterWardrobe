@@ -2504,6 +2504,12 @@ function TransmogCustomSetModelMixin:UpdateSet()
 
 	else
 		local customSetTransmogInfo = addon.OutfitDB.char.outfits[self.elementData.customSetID]
+		-- customSetID here is a raw index into addon.OutfitDB.char.outfits, cached on the card at
+		-- build time. Deleting an earlier outfit shifts that array, so a card that hasn't been
+		-- rebuilt yet can hold a now-stale index -- guard rather than crash on the next render.
+		if not customSetTransmogInfo then
+			return;
+		end
 		for slotID, itemTransmogInfo in ipairs(customSetTransmogInfo) do
 			if itemTransmogInfo then
 				local itemTransmogInfo2 = ItemUtil.CreateItemTransmogInfo(itemTransmogInfo);
